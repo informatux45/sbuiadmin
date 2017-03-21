@@ -1,0 +1,8 @@
+/* --- News style Breadcrumb --- */
+
+.sbgraduates_breadcrumb_header {width: 100%; border-bottom: 1px solid #eee; margin: 5px 0px 20px 0px; padding: 0;}
+.sbgraduates_breadcrumb_title {font-size: 15px; font-weight: bold; color: black; padding: 0px;}
+.sbgraduates_breadcrumb_name {font-size: 12px; font-weight: bold; color: black;}
+.sbgraduates_breadcrumb_name a {font-size: 12px; font-weight: bold; color: gray;}
+.sbgraduates_breadcrumb_home {width: 100%; line-height: 18px; font-weight: normal; font-size: 15px; color: black; background-color: silver; padding: 3px;}
+.sbgraduates_breadcrumb_offline {font-size: 15px; font-weight: bold; color: black; padding: 0px 0px 12px 0px;}

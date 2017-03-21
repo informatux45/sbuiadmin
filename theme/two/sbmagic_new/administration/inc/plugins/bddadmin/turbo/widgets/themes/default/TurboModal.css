@@ -1,0 +1,16 @@
+.turbo-modal {
+	position: absolute;
+	background-color: #EBEADB;
+	text-align:center;
+	border: 2px solid black;
+	z-index: 1001;
+}
+
+.turbo-modal-bg {
+	z-index: 1000;
+	position: absolute;
+	background-color: white;
+	border: 0px;
+	left: 0px;
+	top: 0px;
+}

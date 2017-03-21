@@ -1,0 +1,90 @@
+.turbo_table
+{
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
+
+.turbo_table td 
+{
+	vertical-align: top;
+}
+
+.turbo_table table 
+{
+	empty-cells: show;
+	border-collapse: collapse;
+}
+
+.turbo_tableDta 
+{
+	/*overflow: auto;*/
+}
+
+.turbo_tableDta td 
+{
+	border: solid 1px #F1EFE2;
+	border-left-style: none;
+	border-top-style: none;
+	padding: 2px;
+	padding-left: 6px;
+}
+
+.turbo_tableDta td div
+{
+	overflow: hidden;
+}
+
+.turbo_tableRow0 
+{
+	background-color: white;
+}
+
+.turbo_tableRow1 
+{
+	background-color: #FCFAF6;
+}
+
+.turbo_tableRowOver 
+{
+	background-color: #E2F3FC;
+}
+
+.turbo_tableSelected 
+{
+	background-color: #0033CC;
+	color: white;
+}
+
+.turbo_tableEditing 
+{
+	background-color: #CCFFCC;
+}
+
+.turbo_tableDta input 
+{
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	padding: 0px;
+	margin: 0px;
+}
+
+.turbo_tableDta textarea
+{
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	padding: 0px;
+	margin: 0px;
+	border: 0px solid white;
+	overflow: auto;
+}
+
+.turbo_tableDta select
+{
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	padding: 0px;
+	margin: 0px;
+	width: 100%;
+	height: 100%;
+	border: 0px solid white;
+}

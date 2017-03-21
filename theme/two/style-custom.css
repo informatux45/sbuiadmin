@@ -1,0 +1,134 @@
+/* $$$$$$$$$$$$$$$$$$$$$$ */
+/* Update CSS Style theme */
+/* $$$$$$$$$$$$$$$$$$$$$$ */
+
+h1, h2, h3, h4, h5 {margin: 20px 0 40px;}
+h1 {font-size: 2em}
+h2 {font-size: 1.7em}
+h3 {font-size: 1.4em}
+h4 {font-size: 1.2em}
+h5 {font-size: 1em}
+
+/* ================================== */
+/* === Responsive header / footer === */
+/* ================================== */
+.responsive-header {
+	background: white;
+}
+#responsive-footer {
+	display: none;
+}
+@media screen and (max-width: 991px) {
+	.responsive-header-logo {
+		border: 0 none;
+		max-width: 200px;
+		width: 100%;
+		padding: 20px 0;
+	}
+	.toggle-menu {
+		margin-top: 0px;
+	}
+	.main-content, .banner-bg {
+		width: 100% !important;
+	}
+	#responsive-footer {
+		display: block;
+	}
+}
+
+/* ==================== */
+/* === Sidebar left === */
+/* ==================== */
+.sidebar-menu {
+	background-color: white;
+	color: black;
+	float: left;
+	height: 100%;
+	overflow-y: hidden;
+	position: fixed;
+	width: 17%;
+	box-shadow: 1px 1px 10px 2px rgba(0, 0, 0, 0.5);
+	z-index: 10000;
+}
+.profile-image {
+	height: auto;
+	margin-bottom: 20px;
+	overflow: hidden;
+	width: auto;
+	border-radius: 0;
+	border: none;
+}
+.top-section h3, .top-section p {
+	display: none;
+}
+.top-section {
+	padding: 50px;
+}
+.main-content, .banner-bg {
+	float: right;
+	width: 83%;
+}
+/* --- Bottom infos --- */
+.sidebar-bottom-section {
+	bottom: 0;
+	margin-bottom: 10px;
+	position: absolute;
+	text-align: center;
+	width: 100%;
+	line-height: 1.2em;
+	font-size: 0.9em;
+	font-weight: 100;
+	font-family: 'Questrial', serif;
+}
+/* --- Menu --- */
+.main-navigation {
+	margin: 0;
+}
+.main-navigation li {
+	border-top: 1px solid #f2f2f2;
+}
+.main-navigation a.active, .responsive-menu a.active {
+	background: none !important;
+}
+.main-navigation li:last-child {
+    border-bottom: 1px solid #f2f2f2;
+}
+.main-navigation li a, .responsive-menu li a {
+	text-align: center;
+	font-family: 'Playfair Display', serif;
+	text-transform: uppercase;
+	font-size: 1.2em;
+	padding: 10px 40px;
+	color: #575656;
+	letter-spacing: 0.1em;
+}
+.main-navigation li a.active, .responsive-menu li a.active {
+	color: #2c5f8e;
+	border-right: 3px solid #2c5f8e;
+	margin-left: -3px;
+	background: none;
+}
+.navigation li a, .responsive-menu li a {
+	color: #171717;
+	text-align: center;
+}
+.main-navigation li a:hover, .main-navigation li a.active:hover, .responsive-menu li a:hover, .responsive-menu li a.active:hover {
+	color: #2c5f8e;
+	margin-left: -3px;
+	border-right: 3px solid #2c5f8e;
+	background: none !important;
+}
+/* --- Social icons --- */
+.social-icons ul, .social-icons li {
+	text-align: center;	
+}
+.social-icons li a {
+	color: lightgrey;
+}
+.social-icons {
+	padding-top: 30px;
+}
+/* --- Banner --- */
+.banner-bg {
+	padding: 0;
+}

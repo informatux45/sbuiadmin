@@ -1,0 +1,52 @@
+<script>
+	dojo.addOnLoad(tda.sql.init);
+</script>
+<div id="sqlExecutePanel" turboalign="client">
+	<div id="sqlToolbar" turboalign="top" dojoType="TurboToolbar">
+		<input value="Execute SQL" id="sqlExecuteBtn" onclick="tda.sql.sqlExecute()" image="table_sql_run.gif" dojoType="TurboToolbtn" type="button"/> 
+		<input value="Clear" id="sqlClearBtn" onclick="tda.sql.clear()" image="table2.gif" dojoType="TurboToolbtn" type="button"/> 
+		<select id="sqlSelect" style="margin: 4px; padding: 2px; width: 150px;" onchange="tda.sql.saves.loadSql();"><option>[Saved Queries]</option></select>
+		Save as:<input type="text" id="sqlEdit" style="margin: 4px; padding: 2px; width: 150px;">
+		<input value="Save" id="sqlSaveBtn" onclick="tda.sql.saves.commitSql()" image="save.gif" dojoType="TurboToolbtn" type="button"/>
+		<input value="Delete" id="sqlDeleteBtn" onclick="tda.sql.saves.deleteSql()" image="delete.gif" dojoType="TurboToolbtn" type="button"/> 						
+	</div>
+	<div id="sqlInput" turboalign="top" style="height: 100px;">
+		<textarea turboalign="client" id="sqlText" style="margin: 4px; padding: 2px; overflow: auto;"></textarea>
+	</div>
+	<div id="sqlResultsSplitter" turboalign="top" dojoType="TurboSplitter"></div>
+	<div id="sqlResults" turboalign="client">
+		<div turboalign="client">
+			<div turboalign="client" class="noscroll">
+				<div dojoType="TurboGrid" id="sql"></div>
+			</div>
+			<div turboalign="bottom" style="height: 28px;">
+				<div style="display: none; border: 1px solid silver; padding: 2px;" turboalign="client">
+					<div id="sqlPageButtons" dojoType="TurboPageButtons" onPageChange="tda.sql.pageControl.change()" numButtons="10"></div>
+				</div>
+				<div style="display: none; border: 1px solid silver; padding: 12px 8px 4px 8px;" turboalign="client">
+					<div turboalign="client" id="sqlPageSlider" dojoType="TurboSlider" change="tda.sql.pageControl.change()" changing="tda.sql.pageControl.changing()" snap="true"></div>
+				</div>
+				<div turboalign="right" id="sqlPageInfo" style="width: 164px; padding: 8px; border: 1px solid silver;"></div>
+			</div>
+		</div>
+		<div turboalign="bottom" style="padding: 2px 2px 2px 6px;">
+			<div id="sqlExportOptions" style="font-size: small;">
+				<div style="line-height: 26px; padding: 3px;">
+					<form style="display: inline">
+						<label><input type="radio" id="sqlExportHtml" name="sqlExportFormat" value="html" checked="checked">HTML</label>
+						<label><input type="radio" id="sqlExportCsv" name="sqlExportFormat" value="csv">CSV</label>
+					</form>
+					&nbsp;&nbsp;&nbsp;<input value="Export" width="120" id="sqlExportBtn" onclick="tda.sql.exprt.doExport()" image="data_out.gif" dojoType="TurboButton" type="button"/>  
+				</div>	
+			</div>	
+		</div>
+	</div>	
+</div>
+<div id="sqlExportResultsPanel" turboalign="client" style="display: none">
+	<div turboalign="bottom" style="padding: 6px 2px 10px 6px;">
+		<input value="Back" width="96" id="sqlResetExportBtn" onclick="tda.sql.exprt.resetExport()" image="back.gif" dojoType="TurboButton" type="button"/>
+		<input value="Render" width="108" id="sqlRenderExportBtn" onclick="tda.sql.exprt.doRender()" image="replace2.gif" dojoType="TurboButton" type="button"/>	
+	</div>
+	<textarea turboalign="client" id="sqlExportText" style="margin: 4px; padding: 2px; overflow: auto;"></textarea>
+	<div turboalign="client" id="sqlExportRendered" style="display: none; padding: 8px; overflow: auto; font-size: small;"></div>
+</div>

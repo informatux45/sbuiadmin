@@ -1,0 +1,15 @@
+.turbo_sliderH2OLeft {
+	background-image: url(images/turbo_sliderH2OBar.gif); 
+	height:5px;
+}
+
+.turbo_sliderH2ORight {
+	background-image: url(images/turbo_sliderH2OBar.gif); 
+}
+
+.turbo_sliderH2OThumb {
+	background-image: url(images/turbo_sliderH2OThumb.gif); 
+	top: -7px;
+	width: 19px; 
+	height: 19px;
+}

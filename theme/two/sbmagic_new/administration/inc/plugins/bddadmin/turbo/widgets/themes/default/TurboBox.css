@@ -1,0 +1,61 @@
+.turbo_box { 
+	padding: 0 14px 18px 0;
+}
+
+.turbo_box_left, .turbo_box_right, .turbo_box_bottom, .turbo_box_bottom_right {
+	background-image: url(images/turbo_box_yellow.gif);
+	background-repeat: no-repeat;
+}
+
+.turbo_box_left_yellow, .turbo_box_right_yellow, .turbo_box_bottom_yellow, .turbo_box_bottom_right_yellow {
+	background-image: url(images/turbo_box_yellow.gif);
+	background-repeat: no-repeat;
+}
+
+.turbo_box_left_red, .turbo_box_right_red, .turbo_box_bottom_red, .turbo_box_bottom_right_red {
+	background-image: url(images/turbo_box_red.gif);
+	background-repeat: no-repeat;
+}
+
+.turbo_box_left_green, .turbo_box_right_green, .turbo_box_bottom_green, .turbo_box_bottom_right_green {
+	background-image: url(images/turbo_box_green.gif);
+	background-repeat: no-repeat;
+}
+
+.turbo_box_left, .turbo_box_left_yellow, .turbo_box_left_red, .turbo_box_left_green {
+	background-position: left top;
+	position: relative;
+	height: 100%; 
+}
+
+.turbo_box_right, .turbo_box_right_yellow, .turbo_box_right_red, .turbo_box_right_green {
+	background-position: right top;
+	position: relative;
+	right: -14px;
+	padding-right: 14px;
+	height: 100%;
+}
+
+.turbo_box_content, .turbo_box_content_yellow, .turbo_box_content_red, .turbo_box_content_green {
+	margin-right: 14px;
+}
+
+.turbo_box_header, .turbo_box_header_yellow, .turbo_box_header_red, .turbo_box_header_green {
+	line-height: 27px;
+	font-weight: bold;
+}
+
+.turbo_box_bottom, .turbo_box_bottom_yellow, .turbo_box_bottom_red, .turbo_box_bottom_green {
+	background-position: left bottom;
+	position: relative;
+	top: 14px;
+}
+
+.turbo_box_bottom_right, .turbo_box_bottom_right_yellow, .turbo_box_bottom_right_red, .turbo_box_bottom_right_green {
+	background-position: right bottom;
+	position: relative;
+	right: -14px;
+	margin: -14px 0 0 14px;
+	height: 14px;
+	overflow: hidden;
+}

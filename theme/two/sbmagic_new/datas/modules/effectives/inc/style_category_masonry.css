@@ -1,0 +1,49 @@
+/* --- Items Category: module_show => masonry --- */
+.sbeffectives {
+	box-shadow: 2px 2px 5px 1px lightgrey;
+	display: block;
+	padding: 20px;
+	position: relative;
+	overflow: hidden;
+	margin: 0 20px 20px 0px;
+}
+
+.sbeffectives-div-l {
+	margin: 0 0 10px 0;
+	width: 100%;
+}
+
+.sbeffectives-div-l img {
+	border: 1px solid #eee;
+}
+
+.sbeffectives-div-r {
+	font-family: Lato,Arial,Tahoma,sans-serif;
+	font-size: 1em;
+	font-weight: 300;
+	line-height: 1.5em;
+	margin: 0;
+	width: 100%;
+	text-align: center;
+}
+
+.sbeffectives-info {
+	margin-bottom: 20px;
+}
+
+.sbeffectives-p {
+	margin-bottom: 40px;
+}
+
+.sbeffectives-link-item {
+	bottom: 0;
+	right: 0;
+	position: absolute;
+	display: block;
+	margin: 0 22px 22px;
+}
+
+.sbeffectives-clear-both {
+	clear: both;
+	display: block;
+}

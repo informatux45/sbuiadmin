@@ -1,0 +1,19 @@
+<div turboAlign="top" dojoType="TurboToolbar">
+	<input value="Refresh" id="schemaRefreshButton" onclick="tda.app.refresh()" image="server.gif" dojoType="TurboToolbtn" type="button"/>
+	<!--<input value="|" state="disabled" dojoType="TurboToolbtn" type="button"/>
+	<input value="Locked" id="schemaLockedBtn" toggle="toggle" onclick="tda.app.lockedClick(this);" image="lock.gif" dojoType="TurboToolbtn" type="button"/>-->
+	<!--<input value="Browse" id="schemaBrowseBtn" group="SchemaEdit" onclick="tda.app.browseClick();" image="data_sm.gif" dojoType="TurboToolbtn" type="button"/>
+	<input value="Edit" id="schemaEditBtn" group="SchemaEdit" state="down" onclick="tda.app.editClick();" width="50" image="data_edit.gif" dojoType="TurboToolbtn" type="button"/>-->
+	<input value="|" id="sep3" state="disabled" dojoType="TurboToolbtn" type="button"/>
+	<input value="Add Column" id="addColumnBtn" onclick="tda.schema.addRow()" image="column_add.gif" dojoType="TurboToolbtn" type="button"/>
+	<input value="Remove Column(s)" id="deleteColumnsBtn" onclick="tda.schema.deleteColumns()" state="disabled" image="column_delete.gif" dojoType="TurboToolbtn" type="button"/>
+	<input value="|" id="sep4" state="disabled" dojoType="TurboToolbtn" type="button"/>
+	<input value="Move Up" id="moveUpBtn" onclick="tda.schema.moveUp()" image="nav_up_blue.gif" dojoType="TurboToolbtn" type="button"/>
+	<input value="Move Down" id="moveDownBtn" onclick="tda.schema.moveDown()" image="nav_down_blue.gif" dojoType="TurboToolbtn" type="button"/>
+	<input value="|" id="sep5" state="disabled" dojoType="TurboToolbtn" type="button"/>
+	<input value="Apply Edit" id="schemaApplyBtn" onclick="tda.schema.applyEdit()" state="disabled" image="table_edit.gif" dojoType="TurboToolbtn" type="button"/>
+	<input value="Cancel Edit" id="schemaCancelBtn" onclick="tda.schema.cancelEdit()" state="disabled" image="table_drop.gif" dojoType="TurboToolbtn" type="button"/>
+</div>
+<div turboAlign="client" class="noscroll">
+	<div dojoType="TurboGrid" widgetId="schema" onSelectionChange="tda.schema.selectionChange()"></div>
+</div>

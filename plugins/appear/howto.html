@@ -1,0 +1,31 @@
+<article>
+
+<p>Check <a href="../plugins/appear/demo/appear.html" target="_blank">demo page</a>!</p>
+
+<p>This plugin can be used to prevent unnecessary processeing for content that is hidden or is outside of the browser viewport.</p>
+
+<p>It implements a custom <em>appear</em>/<em>disappear</em> events which are fired when an element became visible/invisible in the browser viewport.</p>
+
+<pre>$('someselector').appear(); // It supports optional hash with "force_process" and "interval" keys. Check source code for details.
+
+$('&lt;div&gt;test&lt;/div&gt;').appear(); // It also supports raw DOM nodes wrapped in jQuery.
+
+$('someselector').on('appear', function(event, $all_appeared_elements) {
+   // this element is now inside browser viewport
+});
+$('someselector').on('disappear', function(event, $all_disappeared_elements) {
+   // this element is now outside browser viewport
+});
+</pre>
+
+<p>If you want to fire <em>appear</em> event for elements which are close to viewport but are not visible yet, you may add data attributes <em>appear-top-offset</em> and <em>appear-left-offset</em> to DOM nodes.</p>
+
+<pre>&lt;div class="postloader" data-appear-top-offset="600"&gt;...&lt;/div&gt; # appear will be fired when an element is below browser viewport for 600 or less pixels</pre>
+
+<p>Appear check can be forced by calling <em>$.force_appear()</em>. This is suitable in cases when page is in initial state (not scrolled and not resized) and when you want manually trigger appearance check.</p>
+
+<p>Also this plugin provides custom jQuery filter for manual checking element appearance.</p>
+
+<pre>$('someselector').is(':appeared');</pre>
+
+</article>

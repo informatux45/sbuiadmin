@@ -1,0 +1,41 @@
+<script>
+	dojo.addOnLoad(tda.exprt.init);
+</script>
+<div id="exportSetupPanel" turboAlign="client">
+	<div turboAlign="top" id="exportGridToolbar" dojoType="TurboToolbar" style="height: 23px">
+		<div turboAlign="client" style="padding: 2px 0 4px 56px; font-size: 12px">
+			<img src="images/pointer.gif" width="38" height="23" align="absmiddle" />&nbsp;&nbsp;<a href="javascript:tda.exprt.markNoneAll(true)">All</a>&nbsp;&nbsp;<a href="javascript:tda.exprt.markNoneAll(false)">None</a>
+		</div>	
+	</div>
+	<div turboAlign="client" class="noscroll">
+		<div dojoType="TurboGrid" id="exprt"></div>
+	</div>
+	<div turboAlign="bottom" style="padding: 2px 2px 2px 6px;">
+		<div id="exportOptions" style="font-size: small;">
+			<div style="line-height: 26px; padding-bottom: 4px;">
+				Export:
+				<form style="display: inline">
+					<label><input type="radio" id="exportSql" name="exportFormat" value="sql" checked="checked">SQL</label>
+					<label><input type="radio" id="exportSqlSchema" name="exportFormat" value="sqlSchema">SQL schema only</label>
+					<label><input type="radio" id="exportHtml" name="exportFormat" value="html">HTML</label>
+					<label><input type="radio" id="exportCsv" name="exportFormat" value="csv">CSV</label>
+				</form>	
+				<br />
+				<label>Database Prefix: <input type="text" id="exportDbPrefix" value="" style="width: 120px"></label>
+				<label>Table Prefix: <input type="text" id="exportTablePrefix" value="" style="width: 120px"></label>	
+				<div style="padding: 4px 0 8px 0;">
+					<input value="Export" width="120" id="exportBtn" onclick="tda.exprt.doExport()" image="data_out.gif" dojoType="TurboButton" type="button"/>  
+				</div>	
+			</div>	
+		</div>	
+	</div>	
+</div>	
+
+<div id="exportResultsPanel" turboAlign="client" style="display: none">
+	<div turboAlign="bottom" style="padding: 6px 2px 10px 6px;">
+		<input value="Back" width="96" id="resetExportBtn" onclick="tda.exprt.resetExport()" image="back.gif" dojoType="TurboButton" type="button"/>
+		<input value="Render" width="108" id="renderExportBtn" onclick="tda.exprt.doRender()" image="replace2.gif" dojoType="TurboButton" type="button"/>	
+	</div>
+	<textarea turboAlign="client" id="exportText" style="margin: 4px; padding: 2px; overflow: auto;"></textarea>
+	<div turboAlign="client" id="exportRendered" style="display: none; padding: 8px; overflow: auto; font-size: small;"></div>
+</div>

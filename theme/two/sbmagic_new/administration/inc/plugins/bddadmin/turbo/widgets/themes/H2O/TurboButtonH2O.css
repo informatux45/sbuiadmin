@@ -1,0 +1,49 @@
+.turbo-buttonH2O {
+}
+
+.turbo-buttonH2O button {
+	height: 26px;
+	line-height: 26px;
+}
+
+.turbo-buttonH2O .turbo-button-mid {
+	background-image:url(images/turbo_btnH2OMid.gif);
+}
+
+.turbo-buttonH2O .turbo-button-mid-over {
+	background:url(images/turbo_btnH2OMidHi.gif);
+}
+
+.turbo-buttonH2O .turbo-button-mid-down {
+	background-image:url(images/turbo_btnH2OMidDown.gif);
+}
+
+.turbo-buttonH2O .turbo-button-left {
+	width: 12px;
+	background: url(images/turbo_btnH2O.gif);
+}
+
+.turbo-buttonH2O .turbo-button-left-over {
+	width: 12px;
+	background: url(images/turbo_btnH2O.gif) -24px;
+}
+
+.turbo-buttonH2O .turbo-button-left-down {
+	width: 12px;
+	background: url(images/turbo_btnH2O.gif) -48px;
+}
+
+.turbo-buttonH2O .turbo-button-right {
+	width: 12px;
+	background: url(images/turbo_btnH2O.gif) -12px;
+}
+
+.turbo-buttonH2O .turbo-button-right-over {
+	width: 12px;
+	background: url(images/turbo_btnH2O.gif) -36px;
+}
+
+.turbo-buttonH2O .turbo-button-right-down {
+	width: 12px;
+	background: url(images/turbo_btnH2O.gif) -60px;
+}

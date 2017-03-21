@@ -1,0 +1,64 @@
+body {
+	margin: 0px 40px 8px 40px;
+	background-color: white;
+  	font-family: Geneva, Arial, Helvetica, sans-serif;
+	font-size: small;
+}
+
+a, a:link, a:visited, a:active {
+	font-weight: bold;
+	text-decoration: none;
+	color: navy;
+}
+
+a .section {
+	/*color: white;*/
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+div {
+	padding: 10px;
+}
+
+.section_head {
+	padding: 4px 6px 4px 6px;
+	margin: 10px 0 2px 0;
+	font-weight: bold;
+	font-size: medium;
+	background:#EBEBEB;
+	/*
+	color: white;
+	background: navy;
+	*/
+}
+
+li {
+	padding: 3px;
+}
+
+ol, ul {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+.toc li {
+	padding: 2px;
+}
+
+
+.section_content {
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+.right {
+	float: right;
+	margin-top: -10px;
+}
+
+a.hl, a.hl:link, a.hl:visited, a.hl:active {
+/*	color: white; */
+}

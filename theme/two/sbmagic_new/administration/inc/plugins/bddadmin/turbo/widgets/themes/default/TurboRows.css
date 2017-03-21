@@ -1,0 +1,48 @@
+.turbo_rows
+{
+	/*
+	position: relative;
+	*/
+	overflow: hidden;
+}
+
+.turbo_rows div
+{
+	/*
+	position: relative;
+	*/
+}
+
+.turbo_rows_row
+{
+	/*
+	position: relative;
+	height: 20px;
+	*/
+}
+
+/*
+.turbo_rows_even 
+{
+	background-color: white;
+}
+
+.turbo_rows_odd
+{
+	background-color: #FCFAF6;
+}
+
+.turbo_rows_over
+{
+	background-color: #E2F3FC;
+}
+*/
+
+.turbo_rows_selected
+{
+	/*
+	position: relative;
+	*/
+	background-color: #0033CC;
+	color: white;
+}

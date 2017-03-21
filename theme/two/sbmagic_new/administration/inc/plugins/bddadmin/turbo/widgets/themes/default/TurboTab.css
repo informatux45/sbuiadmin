@@ -1,0 +1,56 @@
+.turbo-tab {
+	display: inline;
+}
+
+.turbo-tab button {
+	background-color: transparent;
+	border: 0 solid;
+	padding: 0;
+	height: 21px;
+	line-height: 21px;
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: normal;
+}
+
+.turbo-tab-mid {
+	background-image:url(images/turbo_tabMid.gif);
+}
+
+.turbo-tab-mid-over {
+	background-image:url(images/turbo_tabMidHi.gif);
+}
+
+.turbo-tab-mid-down {
+	background-image:url(images/turbo_tabMidDown.gif);
+}
+
+.turbo-tab-left {
+	width: 4px;
+	background: url(images/turbo_tab.gif);
+}
+
+.turbo-tab-left-over {
+	width: 4px;
+	background: url(images/turbo_tab.gif) -8px 0;
+}
+
+.turbo-tab-left-down {
+	width: 4px;
+	background: url(images/turbo_tab.gif) -16px 0;
+}
+
+.turbo-tab-right {
+	width: 4px;
+	background: url(images/turbo_tab.gif) -4px 0;
+}
+
+.turbo-tab-right-over {
+	width: 4px;
+	background: url(images/turbo_tab.gif) -12px 0;
+}
+
+.turbo-tab-right-down {
+	width: 4px;
+	background: url(images/turbo_tab.gif) -20px 0;
+}

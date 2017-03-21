@@ -1,0 +1,24 @@
+.turbo_sliderLeft 
+{
+	position: relative; 
+	background-image: url(images/turbo_sliderBar.gif); 
+	height: 4px;
+}
+
+.turbo_sliderRight 
+{
+	position: relative; 
+	height:100%;
+	background-position: right; 
+	background-image: url(images/turbo_sliderBar.gif); 
+}
+
+.turbo_sliderThumb 
+{
+	position: absolute;
+	left: 0;
+	background-image: url(images/turbo_sliderThumb.gif); 
+	top: -3px;
+	width: 22px; 
+	height: 11px;
+}

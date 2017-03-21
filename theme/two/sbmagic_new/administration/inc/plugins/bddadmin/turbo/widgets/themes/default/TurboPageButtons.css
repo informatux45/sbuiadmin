@@ -1,0 +1,36 @@
+.turbo-page-buttons {
+	font-family: "Courier New", Courier, mono;
+	font-size: 11px;
+	overflow: hidden;
+	position: relative;
+}
+
+.turbo-page-buttons-separator {
+	text-align: center;
+	position: absolute;
+}
+
+.turbo-page-buttons-button {
+	cursor: pointer;
+	border: 1px solid #CCC;
+	text-align: center;
+	position: absolute;
+	overflow: hidden;
+}
+
+.turbo-page-buttons-selected {
+	background: black;
+	color: #F5F5F5;
+}
+
+.turbo-page-buttons-highlight {
+	border: 1px solid #2A1FFF;
+	color: black;
+}
+
+.turbo-page-buttons-disabled {
+	background:#EEE;
+	color: #BBB;
+	cursor: default;
+}
+

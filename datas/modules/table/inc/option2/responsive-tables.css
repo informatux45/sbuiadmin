@@ -1,0 +1,42 @@
+/* Foundation v2.1.4 http://foundation.zurb.com */
+/* Artfully masterminded by ZURB  */
+
+/* -------------------------------------------------- 
+   Table of Contents
+-----------------------------------------------------
+:: Shared Styles
+*/
+
+/* -----------------------------------------
+   Shared Styles
+----------------------------------------- */
+
+table.responsive { max-width: 100%; }
+table.responsive th { font-weight: 400; }
+table.responsive td, table.responsive th, div.pinned table td, div.pinned table th { padding: 9px 10px; text-align: left; height: 30px; }
+table.responsive { font-size: 1em; border: 1px solid lightgrey; border-collapse: collapse; }
+div.pinned table { font-size: 1em; border: 1px solid lightgrey; border-collapse: collapse; }
+table.responsive thead tr, div.pinned table thead tr { background-color: #2c2c2c !important; font-weight: 400; }
+table.responsive thead tr th, div.pinned table thead tr th { color: white; font-size: 1.1em; }
+table.responsive tr:nth-child(2n+1), div.pinned table tr:nth-child(2n+1) { background: PapayaWhip none repeat scroll 0 0; border-bottom: 1px solid lightgrey; }
+table.responsive tr:nth-child(2n), div.pinned table tr:nth-child(2n) { background: #F7F7F7 none repeat scroll 0 0 !important; border-bottom: 1px solid lightgrey; }
+table.responsive tr:nth-child(2n+1):hover, table.responsive tr:nth-child(2n):hover { background-color: lightgrey; }
+
+/* Mobile */
+@media only screen and (max-width: 767px) {
+	
+	table.responsive { margin-bottom: 0; }
+	
+	.pinned { position: absolute; left: 0; top: 0; background: #fff; width: 30%; overflow: hidden; overflow-x: scroll; border-right: 1px solid #ccc; border-left: 1px solid #ccc; }
+	.pinned table { border-right: none; border-left: none; width: 100%; }
+	.pinned table th, .pinned table td { white-space: nowrap; }
+	.pinned td:last-child { border-bottom: 0; }
+	
+	div.table-wrapper { position: relative; margin-bottom: 20px; overflow: hidden; border-right: 1px solid #ccc; }
+	div.table-wrapper div.scrollable { margin-left: 30%; }
+	div.table-wrapper div.scrollable { overflow: scroll; overflow-y: hidden; }	
+	
+	table.responsive td, table.responsive th { position: relative; white-space: nowrap; overflow: hidden; }
+	table.responsive th:first-child, table.responsive td:first-child, table.responsive td:first-child, table.responsive.pinned td { display: none; }
+	
+}

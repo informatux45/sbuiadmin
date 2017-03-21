@@ -1,0 +1,45 @@
+<h1>{#I-17#}</h1>
+
+<form action="{#url#}" method="post">
+<input type="hidden" name="step" value="config" />
+<input type="hidden" name="dbhost" value="{#dbhost#}" />
+<input type="hidden" name="dbuser" value="{#dbuser#}" />
+<input type="hidden" name="dbpass" value="{#dbpass#}" />
+<input type="hidden" name="dbname" value="{#dbname#}" />
+<input type="hidden" name="dbprefix" value="{#dbprefix#}" />
+
+<div class="input"><p>{#I-50#}</p>
+<input size="50" class="text" type="text" name="customer_name" value="SBUIADMIN" required>
+</div>
+
+<div class="input"><p>{#I-52#}</p>
+<input size="50" class="text" type="text" name="diruploads" value="../upload" required>
+</div>
+
+<div class="input"><p>{#I-51#}</p>
+<input size="50" class="text" type="text" name="url_customer" value="{#urlcustomer#}" required>
+</div>
+
+<div class="input"><p>{#I-53#}</p>
+<input size="50" class="text" type="text" name="urluploads" value="{#urluploads#}" required>
+</div>
+
+<div class="input"><p>{#I-55#}</p>
+<input size="50" class="text" type="text" name="recaptcha_public" value="" required>
+</div>
+
+<div class="input"><p>{#I-56#}</p>
+<input size="50" class="text" type="text" name="recaptcha_secret" value="" required>
+</div>
+
+<div class="input">
+	<p class="infos">{#I-54#}</p>
+</div>
+
+<!-- begin buttons -->
+<p></p>
+<div class="input">
+	<input class="button" type="submit" value="{#I-03#}" />
+</div>
+<!-- end buttons -->
+</form>

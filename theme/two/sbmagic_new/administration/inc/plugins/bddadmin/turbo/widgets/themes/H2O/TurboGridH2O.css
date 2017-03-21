@@ -1,0 +1,94 @@
+.turbo-grid-H2O {
+	border: 1px solid #7A7A7A;
+	background-image: url(images/bgH2O.gif);
+}
+
+.turbo-grid-H2O .turbo-grid-status {
+	background-color: white;
+	background-image: url(images/bgH2O.gif);
+}
+
+.turbo-grid-H2O .turbo-grid-corner {
+	background-color: white;
+	background-image: url(images/bgH2O.gif);
+	border: 1px solid #D3D3D3;
+	border-left-style: none;
+	border-top-style: none;
+}
+
+.turbo-grid-H2O .turbo-grid-col {
+	background-color: white;
+	background-image:url(images/fixedH2O.gif);
+}
+
+.turbo-grid-H2O .turbo-grid-col td {
+	border: 1px solid #D3D3D3;
+	border-left-style: none;
+	border-top-style: none;
+}
+
+.turbo-grid-H2O .turbo-grid-hdr {
+	background-color: white;
+	background-image: url(images/bevelH2O.gif);
+}
+
+.turbo-grid-H2O .turbo-grid-hdr th {
+}
+
+.turbo-grid-H2O .turbo-grid-hdr .turbo-grid-over {
+	background-color: #F6F6F6;
+}
+
+.turbo-grid-H2O .turbo-grid-hdr .turbo-grid-down {
+	background-color: #F6F6F6;
+	padding-top: 2px;
+	padding-bottom: 0px;
+}
+
+.turbo-grid-H2O .turbo-grid-bevel {
+	height: 1px;
+	background-color: #C7C7C7;
+}
+
+.turbo-grid-H2O .turbo-grid-bevel-over {
+	height: 1px;
+	background-color: #CEEAFF;
+}
+
+.turbo-grid-H2O .turbo-grid-dta td {
+	border: solid 1px #E1E1E1;
+	border-left-style: none;
+	border-top-style: none;
+	padding: 2px;
+	padding-left: 6px;
+	cursor: default;
+}
+
+.turbo-grid-H2O .turbo-grid-row-0 {
+}
+
+.turbo-grid-H2O .turbo-grid-row-1 {
+	background-color:#F7FAFD;
+}
+
+.turbo-grid-H2O .turbo-grid-row-over {
+	background-color: #CEEAFF;
+}
+
+.turbo-grid-H2O .turbo-grid-selected {
+	background-color: #0033CC;
+	color: white;
+}
+
+.turbo-grid-H2O .turbo-grid-editing {
+	background-color: #CCFFCC;
+}
+
+.turbo-grid-H2O .turbo-grid-dta input {
+}
+
+.turbo-grid-H2O .turbo-grid-dta textarea {
+}
+
+.turbo-grid-H2O .turbo-grid-dta select {
+}

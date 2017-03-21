@@ -1,0 +1,91 @@
+/* --- Items Category: module_show => float --- */
+.sbeffectives {
+	box-shadow: 2px 2px 5px 1px lightgrey;
+	display: block;
+	padding: 10px;
+	position: relative;
+	overflow: hidden;
+}
+.even {
+	float: left;
+	width:  47%;
+	margin: 0 20px 20px 0;
+}
+.odd {
+	float: right;
+	width:  47%;
+	margin: 0 0 20px 0;
+}
+
+.sbeffectives-div-l {
+	margin: 0 0 10px 0;
+	width: 100%;
+}
+
+.sbeffectives-div-l img {
+	border: 1px solid #eee;
+}
+
+.sbeffectives-div-r {
+	font-family: Lato,Arial,Tahoma,sans-serif;
+	font-size: 1em;
+	font-weight: 300;
+	line-height: 1.5em;
+	margin: 0;
+	width: 100%;
+	text-align: center;
+}
+
+.sbeffectives-info {
+	margin-bottom: 20px;
+}
+
+.sbeffectives-p {
+	margin-bottom: 40px;
+}
+
+.sbeffectives-link-item {
+	bottom: 0;
+	right: 0;
+	position: absolute;
+	display: block;
+	margin: 0 22px 22px;
+}
+
+.sbeffectives-clear-both {
+	clear: both;
+	display: block;
+}
+
+@media screen and (max-width: 1100px) {
+	.even {
+		width: 98%;
+		clear: both;
+	}
+	.odd {
+		width: 98%;
+		clear: both;
+	}
+}
+
+@media screen and (max-width: 960px) {
+	.even {
+		width: 97%;
+		clear: both;
+	}
+	.odd {
+		width: 97%;
+		clear: both;
+	}
+}
+
+@media screen and (max-width: 524px) {
+	.even {
+		width: 96%;
+		clear: both;
+	}
+	.odd {
+		width: 96%;
+		clear: both;
+	}
+}

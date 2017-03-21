@@ -1,0 +1,26 @@
+.turbo_scrollbox_scroller 
+{
+	position: absolute; 
+	overflow: auto; 
+	left: 0px; 
+	top: 0px; 
+	width: 100%; 
+	height: 100%; 
+	z-index: 0; 
+	/*background-color: green;*/
+}
+
+.turbo_scrollbox_viewport
+{
+	position: absolute; 
+	overflow: hidden; 
+	z-index: 1;
+	border: 1px solid silver;
+	/*background-color: yellow;*/
+}
+
+.turbo_scrollbox_spacer
+{
+	/*background-color: blue;*/
+}
+

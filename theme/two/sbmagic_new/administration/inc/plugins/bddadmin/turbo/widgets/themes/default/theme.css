@@ -1,0 +1,953 @@
+.turbo_box { 
+	padding: 0 14px 18px 0;
+}
+
+.turbo_box_left, .turbo_box_right, .turbo_box_bottom, .turbo_box_bottom_right {
+	background-image: url(images/turbo_box_yellow.gif);
+	background-repeat: no-repeat;
+}
+
+.turbo_box_left_yellow, .turbo_box_right_yellow, .turbo_box_bottom_yellow, .turbo_box_bottom_right_yellow {
+	background-image: url(images/turbo_box_yellow.gif);
+	background-repeat: no-repeat;
+}
+
+.turbo_box_left_red, .turbo_box_right_red, .turbo_box_bottom_red, .turbo_box_bottom_right_red {
+	background-image: url(images/turbo_box_red.gif);
+	background-repeat: no-repeat;
+}
+
+.turbo_box_left_green, .turbo_box_right_green, .turbo_box_bottom_green, .turbo_box_bottom_right_green {
+	background-image: url(images/turbo_box_green.gif);
+	background-repeat: no-repeat;
+}
+
+.turbo_box_left, .turbo_box_left_yellow, .turbo_box_left_red, .turbo_box_left_green {
+	background-position: left top;
+	position: relative;
+	height: 100%; 
+}
+
+.turbo_box_right, .turbo_box_right_yellow, .turbo_box_right_red, .turbo_box_right_green {
+	background-position: right top;
+	position: relative;
+	right: -14px;
+	padding-right: 14px;
+	height: 100%;
+}
+
+.turbo_box_content, .turbo_box_content_yellow, .turbo_box_content_red, .turbo_box_content_green {
+	margin-right: 14px;
+}
+
+.turbo_box_header, .turbo_box_header_yellow, .turbo_box_header_red, .turbo_box_header_green {
+	line-height: 27px;
+	font-weight: bold;
+}
+
+.turbo_box_bottom, .turbo_box_bottom_yellow, .turbo_box_bottom_red, .turbo_box_bottom_green {
+	background-position: left bottom;
+	position: relative;
+	top: 14px;
+}
+
+.turbo_box_bottom_right, .turbo_box_bottom_right_yellow, .turbo_box_bottom_right_red, .turbo_box_bottom_right_green {
+	background-position: right bottom;
+	position: relative;
+	right: -14px;
+	margin: -14px 0 0 14px;
+	height: 14px;
+	overflow: hidden;
+}
+.turbo-button {
+  display: inline;
+	white-space: nowrap;
+	text-align: center;
+}
+
+.turbo-button button {
+	background-color: transparent;
+	border: 0 solid;
+	padding: 0;
+	height: 23px;
+	line-height: 23px;
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: normal;
+}
+
+.turbo-button-mid {
+	background-image:url(images/turbo_btnMid.gif);
+}
+
+.turbo-button-mid-over {
+	background-image:url(images/turbo_btnMidHi.gif);
+}
+
+.turbo-button-mid-down {
+	background-image:url(images/turbo_btnMidDown.gif);
+}
+
+.turbo-button-left {
+	width: 4px;
+	background: url(images/turbo_btn.gif);
+}
+
+.turbo-button-left-over {
+	width: 4px;
+	background: url(images/turbo_btn.gif) -8px 0;
+}
+
+.turbo-button-left-down {
+	width: 4px;
+	background: url(images/turbo_btn.gif) -16px 0;
+}
+
+.turbo-button-right {
+	width: 4px;
+	background: url(images/turbo_btn.gif) -4px 0;
+}
+
+.turbo-button-right-over {
+	width: 4px;
+	background: url(images/turbo_btn.gif) -12px 0;
+}
+
+.turbo-button-right-down {
+	width: 4px;
+	background: url(images/turbo_btn.gif) -20px 0;
+}
+.turbo_cbox {
+	display: inline;
+}
+
+.turbo_cbox button {
+	background-color: transparent;
+	border: 0px solid;
+	padding: 0 0 0 15px;
+	height: 17px;
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: normal;
+	background-repeat: no-repeat;
+	background-position: left;
+}
+
+.turbo_cboxOff {
+	background-image:url(images/turbo_cboxOff.gif);
+}
+
+.turbo_cboxDown {
+	background-image:url(images/turbo_cboxOn.gif);
+}
+
+.turbo_cboxOver {
+	background-image:url(images/turbo_cboxOff.gif);
+}
+
+.turbo-grid {
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
+
+.turbo-grid-status {
+	background-color: #EBEADB;
+	padding: 4px;
+}
+
+.turbo-grid td {
+	vertical-align: top;
+}
+
+.turbo-grid th {
+	padding: 0;
+}
+
+.turbo-grid table {
+	empty-cells: show;
+	border-collapse: collapse;
+	/*table-layout: fixed;*/
+}
+
+.turbo-grid-corner {
+	background-color: #E2E0CB;
+	border: 1px solid #F1EFE2;
+	border-left-style: none;
+	border-top-style: none;
+	overflow: hidden;
+}
+
+.turbo-grid-col {
+	background-color: #EBEADB;
+	overflow: hidden;
+}
+
+.turbo-grid-col td {
+	text-align: right;
+	vertical-align: middle;
+	border: 1px solid #F1EFE2;
+	border-left-style: none;
+	border-top-style: none;
+	padding: 2px;
+	padding-left: 6px;
+	overflow: hidden;
+	cursor: default;
+	-moz-user-select: none;
+}
+
+.turbo-grid-fixed-select {
+	font-weight: bold;
+}
+
+.turbo-grid-hdr {
+	background-color: #EBEADB;
+	overflow: hidden;
+}
+
+.turbo-grid-hdr th {
+	padding-right: 1px;
+	padding-left: 6px;
+	padding-bottom: 1px;
+	cursor: default;
+	font-weight: normal;
+	text-align: left;
+}
+
+.turbo-grid-hdr td {
+	padding: 0;
+	background-color: #D0D0D0;
+	width: 2px;
+	/*cursor: e-resize;*/
+}
+
+.turbo-grid-hdr div {
+	overflow: hidden;
+}
+
+.turbo-grid-hdr .turbo-grid-over {
+	background-color: #F6F6F6;
+}
+
+.turbo-grid-hdr .turbo-grid-down {
+	background-color: #F6F6F6;
+	padding-top: 1px;
+	padding-bottom: 0px;
+}
+
+.turbo-grid-sort-up {
+	background: url(images/up.gif) no-repeat right 5px;
+}
+
+.turbo-grid-sort-down {
+	background: url(images/down.gif) no-repeat right 5px;
+}
+
+.turbo-grid-bevel {
+	background-color: #D0D0D0;
+	height: 3px;
+}
+
+.turbo-grid-bevel-over {
+	background-color: #FFCC33;
+	height: 3px;
+}
+
+.turbo-grid-dta {
+	overflow: auto;
+}
+
+.turbo-grid-dta td {
+	border: solid 1px #F1EFE2;
+	border-left-style: none;
+	border-top-style: none;
+	padding: 2px;
+	padding-left: 6px;
+	vertical-align: middle;
+}
+
+.turbo-grid-dta td div {
+	overflow: hidden;
+}
+
+.turbo-grid-row-0 {
+	background-color: white;
+}
+
+.turbo-grid-row-1 {
+	background-color: #FCFAF6;
+}
+
+.turbo-grid-row-over {
+	background-color: #E2F3FC;
+}
+
+.turbo-grid-selected {
+	background-color: #0033CC;
+	color: white;
+}
+
+.turbo-grid-editing {
+	background-color: #CCFFCC;
+}
+
+.turbo-grid-dta input, .turbo-grid-dta textarea, .turbo-grid-dta select {
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	padding: 0;
+	margin: 0;
+	border: 0 solid white;
+}
+
+.turbo-grid-dta input {
+}
+
+.turbo-grid-dta textarea {
+	overflow: auto;
+}
+
+.turbo-grid-dta select {
+	width: 100%; 
+}
+
+.turbo-grid-money { 
+	text-align: right;
+	font-family: "Courier New", Courier, mono; 
+	/*color: #00CA00; */
+}
+
+.turbo-grid-money-neg { 
+	color: red; 
+}
+
+.turbo-grid-inflight{
+	background-color:#FFFFCC !important;
+}
+
+.turbo-grid-error{
+	background-color:#FFD2D2 !important;
+}
+.turbo_list
+{
+	overflow: hidden;
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	background-color: #FF99FF;
+}
+
+.turbo_list_header
+{
+	overflow: hidden;
+	/* width: auto; */ /*-- doesn't work in IE */
+	width: 100%; /* broken CSS box model means this width will likely be bigger than the inner edge of the host */
+	border: 1px solid brown;
+	background-color: #FFFFCC;
+}
+
+.turbo_list_header_content
+{
+	width: 4096px;
+	height: 21px; 
+	line-height: 21px;
+	padding: 0 4px 0 4px;
+}
+
+.turbo_list_scroller
+{
+	overflow: auto;
+	border: 1px solid gray;
+}
+
+.turbo_list_even 
+{
+	background-color: white;
+}
+
+.turbo_list_odd
+{
+	background-color: #FCFAF6;
+}
+
+.turbo_list_over
+{
+	background-color: #E2F3FC;
+}
+
+.turbo_list_selected
+{
+	background-color: #0033CC;
+	color: white;
+}
+.turbo-modal {
+	position: absolute;
+	background-color: #EBEADB;
+	text-align:center;
+	border: 2px solid black;
+	z-index: 1001;
+}
+
+.turbo-modal-bg {
+	z-index: 1000;
+	position: absolute;
+	background-color: white;
+	border: 0px;
+	left: 0px;
+	top: 0px;
+}
+.turbo-pagebar {
+	position: relative;
+}
+
+.turbo-pagebar-tabs {
+	background-image: url(images/turbo_tabbar.gif);
+	height: 21px;
+}
+
+.turbo-pagebar-pages {
+	border: 1px solid #91A7B4; 
+	border-top: none; 
+	background-color: #FCFCFE;
+}
+.turbo-page-buttons {
+	font-family: "Courier New", Courier, mono;
+	font-size: 11px;
+	overflow: hidden;
+	position: relative;
+}
+
+.turbo-page-buttons-separator {
+	text-align: center;
+	position: absolute;
+}
+
+.turbo-page-buttons-button {
+	cursor: pointer;
+	border: 1px solid #CCC;
+	text-align: center;
+	position: absolute;
+	overflow: hidden;
+}
+
+.turbo-page-buttons-selected {
+	background: black;
+	color: #F5F5F5;
+}
+
+.turbo-page-buttons-highlight {
+	border: 1px solid #2A1FFF;
+	color: black;
+}
+
+.turbo-page-buttons-disabled {
+	background:#EEE;
+	color: #BBB;
+	cursor: default;
+}
+
+.turbo_radio {
+	display: inline;
+}
+
+.turbo_radio button {
+	background-color: transparent;
+	border: 0 solid;
+	padding: 0 0 0 15px;
+	height: 17px;
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: normal;
+	background-repeat: no-repeat;
+	background-position: center left;
+}
+
+.turbo_radioOff {
+	background-image:url(images/turbo_radioOff.gif);
+}
+
+.turbo_radioDown {
+	background-image:url(images/turbo_radioOn.gif);
+}
+
+.turbo_radioOver {
+	background-image:url(images/turbo_radioOff.gif);
+}
+
+.turbo_rangebarLeft {
+	overflow: hidden;
+	height: 17px;
+	background-image: url(images/turbo_rangebarLeft.gif); 
+	background-position: top left;
+	/*
+	position: relative; 
+	*/
+}
+
+.turbo_rangebarRight {	
+	overflow: hidden;
+	height: 100%;
+	background-image: url(images/turbo_rangebarRight.gif); 
+	background-position: top right; 
+	margin-left: 2px;
+	/*
+	position: relative; 
+	*/
+}
+
+.turbo_grid
+{
+	overflow: hidden;
+	height: 100%; 
+}
+
+.turbo_grid, .turbo_grid select, .turbo_grid input
+{
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
+
+.turbo_grid_header
+{
+	position: relative;
+	overflow: hidden;
+	/* width: auto; */ /*-- doesn't work in IE */
+	width: 100%; /* broken CSS box model means this width will likely be bigger than the inner edge of the host */
+	border: 1px solid #F0F0F0;
+}
+
+.turbo_grid_header_content
+{
+	width: 4096px;
+	height: 30px; 
+}
+
+.turbo_grid_container
+{
+	position: relative;
+}
+
+.turbo_grid_scroller
+{
+	position: relative;
+	overflow: auto;
+	border: 1px solid #F0F0F0;
+}
+
+.turbo_grid_row 
+{ 
+}
+
+.turbo_grid_selected
+{
+	color: white;
+	background-color: #0033CC;
+}
+
+/*
+.turbo_grid_even 
+{
+	background-color: white;
+}
+
+.turbo_grid_odd
+{
+	background-color: #FCFAF6;
+}
+
+.turbo_grid_over
+{
+	background-color: #E2F3FC;
+}
+*/
+
+.turbo_data_row
+{
+	position: relative;
+	height: 28px; 
+}
+
+.turbo_data_cell, .turbo_header_cell
+{
+	position: absolute;
+	overflow: hidden;
+	height: 20px; /* row - 7; 2px border + 2px Padding + 4px Margin = 8 */
+	line-height: 20px;
+	/*
+	width: 94px; 
+	*/
+	/* width - 6; 4 px Padding + 2 px Outer margin = 6 */
+	margin: 2px 0 2px 1px;
+	padding: 2px 1px 0 4px;
+	white-space: nowrap;
+}
+
+.turbo_data_cell
+{
+	border: 1px solid #F5F5F5;
+}
+
+.turbo_header_cell
+{
+	border: 1px solid #E0E0E0;
+}
+
+* html .turbo_ie_floathack 
+{
+	margin-right: -3px;
+}
+
+.turbo_grid_float 
+{
+	float: left; 
+	width: 32px; 
+	height: 100%; 
+	overflow: hidden;
+}
+
+.turbo_grid_corner
+{
+	width: 100%; 
+	height: 30px; 
+	background-color: silver;
+}
+
+.turbo_grid_column 
+{
+	height: 100%; 
+	overflow: hidden;
+}.turbo_rows
+{
+	/*
+	position: relative;
+	*/
+	overflow: hidden;
+}
+
+.turbo_rows div
+{
+	/*
+	position: relative;
+	*/
+}
+
+.turbo_rows_row
+{
+	/*
+	position: relative;
+	height: 20px;
+	*/
+}
+
+/*
+.turbo_rows_even 
+{
+	background-color: white;
+}
+
+.turbo_rows_odd
+{
+	background-color: #FCFAF6;
+}
+
+.turbo_rows_over
+{
+	background-color: #E2F3FC;
+}
+*/
+
+.turbo_rows_selected
+{
+	/*
+	position: relative;
+	*/
+	background-color: #0033CC;
+	color: white;
+}.turbo_scrollbox_scroller 
+{
+	position: absolute; 
+	overflow: auto; 
+	left: 0px; 
+	top: 0px; 
+	width: 100%; 
+	height: 100%; 
+	z-index: 0; 
+	/*background-color: green;*/
+}
+
+.turbo_scrollbox_viewport
+{
+	position: absolute; 
+	overflow: hidden; 
+	z-index: 1;
+	border: 1px solid silver;
+	/*background-color: yellow;*/
+}
+
+.turbo_scrollbox_spacer
+{
+	/*background-color: blue;*/
+}
+
+.turbo_sliderLeft 
+{
+	position: relative; 
+	background-image: url(images/turbo_sliderBar.gif); 
+	height: 4px;
+}
+
+.turbo_sliderRight 
+{
+	position: relative; 
+	height:100%;
+	background-position: right; 
+	background-image: url(images/turbo_sliderBar.gif); 
+}
+
+.turbo_sliderThumb 
+{
+	position: absolute;
+	left: 0;
+	background-image: url(images/turbo_sliderThumb.gif); 
+	top: -3px;
+	width: 22px; 
+	height: 11px;
+}.turbo-splitter-h, .turbo-splitter-v {
+	width: 4px;
+	height: 4px;
+	background-color: #DEDEDE;
+	padding: 0;
+	margin: 0;
+	overflow: hidden;
+}
+.turbo-tab {
+	display: inline;
+}
+
+.turbo-tab button {
+	background-color: transparent;
+	border: 0 solid;
+	padding: 0;
+	height: 21px;
+	line-height: 21px;
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: normal;
+}
+
+.turbo-tab-mid {
+	background-image:url(images/turbo_tabMid.gif);
+}
+
+.turbo-tab-mid-over {
+	background-image:url(images/turbo_tabMidHi.gif);
+}
+
+.turbo-tab-mid-down {
+	background-image:url(images/turbo_tabMidDown.gif);
+}
+
+.turbo-tab-left {
+	width: 4px;
+	background: url(images/turbo_tab.gif);
+}
+
+.turbo-tab-left-over {
+	width: 4px;
+	background: url(images/turbo_tab.gif) -8px 0;
+}
+
+.turbo-tab-left-down {
+	width: 4px;
+	background: url(images/turbo_tab.gif) -16px 0;
+}
+
+.turbo-tab-right {
+	width: 4px;
+	background: url(images/turbo_tab.gif) -4px 0;
+}
+
+.turbo-tab-right-over {
+	width: 4px;
+	background: url(images/turbo_tab.gif) -12px 0;
+}
+
+.turbo-tab-right-down {
+	width: 4px;
+	background: url(images/turbo_tab.gif) -20px 0;
+}
+.turbo_tabbar
+{
+	background-image: url(images/turbo_tabbar.gif);
+	height: 21px;
+}
+.turbo_table
+{
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
+
+.turbo_table td 
+{
+	vertical-align: top;
+}
+
+.turbo_table table 
+{
+	empty-cells: show;
+	border-collapse: collapse;
+}
+
+.turbo_tableDta 
+{
+	/*overflow: auto;*/
+}
+
+.turbo_tableDta td 
+{
+	border: solid 1px #F1EFE2;
+	border-left-style: none;
+	border-top-style: none;
+	padding: 2px;
+	padding-left: 6px;
+}
+
+.turbo_tableDta td div
+{
+	overflow: hidden;
+}
+
+.turbo_tableRow0 
+{
+	background-color: white;
+}
+
+.turbo_tableRow1 
+{
+	background-color: #FCFAF6;
+}
+
+.turbo_tableRowOver 
+{
+	background-color: #E2F3FC;
+}
+
+.turbo_tableSelected 
+{
+	background-color: #0033CC;
+	color: white;
+}
+
+.turbo_tableEditing 
+{
+	background-color: #CCFFCC;
+}
+
+.turbo_tableDta input 
+{
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	padding: 0px;
+	margin: 0px;
+}
+
+.turbo_tableDta textarea
+{
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	padding: 0px;
+	margin: 0px;
+	border: 0px solid white;
+	overflow: auto;
+}
+
+.turbo_tableDta select
+{
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	padding: 0px;
+	margin: 0px;
+	width: 100%;
+	height: 100%;
+	border: 0px solid white;
+}
+.turbo_boxTable {
+	padding: 0px;
+	border: none;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+.turbo_boxTop {
+	height: 33px;
+	font-size: 11px;
+	font-weight: bold;
+}
+
+.turbo_boxBottom {
+	height: 23px;
+}
+
+.turbo_boxLeft, .turbo_boxRight {
+	width: 24px;
+}
+
+.turbo_boxMid {
+}
+.turbo-toolbar, .turbo-toolbar-list {
+	background-color: #ECE9D8;
+	vertical-align: middle;
+	padding: 3px 2px 2px 2px;
+	border-bottom: 1px solid #E0DBBE;
+	white-space: nowrap;
+}
+
+.turbo-toolbar-list button div {
+	display: inline;
+}
+
+.turbo-toolbar-list button img {
+	vertical-align: middle;
+	padding-right: 4px;
+}.turbo_toolbtn, .turbo_toolbtn_over, .turbo_toolbtn_down {
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	font-weight: normal;
+	margin: 0;
+	padding: 0;
+}
+
+.turbo_toolbtn {
+	border: 1px solid #ECE9D8;
+	background-color: #ECE9D8;
+}
+
+.turbo_toolbtn_over {
+	border: 1px solid silver;
+}
+
+.turbo_toolbtn_down {
+	border: 1px solid gray; 
+	background-color:#E6EFFF;
+}
+.turbo-tree {
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: normal;
+	overflow: auto;
+}
+
+.turbo-tree .turbo-tree-scroller {
+	white-space: nowrap;
+}
+
+.turbo-tree img {
+	vertical-align: middle;
+}
+
+.turbo-tree span {
+}
+
+.turbo-tree-content {
+}
+
+.turbo-tree-content-selected {
+	background-color: #0000FF;
+	color: white;
+}

@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>RPC Test - TurboDbAdmin</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<script language="JavaScript" type="text/javascript">djConfig = { isDebug: true }</script>
+<script language="JavaScript" type="text/javascript" src="dojo.js"></script>
+<script language="JavaScript" type="text/javascript">
+	dojo.addOnLoad(init);
+	
+	function init()
+	{
+	}
+	
+	var dataServer = "test_server.php";
+	
+	function makeRequest(inId)
+	{
+		var content = JSON.stringify({ method: "discover", arguments: "", id: inId });	
+		turbo.debug('RPC: ', content);
+		dojo.io.bind(
+		{ 
+			url: dataServer,
+			method: "post",
+			contentType: "text/plain; charset=US-ASCII", 
+			postContent: content,
+			load: function(evt, data) { turbo.debug(data); dojo.debug('--'); },
+			error: function(n, err, http) { turbo.debug(n, err, http.status, http.statusText);  dojo.debug('--'); }
+		});
+	}
+</script>
+<style type="text/css">
+<!--
+-->
+</style>
+</head>
+<body> 
+<button onclick="makeRequest(0)">Test 0</button><br><br>
+<button onclick="makeRequest(1)">Test 1</button><br><br>
+<button onclick="makeRequest(2)">Test 2</button><br><br>
+<hr>
+<div id="dojoDebug"></div>
+</body>
+</html>

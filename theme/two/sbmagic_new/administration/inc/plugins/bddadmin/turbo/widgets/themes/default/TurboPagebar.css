@@ -1,0 +1,14 @@
+.turbo-pagebar {
+	position: relative;
+}
+
+.turbo-pagebar-tabs {
+	background-image: url(images/turbo_tabbar.gif);
+	height: 21px;
+}
+
+.turbo-pagebar-pages {
+	border: 1px solid #91A7B4; 
+	border-top: none; 
+	background-color: #FCFCFE;
+}

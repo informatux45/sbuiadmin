@@ -1,0 +1,666 @@
+/**
+ * Admin Startbootstrap
+ * Custom CSS (backend)
+ *
+ * @link http://dev.informatux.com/
+ *
+ * @package SBUIADMIN
+ * @file UTF-8
+ * ©INFORMATUX.COM
+ */
+
+select, textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {
+  height: auto !important;
+}
+.btn-submit {
+	background-color: #006dcc;
+	background-image: linear-gradient(to bottom, #0088cc, #0044cc);
+	background-repeat: repeat-x;
+	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+	color: #ffffff;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+.btn-submit:hover {
+	background-color: #006dcc;
+	background-image: linear-gradient(to bottom, #0044cc, #0088cc);
+	background-repeat: repeat-x;
+	border-color: rgba(10, 0, 0, 0.1) rgba(12, 0, 0, 0.1) rgba(14, 0, 0, 0.25);
+	color: #ffffff;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.red {color: red !important;}
+.green {color: green;}
+.grey {color: grey;}
+.yellow {color: #f0ad4e;}
+
+.fright {float: right;}
+.fleft {float: left;}
+
+.help-block {
+  font-style: italic;
+  font-size: 0.9em;
+  color: #bbb;
+  margin-top: -10px;
+}
+.help-block-radio {
+  font-style: italic;
+  font-size: 0.9em;
+  color: #bbb;
+  margin-top: 0px;
+}
+.center {
+  text-align: center;
+}
+.left {
+  text-align: left;
+}
+.right {
+  text-align: right;
+}
+.margin10 {
+  margin: 10px;
+}
+.sidebar-nav {
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+}
+#side-menu li.user-profile{
+  /*background: rgba(0, 0, 0, 1) url(../../../img/user-bg.jpg) no-repeat scroll center center / cover;*/
+	background-color: #2E313D;
+  text-transform: capitalize;
+  color: rgba(255, 255, 255, 1);
+}
+#side-menu li a {
+  color: white;
+}
+.sidebar ul li a.active {
+  color: #fff !important;
+  background: rgba(41, 44, 54, 1);
+  text-shadow: 1px 1px 1px #444;
+}
+.fa-menu-i {
+  color: rgba(255, 255, 255, 0.3);
+  transition: color 0.3s ease-in-out 0s;
+  line-height: 1.2em;
+  font-size: 1.2em;
+  padding-right: 1.6em;
+}
+.sidebar ul li a.active i.fa-menu-i {
+  color: #fff;
+}
+.nav {
+  background-color: #2E313D;
+}
+.nav > li > a:focus, .nav > li > a:hover {
+	background-color: inherit;
+}
+.nav > li > a:focus i.fa-menu-i, .nav > li > a:hover i.fa-menu-i {
+	color: #fff;
+}
+#page-wrapper {
+  background-color: #F5F5F5 !important;
+}
+.well {
+  background-color: #fff !important;
+}
+.user-img-div {
+  padding: 30px;
+}
+.user-img-div img {
+  max-height: 60px;
+}
+.img-thumbnail {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0);
+  border-radius: 4px;
+  display: inline-block;
+  height: auto;
+  line-height: 1.42857;
+  max-width: 100%;
+  padding: 4px;
+  transition: all 0.2s ease-in-out 0s;
+}
+.user-img-div .inner-text {
+  color: #fff;
+  float: right;
+  line-height: 25px;
+  position: relative;
+  text-align: left;
+}
+.user-img-div .inner-text small {
+  color: rgba(255, 255, 255, 0.3);
+  font-style: italic;
+}
+.user-last-login {
+  line-height: 1em;
+}
+#brand-sbuiadmin {
+  /*border-right: 1px solid #eee;*/
+  font-size: 1.2em;
+  font-weight: 600;
+  height: 3.1em;
+  width: 250px;
+	background-color: #2e313d;
+}
+#brand-sbuiadmin .sbuiadmin-logo { /* Customizes Idea icon */
+  fill: #false;
+  width: 50px;
+  height: 50px;
+	margin-left: 10px;
+	margin-bottom: -17px;
+}
+.icon { /* Customizes all icons at once */
+  display: inline-block;
+}
+
+.navbar-default {
+	background-color: white !important;
+}
+.navbar-left {
+	background-color: inherit;
+}
+.navbar-left li {
+	float: left;
+}
+.navbar-left li a {
+  min-height: 50px;
+  padding: 12px;
+	color: #999 !important;
+}
+.navbar-left li a:hover {
+	color: black !important;
+}
+.navbar-left li a i {
+	font-size: 1.8em;
+}
+.nav.navbar-right > li > a {
+  padding: 15px 5px;
+}
+
+@media screen and (max-width: 768px) {
+	.navbar-left, .navbar-right {
+		float: left;
+	}
+	.navbar-left li a {
+		padding: 16px 7px;
+	}
+	.navbar-left li a i {
+		font-size: 1.2em;
+	}
+	#brand-sbuiadmin {
+		border-right: 0;
+	}
+}
+
+.header-title-row {
+  background-color: white;
+  margin-bottom: 25px;
+  margin-left: -30px;
+  margin-right: -30px;
+  padding: 10px 30px;
+}
+.header-title-row h3 {
+  padding: 0 0 12px;
+}
+.breadcrumbx {
+  background: rgba(0, 0, 0, 0.016) none repeat scroll 0 0;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  border-width: 1px 0 1px;
+  margin: 0 -30px -10px;
+  padding: 10px 30px;
+	font-size: 0.9em;
+}
+.breadcrumbx a {
+	color: #555;
+	text-decoration: none;
+}
+.breadcrumbx a:hover {
+	color: #999;
+	text-decoration: none;
+}
+
+.menu-header a {
+  color: rgba(255, 255, 255, 0.3) !important;
+  cursor: default;
+  font-size: 0.8em;
+  pointer-events: none;
+  text-transform: uppercase;
+  margin-top: 20px;
+}
+.menu-header-top a {
+	margin-top: 0px;
+}
+
+/* ----------------------------------------- */
+/* ---------------- INTERFACE -------------- */
+/* ----------------------------------------- */
+.navbar, .navbar-right {
+  background: rgba(255, 255, 255,1);
+}
+#footer-sec {
+  background: rgb(255,255,255); /* Old browsers */
+  background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(246,246,246,1) 47%, rgba(237,237,237,1) 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(246,246,246,1) 47%,rgba(237,237,237,1) 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(246,246,246,1) 47%,rgba(237,237,237,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ededed',GradientType=0 ); /* IE6-9 */
+}
+.navbar {
+  border-color: #eee;
+}
+a.navbar-brand, .text-primary {
+  outline: none;
+}
+.navbar-right li.dropdown a.dropdown-toggle, .navbar-right li a {
+  color: #999;
+}
+.navbar-right li.dropdown a.dropdown-toggle:hover, .navbar-right li.dropdown.open a.dropdown-toggle, .navbar-right li a:hover {
+  color: #000;
+}
+.row #footer-sec {
+  margin-left: -30px;
+  margin-right: -30px;
+}
+#footer-sec {
+  border-top: 1px solid #e7e7e7;
+  font-size: 12px;
+  padding: 20px 50px;
+  bottom: 0;
+  color: #555d66;
+  left: 0;
+  /*padding: 10px 20px;*/
+  position: absolute;
+  right: 0;
+
+}
+.theme_view {
+  border: 1px solid #ddd;
+  width: 100%;
+  height: auto;
+}
+.theme_view img#img_theme_view {
+  width: 100%;
+}
+.panel-primary {
+  border-color: #53a0bc !important;
+}
+.panel-primary > .panel-heading {
+  background-color: #53a0bc !important;
+  border-color: #53a0bc !important;
+  color: #fff;
+}
+
+/* ----------------------------------------- */
+/* ----------------- LOGIN ----------------- */
+/* ----------------------------------------- */
+.login-panel {
+  /*margin-top: 50% !important;*/
+}
+.cta {
+	font-size: 0.8em;
+	margin: 20px 0 0;
+	text-align: center;
+}
+.cta a {
+	color: #777;
+	text-decoration: none;
+}
+.cta a:hover {
+	color: #fff;
+}
+.rememberme {
+	font-size: 0.8em;
+}
+video#bgvid {
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	min-width: 100%;
+	min-height: 100%;
+	width: auto;
+	height: auto;
+	z-index: -100;
+	background: url(../../../img/login/sbuiadmin_login.jpg) no-repeat;
+	background-size: cover;
+}
+@media screen and (max-device-width: 768px) {
+	html { background: url(../../../img/login/sbuiadmin_login.jpg) #000 no-repeat center center fixed; }
+	#bgvid { display: none; }
+}
+
+/* ----------------------------------------- */
+/* ------------------- 404 ----------------- */
+/* ----------------------------------------- */
+.not-found {
+  width: 327px;
+  height: 236px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: -118px 0 0 -163px;
+}
+
+
+/* ----------------------------------------- */
+/* ------------------ DEBUG ---------------- */
+/* ----------------------------------------- */
+.kint footer {
+  display: none;
+}
+
+.kint {
+  margin: 2px 0 !important;
+}
+
+/* ----------------------------------------- */
+/* ------------ MEDIAS MANAGER ------------- */
+/* ----------------------------------------- */
+p.sbmedia {
+  width: 140px;
+  height: 160px;
+  margin: 5px;
+  border: 1px dashed lightgrey;
+  display: block;
+  float: left;
+  text-align: center;
+  text-decoration: none;
+}
+p.sbmedia:hover {
+  background-color: rgba(0, 171, 199, 0.1);
+  cursor: pointer;
+}
+p.sbmedia img {
+  max-width: 124px;
+  height: 84px;
+  padding: 10px 5px;
+}
+p.sbmedia a, p.sbmedia a.sbmedia-delete {
+  outline: none;
+}
+p.sbmedia > span {
+  font-size: 0.77em;
+  text-align: center;
+  text-decoration: none;
+  color: grey;
+  bottom: 0px;
+  position: relative;
+  line-height: 1em;
+  padding: 0 2px;
+  display: block;
+  font-weight: bold;
+}
+p.sbmedia > span.sbmedia-realname {
+  font-weight: normal;
+  line-height: 1.65em;
+}
+p.sbmedia > span.sbmedia-weight, p.sbmedia > span.sbmedia-mime, p.sbmedia > span.sbmedia-info {
+  font-weight: normal;
+  font-size: 0.77em;
+  line-height: 1.2em;
+}
+p.sbmedia > span.sbmedia-other {
+  display: inline-block;
+  font-size: 64px;
+  height: 73px;
+  margin-top: 11px;
+  color: #236BB1;
+}
+.sbmedia_ext_allowed {
+  text-transform: uppercase;
+  font-weight: bold;
+}
+.sbmedia-delete {
+  position: absolute;
+  margin: -160px 0 0 53px;
+  border-radius: 15px;
+  font-size: 13px !important;
+  height: 22px !important;
+  line-height: 1.42857;
+  padding: 0px !important;
+  text-align: center;
+  width: 22px !important;
+}
+.sbmedia-delete:hover {
+  background-color: red !important;
+  border-color: red !important;
+  color: #fff;
+}
+
+/* ----------------------------------------- */
+/* -------------- FORMULAIRES -------------- */
+/* ----------------------------------------- */
+.input-group {
+  margin-top: 25px !important;
+}
+.input-group-icon {
+  margin-top: 0 !important;
+}
+.transfert-media-img {
+  max-width: 200px;
+  max-height: 170px;
+  background-color: grey;
+}
+.transfert-media-img-remove {
+  width: 170px;
+  height: 170px;
+}
+.transfert-media-img-pictures { /* Customizes Picture icon */
+  background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjAiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgODAgODAiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDgwIDgwOyIgZmlsbD0iIzAwMDAwMCIgPjxnPgk8cmVjdCB4PSIyLjUiIHk9IjguNSIgc3R5bGU9ImZpbGw6I0ZGRkZGRjsiIHdpZHRoPSI3NSIgaGVpZ2h0PSI2MyI+PC9yZWN0Pgk8Zz4JCTxwYXRoIHN0eWxlPSJmaWxsOiM3ODhCOUM7IiBkPSJNNzcsOXY2MkgzVjlINzcgTTc4LDhIMnY2NGg3NlY4TDc4LDh6Ij48L3BhdGg+CTwvZz48L2c+PHJlY3QgeD0iMTIiIHk9IjE4IiBzdHlsZT0iZmlsbDojQjVERUZGOyIgd2lkdGg9IjU2IiBoZWlnaHQ9IjM1Ljc1Ij48L3JlY3Q+PHJlY3QgeD0iMTIiIHk9IjM4IiBzdHlsZT0iZmlsbDojRDlGNkZGOyIgd2lkdGg9IjU2IiBoZWlnaHQ9IjE2Ij48L3JlY3Q+PHJlY3QgeD0iMTIiIHk9IjU0IiBzdHlsZT0iZmlsbDojN0FBREYwOyIgd2lkdGg9IjU2IiBoZWlnaHQ9IjgiPjwvcmVjdD48ZWxsaXBzZSBzdHlsZT0iZmlsbDojRDlGNkZGOyIgY3g9IjI5LjUiIGN5PSIzNi4yODYiIHJ4PSI3IiByeT0iNi4yODYiPjwvZWxsaXBzZT48ZWxsaXBzZSBzdHlsZT0iZmlsbDojRDlGNkZGOyIgY3g9IjIyLjUiIGN5PSIzNi4yODYiIHJ4PSI1LjI1IiByeT0iNC43MTQiPjwvZWxsaXBzZT48ZWxsaXBzZSBzdHlsZT0iZmlsbDojRDlGNkZGOyIgY3g9IjQwIiBjeT0iMzkuNDI5IiByeD0iNyIgcnk9IjYuMjg2Ij48L2VsbGlwc2U+PGVsbGlwc2Ugc3R5bGU9ImZpbGw6I0Q5RjZGRjsiIGN4PSI1MC41IiBjeT0iMzYuMjg2IiByeD0iNyIgcnk9IjYuMjg2Ij48L2VsbGlwc2U+PGVsbGlwc2Ugc3R5bGU9ImZpbGw6I0Q5RjZGRjsiIGN4PSI2NC41IiBjeT0iMzYuMjg2IiByeD0iMy41IiByeT0iMy4xNDMiPjwvZWxsaXBzZT48ZWxsaXBzZSBzdHlsZT0iZmlsbDojRDlGNkZGOyIgY3g9IjE1LjUiIGN5PSIzNi4yODYiIHJ4PSIzLjUiIHJ5PSIzLjE0MyI+PC9lbGxpcHNlPjxlbGxpcHNlIHN0eWxlPSJmaWxsOiNEOUY2RkY7IiBjeD0iNTcuNSIgY3k9IjM2LjI4NiIgcng9IjUuMjUiIHJ5PSI0LjcxNCI+PC9lbGxpcHNlPjxwb2x5Z29uIHN0eWxlPSJmaWxsOiM0QTZEOUM7IiBwb2ludHM9IjEyLDU0IDY4LDU0IDY4LDUwLjc2OCA1MC41LDQwICI+PC9wb2x5Z29uPjxwb2x5Z29uIHN0eWxlPSJmaWxsOiM1RDg0Qjg7IiBwb2ludHM9IjU0LDU0IDEyLDU0IDEyLDQ2IDI5LjUsMzggIj48L3BvbHlnb24+PC9zdmc+') 50% 0% no-repeat;
+  background-size: 90%;
+  width: 200px;
+  height: 170px;
+  margin-top: -10px;
+}
+.transfert-media-img-pictures-without {
+  max-width: 200px;
+  max-height: 170px;
+  margin-top: -10px;
+}
+.icon-transfert { /* Customizes all icons at once */
+  display: inline-block;
+}
+.group-calendar {
+  font-size: 12px !important;
+}
+select[class=ui-datepicker-month], select[class=ui-datepicker-year] {
+  color: #777 !important;
+}
+.hasDatepicker {
+  padding: 0 0 0 10px;
+}
+.input-group .form-control {
+  z-index: 1 !important;
+}
+.editorhtml, div.jHtmlArea, div.jHtmlArea .ToolBar {
+  width: 100%;
+}
+.form-break-info {
+  /*background-color: #eee !important;*/
+  padding: 0;
+  color: white;
+}
+.form-break-info h4 {
+  font-size: 1em;
+  line-height: 1.4em;
+  margin: 0;
+  padding: 4px 4px 4px 45px;
+  text-align: left;
+  width: 100%;
+  color: black;
+  border: 2px solid black;
+  border-radius: 4px;
+  background-color: #eee;
+}
+.input-group-addon:first-child, .input-group-addon:last-child {
+  background-color: darkgrey !important;
+  color: white !important;
+}
+.sb-question-icon:hover {
+  text-decoration: none;
+}
+/* --- Correction bug tiny source affichage --- */
+textarea.cke_source {
+  height: 400px !important;
+}
+
+/* ----------------------------------------- */
+/* ---------------- SORTABLE --------------- */
+/* ----------------------------------------- */
+li.sortable-extra {
+  height: 64px !important;
+}
+li.sortable-extra i {
+  padding-top: 10px;
+}
+#sortable {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+#sortable li {
+  font-size: 1.2em;
+  font-weight: normal;
+  height: 2em;
+  margin: 0 0 5px;
+  padding: 4px 5px 5px 10px;
+  box-shadow: 1px 1px 3px #ccc;
+}
+#sortable li:hover, #sortable-grid li:hover {
+  cursor: move;
+}
+.sb-sort-i {
+  color: black;
+  font-size: 0.7em;
+  padding: 0 20px 0 5px;
+  margin-top: 7px;
+  display: block;
+  float: left;
+}
+#sortable-grid {
+  list-style-type: none;
+  margin: 0 0 20px;
+  padding: 0;
+  width: 100%;
+  clear: both !important;
+  float: left;
+}
+#sortable-grid li {
+  float: left;
+  height: auto !important;
+  margin: 3px 7px 3px 0;
+  padding: 4px 0;
+  text-align: center;
+  width: auto;
+}
+#sortable-grid li img {
+  margin: 0 -10px 0 -3px;
+  padding: 0;
+}
+#sortable-grid .ui-state-highlight {
+  width: 100px !important;
+  padding-bottom: 58px !important;
+  /*height: auto !important;*/
+}
+
+/* --- Upgrade --- */
+.dropdown-upgrade {
+  background-color: rgba(255, 245, 157, 0.9);
+  width: 100%;
+}
+.upgrade-now {
+  position: absolute;
+  right: 50px;
+  top: 10px
+}
+.sbupgrade-filelist {
+  font-size: 0.8em;
+  line-height: 1.1em;
+}
+.sbupgrade-filelist span {
+  font-size: 1.3em;
+  line-height: 0.4em;
+  display: block;
+}
+
+/* --- HTML Textarea / Page BUILDER -> Tabs css --- */
+.sbtabs {
+  position: relative;   
+  clear: both;
+  margin: 25px 0;
+  min-height: 500px;
+}
+.sbtab {
+  float: left;
+}
+.sbtab label {
+  background: #eee; 
+  padding: 4px 10px; 
+  border: 1px solid #ccc; 
+  margin-left: -1px; 
+  position: relative;
+  left: 1px;
+  min-width: 150px;
+}
+.sbtab label:hover {
+ cursor: pointer; 
+}
+.sbtab .form-group label {
+  border: 0;
+  background: none;
+  cursor: auto;
+}
+.sbtab [type=radio] {
+  display: none;   
+}
+.sbcontent {
+  position: absolute;
+  top: 28px;
+  left: 0;
+  background: white;
+  right: 0;
+  bottom: 0;
+  padding: 20px;
+  border: 1px solid #ccc; 
+}
+[type=radio]:checked ~ label {
+  background: white;
+  border-bottom: 1px solid white;
+  z-index: 2;
+  min-width: 150px;
+}
+[type=radio]:checked ~ label ~ .sbcontent {
+  z-index: 1;
+  min-width: 150px;
+}
+
+/* --- CMSConfig Plugins --- */
+.config_blocks {
+  width: 200px;
+  height: 150px;
+  border: 1px solid lightgrey;
+  padding: 10px;
+  border-radius: 5px;
+  float: left;
+  text-align: center;
+  margin: 0 10px 10px 0;
+	background: repeating-radial-gradient(
+		circle,
+		#D9F9F8,
+		#D9F9F8 10px,
+		#F4FCFF 10px, 
+		#F4FCFF 20px
+	);
+}
+.config_blocks_active {
+    width: 200px;
+  height: 150px;
+  border: 1px solid lightgrey;
+  padding: 10px;
+  border-radius: 5px;
+  float: left;
+  text-align: center;
+  margin: 0 10px 10px 0;
+  background-color: greenyellow;
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.5) 35px, rgba(255,255,255,.5) 70px);
+}

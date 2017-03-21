@@ -1,0 +1,22 @@
+<div turboalign="top" dojoType="TurboToolbar">
+	<input value="Refresh" id="dataRefreshBtn" onclick="tda.app.refresh()" image="server.gif" dojoType="TurboToolbtn" type="button"/>
+	<input value="Locked" id="dataLockedBtn" toggle="toggle" onclick="tda.app.lockedClick(this);" image="lock.gif" dojoType="TurboToolbtn" type="button"/>
+	<input value="|" id="sep1" state="disabled" dojoType="TurboToolbtn" type="button"/>
+	<input value="Create Row" id="createRowBtn" onclick="tda.data.addRow()" image="row_add.gif" dojoType="TurboToolbtn" type="button"/>
+	<input value="Delete Row(s)" id="deleteRowsBtn" onclick="tda.data.deleteRows()" state="disabled" image="row_delete.gif" dojoType="TurboToolbtn" type="button"/>
+	<input value="|" id="sep2" state="disabled" dojoType="TurboToolbtn" type="button"/>
+	<input value="Apply Edit" id="dataApplyBtn" onclick="tda.data.applyEdit()" state="disabled" image="table_edit.gif" dojoType="TurboToolbtn" type="button"/>
+	<input value="Cancel Edit" id="dataCancelBtn" onclick="tda.data.cancelEdit()" state="disabled" image="table_drop.gif" dojoType="TurboToolbtn" type="button"/>
+</div>
+<div turboalign="client" class="noscroll">
+	<div dojoType="TurboGrid" id="grid" onSelectionChange="tda.data.selectionChange()"></div>
+</div>
+<div turboalign="bottom" style="height: 28px;">
+	<div style="display: none; border: 1px solid silver; padding: 2px;" turboalign="client">
+		<div id="dataPageButtons" turboalign="client" dojoType="TurboPageButtons" onPageChange="tda.data.pageControl.change()" numButtons="10"></div>
+	</div>
+	<div style="display: none; border: 1px solid silver; padding: 12px 8px 4px 8px;" turboalign="client">
+		<div dojoType="TurboSlider" id="dataPageSlider" change="tda.data.pageControl.change()" changing="tda.data.pageControl.changing()" snap="true"></div>
+	</div>
+	<div turboalign="right" id="dataPageInfo" style="width: 190px; padding: 8px; border: 1px solid silver;"></div>
+</div>
