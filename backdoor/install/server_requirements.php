@@ -147,7 +147,7 @@
 	if(EI_CHECK_MODES){
 		$validations['divider_modes'] = array('title'=>lang_key('modes'), 'description'=>'');
 		$loaded_extensions = get_loaded_extensions();
-		$validations['mod_rewrite'] = array(true, lang_key('mode').' Rewrite', in_array('rewrite', $loaded_extensions), lang_key('installed'), lang_key('not_installed'));
+		$validations['mod_rewrite'] = array(false, lang_key('mode').' Rewrite', in_array('rewrite', $loaded_extensions), lang_key('installed'), lang_key('not_installed'));
 		//$validations['mod_ldap'] = array(false, lang_key('mode').' LDAP', in_array('ldap', $loaded_extensions), lang_key('installed'), lang_key('not_installed'));
 	}
 	
