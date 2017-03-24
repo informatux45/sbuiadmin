@@ -59,7 +59,7 @@
         <link rel="stylesheet" id="cache-custom-css" href="{$smarty.const.SB_THEME_URL}css/cache-custom.css" type="text/css" media="all" />
 	    
         <!-- FONTs -->
-        <link rel='stylesheet' href='{$smarty.const.SB_THEME_URL}css/font-awesome.css' type='text/css' media='all' />
+		<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' type='text/css' media='all' />
 		 {insert name="sbGetFonts"}
         
         <!-- JAVASCRIPTs -->
