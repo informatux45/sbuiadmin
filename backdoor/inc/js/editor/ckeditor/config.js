@@ -23,9 +23,15 @@ CKEDITOR.editorConfig = function( config ) {
 		{ name: 'paragraph',   groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
 		{ name: 'styles' },
 		{ name: 'colors' },
-		//{ name: 'about' }
+		{ name: 'about' }
 	];
+	
+	// Add Ckawesome
+	config.fontawesomePath = 'assets/bower_components/font-awesome/css/font-awesome.min.css';
+	config.extraPlugins = 'lineutils,colordialog,ckawesome';
+    config.allowedContent = true;
 
+	
 	// Remove some buttons provided by the standard plugins, which are
 	// not needed in the Standard(s) toolbar.
 	config.removeButtons = 'Underline,Subscript,Superscript';
