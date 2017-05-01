@@ -144,9 +144,9 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
   /*padding: 1em 0 1em 2em;*/
 }
 #brand-sbuiadmin .sbuiadmin-logo { /* Customizes Idea icon */
-  fill: #false;
-  width: 50px;
-  height: 50px;
+  /*fill: #false;*/
+  width: 35px;
+  height: 35px;
 	margin-left: 10px;
 	margin-bottom: -17px;
 }
