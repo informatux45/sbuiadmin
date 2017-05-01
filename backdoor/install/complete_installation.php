@@ -94,13 +94,14 @@
 								
 								# One level up
 								$settings_file  = EI_CONFIG_FILE_PATH;
+								$dashboard_file = EI_CONFIG_DASHBOARD_FILE_PATH;
 								$htaccess_file  = EI_CONFIG_FILE_HTACCESS;
 								$install_file   = EI_CONFIG_FILE_INSTALL_START;
 								//clearstatcache(true);
 								//$install_file   = getcwd() . '/' . EI_CONFIG_FILE_INSTALL_START;
 								$installer_lock = EI_CONFIG_FILE_INSTALLER_LOCK;
 								
-								// Injection des données
+								// Injection des données (Settings File)
 								$output_file  = $_SESSION['settings_customer_name'] . "\n";
 								$output_file .= "admin" . "\n";
 								$output_file .= $_SESSION['database_host'] . "\n";
@@ -128,6 +129,17 @@
 								
 								// Locker le fichier pour qu'une seule personne a la fois ecrive dedans
 								$result_edit = file_put_contents($settings_file, $output_file, FILE_USE_INCLUDE_PATH | LOCK_EX);
+								
+								// Injection des données (Dashboard File)
+								$output_file_2  = $_SESSION['database_prefix'] . "sb_sandbox" . "\n";
+								$output_file_2 .= $_SESSION['database_prefix'] . "sb_sandbox" . "\n";
+								$output_file_2 .= "Nom (Sandbox)" . "\n";
+								$output_file_2 .= "index.php?p=sandbox" . "\n";
+								$output_file_2 .= "ambulance" . "\n";
+								$output_file_2 .= "nom" . "\n";
+								
+								// Locker le fichier pour qu'une seule personne a la fois ecrive dedans
+								$result_edit_2 = file_put_contents($dashboard_file, $output_file_2, FILE_USE_INCLUDE_PATH | LOCK_EX);
 								
 								// Ecrire le fichier htaccess
 								//$output_htaccess  = '# Prevent viewing of .htaccess file' . "\n";

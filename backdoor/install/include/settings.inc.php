@@ -101,10 +101,14 @@
     // *** config file directory - directory, where config file must be created
     //     for ex.: '../common/' or 'common/' - according to directory hierarchy and relatively to start.php file
     define('EI_CONFIG_FILE_DIRECTORY', '../inc/admin/');
-    // *** config file name - output file with config parameters (database, username etc.)
+    // *** config file name - output file with config parameters (database, username, etc.)
     define('EI_CONFIG_FILE_NAME', 'settings.txt');
+    // *** dashboard file name - output file with config parameters (database, tables, etc.)
+    define('EI_CONFIG_DASHBOARD_FILE_NAME', 'dashboard.txt');
     // *** according to directory hierarchy (you may add/remove '../' before EI_CONFIG_FILE_DIRECTORY)
     define('EI_CONFIG_FILE_PATH', EI_CONFIG_FILE_DIRECTORY.EI_CONFIG_FILE_NAME);
+    // *** according to directory hierarchy (you may add/remove '../' before EI_CONFIG_FILE_DIRECTORY)
+    define('EI_CONFIG_DASHBOARD_FILE_PATH', EI_CONFIG_FILE_DIRECTORY.EI_CONFIG_DASHBOARD_FILE_NAME);
     // *** install file backdoor
     define('EI_CONFIG_FILE_INSTALL_START', '../install.php');
     // *** htaccess file backdoor
