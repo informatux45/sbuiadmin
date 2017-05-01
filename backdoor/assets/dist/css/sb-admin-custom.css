@@ -149,7 +149,6 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
   height: 50px;
 	margin-left: 10px;
 	margin-bottom: -17px;
-  display: none;
 }
 .icon { /* Customizes all icons at once */
   display: inline-block;
