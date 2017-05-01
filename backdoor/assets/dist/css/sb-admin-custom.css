@@ -147,8 +147,12 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
   /*fill: #false;*/
   width: 35px;
   height: 35px;
-	margin-left: 10px;
-	margin-bottom: -17px;
+	margin-left: 30px;
+	margin-bottom: -25px;
+}
+#brand-sbuiadmin-name {
+  margin-left: 80px;
+  margin-top: -10px;
 }
 .icon { /* Customizes all icons at once */
   display: inline-block;
