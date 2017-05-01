@@ -141,7 +141,7 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
   height: 3.1em;
   width: 250px;
   background-color: #2e313d;
-  padding: 1em 0 1em 2em;
+  /*padding: 1em 0 1em 2em;*/
 }
 #brand-sbuiadmin .sbuiadmin-logo { /* Customizes Idea icon */
   fill: #false;
