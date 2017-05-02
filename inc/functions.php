@@ -243,7 +243,7 @@ function sbGetSeo($text = '', $key = '') {
 	$cms_seo = '';
 	$table   = _AM_DB_PREFIX . 'sb_config';
 	
-	// --- Get CMS Plugins CODE (PLUGINS)
+	// --- Get CMS SEO
 	$query   = "SELECT config, content FROM $table WHERE config = 'seo-keywords' OR config = 'seo-description'";
 	$request = $sbsql->query($query);
 	$result  = $sbsql->toarray($request);
@@ -378,7 +378,11 @@ function insert_sbGetHeaders() {
 
 	// --- Get CMS headers CODE (CSS / JAVASCRIPT)
 	// --- Key sort by Alphabetical order => css (0), javascript (1)
-	$query   = "SELECT config, content FROM $table_config WHERE config = 'css' OR config = 'javascript' ORDER BY config ASC";
+	$query   = "SELECT config, content FROM $table_config
+				WHERE config = 'css'
+				OR config = 'javascript'
+				OR config = 'seo-google-analytics'
+				ORDER BY config ASC";
 	$request = $sbsql->query($query);
 	$result  = $sbsql->toarray($request);
 	
@@ -396,6 +400,20 @@ function insert_sbGetHeaders() {
 		$cms_headers .= $sbsanitize->displayText($result[1]['content']);
 		$cms_headers .= "});";
 		$cms_headers .= '</script>';
+	}
+	
+	// --- Get Google Analytic
+	if ($sbsanitize->sTrim($result[2]['content']) != '') {
+		$cms_headers .= "\n" . '<!-- Google Analytics -->' . "\n";
+		$cms_headers .= '<script type="text/javascript">' . "\n";
+		$cms_headers .= "(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+							(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+							m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+						 })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');" . "\n";
+		$cms_headers .= "ga('create', 'UA-".$sbsanitize->displayText($result[2]['content'])."', 'auto');" . "\n";
+		$cms_headers .= "ga('send', 'pageview');" . "\n";
+		$cms_headers .= '</script>' . "\n";
+		$cms_headers .= '<!-- End Google Analytics -->' . "\n";
 	}
 	
 	return $cms_headers;
@@ -776,6 +794,60 @@ function insert_sbGetMobileDetect($param) {
 
 		return strtolower($sb_classes_md);
 	}
+}
+
+/**
+ * Get SEO All Metas From Administration
+ * @return html
+ */
+function insert_sbGetSeoMetas() {
+	global $sbsql, $sbsanitize;
+	$metas_seo = '';
+	$table     = _AM_DB_PREFIX . 'sb_config';
+	
+	// --- Get CMS SEO Metas
+	$query   = "SELECT config, content FROM $table WHERE config LIKE 'seo-%'";
+	$request = $sbsql->query($query);
+	$result  = $sbsql->toarray($request);
+	
+	if ($result) {
+		// Loop all Metas
+		foreach($result as $row) {
+			// Initialize
+			$cs[$row['config']] = utf8_encode($row['content']);
+			// Instantiate
+			if (!empty($cs[$row['config']])) {
+				switch($row['config']) {
+					case "seo-keywords":
+						$metas_seo .= "\t\t" . '<meta name="keywords" content="' . $cs[$row['config']] . '">' . "\n";
+					break;
+					case "seo-description":
+						$metas_seo .= "\t\t" . '<meta name="description" content="' . $cs[$row['config']] . '">' . "\n";
+					break;
+					case "seo-rating":
+						$metas_seo .= "\t\t" . '<meta name="rating" content="' . $cs[$row['config']] . '">' . "\n";
+					break;
+					case "seo-robots":
+						$metas_seo .= "\t\t" . '<meta name="robots" content="' . $cs[$row['config']] . '">' . "\n";
+					break;
+					case "seo-copyright":
+						$metas_seo .= "\t\t" . '<meta name="copyright" content="' . $cs[$row['config']] . '">' . "\n";
+					break;
+					case "seo-author":
+						$metas_seo .= "\t\t" . '<meta name="author" content="' . $cs[$row['config']] . '">' . "\n";
+					break;
+					case "seo-generator":
+						$metas_seo .= "\t\t" . '<meta name="generator" content="' . $cs[$row['config']] . '">' . "\n";
+					break;
+					case "seo-google-analytics":
+						$metas_seo .= "\t\t" . '<meta name="google-site-verification" content="' . $cs[$row['config']] . '">' . "\n";
+					break;
+				}
+			}
+		}
+	}
+	
+	return $metas_seo;
 }
 
 ?>
