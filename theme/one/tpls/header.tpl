@@ -25,9 +25,10 @@
         <!-- this line will appear only if the website is visited with an iPad -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.2, user-scalable=yes" />
 		
-		<meta name="keywords" content="{$sb_seo_keywords|@sbGetSeo:"keywords"}">        
-		<meta name="description" content="{$sb_seo_description|@sbGetSeo:"description"}">
+		<!-- metas tags -->
+		{insert name="sbGetSeoMetas"}
         
+		<!-- Title -->
         <title>{insert name=sbGetPageTitle pti="{$sb_title}" mti="{$sb_pages_title}"} {$sb_site_title|default:""}</title>
         
         <!-- [favicon] begin -->

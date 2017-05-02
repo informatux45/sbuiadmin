@@ -6,11 +6,12 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-		
-        <title>{insert name=sbGetPageTitle pti="{$sb_title}" mti="{$sb_pages_title}"} {$sb_site_title|default:""}</title>
 
-		<meta name="keywords" content="{$sb_seo_keywords|@sbGetSeo:"keywords"}">        
-		<meta name="description" content="{$sb_seo_description|@sbGetSeo:"description"}">
+		<!-- metas tags -->
+		{insert name="sbGetSeoMetas"}
+
+		<!-- Title -->
+        <title>{insert name=sbGetPageTitle pti="{$sb_title}" mti="{$sb_pages_title}"} {$sb_site_title|default:""}</title>
 
         <meta name="viewport" content="width=device-width, initial-scale=1">
         
