@@ -107,15 +107,22 @@ INSERT INTO `<DB_PREFIX>sb_config` (`id`, `config`, `content`) VALUES
 (20, 'multilang', '0'),
 (21, 'plugins', ''),
 (22, 'fonts', ''),
-(23, 'seo-keywords', ''),
-(24, 'seo-description', ''),
+(23, 'seo-keywords', 'sbuiadmin,cms,bootstrap,sbadmin2'),
+(24, 'seo-description', 'Le CMS Bootstrap by BooBoo'),
 (25, 'coming-soon-type', 'image'),
 (26, 'coming-soon-image', ''),
 (27, 'coming-soon-video', ''),
 (28, 'coming-soon-dark', '0'),
 (29, 'coming-soon-date', ''),
 (30, 'coming-soon-google-plus', '#'),
-(31, 'toolbarck', '0');
+(31, 'toolbarck', '0'),
+(32, 'seo-rating', 'general'),
+(33, 'seo-robots', 'index,follow'),
+(34, 'seo-author', 'BooBoo'),
+(35, 'seo-copyright', 'SBUIADMIN By Booboo'),
+(36, 'seo-generator', 'SBUIADMIN'),
+(37, 'seo-google-site-verification', ''),
+(38, 'seo-google-analytics', '');
 
 -- --------------------------------------------------------
 

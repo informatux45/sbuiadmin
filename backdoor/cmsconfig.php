@@ -669,18 +669,40 @@ switch($action) {
 		if ($_POST['form_submit']) {
 
 			// Injection des données
-			$seo_keywords    = $sbsanitize->displayText($_POST['seo_keywords'], 'UTF-8', 1, 0);
-			$seo_description = $sbsanitize->displayText($_POST['seo_description'], 'UTF-8', 1, 0);
+			$seo_keywords                 = $sbsanitize->displayText($_POST['seo_keywords'], 'UTF-8', 1, 0);
+			$seo_description              = $sbsanitize->displayText($_POST['seo_description'], 'UTF-8', 1, 0);
+			$seo_robots                   = $sbsanitize->displayText($_POST['seo_robots'], 'UTF-8', 1, 0);
+			$seo_rating                   = $sbsanitize->displayText($_POST['seo_rating'], 'UTF-8', 1, 0);
+			$seo_author                   = $sbsanitize->displayText($_POST['seo_author'], 'UTF-8', 1, 0);
+			$seo_copyright                = $sbsanitize->displayText($_POST['seo_copyright'], 'UTF-8', 1, 0);
+			$seo_generator                = $sbsanitize->displayText($_POST['seo_generator'], 'UTF-8', 1, 0);
+			$seo_google_site_verification = $sbsanitize->displayText($_POST['seo_google_site_verification'], 'UTF-8', 1, 0);
+			$seo_google_analytics         = $sbsanitize->displayText($_POST['seo_google_analytics'], 'UTF-8', 1, 0);
 			
 			// --- EDIT
 			// UPDATE DATAS
-			$query_keywords     = "UPDATE $table SET content = '$seo_keywords' WHERE config = 'seo-keywords'";
-			$query_description  = "UPDATE $table SET content = '$seo_description' WHERE config = 'seo-description'";
-
-			$result_keywords    = $sbsql->query($query_keywords);			
-			$result_description = $sbsql->query($query_description);
-
-			if ($result_keywords && $result_description) {
+			$query_keywords                 = "UPDATE $table SET content = '$seo_keywords' WHERE config = 'seo-keywords'";
+			$query_description              = "UPDATE $table SET content = '$seo_description' WHERE config = 'seo-description'";
+			$query_robots                   = "UPDATE $table SET content = '$seo_robots' WHERE config = 'seo-robots'";
+			$query_rating                   = "UPDATE $table SET content = '$seo_rating' WHERE config = 'seo-rating'";
+			$query_author                   = "UPDATE $table SET content = '$seo_author' WHERE config = 'seo-author'";
+			$query_copyright                = "UPDATE $table SET content = '$seo_copyright' WHERE config = 'seo-copyright'";
+			$query_generator                = "UPDATE $table SET content = '$seo_generator' WHERE config = 'seo-generator'";
+			$query_google_site_verification = "UPDATE $table SET content = '$seo_google_site_verification' WHERE config = 'seo-google-site-verification'";
+			$query_google_analytics         = "UPDATE $table SET content = '$seo_google_analytics' WHERE config = 'seo-google-analytics'";
+			
+			$result_keywords                 = $sbsql->query($query_keywords);			
+			$result_description              = $sbsql->query($query_description);
+			$result_robots                   = $sbsql->query($query_robots);
+			$result_rating                   = $sbsql->query($query_rating);
+			$result_author                   = $sbsql->query($query_author);
+			$result_copyright                = $sbsql->query($query_copyright);
+			$result_generator                = $sbsql->query($query_generator);
+			$result_google_site_verification = $sbsql->query($query_google_site_verification);
+			$result_google_analytics         = $sbsql->query($query_google_analytics );
+			
+			
+			if ($result_keywords && $result_description && $result_robots && $result_rating && $result_author && $result_copyright && $result_generator && $result_google_site_verification && $result_google_analytics) {
 				// --- Message SUCCES
 				$sb_msg_valid = 'SEO modifié avec succès';
 			} else {
@@ -692,21 +714,12 @@ switch($action) {
 			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query . "\n" . 'Submit Form Type = '.$formType);
 			
 		}
-		
-		// --------------------------------
-		// --- Recuperation des donnees
-		// --------------------------------
-		$query           = "SELECT content FROM $table WHERE config = 'fonts'";
-		$request         = $sbsql->query($query);
-		$assoc           = $sbsql->assoc($request);
-		$seo_keywords    = utf8_encode($assoc['seo_keywords']);
-		$seo_description = utf8_encode($assoc['seo_description']);
-		// --------------------------------
 
 		// --------------------------------
 		// --- Recuperation des donnees
 		// --------------------------------
-		$query = "SELECT config, content FROM $table WHERE config = 'seo-keywords' OR config = 'seo-description'";
+		$query = "SELECT config, content FROM $table WHERE config LIKE 'seo-%'
+														";
 		$request = $sbsql->query($query);
 		$assoc   = $sbsql->toarray($request);
 		// --------------------------------
@@ -728,6 +741,60 @@ switch($action) {
 		// --------------------------------
 		$sbform->addTextarea('SEO Keywords', $cs['seo-keywords'], array('id' => 'seo_keywords', 'name' => 'seo_keywords', 'style' => 'height: 70px !important;'), false, "Les mots clés doivent être séparés par des virgules");
 		$sbform->addTextarea('SEO Description', $cs['seo-description'], array('id' => 'seo_description', 'name' => 'seo_description', 'style' => 'height: 120px !important;'), false, "Google limite la META DESCRIPTION à 155 caractères aujourd'hui... Jusqu'à changement...");
+		// -----------------------------------
+		// Meta Tag (Robots)
+		// -----------------------------------
+		$sb_meta_robots = ['Index, Follow' => 'index,follow'
+						  ,'No Index, Follow' => 'noindex,follow'
+						  ,'Index, No Follow' => 'index,nofollow'
+						  ,'No Index, No Follow' => 'noindex,nofollow'
+						  ];
+		$sbform->openSelect("Meta Robots", array("id"=>"seo_robots", "name"=>"seo_robots"));
+		foreach($sb_meta_robots as $key => $val) {
+			if ($val == $cs['seo-robots'])
+				$sbform->addOption($key, array ("value"=>$val, "selected"=>""));
+		else
+				$sbform->addOption($key, array ("value"=>$val));
+		}
+		// --- Close Select
+		$sbform->closeSelect("La Méta Robots déclarent aux moteurs de recherche quel contenu indexer");
+		// -----------------------------------
+		// Meta Tag (Rating)
+		// -----------------------------------
+		$sb_meta_rating = ['General' => 'general'
+						  ,'14 years' => '14 years'
+						  ,'Restricted' => 'restricted'
+						  ,'Mature' => 'mature'
+						  ];
+		$sbform->openSelect("Meta Rating", array("id"=>"seo_rating", "name"=>"seo_rating"));
+		foreach($sb_meta_rating as $key => $val) {
+			if ($val == $cs['seo-rating'])
+				$sbform->addOption($key, array ("value"=>$val, "selected"=>""));
+		else
+				$sbform->addOption($key, array ("value"=>$val));
+		}
+		// --- Close Select
+		$sbform->closeSelect("La Méta Rating définit la moyenne d'âge des visiteurs et le contenu de votre site");
+		// -----------------------------------
+		// Meta Tag (Author)
+		// -----------------------------------
+		$sbform->addInput('text', 'Meta Author', array ('name' => 'seo_author', 'value' => "{$cs['seo-author']}", 'placeholder' => "Meta Author"), false, false, "La Méta Author définit le nom de l'auteur de votre site");
+		// -----------------------------------
+		// Meta Tag (Copyright)
+		// -----------------------------------
+		$sbform->addInput('text', 'Meta Copyright', array ('name' => 'seo_copyright', 'value' => "{$cs['seo-copyright']}", 'placeholder' => "Meta Copyright"), false, false, "La Méta Copyright définit les droits d'auteur de votre site");
+		// -----------------------------------
+		// Meta Tag (Generator)
+		// -----------------------------------
+		$sbform->addInput('text', 'Meta Generator', array ('name' => 'seo_generator', 'value' => "{$cs['seo-generator']}", 'placeholder' => "Meta Generator"), false, false, "La Méta Generator définit le logiciel moteur de votre site");
+		// -----------------------------------
+		// Meta Tag (Google Verify v1)
+		// -----------------------------------
+		$sbform->addInput('text', 'Meta Google Site Verification', array ('name' => 'seo_google_site_verification', 'value' => "{$cs['seo-google-site-verification']}", 'placeholder' => "Meta Google Site Verify"), false, false, "La Méta Google Site Verify vous permet de confirmer que vous êtes le propriétaire d'un site en ajoutant un code fournit par Google. Indiquer seulement le code fournit sous cette forme <span style='color: red'>+nxGUDJ4QpAZ5l9Bsjdi102tLVC21AIh5d1Nl23908vVuFHs34=</span>");
+		// -----------------------------------
+		// Meta Tag (Google Analytics)
+		// -----------------------------------
+		$sbform->addInput('text', 'Meta Google Analytics', array ('name' => 'seo_google_analytics', 'value' => "{$cs['seo-google-analytics']}", 'placeholder' => "Meta Google Analytics"), false, false, "La Méta Google Google Analytics vous permet d'effectuer le suivi du trafic de votre site sur l'outil fournit par Google Analytics. Indiquer seulement le code fournit en <span style='color: red'>rouge</span> sous cette forme UA-<span style='color: red'>xxxxxxx-x</span>");
 		// --------------------------------
 		// --- Hiddens / Buttons
 		// --------------------------------	
