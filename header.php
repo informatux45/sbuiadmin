@@ -59,6 +59,29 @@ $sbsanitize = new sanitize();
 $sbpage     = new page();
 
 // ----------------------
+// Include Mobile Detect
+// ----------------------
+include_once('plugins/mobile-detect/Mobile_Detect.php');
+$mobile_detect = 'classic';
+if (class_exists('Mobile_Detect')) {
+	$sbMobileDetect = new Mobile_Detect;
+	$sb_isMobile    = $sbMobileDetect->isMobile();
+	$sb_isTablet    = $sbMobileDetect->isTablet();
+	
+	// Layout Type
+	$mobile_detect = ($sb_isMobile ? ($sb_isTablet ? 'tablet' : 'mobile') : 'computer');
+	// Custom detection methods
+	$sb_custom_detection = '';
+	foreach($sbMobileDetect->getRules() as $name => $regex) {
+		$sb_check_custom = $sbMobileDetect->{'is'.$name}();
+		if ($sb_check_custom)
+			$sb_custom_detection .= ' ' . $name;
+	}
+}
+$sbsmarty->assign('sb_mobile_detect', $mobile_detect);
+$sbsmarty->assign('sb_mobile_custom', $sb_custom_detection);
+
+// ----------------------
 // Smarty Configuration
 // ----------------------
 $sbsmarty->setTemplateDir(array('theme' => SB_THEME_DIR . "tpls" . DIRECTORY_SEPARATOR
