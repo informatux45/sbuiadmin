@@ -40,6 +40,7 @@ setlocale(LC_ALL, SBLANG);
 # Define default timezone of server, accepts php timezone string
 # valid timeszones can be found here http://www.php.net/manual/en/timezones.php
 define('SBTIMEZONE', 'Europe/Paris');
+date_default_timezone_set(SBTIMEZONE);
 
 # Set email from address
 define('SBFROMEMAIL', 'noreply@mysite.fr');
