@@ -534,7 +534,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_pages` (
   `title` varchar(255) NOT NULL COMMENT 'Titre de la page',
   `content` text NOT NULL,
   `seo_url` text NOT NULL,
-  `url_custom` varchar(255) NOT NULL,
+  `url_custom` varchar(255) DEFAULT NULL,
   `seo_keywords` text NOT NULL COMMENT 'Mots cles additionnels de la page',
   `seo_description` varchar(155) NOT NULL COMMENT 'Meta description additionnels de la page',
   `module_view` varchar(50) NOT NULL COMMENT 'Module view for the current page',

@@ -148,12 +148,13 @@ switch($action) {
 			$module_view     = $sbsanitize->displayText($_POST['module_view'], 'UTF-8', 1, 0);
 			$headpage        = $sbsanitize->displayText($_POST['headpage'], 'UTF-8', 1, 0);
 			$active          = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$url_custom      = '';
 	
 			// ADD or EDIT
 			if ($formType == 'add') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table (menu,title,content,seo_url,seo_keywords,seo_description,active,theme_view,module_view,headpage,sort)
-						  VALUES ('$menu','$title','$content','$seo_url','$seo_keywords','$seo_description','$active','$theme_view','$module_view','$headpage','0')";
+				$query = "INSERT INTO $table (menu,title,content,seo_url,url_custom,seo_keywords,seo_description,active,theme_view,module_view,headpage,sort)
+						  VALUES ('$menu','$title','$content','$seo_url','$url_custom','$seo_keywords','$seo_description','$active','$theme_view','$module_view','$headpage','0')";
 				$result_add = $sbsql->query($query);
 				if ($result_add) {
 					// --- Vider les champs du formulaire
