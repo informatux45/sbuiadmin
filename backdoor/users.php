@@ -287,17 +287,18 @@ switch($action) {
 		// ----------------------------
 		// --- Initialisation
 		$tab_menu = array();
-		// --- Tableau des types du bien
+		// --- Tableau des modules
 		$array_menu = explode("|", $menu);
 		$i = 0;
 		foreach($module_menu as $key => $val) {
-			$tab_menu[$i]['text']    = $key;
+			$main_text = '<i class="fa fa-'.$module_menu[$key]['icon'].' fa-fw"></i> ' . $module_menu[$key]['main'];
+			$tab_menu[$i]['text']    = ($module_menu[$key]['group'] == 'admin') ? '<span style="color: red;">'.$main_text.'</span>' : $main_text;
 			$tab_menu[$i]['name']    = 'menu[]';
 			$tab_menu[$i]['value']   = $key;
 			$tab_menu[$i]['checked'] = (in_array($key, $array_menu)) ? '1' : '0';
 			$i++;
 		}
-		$sbform->addCheckbox('Autorisation du menu', $tab_menu, '', false, '<br>', "Cochez les entrées du menu qui ne sont pas autorisées pour cet utilisateur.");
+		$sbform->addCheckbox('Autorisation du menu', $tab_menu, '', false, '<br>', "Cochez les entrées du menu qui ne sont pas autorisées pour cet utilisateur.<br>Les entrées en <span style='color: red;'>rouge</span> sont les modules accessibles uniquement par les administrateurs (Groupe Admin).");
 		// --- Hiddens / Buttons
 		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => "$formName"));
 		$sbform->addInput('hidden', '', array('name' => 'id', 'value' => "$id"));
