@@ -33,25 +33,25 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-										{foreach from=$all item=record}
-											<tr class="{cycle values="odd,even"} gradeX">
-												<td>{$record.nom|unescape:"htmlall"}</td>
-												<td>{$record.telephone|unescape:"htmlall"}</td>
-												<td>{$record.email|unescape:"htmlall"}</td>
-												<td>{$record.company|unescape:"htmlall"}</td>
-												<td>{$record.country|unescape:"htmlall"}</td>
-												<td>
-													<span class="glyphicon glyphicon-eye-open {if $record.active}green{else}red{/if}" title="Statut {if $record.active}visible{else}non visible{/if}"></span>
-													&nbsp;
-													<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit&id={$record.id}" title="Modifier"></a>
-													&nbsp;
-													{* Add "jConfirm" class to add confirm box alert *}
-													<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$record.id}" title="Supprimer"></a>
-												</td>
-											</tr>
-										{foreachelse}
-										&nbsp;
-										{/foreach}
+										{if $allsandbox}
+											{foreach from=$allsandbox item=record}
+												<tr class="{cycle values="odd,even"} gradeX">
+													<td>{$record.nom|unescape:"htmlall"}</td>
+													<td>{$record.telephone|unescape:"htmlall"}</td>
+													<td>{$record.email|unescape:"htmlall"}</td>
+													<td>{$record.company|unescape:"htmlall"}</td>
+													<td>{$record.country|unescape:"htmlall"}</td>
+													<td>
+														<span class="glyphicon glyphicon-eye-open {if $record.active}green{else}red{/if}" title="Statut {if $record.active}visible{else}non visible{/if}"></span>
+														&nbsp;
+														<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit&id={$record.id}" title="Modifier"></a>
+														&nbsp;
+														{* Add "jConfirm" class to add confirm box alert *}
+														<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$record.id}" title="Supprimer"></a>
+													</td>
+												</tr>
+											{/foreach}
+										{/if}
                                     </tbody>
                                 </table>
                             </div>

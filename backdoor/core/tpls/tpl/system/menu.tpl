@@ -33,19 +33,21 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-										{foreach from=$all item=page}
-											<tr class="{cycle values="odd,even"} gradeX">
-												<td>{$page.name|unescape:"htmlall"}</td>
-												<td>{$page.tag|unescape:"htmlall"}</td>
-												<td>
-													<span class="glyphicon glyphicon-eye-open {if $page.active}green{else}red{/if}" title="Statut {if $page.active}visible{else}non visible{/if}"></span>
-													&nbsp;
-													<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit&id={$page.id}" title="Modifier"></a>
-													&nbsp;
-													<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$page.id}" title="Supprimer"></a>
-												</td>
-											</tr>										
-										{/foreach}
+										{if $allmenu}
+											{foreach from=$allmenu item=page}
+												<tr class="{cycle values="odd,even"} gradeX">
+													<td>{$page.name|unescape:"htmlall"}</td>
+													<td>{$page.tag|unescape:"htmlall"}</td>
+													<td>
+														<span class="glyphicon glyphicon-eye-open {if $page.active}green{else}red{/if}" title="Statut {if $page.active}visible{else}non visible{/if}"></span>
+														&nbsp;
+														<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit&id={$page.id}" title="Modifier"></a>
+														&nbsp;
+														<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$page.id}" title="Supprimer"></a>
+													</td>
+												</tr>										
+											{/foreach}
+										{/if}
                                     </tbody>
                                 </table>
                             </div>

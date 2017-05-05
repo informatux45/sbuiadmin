@@ -73,26 +73,22 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-										{foreach from=$all item=bloc}
-											<tr class="{cycle values="odd,even"} gradeX">
-												<td>{$bloc.name|unescape:"htmlall"|@sbDisplayLang}</td>
-												{*<td>{$bloc.pagename|unescape:"htmlall"|@sbDisplayLang}</td>*}
-												<td>{$bloc.title|unescape:"htmlall"|@sbDisplayLang}</td>
-												<td>
-													<span class="glyphicon glyphicon-eye-open {if $bloc.active}green{else}red{/if}" title="Statut {if $bloc.active}visible{else}non visible{/if}"></span>
-													&nbsp;
-													<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit&id={$bloc.id}" title="Modifier"></a>
-													&nbsp;
-													<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$bloc.id}" title="Supprimer"></a>
-												</td>
-											</tr>
-										{*foreachelse}
-											<tr class="even gradeX">
-												<td colspan="4">
-													Aucun enregistrement
-												</td>
-											</tr>*}
-										{/foreach}
+										{if $allbloc}
+											{foreach from=$allbloc item=bloc}
+												<tr class="{cycle values="odd,even"} gradeX">
+													<td>{$bloc.name|unescape:"htmlall"|@sbDisplayLang}</td>
+													{*<td>{$bloc.pagename|unescape:"htmlall"|@sbDisplayLang}</td>*}
+													<td>{$bloc.title|unescape:"htmlall"|@sbDisplayLang}</td>
+													<td>
+														<span class="glyphicon glyphicon-eye-open {if $bloc.active}green{else}red{/if}" title="Statut {if $bloc.active}visible{else}non visible{/if}"></span>
+														&nbsp;
+														<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit&id={$bloc.id}" title="Modifier"></a>
+														&nbsp;
+														<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$bloc.id}" title="Supprimer"></a>
+													</td>
+												</tr>
+											{/foreach}
+										{/if}
                                     </tbody>
                                 </table>
                             </div>

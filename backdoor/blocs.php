@@ -92,7 +92,8 @@ switch($action) {
 		// --- Extract all modules
 		$result_modules = sbGetModulesPage();
 		
-		$sbsmarty->assign('all', $result2);
+		$sbsmarty->assign('all', true);
+		$sbsmarty->assign('allbloc', $result2);
 		$sbsmarty->assign('all_pages', $result_pages);
 		$sbsmarty->assign('all_modules', $result_modules);		
 
