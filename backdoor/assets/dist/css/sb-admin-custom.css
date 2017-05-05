@@ -656,8 +656,25 @@ li.sortable-extra i {
 		#F4FCFF 20px
 	);
 }
+.config_blocks_desactived {
+  width: 200px;
+  height: 150px;
+  border: 2px solid red;
+  padding: 10px;
+  border-radius: 5px;
+  float: left;
+  text-align: center;
+  margin: 0 10px 10px 0;
+	background: repeating-radial-gradient(
+		circle,
+		#FCC9A9,
+		#FCC9A9 10px,
+		#F4FCFF 10px, 
+		#F4FCFF 20px
+	);
+}
 .config_blocks_active {
-    width: 200px;
+  width: 200px;
   height: 150px;
   border: 1px solid lightgrey;
   padding: 10px;

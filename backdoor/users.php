@@ -285,20 +285,25 @@ switch($action) {
 		// ----------------------------
 		// Menu
 		// ----------------------------
-		// --- Initialisation
-		$tab_menu = array();
 		// --- Tableau des modules
 		$array_menu = explode("|", $menu);
-		$i = 0;
 		foreach($module_menu as $key => $val) {
-			$main_text = '<i class="fa fa-'.$module_menu[$key]['icon'].' fa-fw"></i> ' . $module_menu[$key]['main'];
-			$tab_menu[$i]['text']    = ($module_menu[$key]['group'] == 'admin') ? '<span style="color: red;">'.$main_text.'</span>' : $main_text;
-			$tab_menu[$i]['name']    = 'menu[]';
-			$tab_menu[$i]['value']   = $key;
-			$tab_menu[$i]['checked'] = (in_array($key, $array_menu)) ? '1' : '0';
-			$i++;
+			// Create random variable
+			$_randstring = substr(str_shuffle(str_repeat("0123456789abcdefghijklmnopqrstuvwxyz", 5)), 0, 5);
+			// Initialize each array
+			$_{$_randstring} = [];
+			// Module Text
+			$main_text = '<i class="fa fa-'.$module_menu[$key]['icon'].' fa-fw"></i> ' . $module_menu[$key]['main'] . '<br>' . "&nbsp;&nbsp;&nbsp;&nbsp;<span class='help-block'>" . 'Module : '.$key.'</span>';
+			$_{$_randstring}[0]['text']    = 'Désactivé';
+			$_{$_randstring}[0]['name']    = 'menu[]';
+			$_{$_randstring}[0]['value']   = $key;
+			$_{$_randstring}[0]['checked'] = (in_array($key, $array_menu)) ? '1' : '0';
+			$config_blocks = ($_{$_randstring}[0]['checked'] == '0') ? 'config_blocks_active' : 'config_blocks_desactived';
+			$sbform->addAnything("<div class='$config_blocks'");
+			$sbform->addCheckbox((($module_menu[$key]['group'] == 'admin') ? '<span style="color: red;">'.$main_text.'</span>' : $main_text), $_{$_randstring}, '', false, '<br />');
+			$sbform->addAnything("</div>");
 		}
-		$sbform->addCheckbox('Autorisation du menu', $tab_menu, '', false, '<br>', "Cochez les entrées du menu qui ne sont pas autorisées pour cet utilisateur.<br>Les entrées en <span style='color: red;'>rouge</span> sont les modules accessibles uniquement par les administrateurs (Groupe Admin).");
+		$sbform->addAnything("<p style='clear: both'>Cochez les entrées du menu qui ne sont pas autorisées pour cet utilisateur.<br>Les entrées nommées en <span style='color: red;'>rouge</span> sont les modules accessibles uniquement par les administrateurs (Groupe Admin).</p>");
 		// --- Hiddens / Buttons
 		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => "$formName"));
 		$sbform->addInput('hidden', '', array('name' => 'id', 'value' => "$id"));
