@@ -61,21 +61,23 @@
 											</tr>
 										</thead>
 										<tbody>
-											{foreach from=$all item=tabbs}
-												<tr class="{cycle values="odd,even"} gradeX">
-													<td>{$tabbs.name|unescape:"htmlall"|@sbDisplayLang}</td>
-													<td>[CS id={$tabbs.id} name=sbtabbs]</td>
-													<td>
-														<span class="glyphicon glyphicon-eye-open {if $tabbs.active}green{else}red{/if}" title="Statut {if $tabbs.active}visible{else}non visible{/if}"></span>
-														&nbsp;
-														<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit&id={$tabbs.id}" title="Modifier"></a>
-														&nbsp;
-														<a class="glyphicon glyphicon-sort-by-attributes" href="{$module_url}&a=sort&tid={$tabbs.id}" title="Trier les onglets"></a>
-														&nbsp;
-														<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$tabbs.id}" title="Supprimer"></a>
-													</td>
-												</tr>										
-											{/foreach}
+											{if $alltabb}
+												{foreach from=$alltabb item=tabbs}
+													<tr class="{cycle values="odd,even"} gradeX">
+														<td>{$tabbs.name|unescape:"htmlall"|@sbDisplayLang}</td>
+														<td>[CS id={$tabbs.id} name=sbtabbs]</td>
+														<td>
+															<span class="glyphicon glyphicon-eye-open {if $tabbs.active}green{else}red{/if}" title="Statut {if $tabbs.active}visible{else}non visible{/if}"></span>
+															&nbsp;
+															<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit&id={$tabbs.id}" title="Modifier"></a>
+															&nbsp;
+															<a class="glyphicon glyphicon-sort-by-attributes" href="{$module_url}&a=sort&tid={$tabbs.id}" title="Trier les onglets"></a>
+															&nbsp;
+															<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$tabbs.id}" title="Supprimer"></a>
+														</td>
+													</tr>										
+												{/foreach}
+											{/if}
 										</tbody>
 									</table>
 								</div>
@@ -89,7 +91,7 @@
 					<!-- /.col-lg-12 -->
 				{/if}
 				
-				{if $alltabs}
+				{if $allt}
                 <div class="col-lg-12">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
@@ -109,19 +111,21 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-										{foreach from=$alltabs item=tabs}
-											<tr class="{cycle values="odd,even"} gradeX">
-												<td>{$tabs.title|unescape:"htmlall"|@sbDisplayLang}</td>
-												<td>{$tabs.catname|unescape:"htmlall"|@sbDisplayLang}</td>
-												<td>
-													<span class="glyphicon glyphicon-eye-open {if $tabs.active}green{else}red{/if}" title="Statut {if $tabs.active}visible{else}non visible{/if}"></span>
-													&nbsp;
-													<a class="glyphicon glyphicon-cog" href="{$module_url}&a=tabedit&id={$tabs.id}" title="Modifier"></a>
-													&nbsp;
-													<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=tabdel&id={$tabs.id}" title="Supprimer"></a>
-												</td>
-											</tr>										
-										{/foreach}
+										{if $alltabs}
+											{foreach from=$alltabs item=tabs}
+												<tr class="{cycle values="odd,even"} gradeX">
+													<td>{$tabs.title|unescape:"htmlall"|@sbDisplayLang}</td>
+													<td>{$tabs.catname|unescape:"htmlall"|@sbDisplayLang}</td>
+													<td>
+														<span class="glyphicon glyphicon-eye-open {if $tabs.active}green{else}red{/if}" title="Statut {if $tabs.active}visible{else}non visible{/if}"></span>
+														&nbsp;
+														<a class="glyphicon glyphicon-cog" href="{$module_url}&a=tabedit&id={$tabs.id}" title="Modifier"></a>
+														&nbsp;
+														<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=tabdel&id={$tabs.id}" title="Supprimer"></a>
+													</td>
+												</tr>										
+											{/foreach}
+										{/if}
                                     </tbody>
                                 </table>
                             </div>

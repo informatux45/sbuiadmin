@@ -77,7 +77,8 @@ switch($action) {
 		$request2  = $sbsql->query($query[0]);
 		$result2   = $sbsql->toarray($request2);
 		
-		$sbsmarty->assign('all', $result2);
+		$sbsmarty->assign('all', true);
+		$sbsmarty->assign('allnew', $result2);
 		
 		// ----------------------------------------
 		// --- News infos
@@ -144,6 +145,7 @@ switch($action) {
 		$request2  = $sbsql->query($query[4]);
 		$result2   = $sbsql->toarray($request2);
 		
+		$sbsmarty->assign('allcat', true);
 		$sbsmarty->assign('allcategory', $result2);
 		
 		// --- Debug SQL

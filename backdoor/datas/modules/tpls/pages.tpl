@@ -33,23 +33,25 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-										{foreach from=$all item=page}
-											<tr class="{cycle values="odd,even"} gradeX">
-												<td>{$page.title|unescape:"htmlall"|@sbDisplayLang}</td>
-												<td>{$page.theme_view|unescape:"htmlall"}</td>
-												<td>{$page.module_view|unescape:"htmlall"}</td>
-												<td><a href="{$seo_url_cms}{$page.seo_url|unescape:"htmlall"}" target="_blank">{$page.seo_url|unescape:"htmlall"}</a></td>
-												<td>
-													<span class="glyphicon glyphicon-eye-open {if $page.active}green{else}red{/if}" title="Statut {if $page.active}visible{else}non visible{/if}"></span>
-													&nbsp;
-													<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit{if $page.url_custom != ''}custom{/if}&id={$page.id}" title="Modifier"></a>
-													{if $page.seo_url != '' || $page.url_custom != ''}
-													&nbsp;
-													<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$page.id}" title="Supprimer"></a>
-													{/if}
-												</td>
-											</tr>										
-										{/foreach}
+										{if $allpage}
+											{foreach from=$allpage item=page}
+												<tr class="{cycle values="odd,even"} gradeX">
+													<td>{$page.title|unescape:"htmlall"|@sbDisplayLang}</td>
+													<td>{$page.theme_view|unescape:"htmlall"}</td>
+													<td>{$page.module_view|unescape:"htmlall"}</td>
+													<td><a href="{$seo_url_cms}{$page.seo_url|unescape:"htmlall"}" target="_blank">{$page.seo_url|unescape:"htmlall"}</a></td>
+													<td>
+														<span class="glyphicon glyphicon-eye-open {if $page.active}green{else}red{/if}" title="Statut {if $page.active}visible{else}non visible{/if}"></span>
+														&nbsp;
+														<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit{if $page.url_custom != ''}custom{/if}&id={$page.id}" title="Modifier"></a>
+														{if $page.seo_url != '' || $page.url_custom != ''}
+														&nbsp;
+														<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$page.id}" title="Supprimer"></a>
+														{/if}
+													</td>
+												</tr>										
+											{/foreach}
+										{/if}
                                     </tbody>
                                 </table>
                             </div>

@@ -41,25 +41,27 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-										{foreach from=$all item=slider}
-											<tr class="{cycle values="odd,even"} gradeX">
-												<td>{$slider.title|unescape:"htmlall"|@sbDisplayLang}</td>
-												<td>{$slider.mode|unescape:"htmlall"}</td>
-												<td>{$slider.cpt_img|default:0}</td>
-												<td>[CS id={$slider.id} name=sbslider]</td>
-												<td>
-													<span class="glyphicon glyphicon-eye-open {if $slider.active}green{else}red{/if}" title="Statut {if $slider.active}visible{else}non visible{/if}"></span>
-													&nbsp;
-													<a class="glyphicon glyphicon-picture" href="{$module_url}&a=photo&sid={$slider.id}" title="Toutes les photos"></a>
-													&nbsp;
-													<a class="glyphicon glyphicon-sort-by-attributes" href="{$module_url}&a=sort&sid={$slider.id}" title="Trier les photos"></a>
-													&nbsp;
-													<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit&id={$slider.id}" title="Modifier"></a>
-													&nbsp;
-													<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$slider.id}" title="Supprimer"></a>
-												</td>
-											</tr>										
-										{/foreach}
+										{if $allslider}
+											{foreach from=$allslider item=slider}
+												<tr class="{cycle values="odd,even"} gradeX">
+													<td>{$slider.title|unescape:"htmlall"|@sbDisplayLang}</td>
+													<td>{$slider.mode|unescape:"htmlall"}</td>
+													<td>{$slider.cpt_img|default:0}</td>
+													<td>[CS id={$slider.id} name=sbslider]</td>
+													<td>
+														<span class="glyphicon glyphicon-eye-open {if $slider.active}green{else}red{/if}" title="Statut {if $slider.active}visible{else}non visible{/if}"></span>
+														&nbsp;
+														<a class="glyphicon glyphicon-picture" href="{$module_url}&a=photo&sid={$slider.id}" title="Toutes les photos"></a>
+														&nbsp;
+														<a class="glyphicon glyphicon-sort-by-attributes" href="{$module_url}&a=sort&sid={$slider.id}" title="Trier les photos"></a>
+														&nbsp;
+														<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit&id={$slider.id}" title="Modifier"></a>
+														&nbsp;
+														<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$slider.id}" title="Supprimer"></a>
+													</td>
+												</tr>										
+											{/foreach}
+										{/if}
                                     </tbody>
                                 </table>
                             </div>

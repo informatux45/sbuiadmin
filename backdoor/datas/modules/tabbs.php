@@ -84,7 +84,8 @@ switch($action) {
 		$request2  = $sbsql->query($query[0]);
 		$result2   = $sbsql->toarray($request2);
 		
-		$sbsmarty->assign('all', $result2);
+		$sbsmarty->assign('all', true);
+		$sbsmarty->assign('alltabb', $result2);
 		
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) {
@@ -122,6 +123,7 @@ switch($action) {
 		$request2  = $sbsql->query($query[0]);
 		$result2   = $sbsql->toarray($request2);
 		
+		$sbsmarty->assign('allt', true);
 		$sbsmarty->assign('alltabs', $result2);
 		
 		// --- Debug SQL

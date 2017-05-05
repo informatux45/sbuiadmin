@@ -34,19 +34,21 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-										{foreach from=$all item=contact}
-											<tr class="{cycle values="odd,even"} gradeX">
-												<td>{$contact.title|unescape:"htmlall"|@sbDisplayLang}</td>
-												<td>[CS id={$contact.id} name=sbcontact class=your-class]</td>
-												<td>
-													<span class="glyphicon glyphicon-eye-open {if $contact.active}green{else}red{/if}" title="Statut {if $contact.active}visible{else}non visible{/if}"></span>
-													&nbsp;
-													<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit&id={$contact.id}" title="Modifier"></a>
-													&nbsp;
-													<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$contact.id}" title="Supprimer"></a>
-												</td>
-											</tr>										
-										{/foreach}
+										{if $allcontact}
+											{foreach from=$allcontact item=contact}
+												<tr class="{cycle values="odd,even"} gradeX">
+													<td>{$contact.title|unescape:"htmlall"|@sbDisplayLang}</td>
+													<td>[CS id={$contact.id} name=sbcontact class=your-class]</td>
+													<td>
+														<span class="glyphicon glyphicon-eye-open {if $contact.active}green{else}red{/if}" title="Statut {if $contact.active}visible{else}non visible{/if}"></span>
+														&nbsp;
+														<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit&id={$contact.id}" title="Modifier"></a>
+														&nbsp;
+														<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$contact.id}" title="Supprimer"></a>
+													</td>
+												</tr>										
+											{/foreach}
+										{/if}
                                     </tbody>
                                 </table>
                             </div>

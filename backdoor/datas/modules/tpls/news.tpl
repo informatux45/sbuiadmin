@@ -34,21 +34,23 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-										{foreach from=$all item=news}
-											<tr class="{cycle values="odd,even"} gradeX">
-												<td>{$news.date|unescape:"htmlall"}</td>
-												<td>{$news.title|unescape:"htmlall"|@sbDisplayLang}</td>
-												<td>{$news.catname|unescape:"htmlall"|@sbDisplayLang}</td>
-												<td>[CS id={$news.id} name=sbnews_item]</td>
-												<td>
-													<span class="glyphicon glyphicon-eye-open {if $news.active}green{else}red{/if}" title="Statut {if $news.active}visible{else}non visible{/if}"></span>
-													&nbsp;
-													<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit&id={$news.id}" title="Modifier"></a>
-													&nbsp;
-													<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$news.id}" title="Supprimer"></a>
-												</td>
-											</tr>										
-										{/foreach}
+										{if $allnew}
+											{foreach from=$allnew item=news}
+												<tr class="{cycle values="odd,even"} gradeX">
+													<td>{$news.date|unescape:"htmlall"}</td>
+													<td>{$news.title|unescape:"htmlall"|@sbDisplayLang}</td>
+													<td>{$news.catname|unescape:"htmlall"|@sbDisplayLang}</td>
+													<td>[CS id={$news.id} name=sbnews_item]</td>
+													<td>
+														<span class="glyphicon glyphicon-eye-open {if $news.active}green{else}red{/if}" title="Statut {if $news.active}visible{else}non visible{/if}"></span>
+														&nbsp;
+														<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit&id={$news.id}" title="Modifier"></a>
+														&nbsp;
+														<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$news.id}" title="Supprimer"></a>
+													</td>
+												</tr>										
+											{/foreach}
+										{/if}
                                     </tbody>
                                 </table>
                             </div>
@@ -62,12 +64,12 @@
                 <!-- /.col-lg-12 -->
 				{/if}
 				
-				{if $allcategory}
+				{if $allcat}
 				
                 <div class="col-lg-12">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
-                            <span class="fa fa-rss fa-fw"></span> <strong>{if $allcategory}Gestion de vos catégories{else}{$legend_add_edit}{/if}</strong>
+                            <span class="fa fa-rss fa-fw"></span> <strong>{if $allcat}Gestion de vos catégories{else}{$legend_add_edit}{/if}</strong>
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
@@ -83,26 +85,28 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-										{foreach from=$allcategory item=category}
-											<tr class="{cycle values="odd,even"} gradeX">
-												<td>{$category.sort}</td>
-												<td>{$category.title|unescape:"htmlall"|@sbDisplayLang}</td>
-												<td>[CS id={$category.id} name=sbnews_latest]</td>
-												<td>
-													<span class="glyphicon glyphicon-eye-open {if $category.active}green{else}red{/if}" title="Statut {if $category.active}visible{else}non visible{/if}"></span>
-													&nbsp;
-													<a class="glyphicon glyphicon-object-align-top yellow" href="{$module_url}&a=tpl_list&id={$category.id}" title="TPL LIST"></a>
-													&nbsp;
-													<a class="glyphicon glyphicon-object-align-left yellow" href="{$module_url}&a=tpl_single&id={$category.id}" title="TPL SINGLE"></a>
-													&nbsp;
-													<a class="glyphicon glyphicon-wrench green" href="{$module_url}&a=settingscategory&id={$category.id}" title="Paramètres"></a>
-													&nbsp;
-													<a class="glyphicon glyphicon-cog" href="{$module_url}&a=categoryedit&id={$category.id}" title="Modifier"></a>
-													&nbsp;
-													<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=categorydel&id={$category.id}" title="Supprimer"></a>
-												</td>
-											</tr>										
-										{/foreach}
+										{if $allcategory}
+											{foreach from=$allcategory item=category}
+												<tr class="{cycle values="odd,even"} gradeX">
+													<td>{$category.sort}</td>
+													<td>{$category.title|unescape:"htmlall"|@sbDisplayLang}</td>
+													<td>[CS id={$category.id} name=sbnews_latest]</td>
+													<td>
+														<span class="glyphicon glyphicon-eye-open {if $category.active}green{else}red{/if}" title="Statut {if $category.active}visible{else}non visible{/if}"></span>
+														&nbsp;
+														<a class="glyphicon glyphicon-object-align-top yellow" href="{$module_url}&a=tpl_list&id={$category.id}" title="TPL LIST"></a>
+														&nbsp;
+														<a class="glyphicon glyphicon-object-align-left yellow" href="{$module_url}&a=tpl_single&id={$category.id}" title="TPL SINGLE"></a>
+														&nbsp;
+														<a class="glyphicon glyphicon-wrench green" href="{$module_url}&a=settingscategory&id={$category.id}" title="Paramètres"></a>
+														&nbsp;
+														<a class="glyphicon glyphicon-cog" href="{$module_url}&a=categoryedit&id={$category.id}" title="Modifier"></a>
+														&nbsp;
+														<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=categorydel&id={$category.id}" title="Supprimer"></a>
+													</td>
+												</tr>										
+											{/foreach}
+										{/if}
                                     </tbody>
                                 </table>
                             </div>
