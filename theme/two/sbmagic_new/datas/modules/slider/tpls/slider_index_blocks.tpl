@@ -1,1 +1,0 @@
-{* --- Show slider Blocks --- *}

@@ -1,2 +1,0 @@
-{* --- Show Search Blocs infos --- *}
-

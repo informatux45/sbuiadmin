@@ -1,8 +1,0 @@
-/* --- News style Breadcrumb --- */
-
-.sbeffectives_breadcrumb_header {width: 100%; border-bottom: 1px solid #eee; margin: 5px 0px 20px 0px; padding: 0;}
-.sbeffectives_breadcrumb_title {font-size: 15px; font-weight: bold; color: black; padding: 0px;}
-.sbeffectives_breadcrumb_name {font-size: 12px; font-weight: bold; color: black;}
-.sbeffectives_breadcrumb_name a {font-size: 12px; font-weight: bold; color: gray;}
-.sbeffectives_breadcrumb_home {width: 100%; line-height: 18px; font-weight: normal; font-size: 15px; color: black; background-color: silver; padding: 3px;}
-.sbeffectives_breadcrumb_offline {font-size: 15px; font-weight: bold; color: black; padding: 0px 0px 12px 0px;}
