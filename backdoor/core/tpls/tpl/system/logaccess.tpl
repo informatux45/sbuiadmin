@@ -34,7 +34,7 @@
                                     </thead>
                                     <tbody>
 										{if $allaccess}
-											{foreach from=$all item=log}
+											{foreach from=$allaccess item=log}
 												<tr class="{if $log.logaccess_type == 'error'}danger{else}{cycle values="odd,even"} gradeX{/if}">
 													<td>{$log.id}</td>
 													<td>{$log.logaccess_date|date_format:"%d.%m.%Y - %R"}</td>

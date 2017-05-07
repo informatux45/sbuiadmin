@@ -73,7 +73,9 @@ class user extends sql {
 	*/
 	function updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user = 'admin') {
 		// --- Update the Access Log file if exist
-		$sql = "INSERT INTO " . _AM_DB_PREFIX . "sb_logaccess VALUES ('', '$sbmagic_type', UNIX_TIMESTAMP(), '$sbmagic_user', '$sbmagic_event')";
+		$sql = "INSERT INTO " . _AM_DB_PREFIX . "sb_logaccess
+				(`logaccess_type`, `logaccess_date`, `logaccess_user`, `logaccess_event`)
+				VALUES ('$sbmagic_type', UNIX_TIMESTAMP(), '$sbmagic_user', '$sbmagic_event')";
 		$result = $this->query($sql);
 		if (!$result)
 			return false;
