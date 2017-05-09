@@ -96,7 +96,7 @@ if (SBMAINTENANCE) {
 // Get Global Infos
 // ----------------------
 if (!empty($_SESSION['sbmagic_user_name'])) {
-	global $sbadministrators, $sb_admin_pages;
+	$sbadministrators = explode(",", trim($sb_settings_config[1]));
 	$sbmagic_user_type = (in_array(trim($_SESSION['sbmagic_user_name']), $sbadministrators)) ? 'admin' : 'user';
 	$sbsmarty->assign('sbmagic_user_name', $_SESSION['sbmagic_user_name']);
 	$sbsmarty->assign('sbmagic_user_type', $sbmagic_user_type);

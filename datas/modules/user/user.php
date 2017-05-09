@@ -26,9 +26,15 @@ $sblang_user = (SBLANG && $_SESSION['lang'] != 'en') ? SBLANG : 'en_US';
 include_once( SB_MODULES_DIR . MODULEFILE . DIRECTORY_SEPARATOR . 'lang' . DIRECTORY_SEPARATOR . $sblang_user . '.php' );
 include_once( SB_MODULES_DIR . MODULEFILE . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'functions.php' );
 
-// ------------------------
+# Initialization
+global $sb_settings_config;
+$publickey  = $sbsanitize->sTrim($sb_settings_config[19]);
+$privatekey = $sbsanitize->sTrim($sb_settings_config[20]);
+$sbsmarty->assign('grecaptcha_publickey', $publickey);
+if (!empty($publickey) && !empty($privatekey)) {
+	defined('_CMS_USER_CAPTCHA_MODE') OR define('_CMS_USER_CAPTCHA_MODE', true);
+}
 
-# -------------------------
 # Define TPL to show (view)
 if (!$_GET['op']) {
 	$op       = 'index';
@@ -48,27 +54,8 @@ $module['template_main'] = MODULEFILE . '_' . $template . '.tpl';
 switch($op) {
 	default: // Show form login (user)
 		// ----------------------
-		// Login / Logout
+		// check if POST
 		// ----------------------
-		//if (isset($_SESSION['sbmagic_user_name']) && isset($_SESSION['sbmagic_user_password'])) {
-		//	// ------------------
-		//	// --- SESSION Auth
-		//	// ------------------
-		//	// --- Check Session
-		//	$sbmagic_user_name     = trim($sbsanitize->stopXSS($_SESSION['sbmagic_user_name']));
-		//	$sbmagic_user_password = $_SESSION['sbmagic_user_password'];
-		//	if ($sbusers->login($sbmagic_user_name, $sbmagic_user_password)) {
-		//		if (!$sbusers->checkUserIsActive($sbmagic_user_name)) {
-		//			// --- User is no more active
-		//			$sbsmarty->assign('sbmagic_access_code', 'E4');
-		//			$sbmagic_type = 'fronterror';
-		//			$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_USER_ERROR, $sbmagic_user_name, $_SERVER["REMOTE_ADDR"]);
-		//			$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user_name);
-		//			//$sbsmarty->display('system/login.tpl');
-		//			//exit;
-		//		}
-		//	}
-		//}
 		if (($_POST['username'] && $_POST['password'])) {
 			// ------------------
 			// --- Form auth
@@ -83,7 +70,7 @@ switch($op) {
 					$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_USER_ERROR, $sbmagic_user_name, $_SERVER["REMOTE_ADDR"]);
 					$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user_name);
 				} else {
-					if (_AM_CAPTCHA_MODE == true) {
+					if (_CMS_USER_CAPTCHA_MODE) {
 						// --- Check Google Recaptcha
 						if (isset($_POST['g-recaptcha-response']) && !empty($_POST['g-recaptcha-response'])) {
 							function getCurlData($url) {
