@@ -57,25 +57,27 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-										{foreach from=$all item=user}
-											<tr class="{cycle values="odd,even"} gradeX">
-												<td><img src="{$user.email|@sbGetGravatar}" class="img-thumbnail" /></td>
-												<td>{$user.username}</td>
-												<td>{$user.email}</td>
-												<td>{$user.lastlogin|date_format:"%d.%m.%Y - %R"}</td>
-												<td>
-													<span class="glyphicon glyphicon-eye-open {if $user.active}green{else}red{/if}" title="Statut {if $user.active}visible{else}non visible{/if}"></span>
-													&nbsp;
-													<a class="glyphicon glyphicon-list yellow" href="{$module_url}&a=menu&id={$user.id}" title="Autorisation menu"></a>
-													&nbsp;
-													<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit&id={$user.id}" title="Modifier"></a>
-													&nbsp;												
-													{if $user.username != $sbmagic_user_name}
-														<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$user.id}" title="Supprimer"></a>
-													{/if}
-												</td>
-											</tr>										
-										{/foreach}
+										{if $alluser}
+											{foreach from=$alluser item=user}
+												<tr class="{cycle values="odd,even"} gradeX">
+													<td><img src="{$user.email|@sbGetGravatar}" class="img-thumbnail" /></td>
+													<td>{$user.username}</td>
+													<td>{$user.email}</td>
+													<td>{$user.lastlogin|date_format:"%d.%m.%Y - %R"}</td>
+													<td>
+														<span class="glyphicon glyphicon-eye-open {if $user.active}green{else}red{/if}" title="Statut {if $user.active}visible{else}non visible{/if}"></span>
+														&nbsp;
+														<a class="glyphicon glyphicon-list yellow" href="{$module_url}&a=menu&id={$user.id}" title="Autorisation menu"></a>
+														&nbsp;
+														<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit&id={$user.id}" title="Modifier"></a>
+														&nbsp;												
+														{if $user.username != $sbmagic_user_name}
+															<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$user.id}" title="Supprimer"></a>
+														{/if}
+													</td>
+												</tr>										
+											{/foreach}
+										{/if}
                                     </tbody>
                                 </table>
                             </div>
