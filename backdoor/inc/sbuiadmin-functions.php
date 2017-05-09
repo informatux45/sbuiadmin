@@ -636,6 +636,18 @@ function sbGetThemesFront($themes_path = '') {
 }
 
 /**
+ * Get User group
+ * @return string (group)
+ */
+function sbGetUserGroup($username) {
+	global $sbadministrators;
+	
+	$sbuiadmin_usergroup = (in_array(trim($username), $sbadministrators)) ? 'admin' : 'user';
+	
+	return $sbuiadmin_usergroup;
+}
+
+/**
  * Get Array Multidimensional ordered by column
  * @param array $array (ex: $sbfiles)
  * @param columns array (ex: 'time')

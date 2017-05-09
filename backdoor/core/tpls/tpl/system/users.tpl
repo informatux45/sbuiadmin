@@ -61,6 +61,7 @@
 											{foreach from=$alluser item=user}
 												<tr class="{cycle values="odd,even"} gradeX">
 													<td><img src="{$user.email|@sbGetGravatar}" class="img-thumbnail" /></td>
+													<td>{$user.username|@sbGetUserGroup|upper}</td>
 													<td>{$user.username}</td>
 													<td>{$user.email}</td>
 													<td>{$user.lastlogin|date_format:"%d.%m.%Y - %R"}</td>

@@ -56,7 +56,7 @@ switch($action) {
 		}
 
 		// Initialisation
-		$sb_table_header =  array('Gravatar', 'Nom', 'Email', 'Dernière connexion', 'action');
+		$sb_table_header =  array('Gravatar', 'Groupe', 'Nom', 'Email', 'Dernière connexion', 'action');
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		
 		// Contents table
