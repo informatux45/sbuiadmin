@@ -15,15 +15,15 @@ if (!defined('SB_PATH')) {
 // -------------------------------------------------
 // --- Global MODULE
 // -------------------------------------------------
-$modpage['name']        = 'SBUIADMIN USER';
-$modpage['dirname']     = basename(dirname(__FILE__));
-$modpage['version']     = '0.1.1';
-$modpage['description'] = "Gestion des utilisateurs";
-$modpage['author']      = "BooBoo";
+$module['name']        = 'SBUIADMIN USER';
+$module['dirname']     = basename(dirname(__FILE__));
+$module['version']     = '0.1.1';
+$module['description'] = "Gestion des utilisateurs";
+$module['author']      = "BooBoo";
 // -------------------------------------------------
 // --- Tables SQL
 // -------------------------------------------------
-$modpage['tables']['user'] = _AM_DB_PREFIX . "sb_users";
+$module['tables']['user'] = _AM_DB_PREFIX . "sb_users";
 // -------------------------------------------------
 
 ?>

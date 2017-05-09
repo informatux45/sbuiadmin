@@ -18,6 +18,10 @@ define('MODULENAME', 'User');
 define('MODULEVERSION','0.1.1');
 
 # Include Module Common Infos
+include_once( SB_MODULES_DIR . MODULEFILE . DIRECTORY_SEPARATOR . 'common.php' );
+global $module, $sbsmarty, $sbsanitize, $sbsql, $sbusers, $sbpage;
+
+# Include Module Common Infos
 $sblang_user = (SBLANG && $_SESSION['lang'] != 'en') ? SBLANG : 'en_US';
 include_once( SB_MODULES_DIR . MODULEFILE . DIRECTORY_SEPARATOR . 'lang' . DIRECTORY_SEPARATOR . $sblang_user . '.php' );
 include_once( SB_MODULES_DIR . MODULEFILE . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'functions.php' );
@@ -26,7 +30,7 @@ include_once( SB_MODULES_DIR . MODULEFILE . DIRECTORY_SEPARATOR . 'inc' . DIRECT
 
 # -------------------------
 # Define TPL to show (view)
-if (!$_GET['op'] && !$_GET['id']) {
+if (!$_GET['op']) {
 	$op       = 'index';
 	$template = 'index';
 } else {
@@ -78,8 +82,6 @@ switch($op) {
 					$sbmagic_type = 'fronterror';
 					$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_USER_ERROR, $sbmagic_user_name, $_SERVER["REMOTE_ADDR"]);
 					$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user_name);
-					//$sbsmarty->display('system/login.tpl');
-					exit;
 				} else {
 					if (_AM_CAPTCHA_MODE == true) {
 						// --- Check Google Recaptcha
@@ -108,8 +110,6 @@ switch($op) {
 								$sbmagic_type = 'fronterror';
 								$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_CAPTCHA_ERROR, $sbmagic_user_name, $_SERVER["REMOTE_ADDR"]);
 								$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user_name);
-								//$sbsmarty->display('system/login.tpl');
-								//exit;
 							}
 							
 						} else {
@@ -118,8 +118,6 @@ switch($op) {
 							$sbmagic_type = 'fronterror';
 							$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_CAPTCHA_ERROR, $sbmagic_user_name, $_SERVER["REMOTE_ADDR"]);
 							$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user_name);
-							//$sbsmarty->display('system/login.tpl');
-							//exit;
 						}
 					}
 					// ------------------
@@ -144,8 +142,6 @@ switch($op) {
 				$sbmagic_type = 'fronterror';
 				$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_NOGRANTED, $_SERVER["REMOTE_ADDR"]);
 				$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event);
-				//$sbsmarty->display('system/login.tpl');
-				//exit;
 			}
 		}
 		
@@ -155,8 +151,6 @@ switch($op) {
 		$sb_user_title = _CMS_USER_TITLE;
 		// --- Assign user page title
 		$sbsmarty->assign('sb_pages_title', $sb_user_title);
-		// $sbsmarty->assign('page_id', strtolower(constant(MODULENAME)));
-
 		// --------------------------
 		// --- Choose theme view
 		// --------------------------
