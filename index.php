@@ -82,7 +82,7 @@ $sbsmarty->assign('sb_site_title', _AM_SITE_TITLE);
 if (SBMAINTENANCE) {
 	$param['id'] = 'coming-soon-url';
 	$getDevUrl   = (insert_sbGetConfig($param)) ? insert_sbGetConfig($param) : 'DevProgress';
-	if ((!isset($_GET['d']) || $_GET['d'] != $getDevUrl) && (!isset($_SESSION['dev_in_progress']) && $_SESSION['dev_in_progress'] != 'SBmagicCMS')) {
+	if ((!isset($_GET['d']) || $_GET['d'] != $getDevUrl) && (!isset($_SESSION['dev_in_progress']) && $_SESSION['dev_in_progress'] != 'SBuiadminCMS')) {
 		$moved_301_maintenance = SB_URL . "coming-soon/";
 		header("Status: 301 Moved Permanently", false, 301);
 		header("Location: " . str_replace('//coming', '/coming', $moved_301_maintenance));
