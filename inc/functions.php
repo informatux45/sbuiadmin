@@ -272,6 +272,21 @@ function shortcode_sbyear($param = '') {
 	return (date('Y'));
 }
 
+/**
+ * Get Lang to display
+ * @return html code
+ */
+function sbDisplayLang($string, $lang = "fr") {
+	// Show the language session (fr OR en OR ...)
+	if (preg_match('#\[' . $lang . '\](.*)\[/' . $lang . ']#Us', $string, $match)) {
+		$text = $match[1];
+	} else {
+		$text = $string;
+	}
+
+	return $text;
+}
+
 
 // --------------------------------
 // Smarty functions
