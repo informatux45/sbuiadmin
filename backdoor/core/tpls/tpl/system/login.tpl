@@ -6,11 +6,6 @@
 	{include file='header.tpl' page='login'}
 	{* ---------------- End Headers --------------- *}
 	
-	{*<video autoplay loop poster="img/login/sbuiadmin_login.jpg" id="bgvid">
-		<source src="img/login/sbuiadmin_login.webm" type="video/webm">
-		<source src="img/login/sbuiadmin_login.mp4" type="video/mp4">
-	</video>*}
-	
 	{* ------------------------- *}
 	{* ---       VIDEOS      --- *}
 	{* --- Chaine INFORMATUX --- *}
@@ -25,14 +20,6 @@
 	{* 8p0RJSp-xkw : Mosaique    *}
 	{* 5k4Y9FGKFTU : Plage 2     *}
 	{* ------------------------- *}
-	
-	{*<div style="position: fixed; z-index: -99; width: 100%; height: 100%">
-	  <iframe frameborder="0" height="100%" width="100%" 
-		src="https://youtube.com/embed/{$sb_random_bg_video}?rel=0&controls=0&showinfo=0&autoplay=1&loop=1&disablekb=1&playlist={$sb_random_bg_video}">
-	  </iframe>
-	</div>*}
-	
-	{*<div id="bgndVideo" class="player"></div>*}
 
     <div class="container" id="bgcontainer">
         <div class="row">
