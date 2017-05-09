@@ -16,15 +16,6 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date dans le passé
 // ----------------------
 // Session Initialization
 // ----------------------
-ini_set('session.gc_probability',	1);
-ini_set('session.gc_divisor',		50); 
-ini_set('session.save_handler',		'files');
-ini_set('session.name',				'sbmagic_session');
-ini_set('session.auto_start',		1);
-ini_set("session.gc_maxlifetime",	14440); // 4 hours
-ini_set('session.use_cookies',		'1');
-ini_set('session.use_only_cookies',	'0');
-session_set_cookie_params(14440); // 4 hours
 session_start();
  
 // ----------------------
@@ -248,7 +239,7 @@ if ($_GET['ac'] == 'logout') {
 	session_write_close();
 	setcookie(session_name(),'',0,'/');
 	session_regenerate_id(true);
-	header("Location: " . _AM_SITE_URL);
+	header("Location: " . trim($sb_link_settings[15]));
 }
 // ----------------------
 // Get Global Infos
