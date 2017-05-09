@@ -89,7 +89,7 @@
                         <li>
                             <a href="#">
                                 <div>
-                                    <i class="fa fa-thumbs-up fa-fw"></i> <span style="font-size: 0.8em;">SBMAGIC Version {$smarty.const._AM_START_VERSION}</span>
+                                    <i class="fa fa-thumbs-up fa-fw"></i> <span style="font-size: 0.8em;">SBUIADMIN Version {$smarty.const._AM_START_VERSION}</span>
                                 </div>
                             </a>
                         </li>
