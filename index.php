@@ -93,6 +93,19 @@ if (SBMAINTENANCE) {
 }
 
 // ----------------------
+// Get Global Infos
+// ----------------------
+global $sbadministrators, $sb_admin_pages;
+$sbmagic_user_type = (in_array(trim($_SESSION['sbmagic_user_name']), $sbadministrators)) ? 'admin' : 'user';
+$sbsmarty->assign('sbmagic_user_name', $_SESSION['sbmagic_user_name']);
+$sbsmarty->assign('sbmagic_user_type', $sbmagic_user_type);
+$sbsmarty->assign('sbmagic_user_email', $sbusers->getUserInfo($_SESSION['sbmagic_user_name'], 'email'));
+$sbsmarty->assign('sbmagic_user_last_login', date("d/m/Y H:i", $sbusers->getUserInfo($_SESSION['sbmagic_user_name'], 'lastlogin')));
+// ----------------------
+// ----------------------
+// ----------------------
+
+// ----------------------
 // Define Safe Pages
 // ----------------------
 // --- Check if rewrite URL

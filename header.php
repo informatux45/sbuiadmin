@@ -49,13 +49,14 @@ if (!SBSMARTYBC) {
 // ----------------------
 // CLASSES by array
 // ----------------------
-$sbmagic_classes = array('sql', 'sanitize', 'page');
+$sbmagic_classes = array('sql', 'sanitize', 'users', 'page');
 foreach ($sbmagic_classes as $sbmagic_class) {
     include(SB_ADMIN_DIR . "inc" . DIRECTORY_SEPARATOR . "class" . DIRECTORY_SEPARATOR . SBMAGICID . "-" . $sbmagic_class . ".php");
 }
 
 $sbsql      = new sql();
 $sbsanitize = new sanitize();
+$sbusers    = new user();
 $sbpage     = new page();
 
 // ----------------------
