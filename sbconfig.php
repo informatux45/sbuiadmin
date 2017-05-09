@@ -100,7 +100,7 @@ define('SBSITESUBDIRECTORY', ''); // Obsolete !
 // ------------------------ 
 // --- Defined Safe Pages
 // ------------------------ 
-$sb_safe_pages_cms   = ['index','news','pages'];
+$sb_safe_pages_cms   = ['index','user','news','pages'];
 
 // ------------------------ 
 // --- Database
