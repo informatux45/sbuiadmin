@@ -27,11 +27,15 @@
 							{$smarty.const._CMS_USER_NO_IE}
 						</span>
 					{else}
-						<div class="form-group">
-							<input class="form-control" placeholder="{$smarty.const._CMS_USER_FORM_USERNAME}" name="username" type="user" autofocus>
+						<div class="form-group has-feedback has-feedback-left">
+							<label class="control-label">{$smarty.const._CMS_USER_FORM_USERNAME}</label>
+							<input type="user" name="username" class="form-control" placeholder="{$smarty.const._CMS_USER_FORM_USERNAME}" autofocus required>
+							<i class="glyphicon glyphicon-user form-control-feedback-left"></i>
 						</div>
-						<div class="form-group">
-							<input class="form-control" placeholder="{$smarty.const._CMS_USER_FORM_PASSWORD}" name="password" type="password" value="">
+						<div class="form-group has-feedback has-feedback-left">
+							<label class="control-label">{$smarty.const._CMS_USER_FORM_PASSWORD}</label>
+							<input class="form-control" placeholder="{$smarty.const._CMS_USER_FORM_PASSWORD}" name="password" type="password" value="" required>
+							<i class="glyphicon glyphicon-lock form-control-feedback-left"></i>
 						</div>
 						<div class="checkbox">
 							<label>

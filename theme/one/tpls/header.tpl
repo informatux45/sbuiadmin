@@ -52,6 +52,7 @@
         <link rel="stylesheet" id="max-width-768-css" href="{$smarty.const.SB_THEME_URL}css/max-width-768.css" type="text/css" media="screen and (max-width: 987px)" />
         <link rel="stylesheet" id="max-width-480-css" href="{$smarty.const.SB_THEME_URL}css/max-width-480.css" type="text/css" media="screen and (max-width: 480px)" />
         <link rel="stylesheet" id="max-width-320-css" href="{$smarty.const.SB_THEME_URL}css/max-width-320.css" type="text/css" media="screen and (max-width: 320px)" />
+		<link rel="stylesheet" href="{$smarty.const.SB_THEME_URL}css/bootstrap.min.css" />
         
         <!-- CSSs Plugin -->
         <link rel="stylesheet" id="thickbox-css" href="{$smarty.const.SB_THEME_URL}css/thickbox.css" type="text/css" media="all" />
