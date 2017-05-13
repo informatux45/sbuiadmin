@@ -13,9 +13,9 @@ if (basename($_SERVER['PHP_SELF']) == 'sbconfig.php') {
 	die('You cannot load this page directly.');
 }; 
 
-/***************************************************************************/
-/** Below are constants that you can use to customize how SBMAGIC operates */ 
-/***************************************************************************/
+/*****************************************************************************/
+/** Below are constants that you can use to customize how SBUIADMIN operates */ 
+/*****************************************************************************/
 
 # Default max width of images
 define('SBIMAGEWIDTH', '1024');
