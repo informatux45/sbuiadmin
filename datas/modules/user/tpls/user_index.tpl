@@ -88,7 +88,7 @@
 	{else}
 		Profil de l'utilisateur ({$smarty.session.sbmagic_user_name})
 		<br>
-		<a href="{seo url="index.php?lang=`$smarty.session.lang`&p=user&ac=logout" rewrite="`$smarty.session.lang`/user/?ac=logout"}">
+		<a href="{seo url="index.php?lang=`$smarty.session.lang`&p=user&ac=logout" rewrite="user/?ac=logout"}">
 			Deconnexion
 		</a>
 	{/if}
