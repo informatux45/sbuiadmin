@@ -37,7 +37,7 @@
                         <div class="panel-heading">
                             <div class="row">
                                 <div class="col-xs-3">
-                                    <i class="fa fa-users fa-5x"></i>
+                                    <i class="fa fa-users fa-4x"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
                                     <div class="huge">{$sb_users_cpt|default:0}</div>
@@ -60,7 +60,7 @@
                         <div class="panel-heading">
                             <div class="row">
                                 <div class="col-xs-3">
-                                    <i class="fa fa-gears fa-5x"></i>
+                                    <i class="fa fa-gears fa-4x"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
                                     <div class="huge">{$smarty.const._AM_SERVER_PHP_VERSION_ID}</div>
@@ -83,7 +83,7 @@
                         <div class="panel-heading">
                             <div class="row">
                                 <div class="col-xs-3">
-                                    <i class="fa fa-database fa-5x"></i>
+                                    <i class="fa fa-database fa-4x"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
                                     <div class="huge">{$smarty.const._AM_DB_HOST}</div>
@@ -106,7 +106,7 @@
                         <div class="panel-heading">
                             <div class="row">
                                 <div class="col-xs-3">
-                                    <i class="fa fa-upload fa-5x"></i>
+                                    <i class="fa fa-upload fa-4x"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
                                     <div class="huge">{$smarty.const._AM_MEDIAS_SIZE_LIMIT}</div>
@@ -139,7 +139,7 @@
                         <div class="panel-heading">
                             <div class="row">
                                 <div class="col-xs-3">
-                                    <i class="fa fa-{$sb_dashboard_status1_icon} fa-5x"></i>
+                                    <i class="fa fa-{$sb_dashboard_status1_icon} fa-4x"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
                                     <div class="huge">{$sb_dashboard_status1_cpt|default:0}</div>
@@ -164,7 +164,7 @@
                         <div class="panel-heading">
                             <div class="row">
                                 <div class="col-xs-3">
-                                    <i class="fa fa-{$sb_dashboard_status2_icon} fa-5x"></i>
+                                    <i class="fa fa-{$sb_dashboard_status2_icon} fa-4x"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
                                     <div class="huge">{$sb_dashboard_status2_cpt|default:0}</div>
@@ -189,7 +189,7 @@
                         <div class="panel-heading">
                             <div class="row">
                                 <div class="col-xs-3">
-                                    <i class="fa fa-{$sb_dashboard_status3_icon} fa-5x"></i>
+                                    <i class="fa fa-{$sb_dashboard_status3_icon} fa-4x"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
                                     <div class="huge">{$sb_dashboard_status3_cpt|default:0}</div>
@@ -214,7 +214,7 @@
                         <div class="panel-heading">
                             <div class="row">
                                 <div class="col-xs-3">
-                                    <i class="fa fa-{$sb_dashboard_status4_icon} fa-5x"></i>
+                                    <i class="fa fa-{$sb_dashboard_status4_icon} fa-4x"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
                                     <div class="huge">{$sb_dashboard_status4_cpt|default:0}</div>
