@@ -53,6 +53,20 @@ $module['template_main'] = MODULEFILE . '_' . $template . '.tpl';
 // --------------------------
 switch($op) {
 	default: // Show form login (user)
+		if ($_GET['ac'] == 'logout') {
+			// ------------------
+			// --- Logout required
+			// ------------------
+			// Update LastLogin
+			$sbusers->updateAccessUserLogin($_SESSION['sbmagic_user_name'], true);
+			session_start();
+			session_unset();
+			session_destroy();
+			session_write_close();
+			setcookie(session_name(),'',0,'/');
+			session_regenerate_id(true);
+			header("Location: " . SB_URL);
+		}
 		// ----------------------
 		// check if POST
 		// ----------------------
