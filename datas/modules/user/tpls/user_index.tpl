@@ -70,7 +70,8 @@
 			});
 		</script>
 		
-		{if $smarty.const._CMS_USER_CAPTCHA_MODE && $get_browser != 'IE'}
+		{if $smarty.const._CMS_USER_CAPTCHA_MODE}
+		{*if $smarty.const._CMS_USER_CAPTCHA_MODE && $get_browser != 'IE'*}
 		<script type="text/javascript">
 			var onloadCallback = function() {
 				grecaptcha.render('grecaptcha_user', {

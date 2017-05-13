@@ -32,7 +32,7 @@ $publickey  = $sbsanitize->sTrim($sb_settings_config[19]);
 $privatekey = $sbsanitize->sTrim($sb_settings_config[20]);
 $sbsmarty->assign('grecaptcha_publickey', $publickey);
 if (!empty($publickey) && !empty($privatekey)) {
-	defined('_CMS_USER_CAPTCHA_MODE') OR define('_CMS_USER_CAPTCHA_MODE', true);
+	defined('_CMS_USER_CAPTCHA_MODE') OR define('_CMS_USER_CAPTCHA_MODE', "true");
 }
 
 # Define TPL to show (view)
@@ -97,6 +97,20 @@ switch($op) {
 								$sbmagic_type = 'fronterror';
 								$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_CAPTCHA_ERROR, $sbmagic_user_name, $_SERVER["REMOTE_ADDR"]);
 								$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user_name);
+							} else {
+								// --- Success Google Recaptcha
+								// ------------------
+								// --- Acces autorise
+								// ------------------
+								// Update Access Log
+								$sbmagic_type = 'frontlogin';
+								$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_GRANTED, $sbmagic_user_name, $_SERVER["REMOTE_ADDR"]);
+								$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user_name);
+								// Update LoginTime
+								$sbusers->updateAccessUserLogin($sbmagic_user_name, false, time());
+								// Assign SESSION
+								$_SESSION['sbmagic_user_name']     = $sbmagic_user_name;
+								$_SESSION['sbmagic_user_password'] = $sbmagic_user_password;
 							}
 							
 						} else {
@@ -106,20 +120,20 @@ switch($op) {
 							$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_CAPTCHA_ERROR, $sbmagic_user_name, $_SERVER["REMOTE_ADDR"]);
 							$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user_name);
 						}
+					} else {
+						// ------------------
+						// --- Acces autorise
+						// ------------------
+						// Update Access Log
+						$sbmagic_type = 'frontlogin';
+						$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_GRANTED, $sbmagic_user_name, $_SERVER["REMOTE_ADDR"]);
+						$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user_name);
+						// Update LoginTime
+						$sbusers->updateAccessUserLogin($sbmagic_user_name, false, time());
+						// Assign SESSION
+						$_SESSION['sbmagic_user_name']     = $sbmagic_user_name;
+						$_SESSION['sbmagic_user_password'] = $sbmagic_user_password;
 					}
-					// ------------------
-					// --- Acces autorise
-					// ------------------
-					// Update Access Log
-					$sbmagic_type = 'frontlogin';
-					$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_GRANTED, $sbmagic_user_name, $_SERVER["REMOTE_ADDR"]);
-					$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user_name);
-					// Update LoginTime
-					$sbusers->updateAccessUserLogin($sbmagic_user_name, false, time());
-					// Assign SESSION
-					$_SESSION['sbmagic_user_name']     = $sbmagic_user_name;
-					$_SESSION['sbmagic_user_password'] = $sbmagic_user_password;
-					
 				}
 			} else {
 				// ------------------
