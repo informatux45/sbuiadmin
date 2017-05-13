@@ -75,7 +75,7 @@ define('SBSMARTYDEBUG', false);
 define('SBMAGIC_PATH', true);
 
 # Enable rewrite url
-define('SBREWRITEURL', false);
+define('SBREWRITEURL', true);
 
 # Enable maintenance mode (Coming soon)
 define('SBMAINTENANCE', true);
