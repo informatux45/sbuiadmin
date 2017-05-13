@@ -35,7 +35,7 @@ function smarty_function_seo($params, &$smarty) {
 	    if ($encode_url == 'url')
 			return urlencode($base_url . $seo_url);
 	    else
-			return $base_url . $seo_url . DIRECTORY_SEPARATOR;
+			return $base_url . $seo_url;
 	}
 
 	return $base_url . $normal_url;
