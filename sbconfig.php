@@ -48,7 +48,6 @@ define('SBFROMEMAIL', 'noreply@mysite.fr');
 # Theme directory
 $sb_theme_config = file(dirname(__FILE__) . DIRECTORY_SEPARATOR . SBADMIN . DIRECTORY_SEPARATOR .'inc' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'theme.txt');
 define('SBTHEME', trim($sb_theme_config[0]));
-//define('SBTHEME', 'two');
 
 # Module activated onto index page
 # False, if you don't have module for index page
@@ -76,7 +75,7 @@ define('SBSMARTYDEBUG', false);
 define('SBMAGIC_PATH', true);
 
 # Enable rewrite url
-define('SBREWRITEURL', true);
+define('SBREWRITEURL', false);
 
 # Enable maintenance mode (Coming soon)
 define('SBMAINTENANCE', true);
