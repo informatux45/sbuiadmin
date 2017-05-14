@@ -172,21 +172,6 @@ switch($op) {
 		$module['theme_main'] = 'index';
 
 	break;
-
-	case "logout":
-		// ------------------
-		// --- Logout required
-		// ------------------
-		// Update LastLogin
-		$sbusers->updateAccessUserLogin($_SESSION['sbmagic_user_name'], true);
-		session_start();
-		session_unset();
-		session_destroy();
-		session_write_close();
-		setcookie(session_name(),'',0,'/');
-		session_regenerate_id(true);
-		header("Location: " . SB_URL);
-	break;
 	
 }
 
