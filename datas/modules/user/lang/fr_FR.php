@@ -23,5 +23,8 @@ define('_CMS_USER_MSG_ERROR_E1',		"Captcha incorrect");
 define('_CMS_USER_MSG_ERROR_E2',		"Login incorrect");
 define('_CMS_USER_MSG_ERROR_E3',		"Login manquant");
 define('_CMS_USER_MSG_ERROR_E4',		"Compte désactivé");
+define('_CMS_USER_ICON_TEXT_LOGIN',		"Login");
+define('_CMS_USER_ICON_TEXT_PROFILE',	"Profil");
+define('_CMS_USER_ICON_TEXT_LOGOUT',	"Déconnexion");
 
 ?>
