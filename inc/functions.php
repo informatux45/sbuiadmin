@@ -896,7 +896,7 @@ function insert_sbGetThemeOption($param) {
 	if (!empty($option_num))
 		$option_string = $theme[$option_name][$option_num];
 	else
-		$option_string = $theme[$option_name][$option_num];
+		$option_string = $theme[$option_name];
     return $option_string;
 }
 
