@@ -882,4 +882,22 @@ function insert_sbGetBrowser($param) {
     return 'Other';
 }
 
+/**
+ * Get Theme Options
+ * @param string Option name
+ * @return String
+ */
+function insert_sbGetThemeOption($param) {
+	global $theme;
+	# Initialize
+	$option_name = $param['option'];
+	$option_num  = $param['n'];    
+	# Get option string
+	if (!empty($option_num))
+		$option_string = $theme[$option_name][$option_num];
+	else
+		$option_string = $theme[$option_name][$option_num];
+    return $option_string;
+}
+
 ?>
