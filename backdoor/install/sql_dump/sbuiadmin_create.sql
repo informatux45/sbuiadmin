@@ -464,7 +464,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_news` (
   `subtitle` text NOT NULL,
   `desc_short` text NOT NULL,
   `desc_full` text NOT NULL,
-  `image` varchar(200) NOT NULL,
+  `image` varchar(200) DEFAULT NULL,
   `date` varchar(10) NOT NULL,
   `active` tinyint(4) NOT NULL COMMENT '0: inactive, 1: active'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
