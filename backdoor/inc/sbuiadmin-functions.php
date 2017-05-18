@@ -480,13 +480,32 @@ function sbGetModulesPage() {
 	$result_modules_dir = array();	 
 	$modules_dir = scandir($dir);
 	foreach ($modules_dir as $key => $value) {
-	   if (!in_array($value,array(".","..","pages","slider"))) {
+	   if (!in_array($value, array(".","..","pages","slider","tabbs","table"))) {
 		  if (is_dir($dir . DIRECTORY_SEPARATOR . $value)) {
 			 $result_modules_dir[] = $value;
 		  }
 	   }
 	}
 	return $result_modules_dir;
+}
+
+/**
+ * Get List Various HTML Content File useable for the module PAGES
+ * @return array various files list
+ */
+function sbGetVariousPage($type) {
+	$dir                = SB_VARIOUS_DIR;
+	$search_type        = "$type-";
+	$result_various_dir = array();	 
+	$various_dir        = scandir($dir);
+	foreach ($various_dir as $key => $value) {
+	   if (!in_array($value, array(".",".."))) {
+		  if (!is_dir($dir . DIRECTORY_SEPARATOR . $value) && strpos($value, $search_type) !== false) {
+			 $result_various_dir[] = $value;
+		  }
+	   }
+	}
+	return $result_various_dir;
 }
 
 /**

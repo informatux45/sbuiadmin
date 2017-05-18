@@ -99,7 +99,7 @@ define('SBSITESUBDIRECTORY', ''); // Obsolete !
 // ------------------------ 
 // --- Defined Safe Pages
 // ------------------------ 
-$sb_safe_pages_cms   = ['index','user','news','pages'];
+$sb_safe_pages_cms = ['index','user','news','pages'];
 
 // ------------------------ 
 // --- Database
@@ -138,6 +138,12 @@ defined('SB_THEME_DIR') OR define('SB_THEME_DIR', SB_PATH . "theme" . DIRECTORY_
 // ------------------------ 
 defined('SB_MODULES_URL') OR define('SB_MODULES_URL', SB_URL . "datas" . DIRECTORY_SEPARATOR . "modules" . DIRECTORY_SEPARATOR );
 defined('SB_MODULES_DIR') OR define('SB_MODULES_DIR', SB_PATH . "datas" . DIRECTORY_SEPARATOR . "modules" . DIRECTORY_SEPARATOR );
+
+// ------------------------ 
+// --- Various HTML Content
+// ------------------------ 
+defined('SB_VARIOUS_URL') OR define('SB_VARIOUS_URL', SB_THEME_URL . "inc" . DIRECTORY_SEPARATOR );
+defined('SB_VARIOUS_DIR') OR define('SB_VARIOUS_DIR', SB_THEME_DIR . "inc" . DIRECTORY_SEPARATOR );
 
 // ------------------------ 
 // --- Administration

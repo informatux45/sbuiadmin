@@ -289,6 +289,24 @@ switch($action) {
 		}
 		// --- Close Select
 		$sbform->closeSelect("Le choix du module peut être défini par défaut pour la page d'accueil uniquement dans la configuration fichier (SBCONFIG => SBMODULEINDEX)<br>Si vous choisissez un module pour la page d'accueil, la configuration fichier ne sera plus active");
+		// -----------------------------------
+		// --- VARIOUS HTML CONTENT FILES
+		// -----------------------------------
+		// --- Get various page
+		$result_various_dir = sbGetVariousPage('page'); // Type 'page' or 'block'
+		$sbform->openSelect("Choix de contenu HTML additionnel", array("id"=>"various_view", "name"=>"various_view"), false);
+		if ($various_view == '')
+			$sbform->addOption('Pas de contenu HTML additionnel pour cette page', array ("value"=>"", "selected"=>""));
+		else
+			$sbform->addOption('Pas de contenu HTML additionnel pour cette page', array ("value"=>""));
+		for($i = 0; $i < count($result_various_dir); $i++) {
+			if ($result_various_dir[$i] == $various_view)
+				$sbform->addOption($result_various_dir[$i], array ("value"=>$result_various_dir[$i], "selected"=>""));
+			else
+				$sbform->addOption($result_various_dir[$i], array ("value"=>$result_various_dir[$i]));
+		}
+		// --- Close Select
+		$sbform->closeSelect("En sélectionnant un fichier HTML vous pouvez ajouter du contenu additionnel à votre page.<br>Celui-ci s'ajoutera à la fin du contenu dynamique.");
 		// --------------------------------
 		// Menu FR / EN
 		// --------------------------------
