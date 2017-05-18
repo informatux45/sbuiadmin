@@ -53,7 +53,7 @@
 					{$news.date|sbConvertDate:"FR"}
 				</p>
 				<p class="sbnews-p">
-					{$news.desc_short|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"}
+					{$news.desc_short|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|truncate:60:".."}
 				</p>
 				<span class="sbnews-link-item">
 					<a href="{seo url="index.php?p=news&op=article&id={$news.id}" rewrite="news/article/{$news.id}/{$news.title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|strip_tags|@sbRewriteString|@strtolower}"}">
