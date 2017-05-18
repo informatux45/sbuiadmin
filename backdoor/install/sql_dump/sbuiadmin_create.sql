@@ -479,12 +479,12 @@ DROP TABLE IF EXISTS `<DB_PREFIX>sb_news_category`;
 CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_news_category` (
   `id` int(11) NOT NULL,
   `title` text NOT NULL,
-  `subtitle` text NOT NULL,
-  `tpl_list` text NOT NULL,
-  `tpl_single` text NOT NULL,
-  `module_show` varchar(50) NOT NULL COMMENT 'normal,masonry,...',
-  `module_show_masonry` int(11) NOT NULL COMMENT 'columns width (pixels)',
-  `photo` varchar(255) NOT NULL,
+  `subtitle` text,
+  `tpl_list` text,
+  `tpl_single` text,
+  `module_show` varchar(50) DEFAULT NULL COMMENT 'normal,masonry,...',
+  `module_show_masonry` int(11) DEFAULT NULL COMMENT 'columns width (pixels)',
+  `photo` varchar(255) DEFAULT NULL,
   `active` tinyint(4) NOT NULL COMMENT '0: inactive, 1: active',
   `sort` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

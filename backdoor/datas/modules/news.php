@@ -405,8 +405,8 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'categoryadd') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table_category (title,subtitle,photo,sort)
-						  VALUES ('$title','$subtitle','$photo','0')";
+				$query = "INSERT INTO $table_category (title,subtitle,photo,sort,active)
+						  VALUES ('$title','$subtitle','$photo','0','$active')";
 				$result_add = $sbsql->query($query);
 				if ($result_add) {
 					// --- Vider les champs du formulaire
