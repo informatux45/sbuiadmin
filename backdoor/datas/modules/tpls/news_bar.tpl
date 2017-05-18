@@ -51,7 +51,7 @@
 </div>
 
 {if !$smarty.get.a}
-<div class="panel panel-success">
+<div class="panel panel-yellow">
 	<div class="panel-heading">
 		INFOS News
 	</div>
