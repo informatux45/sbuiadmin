@@ -41,7 +41,7 @@
 
 			<div class="sbnews-div-l">
 				<a class="" href="{seo url="index.php?p=news&op=article&id={$news.id}" rewrite="news/article/{$news.id}/{$news.title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|strip_tags|@sbRewriteString|@strtolower}"}">
-					<img src="{$smarty.const._AM_MEDIAS_URL}/{$news.image}" alt="{$news.title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"}" style="width: 100%;">
+					<img src="{if $news.image}{$smarty.const._AM_MEDIAS_URL}/{$news.image}{else}{$smarty.const.SB_MODULES_URL}{$smarty.const.MODULEFILE}/images/news-img.jpg{/if}" alt="{$news.title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"}" style="width: 100%;">
 				</a>
 			</div>
 		
