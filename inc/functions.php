@@ -265,6 +265,23 @@ function sbGetSeo($text = '', $key = '') {
 }
 
 /**
+* Get Date Conversion from ISO format
+* @return html date
+*/
+function sbConvertDate($date, $format = 'ISO') {
+	switch(strtoupper($format)) {
+		// Format ISO (AAAA-MM-DD)
+		default: return strftime("%F", strtotime($date)); break;
+		// Format US (MM-DD-AAAA)
+		case "US": return strftime("%m/%d/%Y", strtotime($date)); break;
+		// Format FR (DD-MM-AAAA)
+		case "FR": return strftime("%d/%m/%Y", strtotime($date)); break;
+		// Year (AAAA)
+		case "YEAR": return strftime("%Y", strtotime($date)); break;
+	}
+}
+
+/**
 * Get Date by Shortcode
 * @return string (current server year)
 */
