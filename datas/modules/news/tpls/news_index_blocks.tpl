@@ -9,7 +9,7 @@
 		<div id="bloc_{$block.id}" class="">
 	
 			{if $block.title}
-				<h3>{$block.title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"}</h3>
+				<h5 class="title-bg">{$block.title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"}</h3>
 			{/if}
 	
 			{$block.content|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|@sbGetShortcode}
