@@ -639,7 +639,6 @@ function insert_sbGetContentCmsBlocks($param) {
 					   WHERE t2.active = '1' AND $type_t1_query
 					   ORDER BY t1.sort ASC ";	
 	$request = $sbsql->query($query);
-	
 	return $sbsql->toarray($request);
 }
 
