@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_blocs` (
   `pages_id` varchar(255) NOT NULL COMMENT 'Pages IDs (separate by | )',
   `modules_id` varchar(255) NOT NULL COMMENT 'Module dirnames (separate by | )',
   `name` varchar(100) NOT NULL COMMENT 'Nom du bloc',
-  `title` text NOT NULL COMMENT 'titre du bloc (cÃ´te client)',
+  `title` text NOT NULL COMMENT 'titre du bloc (cote client)',
   `content` text NOT NULL COMMENT 'Contenu du bloc',
   `position` varchar(100) NOT NULL,
   `active` tinyint(4) NOT NULL COMMENT '0: inactive, 1: active',
@@ -62,8 +62,8 @@ DROP TABLE IF EXISTS `<DB_PREFIX>sb_blocs_sort`;
 CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_blocs_sort` (
   `id` int(11) NOT NULL,
   `bloc_id` int(11) NOT NULL COMMENT 'ID des blocs',
-  `page_id` int(11) NOT NULL COMMENT 'ID des pages',
-  `module_id` varchar(50) NOT NULL COMMENT 'Nom du module (nom du repertoire)',
+  `page_id` int(11) DEFAULT NULL COMMENT 'ID des pages',
+  `module_id` varchar(50) DEFAULT NULL COMMENT 'Nom du module (nom du repertoire)',
   `sort` int(11) NOT NULL COMMENT 'Tri des blocs par page'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
