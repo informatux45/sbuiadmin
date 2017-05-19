@@ -50,10 +50,10 @@ function shortcode_sbuser($param = '') {
 	if (isset($_SESSION['sbmagic_user_name']) && $_SESSION['sbmagic_user_name'] != '') {
 		// --- Initialization LOGOUT
 		if ($icon_menu)
-			$user_html .= '<li>';
+			$user_html .= '<li class="' . $class_menu . '">';
 		else
 			$user_html .= '&nbsp;&nbsp;';
-		$user_html .= '<a href="' . $logout_url . '">';
+		$user_html .= '<a href="' . $logout_url . '" class="' . $class_href . '">';
 		$user_html .= '<i class="fa fa-lock"></i>';
 		if ($icon_text) $user_html .= ' logout';
 		$user_html .= '</a>';		
