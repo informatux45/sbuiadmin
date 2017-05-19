@@ -1,17 +1,21 @@
-{* --- Show Blocs infos --- *}
+{* --- Show User Blocs infos --- *}
 
-{insert name="sbGetContentCmsBlocks" pid="$page_id" lang="`$smarty.session.lang`" assign=blocks}
+{if $smarty.get.p != 'pages'}
 
-{foreach from=$blocks item=block}
+	{insert name="sbGetContentCmsBlocks" pid="`$smarty.const.MODULENAME|lower`" lang="`$smarty.session.lang`" mod="module" assign=blocks}
+	
+	{foreach from=$blocks item=block}
+	
+		<div id="bloc_{$block.id}" class="">
+	
+			{if $block.title}
+				<h5 class="title-bg">{$block.title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"}</h3>
+			{/if}
+	
+			{$block.content|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|@sbGetShortcode}
+	
+		</div> <!-- bloc_{$block.id} -->
+	
+	{/foreach}
 
-	<div id="bloc_{$block.id}" class="">
-
-		{if $block.title}
-			<h3>{$block.title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"}</h3>
-		{/if}
-
-		{$block.content|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|@sbGetShortcode}
-
-	</div> <!-- bloc_{$block.id} -->
-
-{/foreach}
+{/if}
