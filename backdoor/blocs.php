@@ -406,9 +406,8 @@ switch($action) {
 			$sort_id          = $sort['id'];
 			$toSort[$sort_id] = utf8_encode($sort['blocname']);
 		}
-
 		// --- Debug SQL
-		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[3]	 . "\n" . 'Form Type = '.$formType);
+		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[3] . "\n" . 'Form Type = '.$formType);
 		
 		// --------------------------------		
 		// --- Define variables
