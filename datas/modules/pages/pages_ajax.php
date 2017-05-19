@@ -53,10 +53,20 @@ $sb_pages_content = $sbsanitize->displayLang(utf8_encode($assoc['content']), $_S
 $sb_pages_active  = $assoc['active'];
 
 if ($sb_pages_active) {
+	
+	// --------------------------
+	// --- Get Additional HTML Content
+	// --------------------------
+	if (!empty($assoc['various_view'])) {
+		$various_html = @file_get_contents(SB_VARIOUS_URL . $assoc['various_view']);
+		$additional_html_content = ($various_html) ? sbGetShortcode($various_html) : false;
+	} else {
+		$additional_html_content = false;
+	}
 
 	$sb_pages_ajax .= '<h1>' . $sb_pages_title . '</h1>';
 	if (trim($sb_pages_title2) != '') $sb_pages_ajax .= '<h2>' . $sbsanitize->stripTags($sb_pages_title2) . '</h2>';
-	$sb_pages_ajax .= '<div class="sb_pages_content">' . sbGetShortcode($sb_pages_content) . '</div>';
+	$sb_pages_ajax .= '<div class="sb_pages_content">' . sbGetShortcode($sb_pages_content) . $additional_html_content . '</div>';
 
 } else {
 

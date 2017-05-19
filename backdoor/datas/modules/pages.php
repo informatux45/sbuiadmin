@@ -147,6 +147,7 @@ switch($action) {
 			$seo_description = $sbsanitize->displayText($_POST['seo_description'], 'UTF-8', 1, 0);
 			$theme_view      = $sbsanitize->displayText($_POST['theme_view'], 'UTF-8', 1, 0);
 			$module_view     = $sbsanitize->displayText($_POST['module_view'], 'UTF-8', 1, 0);
+			$various_view    = $sbsanitize->displayText($_POST['various_view'], 'UTF-8', 1, 0);
 			$headpage        = $sbsanitize->displayText($_POST['headpage'], 'UTF-8', 1, 0);
 			$active          = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
 			$url_custom      = '';
@@ -154,12 +155,12 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'add') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table (menu,title,content,seo_url,url_custom,seo_keywords,seo_description,active,theme_view,module_view,headpage,sort)
-						  VALUES ('$menu','$title','$content','$seo_url','$url_custom','$seo_keywords','$seo_description','$active','$theme_view','$module_view','$headpage','0')";
+				$query = "INSERT INTO $table (menu,title,content,seo_url,url_custom,seo_keywords,seo_description,active,theme_view,module_view,various_view,headpage,sort)
+						  VALUES ('$menu','$title','$content','$seo_url','$url_custom','$seo_keywords','$seo_description','$active','$theme_view','$module_view','$various_view','$headpage','0')";
 				$result_add = $sbsql->query($query);
 				if ($result_add) {
 					// --- Vider les champs du formulaire
-					$menu_fr = $menu_en = $title_fr = $title_en = $content_fr = $content_en = $seo_url = $seo_keywords = $seo_description = $theme_view = $headpage = $module_view = $active = '';
+					$menu_fr = $menu_en = $title_fr = $title_en = $content_fr = $content_en = $seo_url = $seo_keywords = $seo_description = $theme_view = $headpage = $module_view = $various_view = $active = '';
 					// --- Message SUCCESS
 					$sb_msg_valid = 'Page ajoutée avec succès';
 				} else {
@@ -178,6 +179,7 @@ switch($action) {
 										   ,active = '$active'
 										   ,theme_view = '$theme_view'
 										   ,module_view = '$module_view'
+										   ,various_view = '$various_view'
 										   ,headpage = '$headpage'
 										   WHERE id = '$id'";
 											 
@@ -200,7 +202,7 @@ switch($action) {
 		} else {
 			// Si AJOUT (First time)
 			// --- Vider les champs du formulaire
-			$menu_fr = $menu_en = $title_fr = $title_en = $content_fr = $content_en = $seo_url = $seo_keywords = $seo_description = $active = $theme_view = $headpage = $module_view = '';
+			$menu_fr = $menu_en = $title_fr = $title_en = $content_fr = $content_en = $seo_url = $seo_keywords = $seo_description = $active = $theme_view = $headpage = $module_view = $various_view = '';
 		}
 		// --------------------------------
 		if ($formType == 'edit' && !$_POST['form_submit']) {
@@ -222,6 +224,7 @@ switch($action) {
 			$seo_description = utf8_encode($assoc['seo_description']);
 			$theme_view      = $assoc['theme_view'];
 			$module_view     = $assoc['module_view'];
+			$various_view    = $assoc['various_view'];
 			$headpage        = $assoc['headpage'];
 			$active          = $assoc['active'];
 

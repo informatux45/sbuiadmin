@@ -47,13 +47,23 @@ if ($sb_pages_active) {
 	// --------------------------
 	$modpage['theme_main'] = $assoc['theme_view'];
 	$modpage['module_main'] = $assoc['module_view'];
+	
+	// --------------------------
+	// --- Get Additional HTML Content
+	// --------------------------
+	if (!empty($assoc['various_view'])) {
+		$various_html = @file_get_contents(SB_VARIOUS_URL . $assoc['various_view']);
+		$additional_html_content = ($various_html) ? sbGetShortcode($various_html) : false;
+	} else {
+		$additional_html_content = false;
+	}
 
 	// --------------------------
 	// --- Assign Title Page
 	// --------------------------
 	$sbsmarty->assign('sb_title', $sb_pages_title); // Title of Module PAGES
 	$sbsmarty->assign('sb_pages_title', $sb_pages_title);
-	$sbsmarty->assign('sb_pages_content', sbGetShortcode($sb_pages_content));
+	$sbsmarty->assign('sb_pages_content', sbGetShortcode($sb_pages_content) . $additional_html_content);
 	
 	// --------------------------
 	// --- Assign Page ID
