@@ -14,10 +14,12 @@
 	</style>
 	<script src="{$smarty.const.SB_MODULES_URL}{$smarty.const.MODULEFILE}/inc/masonry.pkgd.min.js"></script>
 {elseif $sbnews_module_show == 'float'}
+	{assign var="no_masonry" value="true"}
 	<link rel="stylesheet" href="{$smarty.const.SB_MODULES_URL}{$smarty.const.MODULEFILE}/inc/style_category_float.css">
 {elseif $sbnews_module_show == 'masonrycss'}
 	<link rel="stylesheet" href="{$smarty.const.SB_MODULES_URL}{$smarty.const.MODULEFILE}/inc/style_category_masonrycss.css">
 {else}
+	{assign var="no_masonry" value="true"}
 	<link rel="stylesheet" href="{$smarty.const.SB_MODULES_URL}{$smarty.const.MODULEFILE}/inc/style_category_normal.css">
 {/if}
 
@@ -53,7 +55,11 @@
 					{$news.date|sbConvertDate:"FR"}
 				</p>
 				<p class="sbnews-p">
-					{$news.desc_short|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|truncate:60:".."}
+					{if $no_masonry == "true"}
+						{$news.desc_short|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"}
+					{else}
+						{$news.desc_short|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|truncate:60:".."}
+					{/if}
 				</p>
 				<span class="sbnews-link-item">
 					<a href="{seo url="index.php?p=news&op=article&id={$news.id}" rewrite="news/article/{$news.id}/{$news.title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|strip_tags|@sbRewriteString|@strtolower}"}">
