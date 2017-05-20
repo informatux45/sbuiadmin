@@ -506,7 +506,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_news_category` (
 --
 
 INSERT INTO `<DB_PREFIX>sb_news_category` (`id`, `title`, `subtitle`, `tpl_list`, `tpl_single`, `module_show`, `module_show_masonry`, `photo`, `active`, `sort`) VALUES
-(1, '[fr]Actualit&eacute;s[/fr]', '[fr][/fr]', NULL, NULL, NULL, NULL, '', 1, 0);
+(1, '[fr]Sports[/fr]', '[fr][/fr]', NULL, NULL, 'float', 200, '', 1, 0);
 
 
 -- --------------------------------------------------------
@@ -572,9 +572,9 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_pages` (
 
 INSERT INTO `<DB_PREFIX>sb_pages` (`id`, `menu`, `title`, `content`, `seo_url`, `url_custom`, `seo_keywords`, `seo_description`, `module_view`, `theme_view`, `various_view`, `headpage`, `active`, `sort`) VALUES
 (1, '[fr]Accueil[/fr]', '[fr]Accueil[/fr]', '[fr]&lt;p&gt;Thank you for using SBUIADMIN CMS. This is your homepage, so please change this text to be what you want.&lt;/p&gt;\r\n\r\n&lt;ul&gt;\r\n	&lt;li&gt;&lt;a href=&quot;#&quot;&gt;SBUIADMIN CMS Documentation&lt;/a&gt;\r\n\r\n	&lt;ul&gt;\r\n		&lt;li&gt;&lt;a href=&quot;#&quot;&gt;How to Create a SBUIADMIN Theme&lt;/a&gt;&lt;/li&gt;\r\n	&lt;/ul&gt;\r\n	&lt;/li&gt;\r\n	&lt;li&gt;&lt;a href=&quot;#&quot;&gt;SBUIADMIN Support Forums&lt;/a&gt;&lt;/li&gt;\r\n&lt;/ul&gt;\r\n\r\n&lt;h2&gt;Header 2&lt;/h2&gt;\r\n\r\n&lt;p&gt;Lorem ipsum &lt;em&gt;dolor sit amet&lt;/em&gt;, &lt;strong&gt;consectetur adipiscing elit&lt;/strong&gt;. Donec &lt;code&gt;this is code&lt;/code&gt; venenatis augue. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Integer vulputate pretium augue.&lt;/p&gt;\r\n\r\n&lt;h3&gt;Header 3&lt;/h3&gt;\r\n\r\n&lt;pre&gt;\r\n&lt;code class=&quot;language-css&quot;&gt;#header h1 a { \r\n	display: block; \r\n	width: 300px; \r\n	height: 80px; \r\n}&lt;/code&gt;&lt;/pre&gt;\r\n\r\n&lt;h4&gt;Header 4&lt;/h4&gt;\r\n\r\n&lt;ol&gt;\r\n	&lt;li&gt;Lorem ipsum dolor sit amet&lt;/li&gt;\r\n	&lt;li&gt;Consectetur adipiscing elit&lt;/li&gt;\r\n	&lt;li&gt;Donec ut est risus, placerat venenatis augue&lt;/li&gt;\r\n&lt;/ol&gt;\r\n\r\n&lt;blockquote&gt;A blockquote. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ut est risus, placerat venenatis augue. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.&lt;/blockquote&gt;[/fr]', '', '', 'mon,site,page,accueil', 'La page Accueil de mon site', '', 'index', 'page-features.html', '', 1, 0),
-(2, '[fr]News[/fr]', '[fr]News[/fr]', '[fr][/fr]', 'news', '', '', '', 'news', 'index', NULL, '', 1, 0),
+(2, '[fr]News[/fr]', '[fr]News[/fr]', '[fr][/fr]', 'news', '', '', '', 'news', 'index', '', '', 1, 0),
 (3, '[fr]Contact[/fr]', '[fr]Contact[/fr]', '[fr][/fr]', 'contact', '', '', '', '', 'index-contact', NULL, '', 1, 0),
-(4, '[fr]Login[/fr]', '[fr]Login[/fr]', '[fr]&lt;h1&gt;Module USER&lt;/h1&gt;\r\n\r\n&lt;p&gt;&amp;nbsp;&lt;/p&gt;\r\n\r\n&lt;h3&gt;Utilisation du module USER dans votre code&lt;/h3&gt;\r\n\r\n&lt;ol&gt;\r\n	&lt;li&gt;&amp;nbsp;Editeur WYSIWYG : &lt;strong style=&quot;color: red;&quot;&gt;&amp;lsqb;CS name=sbuser icontext=1 menu=li&amp;rsqb;&lt;/strong&gt;&lt;/li&gt;\r\n	&lt;li&gt;&amp;nbsp;Smarty Templates : &lt;strong style=&quot;color: red;&quot;&gt;{insert name=&amp;quot;sbDoShortcode&amp;quot; code=&amp;quot;&amp;lsqb;CS name=sbuser icontext=1 menu=li&amp;rsqb;&amp;quot;}&lt;/strong&gt;&lt;/li&gt;\r\n&lt;/ol&gt;\r\n\r\n&lt;h3&gt;Les param&amp;egrave;tres&lt;/h3&gt;\r\n\r\n&lt;ul&gt;\r\n	&lt;li&gt;name : &lt;strong style=&quot;color: red;&quot;&gt;sbuser &lt;/strong&gt;(tout le temps)&lt;/li&gt;\r\n	&lt;li&gt;icontext : &lt;strong style=&quot;color: red;&quot;&gt;1&lt;/strong&gt; (si vous voulez activer le texte et les ic&amp;ocirc;nes - optionnel)&lt;/li&gt;\r\n	&lt;li&gt;menu : &lt;strong style=&quot;color: red;&quot;&gt;li&lt;/strong&gt; (si vous voulez l&amp;#39;int&amp;eacute;grer &amp;agrave; un menu ou liste &amp;agrave; puce - optionnel)&lt;/li&gt;\r\n&lt;/ul&gt;\r\n\r\n&lt;h3&gt;Module URLs&lt;/h3&gt;\r\n\r\n&lt;ul&gt;\r\n	&lt;li&gt;&lt;strong style=&quot;color: red;&quot;&gt;http://www.votresite.com/index.php?p=user&lt;/strong&gt; (mode rewrite d&amp;eacute;sactiv&amp;eacute;)&lt;/li&gt;\r\n	&lt;li&gt;&lt;strong style=&quot;color: red;&quot;&gt;http://www.votresite.com/user&lt;/strong&gt; (mode rewrite activ&amp;eacute;)&lt;/li&gt;\r\n&lt;/ul&gt;\r\n&lt;br /&gt;\r\n&amp;nbsp;[/fr]', 'login', '', '', '', 'user', 'index', NULL, '', 1, 0);
+(4, '[fr]Login[/fr]', '[fr]Login[/fr]', '[fr]&lt;h1&gt;Module USER&lt;/h1&gt;\r\n\r\n&lt;p&gt;&amp;nbsp;&lt;/p&gt;\r\n\r\n&lt;h3&gt;Utilisation du module USER dans votre code&lt;/h3&gt;\r\n\r\n&lt;ol&gt;\r\n	&lt;li&gt;&amp;nbsp;Editeur WYSIWYG : &lt;strong style=&quot;color: red;&quot;&gt;&amp;lsqb;CS name=sbuser icontext=1 menu=li menu_class=mymenuclass href_class=myhrefclass&amp;rsqb;&lt;/strong&gt;&lt;/li&gt;\r\n	&lt;li&gt;&amp;nbsp;Smarty Templates : &lt;strong style=&quot;color: red;&quot;&gt;{insert name=&amp;quot;sbDoShortcode&amp;quot; code=&amp;quot;&amp;lsqb;CS name=sbuser icontext=1 menu=li menu_class=mymenuclass href_class=myhrefclass&amp;rsqb;&amp;quot;}&lt;/strong&gt;&lt;/li&gt;\r\n&lt;/ol&gt;\r\n\r\n&lt;h3&gt;Les param&amp;egrave;tres&lt;/h3&gt;\r\n\r\n&lt;ul&gt;\r\n	&lt;li&gt;name : &lt;strong style=&quot;color: red;&quot;&gt;sbuser &lt;/strong&gt;(tout le temps)&lt;/li&gt;\r\n	&lt;li&gt;icontext : &lt;strong style=&quot;color: red;&quot;&gt;1&lt;/strong&gt; (activer le texte et les ic&amp;ocirc;nes - optionnel)&lt;/li&gt;\r\n	&lt;li&gt;menu : &lt;strong style=&quot;color: red;&quot;&gt;li&lt;/strong&gt; (int&amp;eacute;grer &amp;agrave; un menu ou liste &amp;agrave; puce - optionnel)&lt;/li&gt;\r\n	&lt;li&gt;menu_class : &lt;strong style=&quot;color: red;&quot;&gt;class_name&lt;/strong&gt; (ajouter une classe &amp;agrave; la balise LI - optionnel)&lt;/li&gt;\r\n	&lt;li&gt;href_class : &lt;strong style=&quot;color: red;&quot;&gt;class_name&lt;/strong&gt; (ajouter une classe &amp;agrave; la balise A&lt;/li&gt;\r\n&lt;/ul&gt;\r\n\r\n&lt;h3&gt;Module URLs&lt;/h3&gt;\r\n\r\n&lt;ul&gt;\r\n	&lt;li&gt;&lt;strong style=&quot;color: red;&quot;&gt;http://www.votresite.com/index.php?p=user&lt;/strong&gt; (mode rewrite d&amp;eacute;sactiv&amp;eacute;)&lt;/li&gt;\r\n	&lt;li&gt;&lt;strong style=&quot;color: red;&quot;&gt;http://www.votresite.com/user&lt;/strong&gt; (mode rewrite activ&amp;eacute;)&lt;/li&gt;\r\n&lt;/ul&gt;\r\n\r\n&lt;h3&gt;Exemples&lt;/h3&gt;\r\n&amp;lsqb;CS name=sbuser href_class=myhrefclass1&amp;rsqb;&lt;br /&gt;\r\n[CS name=sbuser href_class=myhrefclass1]&lt;br /&gt;\r\n&lt;br /&gt;\r\n&amp;lsqb;CS name=sbuser icontext=1 href_class=myhrefclass2&amp;rsqb;&lt;br /&gt;\r\n[CS name=sbuser icontext=1 href_class=myhrefclass2]&lt;br /&gt;\r\n&lt;br /&gt;\r\n&amp;lsqb;CS name=sbuser icontext=1 menu=li menu_class=mymenuclass3 href_class=myhrefclass3&amp;rsqb;&lt;br /&gt;\r\n[CS name=sbuser icontext=1 menu=li menu_class=mymenuclass3 href_class=myhrefclass3]&lt;br /&gt;\r\n&amp;nbsp;[/fr]', 'login', '', '', '', 'user', 'index', '', '', 1, 0);
 
 -- --------------------------------------------------------
 
@@ -748,6 +748,14 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_slider` (
   `active` tinyint(4) NOT NULL COMMENT '0: inactive, 1: active'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Dumping data for table `sb_slider`
+--
+
+INSERT INTO `<DB_PREFIX>sb_slider` (`id`, `title`, `jquery`, `responsive`, `auto`, `pause`, `speed`, `randomstart`, `mode`, `preloadimages`, `controls`, `autocontrols`, `autohover`, `captions`, `adaptiveheight`, `adaptiveheightspeed`, `slidemargin`, `video`, `usecss`, `pager`, `pagertype`, `active`) VALUES
+(1, 'Mon slider', 1, 1, 1, 4000, 500, 1, 'horizontal', 'visible', 1, 0, 0, 0, 0, 500, 0, 0, 1, 1, 'full', 1);
+
+
 -- --------------------------------------------------------
 
 --
@@ -764,6 +772,18 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_slider_photos` (
   `active` tinyint(4) NOT NULL COMMENT '0: inactive, 1: active',
   `sort` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `sb_slider_photos`
+--
+
+INSERT INTO `<DB_PREFIX>sb_slider_photos` (`id`, `sid`, `title`, `photo`, `type`, `active`, `sort`) VALUES
+(1, 1, 'Mont Saint Michel', 'slider-5.jpg', 'photo', 1, 1),
+(2, 1, 'New York', 'slider-3.jpg', 'photo', 1, 2),
+(3, 1, 'Rafting', 'slider-2.jpg', 'photo', 1, 3),
+(4, 1, 'Mon chalet &agrave; la montagne', 'slider-1.jpg', 'photo', 1, 4),
+(5, 1, 'Miam Miam', 'slider-4.jpg', 'photo', 1, 5);
+
 
 -- --------------------------------------------------------
 
