@@ -82,7 +82,7 @@ h5 {font-size: 1em}
 }
 /* --- Menu --- */
 .main-navigation {
-	margin: 0;
+	margin: 1em 0 0 0;
 }
 .main-navigation li {
 	border-top: 1px solid #f2f2f2;

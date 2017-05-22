@@ -25,11 +25,11 @@
                 <h3 class="profile-title">{$sb_site_title}</h3>
                 <p class="profile-description">{$sb_site_title}</p>
             </div> <!-- top-section -->
-                <div class="row">
-                    <ul class="navigation">
-                        <li>{insert name="sbDoShortcode" code="[CS name=sbuser icontext=1 menu=li]"}</li>
-                    </ul>
-                </div>
+            <p class="row acenter">
+                {*ul class="navigation">*}
+                    {insert name="sbDoShortcode" code="[CS name=sbuser icontext=1]"}
+                {*</ul>*}
+            </p>
             <div class="main-navigation">
                 {insert name='sbGetMenuCms' mclass='navigation' mid='nav' mtag='main_menu' mlang="`$smarty.session.lang`"}
             </div> <!-- .main-navigation -->
