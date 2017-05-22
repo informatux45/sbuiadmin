@@ -330,11 +330,12 @@ function insert_sbGetMenuCms($param) {
 	$menu_ul_class = trim($param['mclass']);
 	$menu_ul_id    = trim($param['mid']);
 	$menu_lang     = trim($param['mlang']);
+	$menu_type     = trim($param['mtype']);
 	
 	$menu_entries  = explode("|", $assoc['pages']);
 	
 	// --- Initialization
-	$menu   = '<ul id="' . $menu_ul_id . '" class="' . $menu_ul_class . '">';
+	if (!isset($menu_type) || $menu_type != 'option') $menu   = '<ul id="' . $menu_ul_id . '" class="' . $menu_ul_class . '">';
 	$active = '';
 
 	foreach($menu_entries as $entry) {
@@ -350,26 +351,33 @@ function insert_sbGetMenuCms($param) {
 			// Seo / Normal URL
 			$seo_normal_url = sbGetSeoUrl("index.php?p=pages&id={$assoc2['seo_url']}", $assoc2['seo_url'], false);
 			// Increase Menu
-			$menu .= '<li id="menu_' . $assoc2['id'] . '">';
-			// --- Get active menu
-			if ($assoc2['url_custom']) {
-				// --- Custom URL
-				$current_url    = $sbsanitize->htmlEntities(sbGetCurrentUrl());
-				$stringtosearch = $assoc2['url_custom'];
-				$active  = ($current_url == $stringtosearch) ? 'active' : '';
-				$menu .= '<a class="' . $active . '" href="' . $assoc2['url_custom'] . '">';
+			if ($menu_type == 'option') {
+				$active = ($seo_url_rewrite == $seo_url_id) ? 'selected="" ' : '';
+				$menu .= '<option ' . $active . 'id="menu_' . $assoc2['id'] . '" data-href="' . ((isset($assoc2['seo_url']) && trim($assoc2['seo_url']) != '') ? $seo_normal_url : SB_URL) . '">';
+				$menu .= $sbsanitize->displayLang($sbsanitize->displayText($assoc2['menu'], 'UTF-8', 1, 0), "$menu_lang");
+				$menu .= '</option>';
 			} else {
-				// --- Page URL
-				$active = ($seo_url_rewrite == $seo_url_id) ? 'active' : '';
-				$menu .= '<a class="' . $active . '" href="' . ((isset($assoc2['seo_url']) && trim($assoc2['seo_url']) != '') ? $seo_normal_url : SB_URL) . '">';
+				$menu .= '<li id="menu_' . $assoc2['id'] . '">';
+				// --- Get active menu
+				if ($assoc2['url_custom']) {
+					// --- Custom URL
+					$current_url    = $sbsanitize->htmlEntities(sbGetCurrentUrl());
+					$stringtosearch = $assoc2['url_custom'];
+					$active  = ($current_url == $stringtosearch) ? 'active' : '';
+					$menu .= '<a class="' . $active . '" href="' . $assoc2['url_custom'] . '">';
+				} else {
+					// --- Page URL
+					$active = ($seo_url_rewrite == $seo_url_id) ? 'active' : '';
+					$menu .= '<a class="' . $active . '" href="' . ((isset($assoc2['seo_url']) && trim($assoc2['seo_url']) != '') ? $seo_normal_url : SB_URL) . '">';
+				}
+				$menu .= $sbsanitize->displayLang($sbsanitize->displayText($assoc2['menu'], 'UTF-8', 1, 0), "$menu_lang");
+				$menu .= '</a>';
+				$menu .= '</li>';
 			}
-			$menu .= $sbsanitize->displayLang($sbsanitize->displayText($assoc2['menu'], 'UTF-8', 1, 0), "$menu_lang");
-			$menu .= '</a>';
-			$menu .= '</li>';
 		}
 		$active = '';
 	}
-	$menu .= '</ul>';
+	if (!isset($menu_type) || $menu_type != 'option') $menu .= '</ul>';
 
 	return $menu;
 }
