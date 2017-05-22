@@ -29,7 +29,7 @@ $theme['headpage'][0] = true;
 // ---------------------------------
 // --- Various informations
 // ---------------------------------
-$theme['slogan'] = "INFORMATUX";
+$theme['slogan'] = "[CS name=sbuser href_class=headerlogin]";
 
 // ---------------------------------
 // --- Special blocks
