@@ -872,7 +872,7 @@ function insert_sbGetThemeOption($param) {
 		$option_string = $theme[$option_name][$option_num];
 	else
 		$option_string = $theme[$option_name];
-    return $option_string;
+    return sbGetShortcode($option_string);
 }
 
 ?>
