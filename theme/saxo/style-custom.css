@@ -7,3 +7,12 @@ ul.sbslider1 {
 .flexslider {
     margin: 0 0 2em 0;
 }
+
+{* --- Footer --- *}
+.nav_footer li {
+	float: left;
+	margin: 0;
+}
+.nav_footer li a {
+	margin: 0 1em;
+}
