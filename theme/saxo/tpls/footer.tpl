@@ -32,23 +32,16 @@
                 </div>
                 <div class="span3 footer-col">
                     <h5>News</h5>
-					{insert name="sbDoShortcode" code="[CS name=sbnews_blocks_recent]"}
+					{insert name="sbDoShortcode" code="[CS name=sbnews_blocks_recent count=3]"}
                 </div>
                 <div class="span3 footer-col">
                     <h5>Photos</h5>
                     <ul class="img-feed">
-                        <li><a href="#"><img src="{$smarty.const.SB_THEME_URL}img/gallery/flickr-img-1.jpg" alt="Image Feed"></a></li>
-                        <li><a href="#"><img src="{$smarty.const.SB_THEME_URL}img/gallery/flickr-img-1.jpg" alt="Image Feed"></a></li>
-                        <li><a href="#"><img src="{$smarty.const.SB_THEME_URL}img/gallery/flickr-img-1.jpg" alt="Image Feed"></a></li>
-                        <li><a href="#"><img src="{$smarty.const.SB_THEME_URL}img/gallery/flickr-img-1.jpg" alt="Image Feed"></a></li>
-                        <li><a href="#"><img src="{$smarty.const.SB_THEME_URL}img/gallery/flickr-img-1.jpg" alt="Image Feed"></a></li>
-                        <li><a href="#"><img src="{$smarty.const.SB_THEME_URL}img/gallery/flickr-img-1.jpg" alt="Image Feed"></a></li>
-                        <li><a href="#"><img src="{$smarty.const.SB_THEME_URL}img/gallery/flickr-img-1.jpg" alt="Image Feed"></a></li>
-                        <li><a href="#"><img src="{$smarty.const.SB_THEME_URL}img/gallery/flickr-img-1.jpg" alt="Image Feed"></a></li>
-                        <li><a href="#"><img src="{$smarty.const.SB_THEME_URL}img/gallery/flickr-img-1.jpg" alt="Image Feed"></a></li>
-                        <li><a href="#"><img src="{$smarty.const.SB_THEME_URL}img/gallery/flickr-img-1.jpg" alt="Image Feed"></a></li>
-                        <li><a href="#"><img src="{$smarty.const.SB_THEME_URL}img/gallery/flickr-img-1.jpg" alt="Image Feed"></a></li>
-                        <li><a href="#"><img src="{$smarty.const.SB_THEME_URL}img/gallery/flickr-img-1.jpg" alt="Image Feed"></a></li>
+						{for $img_feed=1 to 12}
+							<li>
+								<a href="#"><img src="{$smarty.const.SB_THEME_URL}img/gallery/flickr-img-1.jpg" alt="Image Feed"></a>
+							</li>
+						{/for}
                     </ul>
                 </div>
             </div>
