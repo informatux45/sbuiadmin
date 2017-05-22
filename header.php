@@ -22,8 +22,8 @@ if (SBDEBUG) {
 // ------------------------ 
 // Functions
 // ------------------------
-if (file_exists(SB_ADMIN_DIR . "inc" . DIRECTORY_SEPARATOR . "sbmagic-functions.php"))
-	require_once(SB_ADMIN_DIR . "inc" . DIRECTORY_SEPARATOR . "sbmagic-functions.php");
+if (file_exists(SB_ADMIN_DIR . "inc" . DIRECTORY_SEPARATOR . "sbuiadmin-functions.php"))
+	require_once(SB_ADMIN_DIR . "inc" . DIRECTORY_SEPARATOR . "sbuiadmin-functions.php");
  
 // ------------------------
 // Langage
