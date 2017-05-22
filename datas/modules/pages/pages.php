@@ -53,9 +53,9 @@ if ($sb_pages_active) {
 	// --------------------------
 	if (!empty($assoc['various_view'])) {
 		$various_html = @file_get_contents(SB_VARIOUS_URL . $assoc['various_view']);
-		$additional_html_content = ($various_html) ? sbGetShortcode($various_html) : false;
+		$additional_html_content = ($various_html) ? sbGetShortcode($various_html) : "";
 	} else {
-		$additional_html_content = false;
+		$additional_html_content = "";
 	}
 
 	// --------------------------
