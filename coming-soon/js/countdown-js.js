@@ -1,5 +1,4 @@
-// set the date we're counting down to
-var target_date = new Date('Nov, 31, 2018').getTime();
+
  
 // variables for time units
 var days, hours, minutes, seconds;
@@ -24,7 +23,12 @@ setInterval(function () {
     minutes = parseInt(seconds_left / 60);
     seconds = parseInt(seconds_left % 60);
      
-    // format countdown string + set tag value
-    countdown.innerHTML = '<div class="days"><h2>Left <span>' + days +  ' </span>Days</div> ';  
+    // format countdown string + set tag value
+	var real_days = (seconds_left < 0) ? 0 : (days+1);
+	if (real_days < 2)
+		var dday = 'jour';
+	else
+		var dday = 'jours';
+    countdown.innerHTML = '<div class="days"><br><h2>Lancement<br>dans <span>' + real_days + '</span> ' + dday + '</div> ';  
  
 }, 1000);

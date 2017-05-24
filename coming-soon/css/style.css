@@ -268,7 +268,7 @@ article[role="countdown"].countdown-pan h2{font-family: 'Oranienbaum', serif; pa
 
 article[role="countdown"].countdown-pan h2 > span{ font-size:72px; line-height:72px; position:relative; letter-spacing:inherit; display:inline-block}
 
-article[role="countdown"].countdown-pan h2 > span:after{ content:""; display:block; width:98px; height:3px; position:absolute; left:0; right:0; bottom:-5px; margin:0 auto; background-color:#e84d49}
+article[role="countdown"].countdown-pan h2 > span:after{ content:""; display:block; width:100%; height:3px; position:absolute; left:0; right:0; bottom:-5px; margin:0 auto; background-color:#e84d49}
 
 article[role="countdown"].countdown-pan > p{ text-transform:uppercase; font-weight:700; letter-spacing:3px; margin:0; padding:0; padding-top:29px}
 
@@ -282,7 +282,7 @@ article header.page-title h2:after{ content:""; display:block; width:98px; heigh
 
 article[role="introduction"].introduction-pan{ padding-top:17.6%}
 
-article[role="introduction"].introduction-pan p{ letter-spacing:1px; line-height:18px; font-weight:300}
+article[role="introduction"].introduction-pan p{ letter-spacing:1px; line-height:18px; font-weight:normal}
 
 article[role="introduction"].introduction-pan ul{ margin:0; padding:0; text-align:center; padding-top:50px;}
 

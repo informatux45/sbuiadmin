@@ -177,7 +177,7 @@ $coming_soon_video = ($cs['coming-soon-video'] == '') ? 'PF0L3gvSVcg' : $cs['com
 	  
 	  <!-- Countdown --> 
 	  
-	  <!-- introduction -->
+	  <!-- About us -->
 	  
 	  <section id="menu1" class="tab-pane fade">
 		<article role="introduction" class="introduction-pan">
@@ -185,75 +185,40 @@ $coming_soon_video = ($cs['coming-soon-video'] == '') ? 'PF0L3gvSVcg' : $cs['com
 			<h2>A propos de nous</h2>
 		  </header>
 		  <p><?php echo html_entity_decode($cs['coming-soon-text']) ?></p>
-		  
-		  <!-- services -->
-		  
-		  <ul role="services">
-			<li> <i class="fa fa-diamond" aria-hidden="true"></i>
-			  <h6>Branding Consuting</h6>
-			  <p>We are a team of talented people<br/>
-				with big ideas and creative.</p>
-			</li>
-			<li> <i class="fa fa-camera-retro" aria-hidden="true"></i>
-			  <h6>Fashion Photography</h6>
-			  <p>We are a team of talented people<br/>
-				with big ideas and creative.</p>
-			</li>
-			<li> <i class="fa fa-bullhorn" aria-hidden="true"></i>
-			  <h6>Digital Marketing</h6>
-			  <p>We are a team of talented people<br/>
-				with big ideas and creative.</p>
-			</li>
-		  </ul>
-		  
-		  <!-- services --> 
-		  
 		</article>
 	  </section>
 	  
-	  <!-- introduction --> 
-	  
-	  <!-- Subscribe -->
-	  
-	  <section id="menu2" class="tab-pane fade">
-		<article role="subscribe" class="subscribe-pan">
-		  <header class="page-title">
-			<h2>Subscribe to Us</h2>
-		  </header>
-		  <div class="ntify_form">
-			<form method="post" action="php/subscribe.php" name="subscribeform" id="subscribeform">
-			  <input name="email" type="email" id="subemail" placeholder="Enter Your Email...">
-			  <label>
-				<input name="" type="submit" class="button-icon">
-				<i class="fa fa-paper-plane" aria-hidden="true"></i> </label>
-			</form>
-			
-			<!-- subscribe message -->
-			
-			<div id="mesaj"></div>
-			
-			<!-- subscribe message --> 
-			
-		  </div>
-		  <p>Please enter your email below and we'll let you know once<br/>
-			we're up and running.</p>
-		</article>
-	  </section>
-	  
-	  <!-- Subscribe --> 
+	  <!-- About us --> 
 	  
 	  <!-- Contact -->
 	  
 	  <section id="menu3" class="tab-pane fade">
 		<article role="contact" class="contact-pan">
 		  <header class="page-title">
-			<h2>Stay in touch with us</h2>
+			<h2>Contactez nous</h2>
 		  </header>
-		  <h3><a href="mailto:Contact@pixicon.com">Contact @ pixicon.com</a></h3>
-		  <ul>
-			<li><i class="fa fa-map-marker" aria-hidden="true"></i> Collins Street West Victoria 8007 Australia.</li>
-			<li><i class="fa fa-phone" aria-hidden="true"></i> <a href="tel:1-212-290-4700">+1-212-290-4700</a></li>
-		  </ul>
+		  <?php
+			if ($cs['coming-soon-email'] != '') {
+				echo "<h3><a href='mailto:{$cs[coming-soon-email]}'>";
+				echo $cs['coming-soon-email'];
+				echo '</a></h3>';
+			}
+			echo '<ul class="contact-infos">';
+			if ($cs['coming-soon-address'] != '' || $cs['coming-soon-tel'] != '') {
+				if ($cs['coming-soon-address'] != '') {
+					echo "<li><i class='fa fa-map-marker' aria-hidden='true'></i> ";
+					echo $cs['coming-soon-address'];
+					echo '</li>';
+				}
+				if ($cs['coming-soon-tel'] != '') {
+					echo "<li><i class='fa fa-phone' aria-hidden='true'></i> ";
+					echo "<a href='tel:" . $cs['coming-soon-tel'] . "'>";
+					echo $cs['coming-soon-tel'];
+					echo '</a></li>';
+				}
+			}
+			echo '</ul>';
+		  ?>
 		</article>
 	  </section>
 	</div>
@@ -283,8 +248,6 @@ $coming_soon_video = ($cs['coming-soon-video'] == '') ? 'PF0L3gvSVcg' : $cs['com
 		  <?php
 			if ($cs['coming-soon-text'])
 				echo '<li><a data-toggle="tab" href="#menu1" title="Introduction">A propos de nous</a></li>';
-			if ($cs['coming-soon-subscribe'])
-				echo '<li><a data-toggle="tab" href="#menu2" title="Subscribe">Inscription</a></li>';
 			if ($cs['coming-soon-address'] || $cs['coming-soon-tel'] || $cs['coming-soon-email'])
 				echo '<li><a data-toggle="tab" href="#menu3" title="Contact">Contact</a></li>';
 		  ?>
@@ -324,14 +287,14 @@ $coming_soon_video = ($cs['coming-soon-video'] == '') ? 'PF0L3gvSVcg' : $cs['com
 	  
 	</hgroup>
 	<footer class="desk">
-	  <p><?php echo date('Y'); ?> &copy; <?php echo utf8_encode($cs['coming-soon-title']) ?> Tous droits r&eacute;serv&eacute;s.</p>
+	  <p>&copy; <?php echo utf8_encode($cs['coming-soon-title']) ?> <?php echo date('Y'); ?>. Tous droits r&eacute;serv&eacute;s.</p>
 	</footer>
   </header>
   
   <!-- header -->
   
   <footer class="mobile">
-	<p><?php echo date('Y'); ?> &copy; <?php echo utf8_encode($cs['coming-soon-title']) ?> Tous droits r&eacute;serv&eacute;s.</p>
+	<p>&copy; <?php echo utf8_encode($cs['coming-soon-title']) ?> <?php echo date('Y'); ?>. Tous droits r&eacute;serv&eacute;s.</p>
   </footer>
 </div>
 </main>
@@ -349,8 +312,15 @@ $coming_soon_video = ($cs['coming-soon-video'] == '') ? 'PF0L3gvSVcg' : $cs['com
 
 <script src="js/bootstrap.min.js" type="text/javascript"></script> 
 
-<!-- jquery.countdown --> 
-
+<!-- jquery.countdown -->
+<script>
+	// set the date we're counting down to
+	<?php
+		$coming_soon_date = $cs['coming-soon-date'];
+		list($date_day, $date_month, $date_year) = explode("/", $coming_soon_date);
+	?>
+	var target_date = new Date('<?php echo $date_year; ?>, <?php echo $date_month; ?>, <?php echo $date_day; ?>').getTime();
+</script>
 <script src="js/countdown-js.js" type="text/javascript"></script>
 
 <?php if ($coming_soon_type == 'video') { ?>
