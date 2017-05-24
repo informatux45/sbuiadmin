@@ -25,6 +25,7 @@ define('_CMS_USER_MSG_ERROR_E3',		"Login manquant");
 define('_CMS_USER_MSG_ERROR_E4',		"Compte désactivé");
 define('_CMS_USER_ICON_TEXT_LOGIN',		"Login");
 define('_CMS_USER_ICON_TEXT_PROFILE',	"Profil");
+define('_CMS_USER_ICON_TEXT_ADMIN',		"Admin");
 define('_CMS_USER_ICON_TEXT_LOGOUT',	"Déconnexion");
 
 ?>

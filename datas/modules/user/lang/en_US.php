@@ -25,6 +25,7 @@ define('_CMS_USER_MSG_ERROR_E3',		"Missing Login");
 define('_CMS_USER_MSG_ERROR_E4',		"Account Disabled");
 define('_CMS_USER_ICON_TEXT_LOGIN',		"Login");
 define('_CMS_USER_ICON_TEXT_PROFILE',	"Profile");
+define('_CMS_USER_ICON_TEXT_ADMIN',		"Admin");
 define('_CMS_USER_ICON_TEXT_LOGOUT',	"Logout");
 
 ?>

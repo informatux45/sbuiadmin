@@ -35,16 +35,32 @@ function shortcode_sbuser($param = '') {
 	$class_menu = (isset($param['menu_class'])) ? $param['menu_class'] : "";
 	$class_href = (isset($param['href_class'])) ? $param['href_class'] : "";
 	// --- Initialization URL
-	$login_url  = (SBREWRITEURL === true) ? SB_URL . 'user' : SB_URL . 'index.php?p=user';
-	$logout_url = (SBREWRITEURL === true) ? SB_URL . 'user/?ac=logout' : SB_URL . 'index.php?p=user&ac=logout';
-	$login_text = (isset($_SESSION['sbmagic_user_name']) && $_SESSION['sbmagic_user_name'] != '') ? 'Profil' : 'Login';
-	// --- Initialization LOGIN / PROFILE
+	$login_url   = (SBREWRITEURL === true) ? SB_URL . 'user' : SB_URL . 'index.php?p=user';
+	$admin_url   = SB_ADMIN_URL;
+	$logout_url  = (SBREWRITEURL === true) ? SB_URL . 'user/?ac=logout' : SB_URL . 'index.php?p=user&ac=logout';
+	$login_text  = (isset($_SESSION['sbmagic_user_name']) && $_SESSION['sbmagic_user_name'] != '') ? _CMS_USER_ICON_TEXT_PROFILE : _CMS_USER_ICON_TEXT_LOGIN;
+	$admin_text  = _CMS_USER_ICON_TEXT_ADMIN;
+	$logout_text = _CMS_USER_ICON_TEXT_LOGOUT;
+	// --- LOGIN / PROFILE
 	if ($icon_menu) $user_html .= '<li class="' . $class_menu . '">';
-	$user_html .= '<a href="' . $login_url . '" class="' . $class_href . '">';
+	$user_html .= '<a href="' . $login_url . '" class="' . $class_href . '" title="' . $login_text . '">';
 	$user_html .= '<i class="fa fa-user"></i>';
 	if ($icon_text) $user_html .= ' ' . $login_text;
 	$user_html .= '</a>';
 	if ($icon_menu) $user_html .= '</li>';
+	// --- ADMIN BACKEND (if admin group)
+	global $sbmagic_user_type;
+	if ($sbmagic_user_type == 'admin') {
+		if ($icon_menu)
+			$user_html .= '<li class="' . $class_menu . '">';
+		else
+			$user_html .= '&nbsp;&nbsp;';
+		$user_html .= '<a href="' . $admin_url . '" class="' . $class_href . '" title="' . $admin_text . '">';
+		$user_html .= '<i class="fa fa-cogs"></i>';
+		if ($icon_text) $user_html .= ' ' . $admin_text;
+		$user_html .= '</a>';
+		if ($icon_menu) $user_html .= '</li>';
+	}
 
 	// --- Check if user is logging
 	if (isset($_SESSION['sbmagic_user_name']) && $_SESSION['sbmagic_user_name'] != '') {
@@ -53,9 +69,9 @@ function shortcode_sbuser($param = '') {
 			$user_html .= '<li class="' . $class_menu . '">';
 		else
 			$user_html .= '&nbsp;&nbsp;';
-		$user_html .= '<a href="' . $logout_url . '" class="' . $class_href . '">';
+		$user_html .= '<a href="' . $logout_url . '" class="' . $class_href . '" title="' . $logout_text . '">';
 		$user_html .= '<i class="fa fa-lock"></i>';
-		if ($icon_text) $user_html .= ' logout';
+		if ($icon_text) $user_html .= ' ' . $logout_text;
 		$user_html .= '</a>';		
 		if ($icon_menu) $user_html .= '</li>';
 	}
