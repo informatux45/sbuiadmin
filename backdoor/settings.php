@@ -205,7 +205,7 @@ switch($action) {
 		$tab_check_3[0]['text']    = 'Activé';
 		$tab_check_3[0]['name']    = 'cms';
 		$tab_check_3[0]['checked'] = ($sb_config_cms == 1) ? '1' : '0';
-		$sbform->addCheckbox('Activation du CMS', $tab_check_3, '', false, '<br />', "Permet d'afficher la gestion du menu<br>Activer SBMAGIC en CMS (si coché) ou Autonome (si non coché)");
+		$sbform->addCheckbox('Activation du CMS', $tab_check_3, '', false, '<br />', "Permet d'afficher la gestion du menu<br>Activer SBUIADMIN en CMS (si coché) ou en Administration Autonome (si non coché)");
 		// Checkbox du mode CAPTCHA
 		$tab_check_4 = array();
 		$tab_check_4[0]['text']    = 'Activé';
