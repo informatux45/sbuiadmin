@@ -204,9 +204,9 @@ a:focus, img:focus, button:focus, .btn:focus {
 
 /*===== Main ===*/
 
-main[role="main-wrapper-iamge"],main[role="main-wrapper-iamge"] > .over-bg-color{ background-image:url(../images/bg-image.jpg); background-size:cover; background-position:50% 0; background-repeat:no-repeat; width:100%; height:100%; position:fixed; width:100%; height:100%}
-
-main[role="main-wrapper-iamge"] > .over-bg-color{background-color:rgba(255,255,255,0.5); background-image:none; padding:0}
+/*main[role="main-wrapper-iamge"],main[role="main-wrapper-iamge"] > .over-bg-color{ background-image:url(../images/bg-image.jpg); background-size:cover; background-position:50% 0; background-repeat:no-repeat; width:100%; height:100%; position:fixed; width:100%; height:100%}*/
+/**/
+/*main[role="main-wrapper-iamge"] > .over-bg-color{background-color:rgba(255,255,255,0.5); background-image:none; padding:0}*/
 
 /*===== Header ===*/
 
@@ -246,7 +246,7 @@ header[role="header"] > hgroup ul[role="socil-icons"].mobile-social{ display:non
 
 header[role="header"] > hgroup ul[role="socil-icons"] li{ display:inline-block; margin-right:21px}
 
-header[role="header"] > hgroup ul[role="socil-icons"] li > a{ display:block; line-height:52px; font-size:13px; color:#353535}
+header[role="header"] > hgroup ul[role="socil-icons"] li > a{ display:block; line-height:52px; font-size:2em; color:#353535}
 
 header[role="header"] > hgroup ul[role="socil-icons"] li a:hover{ color:#e84d49}
 

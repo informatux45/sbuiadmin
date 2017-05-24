@@ -45,7 +45,7 @@
 	footer.mobile p{ text-align:center; line-height:18px}
 	header[role="header"] > hgroup div[role="socil-icons"]{ clear:both; display:block; margin:8px 0}
 	header[role="header"] > hgroup div[role="socil-icons"] li{ display:inline-block; margin:0 6px}
-	header[role="header"] > hgroup div[role="socil-icons"] li a{ color:#353535}
+	header[role="header"] > hgroup div[role="socil-icons"] li a{ color:#353535; font-size: 1.6em; }
 	header[role="header"] > hgroup div[role="socil-icons"] li a:hover{color:#e84d49}
 	
 	#menu-button{ display: block; position:absolute; right:1%; top:-41px; font-size:0; background-color:#353535; padding:3px 7px; cursor:pointer}
