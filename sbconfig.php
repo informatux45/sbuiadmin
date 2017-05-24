@@ -28,7 +28,7 @@ define('SBADMIN', 'backdoor');
 define('SBMAGICID', 'sbuiadmin');
 
 # Turn on debug mode
-define('SBDEBUG', false);
+define('SBDEBUG', true);
 
 # Language (default fr_FR)
 define('SBLANG', 'fr_FR');
@@ -75,7 +75,7 @@ define('SBSMARTYDEBUG', false);
 define('SBMAGIC_PATH', true);
 
 # Enable rewrite url
-define('SBREWRITEURL', true);
+define('SBREWRITEURL', false);
 
 # Enable maintenance mode (Coming soon)
 define('SBMAINTENANCE', true);
