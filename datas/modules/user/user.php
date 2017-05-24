@@ -28,10 +28,11 @@ include_once( SB_MODULES_DIR . MODULEFILE . DIRECTORY_SEPARATOR . 'inc' . DIRECT
 
 # Initialization
 global $sb_settings_config;
-$publickey  = $sbsanitize->sTrim($sb_settings_config[19]);
-$privatekey = $sbsanitize->sTrim($sb_settings_config[20]);
+$publickey      = $sbsanitize->sTrim($sb_settings_config[19]);
+$privatekey     = $sbsanitize->sTrim($sb_settings_config[20]);
+$captcha_active = $sbsanitize->sTrim($sb_settings_config[22]);
 $sbsmarty->assign('grecaptcha_publickey', $publickey);
-if (!empty($publickey) && !empty($privatekey)) {
+if (!empty($publickey) && !empty($privatekey) && $captcha_active) {
 	defined('_CMS_USER_CAPTCHA_MODE') OR define('_CMS_USER_CAPTCHA_MODE', "true");
 }
 
@@ -70,7 +71,7 @@ switch($op) {
 					$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_USER_ERROR, $sbmagic_user_name, $_SERVER["REMOTE_ADDR"]);
 					$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user_name);
 				} else {
-					if (_CMS_USER_CAPTCHA_MODE) {
+					if (_CMS_USER_CAPTCHA_MODE == "true") {
 						// --- Check Google Recaptcha
 						if (isset($_POST['g-recaptcha-response']) && !empty($_POST['g-recaptcha-response'])) {
 							function getCurlData($url) {
