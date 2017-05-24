@@ -28,7 +28,7 @@ define('SBADMIN', 'backdoor');
 define('SBMAGICID', 'sbuiadmin');
 
 # Turn on debug mode
-define('SBDEBUG', true);
+define('SBDEBUG', false);
 
 # Language (default fr_FR)
 define('SBLANG', 'fr_FR');
@@ -159,6 +159,6 @@ defined('SB_SMARTY_DIR') OR define('SB_SMARTY_DIR', SB_ADMIN_DIR . "core" . DIRE
 // ------------------------ 
 // --- Settings (Admin)
 // ------------------------ 
-defined('SB_SETTINGS_FILE') OR define('SB_SETTINGS_FILE', SB_ADMIN_DIR . DIRECTORY_SEPARATOR . "inc" . DIRECTORY_SEPARATOR . "admin" . DIRECTORY_SEPARATOR . "settings.txt");
+defined('SB_SETTINGS_FILE') OR define('SB_SETTINGS_FILE', SB_ADMIN_DIR . "inc" . DIRECTORY_SEPARATOR . "admin" . DIRECTORY_SEPARATOR . "settings.txt");
 
 ?>
