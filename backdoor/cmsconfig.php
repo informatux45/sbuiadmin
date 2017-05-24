@@ -329,7 +329,7 @@ switch($action) {
 		// --------------------------------
 		// Selection du type de Coming Soon
 		// --------------------------------
-		$sb_type = ['image','raindrops','snowflakes','cloud','video-sound','video-youtube'];
+		$sb_type = ['image','video'];
 		$sbform->openSelect("Choisissez un type de coming soon", array("id"=>"coming_soon_type", "name"=>"coming_soon_type"), true);
 		for($i = 0; $i < count($sb_type); $i++) {
 			if ($sb_type[$i] == $cs['coming-soon-type'])
@@ -343,15 +343,15 @@ switch($action) {
 		// Image / video
 		// --------------------------------
 		$sbform->addInput('text', 'Photo', array ('id'=>'inputPhoto', 'name' => 'coming_soon_image', 'value' => $cs['coming-soon-image'], 'placeholder' => "Photo (background)", "medias"=>"", 'icon' => 'photo'), false, false, 'Image commune à tous les types de Coming soon. Si vous ne choisissez pas de photo, il y en a une par défaut pour chaque type.');
-		$sbform->addInput('text', 'ID Youtube', array ('name' => 'coming_soon_video', 'value' => $cs['coming-soon-video'], 'placeholder' => "ID Youtube"), false, false, "Ex: hhttps://www.youtube.com/watch?v=<span style='color: red; font-weight: bold;'>Ekr05T9Iaio</span><br>N'indiquez que la partie en <span style='color: red;'>rouge</span> si le type est VIDEO-SOUND ou VIDEO-YOUTUBE<br>Si vous ne choisissez pas de vidéo, il y en une par défaut pour chaque type VIDEO-SOUND / VIDEO-YOUTUBE.");
+		$sbform->addInput('text', 'ID Youtube', array ('name' => 'coming_soon_video', 'value' => $cs['coming-soon-video'], 'placeholder' => "ID Youtube"), false, false, "N'indiquez que la partie en <span style='color: red;'>rouge</span>.<br>Si vous n'indiquez aucun ID vidéo, il y en une par défaut.<br>Ex: https://www.youtube.com/watch?v=<span style='color: red; font-weight: bold;'>PF0L3gvSVcg</span>");
 		// --------------------------------
 		// Dark Theme
 		// --------------------------------
-		$tab_check = array();
-		$tab_check[0]['text']    = 'Dark Theme';
-		$tab_check[0]['name']    = 'coming_soon_dark';
-		$tab_check[0]['checked'] = ($cs['coming-soon-dark'] == 1) ? '1' : '0';
-		$sbform->addCheckbox('Activation du theme DARK', $tab_check, '', false, '<br />', "Les éléments passeront en version sombre sinon ils resteront en blanc.");
+		//$tab_check = array();
+		//$tab_check[0]['text']    = 'Dark Theme';
+		//$tab_check[0]['name']    = 'coming_soon_dark';
+		//$tab_check[0]['checked'] = ($cs['coming-soon-dark'] == 1) ? '1' : '0';
+		//$sbform->addCheckbox('Activation du theme DARK', $tab_check, '', false, '<br />', "Les éléments passeront en version sombre sinon ils resteront en blanc.");
 		// ----------------------------
 		// Date du lancement
 		// ----------------------------
