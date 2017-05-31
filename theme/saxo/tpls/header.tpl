@@ -30,7 +30,7 @@
 	<link rel="apple-touch-icon" sizes="114x114" href="{$smarty.const.SB_THEME_URL}img/apple-touch-icon-114x114.png">
 	
 	<!-- JS -->
-	<script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+	<script src="https://code.jquery.com/jquery-latest.min.js"></script>
 	<script src="{$smarty.const.SB_THEME_URL}js/bootstrap.js"></script>
 	<script src="{$smarty.const.SB_THEME_URL}js/jquery.prettyPhoto.js"></script>
 	<script src="{$smarty.const.SB_THEME_URL}js/jquery.flexslider.js"></script>
