@@ -67,9 +67,9 @@
 			{math equation="x - 1" x=$media_768 assign=media_544}
 			<style>
 				.sbnews-single-others {
-					-webkit-columns: {$sbnews_options.other_news_per_page|default:5};
-					-moz-columns: {$sbnews_options.other_news_per_page|default:5};
-					columns: {$sbnews_options.other_news_per_page|default:5};
+					-webkit-columns: {$sbnews_options.other_news_per_page|default:4};
+					-moz-columns: {$sbnews_options.other_news_per_page|default:4};
+					columns: {$sbnews_options.other_news_per_page|default:4};
 				}
 				.sbnews-othernews {
 					height: 300px;
