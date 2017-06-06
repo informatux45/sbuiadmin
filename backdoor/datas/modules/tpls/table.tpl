@@ -48,7 +48,8 @@
 											</tr>
 										</thead>
 										<tbody>
-											{foreach from=$all item=table}
+										{if $alltable}
+											{foreach from=$alltable item=table}
 												<tr class="{cycle values="odd,even"} gradeX">
 													<td>{$table.name|unescape:"htmlall"|@sbDisplayLang}</td>
 													<td>[CS id={$table.id} name=sbtable]</td>
@@ -66,6 +67,7 @@
 													</td>
 												</tr>										
 											{/foreach}
+										{/if}
 										</tbody>
 									</table>
 								</div>
@@ -104,7 +106,7 @@
 							</div>
 							<div class="panel-body">
 								<p>
-									{if $allstructure}
+									{if $allstructure || $smarty.get.a == 'editfield'}
 										<u>Les types de champs utilisés pour une colonne de votre tableau :</u>
 										<br>
 										<b>date</b>: Input DATE<br>
@@ -120,7 +122,7 @@
 										<b>blank</b>: Ouvre le lien dans un nouvel onglet<br>
 										<b>lightbox</b>: Ouvre votre lien dans une lightbox (NB: <i>Ne pas oublier d'activer la lightbox dans les plugins de l'administration</i>)<br>
 										<b>lightbox_fancy</b>: Ouvre votre lien dans une lightbox FANCYBOX (NB: <i>Ne pas oublier d'activer la lightbox dans les plugins de l'administration</i>)<br>
-									{elseif $alldatas}
+									{elseif $alldatas || $smarty.get.a == 'editdatas'}
 										Saissisez les données de votre tableau par entrée (ligne).<br>
 										<br>
 										Si vous souhaitez modifier la structure de votre tableau, cliquez sur
@@ -234,6 +236,7 @@
 											</tr>
 										</thead>
 										<tbody>
+										{if $allstructure}
 											{foreach from=$allstructure item=column}
 												<tr class="{cycle values="odd,even"} gradeX"{if !$column.active} style="background-color: yellow;"{/if}>
 													<td>{$column.sort}</td>
@@ -249,6 +252,7 @@
 													</td>
 												</tr>										
 											{/foreach}
+										{/if}
 										</tbody>
 									</table>
 								</div>
@@ -301,6 +305,7 @@
 											</tr>
 										</thead>
 										<tbody>
+										{if $alldatas}
 											{foreach from=$alldatas item=datas}
 												<tr class="{cycle values="odd,even"} gradeX">
 													<td>
@@ -317,6 +322,7 @@
 													</td>
 												</tr>										
 											{/foreach}
+										{/if}
 										</tbody>
 									</table>
 								</div>

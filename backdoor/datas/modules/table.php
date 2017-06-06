@@ -702,11 +702,14 @@ if (!function_exists(insert_sortfield)) {
 		$table_structure = _AM_DB_PREFIX . "sb_table_structure";
 		$module_url      = _AM_SITE_PROTOCOL . SBMAGIC_URL . SBMAGIC_BASE . '?p=table';
 		
-		$tid           = intval($_GET['tid']);
-		$query         = "SELECT * FROM $table_structure WHERE tid = '$tid' ORDER BY sort ASC";
-		$requestQ      = $sbsql->query($query);
-		$sort_array    = $sbsql->toarray($requestQ);
+		//$tid           = intval($_GET['tid']);
+		$query_structure   = "SELECT * FROM $table_structure WHERE tid = '$tid' ORDER BY sort ASC";
+		$request_structure = $sbsql->query($query_structure);
+		$sort_array        = $sbsql->toarray($request_structure);
+		$toSort            = array();
+		//echo 'sql: '.print_r($sort_array);
 		foreach($sort_array as $sort) {
+			echo ' Title: '.$sort['title'];
 			$active = ($sort['active']) ? $sbsanitize->displayLang(utf8_encode($sort['title'])) : "<span style='color: red;'>".$sbsanitize->displayLang(utf8_encode($sort['title']))."</span>";
 			$sort_id          = $sort['id'];
 			$toSort[$sort_id] = $active;
