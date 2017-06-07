@@ -645,6 +645,78 @@ switch($action) {
 			
 		$sbsmarty->assign('sort', true);
 	break;
+
+	case "sortstructure":
+		// --------------------------------
+		// Initialize Form SORT
+		// --------------------------------
+		$tid             = intval($_GET['tid']);
+		$query[1]        = "SELECT name FROM $table WHERE id = '$tid'";
+		$request_tblname = $sbsql->query($query[1]);
+		$table_infos     = $sbsql->object($request_tblname);
+		$formName        = "sort_form";
+		$formType        = "sortstructure";
+		$btn_add_edit    = "Valider le tri des colonnes";
+		$legend_add_edit = sprintf("Trier les colonnes du tableau &laquo; <span style='color: red;'>%s</span> &raquo;", $table_infos->name);
+		// --------------------------------
+		if ($_POST['drag']) {
+			// --------------------------------
+			// --- Control form submit --------
+			// --------------------------------
+			$sb_toSort = $_POST['drag'];
+			
+			// reorganizes the order of elements
+			$sql_error = 0;
+			for ($i = 0; $i < count($sb_toSort); $i++) {
+				$tri = $i + 1;
+				$query_sort  = "UPDATE $table_structure SET sort = $tri WHERE id = " . $sb_toSort[$i];
+				$result_sort = $sbsql->query($query_sort);
+				if (!$result_sort) {
+					// --- Error Database
+					$sql_error++;
+				}
+				if (_AM_SITE_DEBUG) $sbsmarty->append('sbdebugsql', $query_sort);
+			}
+			// Check result
+			if ($sql_error < 1) {
+				// --- Message SUCCES
+				$sb_msg_valid = "Les colonnes ont été trié avec succès";
+			} else {
+				// --- Message ERROR
+				$sb_msg_error = 'Error: Write Error (SORT)!';
+			}
+		}
+		
+		// --- Recuperation des donnees
+		$query[3]      = "SELECT * FROM $table_structure WHERE tid = '$tid' ORDER BY sort ASC";
+		$requestQ      = $sbsql->query($query[3]);
+		$sort_array    = $sbsql->toarray($requestQ);
+		foreach($sort_array as $sort) {
+			$active = ($sort['active']) ? $sbsanitize->displayLang(utf8_encode($sort['title'])) : "<span style='color: red;'>".$sbsanitize->displayLang(utf8_encode($sort['title']))."</span>";
+			$sort_id          = $sort['id'];
+			$toSort[$sort_id] = $active;
+		}
+
+		// --- Debug SQL
+		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[3]	 . "\n" . 'Form Type = '.$formType);
+		
+		// --------------------------------		
+		// --- Define variables
+		$formAction = $module_url . "&a=" . $formType . "&tid=" . $tid;
+		// --- Form construct
+		$sbform->openForm(array('action' => "$formAction", 'name' => "$formName", 'id' => "$formName", 'reloadpage' => "$formAction", 'submitpage' => "$formAction"));
+		// --- Add inputs and more
+		//$active = ($active) ? '1' : '0';
+		$sbform->addSortable($toSort, "Tri par glisser/déposer (drag'n drop) puis Valider<br>Les noms des <span style='color: red;'>colonnes en rouge</span> sont des colonnes en statut non visible");
+		$sbform->addInput('submit', '', array('value' => "$btn_add_edit"));
+		// --------------------------------	
+		// --- Close Form
+		// --------------------------------	
+		$sbform->closeForm ();
+		// --------------------------------
+		$sbsmarty->assign('tid', $tid);
+		$sbsmarty->assign('sort', true);
+	break;
 	
 }
 
@@ -695,7 +767,7 @@ function sbTableEditdatas($structure, $id) {
 	return $data_arr;
 }
 
-if (!function_exists(insert_sortfield)) {
+//if (!function_exists(insert_sortfield)) {
 	function insert_sortfield($param) {
 		global $sbsanitize, $sbsql, $sbform, $sbsmarty;
 		$tid             = $param['tid'];
@@ -706,8 +778,12 @@ if (!function_exists(insert_sortfield)) {
 		$query_structure   = "SELECT * FROM $table_structure WHERE tid = '$tid' ORDER BY sort ASC";
 		$request_structure = $sbsql->query($query_structure);
 		$sort_array        = $sbsql->toarray($request_structure);
-		$toSort            = array();
+		//$query_structure   = "SELECT field_type FROM $table_structure WHERE id = '2' ORDER BY sort ASC";
+		//$request_structure = $sbsql->query($query_structure);
+		//$sort_array        = $sbsql->assoc($request_structure);
 		//echo 'sql: '.print_r($sort_array);
+		//$sort_array = sbTableSortStructure($tid);
+		//echo 's: '.$sort_array;
 		foreach($sort_array as $sort) {
 			echo ' Title: '.$sort['title'];
 			$active = ($sort['active']) ? $sbsanitize->displayLang(utf8_encode($sort['title'])) : "<span style='color: red;'>".$sbsanitize->displayLang(utf8_encode($sort['title']))."</span>";
@@ -724,7 +800,7 @@ if (!function_exists(insert_sortfield)) {
 		
 		echo $sbform;
 	}
-}
+//}
 
 if (!function_exists(insert_sortdatas)) {
 	function insert_sortdatas($param) {

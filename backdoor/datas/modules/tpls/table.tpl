@@ -82,7 +82,7 @@
 				{/if}
 
 				{if !$all}
-					<div class="col-lg-8">
+					<div class="col-lg-{if $smarty.get.a == 'sortstructure'}12{else}8{/if}">
 						<div class="panel panel-default">
 							<div class="panel-heading">
 								<span class="fa fa-list-alt fa-fw"></span> <strong>{$legend_add_edit}</strong>
@@ -99,6 +99,7 @@
 					<!-- /.col-lg-8 -->
 					
 					{*if $allstructure || $alldatas || $alldatasempty || $allstructureempty*}
+					{if $smarty.get.a != 'sortstructure'}
 					<div class="col-lg-4">
 						<div class="panel panel-primary">
 							<div class="panel-heading">
@@ -211,7 +212,7 @@
 						</div>
 					</div>
 					<!-- /.col-lg-4 -->
-					{*/if*}
+					{/if}
 					
 				{/if}
 				
@@ -221,6 +222,10 @@
 						<div class="panel panel-primary">
 							<div class="panel-heading">
 								<span class="fa fa-list-alt fa-fw"></span> <strong>Gestion des colonnes du tableau &laquo; {$tabname} &raquo;</strong>
+								&nbsp;&nbsp;
+								<button class="btn btn-danger" type="button" onclick="location.href='index.php?p=table&a=sortstructure&tid={$smarty.get.tid}'">
+									Trier les colonnes
+								</button>
 							</div>
 							<!-- /.panel-heading -->
 							<div class="panel-body">
@@ -258,22 +263,6 @@
 								</div>
 								<!-- /.table-responsive -->
 	
-							</div>
-							<!-- /.panel-body -->
-						</div>
-						<!-- /.panel -->
-					</div>
-					<!-- /.col-lg-12 -->
-					
-					<div class="col-lg-12">
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<span class="fa fa-list-alt fa-fw"></span> <strong>Trier les colonnes du tableau &laquo; <span class="red">{$tabname}</span> &raquo;</strong>
-							</div>
-							<!-- /.panel-heading -->
-							<div class="panel-body">
-								{* Afficher le formulaire SORT *}
-								{insert name=sortfield tid="`$smarty.get.tid`"}
 							</div>
 							<!-- /.panel-body -->
 						</div>
