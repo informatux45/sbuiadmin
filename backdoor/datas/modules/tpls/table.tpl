@@ -82,7 +82,7 @@
 				{/if}
 
 				{if !$all}
-					<div class="col-lg-{if $smarty.get.a == 'sortstructure'}12{else}8{/if}">
+					<div class="col-lg-{if $smarty.get.a == 'sortstructure' || $smarty.get.a == 'sortdatas'}12{else}8{/if}">
 						<div class="panel panel-default">
 							<div class="panel-heading">
 								<span class="fa fa-list-alt fa-fw"></span> <strong>{$legend_add_edit}</strong>
@@ -99,7 +99,7 @@
 					<!-- /.col-lg-8 -->
 					
 					{*if $allstructure || $alldatas || $alldatasempty || $allstructureempty*}
-					{if $smarty.get.a != 'sortstructure'}
+					{if $smarty.get.a != 'sortstructure' && $smarty.get.a != 'sortdatas'}
 					<div class="col-lg-4">
 						<div class="panel panel-primary">
 							<div class="panel-heading">
@@ -278,6 +278,10 @@
 						<div class="panel panel-primary">
 							<div class="panel-heading">
 								<span class="fa fa-list-alt fa-fw"></span> <strong>Gestion des données du tableau &laquo; {$tabname} &raquo;</strong>
+								&nbsp;&nbsp;
+								<button class="btn btn-danger" type="button" onclick="location.href='index.php?p=table&a=sortdatas&tid={$smarty.get.tid}'">
+									Trier les données
+								</button>
 							</div>
 							<!-- /.panel-heading -->
 							<div class="panel-body">
@@ -324,21 +328,21 @@
 					</div>
 					<!-- /.col-lg-12 -->
 					
-					<div class="col-lg-12">
+					{*<div class="col-lg-12">
 						<div class="panel panel-default">
 							<div class="panel-heading">
 								<span class="fa fa-list-alt fa-fw"></span> <strong>Trier les données du tableau &laquo; <span class="red">{$tabname}</span> &raquo;</strong>
 							</div>
 							<!-- /.panel-heading -->
-							<div class="panel-body">
+							<div class="panel-body">*}
 								{* Afficher le formulaire SORT *}
-								{insert name=sortdatas tid="`$smarty.get.tid`"}
+								{*insert name=sortdatas tid="`$smarty.get.tid`"}
 							</div>
 							<!-- /.panel-body -->
 						</div>
 						<!-- /.panel -->
 					</div>
-					<!-- /.col-lg-12 -->
+					<!-- /.col-lg-12 -->*}
 					
 				{/if}
 				

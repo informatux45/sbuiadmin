@@ -7,14 +7,14 @@
 		Tous les tableaux
 	</button>		
 	
-	{if $smarty.get.a == 'editfield' || $smarty.get.a == 'delfield' || $smarty.get.a == 'sortstructure'}
+	{if $smarty.get.a == 'editfield' || $smarty.get.a == 'delfield' || $smarty.get.a == 'sortstructure' || $smarty.get.a == 'sortdatas'}
 	&nbsp;
 	<button class="btn btn-warning" type="button" onclick="location.href='index.php?p=table&a=editdatas&tid={$smarty.get.tid}'">
 		Ses données
 	</button>
 	{/if}
 
-	{if $smarty.get.a == 'editdatas' || $smarty.get.a == 'deldatas' || $smarty.get.a == 'sortstructure'}
+	{if $smarty.get.a == 'editdatas' || $smarty.get.a == 'deldatas' || $smarty.get.a == 'sortstructure' || $smarty.get.a == 'sortdatas'}
 	&nbsp;
 	<button class="btn btn-success" type="button" onclick="location.href='index.php?p=table&a=editfield&tid={$smarty.get.tid}'">
 		Sa structure
