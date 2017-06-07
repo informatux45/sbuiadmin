@@ -246,29 +246,6 @@ switch($action) {
 		$result_table    = $sbsql->object($request_table);
 		$tabname         = $result_table->name;
 		$sbsmarty->assign('tabname', $tabname);
-		
-		// --------------------------------------------------------
-		// --- Control form submit ADD /EDIT / SORT Fields --------
-		// --------------------------------------------------------
-		if ($_POST['drag']) {
-			$sb_toSort = $_POST['drag'];
-			
-			// reorganizes the order of elements
-			$sql_error = 0;
-			for ($i = 0; $i < count($sb_toSort); $i++) {
-				$tri = $i + 1;
-				$query_sort  = "UPDATE $table_structure SET sort = $tri WHERE id = " . $sb_toSort[$i];
-				$result_sort = $sbsql->query($query_sort);
-			}
-			// Check result
-			if ($sql_error < 1) {
-				// --- Message SUCCES
-				$sb_msg_valid = "Les colonnes ont été trié avec succès";
-			} else {
-				// --- Message ERROR
-				$sb_msg_error = 'Error: Write Error (SORT)!';
-			}
-		}
 
 		if ($_POST['form_submit']) {
 
