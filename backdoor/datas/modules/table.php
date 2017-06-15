@@ -588,9 +588,21 @@ switch($action) {
 		$sb_table_header[] = "actions";
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		// --------------------------------
+		// --- SQL Request (DATAS)
+		// --------------------------------
 		$query_datas   = "SELECT * FROM $table_datas WHERE tid = '" . intval($_GET['tid']) . "' ORDER BY sort ASC";
 		$request_datas = $sbsql->query($query_datas);
 		$result_datas  = $sbsql->toarray($request_datas);
+		// --------------------------------
+		// --- SQL Request (JSON)
+		// --------------------------------
+		// --- SQL Request
+		//$query_structure   = "SELECT * FROM $table_structure WHERE tid = '$tid' AND active = 1 ORDER BY sort ASC";
+		$query_structure   = "SELECT * FROM $table_structure WHERE tid = '" . intval($_GET['tid']) . "' ORDER BY sort ASC";
+		$request_structure = $sbsql->query($query_structure);
+		$result_structure  = $sbsql->toarray($request_structure);
+		$sbsmarty->assign('structure', $result_structure);
+		// --------------------------------
 		// Check if array is empty
 		if (!empty(array_filter($result_datas)))
 			$sbsmarty->assign('alldatas', $result_datas);
@@ -799,72 +811,17 @@ function sbTableEditdatas($structure, $id) {
 	return $data_arr;
 }
 
-if (!function_exists(insert_sortdatas)) {
-	function insert_sortdatas($param) {
-		global $sbsanitize, $sbsql, $sbform, $sbsmarty;
-		$tid         = $param['tid'];
-		$table_datas = _AM_DB_PREFIX . "sb_table_datas";
-		$module_url  = _AM_SITE_PROTOCOL . SBMAGIC_URL . SBMAGIC_BASE . '?p=table';
-		
-		$tid           = intval($_GET['tid']);
-		$query         = "SELECT * FROM $table_datas WHERE tid = '$tid' ORDER BY sort ASC";
-		$requestQ      = $sbsql->query($query);
-		$sort_array    = $sbsql->toarray($requestQ);
-		//$datas         = array();
-		foreach($sort_array as $sort) {
-			$datas            = json_decode($sort['content'], true);
-			$active           = $sbsanitize->displayText($datas[0]['v']);
-			$sort_id          = $sort['id'];
-			$toSort[$sort_id] = $active;
-		}
-		
-		$formAction = $module_url . "&a=editdatas&tid=" . $tid;
-		$sbform->openForm(array('action' => "$formAction", 'name' => "$formName", 'id' => "$formName", 'reloadpage' => "$formAction", 'submitpage' => "$formAction"));
-		//$active = ($active) ? '1' : '0';
-		$sbform->addSortable($toSort, "Tri par glisser/déposer (drag'n drop) puis Valider");
-		$sbform->addInput('submit', '', array('value' => "Valider le tri des données"));
-		$sbform->closeForm ();
-		
-		echo $sbform;
+function insert_jsondata($param) {
+	global $sbsanitize;
+	$datas    = $param['datas'];
+	$data_arr = "";
+	foreach(json_decode($datas, true) as $k => $val) {
+		// Json table
+		$input     = $val['i'];
+		$value     = preg_replace("/<br \/>/"," ", $sbsanitize->displayText($val['v']));
+		$data_arr .= '<td>' . $value . '</td>';
 	}
-}
-
-if (!function_exists(insert_jsondatas)) {
-	function insert_jsondatas($param) {
-		global $sbsql, $sbsanitize;
-		$datas   = $param['datas'];
-		
-		$tid             = intval($param['tid']);
-		$table_structure = _AM_DB_PREFIX . "sb_table_structure";
-
-		// --- SQL Request
-		//$query_structure   = "SELECT * FROM $table_structure WHERE tid = '$tid' AND active = 1 ORDER BY sort ASC";
-		$query_structure   = "SELECT * FROM $table_structure WHERE tid = '$tid' ORDER BY sort ASC";
-		$request_structure = $sbsql->query($query_structure);
-		$result_structure  = $sbsql->toarray($request_structure);
-
-		$columns = [];
-		foreach($result_structure as $col) {
-			$columns[] = $sbsanitize->rewriteString($sbsanitize->displayLang($col['title']), true);
-		}
-		
-		for($i = 0; $i < count($columns); $i++) {
-			// Get the right value if column is unknown 
-			$data_arr[$i] = ' ';
-
-			foreach(json_decode($datas, true) as $k => $val) {
-				// Check if column is into the JSON Datas
-				if ($columns[$i] == $val['i']) {
-					// Json table
-					$input        = $val['i'];
-					$value        = preg_replace("/<br \/>/"," ", $sbsanitize->displayText($val['v']));
-					$data_arr[$i] = $value;
-				}
-			}
-		}
-		
-		return $data_arr;
-	}
+	return $data_arr;
 }
 
 // ---------------------------------------------------

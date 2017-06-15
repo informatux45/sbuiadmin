@@ -304,10 +304,7 @@
 													<td>
 														{$datas.sort}
 													</td>
-													{insert name="jsondatas" assign="data_arr" datas="`$datas.content`" tid="`$smarty.get.tid`" }
-													{foreach from=$data_arr item=d}
-														<td>{$d|truncate:25:"...":true}</td>
-													{/foreach}
+													{insert name=jsondata datas="`$datas.content`"}
 													<td>
 														<a class="glyphicon glyphicon-cog" href="{$module_url}&a=editdatas&tid={$datas.tid}&id={$datas.id}" title="Modifier"></a>
 														&nbsp;
