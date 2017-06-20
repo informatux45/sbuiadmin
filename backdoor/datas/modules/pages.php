@@ -267,10 +267,11 @@ switch($action) {
 		$sbform->openSelect("Choix du template (VIEW)", array("id"=>"theme_view", "name"=>"theme_view"), true);
 		if ($theme_view == '') $sbform->addOption('Choisissez un template', array ("value"=>"", "selected"=>""));
 		for($i = 0; $i < count($theme['view']); $i++) {
+			$data_src_img = str_replace(SBADMIN, '', SB_THEME_URL);
 			if ($theme['view'][$i] == $theme_view)
-				$sbform->addOption($theme['view'][$i], array ("value"=>$theme['view'][$i], "selected"=>""));
+				$sbform->addOption($theme['view'][$i], array ("value"=>$theme['view'][$i], "selected"=>"", "rel" => "$data_src_img"));
 		else
-				$sbform->addOption($theme['view'][$i], array ("value"=>$theme['view'][$i]));
+				$sbform->addOption($theme['view'][$i], array ("value"=>$theme['view'][$i], "rel" => "$data_src_img"));
 		}
 		// --- Close Select
 		$sbform->closeSelect();

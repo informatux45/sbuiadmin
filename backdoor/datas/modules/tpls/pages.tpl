@@ -121,7 +121,7 @@
 			});
 			$("#theme_view").change(function () {
 				var str = $( "select#theme_view option:selected" ).val();
-				var new_theme_view = '{$smarty.const.SB_THEME_URL|replace:"`$smarty.const.SBADMIN`":''}screenshot-'+str+'.jpg';
+				var new_theme_view = $( "select#theme_view option:selected" ).attr('rel') + 'screenshot-'+str+'.jpg';
 				if (str != '') {
 					$('img#img_theme_view').attr('src', new_theme_view);
 				} else {
