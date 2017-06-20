@@ -344,14 +344,6 @@ switch($action) {
 		// --------------------------------
 		$sbform->addInput('text', 'Photo', array ('id'=>'inputPhoto', 'name' => 'coming_soon_image', 'value' => $cs['coming-soon-image'], 'placeholder' => "Photo (background)", "medias"=>"", 'icon' => 'photo'), false, false, 'Image commune à tous les types de Coming soon. Si vous ne choisissez pas de photo, il y en a une par défaut pour chaque type.');
 		$sbform->addInput('text', 'ID Youtube', array ('name' => 'coming_soon_video', 'value' => $cs['coming-soon-video'], 'placeholder' => "ID Youtube"), false, false, "N'indiquez que la partie en <span style='color: red;'>rouge</span>.<br>Si vous n'indiquez aucun ID vidéo, il y en une par défaut.<br>Ex: https://www.youtube.com/watch?v=<span style='color: red; font-weight: bold;'>PF0L3gvSVcg</span>");
-		// --------------------------------
-		// Dark Theme
-		// --------------------------------
-		//$tab_check = array();
-		//$tab_check[0]['text']    = 'Dark Theme';
-		//$tab_check[0]['name']    = 'coming_soon_dark';
-		//$tab_check[0]['checked'] = ($cs['coming-soon-dark'] == 1) ? '1' : '0';
-		//$sbform->addCheckbox('Activation du theme DARK', $tab_check, '', false, '<br />', "Les éléments passeront en version sombre sinon ils resteront en blanc.");
 		// ----------------------------
 		// Date du lancement
 		// ----------------------------
@@ -844,21 +836,6 @@ $sbsmarty->assign('cmsconfig_email_help', "<img src='img/google-recaptcha.png' a
 $sbsmarty->assign('cmsconfig_comingsoon_help', "Le mode \"Coming Soon\" activé permet de construire son site sans que vos visiteurs puissent accéder à son contenu, ils seront redirigés vers une page d'attente ou de maintenance.<br><br>Ce mode peut également être utilisé lorsque vous effectuez une modification importante à votre site web.<br><br>L'url pour que vous puissiez accéder à votre site lorsque celui-ci est fermé au public sera celle-ci :<br><div style='text-align: center;'><span style='font-weight: bold; color: rgb(255, 102, 0);'><a target='_blank' href='".trim($sb_link_settings[15])."?d=".$cs['coming-soon-url']."'>".trim($sb_link_settings[15])."?d=".$cs['coming-soon-url']."</a></span><br></div><br>Vous pourrez voir votre site le temps de la session de votre serveur (par défaut).<br><br>Pour activer / désactiver le COMING SOON, placez la constante SBMAINTENANCE à <b>true</b> ou <b>false</b> dans le fichier de configuration de votre CMS SBUIADMIN.");
 
 $sbsmarty->assign('cmsconfig_multilang_help',	"L'option multilangue désactivé n'affichera que la langue FR sur votre site web.<br>Dans l'administration, dans la gestion des pages et des blocs ne s'afficheront également que les champs FR.<br><br>Si vous activez l'option multilangue, les langues définies dans le champs 'langue(s)' vous permettront d'avoir ces langues sur votre site web.<br>Dans l'administration, dans la gestion des pages et des blocs s'afficheront les blocs supplémentaires des langues disponibles.<br><br><img style='width: 100%;' alt=''src='img/multilang.jpg'>");
-
-//function sbHowToPlugins($title, $htmlpage, $id) {
-//	return '<div class="panel panel-default">
-//				<div class="panel-heading">
-//					<h4 class="panel-title">
-//						<a data-toggle="collapse" data-parent="#accordion" href="#collapse'.$id.'" aria-expanded="false" class="collapsed"><i class="fa fa-arrow-circle-down"></i> '.$title.'</a>
-//					</h4>
-//				</div>
-//				<div id="collapse'.$id.'" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
-//					<div class="panel-body">
-//						'.file_get_contents('../plugins/'.$htmlpage).'
-//					</div>
-//				</div>
-//			</div>';
-//}
 
 function sbHowToPlugins($title, $htmlpage, $id, $button = '') {
 	return '<button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#'.$id.'" onclick="javascript:return false;">Howto '.$button.'</button>
