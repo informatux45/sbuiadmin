@@ -1,0 +1,40 @@
+/* --- Style custom Activebox Theme --- */
+
+/* --- Logo --- */
+.header-content a.logo img {
+	height: 24px;
+	margin: 0;
+}
+
+/* --- Menu --- */
+.primary-nav {
+	float: left;
+}
+#header .header-content {
+	padding: 30px 0;
+}
+
+/* --- Menu Mobile --- */
+.nav-toggle {
+	top: 1.3em;
+}
+
+/* --- Banner --- */
+.no-banner {
+	min-height: 130px !important;
+}
+.banner-text {
+	padding-top: 21%;
+}
+
+/* --- Form --- */
+label, small {
+	display: block;
+	text-align: left;
+}
+
+/* --- Container-Slider --- */
+.container-slider {
+	padding-left: 0;
+	padding-right: 0;
+}
