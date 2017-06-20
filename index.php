@@ -109,6 +109,21 @@ if (!empty($_SESSION['sbmagic_user_name'])) {
 // ----------------------
 
 // ----------------------
+// Get CMS Theme infos
+// ----------------------
+$query_theme_infos   = "SELECT config, content FROM " . _AM_DB_PREFIX . "sb_config WHERE config LIKE 'theme_infos_%'";
+$request_theme_infos = $sbsql->query($query_theme_infos);
+$result_theme_infos  = $sbsql->toarray($request_theme_infos);
+foreach($result_theme_infos as $row_theme_infos) {
+	$theme_config = $row_theme_infos['config'];
+	$sb_theme_infos[$theme_config] = $row_theme_infos['content'];
+}
+$sbsmarty->assign('sb_theme_infos', $sb_theme_infos);
+// ----------------------
+// ----------------------
+// ----------------------
+
+// ----------------------
 // Define Safe Pages
 // ----------------------
 // --- Check if rewrite URL

@@ -71,19 +71,19 @@ if ($_POST['form_submit']) {
 	
 	// --- EDIT
 	// UPDATE DATAS
-	$query_tel         = "UPDATE $table SET content = '$theme_infos_tel' WHERE config = 'theme-infos-tel'";
-	$query_address     = "UPDATE $table SET content = '$theme_infos_address' WHERE config = 'theme-infos-address'";
-	$query_email       = "UPDATE $table SET content = '$theme_infos_email' WHERE config = 'theme-infos-email'";
-	$query_facebook    = "UPDATE $table SET content = '$theme_infos_facebook' WHERE config = 'theme-infos-facebook'";
-	$query_twitter     = "UPDATE $table SET content = '$theme_infos_twitter' WHERE config = 'theme-infos-twitter'";
-	$query_google_plus = "UPDATE $table SET content = '$theme_infos_google_plus' WHERE config = 'theme-infos-google-plus'";
-	$query_pinterest   = "UPDATE $table SET content = '$theme_infos_pinterest' WHERE config = 'theme-infos-pinterest'";
-	$query_instagram   = "UPDATE $table SET content = '$theme_infos_instagram' WHERE config = 'theme-infos-instagram'";
-	$query_skype       = "UPDATE $table SET content = '$theme_infos_skype' WHERE config = 'theme-infos-skype'";
-	$query_viadeo      = "UPDATE $table SET content = '$theme_infos_viadeo' WHERE config = 'theme-infos-viadeo'";
-	$query_linkedin    = "UPDATE $table SET content = '$theme_infos_linkedin' WHERE config = 'theme-infos-linkedin'";
-	$query_vimeo       = "UPDATE $table SET content = '$theme_infos_vimeo' WHERE config = 'theme-infos-vimeo'";
-	$query_youtube     = "UPDATE $table SET content = '$theme_infos_youtube' WHERE config = 'theme-infos-youtube'";
+	$query_tel         = "UPDATE $table SET content = '$theme_infos_tel' WHERE config = 'theme_infos_tel'";
+	$query_address     = "UPDATE $table SET content = '$theme_infos_address' WHERE config = 'theme_infos_address'";
+	$query_email       = "UPDATE $table SET content = '$theme_infos_email' WHERE config = 'theme_infos_email'";
+	$query_facebook    = "UPDATE $table SET content = '$theme_infos_facebook' WHERE config = 'theme_infos_facebook'";
+	$query_twitter     = "UPDATE $table SET content = '$theme_infos_twitter' WHERE config = 'theme_infos_twitter'";
+	$query_google_plus = "UPDATE $table SET content = '$theme_infos_google_plus' WHERE config = 'theme_infos_google_plus'";
+	$query_pinterest   = "UPDATE $table SET content = '$theme_infos_pinterest' WHERE config = 'theme_infos_pinterest'";
+	$query_instagram   = "UPDATE $table SET content = '$theme_infos_instagram' WHERE config = 'theme_infos_instagram'";
+	$query_skype       = "UPDATE $table SET content = '$theme_infos_skype' WHERE config = 'theme_infos_skype'";
+	$query_viadeo      = "UPDATE $table SET content = '$theme_infos_viadeo' WHERE config = 'theme_infos_viadeo'";
+	$query_linkedin    = "UPDATE $table SET content = '$theme_infos_linkedin' WHERE config = 'theme_infos_linkedin'";
+	$query_vimeo       = "UPDATE $table SET content = '$theme_infos_vimeo' WHERE config = 'theme_infos_vimeo'";
+	$query_youtube     = "UPDATE $table SET content = '$theme_infos_youtube' WHERE config = 'theme_infos_youtube'";
 	
 	$result_tel         = $sbsql->query($query_tel);
 	$result_address     = $sbsql->query($query_address);
@@ -112,19 +112,19 @@ if ($_POST['form_submit']) {
 // --------------------------------
 // --- Recuperation des donnees
 // --------------------------------
-$query = "SELECT config, content FROM $table WHERE config = 'theme-infos-tel'
-												OR config = 'theme-infos-address'
-												OR config = 'theme-infos-email'
-												OR config = 'theme-infos-facebook'
-												OR config = 'theme-infos-twitter'
-												OR config = 'theme-infos-youtube'
-												OR config = 'theme-infos-pinterest'
-												OR config = 'theme-infos-instagram'
-												OR config = 'theme-infos-skype'
-												OR config = 'theme-infos-viadeo'
-												OR config = 'theme-infos-linkedin'
-												OR config = 'theme-infos-vimeo'
-												OR config = 'theme-infos-google-plus'
+$query = "SELECT config, content FROM $table WHERE config = 'theme_infos_tel'
+												OR config = 'theme_infos_address'
+												OR config = 'theme_infos_email'
+												OR config = 'theme_infos_facebook'
+												OR config = 'theme_infos_twitter'
+												OR config = 'theme_infos_youtube'
+												OR config = 'theme_infos_pinterest'
+												OR config = 'theme_infos_instagram'
+												OR config = 'theme_infos_skype'
+												OR config = 'theme_infos_viadeo'
+												OR config = 'theme_infos_linkedin'
+												OR config = 'theme_infos_vimeo'
+												OR config = 'theme_infos_google_plus'
 												";
 $request = $sbsql->query($query);
 $assoc   = $sbsql->toarray($request);
@@ -148,57 +148,57 @@ $sbform->addBreak('Coordonnées');
 // --------------------------------
 // Telephone
 // --------------------------------	
-$sbform->addInput('text', 'Téléphone', array ('name' => 'theme_infos_tel', 'value' => $cs['theme-infos-tel'], 'placeholder' => "Téléphone", 'icon' => 'phone'), false);
+$sbform->addInput('text', 'Téléphone', array ('name' => 'theme_infos_tel', 'value' => $cs['theme_infos_tel'], 'placeholder' => "Téléphone", 'icon' => 'phone'), false);
 // --------------------------------
 // Email
 // --------------------------------
-$sbform->addInput('text', 'Email', array ('name' => 'theme_infos_email', 'value' => $cs['theme-infos-email'], 'placeholder' => "Email", 'icon' => 'envelope'), false);
+$sbform->addInput('text', 'Email', array ('name' => 'theme_infos_email', 'value' => $cs['theme_infos_email'], 'placeholder' => "Email", 'icon' => 'envelope'), false);
 // --------------------------------
 // Adresse / CP / Ville
 // --------------------------------	
-$sbform->addTextarea('Adresse complète', $cs['theme-infos-address'], array('id' => 'theme_infos_address', 'name' => 'theme_infos_address'), false);
+$sbform->addTextarea('Adresse complète', $cs['theme_infos_address'], array('id' => 'theme_infos_address', 'name' => 'theme_infos_address'), false);
 // --------------------------------
 $sbform->addBreak('Réseaux sociaux');
 // --------------------------------
 // Facebook
 // --------------------------------	
-$sbform->addInput('text', 'Facebook', array ('name' => 'theme_infos_facebook', 'value' => $cs['theme-infos-facebook'], 'placeholder' => "Lien Facebook", 'icon' => 'facebook'), false);
+$sbform->addInput('text', 'Facebook', array ('name' => 'theme_infos_facebook', 'value' => $cs['theme_infos_facebook'], 'placeholder' => "Lien Facebook", 'icon' => 'facebook'), false);
 // --------------------------------
 // Twitter
 // --------------------------------	
-$sbform->addInput('text', 'Twitter', array ('name' => 'theme_infos_twitter', 'value' => $cs['theme-infos-twitter'], 'placeholder' => "Lien Twitter", 'icon' => 'twitter'), false);
+$sbform->addInput('text', 'Twitter', array ('name' => 'theme_infos_twitter', 'value' => $cs['theme_infos_twitter'], 'placeholder' => "Lien Twitter", 'icon' => 'twitter'), false);
 // --------------------------------
 // Google +
 // --------------------------------	
-$sbform->addInput('text', 'Google +', array ('name' => 'theme_infos_google_plus', 'value' => $cs['theme-infos-google-plus'], 'placeholder' => "Lien Google +", 'icon' => 'google-plus'), false);
+$sbform->addInput('text', 'Google +', array ('name' => 'theme_infos_google_plus', 'value' => $cs['theme_infos_google_plus'], 'placeholder' => "Lien Google +", 'icon' => 'google_plus'), false);
 // --------------------------------
 // Pinterest
 // --------------------------------	
-$sbform->addInput('text', 'Pinterest', array ('name' => 'theme_infos_pinterest', 'value' => $cs['theme-infos-pinterest'], 'placeholder' => "Lien Pinterest", 'icon' => 'pinterest'), false);
+$sbform->addInput('text', 'Pinterest', array ('name' => 'theme_infos_pinterest', 'value' => $cs['theme_infos_pinterest'], 'placeholder' => "Lien Pinterest", 'icon' => 'pinterest'), false);
 // --------------------------------
 // Instagram
 // --------------------------------	
-$sbform->addInput('text', 'Instagram', array ('name' => 'theme_infos_instagram', 'value' => $cs['theme-infos-instagram'], 'placeholder' => "Lien Instagram", 'icon' => 'instagram'), false);
+$sbform->addInput('text', 'Instagram', array ('name' => 'theme_infos_instagram', 'value' => $cs['theme_infos_instagram'], 'placeholder' => "Lien Instagram", 'icon' => 'instagram'), false);
 // --------------------------------
 // Linkedin
 // --------------------------------	
-$sbform->addInput('text', 'Linkedin', array ('name' => 'theme_infos_linkedin', 'value' => $cs['theme-infos-linkedin'], 'placeholder' => "Lien Linkedin", 'icon' => 'linkedin'), false);
+$sbform->addInput('text', 'Linkedin', array ('name' => 'theme_infos_linkedin', 'value' => $cs['theme_infos_linkedin'], 'placeholder' => "Lien Linkedin", 'icon' => 'linkedin'), false);
 // --------------------------------
 // Viadeo
 // --------------------------------	
-$sbform->addInput('text', 'Viadeo', array ('name' => 'theme_infos_viadeo', 'value' => $cs['theme-infos-viadeo'], 'placeholder' => "Lien Viadeo", 'icon' => 'viadeo'), false);
+$sbform->addInput('text', 'Viadeo', array ('name' => 'theme_infos_viadeo', 'value' => $cs['theme_infos_viadeo'], 'placeholder' => "Lien Viadeo", 'icon' => 'viadeo'), false);
 // --------------------------------
 // Skype
 // --------------------------------	
-$sbform->addInput('text', 'Skype', array ('name' => 'theme_infos_skype', 'value' => $cs['theme-infos-skype'], 'placeholder' => "Lien Skype", 'icon' => 'skype'), false);
+$sbform->addInput('text', 'Skype', array ('name' => 'theme_infos_skype', 'value' => $cs['theme_infos_skype'], 'placeholder' => "Lien Skype", 'icon' => 'skype'), false);
 // --------------------------------
 // Youtube
 // --------------------------------	
-$sbform->addInput('text', 'Youtube', array ('name' => 'theme_infos_youtube', 'value' => $cs['theme-infos-youtube'], 'placeholder' => "Lien Youtube", 'icon' => 'youtube'), false);
+$sbform->addInput('text', 'Youtube', array ('name' => 'theme_infos_youtube', 'value' => $cs['theme_infos_youtube'], 'placeholder' => "Lien Youtube", 'icon' => 'youtube'), false);
 // --------------------------------
 // Vimeo
 // --------------------------------	
-$sbform->addInput('text', 'Vimeo', array ('name' => 'theme_infos_vimeo', 'value' => $cs['theme-infos-vimeo'], 'placeholder' => "Lien Vimeo", 'icon' => 'vimeo'), false);
+$sbform->addInput('text', 'Vimeo', array ('name' => 'theme_infos_vimeo', 'value' => $cs['theme_infos_vimeo'], 'placeholder' => "Lien Vimeo", 'icon' => 'vimeo'), false);
 // --------------------------------
 // --- Hiddens / Buttons
 // --------------------------------	
