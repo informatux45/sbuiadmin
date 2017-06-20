@@ -22,5 +22,9 @@
 		<button class="btn btn-outline btn-danger" type="button" onclick="location.href='index.php?p=theme'">
 			Thème
 		</button>
+		&nbsp;
+		<button class="btn btn-outline btn-danger" type="button" onclick="location.href='index.php?p=themeinfos'">
+			Thème infos
+		</button>
 		
 </div>
