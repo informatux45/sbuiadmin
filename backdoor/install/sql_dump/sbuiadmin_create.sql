@@ -122,7 +122,20 @@ INSERT INTO `<DB_PREFIX>sb_config` (`id`, `config`, `content`) VALUES
 (35, 'seo-copyright', 'SBUIADMIN By Booboo'),
 (36, 'seo-generator', 'SBUIADMIN'),
 (37, 'seo-google-site-verification', ''),
-(38, 'seo-google-analytics', '');
+(38, 'seo-google-analytics', ''),
+(39, 'theme_infos_tel', '07.80.53.23.67'),
+(40, 'theme_infos_address', 'Rue de la bourse\r\n75016 Paris, FR'),
+(41, 'theme_infos_email', 'contact@informatux.com'),
+(42, 'theme_infos_facebook', 'https://www.facebook.com/patrice.bouthier'),
+(43, 'theme_infos_twitter', ''),
+(44, 'theme_infos_google_plus', 'https://plus.google.com/109974847432830295737'),
+(45, 'theme_infos_pinterest', ''),
+(46, 'theme_infos_instagram', ''),
+(47, 'theme_infos_skype', 'skype:informatux27'),
+(48, 'theme_infos_viadeo', 'http://fr.viadeo.com/fr/profile/patrice.bouthier'),
+(49, 'theme_infos_vimeo', ''),
+(50, 'theme_infos_youtube', 'https://www.youtube.com/channel/UCLk-U6SQ6Syj1XXkvdVgoAQ'),
+(51, 'theme_infos_linkedin', '');
 
 -- --------------------------------------------------------
 
@@ -1043,7 +1056,7 @@ ALTER TABLE `<DB_PREFIX>sb_blocs_sort`
 -- AUTO_INCREMENT for table `sb_config`
 --
 ALTER TABLE `<DB_PREFIX>sb_config`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 --
 -- AUTO_INCREMENT for table `sb_contact`
 --
