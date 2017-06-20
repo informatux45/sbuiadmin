@@ -204,6 +204,7 @@ class form extends sanitize {
 							   ,'label' => ''
 							   ,'selected' => ''
 							   ,'value' => ''
+							   ,'rel' => ''
 							   );
 	private $optgroupArr      = array ('label' => ''
 									  ,'disabled' => ''
