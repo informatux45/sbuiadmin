@@ -13,6 +13,7 @@
 // ----------------------
 ini_set("session.gc_maxlifetime", 24*3600); // 1 day (24 hours)
 session_start();
+ob_start();
 
 // ----------------------
 // SESSION Language
@@ -306,5 +307,7 @@ if (in_array($sb_get_page, $sb_safe_pages_cms) || in_array($sb_get_page, $sb_saf
 	// --- Unsafe Pages / Modules
 	$sbsmarty->display("404.tpl");
 }
+// --------------------------------
+ob_end_flush();
 // --------------------------------
 ?>
