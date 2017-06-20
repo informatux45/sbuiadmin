@@ -28,7 +28,7 @@ define('SBADMIN', 'backdoor');
 define('SBMAGICID', 'sbuiadmin');
 
 # Turn on debug mode
-define('SBDEBUG', true);
+define('SBDEBUG', false);
 
 # Language (default fr_FR)
 define('SBLANG', 'fr_FR');
@@ -130,25 +130,25 @@ defined('SB_URL') OR define('SB_URL', trim($sb_settings_config[15]));
 // ------------------------ 
 // --- Theme
 // ------------------------ 
-defined('SB_THEME_URL') OR define('SB_THEME_URL', SB_URL . "theme" . DIRECTORY_SEPARATOR . SBTHEME . DIRECTORY_SEPARATOR );
+defined('SB_THEME_URL') OR define('SB_THEME_URL', SB_URL . "theme/" . SBTHEME . "/" );
 defined('SB_THEME_DIR') OR define('SB_THEME_DIR', SB_PATH . "theme" . DIRECTORY_SEPARATOR . SBTHEME . DIRECTORY_SEPARATOR );
 
 // ------------------------ 
 // --- Modules
 // ------------------------ 
-defined('SB_MODULES_URL') OR define('SB_MODULES_URL', SB_URL . "datas" . DIRECTORY_SEPARATOR . "modules" . DIRECTORY_SEPARATOR );
+defined('SB_MODULES_URL') OR define('SB_MODULES_URL', SB_URL . "datas/modules/" );
 defined('SB_MODULES_DIR') OR define('SB_MODULES_DIR', SB_PATH . "datas" . DIRECTORY_SEPARATOR . "modules" . DIRECTORY_SEPARATOR );
 
 // ------------------------ 
 // --- Various HTML Content
 // ------------------------ 
-defined('SB_VARIOUS_URL') OR define('SB_VARIOUS_URL', SB_THEME_URL . "inc" . DIRECTORY_SEPARATOR );
+defined('SB_VARIOUS_URL') OR define('SB_VARIOUS_URL', SB_THEME_URL . "inc/" );
 defined('SB_VARIOUS_DIR') OR define('SB_VARIOUS_DIR', SB_THEME_DIR . "inc" . DIRECTORY_SEPARATOR );
 
 // ------------------------ 
 // --- Administration
 // ------------------------ 
-defined('SB_ADMIN_URL') OR define('SB_ADMIN_URL', SB_URL . SBADMIN . DIRECTORY_SEPARATOR );
+defined('SB_ADMIN_URL') OR define('SB_ADMIN_URL', SB_URL . SBADMIN . "/" );
 defined('SB_ADMIN_DIR') OR define('SB_ADMIN_DIR', SB_PATH . SBADMIN . DIRECTORY_SEPARATOR );
 
 // ------------------------ 
