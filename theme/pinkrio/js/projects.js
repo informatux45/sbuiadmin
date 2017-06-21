@@ -1,7 +1,6 @@
-jQuery(document).ready(function($){
-	var animation = $.browser.msie ? 'fade' : 'scrollLeft';
-    $('.featured-projects-widget').flexslider({
-        animation: animation,
+jQuery(document).ready(function(){
+    jQuery('.featured-projects-widget').flexslider({
+        animation: 'fade', // fade, scrollLeft
         slideshowSpeed: 8000,
         animationSpeed: 300,
         selectors: 'ul > li',
