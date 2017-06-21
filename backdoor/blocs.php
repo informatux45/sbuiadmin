@@ -144,20 +144,21 @@ switch($action) {
 				$content   .= "[en]".$content_en."[/en]";				
 			}
 			// ---------
-			$position = $sbsanitize->displayText($_POST['position'], 'UTF-8', 1, 0);
-			$active   = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$various_view = $sbsanitize->displayText($_POST['various_view'], 'UTF-8', 1, 0);
+			$position     = $sbsanitize->displayText($_POST['position'], 'UTF-8', 1, 0);
+			$active       = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
 			
 			// ADD or EDIT
 			if ($formType == 'add') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table (pages_id,modules_id,name,title,content,position,active,sort)
-						  VALUES ('$pages','$modules','$name','$title','$content','$position','$active','0')";
+				$query = "INSERT INTO $table (pages_id,modules_id,name,title,content,position,various_view,active,sort)
+						  VALUES ('$pages','$modules','$name','$title','$content','$position','$various_view','$active','0')";
 				$result_add = $sbsql->query($query);
 				if ($result_add) {
 					// --------------------------------------------------
 					// --- Vider les champs du formulaire
 					// --------------------------------------------------
-					$pages = $modules = $name_fr = $name_en = $title_fr = $title_en = $content = $active = '';
+					$pages = $modules = $name_fr = $name_en = $title_fr = $title_en = $content = $various_view = $active = '';
 					// ------------------------------------------------------
 					// --- Ajouter les blocs dans leurs pages respectives ---
 					// ------------------------------------------------------
@@ -184,6 +185,7 @@ switch($action) {
 										   ,name = '$name'
 										   ,title = '$title'
 										   ,content = '$content'
+										   ,various_view = '$various_view'
 										   ,position = '$position'
 										   ,active = '$active'
 										   WHERE id = '$id'";
@@ -230,27 +232,28 @@ switch($action) {
 		} else {
 			// Si AJOUT (First time)
 			// --- Vider les champs du formulaire
-			$pages = $modules = $name_fr = $name_en = $title_fr = $title_en = $content = $active = '';
+			$pages = $modules = $name_fr = $name_en = $title_fr = $title_en = $content = $various_view = $active = '';
 		}
 		// --------------------------------
 		if ($formType == 'edit' && !$_POST['form_submit']) {
 			// --- Recuperation des donnees
-			$id         = intval($_GET['id']);
-			$query[1]   = "SELECT * FROM $table WHERE id = $id";
-			$requestQ   = $sbsql->query($query[1]);
-			$assoc      = $sbsql->assoc($requestQ);
-			$pages      = $assoc['pages_id'];
-			$modules    = $assoc['modules_id'];
-			$name       = $sbsanitize->displayLang(utf8_encode($assoc['name']));
+			$id           = intval($_GET['id']);
+			$query[1]     = "SELECT * FROM $table WHERE id = $id";
+			$requestQ     = $sbsql->query($query[1]);
+			$assoc        = $sbsql->assoc($requestQ);
+			$pages        = $assoc['pages_id'];
+			$modules      = $assoc['modules_id'];
+			$name         = $sbsanitize->displayLang(utf8_encode($assoc['name']));
 			// ----------------------------
-			$title_fr   = $sbsanitize->displayLang(utf8_encode($assoc['title']));
-			$title_en   = $sbsanitize->displayLang(utf8_encode($assoc['title']), 'en');
+			$title_fr     = $sbsanitize->displayLang(utf8_encode($assoc['title']));
+			$title_en     = $sbsanitize->displayLang(utf8_encode($assoc['title']), 'en');
 			// ----------------------------
-			$content_fr = $sbsanitize->displayLang(utf8_encode($assoc['content']));
-			$content_en = $sbsanitize->displayLang(utf8_encode($assoc['content']), 'en');
+			$content_fr   = $sbsanitize->displayLang(utf8_encode($assoc['content']));
+			$content_en   = $sbsanitize->displayLang(utf8_encode($assoc['content']), 'en');
 			// ----------------------------
-			$position   = $assoc['position'];
-			$active     = $assoc['active'];
+			$various_view = $assoc['various_view'];
+			$position     = $assoc['position'];
+			$active       = $assoc['active'];
 
 			$sbsmarty->assign('assoc', $query[1]);
 
@@ -324,16 +327,34 @@ switch($action) {
 		// -----------------------------------
 		// --- Position du bloc dans la page
 		// -----------------------------------
-		$sbform->openSelect("Position du bloc", array("id"=>"position", "name"=>"position", 'disabled' => 'disabled'));
-		$sbform->addOption('Choisissez une position', array ("value"=>"", "selected"=>""));
-		for($i = 0; $i < count($sb_position); $i++) {
-			if ($sb_position[$i] == $position)
-				$sbform->addOption($sb_position[$i], array ("value"=>$sb_position[$i], "selected"=>""));
+		//$sbform->openSelect("Position du bloc", array("id"=>"position", "name"=>"position", 'disabled' => 'disabled'));
+		//$sbform->addOption('Choisissez une position', array ("value"=>"", "selected"=>""));
+		//for($i = 0; $i < count($sb_position); $i++) {
+		//	if ($sb_position[$i] == $position)
+		//		$sbform->addOption($sb_position[$i], array ("value"=>$sb_position[$i], "selected"=>""));
+		//else
+		//		$sbform->addOption($sb_position[$i], array ("value"=>$sb_position[$i]));
+		//}
+		//// --- Close Select
+		//$sbform->closeSelect("Position du bloc dans votre page (peut varier selon la disposition du votre theme)");
+		// -----------------------------------
+		// --- VARIOUS HTML CONTENT FILES
+		// -----------------------------------
+		// --- Get various page
+		$result_various_dir = sbGetVariousPage('block'); // Type 'page' or 'block'
+		$sbform->openSelect("Choix de contenu HTML additionnel", array("id"=>"various_view", "name"=>"various_view"), false);
+		if ($various_view == '')
+			$sbform->addOption('Pas de contenu HTML additionnel pour ce bloc', array ("value"=>"", "selected"=>""));
 		else
-				$sbform->addOption($sb_position[$i], array ("value"=>$sb_position[$i]));
+			$sbform->addOption('Pas de contenu HTML additionnel pour ce bloc', array ("value"=>""));
+		for($i = 0; $i < count($result_various_dir); $i++) {
+			if ($result_various_dir[$i] == $various_view)
+				$sbform->addOption($result_various_dir[$i], array ("value"=>$result_various_dir[$i], "selected"=>""));
+			else
+				$sbform->addOption($result_various_dir[$i], array ("value"=>$result_various_dir[$i]));
 		}
 		// --- Close Select
-		$sbform->closeSelect("Position du bloc dans votre page (peut varier selon la disposition du votre theme)");
+		$sbform->closeSelect("En sélectionnant un fichier HTML vous pouvez ajouter du contenu additionnel à votre bloc.<br>Celui-ci s'ajoutera à la fin du contenu dynamique.");
 		// -----------------------------------
 		// --- Contenu du bloc
 		// -----------------------------------

@@ -609,7 +609,7 @@ function insert_sbGetContentCmsBlocks($param) {
 	
 	// --- Get ALL blocks for this page_id
 	$query   = "SELECT t1.bloc_id, $type_t1, t1.sort,
-					   t2.id, t2.name, t2.title, t2.content
+					   t2.id, t2.name, t2.title, t2.content, t2.various_view
 					   FROM $table_sort AS t1
 					   LEFT JOIN $table_blocs AS t2 ON (t1.bloc_id = t2.id)
 					   WHERE t2.active = '1' AND $type_t1_query

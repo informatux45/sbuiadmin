@@ -11,6 +11,10 @@
 		{/if}
 
 		{$block.content|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|@sbGetShortcode}
+		
+		{if $block.various_view != ""}
+			{include file="{$smarty.const.SB_VARIOUS_DIR}{$block.various_view}"}
+		{/if}
 
 	</div> <!-- bloc_{$block.id} -->
 
