@@ -61,7 +61,7 @@
         {insert name="sbGetFonts"}
         
         <!-- JAVASCRIPTs -->
-        <script type="text/javascript" src="{$smarty.const.SB_THEME_URL}js/jquery.js"></script>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
         <script type="text/javascript" src="{$smarty.const.SB_THEME_URL}js/comment-reply.js"></script>
         <script type="text/javascript" src="{$smarty.const.SB_THEME_URL}js/jquery.quicksand.js"></script>
         <script type="text/javascript" src="{$smarty.const.SB_THEME_URL}js/jquery.tipsy.js"></script>
