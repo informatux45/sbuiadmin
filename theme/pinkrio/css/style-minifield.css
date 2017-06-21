@@ -3952,6 +3952,12 @@ a.pinterest {
 a.bookmark {
 	background: url("../images/icons/socials/bookmark.png") no-repeat scroll 0 0 transparent;
 }
+a.viadeo {
+	background: url("../images/icons/socials/viadeo.png") no-repeat scroll 0 0 transparent;
+}
+a.instagram {
+	background: url("../images/icons/socials/instagram.png") no-repeat scroll 0 0 transparent;
+}
 a.facebook-small {
 	background: url("../images/icons/small-socials/facebook.png") no-repeat scroll 0 0 transparent;
 }
@@ -4017,6 +4023,12 @@ a.pinterest-small {
 }
 a.bookmark-small {
 	background: url("../images/icons/small-socials/bookmark.png") no-repeat scroll 0 0 transparent;
+}
+a.viadeo-small {
+	background: url("../images/icons/small-socials/viadeo.png") no-repeat scroll 0 0 transparent;
+}
+a.instagram-small {
+	background: url("../images/icons/small-socials/instagram.png") no-repeat scroll 0 0 transparent;
 }
 ul.tweets-widget {
 	list-style-type: none;
