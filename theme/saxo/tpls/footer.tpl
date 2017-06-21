@@ -10,16 +10,52 @@
 					<img class="footer-logo" src="{$smarty.const.SB_THEME_URL}img/logo.png" title="{$sb_site_title}" alt="{$sb_site_title}" />
 					<br /><br />
                     <address>
-                        <strong>Big Society</strong><br />
-                        123 Main St, Suite 500<br />
-                        New York, NY 12345<br />
+                        <strong>{$sb_site_title|default:""}</strong><br />
+                        {$sb_theme_infos.theme_infos_address|@nl2br}
+						<br />
+						{$sb_theme_infos.theme_infos_email|escape:'mail'}
                     </address>
                     <ul class="social-icons">
-                        <li><a href="#" class="social-icon facebook"></a></li>
-                        <li><a href="#" class="social-icon twitter"></a></li>
-                        <li><a href="#" class="social-icon dribble"></a></li>
-                        <li><a href="#" class="social-icon rss"></a></li>
-                        <li><a href="#" class="social-icon forrst"></a></li>
+						{if $sb_theme_infos.theme_infos_facebook}<a href="{$sb_theme_infos.theme_infos_facebook}" class="fa-stack fa-2x" aria-hidden="true">
+							<i class="fa fa-square-o fa-stack-2x"></i>
+							<i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+						</a>{/if}
+						{if $sb_theme_infos.theme_infos_twitter}<a href="{$sb_theme_infos.theme_infos_twitter}" class="fa-stack fa-2x" aria-hidden="true">
+							<i class="fa fa-square-o fa-stack-2x"></i>
+							<i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+						</a>{/if}
+						{if $sb_theme_infos.theme_infos_google_plus}<a href="{$sb_theme_infos.theme_infos_google_plus}" class="fa-stack fa-2x" aria-hidden="true">
+							<i class="fa fa-square-o fa-stack-2x"></i>
+							<i class="fa fa-google fa-stack-1x fa-inverse"></i>
+						</a>{/if}
+						{if $sb_theme_infos.theme_infos_pinterest}<a href="{$sb_theme_infos.theme_infos_pinterest}" class="fa-stack fa-2x" aria-hidden="true">
+							<i class="fa fa-square-o fa-stack-2x"></i>
+							<i class="fa fa-pinterest fa-stack-1x fa-inverse"></i>
+						</a>{/if}
+						{if $sb_theme_infos.theme_infos_instagram}<a href="{$sb_theme_infos.theme_infos_instagram}" class="fa-stack fa-2x" aria-hidden="true">
+							<i class="fa fa-square-o fa-stack-2x"></i>
+							<i class="fa fa-instagram fa-stack-1x fa-inverse"></i>
+						</a>{/if}
+						{if $sb_theme_infos.theme_infos_skype}<a href="{$sb_theme_infos.theme_infos_skype}" class="fa-stack fa-2x" aria-hidden="true">
+							<i class="fa fa-square-o fa-stack-2x"></i>
+							<i class="fa fa-skype fa-stack-1x fa-inverse"></i>
+						</a>{/if}
+						{if $sb_theme_infos.theme_infos_viadeo}<a href="{$sb_theme_infos.theme_infos_viadeo}" class="fa-stack fa-2x" aria-hidden="true">
+							<i class="fa fa-square-o fa-stack-2x"></i>
+							<i class="fa fa-viadeo fa-stack-1x fa-inverse"></i>
+						</a>{/if}
+						{if $sb_theme_infos.theme_infos_vimeo}<a href="{$sb_theme_infos.theme_infos_vimeo}" class="fa-stack fa-2x" aria-hidden="true">
+							<i class="fa fa-square-o fa-stack-2x"></i>
+							<i class="fa fa-vimeo fa-stack-1x fa-inverse"></i>
+						</a>{/if}
+						{if $sb_theme_infos.theme_infos_youtube}<a href="{$sb_theme_infos.theme_infos_youtube}" class="fa-stack fa-2x" aria-hidden="true">
+							<i class="fa fa-square-o fa-stack-2x"></i>
+							<i class="fa fa-youtube fa-stack-1x fa-inverse"></i>
+						</a>{/if}
+						{if $sb_theme_infos.theme_infos_linkedin}<a href="{$sb_theme_infos.theme_infos_linkedin}" class="fa-stack fa-2x" aria-hidden="true">
+							<i class="fa fa-square-o fa-stack-2x"></i>
+							<i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+						</a>{/if}
                     </ul>
                 </div>
                 <div class="span3 footer-col">

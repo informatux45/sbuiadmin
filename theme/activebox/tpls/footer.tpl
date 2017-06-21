@@ -5,15 +5,27 @@
                 <div class="row">
                     <div class="footer-col col-md-4">
                         <h5>Adresse</h5>
-                        <p>35 rue de la bourse<br>75016 Paris</p>
+                        <p>
+							<strong>{$sb_site_title|default:""}</strong><br />
+							{$sb_theme_infos.theme_infos_address|@nl2br}
+							<br />
+							{$sb_theme_infos.theme_infos_email|escape:'mail'}
+						</p>
                     </div>
                     <div class="footer-col col-md-4">
                         <h5>Partage</h5>
                         <ul class="footer-share">
-                            <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                            <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-                            <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
-                            <li><a href="#"><i class="fa fa-google-plus"></i></a></li>
+                            {if $sb_theme_infos.theme_infos_facebook}<li><a href="{$sb_theme_infos.theme_infos_facebook}"><i class="fa fa-facebook"></i></a></li>{/if}
+                            {if $sb_theme_infos.theme_infos_twitter}<li><a href="{$sb_theme_infos.theme_infos_twitter}"><i class="fa fa-twitter"></i></a></li>{/if}
+                            {if $sb_theme_infos.theme_infos_google_plus}<li><a href="#"><i class="fa fa-google-plus"></i></a></li>{/if}
+                            {if $sb_theme_infos.theme_infos_pinterest}<li><a href="{$sb_theme_infos.theme_infos_pinterest}"><i class="fa fa-pinterest"></i></a></li>{/if}
+                            {if $sb_theme_infos.theme_infos_instagram}<li><a href="{$sb_theme_infos.theme_infos_instagram}"><i class="fa fa-instagram"></i></a></li>{/if}
+                            {if $sb_theme_infos.theme_infos_vimeo}<li><a href="{$sb_theme_infos.theme_infos_vimeo}"><i class="fa fa-vimeo"></i></a></li>{/if}
+                            {if $sb_theme_infos.theme_infos_viadeo}<li><a href="{$sb_theme_infos.theme_infos_viadeo}"><i class="fa fa-viadeo"></i></a></li>{/if}
+                            {if $sb_theme_infos.theme_infos_youtube}<li><a href="{$sb_theme_infos.theme_infos_youtube}"><i class="fa fa-youtube"></i></a></li>{/if}
+                            {if $sb_theme_infos.theme_infos_skype}<li><a href="{$sb_theme_infos.theme_infos_skype}"><i class="fa fa-skype"></i></a></li>{/if}
+                            {if $sb_theme_infos.theme_infos_linkedin}<li><a href="{$sb_theme_infos.theme_infos_linkedin}"><i class="fa fa-linkedin"></i></a></li>{/if}
+
                         </ul>
                     </div>
                     <div class="footer-col col-md-4">
