@@ -766,7 +766,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_slider` (
 --
 
 INSERT INTO `<DB_PREFIX>sb_slider` (`id`, `title`, `jquery`, `responsive`, `auto`, `pause`, `speed`, `randomstart`, `mode`, `preloadimages`, `controls`, `autocontrols`, `autohover`, `captions`, `adaptiveheight`, `adaptiveheightspeed`, `slidemargin`, `video`, `usecss`, `pager`, `pagertype`, `active`) VALUES
-(1, 'Mon slider', 1, 1, 1, 4000, 500, 1, 'horizontal', 'visible', 1, 0, 0, 0, 0, 500, 0, 0, 1, 1, 'full', 1);
+(1, 'Mon slider', 0, 1, 1, 4000, 500, 1, 'horizontal', 'visible', 1, 0, 0, 0, 0, 500, 0, 0, 1, 1, 'full', 1);
 
 
 -- --------------------------------------------------------
