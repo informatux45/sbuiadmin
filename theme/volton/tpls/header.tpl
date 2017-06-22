@@ -14,6 +14,14 @@
         <title>{insert name=sbGetPageTitle pti="{$sb_title}" mti="{$sb_pages_title}"} {$sb_site_title|default:""}</title>
 
         <meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<!-- Favicons -->
+		<link rel="apple-touch-icon" sizes="152x152" href="{$smarty.const.SB_THEME_URL}img/favicons/apple-touch-icon.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="{$smarty.const.SB_THEME_URL}img/favicons/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="{$smarty.const.SB_THEME_URL}img/favicons/favicon-16x16.png">
+		<link rel="manifest" href="{$smarty.const.SB_THEME_URL}img/favicons/manifest.json">
+		<link rel="mask-icon" href="{$smarty.const.SB_THEME_URL}img/favicons/safari-pinned-tab.svg" color="#5bbad5">
+		<meta name="theme-color" content="#ffffff">
         
         <link rel="stylesheet" href="{$smarty.const.SB_THEME_URL}css/normalize.css">
         <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' type='text/css' media='all' />
