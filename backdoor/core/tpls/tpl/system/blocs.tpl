@@ -102,7 +102,7 @@
                 <!-- /.col-lg-12 -->
 				
 				{else}
-                <div class="col-lg-12">
+                <div class="col-lg-8">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <span class="fa fa-copy fa-fw"></span> <strong>{if $all}Gestion de vos blocs{else}{$legend_add_edit}{/if}</strong>
@@ -117,6 +117,15 @@
                     <!-- /.panel -->
                 </div>
                 <!-- /.col-lg-12 -->
+				
+				<div class="col-lg-4">
+					{* ------------------------------------ *}
+					{* --- Include Shared Panel Actions --- *}
+					{include file='shared/shared-panel-actions.tpl'}
+					{* ------------------------------------ *}
+					{* ------------------------------------ *}
+				</div>
+				<!-- /.col-lg-4 -->
 
 				{/if}
             </div>
