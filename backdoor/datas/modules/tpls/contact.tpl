@@ -80,6 +80,11 @@
                 <!-- /.col-lg-8 -->
 				
                 <div class="col-lg-4">
+					{* ------------------------------------ *}
+					{* --- Include Shared Panel Actions --- *}
+					{include file='shared/shared-panel-actions.tpl'}
+					{* ------------------------------------ *}
+					{* ------------------------------------ *}
                     <div class="panel panel-primary">
                         <div class="panel-heading">
                             <span class="fa fa-exclamation-circle fa-fw"></span> <strong>AIDE</strong>
@@ -88,6 +93,7 @@
                         <div class="panel-body">
 							{* Aide Contact *}
 							<img src="img/contact.jpg" alt="" style="width: 100%;" />
+							{if $smarty.get.a != 'settings'}
 							<br><br>
 							Si les champs suivants ne sont pas remplis, les paramètres par défaut
 							seront utilisés :<br>
@@ -135,7 +141,7 @@
 							<br>
 							Champs SUBMIT<br>
 							<span style="font-weight: bold;">[SUBMIT name=go]</span>
-							
+							{/if}
                         </div>
                         <!-- /.panel-body -->
                     </div>
