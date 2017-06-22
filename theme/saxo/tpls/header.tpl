@@ -24,10 +24,12 @@
 	<![endif]--> 
 	
 	<!-- Favicons -->
-	<link rel="shortcut icon" href="{$smarty.const.SB_THEME_URL}img/favicon.ico">
-	<link rel="apple-touch-icon" href="{$smarty.const.SB_THEME_URL}img/apple-touch-icon.png">
-	<link rel="apple-touch-icon" sizes="72x72" href="{$smarty.const.SB_THEME_URL}img/apple-touch-icon-72x72.png">
-	<link rel="apple-touch-icon" sizes="114x114" href="{$smarty.const.SB_THEME_URL}img/apple-touch-icon-114x114.png">
+		<link rel="apple-touch-icon" sizes="152x152" href="{$smarty.const.SB_THEME_URL}img/favicons/apple-touch-icon.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="{$smarty.const.SB_THEME_URL}img/favicons/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="{$smarty.const.SB_THEME_URL}img/favicons/favicon-16x16.png">
+		<link rel="manifest" href="{$smarty.const.SB_THEME_URL}img/favicons/manifest.json">
+		<link rel="mask-icon" href="{$smarty.const.SB_THEME_URL}img/favicons/safari-pinned-tab.svg" color="#5bbad5">
+		<meta name="theme-color" content="#ffffff">
 	
 	<!-- JS -->
 	<script src="https://code.jquery.com/jquery-latest.min.js"></script>
