@@ -124,6 +124,17 @@
 					{include file='shared/shared-panel-actions.tpl'}
 					{* ------------------------------------ *}
 					{* ------------------------------------ *}
+                    <div class="panel panel-default">
+						<div class="panel-heading">
+							<span class="fa fa-copy fa-fw"></span> <strong>Exemple de grille (layout)</strong>
+						</div>
+						<!-- /.panel-heading -->
+						<div class="panel-body">
+							<img src="img/cssgridlayout.jpg" alt="" style="width: 100%;">
+						</div>
+						<!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
 				</div>
 				<!-- /.col-lg-4 -->
 
