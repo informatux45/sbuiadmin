@@ -30,6 +30,7 @@ define('_CMS_GLOBAL_MORE',							'plus...');
 define('_CMS_GLOBAL_ADD',							'Ajouter');
 define('_CMS_GLOBAL_REPLY',							'Répondre');
 define('_CMS_GLOBAL_MAIN',							'Principal');
+define('_CMS_GLOBAL_MENU',							'Menu');
 define('_CMS_GLOBAL_PLEASEWAIT',					'Merci de patienter');
 define('_CMS_GLOBAL_FETCHING',						'Chargement ...');
 define('_CMS_GLOBAL_TAKINGBACK',					'Retour là où vous étiez ...');
@@ -72,6 +73,11 @@ define('_CMS_GLOBAL_DATESTRING',					'd/m/Y H:i:s');
 define('_CMS_GLOBAL_MEDIUMDATESTRING',				'd/m/Y H:i');
 define('_CMS_GLOBAL_SHORTDATESTRING',				'd/m/Y');
 define('_CMS_GLOBAL_404',							"La page que vous recherchez n'existe pas.<br />Vous pouvez <a href='%s'>revenir à la page d'accueil</a> ou effectuer une nouvelle recherche.");
+define('_CMS_GLOBAL_LEARN_MORE',					"En savoir +");
+define('_CMS_GLOBAL_ABOUT',							"A propos");
+define('_CMS_GLOBAL_ABOUT_US',						"A propos de nous");
+define('_CMS_GLOBAL_PAGE_NOT_FOUND',				"Page introuvable, désolé !");
+
 // ------------------------------------------------------------------
 //               Get ALL Language Files Module
 // ------------------------------------------------------------------

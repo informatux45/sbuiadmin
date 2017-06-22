@@ -30,6 +30,7 @@ define('_CMS_GLOBAL_MORE',							'more...');
 define('_CMS_GLOBAL_ADD',							'Add');
 define('_CMS_GLOBAL_REPLY',							'Reply');
 define('_CMS_GLOBAL_MAIN',							'Main');
+define('_CMS_GLOBAL_MENU',							'Menu');
 define('_CMS_GLOBAL_PLEASEWAIT',					'Please wait');
 define('_CMS_GLOBAL_FETCHING',						'Loading ...');
 define('_CMS_GLOBAL_TAKINGBACK',					'Taking you back to where you were...');
@@ -72,6 +73,11 @@ define('_CMS_GLOBAL_DATESTRING',					'd/m/Y H:i:s');
 define('_CMS_GLOBAL_MEDIUMDATESTRING',				'd/m/Y H:i');
 define('_CMS_GLOBAL_SHORTDATESTRING',				'd/m/Y');
 define('_CMS_GLOBAL_404',							"We are sorry but the page you are looking for does not exist.<br />You could <a href='%s'>return to the home page</a> or search using the search box below.");
+define('_CMS_GLOBAL_LEARN_MORE',					"Learn more");
+define('_CMS_GLOBAL_ABOUT',							"About");
+define('_CMS_GLOBAL_ABOUT_US',						"About us");
+define('_CMS_GLOBAL_PAGE_NOT_FOUND',				"Page not found, sorry!");
+
 // ------------------------------------------------------------------
 //               Get ALL Language Files Module
 // ------------------------------------------------------------------
