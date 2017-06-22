@@ -1,0 +1,16 @@
+/* --- Style custom Editorial Theme --- */
+
+/* --- Block Title --- */
+.blocks_group h5 {
+	font-size: 1.38889em;
+	border-bottom: 3px solid #f56a6a;
+	display: block;
+	margin: 0 0 1em;
+	padding: 0 0.75em 0.5em 0;
+}
+header.major > *:last-child {
+	display: block;
+}
+.blocks_group section {
+	margin: 2.2em 0 0;
+}
