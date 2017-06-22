@@ -2,7 +2,7 @@
 /**
  * Plugin Name: SBUIADMIN PAGES
  * Description: Gestionnaire de pages libres
- * Version: 0.1.1
+ * Version: 0.1.2
  * Author: BooBoo
  * Author URI: //www.informatux.com/
  */
@@ -15,7 +15,7 @@ if (!defined('SB_PATH')) {
 # Define some important stuff
 define('MODFILE', basename(__FILE__, ".php"));
 define('MODNAME', 'Pages');
-define('MODVERSION','0.1.1');
+define('MODVERSION','0.1.2');
 
 # Include Module Common Infos
 include_once( SB_MODULES_DIR . MODFILE . DIRECTORY_SEPARATOR . 'common.php' );
@@ -51,19 +51,15 @@ if ($sb_pages_active) {
 	// --------------------------
 	// --- Get Additional HTML Content
 	// --------------------------
-	if (!empty($assoc['various_view'])) {
-		$various_html = @file_get_contents(SB_VARIOUS_URL . $assoc['various_view']);
-		$additional_html_content = ($various_html) ? sbGetShortcode($various_html) : "";
-	} else {
-		$additional_html_content = "";
-	}
-
+	$additional_html_content = (!empty($assoc['various_view'])) ? $assoc['various_view'] : false;
+	
 	// --------------------------
 	// --- Assign Title Page
 	// --------------------------
 	$sbsmarty->assign('sb_title', $sb_pages_title); // Title of Module PAGES
 	$sbsmarty->assign('sb_pages_title', $sb_pages_title);
-	$sbsmarty->assign('sb_pages_content', sbGetShortcode($sb_pages_content) . $additional_html_content);
+	$sbsmarty->assign('sb_pages_content', sbGetShortcode($sb_pages_content));
+	$sbsmarty->assign('sb_pages_various', $additional_html_content);
 	
 	// --------------------------
 	// --- Assign Page ID
@@ -97,7 +93,7 @@ if ($sb_pages_active) {
 	// --------------------------
 	// --- Assign Title Page
 	// --------------------------
-	$sbsmarty->assign('sb_pages_title', 'Page not found, sorry!');	
+	$sbsmarty->assign('sb_pages_title', _CMS_GLOBAL_PAGE_NOT_FOUND);	
 }
 
 // --------------------------

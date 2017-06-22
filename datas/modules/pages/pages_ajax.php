@@ -2,7 +2,7 @@
 /**
  * Plugin Name: SBUIADMIN PAGES AJAX
  * Description: Gestionnaire de pages libres
- * Version: 0.1.1
+ * Version: 0.1.2
  * Author: BooBoo
  * Author URI: //www.informatux.com/
  */
@@ -24,7 +24,7 @@ global $sbsmarty, $sbsanitize, $sbsql, $sbpage;
 // ---------------------------
 define('MODFILE', basename(__FILE__, "_ajax.php"));
 define('MODNAME', 'Pages');
-define('MODVERSION','0.1.1');
+define('MODVERSION','0.1.2');
 
 // ---------------------------
 // Security Check
@@ -70,7 +70,7 @@ if ($sb_pages_active) {
 
 } else {
 
-	$sb_pages_ajax .= '<h1>Page not found, sorry!</h1>';	
+	$sb_pages_ajax .= '<h1>' . _CMS_GLOBAL_PAGE_NOT_FOUND . '</h1>';	
 
 }
 
