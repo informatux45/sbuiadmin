@@ -19,6 +19,7 @@
 										{if $sb_theme_infos.theme_infos_youtube}<li><a href="{$sb_theme_infos.theme_infos_youtube}" class="icon fa-youtube"><span class="label">Youtube</span></a></li>{/if}
 										{if $sb_theme_infos.theme_infos_skype}<li><a href="{$sb_theme_infos.theme_infos_skype}" class="icon fa-skype"><span class="label">Skype</span></a></li>{/if}
 										{if $sb_theme_infos.theme_infos_linkedin}<li><a href="{$sb_theme_infos.theme_infos_linkedin}" class="icon fa-linkedin"><span class="label">Linkedin</span></a></li>{/if}
+										{insert name="sbGetThemeOption" option="slogan"}
 									</ul>
 								</header>
 
