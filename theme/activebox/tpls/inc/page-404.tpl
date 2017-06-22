@@ -17,7 +17,7 @@
 						<div class="input-append">
 							<form method="get" id="searchform" action="#">
 								<div class="input-group col-md-4 col-sm-12 text-left">
-									<input id="inlineFormInputGroup" class="form-control" placeholder="Recherche sur {$sb_site_title}" type="search">
+									<input id="inlineFormInputGroup" class="form-control" placeholder="{$smarty.const._CMS_GLOBAL_SEARCH}" type="search">
 									<div class="input-group-addon"><i class="fa fa-search" aria-hidden="true"></i></div>
 								</div>
 							</form>
