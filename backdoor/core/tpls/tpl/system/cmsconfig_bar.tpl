@@ -15,10 +15,6 @@
 			JAVASCRIPT Code
 		</button>
 		&nbsp;
-		<button class="btn btn-outline btn-danger" type="button" onclick="location.href='index.php?p=cmsconfig&op=email'">
-			EMAIL config
-		</button>
-		&nbsp;
 		<button class="btn btn-outline btn-danger" type="button" onclick="location.href='index.php?p=cmsconfig&op=comingsoon'">
 			Coming Soon
 		</button>
