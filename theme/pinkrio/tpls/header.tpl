@@ -32,11 +32,11 @@
         <title>{insert name=sbGetPageTitle pti="{$sb_title}" mti="{$sb_pages_title}"} {$sb_site_title|default:""}</title>
         
         <!-- [favicon] begin -->
-		<link rel="apple-touch-icon" sizes="180x180" href="{$smarty.const.SB_THEME_URL}favicons/apple-touch-icon.png">
-		<link rel="icon" type="image/png" href="{$smarty.const.SB_THEME_URL}favicons/favicon-32x32.png" sizes="32x32">
-		<link rel="icon" type="image/png" href="{$smarty.const.SB_THEME_URL}favicons/favicon-16x16.png" sizes="16x16">
-		<link rel="manifest" href="{$smarty.const.SB_THEME_URL}favicons/manifest.json">
-		<link rel="mask-icon" href="{$smarty.const.SB_THEME_URL}favicons/safari-pinned-tab.svg" color="#5bbad5">
+		<link rel="apple-touch-icon" sizes="152x152" href="{$smarty.const.SB_THEME_URL}images/favicons/apple-touch-icon.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="{$smarty.const.SB_THEME_URL}images/favicons/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="{$smarty.const.SB_THEME_URL}images/favicons/favicon-16x16.png">
+		<link rel="manifest" href="{$smarty.const.SB_THEME_URL}images/favicons/manifest.json">
+		<link rel="mask-icon" href="{$smarty.const.SB_THEME_URL}images/favicons/safari-pinned-tab.svg" color="#5bbad5">
 		<meta name="theme-color" content="#ffffff">
         <!-- [favicon] end -->
         
