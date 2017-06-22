@@ -57,11 +57,13 @@
 	
 	<script>
 	$(document).ready(function() {
+		// -----------------------------------------------------
 		// Enable tooltip
 		$('.tooltip').tooltip({
 			selector: "[data-toggle=tooltip]",
 			container: "body"
 		})
+		// -----------------------------------------------------
 		// Enable lightbox
 		// USAGE : add --> rel="facebox" <-- to your links
 		// Web : http://defunkt.io/facebox/
@@ -69,7 +71,7 @@
 			loadingImage : 'inc/js/facebox/loading.gif',
 			closeImage   : 'inc/js/facebox/closelabel.png'
 		});
-		
+		// -----------------------------------------------------
 		// Enable jConfirm box
 		// USAGE : add --> class="jConfirm"
 		//         add --> href="url.php"
@@ -84,11 +86,22 @@
 				window.location.href = elem.attr('href'); 
 			} 
 		});
-
+		// -----------------------------------------------------
 		// Enable infinite scroll
 		// USAGE : add --> class="infinite-scroll" to your div
 		// Web : http://jscroll.com/
-		//$('.infinite-scroll').jscroll();
+		//$('.infinite-scroll').jscroll();		
+		// -----------------------------------------------------
+		// Fixed Div Submit Button (Forms)
+		var num = 50; //number of pixels before modifying styles
+		$(window).bind('scroll', function () {
+			if ($(window).scrollTop() > num) {
+				$('.sbmenufixed').addClass('fixed panel-red').removeClass('panel-primary');
+			} else {
+				$('.sbmenufixed').removeClass('fixed panel-red').addClass('panel-primary');
+			}
+		});
+		// -----------------------------------------------------
 	});
 	</script>
 	{/if}

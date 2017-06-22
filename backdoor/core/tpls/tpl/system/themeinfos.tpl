@@ -32,16 +32,11 @@
                 <!-- /.col-lg-7 -->
 				
 				<div class="col-lg-5">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<span class="fa fa-columns fa-fw"></span> <strong>Actions</strong>
-						</div>
-						<!-- /.panel-heading -->
-						<div class="panel-body">
-							<input type="submit" value="{$sb_form_submit_value}" class="btn btn-default btn-submit" form="{$sb_form_id}">
-						</div>
-						<!-- /.panel-body -->
-					</div>
+					{* ------------------------------------ *}
+					{* --- Include Shared Panel Actions --- *}
+					{include file='shared/shared-panel-actions.tpl'}
+					{* ------------------------------------ *}
+					{* ------------------------------------ *}
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<span class="fa fa-columns fa-fw"></span> <strong>Aperçu du thème actuel</strong>

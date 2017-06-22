@@ -64,7 +64,7 @@
 	
     <div id="outdated">
         <h6>Your browser is out-of-date!</h6>
-        <p>Update your browser to view SBMAGIC Software correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
+        <p>Update your browser to view SBUIADMIN Software correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
         <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
     </div> <!-- OutdatedBrowser -->
 	
