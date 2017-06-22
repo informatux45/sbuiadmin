@@ -266,10 +266,10 @@ switch($action) {
 			
 			// --- EDIT
 			// UPDATE DATAS
-			$query_email_to         = "UPDATE " . _AM_DB_PREFIX . "$table_cmsconfig SET content = '$email_to' WHERE config = 'email_to'";
-			$query_email_subject    = "UPDATE " . _AM_DB_PREFIX . "$table_cmsconfig SET content = '$email_subject' WHERE config = 'email_subject'";
-			$query_email_publickey  = "UPDATE " . _AM_DB_PREFIX . "$table_cmsconfig SET content = '$email_publickey' WHERE config = 'email_publickey'";
-			$query_email_privatekey = "UPDATE " . _AM_DB_PREFIX . "$table_cmsconfig SET content = '$email_privatekey' WHERE config = 'email_privatekey'";
+			$query_email_to         = "UPDATE $table_cmsconfig SET content = '$email_to' WHERE config = 'email_to'";
+			$query_email_subject    = "UPDATE $table_cmsconfig SET content = '$email_subject' WHERE config = 'email_subject'";
+			$query_email_publickey  = "UPDATE $table_cmsconfig SET content = '$email_publickey' WHERE config = 'email_publickey'";
+			$query_email_privatekey = "UPDATE $table_cmsconfig SET content = '$email_privatekey' WHERE config = 'email_privatekey'";
 			
 			$result_edit_email_to         = $sbsql->query($query_email_to);
 			$result_edit_email_subject    = $sbsql->query($query_email_subject);
@@ -291,10 +291,10 @@ switch($action) {
 		// --------------------------------
 		// --- Recuperation des donnees
 		// --------------------------------
-		$queryT   = "SELECT content FROM " . _AM_DB_PREFIX . "$table_cmsconfig WHERE config = 'email_to'";
-		$queryP   = "SELECT content FROM " . _AM_DB_PREFIX . "$table_cmsconfig WHERE config = 'email_publickey'";
-		$queryS   = "SELECT content FROM " . _AM_DB_PREFIX . "$table_cmsconfig WHERE config = 'email_privatekey'";
-		$queryA   = "SELECT content FROM " . _AM_DB_PREFIX . "$table_cmsconfig WHERE config = 'email_subject'";
+		$queryT   = "SELECT content FROM $table_cmsconfig WHERE config = 'email_to'";
+		$queryP   = "SELECT content FROM $table_cmsconfig WHERE config = 'email_publickey'";
+		$queryS   = "SELECT content FROM $table_cmsconfig WHERE config = 'email_privatekey'";
+		$queryA   = "SELECT content FROM $table_cmsconfig WHERE config = 'email_subject'";
 		$requestT = $sbsql->query($queryT);
 		$requestP = $sbsql->query($queryP);
 		$requestS = $sbsql->query($queryS);
