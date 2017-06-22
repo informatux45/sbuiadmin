@@ -14,11 +14,18 @@
 									{$smarty.const._CMS_GLOBAL_404|@sprintf:"{$smarty.const.SB_URL}"}
 								</p>
 								
-				                <form method="get" id="searchform" action="#">
-				                    <div><label class="screen-reader-text" for="s">Search for:</label>
-				                        <input type="text" value="" name="s" id="s" />
-				                        <input type="submit" id="searchsubmit" value="Search" />
-				                    </div>
+				                <form method="post" action="#" id="contact-form-contact-us" class="contact-form" style="margin: 0 auto; width: 50%;">
+									<fieldset>
+				                        <ul>
+				                            <li class="text-field" style="width: 100%">
+				                                <div class="input-prepend">
+													<span class="add-on"><i class="fa fa-search"></i></span>
+													<input name="name" id="search-submit" class="required" value="" type="text" placeholder="{$smarty.const._CMS_GLOBAL_SEARCH}">
+												</div>
+				                            </li>
+
+				                        </ul>
+				                    </fieldset>
 				                </form>
 				            </div>
 				        </div>
