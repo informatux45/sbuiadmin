@@ -1,6 +1,5 @@
 
 
-        <script src="{$smarty.const.SB_THEME_URL}js/vendor/jquery-1.10.2.min.js"></script>
         <script src="{$smarty.const.SB_THEME_URL}js/min/plugins.min.js"></script>
 		<script src="{$smarty.const.SB_THEME_URL}dist/js/lightbox.min.js"></script>
 		<script type="text/javascript">

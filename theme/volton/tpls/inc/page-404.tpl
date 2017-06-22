@@ -15,9 +15,21 @@
 						<div class="row">
 							<div class="col-md-12">
 									<p class="acenter">
-										<img class="error-404-image group" src="{$smarty.const.SB_THEME_URL}img/404.jpg" title="Error 404" alt="404" />
+										<img class="error-404-image group" src="{$smarty.const.SB_THEME_URL}img/features/404.png" title="Error 404" alt="404" />
 										<br><br>
 										{$smarty.const._CMS_GLOBAL_404|@sprintf:"{$smarty.const.SB_URL}"}
+										<br><br>										
+										<form method="post" action="#" class="search-form" style="margin: 0 auto; width: 50%;">
+										  <div class="input-group">
+											<input type="text" class="form-control" placeholder="Search">
+											<div class="input-group-btn">
+											  <button class="btn btn-default" type="submit">
+												<i class="fa fa-search"></i>
+											  </button>
+											</div>
+										  </div>
+										</form>
+										<br><br>
 									</p>
 								
 							</div>

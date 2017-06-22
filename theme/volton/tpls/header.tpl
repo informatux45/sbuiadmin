@@ -22,6 +22,9 @@
 		<link rel="manifest" href="{$smarty.const.SB_THEME_URL}img/favicons/manifest.json">
 		<link rel="mask-icon" href="{$smarty.const.SB_THEME_URL}img/favicons/safari-pinned-tab.svg" color="#5bbad5">
 		<meta name="theme-color" content="#ffffff">
+		
+		<!-- Scripts -->
+        <script src="{$smarty.const.SB_THEME_URL}js/vendor/jquery-1.10.2.min.js"></script>
         
         <link rel="stylesheet" href="{$smarty.const.SB_THEME_URL}css/normalize.css">
         <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' type='text/css' media='all' />
