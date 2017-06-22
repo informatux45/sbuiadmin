@@ -122,7 +122,6 @@
 				
 				{if (!$all || !$allcategory) && ($smarty.get.a && $smarty.get.a != 'category') }
 
-					{*<div class="col-lg-{if $smarty.get.a == 'categoryedit' OR $smarty.get.a == 'tpl_list' OR $smarty.get.a == 'tpl_single'}8{else}12{/if}">*}
 					<div class="col-lg-8">
 						<div class="panel panel-default">
 							<div class="panel-heading">
@@ -139,25 +138,24 @@
 					</div>
 					<!-- /.col-lg-12 -->
 					
-					{*if $smarty.get.a == 'categoryedit' OR $smarty.get.a == 'tpl_list' OR $smarty.get.a == 'tpl_single'*}
-						<div class="col-lg-4">
-							{* ------------------------------------ *}
-							{* --- Include Shared Panel Actions --- *}
-							{include file='shared/shared-panel-actions.tpl'}
-							{* ------------------------------------ *}
-							{* ------------------------------------ *}
-							{if $smarty.get.a == 'edit' || $smarty.get.a == 'add'}
-							<div class="panel panel-default">
-									<div class="panel-heading">
-										Exemple d'articles (layout)
-									</div>
-								<div class="panel-body">
-									<img src="img/news-template.jpg" alt="" style="width: 100%;">
+					<div class="col-lg-4">
+						{* ------------------------------------ *}
+						{* --- Include Shared Panel Actions --- *}
+						{include file='shared/shared-panel-actions.tpl'}
+						{* ------------------------------------ *}
+						{* ------------------------------------ *}
+						{if $smarty.get.a == 'edit' || $smarty.get.a == 'add'}
+						<div class="panel panel-default">
+								<div class="panel-heading">
+									Exemple d'articles (layout)
 								</div>
-								<!-- /.panel-body -->
+							<div class="panel-body">
+								<img src="img/news-template.jpg" alt="" style="width: 100%;">
 							</div>
-							<!-- /.panel -->
-							{/if}
+							<!-- /.panel-body -->
+						</div>
+						<!-- /.panel -->
+						{/if}
 							
 						{if $smarty.get.a == 'tpl_list' OR $smarty.get.a == 'tpl_single'}
 
@@ -263,9 +261,8 @@
 
 						{/if}
 
-						</div>
-						<!-- /.col-lg-4 -->
-					{*/if*}
+					</div>
+					<!-- /.col-lg-4 -->
 				
 				{/if}
 				
