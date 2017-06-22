@@ -10,14 +10,16 @@
     <!-- metas tags -->
     {insert name="sbGetSeoMetas"}
 
-    <!-- Favicons -->
+    <!-- Title -->
     <title>{insert name=sbGetPageTitle pti="{$sb_title}" mti="{$sb_pages_title}"} {$sb_site_title|default:""}</title>
 	
-    <link rel="apple-touch-icon" sizes="180x180" href="{$smarty.const.SB_THEME_URL}images/favicons/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="{$smarty.const.SB_THEME_URL}images/favicons/android-icon-192x192.png">
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="152x152" href="{$smarty.const.SB_THEME_URL}images/favicons/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="{$smarty.const.SB_THEME_URL}images/favicons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="{$smarty.const.SB_THEME_URL}images/favicons/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="{$smarty.const.SB_THEME_URL}images/favicons/favicon-16x16.png">
+    <link rel="manifest" href="{$smarty.const.SB_THEME_URL}images/favicons/manifest.json">
+    <link rel="mask-icon" href="{$smarty.const.SB_THEME_URL}images/favicons/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="theme-color" content="#ffffff">
 	
     <!-- Fonts -->
     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' type='text/css' media='all' />
