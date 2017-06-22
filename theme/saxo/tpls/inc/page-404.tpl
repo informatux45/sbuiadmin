@@ -10,10 +10,12 @@
 					
 					<div class="input-append">
 						<form method="get" id="searchform" action="#">
-							<input id="appendedInputButton" size="16" placeholder="Recherche sur {$sb_site_title}" type="text">
+							<input id="appendedInputButton" size="20" placeholder="{$smarty.const._CMS_GLOBAL_SEARCH}" type="text">
 							<button class="btn" type="button"><i class="icon-search"></i></button>
 						</form>
 					</div>
+					
+					<br><br>
 					
 				</div>
 			</div> <!-- End span12 -->
