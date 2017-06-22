@@ -122,7 +122,8 @@
 				
 				{if (!$all || !$allcategory) && ($smarty.get.a && $smarty.get.a != 'category') }
 
-					<div class="col-lg-{if $smarty.get.a == 'categoryedit' OR $smarty.get.a == 'tpl_list' OR $smarty.get.a == 'tpl_single'}8{else}12{/if}">
+					{*<div class="col-lg-{if $smarty.get.a == 'categoryedit' OR $smarty.get.a == 'tpl_list' OR $smarty.get.a == 'tpl_single'}8{else}12{/if}">*}
+					<div class="col-lg-8">
 						<div class="panel panel-default">
 							<div class="panel-heading">
 								<span class="fa fa-rss fa-fw"></span> <strong>{$legend_add_edit}</strong>
@@ -138,9 +139,28 @@
 					</div>
 					<!-- /.col-lg-12 -->
 					
-					{if $smarty.get.a == 'categoryedit' OR $smarty.get.a == 'tpl_list' OR $smarty.get.a == 'tpl_single'}
+					{*if $smarty.get.a == 'categoryedit' OR $smarty.get.a == 'tpl_list' OR $smarty.get.a == 'tpl_single'*}
+						<div class="col-lg-4">
+							{* ------------------------------------ *}
+							{* --- Include Shared Panel Actions --- *}
+							{include file='shared/shared-panel-actions.tpl'}
+							{* ------------------------------------ *}
+							{* ------------------------------------ *}
+							{if $smarty.get.a == 'edit' || $smarty.get.a == 'add'}
+							<div class="panel panel-default">
+									<div class="panel-heading">
+										Exemple d'articles (layout)
+									</div>
+								<div class="panel-body">
+									<img src="img/news-template.jpg" alt="" style="width: 100%;">
+								</div>
+								<!-- /.panel-body -->
+							</div>
+							<!-- /.panel -->
+							{/if}
+							
 						{if $smarty.get.a == 'tpl_list' OR $smarty.get.a == 'tpl_single'}
-							<div class="col-lg-4">
+
 								<div class="panel panel-red">
 									<div class="panel-heading">
 										Variables à utiliser dans votre code {if $smarty.get.a == 'tpl_list'}TPL LIST{else}TPL SINGLE{/if}
@@ -213,11 +233,11 @@
 										<a href="http://www.smarty.net/" target="_blank">Voir Doc smarty pour plus d'infos</a>
 									</div>
 								</div>
-							</div>
-							<!-- /.col-lg-4 -->
+
 						{/if}
-						{if $smarty.get.a != 'tpl_list' AND $smarty.get.a != 'tpl_single'}
-						<div class="col-lg-4">
+
+						{if $smarty.get.a != 'tpl_list' AND $smarty.get.a != 'tpl_single' AND $smarty.get.a != 'settings' AND $smarty.get.a != 'edit'}
+
 							<div class="panel panel-success">
 								<div class="panel-heading">
 									Templates Catégorie
@@ -240,11 +260,12 @@
 									</p>
 								</div>
 							</div>
-						</div>
+
 						{/if}
 
+						</div>
 						<!-- /.col-lg-4 -->
-					{/if}
+					{*/if*}
 				
 				{/if}
 				

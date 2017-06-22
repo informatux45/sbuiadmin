@@ -915,7 +915,7 @@ switch($action) {
 		$formName        = "edit_form";
 		$formType        = "settingscategory";
 		$btn_add_edit    = "Modifier";
-		$legend_add_edit = "Modifier les paramètres de la catégorie '<span style=\"color: red;\">%s</span>'";
+		$legend_add_edit = "Modifier les paramètres de la catégorie &quot;<span style=\"color: red;\">%s</span>&quot;";
 		$id              = intval($_GET['id']);
 		// --------------------------------
 		// --- Control form submit --------
@@ -1006,7 +1006,7 @@ switch($action) {
 		$sbform->closeForm ();
 		// --------------------------------
 		
-		$name = $sbsanitize->displayLang($assoc['title']);
+		$title_fr = $sbsanitize->displayLang($assoc['title']);
 	break;
 	
 }
@@ -1029,6 +1029,9 @@ $sbsmarty->assign('legend_add_edit', sprintf($legend_add_edit, $sbsanitize->disp
 // ----------------------
 $sbsmarty->assign('sb_msg_error', $sb_msg_error);
 $sbsmarty->assign('sb_msg_valid', $sb_msg_valid);
+// --- Second submit Button
+$sbsmarty->assign('sb_form_id', $formName);
+$sbsmarty->assign('sb_form_submit_value', $btn_add_edit);
 
 // ----------------------
 // CLOSE SQL
