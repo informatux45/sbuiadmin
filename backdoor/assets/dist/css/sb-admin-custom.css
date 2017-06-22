@@ -36,7 +36,7 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 
 .fright {float: right;}
 .fleft {float: left;}
-.fixed {position: fixed; top: 0; right: 0; min-width: 20em;}
+.fixed {position: fixed; top: 0; right: 0; min-width: 20em; z-index: 1;}
 
 .help-block {
   font-style: italic;

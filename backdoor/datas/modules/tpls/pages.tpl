@@ -66,7 +66,7 @@
 				
 				{else}
 				
-                <div class="col-lg-{if $smarty.get.a == 'addcustom' OR $smarty.get.a == 'editcustom'}12{else}8{/if}">
+                <div class="col-lg-8">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <span class="fa fa-copy fa-fw"></span> <strong>{if $all}Gestion de vos pages{else}{$legend_add_edit}{/if}</strong>
@@ -82,29 +82,34 @@
                 </div>
                 <!-- /.col-lg-8 -->
 
-				{if $smarty.get.a != 'addcustom' AND $smarty.get.a != 'editcustom'}
-					<div class="col-lg-4">
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<span class="fa fa-columns fa-fw"></span> <strong>Choix du template (VIEW)</strong>
-							</div>
-							<!-- /.panel-heading -->
-							<div class="panel-body">
-								<div class="theme_view">
-									<img id="img_theme_view" src="" title="" />
-								</div>
-							</div>
-							<!-- /.panel-body -->
+				<div class="col-lg-4">
+					{* ------------------------------------ *}
+					{* --- Include Shared Panel Actions --- *}
+					{include file='shared/shared-panel-actions.tpl'}
+					{* ------------------------------------ *}
+					{* ------------------------------------ *}
+					{if $smarty.get.a != 'addcustom' AND $smarty.get.a != 'editcustom'}
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<span class="fa fa-columns fa-fw"></span> <strong>Choix du template (VIEW)</strong>
 						</div>
-						<!-- /.panel -->
+						<!-- /.panel-heading -->
+						<div class="panel-body">
+							<div class="theme_view">
+								<img id="img_theme_view" src="" title="" />
+							</div>
+						</div>
+						<!-- /.panel-body -->
 					</div>
-					<!-- /.col-lg-4 -->
-
-					{if $show_headpage}
-						{include file='shared/shared-slider-4col.tpl'}
+					<!-- /.panel -->
 					{/if}
+				</div>
+				<!-- /.col-lg-4 -->
 
+				{if $show_headpage}
+					{include file='shared/shared-slider-4col.tpl'}
 				{/if}
+
 
 				{/if}
             </div>
