@@ -92,6 +92,7 @@ $sbsmarty->assign('sbfiles_medias_dirs_allowed', $sbfiles_medias_dirs_allowed);
 
 // --- ASSIGN Infos ini_get
 $sbsmarty->assign('media_ini_get_post_max_size', sbIniGet('post_max_size'));
+$sbsmarty->assign('media_ini_get_upload_max_filesize', sbIniGet('upload_max_filesize'));
 $sbsmarty->assign('media_ini_get_file_uploads', sbIniGet('file_uploads'));
 
 // --- ASSIGN Infos Uploads
