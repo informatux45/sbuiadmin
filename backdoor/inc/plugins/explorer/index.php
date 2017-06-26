@@ -36,6 +36,12 @@
 // +--------------------------------------------------
 // | Header and Globals
 // +--------------------------------------------------
+$include = @include '../../../../sbconfig.php';
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Blocking direct access to plugin      -=
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+defined('SBMAGIC_PATH') or die('Are you crazy!');
+
 if(!isset($_SERVER['PATH_INFO']) && isset($_SERVER["ORIG_PATH_INFO"])) {
     $_SERVER["PATH_INFO"] = $_SERVER["ORIG_PATH_INFO"];
 }
@@ -137,7 +143,7 @@ function array_to_object( $var ) {
 }
 class config {
     var $data;
-    function config(){
+    function __construct(){
         global $fm_file;
         $this->data = array(
             'lang'=>'',
@@ -174,7 +180,7 @@ class config {
 // | Config
 // +--------------------------------------------------
 $charset = "UTF-8";
-$version = '0.9.9';
+$version = '1.0.1';
 $quota_mb = 0;
 $upload_ext_filter = array();
 $download_ext_filter = array();
@@ -1647,13 +1653,13 @@ function dir_list_form() {
             <tr>
             <td bgcolor=\"#DDDDDD\" colspan=50><nobr>
             <form style=\"display:inline-block;margin-top:-2px;\" action=\"".$fm_path_info["basename"]."\" method=\"post\" onsubmit=\"return test_action();\">
-                <input type=button onclick=\"config_form()\" value=\"".et('Config')."\">
+                <!--<input type=button onclick=\"config_form()\" value=\"".et('Config')."\">-->
                 <input type=button onclick=\"server_info_form()\" value=\"".et('ServerInfo')."\">
                 <input type=button onclick=\"test_prompt(1)\" value=\"".et('CreateDir')."\">
                 <input type=button onclick=\"test_prompt(2)\" value=\"".et('CreateArq')."\">
                 <input type=button onclick=\"upload_form()\" value=\"".et('Upload')."\">
-                <input type=button onclick=\"shell_form()\" value=\"".et('Shell')."\">
-                <input type=button onclick=\"portscan_form()\" value=\"".et('Portscan')."\">
+                <!--<input type=button onclick=\"shell_form()\" value=\"".et('Shell')."\">
+                <input type=button onclick=\"portscan_form()\" value=\"".et('Portscan')."\">-->
             </form>
             <style type=\"text/css\">
                 .paypal {
@@ -1683,7 +1689,7 @@ function dir_list_form() {
                     background-position: 0 -24px;
                 }
             </style>
-            <form style=\"display:inline-block;\" action=\"https://www.paypal.com/cgi-bin/webscr\" method=\"post\" target=\"_blank\">
+            <!--<form style=\"display:inline-block;\" action=\"https://www.paypal.com/cgi-bin/webscr\" method=\"post\" target=\"_blank\">
                 <input type=\"hidden\" name=\"cmd\" value=\"_xclick\">
                 <input type=\"hidden\" name=\"business\" value=\"dulldusk@gmail.com\">
                 <input type=\"hidden\" name=\"lc\" value=\"BR\">
@@ -1703,7 +1709,7 @@ function dir_list_form() {
                 <input type=\"hidden\" name=\"cancel_return\" value=\"http://phpfm.sf.net\">
                 <input type=\"submit\" class=\"paypal\" value=\"donate with paypal\">
             </form>
-            <a class=\"bitcoin\" href=\"http://phpfm.sf.net/#donation\" target=\"_blank\">donate with bitcoin</a>
+            <a class=\"bitcoin\" href=\"http://phpfm.sf.net/#donation\" target=\"_blank\">donate with bitcoin</a>-->
             </nobr>
             </td>
             </tr>";
@@ -2394,11 +2400,11 @@ function config_form(){
     } else {
         $newpassvar = "newpass".time();
         echo "
-        <form name=\"config_form\" action=\"".$fm_path_info["basename"]."\" method=\"post\">
+        <form name=\"config_form\" action=\"".$fm_path_info["basename"]."\" method=\"post\" target=\"_self\">
         <input type=hidden name=\"newpassvar\" value=\"".$newpassvar."\">
         <table border=0 cellspacing=0 cellpadding=5 align=center width=\"100%\" style=\"padding:5px;\">
         <tr><td align=right width=\"1%\">".et('Version').":<td>$version (".get_size($fm_file).")</td></tr>
-        <tr><td align=right>".et('Website').":<td><a href=\"http://phpfm.sf.net\" target=\"_blank\">http://phpfm.sf.net</a></td></tr>
+        <!--<tr><td align=right>".et('Website').":<td><a href=\"https://informatux.com\" target=\"_blank\">https://informatux.com</a></td></tr>-->
         <input type=hidden name=action value=2>
         <input type=hidden name=config_action value=0>
         <tr><td align=right width=1><nobr>".et('DocRoot').":</nobr><td>".$doc_root."</td></tr>
@@ -3266,7 +3272,7 @@ function frameset(){
  +--------------------------------------------------
  */
 class archive {
-    function archive($name) {
+    function __construct($name) {
         $this->options   = array(
             'basedir' => ".",
             'name' => $name,
@@ -3547,7 +3553,7 @@ class archive {
     }
 }
 class tar_file extends archive {
-    function tar_file($name) {
+    function __construct($name) {
         $this->archive($name);
         $this->options['type'] = "tar";
     }
@@ -3671,7 +3677,7 @@ class tar_file extends archive {
     }
 }
 class gzip_file extends tar_file {
-    function gzip_file($name) {
+    function __construct($name) {
         $this->tar_file($name);
         $this->options['type'] = "gzip";
     }
@@ -3701,7 +3707,7 @@ class gzip_file extends tar_file {
     }
 }
 class bzip_file extends tar_file {
-    function bzip_file($name) {
+    function __construct($name) {
         $this->tar_file($name);
         $this->options['type'] = "bzip";
     }
@@ -3731,7 +3737,7 @@ class bzip_file extends tar_file {
     }
 }
 class zip_file extends archive {
-    function zip_file($name) {
+    function __construct($name) {
         $this->archive($name);
         $this->options['type'] = "zip";
     }
@@ -4631,18 +4637,18 @@ function et($tag){
     $et['fr']['View'] = 'Voir';
     $et['fr']['Config'] = 'Config';
     $et['fr']['Ren'] = 'Renommer';
-    $et['fr']['Rem'] = 'Detruire';
+    $et['fr']['Rem'] = 'Supprimer';
     $et['fr']['Compress'] = 'Compresser';
     $et['fr']['Decompress'] = 'Decompresser';
     $et['fr']['ResolveIDs'] = 'Resoudre les IDs';
     $et['fr']['Move'] = 'Déplacer';
     $et['fr']['Copy'] = 'Copier';
-    $et['fr']['ServerInfo'] = 'info du sreveur';
+    $et['fr']['ServerInfo'] = 'info du serveur';
     $et['fr']['CreateDir'] = 'Créer un répertoire';
     $et['fr']['CreateArq'] = 'Créer un fichier';
     $et['fr']['ExecCmd'] = 'Executer une Commande';
-    $et['fr']['Upload'] = 'Téléversement(upload)';
-    $et['fr']['UploadEnd'] = 'Téléversement Fini';
+    $et['fr']['Upload'] = 'Upload';
+    $et['fr']['UploadEnd'] = 'Upload terminé';
     $et['fr']['Perm'] = 'Perm';
     $et['fr']['Perms'] = 'Permissions';
     $et['fr']['Owner'] = 'Propriétaire';
@@ -4655,7 +4661,7 @@ function et($tag){
     $et['fr']['Shell'] = 'Shell';
     $et['fr']['Read'] = 'Lecture';
     $et['fr']['Write'] = 'Ecriture';
-    $et['fr']['Exec'] = 'Executer';
+    $et['fr']['Exec'] = 'Exécuter';
     $et['fr']['Apply'] = 'Appliquer';
     $et['fr']['StickyBit'] = 'Sticky Bit';
     $et['fr']['Pass'] = 'Mot de passe';
@@ -4702,8 +4708,8 @@ function et($tag){
     $et['fr']['FileSent'] = 'Fichier envoyé';
     $et['fr']['SpaceLimReached'] = 'Espace maxi atteint';
     $et['fr']['InvExt'] = 'Extension invalide';
-    $et['fr']['FileNoOverw'] = 'Le fichier ne peut pas etre écrasé';
-    $et['fr']['FileOverw'] = 'Fichier écrasé';
+    $et['fr']['FileNoOverw'] = 'Le fichier ne peut pas être supprimé';
+    $et['fr']['FileOverw'] = 'Fichier supprimé';
     $et['fr']['FileIgnored'] = 'Fichier ignoré';
     $et['fr']['ChkVer'] = 'Verifier nouvelle version';
     $et['fr']['ChkVerAvailable'] = 'Nouvelle version, cliquer ici pour la téléchager!!';
