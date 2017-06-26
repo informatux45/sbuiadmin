@@ -74,7 +74,7 @@ for($i = 0; $i < count($sbfiles_arr); $i++) {
 $sbfiles_new = sbArrayOrderby($sbfiles_new, 'time', SORT_DESC, 'file', SORT_ASC);
 
 foreach($sbfiles_new as $key => $val) {
-	$sbfiles[] = $val['file'];
+	$sbfiles[] = str_replace("\\", "/", $val['file']);
 }
 
 $sbsmarty->assign('medias_all', $sbfiles);
