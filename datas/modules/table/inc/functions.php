@@ -18,6 +18,7 @@ if (!defined('SB_PATH')) {
  * Get A TABBS with ID
  * id		int			$param id
  * name		string		$param name (function name after 'shortcode_')
+ * Text shortcode		[CS id=1 name=sbtable]
  * return HTML
  */
 function shortcode_sbtable($param = '') {
@@ -27,11 +28,11 @@ function shortcode_sbtable($param = '') {
 	$html_table = '';
 	$id         = intval($param['id']);
 	// --- Tables
-	$table           = _AM_DB_PREFIX . "sb_table";
+	$table_table     = _AM_DB_PREFIX . "sb_table";
 	$table_structure = _AM_DB_PREFIX . "sb_table_structure";
 	$table_datas     = _AM_DB_PREFIX . "sb_table_datas";
 	// --- SQL TABLE
-	$query = "SELECT t2.tid, t2.content FROM $table AS t1
+	$query = "SELECT t2.tid, t2.content FROM $table_table AS t1
 			  LEFT JOIN $table_datas AS t2 ON (t1.id = t2.tid)
 			  WHERE t1.id = '$id' AND t1.active = '1'
 			  ORDER BY t2.sort ASC
@@ -42,19 +43,17 @@ function shortcode_sbtable($param = '') {
 	// --- Check if news exists
 	if ($table) {
 		// --- Get Config options Table
-		$table_config      = _AM_DB_PREFIX . "sb_config";
-		$query_config      = "SELECT config, content FROM $table_config WHERE config = 'table_options'";
+		$query_config      = "SELECT type FROM $table_table WHERE id = '$id'";
 		$request_config    = $sbsql->query($query_config);
 		$result_config     = $sbsql->object($request_config);
-		$responsive_config = $sbsanitize->sTrim($result_config->content);
+		$responsive_config = $sbsanitize->sTrim($result_config->type);
 		// --- Construct HTML
 		switch($responsive_config) {
-			//default:
+			default:
 			case "option1":
 				$html_table .= '<link href="' . SB_MODULES_URL . 'table/inc/option1/responsive-table.css" rel="stylesheet" />';
 				$class_table = 'responsive-table';
 			break;
-			default:
 			case "option2":				
 				$html_table .= '<link type="text/css" media="screen" rel="stylesheet" href="' . SB_MODULES_URL . 'table/inc/option2/responsive-tables.css" />';
 				$html_table .= '<script type="text/javascript" src="' . SB_MODULES_URL . 'table/inc/option2/responsive-tables.js"></script>';
