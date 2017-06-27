@@ -82,6 +82,7 @@ $arrLang['folder_paths'] = "Folder Paths";
 $arrLang['follow_the_wizard'] = "Follow the <b>Wizard</b> to install your program";
 $arrLang['installed'] = "installed";
 $arrLang['installation_completed'] = "Installation Completed!";
+$arrLang['installation_in_progress'] = "Installation in progress";
 $arrLang['installation_guide'] = "Installation Guide";
 $arrLang['installation_type'] = "Installation Type";
 $arrLang['language'] = "Language";

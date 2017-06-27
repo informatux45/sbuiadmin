@@ -81,6 +81,7 @@ $arrLang['folder_paths'] = "Folder Paths";
 $arrLang['follow_the_wizard'] = "Suivre l'<b>assistant</b> pour l'installation";
 $arrLang['installed'] = "installé";
 $arrLang['installation_completed'] = "Installation réussie !";
+$arrLang['installation_in_progress'] = "Installation en cours";
 $arrLang['installation_guide'] = "SBUIADMIN installation";
 $arrLang['installation_type'] = "Type d'installation";
 $arrLang['language'] = "Langage";

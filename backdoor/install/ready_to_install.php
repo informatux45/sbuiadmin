@@ -68,7 +68,9 @@
 				<td colspan="2">
 					<a href="administrator_account.php" class="form_button" /><?php echo lang_key('back'); ?></a>
 					&nbsp;&nbsp;&nbsp;&nbsp;
-					<input type="submit" class="form_button" value="<?php echo lang_key('continue'); ?>" />
+					<input type="submit" id="form_submit_installation" class="form_button" value="<?php echo lang_key('continue'); ?>" />
+					<img class="show_installation_in_progress" src='images/ajax_loading.gif' alt='' style="position: absolute; margin-top: -3px; visibility: hidden;" />
+					&nbsp;<h3 class="show_installation_in_progress" style="display: inline; margin-left: 40px; visibility: hidden;"><?php echo lang_key('installation_in_progress'); ?></h3>
 				</td>
 			</tr>                        
 			</table>
@@ -77,6 +79,14 @@
 		</div>
 		<div class="clear"></div>
 	</div>
+
+	<script>	
+		// Check if form submit
+		$("form").submit(function() {
+			$('#form_submit_installation').css("display", "none");
+			$('.show_installation_in_progress').css("visibility", "visible");
+		});
+	</script>
 	
 	<?php include_once('include/footer.inc.php'); ?>        
 
