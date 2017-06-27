@@ -128,6 +128,12 @@ function shortcode_sbtable($param = '') {
 						// --- 
 						switch($field_type[$i]) {
 							default: $data_value = $value; break;
+							case "photo":
+								$data_value = "<img class='table_image' src='"._AM_MEDIAS_URL."$value' alt='' />";
+							break;
+							case "textarea":
+								$data_value = nl2br($value);
+							break;
 							case "link_image":
 								$data_value = '<a class="icon-large icon-picture' . $data_fancy . '" href="'.$value.'" title=""' . $data_target . '></a>';
 							break;

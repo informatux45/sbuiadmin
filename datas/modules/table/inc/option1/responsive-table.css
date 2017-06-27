@@ -76,6 +76,11 @@ table.responsive-table tr:nth-child(2n+1) {
 	}
 }
 
+.table_image {
+	max-height: 50px;
+	max-width: 100px;
+}
+
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=- */
 /* END - Optional - Basic Skin */
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=- */
