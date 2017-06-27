@@ -78,12 +78,9 @@ class qqFileUploader {
      * @param string $name Overwrites the name of the file.
      */
     public function handleUpload($uploadDirectory, $name = null) {
-        
-        $uploadDirectory = str_replace("\\", "/", $uploadDirectory);
 
         if (is_writable($this->chunksFolder) &&
-            1 == mt_rand(1, 1/$this->chunksCleanupProbability)){
-
+            1 == mt_rand(1, 1/$this->chunksCleanupProbability)) {
             // Run garbage collection
             $this->cleanupChunks();
         }
@@ -123,11 +120,11 @@ class qqFileUploader {
 
         // Validate file size
 
-        if ($size == 0){
+        if ($size == 0) {
             return array('error' => 'File is empty.');
         }
 
-        if ($size > $this->sizeLimit){
+        if ($size > $this->sizeLimit) {
             return array('error' => 'File is too large.');
         }
 
@@ -136,7 +133,7 @@ class qqFileUploader {
         $pathinfo = pathinfo($name);
         $ext = isset($pathinfo['extension']) ? $pathinfo['extension'] : '';
 
-        if($this->allowedExtensions && !in_array(strtolower($ext), array_map("strtolower", $this->allowedExtensions))){
+        if ($this->allowedExtensions && !in_array(strtolower($ext), array_map("strtolower", $this->allowedExtensions))) {
             $these = implode(', ', $this->allowedExtensions);
             return array('error' => 'File has an invalid extension, it should be one of '. $these . '.');
         }
@@ -151,13 +148,13 @@ class qqFileUploader {
             $partIndex = (int)$_REQUEST['qqpartindex'];
             $uuid = $_REQUEST['qquuid'];
 
-            if (!is_writable($chunksFolder) || !is_executable($uploadDirectory)){
+            if (!is_writable($chunksFolder)) {
                 return array('error' => "Server error. Chunks directory isn't writable or executable.");
             }
 
             $targetFolder = $this->chunksFolder . "/" . $uuid;
 
-            if (!file_exists($targetFolder)){
+            if (!file_exists($targetFolder)) {
                 mkdir($targetFolder);
             }
 
@@ -165,14 +162,14 @@ class qqFileUploader {
             $success = move_uploaded_file($_FILES[$this->inputName]['tmp_name'], $target);
 
             // Last chunk saved successfully
-            if ($success AND ($totalParts-1 == $partIndex)){
+            if ($success AND ($totalParts-1 == $partIndex)) {
 
                 $target = $this->getUniqueTargetPath($uploadDirectory, $name);
                 $this->uploadName = basename($target);
 
                 $target = fopen($target, 'w');
 
-                for ($i=0; $i<$totalParts; $i++){
+                for ($i=0; $i<$totalParts; $i++) {
                     $chunk = fopen($targetFolder.'/'.$i, "rb");
                     stream_copy_to_stream($chunk, $target);
                     fclose($chunk);
@@ -181,7 +178,7 @@ class qqFileUploader {
                 // Success
                 fclose($target);
 
-                for ($i=0; $i<$totalParts; $i++){
+                for ($i=0; $i<$totalParts; $i++) {
                     $chunk = fopen($targetFolder.'/'.$i, "r");
                     unlink($targetFolder.'/'.$i);
                 }
@@ -198,10 +195,10 @@ class qqFileUploader {
 
             $target = $this->getUniqueTargetPath($uploadDirectory, $name);
 
-            if ($target){
+            if ($target) {
                 $this->uploadName = basename($target);
 
-                if (move_uploaded_file($file['tmp_name'], $target)){
+                if (move_uploaded_file($file['tmp_name'], $target)) {
                     return array('success'=> true);
                 }
             }
@@ -222,7 +219,7 @@ class qqFileUploader {
         // if multiple people would upload a file with the same name at the same time
         // only the latest would be saved.
 
-        if (function_exists('sem_acquire')){
+        if (function_exists('sem_acquire')) {
             $lock = sem_get(ftok(__FILE__, 'u'));
             sem_acquire($lock);
         }
@@ -237,7 +234,7 @@ class qqFileUploader {
 
         // Get unique file name for the file, by appending random suffix.
 
-        while (file_exists($uploadDirectory . "/" . $unique . $ext)){
+        while (file_exists($uploadDirectory . "/" . $unique . $ext)) {
             $suffix += rand(1, 999);
             $unique = $base.'-'.$suffix;
         }
@@ -245,12 +242,12 @@ class qqFileUploader {
         $result =  $uploadDirectory . "/" . $unique . $ext;
 
         // Create an empty target file
-        if (!touch($result)){
+        if (!touch($result)) {
             // Failed
             $result = false;
         }
 
-        if (function_exists('sem_acquire')){
+        if (function_exists('sem_acquire')) {
             sem_release($lock);
         }
 
@@ -262,7 +259,7 @@ class qqFileUploader {
      * more than chunksExpireIn seconds ago
      */
     protected function cleanupChunks() {
-        foreach (scandir($this->chunksFolder) as $item){
+        foreach (scandir($this->chunksFolder) as $item) {
             if ($item == "." || $item == "..")
                 continue;
 
@@ -271,7 +268,7 @@ class qqFileUploader {
             if (!is_dir($path))
                 continue;
 
-            if (time() - filemtime($path) > $this->chunksExpireIn){
+            if (time() - filemtime($path) > $this->chunksExpireIn) {
                 $this->removeDir($path);
             }
         }
@@ -282,7 +279,7 @@ class qqFileUploader {
      * @param string $dir
      */
     protected function removeDir($dir) {
-        foreach (scandir($dir) as $item){
+        foreach (scandir($dir) as $item) {
             if ($item == "." || $item == "..")
                 continue;
 
