@@ -129,7 +129,10 @@ function shortcode_sbtable($param = '') {
 						switch($field_type[$i]) {
 							default: $data_value = $value; break;
 							case "photo":
-								$data_value = "<img class='table_image' src='"._AM_MEDIAS_URL."$value' alt='' />";
+								if ($data_target != '' || isset($data_fancy))
+									$data_value = "<a class='$data_fancy' href='"._AM_MEDIAS_URL."$value' title=''$data_target><img class='table_image' src='"._AM_MEDIAS_URL."$value' alt='' /></a>";
+								else
+									$data_value = "<img class='table_image' src='"._AM_MEDIAS_URL."$value' alt='' />";
 							break;
 							case "textarea":
 								$data_value = nl2br($value);
