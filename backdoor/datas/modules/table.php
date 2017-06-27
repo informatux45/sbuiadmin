@@ -349,7 +349,6 @@ switch($action) {
 		// ----------------------------
 		$table_target = ['blank', 'lightbox', 'lightbox_fancy'];
 		$sbform->openSelect("Target de champs", array("id"=>"field_target", "name"=>"field_target"), false);
-		//if ($field_target == '') $sbform->addOption('Choisissez une target de champs', array ("value"=>"", "selected"=>""));
 		$sbform->addOption('Choisissez une target de champs', array ("value"=>"", "selected"=>""));
 		for($i = 0; $i < count($table_target); $i++) {
 			if ($table_target[$i] == $field_target)
