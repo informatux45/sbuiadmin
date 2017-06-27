@@ -349,14 +349,15 @@ switch($action) {
 		// ----------------------------
 		$table_target = ['blank', 'lightbox', 'lightbox_fancy'];
 		$sbform->openSelect("Target de champs", array("id"=>"field_target", "name"=>"field_target"), false);
-		if ($field_target == '') $sbform->addOption('Choisissez une target de champs', array ("value"=>"", "selected"=>""));
+		//if ($field_target == '') $sbform->addOption('Choisissez une target de champs', array ("value"=>"", "selected"=>""));
+		$sbform->addOption('Choisissez une target de champs', array ("value"=>"", "selected"=>""));
 		for($i = 0; $i < count($table_target); $i++) {
 			if ($table_target[$i] == $field_target)
 				$sbform->addOption($table_target[$i], array ("value"=>$table_target[$i], "selected"=>""));
 		else
 				$sbform->addOption($table_target[$i], array ("value"=>$table_target[$i]));
 		}
-		$sbform->closeSelect();
+		$sbform->closeSelect("Si vous choisissez une lightbox, n'oubliez pas d'activer le plugin approprié dans <a href='./index.php?p=cmsconfig&a=edit&op=plugins'>CMS Config / Plugins</a><br>Les lightbox fonctionnent uniquement avec les types de champs suivants : photo, link_image, link_video, link_file");
 		// --------------------------------			
 		// --- Hiddens / Buttons
 		// --------------------------------	
