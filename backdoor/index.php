@@ -15,8 +15,11 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date dans le passé
  
 // ----------------------
 // Session Initialization
+// This sends a persistent cookie that lasts a day
 // ----------------------
-session_start();
+session_start([
+    'cookie_lifetime' => 86400,
+]);
  
 // ----------------------
 // Global defined
