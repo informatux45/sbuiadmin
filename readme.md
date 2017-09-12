@@ -7,10 +7,12 @@
 ###### CMS SBootstrap Admin Responsive
 ###### Initial project UIADMIN v3.0
 ##### -------
-**Version en cours instable et non terminée (ne pas utiliser en production)**
-**Sur serveur Unix/Linux uniquement**
+**Version stable modulaires**
+**Sur serveur IIS/Unix/Linux/Windows**
 
 ### Changelog
 
 **2.01**
 - Second version.
+**1.00**
+- First version.
