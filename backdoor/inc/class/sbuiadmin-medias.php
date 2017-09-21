@@ -49,6 +49,12 @@
  * Multiple dirs, with specified extensions, include sub-dir files
  * CODE : $files = scanDir::scan($dirs, $file_ext, true);
  * 
+ * -------------------------------------------------------------------
+ *
+ * -------------------------------------------------------------------
+ * Multiple dirs, with specified extensions, include sub-dir files AND limit files to display
+ * CODE : $files = scanDir::scan($dirs, $file_ext, true, 50);
+ * 
  * **************************************************************** */
 
 
@@ -59,7 +65,7 @@ defined('SBMAGIC_PATH') or die('Are you crazy!');
 
 
 class medias {
-    static private $directories, $files, $ext_filter, $recursive;
+    static private $directories, $files, $ext_filter, $recursive, $limitfile;
 
 // ----------------------------------------------------------------------------------------------
     // scan(dirpath::string|array, extensions::string|array, recursive::true|false)
@@ -69,6 +75,7 @@ class medias {
         self::$directories = array();
         self::$files = array();
         self::$ext_filter = false;
+        self::$limitfile = false;
 
         // Check we have minimum parameters
         if(!$args = func_get_args()){
@@ -80,6 +87,9 @@ class medias {
 
         // Check if recursive scan | default action: no sub-directories
         if(isset($args[2]) && $args[2] == true){self::$recursive = true;}
+        
+        // Check if limit files to display | default action: false
+        if(isset($args[3]) && $args[3] > 0) { self::$limitfile = $args[3]; }
 
         // Was a filter on file extensions included? | default action: return all file types
         if(isset($args[1])){
@@ -115,17 +125,26 @@ class medias {
     static private function find_contents($dir){
         $result = array();
         $root = scandir($dir);
+        if (self::$limitfile) $cpt = self::$limitfile;
         foreach($root as $value){
             if($value === '.' || $value === '..') {continue;}
             if(is_file($dir.DIRECTORY_SEPARATOR.$value)){
                 if(!self::$ext_filter || in_array(strtolower(pathinfo($dir.DIRECTORY_SEPARATOR.$value, PATHINFO_EXTENSION)), self::$ext_filter)){
                     self::$files[] = $result[] = $dir.DIRECTORY_SEPARATOR.$value;
+                    if (self::$limitfile) {
+                        if ($cpt == 0) break;
+                        $cpt--;
+                    }
                 }
                 continue;
             }
             if(self::$recursive){
                 foreach(self::find_contents($dir.DIRECTORY_SEPARATOR.$value) as $value) {
                     self::$files[] = $result[] = $value;
+                    if (self::$limitfile) {
+                        if ($cpt == 0) break;
+                        $cpt--;
+                    }
                 }
             }
         }
