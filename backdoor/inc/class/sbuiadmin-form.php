@@ -89,6 +89,7 @@ class form extends sanitize {
 											   ,'subdir' => ''
 											   ,'extension' => ''
 											   ,'into' => ''
+						    					   ,'limitfiles' => ''
 											   ),
 							   'button' => array ('name' => ''
 												 ,'value' => ''
@@ -369,6 +370,8 @@ class form extends sanitize {
 					$dir = $val;
 				if ($clef == 'extension')
 					$exts = $val;
+				if ($clef == 'limitfiles')
+					$limitfiles = $val;
 				
 				$chaineTemp .= $clef.'="'.$val.'" ';
 			}
@@ -378,9 +381,9 @@ class form extends sanitize {
 
 			if ($onclickFunction && $id) {
 				if ($exts) {
-					$chaineTemp .= " onclick=\"sbOpenPopup('$id', '$exts', '$transfert')\"";
+					$chaineTemp .= " onclick=\"sbOpenPopup('$id', '$exts', '$transfert', '$limitfiles')\"";
 				} else {
-					$chaineTemp .= " onclick=\"sbOpenPopup('$id', '', '$transfert')\"";
+					$chaineTemp .= " onclick=\"sbOpenPopup('$id', '', '$transfert', '$limitfiles')\"";
 				}
 			}
 			
