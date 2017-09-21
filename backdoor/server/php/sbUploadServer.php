@@ -17,7 +17,8 @@ require_once '../../server/php/qqFileUploader.php';
 $sb_upload_config = file('../../inc/admin/settings.txt');
 
 // File path
-$sbfiles_medias_dir = '../../' . trim($sb_upload_config[6]);
+$sbfiles_medias_subdir = (isset($_REQUEST['subdir']) && $_REQUEST['subdir'] != '') ? '/' . rtrim($_REQUEST['subdir'], "/") : '';
+$sbfiles_medias_dir = '../../' . trim($sb_upload_config[6]) . $sbfiles_medias_subdir;
 
 $uploader = new qqFileUploader();
 
