@@ -85,9 +85,10 @@ function sbGetFileExtension(file) {
 	return file.substr((~-file.lastIndexOf(".") >>> 0) + 2);
 }
 
-function sbOpenPopup(id, extension, subdir, nomfenetre, largeur, hauteur) {
+function sbOpenPopup(id, extension, subdir, limitfiles, nomfenetre, largeur, hauteur) {
 	if (!extension) extension = '';
-	if (!custom) custom = '';
+	if (!subdir) subdir = '';
+	if (!limitfiles) limitfiles = '';
 	if (!nomfenetre) nomfenetre = 'MEDIAS';
 	if (!largeur) largeur = '800';
 	if (!hauteur) hauteur = '600';
@@ -95,9 +96,9 @@ function sbOpenPopup(id, extension, subdir, nomfenetre, largeur, hauteur) {
 	var left = (screen.width-largeur)/2;
 	var config = ' toolbar=no, menubar=no, scrollbars=yes, resizable=no, location=no, directories=no, status=no';
 	if (extension != '') {
-		Popup = window.open("index.php?p=transfert&subdir="+subdir+"&id="+id+"&ext="+extension, nomfenetre, "top="+top+",left="+left+",width="+largeur+",height="+hauteur+","+config);
+		Popup = window.open("index.php?p=transfert&subdir="+subdir+"&limitfiles="+limitfiles+"&id="+id+"&ext="+extension, nomfenetre, "top="+top+",left="+left+",width="+largeur+",height="+hauteur+","+config);
 	} else {
-		Popup = window.open("index.php?p=transfert&subdir="+subdir+"&id="+id, nomfenetre, "top="+top+",left="+left+",width="+largeur+",height="+hauteur+","+config);
+		Popup = window.open("index.php?p=transfert&subdir="+subdir+"&limitfiles="+limitfiles+"&id="+id, nomfenetre, "top="+top+",left="+left+",width="+largeur+",height="+hauteur+","+config);
 	}
 	Popup.focus();
 }
