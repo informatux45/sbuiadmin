@@ -124,7 +124,10 @@ class medias {
     // This is how we scan directories
     static private function find_contents($dir){
         $result = array();
-        $root = scandir($dir);
+        // PHP scandir documentation
+        // http://php.net/scandir
+        $root = scandir($dir, SCANDIR_SORT_DESCENDING);
+        // Set limit files if active
         if (self::$limitfile) $cpt = self::$limitfile;
         foreach($root as $value){
             if($value === '.' || $value === '..') {continue;}
@@ -142,7 +145,7 @@ class medias {
                 foreach(self::find_contents($dir.DIRECTORY_SEPARATOR.$value) as $value) {
                     self::$files[] = $result[] = $value;
                     if (self::$limitfile) {
-                        if ($cpt == 0) break;
+                        if ($cpt == 1) break;
                         $cpt--;
                     }
                 }
