@@ -38,6 +38,7 @@ $sb_msg_valid = false;
 // -----------------------
 // Global MEDIAS
 // -----------------------
+if (isset($_GET['subdir']) && $_GET['subdir'] != '') $sbfiles_medias_dirs_allowed = rtrim($sbfiles_medias_dirs_allowed . DIRECTORY_SEPARATOR . $_GET['subdir'], "/");
 global $sbfiles_medias_dirs_allowed, $sbfiles_medias_exts_allowed;
 
 // ---------------------------------------------------
