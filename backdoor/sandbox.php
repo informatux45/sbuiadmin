@@ -231,6 +231,10 @@ switch($action) {
 		// ----------------------------
 		$sbform->addInput('text', 'Photo (Width popup MEDIAS)', array ('id'=>'inputPhoto', 'name' => 'photo', 'value' => "$photo", 'placeholder' => "Votre photo", "medias"=>"", 'icon' => 'photo'), false);
 		// ----------------------------
+		// --- Photo (width popup medias in SUBDIR)
+		// ----------------------------
+		$sbform->addInput('text', 'Photo (Width popup MEDIAS in SUBDIR)', array ('id'=>'inputPhoto', 'name' => 'photo', 'value' => "$photo", 'placeholder' => "Votre photo", "medias"=>"", 'icon' => 'photo', "dir" => _AM_MEDIAS_DIR . "/new", "subdir" => "new"), false);
+		// ----------------------------
 		// -- Video (without popup media)
 		// ----------------------------
 		$sbform->addInput('text', 'Vidéo (URL) - (Without popup MEDIAS)', array ('id' => 'video', 'name' => 'video', 'value' => "$country", 'placeholder' => "URL de votre vidéo ( http:// )", 'icon' => 'video-camera'), true);
