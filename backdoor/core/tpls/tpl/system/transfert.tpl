@@ -134,7 +134,7 @@
 		$('#fine-uploader-gallery').fineUploader({
 			template: 'qq-template-gallery',
 			request: {
-				endpoint: 'server/php/sbUploadServer.php'
+				endpoint: 'server/php/sbUploadServer.php{if $smarty.get.subdir}?subdir={$smarty.get.subdir}{/if}'
 			},
 			scaling: {
 				sendOriginal: false,
