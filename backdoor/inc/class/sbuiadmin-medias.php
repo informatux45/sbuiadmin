@@ -120,13 +120,29 @@ class medias {
 
         if($path_errors){echo "The following directories do not exists<br />";die(var_dump($path_errors));}
     }
+    
+    static private function scan_dir($dir) {
+        $ignored = array('.', '..', '.svn', '.htaccess');
+    
+        $files = array();    
+        foreach (scandir($dir) as $file) {
+            if (in_array($file, $ignored)) continue;
+            $files[$file] = filemtime($dir . '/' . $file);
+        }
+    
+        arsort($files);
+        $files = array_keys($files);
+    
+        return ($files) ? $files : false;
+    }
 
     // This is how we scan directories
     static private function find_contents($dir){
         $result = array();
         // PHP scandir documentation
         // http://php.net/scandir
-        $root = scandir($dir, SCANDIR_SORT_DESCENDING);
+        // Obsolete :: $root = scandir($dir, SCANDIR_SORT_DESCENDING);
+        $root = self::scan_dir($dir);
         // Set limit files if active
         if (self::$limitfile) $cpt = self::$limitfile;
         foreach($root as $value){
