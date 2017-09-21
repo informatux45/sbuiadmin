@@ -86,7 +86,7 @@ class form extends sanitize {
 											   ,'icon2' => ''
 											   ,'medias' => ''
 											   ,'dir' => ''
-											   ,'custom' => ''
+											   ,'subdir' => ''
 											   ,'extension' => ''
 											   ,'into' => ''
 											   ),
@@ -363,7 +363,7 @@ class form extends sanitize {
 					$photo = $val;
 				if ($clef == 'id')
 					$id = $val;
-				if ($clef == 'custom')
+				if ($clef == 'subdir')
 					$transfert = $val;
 				if ($clef == 'dir')
 					$dir = $val;
@@ -375,13 +375,12 @@ class form extends sanitize {
 
 			$chaineRequired = ($isRequired == true) ? 'required="true" ' : '';
 			$chaineTemp    .= $chaineRequired;
-			$transfertFunction = ($transfert != '') ? $transfert : '';
 
 			if ($onclickFunction && $id) {
 				if ($exts) {
-					$chaineTemp .= " onclick=\"sbOpenPopup('$id', '$exts', '$transfertFunction')\"";
+					$chaineTemp .= " onclick=\"sbOpenPopup('$id', '$exts', '$transfert')\"";
 				} else {
-					$chaineTemp .= " onclick=\"sbOpenPopup('$id', '', '$transfertFunction')\"";
+					$chaineTemp .= " onclick=\"sbOpenPopup('$id', '', '$transfert')\"";
 				}
 			}
 			
