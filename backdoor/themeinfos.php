@@ -170,7 +170,7 @@ $sbform->addInput('text', 'Twitter', array ('name' => 'theme_infos_twitter', 'va
 // --------------------------------
 // Google +
 // --------------------------------	
-$sbform->addInput('text', 'Google +', array ('name' => 'theme_infos_google_plus', 'value' => $cs['theme_infos_google_plus'], 'placeholder' => "Lien Google +", 'icon' => 'google_plus'), false);
+$sbform->addInput('text', 'Google +', array ('name' => 'theme_infos_google_plus', 'value' => $cs['theme_infos_google_plus'], 'placeholder' => "Lien Google +", 'icon' => 'google-plus'), false);
 // --------------------------------
 // Pinterest
 // --------------------------------	
