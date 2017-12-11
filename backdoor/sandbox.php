@@ -256,6 +256,21 @@ switch($action) {
 		$tab_check[2]['name']    = 'option_three';
 		$tab_check[2]['checked'] = ($option_three == 1) ? '1' : '0';
 		$sbform->addCheckbox('Toutes vos options', $tab_check, '', false, '<br />');
+		// ----------------------------
+		// -- Input RADIO
+		// ----------------------------
+		$tab_type  = [];
+		$tab_types = array( ['id' => '1', 'title' => 'Option 1'],
+						    ['id' => '2', 'title' => 'Option 2'],
+						    ['id' => '3', 'title' => 'Option 3'],
+						   );
+		foreach($tab_types as $key => $val) {
+			if ($type == $val['id'])
+				$type_checked = $val['id'];
+			$tab_type[$key]['text']  = $val['title'];
+			$tab_type[$key]['value'] = $val['id'];
+		}
+		$sbform->addRadio ('Choisissez un type', $tab_type, array('id'=>'type', 'name'=>'type', 'checked'=>"$type_checked"), true, '<br>');
 		// -----------------------------------
 		// --- Affichage du Select - STATUS 2
 		// -----------------------------------
