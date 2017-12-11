@@ -113,7 +113,7 @@
                         <li>
                             <a href="#">
                                 <div>
-                                    <i class="fa fa-soundcloud fa-fw"></i> <span style="font-size: 0.8em;">&copy; {$smarty.now|date_format:'%Y'} INFORMATUX</span>
+                                    <i class="fa fa-soundcloud fa-fw"></i> <span style="font-size: 0.8em;">&copy; 2007 - {$smarty.now|date_format:'%Y'} INFORMATUX</span>
                                 </div>
                             </a>
                         </li>
