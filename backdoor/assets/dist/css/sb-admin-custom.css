@@ -686,3 +686,9 @@ li.sortable-extra i {
   background-color: greenyellow;
   background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.5) 35px, rgba(255,255,255,.5) 70px);
 }
+
+/* --- Input 2 icons --- */
+.input-group-addon,
+.input-group-btn {
+  width: auto;
+}
