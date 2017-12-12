@@ -206,6 +206,10 @@ switch($action) {
 		// ----------------------------
 		$sbform->addInput('text', 'Nom (2 icônes)', array ('name' => 'montant', 'value' => "$montant", 'placeholder' => "Votre montant", 'icon' => 'euro', 'icon2' => '.00'), true);
 		// ----------------------------
+		// --- Input TEXT with text instead of icon
+		// ----------------------------
+		$sbform->addInput('text', "Texte à la place de l'icône", array ('name' => 'seo_url', 'value' => "$seo_url", 'placeholder' => "Votre url", 'icon' => '0Url du site'), false);
+		// ----------------------------
 		// --- BREAK
 		// ----------------------------
 		$sbform->addBreak('Separation');
