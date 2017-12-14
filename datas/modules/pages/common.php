@@ -15,7 +15,7 @@ if (!defined('SB_PATH')) {
 // -------------------------------------------------
 // --- Global MODULE
 // -------------------------------------------------
-$modpage['name']        = 'SbMagic PAGES';
+$modpage['name']        = 'SBUIADMIN PAGES';
 $modpage['dirname']     = basename(dirname(__FILE__));
 $modpage['version']     = '0.1.1';
 $modpage['description'] = "Gestionnaire de pages libres";
