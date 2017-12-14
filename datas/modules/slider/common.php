@@ -15,7 +15,7 @@ if (!defined('SB_PATH')) {
 // -------------------------------------------------
 // --- Global MODULE
 // -------------------------------------------------
-$modpage['name']        = 'SbMagic SLIDER';
+$modpage['name']        = 'SBUIADMIN SLIDER';
 $modpage['dirname']     = basename(dirname(__FILE__));
 $modpage['version']     = '0.1.1';
 $modpage['description'] = "Générateur de slider / carousel";
