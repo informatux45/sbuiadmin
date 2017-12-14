@@ -15,7 +15,7 @@ if (!defined('SB_PATH')) {
 // -------------------------------------------------
 // --- Global MODULE
 // -------------------------------------------------
-$module['name']        = 'SbMagic TABLE';
+$module['name']        = 'SBUIADMIN TABLE';
 $module['dirname']     = basename(dirname(__FILE__));
 $module['version']     = '0.1.1';
 $module['description'] = "Tableaux Dynamiques";
