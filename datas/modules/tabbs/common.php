@@ -15,7 +15,7 @@ if (!defined('SB_PATH')) {
 // -------------------------------------------------
 // --- Global MODULE
 // -------------------------------------------------
-$module['name']        = 'SbMagic TABBS';
+$module['name']        = 'SBUIADMIN TABBS';
 $module['dirname']     = basename(dirname(__FILE__));
 $module['version']     = '0.1.1';
 $module['description'] = "Jquery TABS";
