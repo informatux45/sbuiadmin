@@ -16,7 +16,7 @@ if (!defined('SB_PATH')) {
 // -------------------------------------------------
 // --- Global MODULE
 // -------------------------------------------------
-$module['name']        = 'SbMagic SEARCH';
+$module['name']        = 'SBUIADMIN SEARCH';
 $module['dirname']     = basename(dirname(__FILE__));
 $module['version']     = MODULEVERSION;
 $module['description'] = "Module de recherche";
