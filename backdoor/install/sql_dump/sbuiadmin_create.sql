@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_blocs` (
   `title` text NOT NULL COMMENT 'titre du bloc (cote client)',
   `content` text NOT NULL COMMENT 'Contenu du bloc',
   `position` varchar(100) NOT NULL,
+  `various_view` varchar(100) DEFAULT NULL COMMENT 'Additional HTML file ',
   `active` tinyint(4) NOT NULL COMMENT '0: inactive, 1: active',
   `sort` int(11) NOT NULL COMMENT 'Tri des blocs'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Blocs associes aux pages';
