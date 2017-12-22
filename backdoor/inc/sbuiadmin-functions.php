@@ -46,6 +46,7 @@
  * sbGetGravatar
  * sbGetMenuModule
  * sbArrayOrderby
+ * sbGetFileDocData
  * -------------------------------
  * Available Smarty functions :
  * -------------------------------
@@ -688,6 +689,45 @@ function sbArrayOrderby() {
     $args[] = &$data;
     call_user_func_array('array_multisort', $args);
     return array_pop($args);
+}
+
+/**
+ * Get Searchword doc comment to found
+ * Find values that match your search criteria
+ * @return string
+ */
+function sbGetFileDocData($file, $searchword) {
+    $docComments = array_filter(
+        token_get_all( file_get_contents( $file ) ), function($entry) {
+            return $entry[0] == T_DOC_COMMENT;
+        }
+    );
+    $fileDocComment = array_shift( $docComments );
+	
+	// Create array for each line of the results
+	$tags = explode("\n", $fileDocComment[1]);
+
+	// Initialize tag string to return
+	$tag_value = "";
+	
+	// Check if array is empty
+	if (array_keys( $tags, true )) {			
+		// Find keys / values that match your search criteria
+		foreach($tags as $key => $value) {
+			if ( preg_match("/\b$searchword\b/i", $value) ) {
+				$tag_key   = $key;
+				$tag_value = $value;
+			}
+		}
+	}
+	
+	// Check if result
+	if ( $tag_value != "" ) {
+		list($tag_phpdoc, $tag_detail) = explode(":", $tag_value);
+		return trim($tag_detail);
+	} else {
+		return "N.C.";	
+	}
 }
 
 // -------------------------------------------------------------------
