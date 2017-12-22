@@ -1,5 +1,5 @@
 /**
- * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2017, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -7,7 +7,7 @@ CKEDITOR.editorConfig = function( config ) {
 	// Define changes to default configuration here.
 	// For complete reference see:
 	// http://docs.ckeditor.com/#!/api/CKEDITOR.config
-	
+
 	// The toolbar groups arrangement, optimized for two toolbar rows.
 	config.toolbarGroups = [
 		{ name: 'clipboard',   groups: [ 'clipboard', 'undo' ] },
@@ -25,13 +25,23 @@ CKEDITOR.editorConfig = function( config ) {
 		{ name: 'colors' },
 		{ name: 'about' }
 	];
-	
-	// Add Ckawesome
-	config.fontawesomePath = 'assets/bower_components/font-awesome/css/font-awesome.min.css';
-	config.extraPlugins = 'lineutils,colordialog,ckawesome';
-    config.allowedContent = true;
 
-	
+	// -----------------------------------------------------
+	//                      ADD PLUGINS
+	// -----------------------------------------------------
+	// Add Ckawesome Plugin
+	// Add Justify Plugin
+	// Add Youtube Plugin
+	// Add Color Buttons Plugin (Dependencies: panelbutton, floatpanel)
+	// Add Enhanced Image Plugin
+	// Add Code Snippet Plugin
+	// Add HTML5 Video / Audio Plugins
+	// Add Color Dialog Plugin
+	config.fontawesomePath = 'assets/bower_components/font-awesome/css/font-awesome.min.css';
+	config.extraPlugins = 'lineutils,colordialog,ckawesome,justify,youtube,panelbutton,floatpanel,colorbutton,image2,codesnippet,html5video,html5audio,colordialog';
+    config.allowedContent = true;
+	// -----------------------------------------------------
+		
 	// Remove some buttons provided by the standard plugins, which are
 	// not needed in the Standard(s) toolbar.
 	config.removeButtons = 'Subscript,Superscript';
