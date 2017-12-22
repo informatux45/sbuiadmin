@@ -4,7 +4,7 @@
  * Description: Activebox theme
  * Version: 0.1.1
  * Author: Kamal Chaneman
- * Author URI: http://kamalchaneman.com/activebox/
+ * Author_URI: http://kamalchaneman.com/activebox/
  * Licence: Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)
  */
 

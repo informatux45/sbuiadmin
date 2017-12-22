@@ -4,7 +4,7 @@
  * Description: A Free Responsive HTML Template
  * Version: 0.1.1
  * Author: Yith
- * Author URI: https://yithemes.com/
+ * Author_URI: https://yithemes.com/
  * Licence: Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)
  */
 

@@ -4,7 +4,7 @@
  * Description: Bootstrap v3.3.1 mobile friendly layout
  * Version: 0.1.1
  * Author: templatemo.com
- * Author URI: http://www.templatemo.com/tm-441-volton
+ * Author_URI: http://www.templatemo.com/tm-441-volton
  * Licence: Creative Commons Attribution 4.0 International License
  */
 

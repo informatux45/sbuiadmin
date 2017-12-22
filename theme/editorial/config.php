@@ -4,7 +4,7 @@
  * Description: a blog/magazine-ish template built around a toggleable "locking" sidebar
  * Version: 0.1.1
  * Author: HTML5 UP
- * Author URI: html5up.net
+ * Author_URI: html5up.net
  * Licence: Creative Commons Attribution 3.0 Unported
  */
 

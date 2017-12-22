@@ -4,7 +4,7 @@
  * Description: Piccolo theme
  * Version: 0.1.1
  * Author: Nathan Brown
- * Author URI: https://wegraphics.net/demo/piccolo/
+ * Author_URI: https://wegraphics.net/demo/piccolo/
  * Licence: Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)
  */
 
