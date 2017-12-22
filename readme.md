@@ -12,6 +12,10 @@
 
 ### Changelog
 
+**2.03**
+- Change version of CKEditor to 4.8.0.
+- Add new plugins to CKEditor (ckawesome, justify, youtube, panelbutton, floatpanel, colorbutton, image2, codesnippet, html5video, html5audio)
+
 **2.02**
 - FORM Input text MEDIAS : Add possibility to display a subdirectory of MEDIAS Directory.
 - FORM Input text MEDIAS : Add possibility to limit the number of medias to display.
