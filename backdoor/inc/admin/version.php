@@ -18,6 +18,6 @@ defined('SBMAGIC_PATH') or die('Are you crazy!');
 // ------------------------------------------
 // --- Version 
 // ------------------------------------------
-define('_AM_START_VERSION', 					'2.01');
+define('_AM_START_VERSION', 					'2.03');
 
 ?>
