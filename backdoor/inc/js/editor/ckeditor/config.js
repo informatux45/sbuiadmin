@@ -38,7 +38,7 @@ CKEDITOR.editorConfig = function( config ) {
 	// Add HTML5 Video / Audio Plugins
 	// Add Color Dialog Plugin
 	config.fontawesomePath = 'assets/bower_components/font-awesome/css/font-awesome.min.css';
-	config.extraPlugins = 'lineutils,colordialog,ckawesome,justify,youtube,panelbutton,floatpanel,colorbutton,image2,codesnippet,html5video,html5audio,colordialog';
+	config.extraPlugins = 'lineutils,colordialog,ckawesome,justify,youtube,panelbutton,floatpanel,colorbutton,image2,codesnippet,html5video,html5audio';
     config.allowedContent = true;
 	// -----------------------------------------------------
 		
