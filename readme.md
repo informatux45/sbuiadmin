@@ -24,6 +24,8 @@ Demandez nous un accès ;-)
 
 ![alt text](https://sbuiadmin.fr/demo_github/sbuiadmin-admin-1.jpg "L'administration")
 
+[D'autres copie d'écran ici...](https://sbuiadmin.fr/demo_img/ "SBUIADMIN Screenshots")
+
 ---
 
 ### Changelog
