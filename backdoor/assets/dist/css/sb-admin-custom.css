@@ -294,6 +294,26 @@ a.navbar-brand, .text-primary {
   border-color: #53a0bc !important;
   color: #fff;
 }
+.theme_img {
+	border: 1px solid lightgrey;
+	border-radius: 7px;
+	float: left;
+	margin-right: 2em;
+}
+.theme_block {
+	overflow: hidden;
+	border-radius: 7px;
+	min-height: 200px;
+}
+.theme_block_active {
+	background: linear-gradient(to top, rgba(195, 255, 168, 0), rgba(0, 247, 45, 1));
+}
+.theme_description {
+	font-size: 0.9em;
+}
+.theme_activate {
+	margin-top: 1em;
+}
 
 /* ----------------------------------------- */
 /* ----------------- LOGIN ----------------- */

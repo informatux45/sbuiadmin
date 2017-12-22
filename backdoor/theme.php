@@ -49,20 +49,13 @@ $sb_theme_file = _AM_THEME_FILE;
 // ---------------------------------------------------
 // ---------------------------------------------------
 
-// --------------------------------
-// Initialize Form
-// --------------------------------
-$formName        = "edit_form";
-$formType        = "edit";
-$btn_add_edit    = "Modifier";
-$legend_add_edit = "Modifier votre theme (client)";
-// --------------------------------
-// --- Control form submit --------
-// --------------------------------
-if ($_POST['form_submit']) {
+// ------------------------------------
+// --- Control GET information --------
+// ------------------------------------
+if ($_GET['th']) {
 
 	// Injection des données
-	$sb_output_file  = $sbsanitize->displayText($_POST['theme_view'], 'UTF-8', 1, 0) . "\n";
+	$sb_output_file  = $sbsanitize->displayText($_GET['th'], 'UTF-8', 1, 0) . "\n";
 	
 	// Locker le fichier pour qu'une seule personne a la fois ecrive dedans
 	$result_edit = file_put_contents($sb_theme_file, $sb_output_file, FILE_USE_INCLUDE_PATH | LOCK_EX);
@@ -84,35 +77,18 @@ if ($_POST['form_submit']) {
 $sb_theme = file($sb_theme_file);
 // --- Initialisation
 $sb_theme_name = trim($sb_theme[0]);
-
+$sbsmarty->assign('sb_theme_name', $sb_theme_name);
 
 // --- Debug SQL
 if (_AM_SITE_DEBUG) $sbsmarty->assign('file_content', $sb_theme);						
 // --------------------------------		
 // --- Define variables
-$formAction = $module_url . "&a=" . $formType;
-// --- Form construct
-$sbform->openForm(array('action' => "$formAction", 'name' => "$formName", 'id' => "$formName", 'reloadpage' => "$formAction", 'submitpage' => "$formAction"));
+$sbsmarty->assign('formAction', $module_url);
 // -----------------------------------
-// --- Affichage du Select - THEME Name
+// --- All the THEME Names
 // -----------------------------------
 $sb_themes = sbGetThemesFront(SB_PATH . "theme");
-$sbform->openSelect("Thème de votre site web", array("id"=>"theme_view", "name"=>"theme_view"));
-for($i = 0; $i < count($sb_themes); $i++) {
-	if ($sb_themes[$i] == $sb_theme_name)
-		$sbform->addOption($sb_themes[$i], array ("value"=>$sb_themes[$i], "selected"=>""));
-else
-		$sbform->addOption($sb_themes[$i], array ("value"=>$sb_themes[$i]));
-}
-// --- Close Select
-$sbform->closeSelect();
-// --- Hiddens / Buttons
-$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => "$formName"));
-$sbform->addInput('submit', '', array('value' => "$btn_add_edit"));
-$sbform->addInput('reset', '', array('value' => "Reset"));
-// --- Close Form
-$sbform->closeForm ();
-
+$sbsmarty->assign('sb_themes', $sb_themes);
 
 // ----------------------
 // ASSIGN Settings
@@ -132,8 +108,4 @@ $sbsmarty->assign('sb_msg_error', $sb_msg_error);
 $sbsmarty->assign('sb_msg_valid', $sb_msg_valid);
 $sbsmarty->assign('sb_page', $sbpage);
 
-// ----------------------
-// CLOSE SQL
-// ----------------------
-// $sbsql->close();
 ?>
