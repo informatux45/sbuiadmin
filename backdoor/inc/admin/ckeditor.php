@@ -37,6 +37,7 @@
  * 				removeButtons: 'Save,NewPage,Preview,Print,Templates,Find,Replace,SelectAll,Scayt,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,Subscript,CreateDiv,BidiLtr,BidiRtl,Language,Anchor,NumberedList,BulletedList,Outdent,Indent,Strike,Blockquote,JustifyCenter,JustifyRight,JustifyBlock,Image,Flash,Table,HorizontalRule,Smiley,SpecialChar,PageBreak,Iframe,ShowBlocks,Maximize,About,TextColor,BGColor,Font,FontSize,Format,JustifyLeft,Cut,Copy,Paste'
  * 				});
  * 				CKEDITOR.config.allowedContent = true;
+ * 				CKEDITOR.config.removePlugins = 'ckawesome,justify,youtube,panelbutton,floatpanel,colorbutton,image2,codesnippet,html5video,html5audio';
  * 			   ";
  * 
  */
@@ -66,6 +67,7 @@ $chaineTemp .= "CKEDITOR.replace( '$validNameEditor', {
 				removeButtons: 'Save,NewPage,Preview,Print,Templates,Find,Replace,SelectAll,Scayt,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,Subscript,CreateDiv,BidiLtr,BidiRtl,Language,Anchor,NumberedList,BulletedList,Outdent,Indent,Strike,Blockquote,JustifyCenter,JustifyRight,JustifyBlock,Image,Flash,Table,HorizontalRule,Smiley,SpecialChar,PageBreak,Iframe,ShowBlocks,Maximize,About,TextColor,BGColor,Font,FontSize,Format,JustifyLeft,Cut,Copy,Paste'
 				});
 				CKEDITOR.config.allowedContent = true;
+				CKEDITOR.config.removePlugins = 'ckawesome,justify,youtube,panelbutton,floatpanel,colorbutton,image2,codesnippet,html5video,html5audio';
 			   ";
 
 ?>
