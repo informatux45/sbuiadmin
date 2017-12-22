@@ -1,14 +1,19 @@
 # SBUIADMIN
-- Contributors: INFORMATUX
-- Stable version: 2.02
+- CMS SBootstrap Admin Responsive
+- Initial project UIADMIN v3.0
+- Contributeurs : INFORMATUX
+- Version stable : 2.03
 - License: [GPLv3](http://www.gnu.org/licenses/gpl-3.0.fr.html "Licence publique générale GNU v3")
 
-##### -------
-###### CMS SBootstrap Admin Responsive
-###### Initial project UIADMIN v3.0
-##### -------
-**Version stable modulaires**
+---
+
+CMS Test : https://sbuiadmin.fr/
+Demandez nous un accès ;-)
+
+*Version stable*
 **Sur serveur IIS/Unix/Linux/Windows**
+
+---
 
 ### Changelog
 
