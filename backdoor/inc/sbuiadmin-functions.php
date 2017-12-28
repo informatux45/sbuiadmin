@@ -723,7 +723,7 @@ function sbGetFileDocData($file, $searchword) {
 	
 	// Check if result
 	if ( $tag_value != "" ) {
-		list($tag_phpdoc, $tag_detail) = explode(":", $tag_value);
+		list($tag_phpdoc, $tag_detail) = explode(":", $tag_value, 2);
 		return trim($tag_detail);
 	} else {
 		return "N.C.";	
