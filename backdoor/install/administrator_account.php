@@ -103,7 +103,7 @@
 		}
 	} else {
 		// --- Initialization
-        $current_url          = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+        $current_url          =  ( (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? 'https://' : 'http://' ) . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
         $sbuiadmin_url        = str_replace('backdoor/install/administrator_account.php', '', $current_url);
 		$sbuiadmin_url_upload = $sbuiadmin_url . 'upload/';
 		// Url upload
