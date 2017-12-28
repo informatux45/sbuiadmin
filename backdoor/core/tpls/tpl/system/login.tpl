@@ -48,7 +48,7 @@
 							</div>
 						{/if}
 						{insert name=sbGetBrowser assign=get_browser ua="`$smarty.server.HTTP_USER_AGENT`"}
-                        <form role="form" action="" method="post">
+                        <form id="sbuiadmin-login" role="form" action="" method="post">
                             <fieldset>
 								{if $get_browser == 'IE'}
 									<img src="{$smarty.const._AM_SITE_URL}img/noiexplorer.png" alt="" title="" style="margin-right: 15px; float: left; max-height: 100px;" />
@@ -60,24 +60,30 @@
 									<div class="form-group">
 										<input class="form-control" placeholder="Password" name="password" type="password" value="">
 									</div>
-									{*<div class="checkbox">
-										<label>
-											&nbsp;<input name="remember" type="checkbox" value="Remember Me"><span class="rememberme">Remember me</span>
-										</label>
-									</div>*}
+
 									{if $smarty.const._AM_CAPTCHA_MODE}
 									<div class="form-group">
-										{* Google ReCaptcha *}
-										<div id="grecaptcha"></div>
-										<script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit&hl=fr&remoteip={$smarty.server.REMOTE_ADDR}" async defer></script>
+										{* Google Invisible ReCaptcha *}
+										<script src="https://www.google.com/recaptcha/api.js?hl=fr&remoteip={$smarty.server.REMOTE_ADDR}" async defer></script>
 										{* ================ *}
 									</div>
 									{/if}
 									<!-- Change this to a button or input when using this as a form -->
 									
-									<button type="submit" value="Login" class="btn btn-outline btn-primary">
-										<span class="glyphicon glyphicon-log-in"> Login</span>
-									</button>
+									{if $smarty.const._AM_CAPTCHA_MODE}
+										<button
+											type="submit"
+											value="Login"
+											class="g-recaptcha btn btn-outline btn-primary"
+											data-sitekey="{$grecaptcha_publickey}"
+											data-callback="sbLoginOnSubmit">
+											<span class="glyphicon glyphicon-log-in"> Login</span>
+										</button>
+									{else}
+										<button type="submit" value="Login" class="btn btn-outline btn-primary">
+											<span class="glyphicon glyphicon-log-in"> Login</span>
+										</button>
+									{/if}
 									<p class="cta">
 										&laquo;&nbsp;<a href="{$smarty.const.SB_URL}">Back to Website</a>
 										&nbsp; | &nbsp;
@@ -100,18 +106,11 @@
 
 	});
 	</script>
-	
 	{if $smarty.const._AM_CAPTCHA_MODE && $get_browser != 'IE'}
 	<script type="text/javascript">
-		var onloadCallback = function() {
-			grecaptcha.render('grecaptcha', {
-				'sitekey' : '{$grecaptcha_publickey}',
-				'theme' : 'light', // light, dark
-				'type' : 'image', // image, audio
-				'size' : 'normal', // normal, compact
-				'tabindex' : 0
-			});
-		};
+       function sbLoginOnSubmit(token) {
+         document.getElementById("sbuiadmin-login").submit();
+       }
 	</script>
 	{/if}
 
