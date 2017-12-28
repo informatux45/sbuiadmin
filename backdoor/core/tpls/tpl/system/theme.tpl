@@ -26,7 +26,7 @@
 								<br>
 								Version: <i>{$sb_theme_config_file|@sbGetFileDocData:"Version"}</i>
 								<br>
-								Auteur: <i>{$sb_theme_config_file|@sbGetFileDocData:"Author"}</i>
+								Auteur: <i>{if $sb_theme_config_file|@sbGetFileDocData:"Author_URI"}<a target="_blank" href="{$sb_theme_config_file|@sbGetFileDocData:"Author_URI"}">{$sb_theme_config_file|@sbGetFileDocData:"Author"}</a>{else}{$sb_theme_config_file|@sbGetFileDocData:"Author"}{/if}</i>
 							</div>
 							{if $sb_themes[theme] != $sb_theme_name}
 							<div class="theme_activate">
