@@ -1,18 +1,40 @@
-# SBUIADMIN
+# [SBUIADMIN](https://sbuiadmin.fr/)
 - CMS SBootstrap Admin Responsive
-- Initial project UIADMIN v3.0
+- Projet initial : UIADMIN v3.0
 - Contributeurs : INFORMATUX
 - Version stable : 2.03
 - License: [GPLv3](http://www.gnu.org/licenses/gpl-3.0.fr.html "Licence publique générale GNU v3")
 
 ---
 
-CMS Test : https://sbuiadmin.fr/
+### Spécifications
+
+Ready | Fonctionnalités
+--- | ---
+*✓* | PHP 7 Ready / MySQL 5.7 Ready
+*✓* | HTML 5 / CSS 3
+*✓* | Bootstrap Ready
+*✓* | Installeur en ligne
+*✓* | Responsive design (frontend / administration)
+*✓* | Livré avec 5 thèmes
+*✓* | Gestion des utilisateurs (droits modules)
+*✓* | Rewrite URLs
+*✓* | Multilangues
+*✓* | 6 modules (Articles, Slider, Contact Form, Tables, Tabbs)
+*✓* | Gestion des blocs
+*✓* | Contenu additionnels HTML (Smarty ready)
+*✓* | Administration déplaçable (Répertoire)
+*✓* | Google Invisible Recaptcha Ready
+*✓* | Développeurs (Templates Smarty, Sandbox, Debug Kint, Modules, ...)
+*✓* | Serveurs IIS / Unix / Linux / Windows
+
+---
+
+### [CMS Test](https://sbuiadmin.fr/)
+
+Demo URL : https://sbuiadmin.fr/
 
 Demandez nous un accès ;-)
-
-*Version stable*
-**sur serveur IIS/Unix/Linux/Windows**
 
 ---
 
@@ -29,6 +51,9 @@ Demandez nous un accès ;-)
 ---
 
 ### Changelog
+
+**2.04**
+- Add Google INVISIBLE Recaptcha
 
 **2.03**
 - Change version of CKEditor to 4.8.0.

@@ -3,7 +3,7 @@
  * Admin Startbootstrap
  * SBUIADMIN Version
  *
- * @link http://dev.informatux.com/
+ * @link https://sbuiadmin.fr/
  *
  * @package SBUIADMIN
  * @file UTF-8
@@ -18,6 +18,6 @@ defined('SBMAGIC_PATH') or die('Are you crazy!');
 // ------------------------------------------
 // --- Version 
 // ------------------------------------------
-define('_AM_START_VERSION', 					'2.03');
+define('_AM_START_VERSION', 					'2.04');
 
 ?>
