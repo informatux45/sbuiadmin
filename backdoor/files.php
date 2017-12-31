@@ -13,7 +13,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Blocking direct access to plugin      -=
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-defined('SBMAGIC_PATH') or die('Are you crazy!');
+defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
  
 // -----------------------
@@ -22,7 +22,7 @@ defined('SBMAGIC_PATH') or die('Are you crazy!');
 $module_page = 'files';
 $sbsmarty->assign('module_page', $module_page);
 // -----------------------
-$module_url = _AM_SITE_PROTOCOL . SBMAGIC_URL . SBMAGIC_BASE . '?p=' . $module_page;
+$module_url = _AM_SITE_PROTOCOL . SBUIADMIN_URL . SBUIADMIN_BASE . '?p=' . $module_page;
 $sbsmarty->assign('module_url', $module_url);
  
 // -----------------------
@@ -40,7 +40,7 @@ $sb_msg_valid = false;
 // Select type mime allowed to view
 $filetree_allowed_extensions = array();
 // Get files Tree
-$filetree = sbFileTree(SBMAGIC_PATH, "javascript:sbView('[link]');", $filetree_allowed_extensions);
+$filetree = sbFileTree(SBUIADMIN_PATH, "javascript:sbView('[link]');", $filetree_allowed_extensions);
 // ASSIGN files Tree 
 $sbsmarty->assign('filetree', $filetree);
 

@@ -57,7 +57,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Blocking direct access to plugin      -=
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-defined('SBMAGIC_PATH') or die('Are you crazy!');
+defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
 
 function sb_get_include_contents($filename) {
@@ -540,7 +540,7 @@ function sbGetGravatar( $email, $s = 80, $d = 'mm', $r = 'g', $img = false, $att
  * @return String menu Admin
  */
 function sbGetMenuModule($param = '') {
-	global $module_menu, $sbsanitize, $sbsql, $sbusers, $sbmagic_user_type;
+	global $module_menu, $sbsanitize, $sbsql, $sbusers, $sbuiadmin_user_type;
 	
 	// --- Initialization
 	$ret_module_menu = '';
@@ -578,7 +578,7 @@ function sbGetMenuModule($param = '') {
 
 	if (!empty($modules_dir)) {
 		// --- Get User Authorizations
-		$id         = $sbusers->getUserInfo($_SESSION['sbmagic_user_name'], 'id');
+		$id         = $sbusers->getUserInfo($_SESSION['sbuiadmin_user_name'], 'id');
 		$table      = _AM_DB_PREFIX . "sb_users";
 		$query      = "SELECT menu FROM $table WHERE id = $id";
 		$request    = $sbsql->query($query);
@@ -593,9 +593,9 @@ function sbGetMenuModule($param = '') {
 			if ($module_menu[$module_name]['main']) {
 				
 				// --- Check if user is authorized to view menu (Global)
-				if (($module_menu[$module_name]['group'] == 'admin' && $sbmagic_user_type == 'admin')
-					|| ($module_menu[$module_name]['group'] == 'user' && $sbmagic_user_type == 'admin')
-					|| ($module_menu[$module_name]['group'] == 'user' && $sbmagic_user_type == 'user')) {
+				if (($module_menu[$module_name]['group'] == 'admin' && $sbuiadmin_user_type == 'admin')
+					|| ($module_menu[$module_name]['group'] == 'user' && $sbuiadmin_user_type == 'admin')
+					|| ($module_menu[$module_name]['group'] == 'user' && $sbuiadmin_user_type == 'user')) {
 					
 					// --- Check if user is authorized to view menu (Personnalized)
 					if (!in_array($module_name, $auth_array)) {			

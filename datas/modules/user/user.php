@@ -61,15 +61,15 @@ switch($op) {
 			// ------------------
 			// --- Form auth
 			// ------------------
-			$sbmagic_user_name     = trim($sbsanitize->stopXSS($_POST['username']));
-			$sbmagic_user_password = trim($sbusers->encrypt($_POST['password']));
-			if ($sbusers->login($sbmagic_user_name, $sbmagic_user_password)) {
-				if (!$sbusers->checkUserIsActive($sbmagic_user_name)) {
+			$sbuiadmin_user_name     = trim($sbsanitize->stopXSS($_POST['username']));
+			$sbuiadmin_user_password = trim($sbusers->encrypt($_POST['password']));
+			if ($sbusers->login($sbuiadmin_user_name, $sbuiadmin_user_password)) {
+				if (!$sbusers->checkUserIsActive($sbuiadmin_user_name)) {
 					// --- User is no more active
-					$sbsmarty->assign('sbmagic_access_code', 'E4');
-					$sbmagic_type = 'fronterror';
-					$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_USER_ERROR, $sbmagic_user_name, $_SERVER["REMOTE_ADDR"]);
-					$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user_name);
+					$sbsmarty->assign('sbuiadmin_access_code', 'E4');
+					$sbuiadmin_type = 'fronterror';
+					$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_USER_ERROR, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
+					$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
 				} else {
 					if (_CMS_USER_CAPTCHA_MODE == "true") {
 						// --- Check Google Recaptcha
@@ -94,56 +94,56 @@ switch($op) {
 							
 							if ($response->success === false) {
 								// --- Error Google Recaptcha
-								$sbsmarty->assign('sbmagic_access_code', 'E1');
-								$sbmagic_type = 'fronterror';
-								$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_CAPTCHA_ERROR, $sbmagic_user_name, $_SERVER["REMOTE_ADDR"]);
-								$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user_name);
+								$sbsmarty->assign('sbuiadmin_access_code', 'E1');
+								$sbuiadmin_type = 'fronterror';
+								$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_CAPTCHA_ERROR, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
+								$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
 							} else {
 								// --- Success Google Recaptcha
 								// ------------------
 								// --- Acces autorise
 								// ------------------
 								// Update Access Log
-								$sbmagic_type = 'frontlogin';
-								$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_GRANTED, $sbmagic_user_name, $_SERVER["REMOTE_ADDR"]);
-								$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user_name);
+								$sbuiadmin_type = 'frontlogin';
+								$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_GRANTED, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
+								$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
 								// Update LoginTime
-								$sbusers->updateAccessUserLogin($sbmagic_user_name, false, time());
+								$sbusers->updateAccessUserLogin($sbuiadmin_user_name, false, time());
 								// Assign SESSION
-								$_SESSION['sbmagic_user_name']     = $sbmagic_user_name;
-								$_SESSION['sbmagic_user_password'] = $sbmagic_user_password;
+								$_SESSION['sbuiadmin_user_name']     = $sbuiadmin_user_name;
+								$_SESSION['sbuiadmin_user_password'] = $sbuiadmin_user_password;
 							}
 							
 						} else {
 							// --- Error Google Recaptcha
-							$sbsmarty->assign('sbmagic_access_code', 'E1');
-							$sbmagic_type = 'fronterror';
-							$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_CAPTCHA_ERROR, $sbmagic_user_name, $_SERVER["REMOTE_ADDR"]);
-							$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user_name);
+							$sbsmarty->assign('sbuiadmin_access_code', 'E1');
+							$sbuiadmin_type = 'fronterror';
+							$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_CAPTCHA_ERROR, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
+							$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
 						}
 					} else {
 						// ------------------
 						// --- Acces autorise
 						// ------------------
 						// Update Access Log
-						$sbmagic_type = 'frontlogin';
-						$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_GRANTED, $sbmagic_user_name, $_SERVER["REMOTE_ADDR"]);
-						$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user_name);
+						$sbuiadmin_type = 'frontlogin';
+						$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_GRANTED, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
+						$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
 						// Update LoginTime
-						$sbusers->updateAccessUserLogin($sbmagic_user_name, false, time());
+						$sbusers->updateAccessUserLogin($sbuiadmin_user_name, false, time());
 						// Assign SESSION
-						$_SESSION['sbmagic_user_name']     = $sbmagic_user_name;
-						$_SESSION['sbmagic_user_password'] = $sbmagic_user_password;
+						$_SESSION['sbuiadmin_user_name']     = $sbuiadmin_user_name;
+						$_SESSION['sbuiadmin_user_password'] = $sbuiadmin_user_password;
 					}
 				}
 			} else {
 				// ------------------
 				// --- Failed auth
 				// ------------------
-				$sbsmarty->assign('sbmagic_access_code', 'E2');
-				$sbmagic_type = 'fronterror';
-				$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_NOGRANTED, $_SERVER["REMOTE_ADDR"]);
-				$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event);
+				$sbsmarty->assign('sbuiadmin_access_code', 'E2');
+				$sbuiadmin_type = 'fronterror';
+				$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_NOGRANTED, $_SERVER["REMOTE_ADDR"]);
+				$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event);
 			}
 		}
 		
@@ -155,7 +155,7 @@ switch($op) {
 			// --- Logout required
 			// ------------------
 			// Update LastLogin
-			$sbusers->updateAccessUserLogin($_SESSION['sbmagic_user_name'], true);
+			$sbusers->updateAccessUserLogin($_SESSION['sbuiadmin_user_name'], true);
 			session_start();
 			session_unset();
 			session_destroy();

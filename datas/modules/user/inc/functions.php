@@ -38,7 +38,7 @@ function shortcode_sbuser($param = '') {
 	$login_url   = (SBREWRITEURL === true) ? SB_URL . 'user' : SB_URL . 'index.php?p=user';
 	$admin_url   = SB_ADMIN_URL;
 	$logout_url  = (SBREWRITEURL === true) ? SB_URL . 'user/?ac=logout' : SB_URL . 'index.php?p=user&ac=logout';
-	$login_text  = (isset($_SESSION['sbmagic_user_name']) && $_SESSION['sbmagic_user_name'] != '') ? _CMS_USER_ICON_TEXT_PROFILE : _CMS_USER_ICON_TEXT_LOGIN;
+	$login_text  = (isset($_SESSION['sbuiadmin_user_name']) && $_SESSION['sbuiadmin_user_name'] != '') ? _CMS_USER_ICON_TEXT_PROFILE : _CMS_USER_ICON_TEXT_LOGIN;
 	$admin_text  = _CMS_USER_ICON_TEXT_ADMIN;
 	$logout_text = _CMS_USER_ICON_TEXT_LOGOUT;
 	// --- LOGIN / PROFILE
@@ -49,8 +49,8 @@ function shortcode_sbuser($param = '') {
 	$user_html .= '</a>';
 	if ($icon_menu) $user_html .= '</li>';
 	// --- ADMIN BACKEND (if admin group)
-	global $sbmagic_user_type;
-	if ($sbmagic_user_type == 'admin') {
+	global $sbuiadmin_user_type;
+	if ($sbuiadmin_user_type == 'admin') {
 		if ($icon_menu)
 			$user_html .= '<li class="' . $class_menu . '">';
 		else
@@ -63,7 +63,7 @@ function shortcode_sbuser($param = '') {
 	}
 
 	// --- Check if user is logging
-	if (isset($_SESSION['sbmagic_user_name']) && $_SESSION['sbmagic_user_name'] != '') {
+	if (isset($_SESSION['sbuiadmin_user_name']) && $_SESSION['sbuiadmin_user_name'] != '') {
 		// --- Initialization LOGOUT
 		if ($icon_menu)
 			$user_html .= '<li class="' . $class_menu . '">';

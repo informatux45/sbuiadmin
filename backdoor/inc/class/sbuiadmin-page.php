@@ -15,7 +15,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Blocking direct access to plugin      -=
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-defined('SBMAGIC_PATH') or die('Are you crazy!');
+defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
 
 class page extends SmartyBC {

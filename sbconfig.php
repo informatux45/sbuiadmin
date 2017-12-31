@@ -24,8 +24,8 @@ define('SBIMAGEWIDTH', '1024');
 # Don't miss to change the htaccess file in administration
 define('SBADMIN', 'backdoor');
 
-# Define SBMAGIC ID Files
-define('SBMAGICID', 'sbuiadmin');
+# Define SBUIADMIN ID Files
+define('SBUIADMINID', 'sbuiadmin');
 
 # Turn on debug mode
 define('SBDEBUG', false);
@@ -72,7 +72,7 @@ define('SBSMARTYCACHELIFETIME', 120);
 define('SBSMARTYDEBUG', false);
 
 # Enable access to classes/files/functions Admin
-define('SBMAGIC_PATH', true);
+define('SBUIADMIN_PATH', true);
 
 # Enable rewrite url
 define('SBREWRITEURL', false);

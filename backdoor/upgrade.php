@@ -1,7 +1,7 @@
 <?php
 /**
  * Admin Startbootstrap
- * UPGRADE SBMAGIC (backend)
+ * UPGRADE SBUIADMIN (backend)
  *
  * @link http://dev.informatux.com/
  *
@@ -21,16 +21,16 @@ session_start();
 // ----------------------
 // Global defined
 // ----------------------
-defined('SBMAGIC_PATH') or define('SBMAGIC_PATH', dirname(__FILE__));
-defined('SBMAGIC_URL') or define('SBMAGIC_URL', $_SERVER['SERVER_NAME'].dirname($_SERVER["REQUEST_URI"].'?').'/');
-defined('SBMAGIC_BASE') or define('SBMAGIC_BASE', basename(__FILE__));
-defined('SBMAGIC_NAME') or define('SBMAGIC_NAME', 'SBMagic');
-defined('SBMAGIC_ID') or define('SBMAGIC_ID', 'sbmagic');
+defined('SBUIADMIN_PATH') or define('SBUIADMIN_PATH', dirname(__FILE__));
+defined('SBUIADMIN_URL') or define('SBUIADMIN_URL', $_SERVER['SERVER_NAME'].dirname($_SERVER["REQUEST_URI"].'?').'/');
+defined('SBUIADMIN_BASE') or define('SBUIADMIN_BASE', basename(__FILE__));
+defined('SBUIADMIN_NAME') or define('SBUIADMIN_NAME', 'SBMagic');
+defined('SBUIADMIN_ID') or define('SBUIADMIN_ID', 'sbuiadmin');
 
 // ----------------------
 // Global include
 // ----------------------
-include 'inc/sbmagic-header.php';
+include 'inc/sbuiadmin-header.php';
 // ----------------------
 
 // ----------------------
@@ -42,7 +42,7 @@ global $sbdebug, $sbsmarty, $sbsanitize, $sbusers, $sbform, $sbpage, $sbmedias;
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Blocking direct access to plugin      -=
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-defined('SBMAGIC_PATH') or die('Are you crazy!');
+defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
 // ----------------------
 // Initialization

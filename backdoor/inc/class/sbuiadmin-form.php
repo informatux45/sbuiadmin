@@ -15,7 +15,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Blocking direct access to plugin      -=
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-defined('SBMAGIC_PATH') or die('Are you crazy!');
+defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
 
 class form extends sanitize {
@@ -982,7 +982,7 @@ class form extends sanitize {
 						$(document).ready(function() {
 					   ';
 
-		if (SBMAGIC_CKEDITOR_BEHAVIOR) $toolbar = 'custom';
+		if (SBUIADMIN_CKEDITOR_BEHAVIOR) $toolbar = 'custom';
 					   
 		switch($toolbar) {
 			default: // full toolbar
@@ -1042,7 +1042,7 @@ class form extends sanitize {
 			break;
 		
 			case 'custom': // Custom toolbar by developer
-				require(SBMAGIC_PATH . '/inc/admin/ckeditor.php');
+				require(SBUIADMIN_PATH . '/inc/admin/ckeditor.php');
 			break;
 		}
 		

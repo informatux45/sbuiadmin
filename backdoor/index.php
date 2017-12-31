@@ -24,17 +24,17 @@ session_start([
 // ----------------------
 // Global defined
 // ----------------------
-defined('SBMAGIC_PATH') or define('SBMAGIC_PATH', dirname(__FILE__));
-defined('SBMAGIC_URL') or define('SBMAGIC_URL', $_SERVER['SERVER_NAME'].dirname($_SERVER["REQUEST_URI"].'?').'/');
-defined('SBMAGIC_BASE') or define('SBMAGIC_BASE', basename(__FILE__));
-defined('SBMAGIC_NAME') or define('SBMAGIC_NAME', 'SBuiadmin');
-defined('SBMAGIC_ID') or define('SBMAGIC_ID', 'sbuiadmin');
+defined('SBUIADMIN_PATH') or define('SBUIADMIN_PATH', dirname(__FILE__));
+defined('SBUIADMIN_URL') or define('SBUIADMIN_URL', $_SERVER['SERVER_NAME'].dirname($_SERVER["REQUEST_URI"].'?').'/');
+defined('SBUIADMIN_BASE') or define('SBUIADMIN_BASE', basename(__FILE__));
+defined('SBUIADMIN_NAME') or define('SBUIADMIN_NAME', 'SBuiadmin');
+defined('SBUIADMIN_ID') or define('SBUIADMIN_ID', 'sbuiadmin');
 // ----------------------
 
 // ----------------------
 // Global include
 // ----------------------
-include 'inc/' . SBMAGIC_ID . '-header.php';
+include 'inc/' . SBUIADMIN_ID . '-header.php';
 // ----------------------
 
 // ----------------------
@@ -46,34 +46,34 @@ global $sbdebug, $sbsmarty, $sbsanitize, $sbusers, $sbform, $sbpage, $sbmedias;
 // ----------------------
 // Check INSTALLATION
 // ----------------------
-$sbmagic_install_dir  = SBMAGIC_PATH . '/install.php';
-$sbmagic_install_url  = SBMAGIC_URL . 'install.php';
-//$sbmagic_install_lock = SBMAGIC_PATH . '/install/installer/data/';
-$sbmagic_install_lock = SBMAGIC_PATH . '/install/';
-$sbmagic_htaccess     = SBMAGIC_PATH . '/htaccess';
-$sbmagic_dot_htaccess = SBMAGIC_PATH . '/.htaccess';
+$sbuiadmin_install_dir  = SBUIADMIN_PATH . '/install.php';
+$sbuiadmin_install_url  = SBUIADMIN_URL . 'install.php';
+//$sbuiadmin_install_lock = SBUIADMIN_PATH . '/install/installer/data/';
+$sbuiadmin_install_lock = SBUIADMIN_PATH . '/install/';
+$sbuiadmin_htaccess     = SBUIADMIN_PATH . '/htaccess';
+$sbuiadmin_dot_htaccess = SBUIADMIN_PATH . '/.htaccess';
 // ----------------------
-if (file_exists($sbmagic_install_dir)) {
+if (file_exists($sbuiadmin_install_dir)) {
 	// --- Check if install is done or not
-	//if (!file_exists($sbmagic_install_lock . 'installer.lock')) {
-	if (!file_exists($sbmagic_install_lock . 'config.inc.php')) {
+	//if (!file_exists($sbuiadmin_install_lock . 'installer.lock')) {
+	if (!file_exists($sbuiadmin_install_lock . 'config.inc.php')) {
 		header("Status: 301 Moved Permanently", false, 301);
-		header("Location: http://$sbmagic_install_url");
+		header("Location: http://$sbuiadmin_install_url");
 		exit();
 	} else {
 		// --- Warning Page Home Admin
 		$sbsmarty->assign('sb_warning_install_file', true);
 	}
 }
-if (file_exists($sbmagic_htaccess)) {
+if (file_exists($sbuiadmin_htaccess)) {
 	// --- Rename htaccess TO .htaccess
-	$sbmagic_copy_htaccess = @copy($sbmagic_htaccess, $sbmagic_dot_htaccess);
-	if ($sbmagic_copy_htaccess) {
+	$sbuiadmin_copy_htaccess = @copy($sbuiadmin_htaccess, $sbuiadmin_dot_htaccess);
+	if ($sbuiadmin_copy_htaccess) {
 		// --- Access to Admin and remove install file
-		@unlink($sbmagic_htaccess);
+		@unlink($sbuiadmin_htaccess);
 	}
 }
-if (is_dir(SBMAGIC_PATH . '/install')) {
+if (is_dir(SBUIADMIN_PATH . '/install')) {
 	$sbsmarty->assign('sb_warning_installer_lock', true);
 }
 // ----------------------
@@ -84,7 +84,7 @@ if (is_dir(SBMAGIC_PATH . '/install')) {
 $query_ckeditor_behavior   = "SELECT content FROM " . _AM_DB_PREFIX . "sb_config WHERE config = 'toolbarck'";
 $request_ckeditor_behavior = $sbsql->query($query_ckeditor_behavior);
 $ckeditor_behavior         = $sbsql->assoc($request_ckeditor_behavior);
-defined('SBMAGIC_CKEDITOR_BEHAVIOR') or define('SBMAGIC_CKEDITOR_BEHAVIOR', (trim($ckeditor_behavior['content']) == 1) ? true : false);
+defined('SBUIADMIN_CKEDITOR_BEHAVIOR') or define('SBUIADMIN_CKEDITOR_BEHAVIOR', (trim($ckeditor_behavior['content']) == 1) ? true : false);
 
 // ----------------------
 // --- Settings file init
@@ -116,20 +116,20 @@ shuffle($sb_background);
 $rand_video    = array_rand($sb_background, 2);
 $sbsmarty->assign('sb_random_bg_video', $sb_background[$rand_video[1]]);
 
-if (isset($_SESSION['sbmagic_user_name']) && isset($_SESSION['sbmagic_user_password'])) {
+if (isset($_SESSION['sbuiadmin_user_name']) && isset($_SESSION['sbuiadmin_user_password'])) {
 	// ------------------
 	// --- SESSION Auth
 	// ------------------
 	// --- Check Session
-	$sbmagic_user_name     = trim($sbsanitize->stopXSS($_SESSION['sbmagic_user_name']));
-	$sbmagic_user_password = $_SESSION['sbmagic_user_password'];
-	if ($sbusers->login($sbmagic_user_name, $sbmagic_user_password)) {
-		if (!$sbusers->checkUserIsActive($sbmagic_user_name)) {
+	$sbuiadmin_user_name     = trim($sbsanitize->stopXSS($_SESSION['sbuiadmin_user_name']));
+	$sbuiadmin_user_password = $_SESSION['sbuiadmin_user_password'];
+	if ($sbusers->login($sbuiadmin_user_name, $sbuiadmin_user_password)) {
+		if (!$sbusers->checkUserIsActive($sbuiadmin_user_name)) {
 			// --- User is no more active
-			$sbsmarty->assign('sbmagic_access_code', 'E4');
-			$sbmagic_type = 'error';
-			$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_USER_ERROR, $sbmagic_user_name, $_SERVER["REMOTE_ADDR"]);
-			$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user_name);
+			$sbsmarty->assign('sbuiadmin_access_code', 'E4');
+			$sbuiadmin_type = 'error';
+			$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_USER_ERROR, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
+			$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
 			$sbsmarty->display('system/login.tpl');
 			exit;
 		}
@@ -139,15 +139,15 @@ if (($_POST['username'] && $_POST['password'])) {
 	// ------------------
 	// --- Form auth
 	// ------------------
-	$sbmagic_user_name     = trim($sbsanitize->stopXSS($_POST['username']));
-	$sbmagic_user_password = trim($sbusers->encrypt($_POST['password']));
-	if ($sbusers->login($sbmagic_user_name, $sbmagic_user_password)) {
-		if (!$sbusers->checkUserIsActive($sbmagic_user_name)) {
+	$sbuiadmin_user_name     = trim($sbsanitize->stopXSS($_POST['username']));
+	$sbuiadmin_user_password = trim($sbusers->encrypt($_POST['password']));
+	if ($sbusers->login($sbuiadmin_user_name, $sbuiadmin_user_password)) {
+		if (!$sbusers->checkUserIsActive($sbuiadmin_user_name)) {
 			// --- User is no more active
-			$sbsmarty->assign('sbmagic_access_code', 'E4');
-			$sbmagic_type = 'error';
-			$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_USER_ERROR, $sbmagic_user_name, $_SERVER["REMOTE_ADDR"]);
-			$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user_name);
+			$sbsmarty->assign('sbuiadmin_access_code', 'E4');
+			$sbuiadmin_type = 'error';
+			$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_USER_ERROR, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
+			$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
 			$sbsmarty->display('system/login.tpl');
 			exit;
 		} else {
@@ -174,20 +174,20 @@ if (($_POST['username'] && $_POST['password'])) {
 					
 					if ($response->success === false) {
 						// --- Error Google Recaptcha
-						$sbsmarty->assign('sbmagic_access_code', 'E1');
-						$sbmagic_type = 'error';
-						$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_CAPTCHA_ERROR, $sbmagic_user_name, $_SERVER["REMOTE_ADDR"]);
-						$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user_name);
+						$sbsmarty->assign('sbuiadmin_access_code', 'E1');
+						$sbuiadmin_type = 'error';
+						$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_CAPTCHA_ERROR, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
+						$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
 						$sbsmarty->display('system/login.tpl');
 						exit;						
 					}
 					
 				} else {
 					// --- Error Google Recaptcha
-					$sbsmarty->assign('sbmagic_access_code', 'E1');
-					$sbmagic_type = 'error';
-					$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_CAPTCHA_ERROR, $sbmagic_user_name, $_SERVER["REMOTE_ADDR"]);
-					$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user_name);
+					$sbsmarty->assign('sbuiadmin_access_code', 'E1');
+					$sbuiadmin_type = 'error';
+					$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_CAPTCHA_ERROR, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
+					$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
 					$sbsmarty->display('system/login.tpl');
 					exit;
 				}
@@ -196,37 +196,37 @@ if (($_POST['username'] && $_POST['password'])) {
 			// --- Acces autorise
 			// ------------------
 			// Update Access Log
-			$sbmagic_type = 'login';
-			$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_GRANTED, $sbmagic_user_name, $_SERVER["REMOTE_ADDR"]);
-			$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user_name);
+			$sbuiadmin_type = 'login';
+			$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_GRANTED, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
+			$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
 			// Update LoginTime
-			$sbusers->updateAccessUserLogin($sbmagic_user_name, false, time());
+			$sbusers->updateAccessUserLogin($sbuiadmin_user_name, false, time());
 			// Assign SESSION
-			$_SESSION['sbmagic_user_name']     = $sbmagic_user_name;
-			$_SESSION['sbmagic_user_password'] = $sbmagic_user_password;
+			$_SESSION['sbuiadmin_user_name']     = $sbuiadmin_user_name;
+			$_SESSION['sbuiadmin_user_password'] = $sbuiadmin_user_password;
 			
 		}
 	} else {
 		// ------------------
 		// --- Failed auth
 		// ------------------
-		$sbsmarty->assign('sbmagic_access_code', 'E2');
-		$sbmagic_type = 'error';
-		$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_NOGRANTED, $_SERVER["REMOTE_ADDR"]);
-		$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event);
+		$sbsmarty->assign('sbuiadmin_access_code', 'E2');
+		$sbuiadmin_type = 'error';
+		$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_NOGRANTED, $_SERVER["REMOTE_ADDR"]);
+		$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event);
 		$sbsmarty->display('system/login.tpl');
 		exit;
 	}
 }
-if (!isset($_SESSION['sbmagic_user_name']) && !isset($_SESSION['sbmagic_user_password'])) {
+if (!isset($_SESSION['sbuiadmin_user_name']) && !isset($_SESSION['sbuiadmin_user_password'])) {
 	// ------------------
 	// --- SESSION Auth
 	// ------------------
 	// --- No session
 	$sbsmarty->assign('uiadmin_access_code', 'E3');
-	$sbmagic_type = 'error';
-	$sbmagic_event = sprintf(SBMAGIC_MSG_LOG_ACCESS_MISSING, $_SERVER["REMOTE_ADDR"]);
-	$sbusers->updateAccessLog($sbmagic_type, $sbmagic_event);
+	$sbuiadmin_type = 'error';
+	$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_MISSING, $_SERVER["REMOTE_ADDR"]);
+	$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event);
 	$sbsmarty->display('system/login.tpl');
 	exit;
 }
@@ -235,7 +235,7 @@ if ($_GET['ac'] == 'logout') {
 	// --- Logout required
 	// ------------------
 	// Update LastLogin
-	$sbusers->updateAccessUserLogin($sbmagic_user_name, true);
+	$sbusers->updateAccessUserLogin($sbuiadmin_user_name, true);
 	session_start();
 	session_unset();
 	session_destroy();
@@ -248,11 +248,11 @@ if ($_GET['ac'] == 'logout') {
 // Get Global Infos
 // ----------------------
 global $sbadministrators, $sb_admin_pages;
-$sbmagic_user_type = (in_array(trim($_SESSION['sbmagic_user_name']), $sbadministrators)) ? 'admin' : 'user';
-$sbsmarty->assign('sbmagic_user_name', $_SESSION['sbmagic_user_name']);
-$sbsmarty->assign('sbmagic_user_type', $sbmagic_user_type);
-$sbsmarty->assign('sbmagic_user_email', $sbusers->getUserInfo($_SESSION['sbmagic_user_name'], 'email'));
-$sbsmarty->assign('sbmagic_user_last_login', date("d/m/Y H:i", $sbusers->getUserInfo($_SESSION['sbmagic_user_name'], 'lastlogin')));
+$sbuiadmin_user_type = (in_array(trim($_SESSION['sbuiadmin_user_name']), $sbadministrators)) ? 'admin' : 'user';
+$sbsmarty->assign('sbuiadmin_user_name', $_SESSION['sbuiadmin_user_name']);
+$sbsmarty->assign('sbuiadmin_user_type', $sbuiadmin_user_type);
+$sbsmarty->assign('sbuiadmin_user_email', $sbusers->getUserInfo($_SESSION['sbuiadmin_user_name'], 'email'));
+$sbsmarty->assign('sbuiadmin_user_last_login', date("d/m/Y H:i", $sbusers->getUserInfo($_SESSION['sbuiadmin_user_name'], 'lastlogin')));
 
 // ----------------------
 // Check if user ADMIN is always in DB
@@ -305,7 +305,7 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 	}
 	// Display template page
 	// Check if non admin and authorized page
-	if (in_array($sb_get_page, $sb_admin_pages) && $sbmagic_user_type != 'admin')
+	if (in_array($sb_get_page, $sb_admin_pages) && $sbuiadmin_user_type != 'admin')
 		$sbsmarty->display("404.tpl");
 	else {
 		if ($sb_path_file_sys_mod == '') {

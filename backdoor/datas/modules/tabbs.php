@@ -13,7 +13,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Blocking direct access to plugin      -=
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-defined('SBMAGIC_PATH') or die('Are you crazy!');
+defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
 // -----------------------
 // Include Config CMS
@@ -26,7 +26,7 @@ include_once('../sbconfig.php');
 $module_page = 'tabbs';
 $sbsmarty->assign('module_page', $module_page);
 // -----------------------
-$module_url = _AM_SITE_PROTOCOL . SBMAGIC_URL . SBMAGIC_BASE . '?p=' . $module_page;
+$module_url = _AM_SITE_PROTOCOL . SBUIADMIN_URL . SBUIADMIN_BASE . '?p=' . $module_page;
 $sbsmarty->assign('module_url', $module_url);
  
 // -----------------------

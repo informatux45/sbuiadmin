@@ -13,25 +13,25 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Blocking direct access to plugin      -=
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-defined('SBMAGIC_PATH') or die('Are you crazy!');
+defined('SBUIADMIN_PATH') or die('Are you crazy!');
  
 // ----------------------
 // INCLUDES by array
 // ----------------------
-$sbmagic_files = array('config', 'functions');
-foreach ($sbmagic_files as $sbmagic_file) {
-    require_once(SBMAGIC_PATH . '/inc/' . SBMAGIC_ID . '-' . $sbmagic_file . '.php');
+$sbuiadmin_files = array('config', 'functions');
+foreach ($sbuiadmin_files as $sbuiadmin_file) {
+    require_once(SBUIADMIN_PATH . '/inc/' . SBUIADMIN_ID . '-' . $sbuiadmin_file . '.php');
 }
 
 // ----------------------
 // INCLUDE Version
 // ---------------------- 
-sb_global_include(SBMAGIC_PATH . '/inc/admin/version.php');
+sb_global_include(SBUIADMIN_PATH . '/inc/admin/version.php');
 
 // ----------------------
 // INCLUDE Debug Class
 // ---------------------- 
-sb_global_include(SBMAGIC_PATH . '/inc/debug/Kint.class.php');
+sb_global_include(SBUIADMIN_PATH . '/inc/debug/Kint.class.php');
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // ADMIN Lang
@@ -61,9 +61,9 @@ if (!_AM_SMARTY_BACKWARDS_COMPATIBILITY) {
 // ----------------------
 // CLASSES by array
 // ----------------------
-$sbmagic_classes = array('sql', 'sanitize', 'users', 'medias', 'form', 'page', 'upgrade');
-foreach ($sbmagic_classes as $sbmagic_class) {
-    sb_global_include(SBMAGIC_PATH . '/inc/class/' . SBMAGIC_ID . '-' . $sbmagic_class . '.php');
+$sbuiadmin_classes = array('sql', 'sanitize', 'users', 'medias', 'form', 'page', 'upgrade');
+foreach ($sbuiadmin_classes as $sbuiadmin_class) {
+    sb_global_include(SBUIADMIN_PATH . '/inc/class/' . SBUIADMIN_ID . '-' . $sbuiadmin_class . '.php');
 }
 
 $sbsql      = new sql();
@@ -82,12 +82,12 @@ if (_AM_UPGRADE_MODE) {
 	$sbupgrade  = new upgrade($sb_upgrade_server, $sb_upgrade_version);
 	ob_flush(); // the buffer contents are discarded
 	if ($sbupgrade->check_for_updates()) {
-		$sbsmarty->assign('sbmagic_upgrade_core', $sbupgrade->server_version);
+		$sbsmarty->assign('sbuiadmin_upgrade_core', $sbupgrade->server_version);
 		ob_flush(); // the buffer contents are discarded
-		$sbsmarty->assign('sbmagic_upgrade_core_filelist', $sbupgrade->print_updated_files_list());
+		$sbsmarty->assign('sbuiadmin_upgrade_core_filelist', $sbupgrade->print_updated_files_list());
 		ob_flush(); // the buffer contents are discarded
 	} else {
-		$sbsmarty->assign('sbmagic_upgrade_core', false);
+		$sbsmarty->assign('sbuiadmin_upgrade_core', false);
 		ob_flush(); // the buffer contents are discarded
 	}
 }
@@ -95,11 +95,11 @@ if (_AM_UPGRADE_MODE) {
 
 // ------------------
 $sbsmarty->setTemplateDir(array('sys' => _AM_SMARTY_DIR . 'tpls/tpl/'
-							   ,'mod' => SBMAGIC_PATH . '/datas/modules/tpls/'
+							   ,'mod' => SBUIADMIN_PATH . '/datas/modules/tpls/'
 						  ));
-$sbsmarty->setCompileDir(SBMAGIC_PATH . '/datas/cache/tpls_c/');
+$sbsmarty->setCompileDir(SBUIADMIN_PATH . '/datas/cache/tpls_c/');
 $sbsmarty->setConfigDir(_AM_SMARTY_DIR . 'configs/');
-$sbsmarty->setCacheDir(SBMAGIC_PATH . '/datas/cache/core/');
+$sbsmarty->setCacheDir(SBUIADMIN_PATH . '/datas/cache/core/');
 // ------------------
 $sbsmarty->force_compile = _AM_SMARTY_FORCE_COMPILE;
 // ------------------

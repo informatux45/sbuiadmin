@@ -12,7 +12,7 @@
 	<!-- Basic Page Needs
 	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
 	<meta charset="utf-8">
-	<title>SBMAGIC Net Install</title>
+	<title>SBUIADMIN Net Install</title>
 	<meta name="description" content="INFORMATUX, El BooBoo">
 	<meta name="author" content="BooBoo">
 	
@@ -965,15 +965,15 @@
 			display: block;
 			text-align: center;
 		}
-		#sbmagic_admin, #sbmagic_errors, #sbmagic_download_loader, #sbmagic_admin_msg {
+		#sbuiadmin_admin, #sbuiadmin_errors, #sbuiadmin_download_loader, #sbuiadmin_admin_msg {
 			display: none;
 		}
 	</style>
 	
 	<script type="text/javascript">
 	  function loader() {
-		document.getElementById("sbmagic_download_loader").style.display = "inline-block";
-		document.getElementById("sbmagic_download").style.display = "none";
+		document.getElementById("sbuiadmin_download_loader").style.display = "inline-block";
+		document.getElementById("sbuiadmin_download").style.display = "none";
 	  }
 	</script>
 	
@@ -1017,7 +1017,7 @@ if ($_GET['a'] == 'install') {
 	
 	?>
 	<style>
-		#sbmagic_download_loader {display: inline-block;}
+		#sbuiadmin_download_loader {display: inline-block;}
 	</style>
 	<?php
 
@@ -1083,18 +1083,18 @@ if ($_GET['a'] == 'install') {
 	if ($errors == '') {
 		?>
 		<style>
-			#sbmagic_download {display: none;}
-			#sbmagic_admin {display: inline-block;}
-			#sbmagic_admin_msg {display: inline-block;}
-			#sbmagic_download_loader {display: none;}
+			#sbuiadmin_download {display: none;}
+			#sbuiadmin_admin {display: inline-block;}
+			#sbuiadmin_admin_msg {display: inline-block;}
+			#sbuiadmin_download_loader {display: none;}
 		</style>
 		<?php
 	} else {
 		?>
 		<style>
-			#sbmagic_download {display: none;}
-			#sbmagic_errors {display: inline-block;}
-			#sbmagic_download_loader {display: none;}
+			#sbuiadmin_download {display: none;}
+			#sbuiadmin_errors {display: inline-block;}
+			#sbuiadmin_download_loader {display: none;}
 		</style>
 		<?php
 	}
@@ -1110,13 +1110,13 @@ if ($_GET['a'] == 'install') {
 			<div class="one-half">
 				<section class="header">
 					  <h2 class="title">SBUIADMIN Net Installation</h2>
-					  <h3 id="sbmagic_admin_msg">Fichiers installés ;-)<br>N'oubliez pas de supprimer le fichier netinstall</h3>
-					  <a id="sbmagic_download" class="button button-primary" href="sbmagic_netinstall.php?a=install" onclick="javascript:loader()">Download</a>
-					  <img id="sbmagic_download_loader" src="http://dev.sbuiadmin.fr/update/net_install/gears.svg" style="height: 70px">
+					  <h3 id="sbuiadmin_admin_msg">Fichiers installés ;-)<br>N'oubliez pas de supprimer le fichier netinstall</h3>
+					  <a id="sbuiadmin_download" class="button button-primary" href="sbuiadmin_netinstall.php?a=install" onclick="javascript:loader()">Download</a>
+					  <img id="sbuiadmin_download_loader" src="http://dev.sbuiadmin.fr/update/net_install/gears.svg" style="height: 70px">
 					  <br>
-					  <a id="sbmagic_admin" class="button button-success" href="./administration/index.php">Go to your Administration</a>
+					  <a id="sbuiadmin_admin" class="button button-success" href="./administration/index.php">Go to your Administration</a>
 					  <br>
-					  <a id="sbmagic_errors" class="button button-warning" href="#"><?php echo $errors; ?></a>
+					  <a id="sbuiadmin_errors" class="button button-warning" href="#"><?php echo $errors; ?></a>
 					  <div class="value-props row">
 						<div class="four columns value-prop">
 						  <img class="value-img" src="http://dev.sbuiadmin.fr/update/net_install/feather.svg">

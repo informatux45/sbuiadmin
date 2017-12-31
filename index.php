@@ -59,15 +59,15 @@ global $sbsmarty, $sbsanitize, $sbpage;
 // ----------------------
 // Check INSTALLATION
 // ----------------------
-$sbmagic_install_dir  = SB_ADMIN_DIR . 'install.php';
-$sbmagic_install_url  = SB_ADMIN_URL . 'install.php';
-$sbmagic_install_lock = SB_ADMIN_DIR . 'install/installer/data/';
+$sbuiadmin_install_dir  = SB_ADMIN_DIR . 'install.php';
+$sbuiadmin_install_url  = SB_ADMIN_URL . 'install.php';
+$sbuiadmin_install_lock = SB_ADMIN_DIR . 'install/installer/data/';
 // ----------------------
-if (file_exists($sbmagic_install_dir)) {
+if (file_exists($sbuiadmin_install_dir)) {
 	// --- Check if install is done or not
-	if (!file_exists($sbmagic_install_lock . 'installer.lock')) {
+	if (!file_exists($sbuiadmin_install_lock . 'installer.lock')) {
 		header("Status: 301 Moved Permanently", false, 301);
-		header("Location: $sbmagic_install_url");
+		header("Location: $sbuiadmin_install_url");
 		exit();
 	}
 }
@@ -96,13 +96,13 @@ if (SBMAINTENANCE) {
 // ----------------------
 // Get Global Infos
 // ----------------------
-if (!empty($_SESSION['sbmagic_user_name'])) {
+if (!empty($_SESSION['sbuiadmin_user_name'])) {
 	$sbadministrators = explode(",", trim($sb_settings_config[1]));
-	$sbmagic_user_type = (in_array(trim($_SESSION['sbmagic_user_name']), $sbadministrators)) ? 'admin' : 'user';
-	$sbsmarty->assign('sbmagic_user_name', $_SESSION['sbmagic_user_name']);
-	$sbsmarty->assign('sbmagic_user_type', $sbmagic_user_type);
-	$sbsmarty->assign('sbmagic_user_email', $sbusers->getUserInfo($_SESSION['sbmagic_user_name'], 'email'));
-	$sbsmarty->assign('sbmagic_user_last_login', date("d/m/Y H:i", $sbusers->getUserInfo($_SESSION['sbmagic_user_name'], 'lastlogin')));
+	$sbuiadmin_user_type = (in_array(trim($_SESSION['sbuiadmin_user_name']), $sbadministrators)) ? 'admin' : 'user';
+	$sbsmarty->assign('sbuiadmin_user_name', $_SESSION['sbuiadmin_user_name']);
+	$sbsmarty->assign('sbuiadmin_user_type', $sbuiadmin_user_type);
+	$sbsmarty->assign('sbuiadmin_user_email', $sbusers->getUserInfo($_SESSION['sbuiadmin_user_name'], 'email'));
+	$sbsmarty->assign('sbuiadmin_user_last_login', date("d/m/Y H:i", $sbusers->getUserInfo($_SESSION['sbuiadmin_user_name'], 'lastlogin')));
 }
 // ----------------------
 // ----------------------

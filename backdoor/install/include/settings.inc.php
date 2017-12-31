@@ -160,7 +160,7 @@
     // *** application name
     define('EI_APPLICATION_NAME', 'SBUIADMIN');
     // *** version number of your application
-    define('SBMAGIC_PATH', true);
+    define('SBUIADMIN_PATH', true);
     // --- Handler ajax
     global $handler_ajax;
     if (!$handler_ajax)

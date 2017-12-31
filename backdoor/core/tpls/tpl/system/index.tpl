@@ -6,7 +6,7 @@
 	{include file='sb_header.tpl' module=$module_page pageindex='Dashboard'}
 	{* ---------------- End Headers --------------- *}
 
-			{if $sbmagic_user_type == 'admin'}
+			{if $sbuiadmin_user_type == 'admin'}
             <!-- .row -->
             <div class="row">
 				

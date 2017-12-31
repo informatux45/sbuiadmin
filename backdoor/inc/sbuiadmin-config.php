@@ -13,18 +13,18 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Blocking direct access to plugin      -=
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-defined('SBMAGIC_PATH') or die('Are you crazy!');
+defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
 // ----------------------------------------
 // Don't remove this setting              -
 // ----------------------------------------
 // --- Admin Settings File
-define('_AM_SETTINGS_FILE',						SBMAGIC_PATH . '/inc/admin/settings.txt');
+define('_AM_SETTINGS_FILE',						SBUIADMIN_PATH . '/inc/admin/settings.txt');
 $sb_settings_config = file(_AM_SETTINGS_FILE);
 // --- Admin Dashboard File
-define('_AM_DASHBOARD_FILE',					SBMAGIC_PATH . '/inc/admin/dashboard.txt');
+define('_AM_DASHBOARD_FILE',					SBUIADMIN_PATH . '/inc/admin/dashboard.txt');
 // --- Front Theme File
-define('_AM_THEME_FILE',						SBMAGIC_PATH . '/inc/admin/theme.txt');
+define('_AM_THEME_FILE',						SBUIADMIN_PATH . '/inc/admin/theme.txt');
 // ----------------------------------------
 // ----------------------------------------
 // ----------------------------------------
@@ -127,27 +127,27 @@ $sbadministrators = explode(",", trim($sb_settings_config[1]));
 define('_AM_SITE_PROTOCOL',						$_SERVER['REQUEST_SCHEME'] . '://');
 
 // --- Smarty DIR
-define('_AM_SMARTY_DIR',						SBMAGIC_PATH .'/core/');
+define('_AM_SMARTY_DIR',						SBUIADMIN_PATH .'/core/');
 
 // --- Site DIR
-define('_AM_SITE_DIR',							SBMAGIC_PATH . '/');
+define('_AM_SITE_DIR',							SBUIADMIN_PATH . '/');
 // --- Site URL
-define('_AM_SITE_URL',							_AM_SITE_PROTOCOL . SBMAGIC_URL);
+define('_AM_SITE_URL',							_AM_SITE_PROTOCOL . SBUIADMIN_URL);
 
 // --- Site IMG DIR
-define('_AM_SITE_IMG_DIR',						SBMAGIC_PATH . '/img/');
+define('_AM_SITE_IMG_DIR',						SBUIADMIN_PATH . '/img/');
 // --- Site IMG URL
-define('_AM_SITE_IMG_URL',						_AM_SITE_PROTOCOL . SBMAGIC_URL . 'img/');
+define('_AM_SITE_IMG_URL',						_AM_SITE_PROTOCOL . SBUIADMIN_URL . 'img/');
 
 // --- Site UPLOAD DIR
-define('_AM_SITE_IMG_DIR',						SBMAGIC_PATH . '/upload/');
+define('_AM_SITE_IMG_DIR',						SBUIADMIN_PATH . '/upload/');
 // --- Site UPLOAD URL
-define('_AM_SITE_IMG_URL',						_AM_SITE_PROTOCOL . SBMAGIC_URL . 'upload/');
+define('_AM_SITE_IMG_URL',						_AM_SITE_PROTOCOL . SBUIADMIN_URL . 'upload/');
 
 // --- Site LANG / DIR / URL
 define('_AM_SITE_LANG',							'french');
-define('_AM_SITE_LANG_DIR',						SBMAGIC_PATH . '/lang/');
-define('_AM_SITE_LANG_URL',						_AM_SITE_PROTOCOL . SBMAGIC_URL . 'lang/');
+define('_AM_SITE_LANG_DIR',						SBUIADMIN_PATH . '/lang/');
+define('_AM_SITE_LANG_URL',						_AM_SITE_PROTOCOL . SBUIADMIN_URL . 'lang/');
 
 // --- Customer name
 define('_AM_SITE_CUSTOMER_NAME',				trim($sb_settings_config[0]));

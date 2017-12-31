@@ -3,7 +3,7 @@
  * Main File                       *
  * ------------------------------- *
  * @link http://informatux.com/    *
- * @package CMS SBMAGIC            *
+ * @package CMS SBUIADMIN            *
  * @package LANG FR                *
  * @file UTF-8                     *
  * ©INFORMATUX.COM                 *

@@ -12,7 +12,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Blocking direct access to plugin      -=
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-defined('SBMAGIC_PATH') or die('Are you crazy!');
+defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
  
 // -----------------------
@@ -21,13 +21,13 @@ defined('SBMAGIC_PATH') or die('Are you crazy!');
 $module_page = 'medias';
 $sbsmarty->assign('module_page', $module_page);
 // -----------------------
-$module_url = _AM_SITE_PROTOCOL . SBMAGIC_URL . SBMAGIC_BASE . '?p=' . $module_page;
+$module_url = _AM_SITE_PROTOCOL . SBUIADMIN_URL . SBUIADMIN_BASE . '?p=' . $module_page;
 $sbsmarty->assign('module_url', $module_url);
 
 // -----------------------
 // Module Short URL
 // -----------------------
-$module_short_url = SBMAGIC_BASE . '?p=' . $module_page;
+$module_short_url = SBUIADMIN_BASE . '?p=' . $module_page;
 $sbsmarty->assign('module_short_url', $module_short_url); 
  
 // -----------------------

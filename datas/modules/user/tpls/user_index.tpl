@@ -1,20 +1,20 @@
 {* --- User Form --- *}
 
-	{if $smarty.session.sbmagic_user_name == '' && $smarty.session.sbmagic_user_password == ''}
+	{if $smarty.session.sbuiadmin_user_name == '' && $smarty.session.sbuiadmin_user_password == ''}
 	
 		<div class="panel-body">
-			{if $sbmagic_access_code}
+			{if $sbuiadmin_access_code}
 				<div class="alert alert-danger">
-				{if $sbmagic_access_code == 'E1'}
+				{if $sbuiadmin_access_code == 'E1'}
 					{$smarty.const._CMS_USER_MSG_ERROR_E1}
 				{/if}
-				{if $sbmagic_access_code == 'E2'}
+				{if $sbuiadmin_access_code == 'E2'}
 					{$smarty.const._CMS_USER_MSG_ERROR_E2}
 				{/if}
-				{if $sbmagic_access_code == 'E3'}
+				{if $sbuiadmin_access_code == 'E3'}
 					{$smarty.const._CMS_USER_MSG_ERROR_E3}
 				{/if}
-				{if $sbmagic_access_code == 'E4'}
+				{if $sbuiadmin_access_code == 'E4'}
 					{$smarty.const._CMS_USER_MSG_ERROR_E4}
 				{/if}
 				</div>
@@ -86,7 +86,7 @@
 		{/if}
 	
 	{else}
-		Profil de l'utilisateur ({$smarty.session.sbmagic_user_name})
+		Profil de l'utilisateur ({$smarty.session.sbuiadmin_user_name})
 		<br>
 		<a href="{seo url="index.php?lang=`$smarty.session.lang`&p=user&ac=logout" rewrite="user/?ac=logout"}">
 			Deconnexion

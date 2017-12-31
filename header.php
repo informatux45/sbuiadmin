@@ -49,9 +49,9 @@ if (!SBSMARTYBC) {
 // ----------------------
 // CLASSES by array
 // ----------------------
-$sbmagic_classes = array('sql', 'sanitize', 'users', 'page');
-foreach ($sbmagic_classes as $sbmagic_class) {
-    include(SB_ADMIN_DIR . "inc" . DIRECTORY_SEPARATOR . "class" . DIRECTORY_SEPARATOR . SBMAGICID . "-" . $sbmagic_class . ".php");
+$sbuiadmin_classes = array('sql', 'sanitize', 'users', 'page');
+foreach ($sbuiadmin_classes as $sbuiadmin_class) {
+    include(SB_ADMIN_DIR . "inc" . DIRECTORY_SEPARATOR . "class" . DIRECTORY_SEPARATOR . SBUIADMINID . "-" . $sbuiadmin_class . ".php");
 }
 
 $sbsql      = new sql();

@@ -15,7 +15,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Blocking direct access to plugin      -=
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-defined('SBMAGIC_PATH') or die('Are you crazy!');
+defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
 
 class user extends sql {
@@ -34,8 +34,8 @@ class user extends sql {
 	
 	
     function checkUser($password, $captcha) {
-        if (isset($_SESSION['sbmagic_user_name']) || $_SESSION['sbmagic_user_name'] != '') {
-            if (!$this->login($_SESSION['sbmagic_user_name'], $password, $crypt)) {
+        if (isset($_SESSION['sbuiadmin_user_name']) || $_SESSION['sbuiadmin_user_name'] != '') {
+            if (!$this->login($_SESSION['sbuiadmin_user_name'], $password, $crypt)) {
                 return false;
             } elseif (_AM_CAPTCHA_MODE == 0) {
                 return true;
@@ -62,7 +62,7 @@ class user extends sql {
 	
 	
     function checkIsAdmin() {
-        if (isset($_SESSION['sbmagic_user_name']) || $_SESSION['sbmagic_user_name'] != '') return true;
+        if (isset($_SESSION['sbuiadmin_user_name']) || $_SESSION['sbuiadmin_user_name'] != '') return true;
         else return false;
     }
 	
@@ -71,11 +71,11 @@ class user extends sql {
 	* Update Access Log
 	* @return bool
 	*/
-	function updateAccessLog($sbmagic_type, $sbmagic_event, $sbmagic_user = 'admin') {
+	function updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user = 'admin') {
 		// --- Update the Access Log file if exist
 		$sql = "INSERT INTO " . _AM_DB_PREFIX . "sb_logaccess
 				(`logaccess_type`, `logaccess_date`, `logaccess_user`, `logaccess_event`)
-				VALUES ('$sbmagic_type', UNIX_TIMESTAMP(), '$sbmagic_user', '$sbmagic_event')";
+				VALUES ('$sbuiadmin_type', UNIX_TIMESTAMP(), '$sbuiadmin_user', '$sbuiadmin_event')";
 		$result = $this->query($sql);
 		if (!$result)
 			return false;
@@ -88,17 +88,17 @@ class user extends sql {
 	* Update Acces Login / Last login Time User
 	* @return bool
 	*/
-	function updateAccessUserLogin($sbmagic_user, $lastlogin = false, $time = false) {
+	function updateAccessUserLogin($sbuiadmin_user, $lastlogin = false, $time = false) {
 		// --- Update the Access User logintime
-		if ($sbmagic_user != '' && $lastlogin == false) {
-			$sql = "UPDATE " . _AM_DB_PREFIX . "sb_users SET logintime = '$time' WHERE username = '$sbmagic_user'";
+		if ($sbuiadmin_user != '' && $lastlogin == false) {
+			$sql = "UPDATE " . _AM_DB_PREFIX . "sb_users SET logintime = '$time' WHERE username = '$sbuiadmin_user'";
 			$result = $this->query($sql);
 			if (!$result)
 				return false;
 			else
 				return true;
-		} elseif ($sbmagic_user != '' && $lastlogin) {
-			$sql = "UPDATE " . _AM_DB_PREFIX . "sb_users SET lastlogin = logintime WHERE username = '$sbmagic_user'";
+		} elseif ($sbuiadmin_user != '' && $lastlogin) {
+			$sql = "UPDATE " . _AM_DB_PREFIX . "sb_users SET lastlogin = logintime WHERE username = '$sbuiadmin_user'";
 			$result = $this->query($sql);
 			if (!$result)
 				return false;
@@ -113,13 +113,13 @@ class user extends sql {
 	/**
 	 * Get User Infos
 	 */
-	function getUserInfo($sbmagic_user, $field = '') {
+	function getUserInfo($sbuiadmin_user, $field = '') {
 		global $sbsanitize;
 		// --- Initialization
 		$field        = $sbsanitize->stopXSS($field);
-		$sbmagic_user = $sbsanitize->stopXSS($sbmagic_user);
+		$sbuiadmin_user = $sbsanitize->stopXSS($sbuiadmin_user);
 		
-        $sql       = "SELECT $field FROM " . _AM_DB_PREFIX . "sb_users WHERE username = '$sbmagic_user'";
+        $sql       = "SELECT $field FROM " . _AM_DB_PREFIX . "sb_users WHERE username = '$sbuiadmin_user'";
         $result    = $this->query($sql);
         $user_info = $this->assoc($result);
         if ($user_info[$field]) {

@@ -25,15 +25,15 @@
                 </li>
 
                 <li class="dropdown">
-                    <a title="Mise à jour" class="dropdown-toggle" data-toggle="dropdown" href="#"{if $sbmagic_upgrade_core || $sbmagic_upgrade_modules} style="color: #fbc02d !important;"{/if}>
+                    <a title="Mise à jour" class="dropdown-toggle" data-toggle="dropdown" href="#"{if $sbuiadmin_upgrade_core || $sbuiadmin_upgrade_modules} style="color: #fbc02d !important;"{/if}>
                         <i class="fa fa-refresh fa-fw"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-alerts" style="font-size: 0.8em;">
-                        <li{if $sbmagic_upgrade_core} class="dropdown-upgrade"{/if}>
-                            {if $sbmagic_upgrade_core}
+                        <li{if $sbuiadmin_upgrade_core} class="dropdown-upgrade"{/if}>
+                            {if $sbuiadmin_upgrade_core}
                                 <a href="#" data-target="#sbupgradecore" data-toggle="modal">
                                     <div>
-                                        <i class="fa fa-hand-o-right fa-fw"></i> Nouvelle version <span style="color: #fbc02d !important;">{$sbmagic_upgrade_core}</span><br>
+                                        <i class="fa fa-hand-o-right fa-fw"></i> Nouvelle version <span style="color: #fbc02d !important;">{$sbuiadmin_upgrade_core}</span><br>
                                         <span class="pull-right text-muted small">Version actuelle {$smarty.const._AM_START_VERSION}</span><br>
                                     </div>
                                 </a>                            
@@ -47,11 +47,11 @@
                             {/if}
                         </li>
                         <li class="divider"></li>
-                        <li{if $sbmagic_upgrade_modules} class="dropdown-upgrade"{/if}>
-                            {if $sbmagic_upgrade_modules}
+                        <li{if $sbuiadmin_upgrade_modules} class="dropdown-upgrade"{/if}>
+                            {if $sbuiadmin_upgrade_modules}
                                 <a href="#" data-target="#sbupgrademodules" data-toggle="modal">
                                     <div>
-                                        <i class="fa fa-hand-o-right fa-fw"></i> {$sbmagic_upgrade_modules} New modules<br>{$sbmagic_upgrade_modules}<br>
+                                        <i class="fa fa-hand-o-right fa-fw"></i> {$sbuiadmin_upgrade_modules} New modules<br>{$sbuiadmin_upgrade_modules}<br>
                                     </div>
                                 </a>                            
                             {else}
@@ -71,7 +71,7 @@
             </ul>
 
             <ul class="nav navbar-top-links navbar-right">
-                {*<li class="text-primary">{$smarty.const.SBMAGIC_GLOBAL_HI} {$sbmagic_user_name|@strtolower}</li>*}
+                {*<li class="text-primary">{$smarty.const.SBUIADMIN_GLOBAL_HI} {$sbuiadmin_user_name|@strtolower}</li>*}
                 
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#" title="Credits SBUIADMIN">
@@ -123,7 +123,7 @@
                 <!-- /.dropdown -->
                 
                 <li>
-                    <a class="" href="{$smarty.const._AM_SITE_URL}?ac=logout" title="{$smarty.const.SBMAGIC_GLOBAL_LOGOUT}">
+                    <a class="" href="{$smarty.const._AM_SITE_URL}?ac=logout" title="{$smarty.const.SBUIADMIN_GLOBAL_LOGOUT}">
                         <i class="fa fa-sign-out fa-fw"></i>
                     </a>
                     <!-- /.dropdown-user -->
@@ -138,11 +138,11 @@
                     <ul class="nav" id="side-menu">
                         <li class="user-profile">
                             <div class="user-img-div">
-                                <img src="{$sbmagic_user_email|@sbGetGravatar}" class="img-thumbnail" />
+                                <img src="{$sbuiadmin_user_email|@sbGetGravatar}" class="img-thumbnail" />
                                 <div class="inner-text">
-                                    {$sbmagic_user_name}
+                                    {$sbuiadmin_user_name}
                                     <p class="user-last-login">
-                                        <small>{$smarty.const.SBMAGIC_GLOBAL_LAST_LOGIN}<br>{$sbmagic_user_last_login}</small>
+                                        <small>{$smarty.const.SBUIADMIN_GLOBAL_LAST_LOGIN}<br>{$sbuiadmin_user_last_login}</small>
                                     </p>
                                 </div>
                             </div>
@@ -161,12 +161,12 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
-                        <h4 id="sbupgradecoreLabel" class="modal-title">Mise à niveau vers la version <span style="color: red;">{$sbmagic_upgrade_core}</span></h4><a onclick="javascript:sbUgrade('core','{$smarty.const._AM_SITE_URL}');" role="button" class="upgrade-now btn btn-danger" id="upgrade-core">upgrade now!</a>
+                        <h4 id="sbupgradecoreLabel" class="modal-title">Mise à niveau vers la version <span style="color: red;">{$sbuiadmin_upgrade_core}</span></h4><a onclick="javascript:sbUgrade('core','{$smarty.const._AM_SITE_URL}');" role="button" class="upgrade-now btn btn-danger" id="upgrade-core">upgrade now!</a>
                     </div>
                     <div id="upgrade-ajax-content" class="modal-body">
                         <div class="sbupgrade-filelist">
                             <span>Liste des fichiers à mettre à niveau :</span><br>
-                            {$sbmagic_upgrade_core_filelist}
+                            {$sbuiadmin_upgrade_core_filelist}
                         </div>
                         <div id="sbupgrade-inprogress" class="center" style="display: none;">
                             <br>Mise à niveau en cours<br>
@@ -188,7 +188,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
-                        <h4 id="sbupgrademodulesLabel" class="modal-title">Mise à niveau des modules <span style="color: red;">{$sbmagic_upgrade_modules}</span></h4>
+                        <h4 id="sbupgrademodulesLabel" class="modal-title">Mise à niveau des modules <span style="color: red;">{$sbuiadmin_upgrade_modules}</span></h4>
                     </div>
                     <div class="modal-body">
                         Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.

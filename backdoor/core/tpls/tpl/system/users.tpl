@@ -23,9 +23,9 @@
                         <!-- /.panel-heading -->
                         <div class="panel-body">
 							{* HTML Text Formatted *}
-							Vous êtes connecté sous l'utilisateur : <span style="color: red;">{$sbmagic_user_name}</span>
+							Vous êtes connecté sous l'utilisateur : <span style="color: red;">{$sbuiadmin_user_name}</span>
 							<br>
-							Votre groupe d'utilisateur : {$sbmagic_user_type|@strtoupper}
+							Votre groupe d'utilisateur : {$sbuiadmin_user_type|@strtoupper}
                         </div>
                         <!-- /.panel-body -->
                     </div>
@@ -72,7 +72,7 @@
 														&nbsp;
 														<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit&id={$user.id}" title="Modifier"></a>
 														&nbsp;												
-														{if $user.username != $sbmagic_user_name}
+														{if $user.username != $sbuiadmin_user_name}
 															<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$user.id}" title="Supprimer"></a>
 														{/if}
 													</td>
