@@ -139,7 +139,6 @@
 		$validations['divider_extensions'] = array('title'=>lang_key('extensions'), 'description'=>'');
 		$loaded_extensions = get_loaded_extensions();
 		$validations['php_curl'] = array(true, 'PHP Curl', in_array('curl', $loaded_extensions), lang_key('installed'), lang_key('not_installed'));
-		//$validations['php_xmlrpc'] = array(false, 'PHP XmlRrpc', in_array('xmlrpc', $loaded_extensions), lang_key('installed'), lang_key('not_installed'));
 		$validations['php_gd2'] = array(false, 'PHP Gd2', in_array('gd2', $loaded_extensions), lang_key('installed'), lang_key('not_installed'));
 		$validations['php_mcrypt'] = array(true, 'PHP mcrypt', in_array('mcrypt', $loaded_extensions), lang_key('installed'), lang_key('not_installed'));
 	}
