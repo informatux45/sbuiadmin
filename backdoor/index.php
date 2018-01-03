@@ -265,7 +265,16 @@ if ($sbusers->getUserInfo('admin', 'username') == 'admin') {
 // Get Global Configuration
 // ----------------------
 // --- Link CUSTOMER WEBSITE
-$sbsmarty->assign('sb_url_customer', trim($sb_link_settings[15]));
+if (trim($sb_link_settings[24]) == '1') {
+	$table           = _AM_DB_PREFIX . "sb_config";
+	$query           = "SELECT config, content FROM $table WHERE config = 'coming-soon-url'";
+	$request         = $sbsql->query($query);
+	$assoc           = $sbsql->object($request);
+	$sb_url_customer = trim($sb_link_settings[15]) . '?d=' . trim($assoc->content);
+} else {
+	$sb_url_customer = trim($sb_link_settings[15]);
+}
+$sbsmarty->assign('sb_url_customer', $sb_url_customer);
 // --- Sandbox Activation
 $sbsmarty->assign('sb_sandbox', trim($sb_link_settings[16]));
 // --- CMS Activation

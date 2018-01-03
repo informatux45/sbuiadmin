@@ -17,12 +17,16 @@ if (basename($_SERVER['PHP_SELF']) == 'sbconfig.php') {
 /** Below are constants that you can use to customize how SBUIADMIN operates */ 
 /*****************************************************************************/
 
-# Default max width of images
-define('SBIMAGEWIDTH', '1024');
-
 # Change the administrative panel folder name
 # Don't miss to change the htaccess file in administration
 define('SBADMIN', 'backdoor');
+
+# Get files configuration (theme / general)
+$sb_theme_config   = file(dirname(__FILE__) . DIRECTORY_SEPARATOR . SBADMIN . DIRECTORY_SEPARATOR .'inc' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'theme.txt');
+$sb_general_config = file(dirname(__FILE__) . DIRECTORY_SEPARATOR . SBADMIN . DIRECTORY_SEPARATOR .'inc' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'settings.txt');
+
+# Default max width of images
+define('SBIMAGEWIDTH', '1024');
 
 # Define SBUIADMIN ID Files
 define('SBUIADMINID', 'sbuiadmin');
@@ -46,7 +50,6 @@ date_default_timezone_set(SBTIMEZONE);
 define('SBFROMEMAIL', 'noreply@mysite.fr');
 
 # Theme directory
-$sb_theme_config = file(dirname(__FILE__) . DIRECTORY_SEPARATOR . SBADMIN . DIRECTORY_SEPARATOR .'inc' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'theme.txt');
 define('SBTHEME', trim($sb_theme_config[0]));
 
 # Module activated onto index page
@@ -78,13 +81,13 @@ define('SBUIADMIN_PATH', true);
 define('SBREWRITEURL', false);
 
 # Enable maintenance mode (Coming soon)
-define('SBMAINTENANCE', true);
+define('SBMAINTENANCE', (trim($sb_general_config[24]) == 1 ? true : false));
 
 # Define Subdirectory Site
 # if is visible in your url
 # Default: false
 # Ex: http://site.com/dir/
-define('SBSITESUBDIRECTORY', ''); // Obsolete !
+define('SBSITESUBDIRECTORY', '');
 
 # Defined Safe Modules created by you (developer)
 //$sb_safe_modules_cms = ['your_new_module','your_new_module2'];

@@ -63,6 +63,7 @@ $sb_msg_valid = false;
  * 21 - DB prefix
  * 22 - Captcha Mode
  * 23 - Upgrade Mode
+ * 24 - Coming soon
  * ---------------------------- */
 $sb_settings_file = _AM_SETTINGS_FILE;
 
@@ -111,6 +112,7 @@ switch($action) {
 			$sb_output_file .= $sbsanitize->displayText($_POST['dbprefix'], 'UTF-8', 1, 0) . "\n";
 			$sb_output_file .= ($_POST['captcha_mode'] === "on") ? "1"."\n" : "0"."\n";
 			$sb_output_file .= ($_POST['upgrade_mode'] === "on") ? "1"."\n" : "0"."\n";
+			$sb_output_file .= ($_POST['coming_soon'] === "on") ? "1"."\n" : "0"."\n";
 			
 			// Locker le fichier pour qu'une seule personne a la fois ecrive dedans
 			$result_edit = file_put_contents($sb_settings_file, $sb_output_file, FILE_USE_INCLUDE_PATH | LOCK_EX);
@@ -155,6 +157,7 @@ switch($action) {
 		$sb_config_dbprefix         = $sb_settings[21];
 		$sb_config_captcha_mode     = $sb_settings[22];
 		$sb_config_upgrade_mode     = $sb_settings[23];
+		$sb_config_coming_soon      = $sb_settings[24];
 		
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) $sbsmarty->assign('file_content', $sb_settings);						
@@ -218,6 +221,12 @@ switch($action) {
 		$tab_check_5[0]['name']    = 'upgrade_mode';
 		$tab_check_5[0]['checked'] = ($sb_config_upgrade_mode == 1) ? '1' : '0';
 		$sbform->addCheckbox('Activation du mode UPGRADE (Admin)', $tab_check_5, '', false, '<br />', "Permet d'activer le mode UPGRADE de l'administration");
+		// Checkbox du mode COMING SOON
+		$tab_check_6 = array();
+		$tab_check_6[0]['text']    = 'Activé';
+		$tab_check_6[0]['name']    = 'coming_soon';
+		$tab_check_6[0]['checked'] = ($sb_config_coming_soon == 1) ? '1' : '0';
+		$sbform->addCheckbox('Activation du mode COMING SOON (Maintenance)', $tab_check_6, '', false, '<br />', "Permet d'activer le mode COMING SOON (Maintenance du site)<br>Ouvert uniquement aux administrateurs ou par url spécifique (<a href='"._AM_SITE_URL."index.php?p=cmsconfig&op=comingsoon'>configuration</a>)");
 		// --- Hiddens / Buttons
 		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => "$formName"));
 		$sbform->addInput('submit', '', array('value' => "$btn_add_edit"));
@@ -257,6 +266,7 @@ $sbsmarty->assign('sb_config_recaptcha_secret', trim($sb_config_recaptcha_secret
 $sbsmarty->assign('sb_config_dbprefix', trim($sb_config_dbprefix));
 $sbsmarty->assign('sb_config_captcha_mode', trim($sb_config_captcha_mode));
 $sbsmarty->assign('sb_config_upgrade_mode', trim($sb_config_upgrade_mode));
+$sbsmarty->assign('sb_config_coming_soon', trim($sb_config_coming_soon));
 
 // ----------------------
 // ASSIGN Page TITLE

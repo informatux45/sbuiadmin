@@ -124,8 +124,9 @@
 								$output_file .= $_SESSION['settings_recaptcha_public'] . "\n";
 								$output_file .= $_SESSION['settings_recaptcha_private'] . "\n";
 								$output_file .= $_SESSION['database_prefix'] . "\n";
-								$output_file .= "1" . "\n";
-								$output_file .= "0" . "\n";
+								$output_file .= "1" . "\n"; // Captcha
+								$output_file .= "0" . "\n"; // Upgrade
+								$output_file .= "1" . "\n"; // Coming soon (maintenance)
 								
 								// Locker le fichier pour qu'une seule personne a la fois ecrive dedans
 								$result_edit = file_put_contents($settings_file, $output_file, FILE_USE_INCLUDE_PATH | LOCK_EX);
