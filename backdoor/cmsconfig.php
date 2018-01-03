@@ -330,7 +330,7 @@ switch($action) {
 		// Selection du type de Coming Soon
 		// --------------------------------
 		$sb_type = ['image','video'];
-		$sbform->openSelect("Choisissez un type de coming soon", array("id"=>"coming_soon_type", "name"=>"coming_soon_type"), true);
+		$sbform->openSelect("Choisissez un type de coming soon", array("id"=>"coming_soon_type", "name"=>"coming_soon_type", "style" => "width: 200px;"), true);
 		for($i = 0; $i < count($sb_type); $i++) {
 			if ($sb_type[$i] == $cs['coming-soon-type'])
 				$sbform->addOption($sb_type[$i], array ("value"=>$sb_type[$i], "selected"=>""));
