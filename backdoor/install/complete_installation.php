@@ -103,30 +103,36 @@
 								
 								// Injection des données (Settings File)
 								$output_file  = $_SESSION['settings_customer_name'] . "\n";
-								$output_file .= "admin" . "\n";
+								$output_file .= "admin" . "\n"; // Administrateurs
 								$output_file .= $_SESSION['database_host'] . "\n";
 								$output_file .= $_SESSION['database_name'] . "\n";
 								$output_file .= $_SESSION['database_username'] . "\n";
 								$output_file .= $_SESSION['database_password'] . "\n";
 								$output_file .= $_SESSION['settings_path_upload'] . "\n";
-								$output_file .= "2MB" . "\n";
-								$output_file .= " " . "\n";
-								$output_file .= "0" . "\n";
-								$output_file .= "0" . "\n";
-								$output_file .= "0" . "\n";
+								$output_file .= "2MB" . "\n";  // Upload max
+								$output_file .= " " . "\n";    // Modules autorises
+								$output_file .= "0" . "\n";    // Debug General
+								$output_file .= "0" . "\n";    // Debug Formulaire
+								$output_file .= "0" . "\n";    // Debug Smarty
 								$output_file .= "jpg,jpeg,png,gif,pdf,xml,mp4" . "\n";
 								$output_file .= $_SESSION['settings_url_upload'] . "\n";
-								$output_file .= "20" . "\n";
+								$output_file .= "20" . "\n";   // Uploads simultanes (limit)
 								$output_file .= $_SESSION['settings_customer_url'] . "\n";
-								$output_file .= "1" . "\n";
-								$output_file .= "1" . "\n";
-								$output_file .= "1024" . "\n";
+								$output_file .= "1" . "\n";    // Sandbox
+								$output_file .= "1" . "\n";    // Cms
+								$output_file .= "1024" . "\n"; // Image Scaling Max Size (Medias upload)
 								$output_file .= $_SESSION['settings_recaptcha_public'] . "\n";
 								$output_file .= $_SESSION['settings_recaptcha_private'] . "\n";
 								$output_file .= $_SESSION['database_prefix'] . "\n";
 								$output_file .= "1" . "\n"; // Captcha
 								$output_file .= "0" . "\n"; // Upgrade
 								$output_file .= "1" . "\n"; // Coming soon (maintenance)
+								$output_file .= "0" . "\n"; // Debug General Front
+								$output_file .= "0" . "\n"; // Debug Smarty Front
+								$output_file .= "1" . "\n"; // Smarty Force Compile
+								$output_file .= "0" . "\n"; // Rewrite Url
+								$output_file .= "0" . "\n"; // Smarty Caching
+								$output_file .= "3600" . "\n"; // Smarty Caching Lifetime
 								
 								// Locker le fichier pour qu'une seule personne a la fois ecrive dedans
 								$result_edit = file_put_contents($settings_file, $output_file, FILE_USE_INCLUDE_PATH | LOCK_EX);

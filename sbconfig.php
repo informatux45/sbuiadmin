@@ -22,8 +22,8 @@ if (basename($_SERVER['PHP_SELF']) == 'sbconfig.php') {
 define('SBADMIN', 'backdoor');
 
 # Get files configuration (theme / general)
-$sb_theme_config   = file(dirname(__FILE__) . DIRECTORY_SEPARATOR . SBADMIN . DIRECTORY_SEPARATOR .'inc' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'theme.txt');
-$sb_general_config = file(dirname(__FILE__) . DIRECTORY_SEPARATOR . SBADMIN . DIRECTORY_SEPARATOR .'inc' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'settings.txt');
+$sb_theme_config    = file(dirname(__FILE__) . DIRECTORY_SEPARATOR . SBADMIN . DIRECTORY_SEPARATOR .'inc' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'theme.txt');
+$sb_settings_config = file(dirname(__FILE__) . DIRECTORY_SEPARATOR . SBADMIN . DIRECTORY_SEPARATOR .'inc' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'settings.txt');
 
 # Default max width of images
 define('SBIMAGEWIDTH', '1024');
@@ -32,7 +32,8 @@ define('SBIMAGEWIDTH', '1024');
 define('SBUIADMINID', 'sbuiadmin');
 
 # Turn on debug mode
-define('SBDEBUG', false);
+# Default: false
+define('SBDEBUG', (trim($sb_settings_config[25]) == 1 ? true : false));
 
 # Language (default fr_FR)
 define('SBLANG', 'fr_FR');
@@ -62,26 +63,31 @@ define('SBSMARTYBC', true);
 
 # Define force compile TPL Smarty
 # Don't let this option to TRUE in production
-define('SBSMARTYFORCECOMPILE', true);
+# Default: true
+define('SBSMARTYFORCECOMPILE', (trim($sb_settings_config[27]) == 1 ? true : false));
 
 # Enable caching smarty TPL
-define('SBSMARTYCACHING', false);
+# Default: false
+define('SBSMARTYCACHING', (trim($sb_settings_config[29]) == 1 ? true : false));
 
 # Define lifetime of cache Smarty
-# Only available if CACHING smarty is true
-define('SBSMARTYCACHELIFETIME', 120);
+# Only available if SMARTY CACHING is true
+# Default: 120
+define('SBSMARTYCACHELIFETIME', (isset($sb_settings_config[30]) && trim($sb_settings_config[30]) > 0 ? trim($sb_settings_config[30]) : 120));
 
 # Enable Smarty Debug
-define('SBSMARTYDEBUG', false);
+# Default: false
+define('SBSMARTYDEBUG', (trim($sb_settings_config[26]) == 1 ? true : false));
 
 # Enable access to classes/files/functions Admin
 define('SBUIADMIN_PATH', true);
 
 # Enable rewrite url
-define('SBREWRITEURL', false);
+# Default: false
+define('SBREWRITEURL', (trim($sb_settings_config[28]) == 1 ? true : false));
 
 # Enable maintenance mode (Coming soon)
-define('SBMAINTENANCE', (trim($sb_general_config[24]) == 1 ? true : false));
+define('SBMAINTENANCE', (trim($sb_settings_config[24]) == 1 ? true : false));
 
 # Define Subdirectory Site
 # if is visible in your url
@@ -107,7 +113,6 @@ $sb_safe_pages_cms = ['index','user','news','pages'];
 // ------------------------ 
 // --- Database
 // ------------------------ 
-$sb_settings_config = file(dirname(__FILE__) . DIRECTORY_SEPARATOR . SBADMIN . DIRECTORY_SEPARATOR .'inc' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'settings.txt');
 define('_AM_SITE_TITLE',	trim($sb_settings_config[0]));
 define('_AM_DB_HOST',		trim($sb_settings_config[2]));
 define('_AM_DB_NAME',		trim($sb_settings_config[3]));

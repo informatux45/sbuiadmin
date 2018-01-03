@@ -48,8 +48,8 @@ $sb_msg_valid = false;
  * 6  - Repertoire uploads (DIR)
  * 7  - Upload max
  * 8  - Modules autorises
- * 9  - Debug general
- * 10 - Debug formulaire
+ * 9  - Debug General
+ * 10 - Debug Formulaire
  * 11 - Debug Smarty
  * 12 - Extensions autorisees (upload)
  * 13 - Repertoire uploads (URL)
@@ -64,6 +64,12 @@ $sb_msg_valid = false;
  * 22 - Captcha Mode
  * 23 - Upgrade Mode
  * 24 - Coming soon
+ * 25 - Debug General Front
+ * 26 - Debug Smarty Front
+ * 27 - Smarty Force Compile
+ * 28 - Rewrite Url
+ * 29 - Smarty Caching
+ * 30 - Smarty Caching Lifetime
  * ---------------------------- */
 $sb_settings_file = _AM_SETTINGS_FILE;
 
@@ -113,6 +119,12 @@ switch($action) {
 			$sb_output_file .= ($_POST['captcha_mode'] === "on") ? "1"."\n" : "0"."\n";
 			$sb_output_file .= ($_POST['upgrade_mode'] === "on") ? "1"."\n" : "0"."\n";
 			$sb_output_file .= ($_POST['coming_soon'] === "on") ? "1"."\n" : "0"."\n";
+			$sb_output_file .= ($_POST['debug_general_front'] === "on") ? "1"."\n" : "0"."\n";
+			$sb_output_file .= ($_POST['debug_smarty_front'] === "on") ? "1"."\n" : "0"."\n";
+			$sb_output_file .= ($_POST['smarty_force_tpls'] === "on") ? "1"."\n" : "0"."\n";
+			$sb_output_file .= ($_POST['rewrite_url'] === "on") ? "1"."\n" : "0"."\n";
+			$sb_output_file .= ($_POST['smarty_caching'] === "on") ? "1"."\n" : "0"."\n";
+			$sb_output_file .= $sbsanitize->displayText($_POST['smarty_caching_time'], 'UTF-8', 1, 0) . "\n";
 			
 			// Locker le fichier pour qu'une seule personne a la fois ecrive dedans
 			$result_edit = file_put_contents($sb_settings_file, $sb_output_file, FILE_USE_INCLUDE_PATH | LOCK_EX);
@@ -133,31 +145,37 @@ switch($action) {
 		// --- Ouverture du fichier
 		$sb_settings = file($sb_settings_file);
 		// --- Initialisation
-		$sb_config_customer_name    = $sb_settings[0];
-		$sb_config_administrators   = $sb_settings[1];
-		$sb_config_dbhost           = $sb_settings[2];
-		$sb_config_dbname           = $sb_settings[3];
-		$sb_config_dbuser           = $sb_settings[4];
-		$sb_config_dbpwd            = $sb_settings[5];
-		$sb_config_diruploads       = $sb_settings[6];
-		$sb_config_upload_max       = $sb_settings[7];
-		$sb_config_modules          = $sb_settings[8];
-		$sb_config_debug_general    = $sb_settings[9];
-		$sb_config_debug_form       = $sb_settings[10];
-		$sb_config_debug_smarty     = $sb_settings[11];
-		$sb_config_upload_exts      = $sb_settings[12];
-		$sb_config_urluploads       = $sb_settings[13];
-		$sb_config_upload_limit     = $sb_settings[14];
-		$sb_config_url_customer     = $sb_settings[15];
-		$sb_config_sandbox          = $sb_settings[16];
-		$sb_config_cms              = $sb_settings[17];
-		$sb_config_scaling_maxsize  = $sb_settings[18];
-		$sb_config_recaptcha_public = $sb_settings[19];
-		$sb_config_recaptcha_secret = $sb_settings[20];
-		$sb_config_dbprefix         = $sb_settings[21];
-		$sb_config_captcha_mode     = $sb_settings[22];
-		$sb_config_upgrade_mode     = $sb_settings[23];
-		$sb_config_coming_soon      = $sb_settings[24];
+		$sb_config_customer_name       = $sb_settings[0];
+		$sb_config_administrators      = $sb_settings[1];
+		$sb_config_dbhost              = $sb_settings[2];
+		$sb_config_dbname              = $sb_settings[3];
+		$sb_config_dbuser              = $sb_settings[4];
+		$sb_config_dbpwd               = $sb_settings[5];
+		$sb_config_diruploads          = $sb_settings[6];
+		$sb_config_upload_max          = $sb_settings[7];
+		$sb_config_modules             = $sb_settings[8];
+		$sb_config_debug_general       = $sb_settings[9];
+		$sb_config_debug_form          = $sb_settings[10];
+		$sb_config_debug_smarty        = $sb_settings[11];
+		$sb_config_upload_exts         = $sb_settings[12];
+		$sb_config_urluploads          = $sb_settings[13];
+		$sb_config_upload_limit        = $sb_settings[14];
+		$sb_config_url_customer        = $sb_settings[15];
+		$sb_config_sandbox             = $sb_settings[16];
+		$sb_config_cms                 = $sb_settings[17];
+		$sb_config_scaling_maxsize     = $sb_settings[18];
+		$sb_config_recaptcha_public    = $sb_settings[19];
+		$sb_config_recaptcha_secret    = $sb_settings[20];
+		$sb_config_dbprefix            = $sb_settings[21];
+		$sb_config_captcha_mode        = $sb_settings[22];
+		$sb_config_upgrade_mode        = $sb_settings[23];
+		$sb_config_coming_soon         = $sb_settings[24];
+		$sb_config_debug_general_front = $sb_settings[25];
+		$sb_config_debug_smarty_front  = $sb_settings[26];
+		$sb_config_smarty_force_tpls   = $sb_settings[27];
+		$sb_config_rewrite_url         = $sb_settings[28];
+		$sb_config_smarty_caching      = $sb_settings[29];
+		$sb_config_smarty_caching_time = $sb_settings[30];
 		
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) $sbsmarty->assign('file_content', $sb_settings);						
@@ -187,16 +205,25 @@ switch($action) {
 		$sbform->addInput('text', 'Google Recaptcha (Clé secrète)', array ('name' => 'recaptcha_secret', 'value' => "$sb_config_recaptcha_secret", 'placeholder' => "Clé secrète"), true, false, "Clé pour toute communication entre votre site et Google. Veillez à ne pas la divulguer, car il s'agit d'une clé secrète.");
 		// Checkbox des modes debug
 		$tab_check = array();
-		$tab_check[0]['text']    = 'Debug général';
+		$tab_check[0]['text']    = 'Debug général (ADMIN)';
 		$tab_check[0]['name']    = 'debug_general';
 		$tab_check[0]['checked'] = ($sb_config_debug_general == 1) ? '1' : '0';
-		$tab_check[1]['text']    = 'Debug formulaire';
+		$tab_check[1]['text']    = 'Debug formulaire (ADMIN)';
 		$tab_check[1]['name']    = 'debug_form';
 		$tab_check[1]['checked'] = ($sb_config_debug_form == 1) ? '1' : '0';
-		$tab_check[2]['text']    = 'Debug Smarty';
+		$tab_check[2]['text']    = 'Debug Smarty (ADMIN)';
 		$tab_check[2]['name']    = 'debug_smarty';
 		$tab_check[2]['checked'] = ($sb_config_debug_smarty == 1) ? '1' : '0';
-		$sbform->addCheckbox('Activation des différents modes de DEBUG', $tab_check, '', false, '<br />', "Activation des modes DEBUG Inline, Formulaires, Smarty (core)");
+		$sbform->addCheckbox('Activation des différents modes de DEBUG (ADMINISTRATION)', $tab_check, '', false, '<br />', "Activation des modes DEBUG Inline, Formulaires, Smarty (core)");
+		// --------------------------------------------------
+		$tab_check_7 = array();
+		$tab_check_7[0]['text']    = 'Debug général (FRONT)';
+		$tab_check_7[0]['name']    = 'debug_general_front';
+		$tab_check_7[0]['checked'] = ($sb_config_debug_general_front == 1) ? '1' : '0';
+		$tab_check_7[1]['text']    = 'Debug Smarty (FRONT)';
+		$tab_check_7[1]['name']    = 'debug_smarty_front';
+		$tab_check_7[1]['checked'] = ($sb_config_debug_smarty_front == 1) ? '1' : '0';
+		$sbform->addCheckbox('Activation des différents modes de DEBUG (FRONT)', $tab_check_7, '', false, '<br />', "Activation des modes DEBUG (FRONT) Inline, Smarty (core)");
 		// Checkbox du Sandbox
 		$tab_check_2 = array();
 		$tab_check_2[0]['text']    = 'Sandbox';
@@ -227,6 +254,44 @@ switch($action) {
 		$tab_check_6[0]['name']    = 'coming_soon';
 		$tab_check_6[0]['checked'] = ($sb_config_coming_soon == 1) ? '1' : '0';
 		$sbform->addCheckbox('Activation du mode COMING SOON (Maintenance)', $tab_check_6, '', false, '<br />', "Permet d'activer le mode COMING SOON (Maintenance du site)<br>Ouvert uniquement aux administrateurs ou par url spécifique (<a href='"._AM_SITE_URL."index.php?p=cmsconfig&op=comingsoon'>configuration</a>)");
+		// Checkbox du mode REWRITE URL
+		$tab_check_8 = array();
+		$tab_check_8[0]['text']    = 'Activé';
+		$tab_check_8[0]['name']    = 'rewrite_url';
+		$tab_check_8[0]['checked'] = ($sb_config_rewrite_url == 1) ? '1' : '0';
+		$sbform->addCheckbox('Activation du Rewrite URL', $tab_check_8, '', false, '<br />', "Permet d'activer la réécriture d'adresse (URLs courtes)");
+		// Smarty force compile tpls
+		$tab_check_9 = array();
+		$tab_check_9[0]['text']    = 'Smarty Force Compile (FRONT)';
+		$tab_check_9[0]['name']    = 'smarty_force_tpls';
+		$tab_check_9[0]['checked'] = ($sb_config_smarty_force_tpls == 1) ? '1' : '0';
+		$sbform->addCheckbox('Activation de la compilation des templates Smarty', $tab_check_9, '', false, '<br />', "Désactiver ce mode quand le site est en production !");
+		// Smarty cache
+		$tab_check_10[0]['text']    = 'Smarty Cache Templates';
+		$tab_check_10[0]['name']    = 'smarty_caching';
+		$tab_check_10[0]['checked'] = ($sb_config_smarty_caching == 1) ? '1' : '0';
+		$sbform->addCheckbox('Activation du cache des templates Smarty', $tab_check_10, '', false, '<br />', "Si le cache est activé, choisir la durée du cache des templates");
+		// Smarty Lifetime
+		$sb_options_lifetime = ['30'     => '30 secondes'
+							   ,'60'     => '1 minute'
+							   ,'300'    => '5 minutes'
+							   ,'1800'   => '30 minutes'
+							   ,'3600'   => '1 heure'
+							   ,'18000'  => '5 heures'
+							   ,'86400'  => '1 jour'
+							   ,'259200' => '3 jours'
+							   ,'604800' => '1 semaine'
+								];
+		$sbform->openSelect("Durée du cache Smarty", array("id"=>"smarty_caching_time", "name"=>"smarty_caching_time"));
+		$sbform->addOption('Choisissez une durée de cache', array ("value"=>"", "selected"=>""));
+		foreach($sb_options_lifetime as $key => $value) {
+			if ($key == $sb_config_smarty_caching_time)
+				$sbform->addOption($value, array ("value" => $key, "selected"=>""));
+		else
+				$sbform->addOption($value, array ("value" => $key));
+		}
+		// --- Close Select
+		$sbform->closeSelect("Choisissez la durée en secondes pendant laquelle un cache de template est valide.<br>Une fois cette durée dépassée, le cache est regénéré.");
 		// --- Hiddens / Buttons
 		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => "$formName"));
 		$sbform->addInput('submit', '', array('value' => "$btn_add_edit"));
@@ -267,6 +332,12 @@ $sbsmarty->assign('sb_config_dbprefix', trim($sb_config_dbprefix));
 $sbsmarty->assign('sb_config_captcha_mode', trim($sb_config_captcha_mode));
 $sbsmarty->assign('sb_config_upgrade_mode', trim($sb_config_upgrade_mode));
 $sbsmarty->assign('sb_config_coming_soon', trim($sb_config_coming_soon));
+$sbsmarty->assign('sb_config_debug_general_front', trim($sb_config_debug_general_front));
+$sbsmarty->assign('sb_config_debug_smarty_front', trim($sb_config_debug_smarty_front));
+$sbsmarty->assign('sb_config_smarty_force_tpls', trim($sb_config_smarty_force_tpls));
+$sbsmarty->assign('sb_config_rewrite_url', trim($sb_config_rewrite_url));
+$sbsmarty->assign('sb_config_smarty_caching', trim($sb_config_smarty_caching));
+$sbsmarty->assign('sb_config_smarty_caching_time', trim($sb_config_smarty_caching_time));
 
 // ----------------------
 // ASSIGN Page TITLE
