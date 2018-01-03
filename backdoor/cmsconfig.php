@@ -179,7 +179,7 @@ switch($action) {
 		$requestF = $sbsql->query($queryF);
 		$assocH   = $sbsql->assoc($requestH);
 		$assocF   = $sbsql->assoc($requestF);
-		$contentH = utf8_encode($assoc['content']);
+		$contentH = utf8_encode($assocH['content']);
 
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $queryH . "\n" . $queryF . "\n" . 'Form Type = '.$formType);						
