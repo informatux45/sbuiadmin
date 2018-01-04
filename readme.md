@@ -54,6 +54,7 @@ Demandez nous un accès ;-)
 
 **2.10**
 - Change all constants and variables for SBUIADMIN
+- Add more General Settings (debugs front, rewrite url, Smarty caching, Smarty cache lifetime, Smarty force compile TPLs)
 
 **2.04**
 - Add Google INVISIBLE Recaptcha
