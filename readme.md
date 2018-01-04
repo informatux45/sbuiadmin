@@ -57,7 +57,7 @@ Demandez nous un accès ;-)
 - Add more General Settings (debugs front, rewrite url, Smarty caching, Smarty cache lifetime, Smarty force compile TPLs)
 
 **2.04**
-- Add Google INVISIBLE Recaptcha
+- Add Google INVISIBLE Recaptcha (Login Admin)
 
 **2.03**
 - Change version of CKEditor to 4.8.0.
