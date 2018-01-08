@@ -152,7 +152,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_contact` (
   `subject` text NOT NULL,
   `form` text NOT NULL,
   `active` tinyint(4) NOT NULL COMMENT '0: inactive, 1: active',
-  `sort` int(11) NOT NULL
+  `sort` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
