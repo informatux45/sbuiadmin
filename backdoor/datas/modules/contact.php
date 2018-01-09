@@ -56,9 +56,9 @@ switch($action) {
 	default:
 		// Action DELETE
 		if ($action == 'del') {
-			$get_id   = intval($_GET['id']);
-			$query[2] = "DELETE FROM $table WHERE id = '$get_id'";
-			$request  = $sbsql->query($query[2]);
+			$get_id  = intval($_GET['id']);
+			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
+			$request = $sbsql->query($query_2);
 			
 			if ($request)
 				$sb_msg_valid = $text . ' supprimé avec succès';
@@ -71,18 +71,18 @@ switch($action) {
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		
 		// Contents table
-		$query[0] = "SELECT * FROM $table";
-		$request2  = $sbsql->query($query[0]);
-		$result2   = $sbsql->toarray($request2);
+		$query    = "SELECT * FROM $table";
+		$request2 = $sbsql->query($query);
+		$result2  = $sbsql->toarray($request2);
 		
 		$sbsmarty->assign('all', true);
 		$sbsmarty->assign('allcontact', $result2);
-		
+
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) {
-			$alldel_debug = 'ALL: ' . $query[0];
+			$alldel_debug = 'ALL: ' . $query;
 			if (isset($action) && $action == 'del') {				  
-				$alldel_debug .= "\n" . 'DEL: ' . $query[2];
+				$alldel_debug .= "\n" . 'DEL: ' . $query_2;
 			}
 			$sbsmarty->assign('sbdebugsql', $alldel_debug);
 		}
@@ -169,8 +169,8 @@ switch($action) {
 		if ($formType == 'edit' && !$_POST['form_submit']) {
 			// --- Recuperation des donnees
 			$id          = intval($_GET['id']);
-			$query[1]    = "SELECT * FROM $table WHERE id = $id";
-			$requestQ    = $sbsql->query($query[1]);
+			$query_1     = "SELECT * FROM $table WHERE id = $id";
+			$requestQ    = $sbsql->query($query_1);
 			$assoc       = $sbsql->assoc($requestQ);
 			$title       = $sbsanitize->displayLang(utf8_encode($assoc['title']));
 			$recipients  = $assoc['recipients'];
@@ -180,10 +180,10 @@ switch($action) {
 			// ---------------------------
 			$subject_en  = $sbsanitize->displayLang(utf8_encode($assoc['subject']), 'en');
 
-			$sbsmarty->assign('assoc', $query[1]);
+			$sbsmarty->assign('assoc', $query_1);
 
 			// --- Debug SQL
-			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[1]	 . "\n" . 'Form Type = '.$formType);						
+			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);						
 		}
 				
 		// --------------------------------		
@@ -213,6 +213,7 @@ switch($action) {
 		// Formulaire (construct)
 		// --------------------------------
 		$sbform->addAnything('<p>&nbsp;</p>
+							 <p class="help-block">L\'usage du RECAPTCHA INVISIBLE ne requiert pas le bouton SUBMIT car il devient le bouton de soumission de votre formulaire.</p>
 							 <button class="btn btn-danger btn-xs" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[TEXT name=name/required=required]\')">NAME</button>
 							 &nbsp;&nbsp;
 							 <button class="btn btn-danger btn-xs" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[TEXT name=email/required=required]\')">EMAIL</button>
@@ -224,6 +225,8 @@ switch($action) {
 							 <button class="btn btn-primary btn-xs" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[SELECT name=selection/options=choisissez un choix|choix1|choix2|choix3|choix4/value=0|10|20|30|40/required=required]\')">SELECT</button>
 							 &nbsp;&nbsp;
 							 <button class="btn btn-danger btn-xs" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[RECAPTCHA]\')">RECAPTCHA</button>
+							 &nbsp;&nbsp;
+							 <button class="btn btn-danger btn-xs" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[RECAPTCHA_INVISIBLE name=go/value=Envoyer]\')">RECAPTCHA_INVISIBLE</button>
 							 &nbsp;&nbsp;
 							 <button class="btn btn-primary btn-xs" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[SUBMIT name=go/value=Envoyer]\')">SUBMIT</button>');
 		$sbform->addTextarea('', $contactform, array('id' => 'contactform', 'name' => 'contactform', 'style' => 'height: 400px !important; background: url(img/form-bg-textarea.png) repeat-y; font: normal 12px verdana; line-height: 25px; padding: 2px 10px; border: 2px solid #ddd; border-left: 0px; background-attachment: local;'), false, "Les boutons rouges ont caractère d'obligation. Si vous les omettez, le formulaire de contact ne fonctionnera pas correctement.");
