@@ -56,9 +56,9 @@ switch($action) {
 	default:
 		// Action DELETE table
 		if ($action == 'del') {
-			$get_id   = intval($_GET['id']);
-			$query[2] = "DELETE FROM $table WHERE id = '$get_id'";
-			$request  = $sbsql->query($query[2]);
+			$get_id  = intval($_GET['id']);
+			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
+			$request = $sbsql->query($query_2);
 			// --- Supression de la structure
 			$query_del_structure   = "DELETE FROM $table_structure WHERE tid = '$get_id'";
 			$request_del_structure = $sbsql->query($query_del_structure);
@@ -77,18 +77,18 @@ switch($action) {
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		
 		// Contents table
-		$query[0] = "SELECT * FROM $table";
-		$request2  = $sbsql->query($query[0]);
-		$result2   = $sbsql->toarray($request2);
+		$query    = "SELECT * FROM $table";
+		$request2 = $sbsql->query($query);
+		$result2  = $sbsql->toarray($request2);
 		
 		$sbsmarty->assign('all', true);
 		$sbsmarty->assign('alltable', $result2);
 		
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) {
-			$alldel_debug = 'ALL: ' . $query[0];
+			$alldel_debug = 'ALL: ' . $query;
 			if (isset($action) && $action == 'del') {				  
-				$alldel_debug .= "\n" . 'DEL: ' . $query[2];
+				$alldel_debug .= "\n" . 'DEL: ' . $query_2;
 			}
 			$sbsmarty->assign('sbdebugsql', $alldel_debug);
 		}
@@ -163,17 +163,17 @@ switch($action) {
 		if ($formType == 'edit' && !$_POST['form_submit']) {
 			// --- Recuperation des donnees
 			$id       = intval($_GET['id']);
-			$query[1] = "SELECT * FROM $table WHERE id = $id";
-			$requestQ = $sbsql->query($query[1]);
+			$query_1  = "SELECT * FROM $table WHERE id = $id";
+			$requestQ = $sbsql->query($query_1);
 			$assoc    = $sbsql->assoc($requestQ);
 			$name     = utf8_encode($assoc['name']);
 			$type     = utf8_encode($assoc['type']);
 			$active   = $assoc['active'];
 
-			$sbsmarty->assign('assoc', $query[1]);
+			$sbsmarty->assign('assoc', $query_1);
 
 			// --- Debug SQL
-			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[1]	 . "\n" . 'Form Type = '.$formType);						
+			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);						
 		}
 		
 		// --------------------------------		
@@ -220,9 +220,9 @@ switch($action) {
 	case "delfield":
 		// Action DELETE Fields table (structure)
 		if ($action == 'delfield') {
-			$get_id   = intval($_GET['id']);
-			$query[2] = "DELETE FROM $table_structure WHERE id = '$get_id'";
-			$request  = $sbsql->query($query[2]);
+			$get_id  = intval($_GET['id']);
+			$query_2 = "DELETE FROM $table_structure WHERE id = '$get_id'";
+			$request = $sbsql->query($query_2);
 			
 			if ($request)
 				$sb_msg_valid = 'Colonne de tableau supprimée avec succès';
@@ -301,8 +301,8 @@ switch($action) {
 		if ($formType == 'editfield' && !$_POST['form_submit'] && $_GET['id']) {
 			// --- Recuperation des donnees
 			$id           = intval($_GET['id']);
-			$query[1]     = "SELECT * FROM $table_structure WHERE id = $id";
-			$requestQ     = $sbsql->query($query[1]);
+			$query_1      = "SELECT * FROM $table_structure WHERE id = $id";
+			$requestQ     = $sbsql->query($query_1);
 			$assoc        = $sbsql->assoc($requestQ);
 			$tid          = intval($assoc['tid']);
 			$title        = $sbsanitize->displayLang(utf8_encode($assoc['title']));
@@ -310,10 +310,10 @@ switch($action) {
 			$field_target = utf8_encode($assoc['field_target']);
 			$active       = $assoc['active'];
 
-			$sbsmarty->assign('assoc', $query[1]);
+			$sbsmarty->assign('assoc', $query_1);
 
 			// --- Debug SQL
-			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[1]	 . "\n" . 'Form Type = '.$formType);						
+			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);						
 		} else {
 			// --- Vider les champs du formulaire
 			$tid = $title = $field_type = $field_target = $active = '';
@@ -394,9 +394,9 @@ switch($action) {
 	case "deldatas":
 		// Action DELETE Fields table (structure)
 		if ($action == 'deldatas') {
-			$get_id   = intval($_GET['id']);
-			$query[2] = "DELETE FROM $table_datas WHERE id = '$get_id'";
-			$request  = $sbsql->query($query[2]);
+			$get_id  = intval($_GET['id']);
+			$query_2 = "DELETE FROM $table_datas WHERE id = '$get_id'";
+			$request = $sbsql->query($query_2);
 			
 			if ($request)
 				$sb_msg_valid = 'Ligne de donnée supprimée avec succès';
@@ -494,8 +494,8 @@ switch($action) {
 		if ($formType == 'editdatas' && !$_POST['form_submit'] && $_GET['id']) {
 			// --- Recuperation des donnees
 			$id           = intval($_GET['id']);
-			$query[1]     = "SELECT * FROM $table_datas WHERE id = $id ORDER BY sort ASC";
-			$requestQ     = $sbsql->query($query[1]);
+			$query_1      = "SELECT * FROM $table_datas WHERE id = $id ORDER BY sort ASC";
+			$requestQ     = $sbsql->query($query_1);
 			$assoc        = $sbsql->assoc($requestQ);
 			$tid          = intval($assoc['tid']);
 			$title_fr     = $sbsanitize->displayLang(utf8_encode($assoc['title']));
@@ -506,10 +506,10 @@ switch($action) {
 			$field_target = utf8_encode($assoc['field_target']);
 			$active       = $assoc['active'];
 
-			$sbsmarty->assign('assoc', $query[1]);
+			$sbsmarty->assign('assoc', $query_1);
 
 			// --- Debug SQL
-			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[1]	 . "\n" . 'Form Type = '.$formType);						
+			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);						
 		} else {
 			$name = $sbsanitize->displayLang(utf8_encode($_POST['title_fr'])); // Legende
 		}
@@ -617,8 +617,8 @@ switch($action) {
 		// Initialize Form SORT
 		// --------------------------------
 		$tid             = intval($_GET['tid']);
-		$query[1]        = "SELECT name FROM $table WHERE id = '$tid'";
-		$request_tblname = $sbsql->query($query[1]);
+		$query_1         = "SELECT name FROM $table WHERE id = '$tid'";
+		$request_tblname = $sbsql->query($query_1);
 		$table_infos     = $sbsql->object($request_tblname);
 		$formName        = "sort_form";
 		$formType        = "sortstructure";
@@ -654,9 +654,9 @@ switch($action) {
 		}
 		
 		// --- Recuperation des donnees
-		$query[3]      = "SELECT * FROM $table_structure WHERE tid = '$tid' ORDER BY sort ASC";
-		$requestQ      = $sbsql->query($query[3]);
-		$sort_array    = $sbsql->toarray($requestQ);
+		$query_3    = "SELECT * FROM $table_structure WHERE tid = '$tid' ORDER BY sort ASC";
+		$requestQ   = $sbsql->query($query_3);
+		$sort_array = $sbsql->toarray($requestQ);
 		foreach($sort_array as $sort) {
 			$active = ($sort['active']) ? $sbsanitize->displayLang(utf8_encode($sort['title'])) : "<span style='color: red;'>".$sbsanitize->displayLang(utf8_encode($sort['title']))."</span>";
 			$sort_id          = $sort['id'];
@@ -664,7 +664,7 @@ switch($action) {
 		}
 
 		// --- Debug SQL
-		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[3]	 . "\n" . 'Form Type = '.$formType);
+		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_3 . "\n" . 'Form Type = '.$formType);
 		
 		// --------------------------------		
 		// --- Define variables
@@ -689,8 +689,8 @@ switch($action) {
 		// Initialize Form SORT
 		// --------------------------------
 		$tid             = intval($_GET['tid']);
-		$query[1]        = "SELECT name FROM $table WHERE id = '$tid'";
-		$request_tblname = $sbsql->query($query[1]);
+		$query_1         = "SELECT name FROM $table WHERE id = '$tid'";
+		$request_tblname = $sbsql->query($query_1);
 		$table_infos     = $sbsql->object($request_tblname);
 		$formName        = "sort_form";
 		$formType        = "sortdatas";
@@ -726,14 +726,9 @@ switch($action) {
 		}
 		
 		// --- Recuperation des donnees
-		$query[3]      = "SELECT * FROM $table_datas WHERE tid = '$tid' ORDER BY sort ASC";
-		$requestQ      = $sbsql->query($query[3]);
+		$query_3      = "SELECT * FROM $table_datas WHERE tid = '$tid' ORDER BY sort ASC";
+		$requestQ      = $sbsql->query($query_3);
 		$sort_array    = $sbsql->toarray($requestQ);
-		//foreach($sort_array as $sort) {
-		//	$active = ($sort['active']) ? $sbsanitize->displayLang(utf8_encode($sort['title'])) : "<span style='color: red;'>".$sbsanitize->displayLang(utf8_encode($sort['title']))."</span>";
-		//	$sort_id          = $sort['id'];
-		//	$toSort[$sort_id] = $active;
-		//}
 		foreach($sort_array as $sort) {
 			$datas            = json_decode($sort['content'], true);
 			$active           = $sbsanitize->displayText($datas[0]['v']);
@@ -742,7 +737,7 @@ switch($action) {
 		}
 
 		// --- Debug SQL
-		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[3]	 . "\n" . 'Form Type = '.$formType);
+		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_3	 . "\n" . 'Form Type = '.$formType);
 		
 		// --------------------------------		
 		// --- Define variables
@@ -750,7 +745,6 @@ switch($action) {
 		// --- Form construct
 		$sbform->openForm(array('action' => "$formAction", 'name' => "$formName", 'id' => "$formName", 'reloadpage' => "$formAction", 'submitpage' => "$formAction"));
 		// --- Add inputs and more
-		//$active = ($active) ? '1' : '0';
 		$sbform->addSortable($toSort, "Tri par glisser/déposer (drag'n drop) puis Valider");
 		$sbform->addInput('submit', '', array('value' => "$btn_add_edit"));
 		// --------------------------------	
