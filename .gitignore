@@ -1,0 +1,9 @@
+backdoor/inc/admin/dashboard.txt
+backdoor/inc/admin/settings.txt
+backdoor/inc/admin/theme.txt
+backdoor/datas/cache/core/
+backdoor/datas/cache/medias/
+backdoor/datas/cache/tpls_c/
+datas/cache/core/
+datas/cache/medias/
+datas/cache/tpls_c/
