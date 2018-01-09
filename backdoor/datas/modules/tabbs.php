@@ -65,8 +65,8 @@ switch($action) {
 			if ($numrows_tab > 0) {
 				$sb_msg_error = 'Ce TABBS contient des onglets !!<br>Vous devez supprimer les onglets contenus dans ce TABBS avant !!';		
 			} else {
-				$query[2] = "DELETE FROM $table WHERE id = '$get_id'";
-				$request  = $sbsql->query($query[2]);
+				$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
+				$request  = $sbsql->query($query_2);
 				
 				if ($request)
 					$sb_msg_valid = $text . ' supprimé avec succès';
@@ -80,8 +80,8 @@ switch($action) {
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		
 		// Contents table
-		$query[0] = "SELECT * FROM $table";
-		$request2  = $sbsql->query($query[0]);
+		$query     = "SELECT * FROM $table";
+		$request2  = $sbsql->query($query);
 		$result2   = $sbsql->toarray($request2);
 		
 		$sbsmarty->assign('all', true);
@@ -89,9 +89,9 @@ switch($action) {
 		
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) {
-			$alldel_debug = 'ALL: ' . $query[0];
+			$alldel_debug = 'ALL: ' . $query;
 			if (isset($action) && $action == 'del') {				  
-				$alldel_debug .= "\n" . 'DEL: ' . $query[2];
+				$alldel_debug .= "\n" . 'DEL: ' . $query_2;
 			}
 			$sbsmarty->assign('sbdebugsql', $alldel_debug);
 		}
@@ -103,8 +103,8 @@ switch($action) {
 		// Action DELETE
 		if ($action == 'deltab') {
 			$get_id   = intval($_GET['id']);
-			$query[7] = "DELETE FROM $table_tab WHERE id = '$get_id'";
-			$request  = $sbsql->query($query[7]);
+			$query_7  = "DELETE FROM $table_tab WHERE id = '$get_id'";
+			$request  = $sbsql->query($query_7);
 			
 			if ($request)
 				$sb_msg_valid = 'Onglet supprimé avec succès';
@@ -117,10 +117,10 @@ switch($action) {
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		
 		// Contents table
-		$query[0] = "SELECT t1.*, t2.name AS catname
+		$query = "SELECT t1.*, t2.name AS catname
 					 FROM $table_tab AS t1
 					 LEFT JOIN $table AS t2 ON (t1.tid = t2.id)";
-		$request2  = $sbsql->query($query[0]);
+		$request2  = $sbsql->query($query);
 		$result2   = $sbsql->toarray($request2);
 		
 		$sbsmarty->assign('allt', true);
@@ -128,9 +128,9 @@ switch($action) {
 		
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) {
-			$alldel_debug = 'ALL: ' . $query[0];
-			if (isset($action) && $action == 'del') {				  
-				$alldel_debug .= "\n" . 'DEL: ' . $query[2];
+			$alldel_debug = 'ALL: ' . $query;
+			if (isset($action) && $action == 'deltab') {				  
+				$alldel_debug .= "\n" . 'DEL: ' . $query_7;
 			}
 			$sbsmarty->assign('sbdebugsql', $alldel_debug);
 		}
@@ -204,16 +204,16 @@ switch($action) {
 		if ($formType == 'edit' && !$_POST['form_submit']) {
 			// --- Recuperation des donnees
 			$id       = intval($_GET['id']);
-			$query[1] = "SELECT * FROM $table WHERE id = $id";
-			$requestQ = $sbsql->query($query[1]);
+			$query_1  = "SELECT * FROM $table WHERE id = $id";
+			$requestQ = $sbsql->query($query_1);
 			$assoc    = $sbsql->assoc($requestQ);
 			$name     = utf8_encode($assoc['name']);
 			$active   = $assoc['active'];
 
-			$sbsmarty->assign('assoc', $query[1]);
+			$sbsmarty->assign('assoc', $query_1);
 
 			// --- Debug SQL
-			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[1]	 . "\n" . 'Form Type = '.$formType);						
+			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);						
 		}
 		
 		// --------------------------------		
@@ -324,8 +324,8 @@ switch($action) {
 		if ($formType == 'tabedit' && !$_POST['form_submit']) {
 			// --- Recuperation des donnees
 			$id         = intval($_GET['id']);
-			$query[1]   = "SELECT * FROM $table_tab WHERE id = $id";
-			$requestQ   = $sbsql->query($query[1]);
+			$query_1   = "SELECT * FROM $table_tab WHERE id = $id";
+			$requestQ   = $sbsql->query($query_1);
 			$assoc      = $sbsql->assoc($requestQ);
 			$tid        = intval($assoc['tid']);
 			$title_fr   = $sbsanitize->displayLang(utf8_encode($assoc['title']));
@@ -338,10 +338,10 @@ switch($action) {
 
 			$name       = $sbsanitize->displayLang(utf8_encode($assoc['title'])); // Legende
 			
-			$sbsmarty->assign('assoc', $query[1]);
+			$sbsmarty->assign('assoc', $query_1);
 
 			// --- Debug SQL
-			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[1]	 . "\n" . 'Form Type = '.$formType);						
+			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1	 . "\n" . 'Form Type = '.$formType);						
 		} else {
 			$name = $sbsanitize->displayLang(utf8_encode($_POST['title_fr'])); // Legende
 		}
@@ -436,8 +436,8 @@ switch($action) {
 		
 		// --- Recuperation des donnees
 		$tid           = intval($_GET['tid']);
-		$query[3]      = "SELECT * FROM $table_tab WHERE tid = '$tid' ORDER BY sort ASC";
-		$requestQ      = $sbsql->query($query[3]);
+		$query_3       = "SELECT * FROM $table_tab WHERE tid = '$tid' ORDER BY sort ASC";
+		$requestQ      = $sbsql->query($query_3);
 		$sort_array    = $sbsql->toarray($requestQ);
 		foreach($sort_array as $sort) {
 			$active = ($sort['active']) ? $sbsanitize->displayLang(utf8_encode($sort['title'])) : "<span style='color: red;'>".$sbsanitize->displayLang(utf8_encode($sort['title']))."</span>";
@@ -446,7 +446,7 @@ switch($action) {
 		}
 
 		// --- Debug SQL
-		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[3]	 . "\n" . 'Form Type = '.$formType);
+		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_3	 . "\n" . 'Form Type = '.$formType);
 		
 		// --------------------------------		
 		// --- Define variables
