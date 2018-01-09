@@ -46,8 +46,8 @@ switch($action) {
 		// Action DELETE
 		if ($action == 'del') {
 			$get_id   = intval($_GET['id']);
-			$query[2] = "DELETE FROM $table WHERE id = '$get_id'";
-			$request  = $sbsql->query($query[2]);
+			$query_2  = "DELETE FROM $table WHERE id = '$get_id'";
+			$request  = $sbsql->query($query_2);
 			
 			if ($request)
 				$sb_msg_valid = $text . ' supprimée avec succès';
@@ -60,8 +60,8 @@ switch($action) {
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		
 		// Contents table
-		$query[0] = "SELECT * FROM $table";
-		$request2  = $sbsql->query($query[0]);
+		$query     = "SELECT * FROM $table";
+		$request2  = $sbsql->query($query);
 		$result2   = $sbsql->toarray($request2);
 		
 		$sbsmarty->assign('all', true);
@@ -69,9 +69,9 @@ switch($action) {
 		
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) {
-			$alldel_debug = 'ALL: ' . $query[0];
+			$alldel_debug = 'ALL: ' . $query;
 			if (isset($action) && $action == 'del') {				  
-				$alldel_debug .= "\n" . 'DEL: ' . $query[2];
+				$alldel_debug .= "\n" . 'DEL: ' . $query_2;
 			}
 			$sbsmarty->assign('sbdebugsql', $alldel_debug);
 		}
