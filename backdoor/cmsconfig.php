@@ -92,16 +92,16 @@ switch($action) {
 		// --------------------------------
 		if ($formType == 'edit' && !$_POST['form_submit'] && !$_POST['id']) {
 			// --- Recuperation des donnees
-			$query[1]  = "SELECT * FROM $table WHERE config = '$action'";
-			$requestQ  = $sbsql->query($query[1]);
+			$query_1   = "SELECT * FROM $table WHERE config = '$action'";
+			$requestQ  = $sbsql->query($query_1);
 			$assoc     = $sbsql->assoc($requestQ);
 			$id        = intval($assoc['id']);
 			$content   = utf8_encode($assoc['content']);
 
-			$sbsmarty->assign('assoc', $query[1]);
+			$sbsmarty->assign('assoc', $query_1);
 
 			// --- Debug SQL
-			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[1]	 . "\n" . 'Form Type = '.$formType);						
+			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);						
 		}
 		
 		// --------------------------------		
