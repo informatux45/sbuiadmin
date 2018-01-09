@@ -47,8 +47,8 @@ switch($action) {
 		// Action DELETE
 		if ($action == 'del') {
 			$get_id   = intval($_GET['id']);
-			$query[2] = "DELETE FROM $table WHERE id = '$get_id'";
-			$request  = $sbsql->query($query[2]);
+			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
+			$request  = $sbsql->query($query_2);
 			
 			if ($request)
 				$sb_msg_valid = $text . ' supprimé avec succès';
@@ -61,8 +61,8 @@ switch($action) {
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		
 		// Contents table
-		$query[0] = "SELECT * FROM $table";
-		$request2  = $sbsql->query($query[0]);
+		$query = "SELECT * FROM $table";
+		$request2  = $sbsql->query($query);
 		$result2   = $sbsql->toarray($request2);
 		
 		$sbsmarty->assign('all', true);
@@ -70,9 +70,9 @@ switch($action) {
 		
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) {
-			$alldel_debug = 'ALL: ' . $query[0];
+			$alldel_debug = 'ALL: ' . $query;
 			if (isset($action) && $action == 'del') {				  
-				$alldel_debug .= "\n" . 'DEL: ' . $query[2];
+				$alldel_debug .= "\n" . 'DEL: ' . $query_2;
 			}
 			$sbsmarty->assign('sbdebugsql', $alldel_debug);
 		}
@@ -151,18 +151,18 @@ switch($action) {
 		if ($formType == 'edit' && !$_POST['form_submit']) {
 			// --- Recuperation des donnees
 			$id       = intval($_GET['id']);
-			$query[1] = "SELECT * FROM $table WHERE id = $id";
-			$requestQ = $sbsql->query($query[1]);
+			$query_1 = "SELECT * FROM $table WHERE id = $id";
+			$requestQ = $sbsql->query($query_1);
 			$assoc    = $sbsql->assoc($requestQ);
 			$name     = $sbsanitize->displayLang(utf8_encode($assoc['name']));
 			$tag      = $assoc['tag'];
 			$pages    = $assoc['pages'];
 			$active   = $assoc['active'];
 
-			$sbsmarty->assign('assoc', $query[1]);
+			$sbsmarty->assign('assoc', $query_1);
 
 			// --- Debug SQL
-			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[1]	 . "\n" . 'Form Type = '.$formType);
+			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1	 . "\n" . 'Form Type = '.$formType);
 		}
 		// --------------------------------		
 		// --- Define variables
@@ -250,19 +250,19 @@ switch($action) {
 		
 		// --- Recuperation des donnees
 		$id            = intval($_GET['id']);
-		$query[3]      = "SELECT * FROM $table WHERE id = '$id'";
-		$requestQ      = $sbsql->query($query[3]);
+		$query_3      = "SELECT * FROM $table WHERE id = '$id'";
+		$requestQ      = $sbsql->query($query_3);
 		$sort_array    = $sbsql->assoc($requestQ);
 		$assoc_pages   = explode("|", $sort_array['pages']);
 		foreach($assoc_pages as $sort) {
-			$query[4] = "SELECT menu FROM $table_pages WHERE id = '$sort'";
-			$requestP = $sbsql->query($query[4]);
+			$query_4 = "SELECT menu FROM $table_pages WHERE id = '$sort'";
+			$requestP = $sbsql->query($query_4);
 			$one_page = $sbsql->assoc($requestP);
 			$toSort[$sort] = $sbsanitize->displayLang($one_page['menu']);
 		}
 
 		// --- Debug SQL
-		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[3]	 . "\n" . 'Form Type = '.$formType);
+		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_3	 . "\n" . 'Form Type = '.$formType);
 		
 		// --------------------------------		
 		// --- Define variables
