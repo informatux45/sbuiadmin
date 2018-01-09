@@ -371,9 +371,10 @@ function sbGetContactFormElements($string, $publickey = '', $sendmail = false) {
  */
 function sbContactFormConstructElement($param, $type = '', $publickey = '', $sendmail = false) {
 	// --- Initialization
-	$input_html = '';
-	$required   = false;
-	$keyname    = false;
+	$input_html  = '';
+	$required    = false;
+	$keyname     = false;
+	$recaptcha_t = time();
 	
 	switch($type) {
 		default:
@@ -435,15 +436,58 @@ function sbContactFormConstructElement($param, $type = '', $publickey = '', $sen
 			$input_html .= '</select>';
 		break;
 	
-		case "RECAPTCHA":
-			$recaptcha_t = time();
-			$input_html .= '<div id="grecaptcha_' . $recaptcha_t . '"></div>';
-			$input_html .= '<script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit&hl=';
+		case "SUBMIT":
+			$input_html .= '<input type="submit"';
+			foreach($param as $key => $val) {
+				$input_html .= ' ' . $key . '="' . $val . '"';
+			}
+			$input_html .= '>';
+		break;
+	
+		case "RECAPTCHA_INVISIBLE":
+			$input_html .= '<script src="https://www.google.com/recaptcha/api.js?hl=';
 			$input_html .= ($_SESSION['lang'] == 'en') ? 'en' : 'fr';
 			$input_html .= '&remoteip=' . $_SERVER['REMOTE_ADDR'] . '" async defer></script>';
+			$input_html .= '<input type="submit"';
+			foreach($param as $key => $val) {
+				// If Id inserted
+				if ($key == 'id') {
+					$input_html .= ' ' . $key . '="' . $val . '"';
+					$input_id    = $val;
+				}
+				// If class inserted
+				if ($key == 'class') {
+					$input_html .= ' ' . $key . '="' . $val . ' g-recaptcha"';
+					$input_class = true;
+				}
+				$input_html .= ' ' . $key . '="' . $val . '"';
+			}
+			// If no class in keys
+			if (!$input_class) $input_html .= ' class="g-recaptcha"';
+			if (!$input_id) {
+				$input_id    = 'contactform_' . $recaptcha_t;
+				$input_html .= ' id="' . $input_id . '"';
+			}
+			// Recaptcha settings
+			$input_html .= ' data-sitekey = "' . $publickey . '"';
+			$input_html .= ' data-callback = "sbLoginOnSubmit_' . $recaptcha_t . '"';
+			$input_html .= '>';
 			$input_html .= '<script type="text/javascript">';
-			$input_html .= "var onloadCallback = function() {
-								grecaptcha.render('grecaptcha_$recaptcha_t', {
+			$input_html .= 'function sbLoginOnSubmit_' . $recaptcha_t . '(token) {
+								document.getElementById("' . $input_id . '").submit();
+							}';
+			$input_html .= '</script>';
+		break;
+	
+		case "RECAPTCHA":
+			$recaptcha_v2 = time();
+			$input_html  .= '<div id="grecaptcha_' . $recaptcha_v2 . '"></div>';
+			$input_html  .= '<script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit&hl=';
+			$input_html  .= ($_SESSION['lang'] == 'en') ? 'en' : 'fr';
+			$input_html  .= '&remoteip=' . $_SERVER['REMOTE_ADDR'] . '" async defer></script>';
+			$input_html  .= '<script type="text/javascript">';
+			$input_html  .= "var onloadCallback = function() {
+								grecaptcha.render('grecaptcha_$recaptcha_v2', {
 									'sitekey' : '$publickey',
 									'theme' : 'light', // light, dark
 									'type' : 'image', // image, audio
@@ -453,14 +497,7 @@ function sbContactFormConstructElement($param, $type = '', $publickey = '', $sen
 							};";
 			$input_html .= '</script>';
 		break;
-	
-		case "SUBMIT":
-			$input_html .= '<input type="submit"';
-			foreach($param as $key => $val) {
-				$input_html .= ' ' . $key . '="' . $val . '"';
-			}
-			$input_html .= '>';
-		break;
+
 	}
 
 	return $input_html;
