@@ -55,9 +55,9 @@ switch($action) {
 	default:
 		// Action DELETE
 		if ($action == 'del') {
-			$get_id   = intval($_GET['id']);
-			$query[2] = "DELETE FROM $table WHERE id = '$get_id'";
-			$request  = $sbsql->query($query[2]);
+			$get_id  = intval($_GET['id']);
+			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
+			$request = $sbsql->query($query_2);
 			
 			if ($request)
 				$sb_msg_valid = $text . ' supprimé avec succès';
@@ -70,10 +70,10 @@ switch($action) {
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		
 		// Contents table
-		$query[0] = "SELECT t1.*, COUNT(*) AS cpt_img
-					 FROM $table AS t1
-					 LEFT JOIN $table_photo AS t2 ON (t1.id = t2.sid) GROUP BY t1.id";
-		$request2  = $sbsql->query($query[0]);
+		$query     = "SELECT t1.*, COUNT(*) AS cpt_img
+					  FROM $table AS t1
+					  LEFT JOIN $table_photo AS t2 ON (t1.id = t2.sid) GROUP BY t1.id";
+		$request2  = $sbsql->query($query);
 		$result2   = $sbsql->toarray($request2);
 		
 		$sbsmarty->assign('all', true);
@@ -81,9 +81,9 @@ switch($action) {
 		
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) {
-			$alldel_debug = 'ALL: ' . $query[0];
+			$alldel_debug = 'ALL: ' . $query;
 			if (isset($action) && $action == 'del') {				  
-				$alldel_debug .= "\n" . 'DEL: ' . $query[2];
+				$alldel_debug .= "\n" . 'DEL: ' . $query_2;
 			}
 			$sbsmarty->assign('sbdebugsql', $alldel_debug);
 		}
@@ -94,9 +94,9 @@ switch($action) {
 	case "photo":
 		// Action DELETE photo
 		if ($action == 'delphoto') {
-			$get_id   = intval($_GET['id']);
-			$query[5] = "DELETE FROM $table_photo WHERE id = '$get_id'";
-			$request  = $sbsql->query($query[5]);
+			$get_id  = intval($_GET['id']);
+			$query_5 = "DELETE FROM $table_photo WHERE id = '$get_id'";
+			$request = $sbsql->query($query_5);
 			
 			if ($request)
 				$sb_msg_valid = $text . ' supprimé avec succès';
@@ -110,17 +110,17 @@ switch($action) {
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		
 		// Contents table
-		$query[4] = "SELECT * FROM $table_photo WHERE sid = '$sid'";
-		$request2  = $sbsql->query($query[4]);
-		$result2   = $sbsql->toarray($request2);
+		$query_4  = "SELECT * FROM $table_photo WHERE sid = '$sid'";
+		$request2 = $sbsql->query($query_4);
+		$result2  = $sbsql->toarray($request2);
 		
 		$sbsmarty->assign('allphoto', $result2);
 		
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) {
-			$alldel_debug = 'ALL: ' . $query[4];
+			$alldel_debug = 'ALL: ' . $query_4;
 			if (isset($action) && $action == 'del') {				  
-				$alldel_debug .= "\n" . 'DEL: ' . $query[5];
+				$alldel_debug .= "\n" . 'DEL: ' . $query_5;
 			}
 			$sbsmarty->assign('sbdebugsql', $alldel_debug);
 		}
@@ -234,8 +234,8 @@ switch($action) {
 		if ($formType == 'edit' && !$_POST['form_submit']) {
 			// --- Recuperation des donnees
 			$id                  = intval($_GET['id']);
-			$query[1]            = "SELECT * FROM $table WHERE id = $id";
-			$requestQ            = $sbsql->query($query[1]);
+			$query_1             = "SELECT * FROM $table WHERE id = $id";
+			$requestQ            = $sbsql->query($query_1);
 			$assoc               = $sbsql->assoc($requestQ);
 			$title               = $sbsanitize->displayText($assoc['title'], 'UTF-8', 1, 0);
 			$jquery              = $assoc['jquery'];
@@ -259,10 +259,10 @@ switch($action) {
 			$pagertype           = $assoc['pagertype'];
 			$active              = $assoc['active'];			
 
-			$sbsmarty->assign('assoc', $query[1]);
+			$sbsmarty->assign('assoc', $query_1);
 
 			// --- Debug SQL
-			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[1]	 . "\n" . 'Form Type = '.$formType);						
+			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);						
 		}
 		
 		// --------------------------------
@@ -497,8 +497,8 @@ switch($action) {
 		if ($formType == 'photoedit' && !$_POST['form_submit']) {
 			// --- Recuperation des donnees
 			$id       = intval($_GET['id']);
-			$query[1] = "SELECT * FROM $table_photo WHERE id = $id";
-			$requestQ = $sbsql->query($query[1]);
+			$query_1  = "SELECT * FROM $table_photo WHERE id = $id";
+			$requestQ = $sbsql->query($query_1);
 			$assoc    = $sbsql->assoc($requestQ);
 			$sid      = $assoc['sid'];
 			$title    = $sbsanitize->displayLang(utf8_encode($assoc['title']), 'UTF-8', 1, 0);
@@ -512,10 +512,10 @@ switch($action) {
 			}
 			$active   = $assoc['active'];
 
-			$sbsmarty->assign('assoc', $query[1]);
+			$sbsmarty->assign('assoc', $query_1);
 
 			// --- Debug SQL
-			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[1]	 . "\n" . 'Form Type = '.$formType);						
+			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);						
 		}
 		
 		// --------------------------------		
@@ -624,10 +624,10 @@ switch($action) {
 		}
 		
 		// --- Recuperation des donnees
-		$sid           = intval($_GET['sid']);
-		$query[3]      = "SELECT * FROM $table_photo WHERE sid = '$sid' ORDER BY sort ASC";
-		$requestQ      = $sbsql->query($query[3]);
-		$sort_array    = $sbsql->toarray($requestQ);
+		$sid        = intval($_GET['sid']);
+		$query_3    = "SELECT * FROM $table_photo WHERE sid = '$sid' ORDER BY sort ASC";
+		$requestQ   = $sbsql->query($query_3);
+		$sort_array = $sbsql->toarray($requestQ);
 		foreach($sort_array as $sort) {
 			$title  = $sbsanitize->displayText($sort['title'], 'UTF-8', 1, 0, 0, 0, 0, 1);
 			$active = ($sort['active']) ? $title : "<span style='color: red;'>" . $title . "</span>";
@@ -636,7 +636,7 @@ switch($action) {
 		}
 
 		// --- Debug SQL
-		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[3]	 . "\n" . 'Form Type = '.$formType);
+		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_3 . "\n" . 'Form Type = '.$formType);
 		
 		// --------------------------------		
 		// --- Define variables
