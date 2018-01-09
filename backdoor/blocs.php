@@ -63,12 +63,12 @@ switch($action) {
 		// Action DELETE
 		if ($action == 'del') {
 			$get_id   = intval($_GET['id']);
-			$query[2] = "DELETE FROM $table WHERE id = '$get_id'";
-			$request  = $sbsql->query($query[2]);
+			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
+			$request  = $sbsql->query($query_2);
 			
 			// --- Delete bloc sort too ;-)
-			$query[4] = "DELETE FROM $table_sort WHERE bloc_id = '$get_id'";
-			$request4 = $sbsql->query($query[4]);			
+			$query_4 = "DELETE FROM $table_sort WHERE bloc_id = '$get_id'";
+			$request4 = $sbsql->query($query_4);			
 			
 			if ($request)
 				$sb_msg_valid = $text . ' supprimé avec succès';
@@ -81,8 +81,8 @@ switch($action) {
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		
 		// Contents table
-		$query[0] = "SELECT * FROM $table";
-		$request2  = $sbsql->query($query[0]);
+		$query     = "SELECT * FROM $table";
+		$request2  = $sbsql->query($query);
 		$result2   = $sbsql->toarray($request2);
 		
 		// --- Extract all pages
@@ -99,9 +99,9 @@ switch($action) {
 
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) {
-			$alldel_debug = 'ALL: ' . $query[0];
+			$alldel_debug = 'ALL: ' . $query;
 			if (isset($action) && $action == 'del') {				  
-				$alldel_debug .= "\n" . 'DEL: ' . $query[2];
+				$alldel_debug .= "\n" . 'DEL: ' . $query_2;
 			}
 			$sbsmarty->assign('sbdebugsql', $alldel_debug);
 		}
@@ -238,8 +238,8 @@ switch($action) {
 		if ($formType == 'edit' && !$_POST['form_submit']) {
 			// --- Recuperation des donnees
 			$id           = intval($_GET['id']);
-			$query[1]     = "SELECT * FROM $table WHERE id = $id";
-			$requestQ     = $sbsql->query($query[1]);
+			$query_1      = "SELECT * FROM $table WHERE id = $id";
+			$requestQ     = $sbsql->query($query_1);
 			$assoc        = $sbsql->assoc($requestQ);
 			$pages        = $assoc['pages_id'];
 			$modules      = $assoc['modules_id'];
@@ -255,10 +255,10 @@ switch($action) {
 			$position     = $assoc['position'];
 			$active       = $assoc['active'];
 
-			$sbsmarty->assign('assoc', $query[1]);
+			$sbsmarty->assign('assoc', $query_1);
 
 			// --- Debug SQL
-			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[1]	 . "\n" . 'Form Type = '.$formType);						
+			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);						
 		}
 		
 		// --------------------------------
@@ -416,19 +416,19 @@ switch($action) {
 		
 		// --- Recuperation des donnees
 		$id            = intval($_GET['id']);
-		$query[3]      = "SELECT t1.*, t2.name AS blocname
+		$query_3       = "SELECT t1.*, t2.name AS blocname
 						  FROM $table_sort AS t1
 						  LEFT JOIN $table AS t2 ON (t1.bloc_id = t2.id)
 						  WHERE t1.page_id = $selected_page
 						  ORDER BY t1.sort ASC ";
-		$requestQ      = $sbsql->query($query[3]);
+		$requestQ      = $sbsql->query($query_3);
 		$sort_array    = $sbsql->toarray($requestQ);
 		foreach($sort_array as $sort) {
 			$sort_id          = $sort['id'];
 			$toSort[$sort_id] = utf8_encode($sort['blocname']);
 		}
 		// --- Debug SQL
-		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[3] . "\n" . 'Form Type = '.$formType);
+		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_3 . "\n" . 'Form Type = '.$formType);
 		
 		// --------------------------------		
 		// --- Define variables
@@ -487,12 +487,12 @@ switch($action) {
 		
 		// --- Recuperation des donnees
 		$id            = intval($_GET['id']);
-		$query[3]      = "SELECT t1.*, t2.name AS blocname
+		$query_3      = "SELECT t1.*, t2.name AS blocname
 						  FROM $table_sort AS t1
 						  LEFT JOIN $table AS t2 ON (t1.bloc_id = t2.id)
 						  WHERE t1.module_id = '$selected_page'
 						  ORDER BY t1.sort ASC ";
-		$requestQ      = $sbsql->query($query[3]);
+		$requestQ      = $sbsql->query($query_3);
 		$sort_array    = $sbsql->toarray($requestQ);
 		foreach($sort_array as $sort) {
 			$sort_id          = $sort['id'];
@@ -500,7 +500,7 @@ switch($action) {
 		}
 
 		// --- Debug SQL
-		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[3]	 . "\n" . 'Form Type = '.$formType);
+		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_3	 . "\n" . 'Form Type = '.$formType);
 		
 		// --------------------------------		
 		// --- Define variables
