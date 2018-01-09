@@ -56,9 +56,9 @@ switch($action) {
 	default:
 		// Action DELETE
 		if ($action == 'del') {
-			$get_id   = intval($_GET['id']);
-			$query[2] = "DELETE FROM $table WHERE id = '$get_id'";
-			$request  = $sbsql->query($query[2]);
+			$get_id  = intval($_GET['id']);
+			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
+			$request = $sbsql->query($query_2);
 			
 			if ($request)
 				$sb_msg_valid = $text . ' supprimé avec succès';
@@ -71,11 +71,11 @@ switch($action) {
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		
 		// Contents table
-		$query[0] = "SELECT t1.*, t2.title AS catname
+		$query    = "SELECT t1.*, t2.title AS catname
 					 FROM $table AS t1
 					 LEFT JOIN $table_category AS t2 ON (t1.catid = t2.id)";
-		$request2  = $sbsql->query($query[0]);
-		$result2   = $sbsql->toarray($request2);
+		$request2 = $sbsql->query($query);
+		$result2  = $sbsql->toarray($request2);
 		
 		$sbsmarty->assign('all', true);
 		$sbsmarty->assign('allnew', $result2);
@@ -103,9 +103,9 @@ switch($action) {
 		
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) {
-			$alldel_debug = 'ALL: ' . $query[0];
+			$alldel_debug = 'ALL: ' . $query;
 			if (isset($action) && $action == 'del') {				  
-				$alldel_debug .= "\n" . 'DEL: ' . $query[2];
+				$alldel_debug .= "\n" . 'DEL: ' . $query_2;
 			}
 			$sbsmarty->assign('sbdebugsql', $alldel_debug);
 		}
@@ -126,8 +126,8 @@ switch($action) {
 			if ($numrows_article > 0) {
 				$sb_msg_error = 'Cette catégorie contient des articles !!<br>Vous devez supprimer les articles contenus dans cette catégorie avant !!';		
 			} else {
-				$query[5] = "DELETE FROM $table_category WHERE id = '$get_id'";
-				$request  = $sbsql->query($query[5]);
+				$query_5 = "DELETE FROM $table_category WHERE id = '$get_id'";
+				$request  = $sbsql->query($query_5);
 				
 				if ($request)
 					$sb_msg_valid = 'Catégorie supprimée avec succès';
@@ -141,18 +141,18 @@ switch($action) {
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		
 		// Contents table
-		$query[4] = "SELECT * FROM $table_category";
-		$request2  = $sbsql->query($query[4]);
-		$result2   = $sbsql->toarray($request2);
+		$query_4  = "SELECT * FROM $table_category";
+		$request2 = $sbsql->query($query_4);
+		$result2  = $sbsql->toarray($request2);
 		
 		$sbsmarty->assign('allcat', true);
 		$sbsmarty->assign('allcategory', $result2);
 		
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) {
-			$alldel_debug = 'ALL: ' . $query[4];
+			$alldel_debug = 'ALL: ' . $query_4;
 			if (isset($action) && $action == 'categorydel') {				  
-				$alldel_debug .= "\n" . 'DEL: ' . $query[5] . "\n" . 'Numrows: ' . $query_article;
+				$alldel_debug .= "\n" . 'DEL: ' . $query_5 . "\n" . 'Numrows: ' . $query_article;
 			}
 			$sbsmarty->assign('sbdebugsql', $alldel_debug);
 		}
@@ -266,8 +266,8 @@ switch($action) {
 		if ($formType == 'edit' && !$_POST['form_submit']) {
 			// --- Recuperation des donnees
 			$id            = intval($_GET['id']);
-			$query[1]      = "SELECT * FROM $table WHERE id = $id";
-			$requestQ      = $sbsql->query($query[1]);
+			$query_1       = "SELECT * FROM $table WHERE id = $id";
+			$requestQ      = $sbsql->query($query_1);
 			$assoc         = $sbsql->assoc($requestQ);
 			$catid         = $assoc['catid'];
 			$title_fr      = $sbsanitize->displayLang(utf8_encode($assoc['title']));
@@ -283,10 +283,10 @@ switch($action) {
 			$photo         = utf8_encode($assoc['image']);
 			$active        = $assoc['active'];			
 
-			$sbsmarty->assign('assoc', $query[1]);
+			$sbsmarty->assign('assoc', $query_1);
 
 			// --- Debug SQL
-			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[1]	 . "\n" . 'Form Type = '.$formType);						
+			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);						
 		}
 		
 		// --------------------------------		
@@ -451,8 +451,8 @@ switch($action) {
 		if ($formType == 'categoryedit' && !$_POST['form_submit']) {
 			// --- Recuperation des donnees
 			$id          = intval($_GET['id']);
-			$query[1]    = "SELECT * FROM $table_category WHERE id = $id";
-			$requestQ    = $sbsql->query($query[1]);
+			$query_1     = "SELECT * FROM $table_category WHERE id = $id";
+			$requestQ    = $sbsql->query($query_1);
 			$assoc       = $sbsql->assoc($requestQ);
 			$title_fr    = $sbsanitize->displayLang(utf8_encode($assoc['title']));
 			$subtitle_fr = $sbsanitize->displayLang(utf8_encode($assoc['subtitle']));
@@ -463,10 +463,10 @@ switch($action) {
 			$photo       = utf8_encode($assoc['photo']);
 			$active      = $assoc['active'];
 
-			$sbsmarty->assign('assoc', $query[1]);
+			$sbsmarty->assign('assoc', $query_1);
 
 			// --- Debug SQL
-			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[1]	 . "\n" . 'Form Type = '.$formType);						
+			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);						
 		}
 		
 		// --------------------------------		
@@ -548,8 +548,8 @@ switch($action) {
 		
 		// --- Recuperation des donnees
 		$sid           = intval($_GET['sid']);
-		$query[3]      = "SELECT * FROM $table_category ORDER BY sort ASC";
-		$requestQ      = $sbsql->query($query[3]);
+		$query_3       = "SELECT * FROM $table_category ORDER BY sort ASC";
+		$requestQ      = $sbsql->query($query_3);
 		$sort_array    = $sbsql->toarray($requestQ);
 		foreach($sort_array as $sort) {
 			$active = ($sort['active']) ? $sbsanitize->displayLang(utf8_encode($sort['title'])) : "<span style='color: red;'>".$sbsanitize->displayLang(utf8_encode($sort['title']))."</span>";
@@ -558,7 +558,7 @@ switch($action) {
 		}
 
 		// --- Debug SQL
-		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[3]	 . "\n" . 'Form Type = '.$formType);
+		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_3 . "\n" . 'Form Type = '.$formType);
 		
 		// --------------------------------		
 		// --- Define variables
@@ -625,17 +625,17 @@ switch($action) {
 			// --- Get Cat ID
 			$catid = intval($_GET['id']);
 			// --- Recuperation des donnees
-			$query[1]  = "SELECT title, $action FROM $table_category WHERE id = '$catid'";
-			$requestQ  = $sbsql->query($query[1]);
+			$query_1   = "SELECT title, $action FROM $table_category WHERE id = '$catid'";
+			$requestQ  = $sbsql->query($query_1);
 			$assoc     = $sbsql->assoc($requestQ);
 			$id        = $catid;
 			$content   = $assoc[$action];
 			$title_fr  = $sbsanitize->displayLang($assoc['title']); // Legende
 
-			$sbsmarty->assign('assoc', $query[1]);
+			$sbsmarty->assign('assoc', $query_1);
 
 			// --- Debug SQL
-			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[1]	 . "\n" . 'Form Type = '.$formType);						
+			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);						
 		}
 		
 		// --------------------------------		
@@ -732,8 +732,8 @@ switch($action) {
 		// --------------------------------
 		if ($formType == 'settings' && !$_POST['form_submit']) {
 			// --- Recuperation des donnees
-			$query[1]             = "SELECT * FROM $table_settings WHERE id = $id";
-			$requestQ             = $sbsql->query($query[1]);
+			$query_1              = "SELECT * FROM $table_settings WHERE id = $id";
+			$requestQ             = $sbsql->query($query_1);
 			$assoc                = $sbsql->assoc($requestQ);
 			$catid                = $assoc['catid'];
 			$item_per_page        = $assoc['item_per_page'];
@@ -750,10 +750,10 @@ switch($action) {
 			$other_news_type      = utf8_encode($assoc['other_news_type']);
 			$news_next_prev       = utf8_encode($assoc['news_next_prev']);
 			
-			$sbsmarty->assign('assoc', $query[1]);
+			$sbsmarty->assign('assoc', $query_1);
 
 			// --- Debug SQL
-			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[1]	 . "\n" . 'Form Type = '.$formType);						
+			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);						
 		}
 		
 		// --------------------------------
@@ -955,16 +955,16 @@ switch($action) {
 		// --------------------------------
 		if ($formType == 'settingscategory' && !$_POST['form_submit']) {
 			// --- Recuperation des donnees
-			$query[1]            = "SELECT * FROM $table_category WHERE id = $id";
-			$requestQ            = $sbsql->query($query[1]);
+			$query_1             = "SELECT * FROM $table_category WHERE id = $id";
+			$requestQ            = $sbsql->query($query_1);
 			$assoc               = $sbsql->assoc($requestQ);
 			$module_show         = utf8_encode($assoc['module_show']);
 			$module_show_masonry = $assoc['module_show_masonry'];
 			
-			$sbsmarty->assign('assoc', $query[1]);
+			$sbsmarty->assign('assoc', $query_1);
 
 			// --- Debug SQL
-			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[1]	 . "\n" . 'Form Type = '.$formType);						
+			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);						
 		}
 		
 		// --------------------------------		
