@@ -171,7 +171,7 @@ switch($action) {
 		if ($formType == 'edit' && !$_POST['form_submit']) {
 			// --- Recuperation des donnees
 			$id            = intval($_GET['id']);
-			$query[1]      = "SELECT * FROM $table WHERE id = $id";
+			$query_1       = "SELECT * FROM $table WHERE id = $id";
 			$requestQ      = $sbsql->query($query[1]);
 			$assoc         = $sbsql->assoc($requestQ);
 			$horsename     = utf8_encode($assoc['name']);
@@ -181,10 +181,10 @@ switch($action) {
 			$photo         = $assoc['photo'];
 			$active        = $assoc['active'];
 
-			$sbsmarty->assign('assoc', $query[1]);
+			$sbsmarty->assign('assoc', $query_1);
 
 			// --- Debug SQL
-			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[1]	 . "\n" . 'Form Type = '.$formType);						
+			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);						
 		}
 		// --------------------------------		
 		// --- Define variables
@@ -353,8 +353,8 @@ switch($action) {
 		
 		// --- Recuperation des donnees
 		$id            = intval($_GET['id']);
-		$query[3]      = "SELECT * FROM $table WHERE active = '1' ORDER BY sort ASC";
-		$requestQ      = $sbsql->query($query[3]);
+		$query_3       = "SELECT * FROM $table WHERE active = '1' ORDER BY sort ASC";
+		$requestQ      = $sbsql->query($query_3);
 		$sort_array    = $sbsql->toarray($requestQ);
 		foreach($sort_array as $sort) {
 			$sort_id          = $sort['id'];
@@ -362,7 +362,7 @@ switch($action) {
 		}
 
 		// --- Debug SQL
-		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query[3]	 . "\n" . 'Form Type = '.$formType);
+		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_3 . "\n" . 'Form Type = '.$formType);
 		
 		// --------------------------------		
 		// --- Define variables
