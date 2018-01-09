@@ -172,7 +172,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id            = intval($_GET['id']);
 			$query_1       = "SELECT * FROM $table WHERE id = $id";
-			$requestQ      = $sbsql->query($query[1]);
+			$requestQ      = $sbsql->query($query_1);
 			$assoc         = $sbsql->assoc($requestQ);
 			$horsename     = utf8_encode($assoc['name']);
 			$sire_dam_info = utf8_encode($assoc['sire_dam_info']);
