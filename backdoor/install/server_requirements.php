@@ -145,7 +145,12 @@
 	
 	if(EI_CHECK_MODES){
 		$validations['divider_modes'] = array('title'=>lang_key('modes'), 'description'=>'');
-		$loaded_extensions = apache_get_modules();
+		if (function_exists('apache_get_modules')) {
+			$modules           = apache_get_modules();
+			$loaded_extensions = (in_array('mod_rewrite', $modules)) ? ['mod_rewrite'] : [];
+		} else {
+			$loaded_extensions = (getenv('HTTP_MOD_REWRITE') == 'On') ? ['mod_rewrite'] : [];
+		}
 		$validations['mod_rewrite'] = array(false, lang_key('mode').' Rewrite', in_array('mod_rewrite', $loaded_extensions), lang_key('installed'), lang_key('not_installed'));
 		//$validations['mod_ldap'] = array(false, lang_key('mode').' LDAP', in_array('ldap', $loaded_extensions), lang_key('installed'), lang_key('not_installed'));
 	}
