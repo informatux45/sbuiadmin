@@ -280,7 +280,7 @@ function shortcode_sbcontact($param = '') {
 			
 			// --- Initialization
 			$form_html .= '<a name="form_'.$id.'"></a>';
-			$form_html .= '<form action="http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].'#form_'.$id.'" method="post" class="'.$class.'">';
+			$form_html .= '<form action="http' . (($_SERVER['HTTPS'] == 'on') ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'].'#form_' . $id . '" method="post" class="' . $class . '">';
 			// --- Error / Success Message
 			//$form_html .= '<div class="usermessagea">';
 			if ($errMsg) {
