@@ -113,16 +113,16 @@ $sb_safe_pages_cms = ['index','user','news','pages'];
 // ------------------------ 
 // --- Database
 // ------------------------ 
-define('_AM_SITE_TITLE',	trim($sb_settings_config[0]));
-define('_AM_DB_HOST',		trim($sb_settings_config[2]));
-define('_AM_DB_NAME',		trim($sb_settings_config[3]));
-define('_AM_DB_USER',		trim($sb_settings_config[4]));
-define('_AM_DB_PWD',		trim($sb_settings_config[5]));
-define('_AM_MEDIAS_DIR',	trim($sb_settings_config[6]));
-define('_AM_MEDIAS_URL',	trim($sb_settings_config[13]));
-define('_AM_GC_PUBLIC',		trim($sb_settings_config[19]));
-define('_AM_GC_PRIVATE',	trim($sb_settings_config[20]));
-define('_AM_DB_PREFIX',		trim($sb_settings_config[21]));
+define('_AM_SITE_TITLE',   trim($sb_settings_config[0]));
+define('_AM_DB_HOST',      trim($sb_settings_config[2]));
+define('_AM_DB_NAME',      trim($sb_settings_config[3]));
+define('_AM_DB_USER',      trim($sb_settings_config[4]));
+define('_AM_DB_PWD',       trim($sb_settings_config[5]));
+define('_AM_MEDIAS_DIR',   trim($sb_settings_config[6]));
+define('_AM_MEDIAS_URL',   trim($sb_settings_config[13]));
+define('_AM_GC_PUBLIC',    trim($sb_settings_config[19]));
+define('_AM_GC_PRIVATE',   trim($sb_settings_config[20]));
+define('_AM_DB_PREFIX',    trim($sb_settings_config[21]));
 
 // ------------------------ 
 // --- Protocol
