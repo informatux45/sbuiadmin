@@ -9,7 +9,7 @@
 	<title>{insert name=sbGetPageTitle pti="{$sb_title}" mti="{$sb_pages_title}"} {$sb_site_title|default:""}</title>
 	<!-- FONTs -->
 	<link href='https://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
-	<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' type='text/css' media='all' />
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 	{insert name="sbGetFonts"}
 	<!-- CSS -->
 	<link rel="stylesheet" href="{$smarty.const.SB_THEME_URL}css/bootstrap.css">
@@ -24,12 +24,12 @@
 	<![endif]--> 
 	
 	<!-- Favicons -->
-		<link rel="apple-touch-icon" sizes="152x152" href="{$smarty.const.SB_THEME_URL}img/favicons/apple-touch-icon.png">
-		<link rel="icon" type="image/png" sizes="32x32" href="{$smarty.const.SB_THEME_URL}img/favicons/favicon-32x32.png">
-		<link rel="icon" type="image/png" sizes="16x16" href="{$smarty.const.SB_THEME_URL}img/favicons/favicon-16x16.png">
-		<link rel="manifest" href="{$smarty.const.SB_THEME_URL}img/favicons/manifest.json">
-		<link rel="mask-icon" href="{$smarty.const.SB_THEME_URL}img/favicons/safari-pinned-tab.svg" color="#5bbad5">
-		<meta name="theme-color" content="#ffffff">
+	<link rel="apple-touch-icon" sizes="152x152" href="{$smarty.const.SB_THEME_URL}img/favicons/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="{$smarty.const.SB_THEME_URL}img/favicons/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="{$smarty.const.SB_THEME_URL}img/favicons/favicon-16x16.png">
+	<link rel="manifest" href="{$smarty.const.SB_THEME_URL}img/favicons/manifest.json">
+	<link rel="mask-icon" href="{$smarty.const.SB_THEME_URL}img/favicons/safari-pinned-tab.svg" color="#5bbad5">
+	<meta name="theme-color" content="#ffffff">
 	
 	<!-- JS -->
 	<script src="https://code.jquery.com/jquery-latest.min.js"></script>
