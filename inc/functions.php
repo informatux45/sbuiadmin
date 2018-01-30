@@ -80,12 +80,24 @@ function sbRewriteString($string) {
 
 /**
 * Get Current Url
-* @param	bool	$full	Full url OR without get
 * @return string
 */
 function sbGetCurrentUrl() {
 	$request_url = 'http' . (($_SERVER['HTTPS'] == 'on') ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 	return $request_url;
+}
+
+/**
+ * Get Current Url Without arguments
+ * @return string
+ */
+function sbGetCurrentUrlWithoutArgs() {
+	$request_url = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
+	// Check last string character
+	if (substr($request_url, -1) == '/')
+		return $request_url;
+	else
+		return $request_url . '/';
 }
 
 /**
