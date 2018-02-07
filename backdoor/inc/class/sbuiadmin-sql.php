@@ -104,6 +104,9 @@ class sql extends smarty {
     function free() {
         return @mysqli_free_result($this->connect_id);
     }
+    function escape_string($escapestr) {
+        return @mysqli_real_escape_string($this->connect_id, $escapestr);
+    }
     function optimize($tbl_name) {
         if (!$this->connect_id) $this->connect();
         $query = "OPTIMIZE TABLE $tbl_name";
