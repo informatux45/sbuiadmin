@@ -79,6 +79,27 @@ function sbRewriteString($string) {
 }
 
 /**
+ * Create / Start to Increment Log file
+ * @return string
+ */
+function sbLogStart() {
+	$dir = SB_PATH;  // __DIR__
+	if (SBDEBUG) file_put_contents ( $dir . 'log.txt' , "==========================\n", FILE_APPEND);
+}
+
+/**
+ * Increment Log File
+ * @return string
+ */
+function sbLog ($var) {
+	$dir = SB_PATH;  // __DIR__
+	if (SBDEBUG) {
+		file_put_contents ( $dir . 'log.txt' , var_export($var , true), FILE_APPEND);
+		file_put_contents ( $dir . 'log.txt' , "\n", FILE_APPEND);
+	}
+}
+
+/**
 * Get Current Url
 * @return string
 */
