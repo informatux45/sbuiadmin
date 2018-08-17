@@ -73,6 +73,7 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 }
 #side-menu li a {
   color: white;
+  outline: 0;
 }
 .sidebar ul li a.active {
   color: #fff !important;
