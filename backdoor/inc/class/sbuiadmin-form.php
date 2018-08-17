@@ -3,7 +3,7 @@
 *                      INFORMATUX sanitize class (UTF8)                         *
 /** *****************************************************************************
 * @author     Patrice BOUTHIER <contact[at]informatux.com>                      *
-* @copyright  1996-2016 INFORMATUX                                              *
+* @copyright  1996-2018 INFORMATUX                                              *
 * @link       http://www.informatux.com/                                        *
 * @since      1.0                                                               *
 * @version    CVS: 1.8                                                          *
@@ -1066,7 +1066,7 @@ class form extends sanitize {
 	* add a form element (Html Editor - Page Builder)
 	* @return Page Builder
 	*/
-	public function addPageBuilder ($label = '', $src = '', $model = '', $arrArgs = array (), $isRequired = false, $toolbar = 'full', $helpDsc = '') {
+	public function addPageBuilder ($label = '', $src = '', $arrArgs = array (), $isRequired = false, $toolbar = 'full', $helpDsc = '') {
 		// Load CSS
 		$chaineTemp .= '<link rel="stylesheet" href="inc/plugins/pagebuilder/css/pagebuilder.css">
 						<link rel="stylesheet" href="inc/plugins/pagebuilder/css/colorselector.css">';
@@ -1180,7 +1180,7 @@ class form extends sanitize {
 										<div class="element-desc">Youtube</div>
 									</div>
 									<div class="view">
-										<iframe class="img-responsive" src="https://www.youtube.com/embed/_pVCS8HbrmI" frameborder="0" allowfullscreen data-url=""></iframe>
+										<iframe class="img-responsive" src="https://www.youtube.com/embed/5k4Y9FGKFTU" frameborder="0" allowfullscreen data-url=""></iframe>
 									</div>
 								</div>
 								<!-- Vimeo -->
@@ -1214,7 +1214,7 @@ class form extends sanitize {
 		$chaineTemp .= '</div>
 						</div>
 						<div class="row">
-						<div class="htmlpage">' . $model . '</div>
+						<div class="htmlpage">' . $src . '</div>
 						</div>
 						</div>'; // Row
 						
