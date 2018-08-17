@@ -30,6 +30,155 @@ $sbsmarty->assign('module_url', $module_url);
 $sb_msg_error = false;
 $sb_msg_valid = false;
 
+$page_builder_content  = <<<EOT
+<div class="lyrow ui-draggable" style="position: relative; width: 400px; right: auto; height: 22px; bottom: auto; left: 0px; top: 0px; opacity: 1;"><a href="#close" class="remove btn btn-danger btn-xs">
+											<i class="glyphicon-remove glyphicon" title="Remove"></i>
+										</a>
+										<a class="drag btn btn-default btn-xs ui-draggable-handle">
+											<i class="glyphicon glyphicon-move" title="Move"></i>
+										</a>
+										<a href="#" class="btn btn-info btn-xs clone" title="Clone">
+											<i class="fa fa-copy"></i>
+										</a><div class="preview">
+											<input value="9 3" class="form-control" type="text">
+										</div>
+										<div class="view">
+											<div class="row clearfix">
+												<div class="col-md-9 column ui-sortable"><div class="lyrow ui-draggable" style="position: relative; width: 400px; right: auto; height: 22px; bottom: auto; left: 0px; top: 0px; opacity: 1;"><a href="#close" class="remove btn btn-danger btn-xs">
+											<i class="glyphicon-remove glyphicon" title="Remove"></i>
+										</a>
+										<a class="drag btn btn-default btn-xs ui-draggable-handle">
+											<i class="glyphicon glyphicon-move" title="Move"></i>
+										</a>
+										<a href="#" class="btn btn-info btn-xs clone" title="Clone">
+											<i class="fa fa-copy"></i>
+										</a><div class="preview">
+											<input value="4 4 4" class="form-control" type="text">
+										</div>
+										<div class="view">
+											<div class="row clearfix" style="padding: 25px 14px 0px; margin: 15px 0px; background-color: rgb(245, 245, 245);">
+												<div class="col-md-4 column ui-sortable"><div class="box box-element ui-draggable" data-type="image" style="position: relative; width: 404px; right: auto; height: 50px; bottom: auto; left: 0px; top: 0px; opacity: 1;"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#"><i class="fa fa-gear"></i></a> </span>
+									<div class="preview ui-draggable-handle"> <i class="fa fa-picture-o fa-2x"></i>
+										<div class="element-desc">Image</div>
+									</div>
+									<div class="view"> <img id="" class="" title="Votre image" src="img/add-image.svg" width="130" height="130"> </div>
+								</div></div>
+												<div class="col-md-4 column ui-sortable"><div class="box box-element ui-draggable" data-type="button" style="position: relative; width: 404px; right: auto; height: 50px; bottom: auto; left: 0px; top: 0px; opacity: 1;"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#"><i class="fa fa-gear"></i></a> </span>
+									<div class="preview ui-draggable-handle"> <i class="fa  fa-hand-o-up fa-2x"></i>
+										<div class="element-desc">Bouton</div>
+									</div>
+									<div class="view"> <a class="btn btn-default" href="#">Click Me !</a> </div>
+								</div></div>
+												<div class="col-md-4 column ui-sortable" style="padding: 39px 19px 24px; margin: 15px 0px; background-color: rgb(255, 255, 255);"><div class="box box-element ui-draggable active" data-type="paragraph" style="position: relative; width: 404px; right: auto; height: 50px; bottom: auto; left: 0px; top: 0px; opacity: 1;"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#"><i class="fa fa-gear"></i></a> </span>
+									<div class="preview ui-draggable-handle"> <i class="fa fa-font fa-2x"></i>
+										<div class="element-desc">Texte</div>
+									</div>
+									<div class="view" id=""><p>Lorem ipsum dolor sit amet, consectetur adipisci elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua.</p>
+</div>
+								</div></div>
+											</div>
+										</div>			</div></div>
+												<div class="col-md-3 column ui-sortable"><div class="box box-element ui-draggable" data-type="code" style="position: relative; width: 404px; right: auto; height: 50px; bottom: auto; left: 0px; top: 0px; opacity: 1;"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#"><i class="fa fa-gear"></i></a> </span>
+									<div class="preview ui-draggable-handle"> <i class="fa fa-code fa-2x"></i>
+										<div class="element-desc">Code</div>
+									</div>
+									<div class="view"> Put your html code here </div>
+								</div></div>
+											</div>
+										</div>			</div><div class="lyrow ui-draggable" style="position: relative; width: 400px; right: auto; height: 22px; bottom: auto; left: 0px; top: 0px; opacity: 1;"><a href="#close" class="remove btn btn-danger btn-xs">
+											<i class="glyphicon-remove glyphicon" title="Remove"></i>
+										</a>
+										<a class="drag btn btn-default btn-xs ui-draggable-handle ui-sortable-handle">
+											<i class="glyphicon glyphicon-move" title="Move"></i>
+										</a>
+										<a href="#" class="btn btn-info btn-xs clone" title="Clone">
+											<i class="fa fa-copy"></i>
+										</a><div class="preview">
+											<input value="12" class="form-control" type="text">
+										</div>
+										<div class="view">
+											<div class="row clearfix">
+												<div class="col-md-12 column ui-sortable"><div class="box box-element ui-draggable" data-type="paragraph" style="position: relative; width: 404px; right: auto; height: 50px; bottom: auto; left: 0px; top: 0px; opacity: 1;"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs ui-sortable-handle"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#"><i class="fa fa-gear"></i></a> </span>
+									<div class="preview ui-draggable-handle"> <i class="fa fa-font fa-2x"></i>
+										<div class="element-desc">Texte</div>
+									</div>
+									<div class="view">
+										<p>Lorem ipsum dolor sit amet, consectetur adipisci elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+									</div>
+								</div></div>
+											</div>
+										</div>			</div><div class="lyrow ui-draggable" style="position: relative; width: 400px; right: auto; height: 22px; bottom: auto; left: 0px; top: 0px; opacity: 1;"><a href="#close" class="remove btn btn-danger btn-xs">
+											<i class="glyphicon-remove glyphicon" title="Remove"></i>
+										</a>
+										<a class="drag btn btn-default btn-xs ui-draggable-handle ui-sortable-handle">
+											<i class="glyphicon glyphicon-move" title="Move"></i>
+										</a>
+										<a href="#" class="btn btn-info btn-xs clone" title="Clone">
+											<i class="fa fa-copy"></i>
+										</a><div class="preview">
+											<input value="6 6" class="form-control" type="text">
+										</div>
+										<div class="view">
+											<div class="row clearfix" style="padding: 25px 14px 0px; margin: 15px 0px; background-color: rgb(245, 245, 245);">
+												<div class="col-md-6 column ui-sortable" style="padding: 39px 19px 24px; margin: 15px 0px; background-color: rgb(255, 255, 255);"><div class="box box-element ui-draggable" data-type="youtube" style="position: relative; width: 404px; right: auto; height: 50px; bottom: auto; left: 0px; top: 0px; opacity: 1;"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs ui-sortable-handle"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#"><i class="fa fa-gear"></i></a> </span>
+									<div class="preview ui-draggable-handle"> <i class="fa  fa fa-youtube-play  fa-2x"></i>
+										<div class="element-desc">Youtube</div>
+									</div>
+									<div class="view">
+										<iframe class="" src="https://www.youtube.com/embed/5k4Y9FGKFTU" allowfullscreen="" data-url="" id="" style="width: 100%; height: 150px;" frameborder="0"></iframe>
+									</div>
+								</div></div>
+												<div class="col-md-6 column ui-sortable"><div class="box box-element ui-draggable" data-type="youtube" style="position: relative; width: 404px; right: auto; height: 50px; bottom: auto; left: 0px; top: 0px; opacity: 1;"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs ui-sortable-handle"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#"><i class="fa fa-gear"></i></a> </span>
+									<div class="preview ui-draggable-handle"> <i class="fa  fa-vimeo-square fa-2x"></i>
+										<div class="element-desc">Vimeo</div>
+									</div>
+									<div class="view">
+										<iframe class="img-responsive" src="https://player.vimeo.com/video/20016963?byline=0&amp;portrait=0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" frameborder="0"></iframe>
+									</div>
+								</div></div>
+											</div>
+										</div>			</div><div class="lyrow ui-draggable" style="position: relative; width: 400px; right: auto; height: 22px; bottom: auto; left: 0px; top: 0px; opacity: 1;"><a href="#close" class="remove btn btn-danger btn-xs">
+											<i class="glyphicon-remove glyphicon" title="Remove"></i>
+										</a>
+										<a class="drag btn btn-default btn-xs ui-draggable-handle ui-sortable-handle">
+											<i class="glyphicon glyphicon-move" title="Move"></i>
+										</a>
+										<a href="#" class="btn btn-info btn-xs clone" title="Clone">
+											<i class="fa fa-copy"></i>
+										</a><div class="preview">
+											<input value="3 3 3 3" class="form-control" type="text">
+										</div>
+										<div class="view">
+											<div class="row clearfix">
+												<div class="col-md-3 column ui-sortable"><div class="box box-element ui-draggable" data-type="image" style="position: relative; width: 404px; right: auto; height: 50px; bottom: auto; left: 0px; top: 0px; opacity: 1;"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs ui-sortable-handle"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#"><i class="fa fa-gear"></i></a> </span>
+									<div class="preview ui-draggable-handle"> <i class="fa fa-picture-o fa-2x"></i>
+										<div class="element-desc">Image</div>
+									</div>
+									<div class="view"> <img id="" class="" title="Votre image" src="img/add-image.svg" width="130" height="130"> </div>
+								</div></div>
+												<div class="col-md-3 column ui-sortable"><div class="box box-element ui-draggable" data-type="image" style="position: relative; width: 404px; right: auto; height: 50px; bottom: auto; left: 0px; top: 0px; opacity: 1;"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs ui-sortable-handle"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#"><i class="fa fa-gear"></i></a> </span>
+									<div class="preview ui-draggable-handle"> <i class="fa fa-picture-o fa-2x"></i>
+										<div class="element-desc">Image</div>
+									</div>
+									<div class="view"> <img id="" class="" title="Votre image" src="img/add-image.svg" width="130" height="130"> </div>
+								</div></div>
+												<div class="col-md-3 column ui-sortable"><div class="box box-element ui-draggable" data-type="image" style="position: relative; width: 404px; right: auto; height: 50px; bottom: auto; left: 0px; top: 0px; opacity: 1;"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs ui-sortable-handle"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#"><i class="fa fa-gear"></i></a> </span>
+									<div class="preview ui-draggable-handle"> <i class="fa fa-picture-o fa-2x"></i>
+										<div class="element-desc">Image</div>
+									</div>
+									<div class="view"> <img id="" class="" title="Votre image" src="img/add-image.svg" width="130" height="130"> </div>
+								</div></div>
+												<div class="col-md-3 column ui-sortable"><div class="box box-element ui-draggable" data-type="image" style="position: relative; width: 404px; right: auto; height: 50px; bottom: auto; left: 0px; top: 0px; opacity: 0.35; z-index: 1000;"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs ui-sortable-handle"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#"><i class="fa fa-gear"></i></a> </span>
+									<div class="preview ui-draggable-handle"> <i class="fa fa-picture-o fa-2x"></i>
+										<div class="element-desc">Image</div>
+									</div>
+									<div class="view"> <img id="" class="" title="Votre image" src="img/add-image.svg" width="130" height="130"> </div>
+								</div></div>
+											</div>
+										</div>			</div>
+
+EOT;
+
 // ---------------------------------------------------
 // ---------------------------------------------------
 // Write your own code after these lines
@@ -212,7 +361,7 @@ switch($action) {
 		// ----------------------------
 		// --- BREAK
 		// ----------------------------
-		$sbform->addBreak('Separation');
+		$sbform->addBreak('Separateur');
 		// ----------------------------
 		// --- Input COUNTRY
 		// ----------------------------		
@@ -221,7 +370,9 @@ switch($action) {
 		// --- Input DATE (calendar)
 		// ----------------------------
 		$sbform->addDate('Date de naissance (Calendar)', array('id'=>'dob', 'name'=>'dob', 'value'=>$birth), true);
-		
+		// ----------------------------
+		// --- Input COLOR PICKER
+		// ----------------------------		
 		$sbform->addColor ('Couleur (Color PICKER)', array('id' => 'color', 'name' => 'name'), false);
 		// ----------------------------
 		// --- Pdf only (width popup medias)
@@ -301,6 +452,10 @@ switch($action) {
 		$sbform->addTextareaHTML('Editeur HTML (CKEDITOR Basic)', $comment_ckeditor2, array('id' => 'comment_editor2', 'name' => 'comment_editor2'), false, 'basic');
 		// --- Simple
 		$sbform->addTextareaHTML('Editeur HTML (CKEDITOR Simple)', $comment_ckeditor3, array('id' => 'comment_editor3', 'name' => 'comment_editor3'), false, 'simple');
+		// ----------------------------
+		// -- Page BUILDER
+		// ----------------------------				
+		$sbform->addPageBuilder('Page BUILDER HTML', $page_builder_content, array('id' => 'page_builder_content', 'name' => 'page_builder_content'), false, 'full', '');
 		// --------------------------------			
 		// --- Hiddens / Buttons
 		// --------------------------------	
