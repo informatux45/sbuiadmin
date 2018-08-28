@@ -32,7 +32,7 @@ function shortcode_sbtabbs($param = '') {
 	$query = "SELECT t2.title, t2.content
 			  FROM $table AS t1
 			  LEFT JOIN $table_tab AS t2 ON (t1.id = t2.tid)
-			  WHERE t1.id = '{$param['id']}' AND t1.active = '1'
+			  WHERE t1.id = '{$param['id']}' AND t1.active = '1' AND t2.active = '1'
 			  ORDER BY t2.sort ASC
 			 ";
 	$request = $sbsql->query($query);
