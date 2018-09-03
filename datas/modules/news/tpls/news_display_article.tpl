@@ -101,7 +101,7 @@
 			<div class="sbnews-single-others">
 				{foreach from=$sbnews_other_news item=other}
 					<a href="{seo url="index.php?p=news&op=article&id={$other.id}" rewrite="news/article/{$other.id}/{$other.title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|@strip_tags|@sbRewriteString|@strtolower}"}">
-						<div class="sbnews-othernews" style="{if $other.image}background: url({$smarty.const._AM_MEDIAS_URL}/{$other.image}) no-repeat center center;{/if}">
+						<div class="sbnews-othernews" style="{if $other.image}background: url({$smarty.const._AM_MEDIAS_URL}{$other.image}) no-repeat center center;{/if}">
 							<span class="title">{$other.title|unescape:"htmlall"|@strip_tags|@sbDisplayLang:"`$smarty.session.lang`"|upper}</span>
 							<span class="content">{$other.desc_short|unescape:"htmlall"|@strip_tags|@sbDisplayLang:"`$smarty.session.lang`"|lower|truncate:150:"..."}</span>
 						</div>
