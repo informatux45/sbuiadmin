@@ -12,7 +12,11 @@
 // SESSION Initialisation
 // ----------------------
 ini_set("session.gc_maxlifetime", 24*3600); // 1 day (24 hours)
-session_start();
+// Options disponibles depuis PHP 7.0
+session_start([
+    'cookie_lifetime' => 86400,
+    'gc_maxlifetime'  => 86400,
+]);
 ob_start();
 
 // ----------------------
