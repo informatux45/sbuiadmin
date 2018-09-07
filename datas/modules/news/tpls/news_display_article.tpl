@@ -21,10 +21,10 @@
 		
 		<p class="sbnews-single">
 			{if $item.image}
-			<img class="sbnews-single-img" src="{$smarty.const._AM_MEDIAS_URL}/{$item.image}" alt="{$item.title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"}">
+			<img class="sbnews-single-img" src="{$smarty.const._AM_MEDIAS_URL}/{$item.image}" alt="{$item.title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|@sbGetShortcode}">
 			{/if}
 			<div class="sbnews-single-text">
-				{$item.desc_full|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"}
+				{$item.desc_full|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|@sbGetShortcode}
 			</div>
 		</p>
 
