@@ -676,21 +676,23 @@ switch($action) {
 		if ($_POST['form_submit']) {
 
 			// Injection des données
-			$id                   = intval($_POST['id']);
-			$catid                = intval($_POST['catid']);
-			$item_per_page        = intval($_POST['item_per_page']);
-			$module_start         = intval($_POST['module_start']);
-			$breadcrumb           = intval($_POST['breadcrumb']);
-			$title_h1             = intval($_POST['title_h1']);
-			$title_h2             = intval($_POST['title_h2']);
-			$theme_view_cat       = $sbsanitize->displayText($_POST['theme_view_cat']);
-			$theme_view_list      = $sbsanitize->displayText($_POST['theme_view_list']);
-			$theme_view_single    = $sbsanitize->displayText($_POST['theme_view_single']);
-			$other_news           = intval($_POST['other_news']);
-			$other_news_per_page  = intval($_POST['other_news_per_page']);
-			$other_news_title     = $sbsanitize->displayText($_POST['other_news_title']);
-			$other_news_type      = $sbsanitize->displayText($_POST['other_news_type']);
-			$news_next_prev       = $sbsanitize->displayText($_POST['news_next_prev']);
+			$id                  = intval($_POST['id']);
+			$catid               = intval($_POST['catid']);
+			$item_per_page       = intval($_POST['item_per_page']);
+			$module_start        = intval($_POST['module_start']);
+			$breadcrumb          = intval($_POST['breadcrumb']);
+			$title_h1            = intval($_POST['title_h1']);
+			$title_h2            = intval($_POST['title_h2']);
+			$theme_view_cat      = $sbsanitize->displayText($_POST['theme_view_cat']);
+			$theme_view_list     = $sbsanitize->displayText($_POST['theme_view_list']);
+			$theme_view_single   = $sbsanitize->displayText($_POST['theme_view_single']);
+			$other_news          = intval($_POST['other_news']);
+			$other_news_per_page = intval($_POST['other_news_per_page']);
+			$other_news_title    = $sbsanitize->displayText($_POST['other_news_title']);
+			$other_news_type     = $sbsanitize->displayText($_POST['other_news_type']);
+			$news_next_prev      = $sbsanitize->displayText($_POST['news_next_prev']);
+			$comments            = $sbsanitize->displayText($_POST['comments']);
+			$comments_user       = $sbsanitize->displayText($_POST['comments_user']);
 			
 			// EDIT
 			if ($formType == 'settings' && $id > 0) {
@@ -709,6 +711,8 @@ switch($action) {
 																		 ,other_news_title = '$other_news_title'
 																		 ,other_news_type = '$other_news_type'
 																		 ,news_next_prev = '$news_next_prev'
+																		 ,comments = '$comments'
+																		 ,comments_user = '$comments_user'
 																		 WHERE id = '$id'";
 											 
 				$result_edit = $sbsql->query($query);
@@ -749,6 +753,8 @@ switch($action) {
 			$other_news_title     = utf8_encode($assoc['other_news_title']);
 			$other_news_type      = utf8_encode($assoc['other_news_type']);
 			$news_next_prev       = utf8_encode($assoc['news_next_prev']);
+			$comments             = utf8_encode($assoc['comments']);
+			$comments_user        = utf8_encode($assoc['comments_user']);
 			
 			$sbsmarty->assign('assoc', $query_1);
 
@@ -816,6 +822,24 @@ switch($action) {
 		// --- Article par page
 		// ----------------------------
 		$sbform->addInput('text', 'Article par page', array ('name' => 'item_per_page', 'value' => "$item_per_page", 'placeholder' => "Article par page", "icon" => "file-text-o", "style" => "width: 150px !important"), true, false, "Nombre d'articles par page dans une catégorie");
+		// -----------------------------------
+		// --- Gestionnaire de commentaires (Service)
+		// -----------------------------------
+		$comments_external = ['disqus'];
+		$sbform->openSelect("Choix d'un gestionnaire de commentaires", array("id"=>"comments", "name"=>"comments"), false);
+		$sbform->addOption('Choisissez un gestionnaire de commentaire', array ("value"=>"", "selected"=>""));
+		for($i = 0; $i < count($comments_external); $i++) {
+			if ($comments_external[$i] == $comments)
+				$sbform->addOption($comments_external[$i], array ("value"=>$comments_external[$i], "selected"=>""));
+		else
+				$sbform->addOption($comments_external[$i], array ("value"=>$comments_external[$i]));
+		}
+		// --- Close Select
+		$sbform->closeSelect("Choix d'un gestionnaire de commentaires externe");
+		// ----------------------------
+		// --- Gestionnaire de commentaires (User)
+		// ----------------------------
+		$sbform->addInput('text', "Nom d'utilisateur du service de gestionnaire extene", array ('name' => 'comments_user', 'value' => "$comments_user", 'placeholder' => "Utilisateur", "icon" => "comment"), false, false, "Nom (shortname) utilisé pour vous connecter au service de gestionnaire de commentaires externe");
 		// ----------------------------
 		// --- Liste des catégorie
 		// ----------------------------
