@@ -545,7 +545,9 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_news_settings` (
   `other_news_per_page` int(11) NOT NULL,
   `other_news_title` varchar(255) NOT NULL DEFAULT 'Autres articles',
   `other_news_type` varchar(20) NOT NULL COMMENT 'random, latest, first',
-  `news_next_prev` varchar(20) NOT NULL DEFAULT 'arrow' COMMENT 'arrow, title'
+  `news_next_prev` varchar(20) NOT NULL DEFAULT 'arrow' COMMENT 'arrow, title',
+  `comments` varchar(20) DEFAULT NULL,
+  `comments_user` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
