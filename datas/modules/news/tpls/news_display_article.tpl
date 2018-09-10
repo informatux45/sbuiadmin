@@ -102,7 +102,7 @@
 				{foreach from=$sbnews_other_news item=other}
 					<div class="col-lg-3 m-b-20">
 						<a href="{seo url="index.php?p=news&op=article&id={$other.id}" rewrite="news/article/{$other.id}/{$other.title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|@strip_tags|@sbRewriteString|@strtolower}"}">
-							<div class="sbnews-othernews news_overlay news_color" style="{if $other.image}background: url({$smarty.const.SB_URL}thumb.php?src={$smarty.const._AM_MEDIAS_URL}{$other.image}&size=15x15) no-repeat; background-size: cover;{/if}">
+							<div class="sbnews-othernews sbnews_overlay sbnews_color" style="{if $other.image}background: url({$smarty.const.SB_URL}thumb.php?src={$smarty.const._AM_MEDIAS_URL}{$other.image}&size=15x15) no-repeat; background-size: cover;{/if}">
 								<span class="title">{$other.title|unescape:"htmlall"|@strip_tags|@sbDisplayLang:"`$smarty.session.lang`"|upper}</span>
 								<span class="content">{$other.desc_short|unescape:"htmlall"|@strip_tags|@sbDisplayLang:"`$smarty.session.lang`"|lower|truncate:150:"..."}</span>
 							</div>
