@@ -225,3 +225,23 @@ h2.sbnews-single-others-h2 {
 .sbnews-single-next-prev span a:hover {
 	color: black;	
 }
+/* --- Other news --- */
+.sbnews_overlay {
+  position: relative;
+}
+.sbnews_overlay:before{
+  position: absolute;
+  content:" ";
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  display: none;
+  z-index:0;
+}
+.sbnews_overlay:hover:before{
+  display: block;
+}
+.sbnews_color:before {
+  background-color: rgba(0,0,0,0.9);
+}
