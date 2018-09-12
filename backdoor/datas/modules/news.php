@@ -312,7 +312,7 @@ switch($action) {
 		$categories  = $sbsql->toarray($request_cat);
 		// --- Initialisation
 		$tab_category = array();
-		// --- Tableau des types du bien
+		// --- Tableau des categories
 		$array_category = explode("|", $catid);
 		$i = 0;
 		foreach($categories as $row) {
@@ -677,7 +677,10 @@ switch($action) {
 
 			// Injection des données
 			$id                  = intval($_POST['id']);
-			$catid               = intval($_POST['catid']);
+			$catid               = '';
+			foreach($_POST['catid'] as $val) { $catid .= "$val|"; }
+			$catid               = rtrim($catid, '|');
+			$catid_module_show   = intval($_POST['catid_module_show']);
 			$item_per_page       = intval($_POST['item_per_page']);
 			$module_start        = intval($_POST['module_start']);
 			$breadcrumb          = intval($_POST['breadcrumb']);
@@ -698,22 +701,23 @@ switch($action) {
 			if ($formType == 'settings' && $id > 0) {
 				// UPDATE DATAS
 				$query = "UPDATE $table_settings SET catid = '$catid'
-																		 ,item_per_page = '$item_per_page'
-																		 ,module_start = '$module_start'
-																		 ,breadcrumb = '$breadcrumb'
-																		 ,title_h1 = '$title_h1'
-																		 ,title_h2 = '$title_h2'
-																		 ,theme_view_cat = '$theme_view_cat'
-																		 ,theme_view_list = '$theme_view_list'
-																		 ,theme_view_single = '$theme_view_single'
-																		 ,other_news = '$other_news'
-																		 ,other_news_per_page = '$other_news_per_page'
-																		 ,other_news_title = '$other_news_title'
-																		 ,other_news_type = '$other_news_type'
-																		 ,news_next_prev = '$news_next_prev'
-																		 ,comments = '$comments'
-																		 ,comments_user = '$comments_user'
-																		 WHERE id = '$id'";
+													,catid_module_show = '$catid_module_show'
+													,item_per_page = '$item_per_page'
+													,module_start = '$module_start'
+													,breadcrumb = '$breadcrumb'
+													,title_h1 = '$title_h1'
+													,title_h2 = '$title_h2'
+													,theme_view_cat = '$theme_view_cat'
+													,theme_view_list = '$theme_view_list'
+													,theme_view_single = '$theme_view_single'
+													,other_news = '$other_news'
+													,other_news_per_page = '$other_news_per_page'
+													,other_news_title = '$other_news_title'
+													,other_news_type = '$other_news_type'
+													,news_next_prev = '$news_next_prev'
+													,comments = '$comments'
+													,comments_user = '$comments_user'
+													WHERE id = '$id'";
 											 
 				$result_edit = $sbsql->query($query);
 				if ($result_edit) {
@@ -740,6 +744,7 @@ switch($action) {
 			$requestQ             = $sbsql->query($query_1);
 			$assoc                = $sbsql->assoc($requestQ);
 			$catid                = $assoc['catid'];
+			$catid_module_show    = $assoc['catid_module_show'];
 			$item_per_page        = $assoc['item_per_page'];
 			$module_start         = $assoc['module_start'];
 			$breadcrumb           = $assoc['breadcrumb'];
@@ -814,11 +819,6 @@ switch($action) {
 		// --- Close Select
 		$sbform->closeSelect("Choix d'une VIEW pour le module hors visualisation par une PAGE pour un article");
 		// ----------------------------
-		// --- Démarrage du module
-		// ----------------------------
-		$module_start = ($module_start == '') ? '0' : $module_start;
-		$sbform->addRadioYN('Démarrage du module', true, array('id'=>'module_start', 'name'=>'module_start', 'checked'=>"$module_start"), 'Catégorie spécifique', 'Liste des catégories', "Comportement du démarrage du module", '<br>');
-		// ----------------------------
 		// --- Article par page
 		// ----------------------------
 		$sbform->addInput('text', 'Article par page', array ('name' => 'item_per_page', 'value' => "$item_per_page", 'placeholder' => "Article par page", "icon" => "file-text-o", "style" => "width: 150px !important"), true, false, "Nombre d'articles par page dans une catégorie");
@@ -841,20 +841,39 @@ switch($action) {
 		// ----------------------------
 		$sbform->addInput('text', "Nom d'utilisateur du service de gestionnaire extene", array ('name' => 'comments_user', 'value' => "$comments_user", 'placeholder' => "Utilisateur", "icon" => "comment"), false, false, "Nom (shortname) utilisé pour vous connecter au service de gestionnaire de commentaires externe");
 		// ----------------------------
-		// --- Liste des catégorie
+		// --- Démarrage du module
 		// ----------------------------
-		$query_cat   = "SELECT * FROM $table_category ORDER BY title ASC";
+		$module_start = ($module_start == '') ? '0' : $module_start;
+		$sbform->addRadioYN('Démarrage du module', true, array('id'=>'module_start', 'name'=>'module_start', 'checked'=>"$module_start"), 'Catégories spécifiques visibles (Liste des articles)', 'Liste des catégories (Par vignettes)', "Comportement du démarrage du module", '<br>');
+		// ----------------------------
+		// --- Liste des catégories visibles
+		// ----------------------------
+		$query_cat   = "SELECT * FROM $table_category WHERE active = '1' ORDER BY title ASC";
 		$request_cat = $sbsql->query($query_cat);
 		$categories  = $sbsql->toarray($request_cat);
-		$sbform->openSelect("Catégories", array("id"=>"catid", "name"=>"catid", "" => ""), false);
+		// Initialisation
+		$tab_categories = array();
+		// --- Tableau des categories
+		$array_category = explode("|", $catid);
+		for($i = 0; $i < count($categories); ++$i) {
+			$tab_categories[$i]['text']    = $sbsanitize->displayLang($categories[$i]['title']);
+			$tab_categories[$i]['name']    = 'catid[]';
+			$tab_categories[$i]['value']   = $categories[$i]['id'];
+			$tab_categories[$i]['checked'] = (in_array($categories[$i]['id'], $array_category)) ? '1' : '0';
+		}
+		$sbform->addCheckbox('Catégories spécifiques visibles', $tab_categories, '', false, '<br />', "Les catégories choisies seront visibles au démarrage du module si vous avez choisi \"catégories spécifiques visibles\" à l'option \"Démarrage du module\"");
+		// ----------------------------
+		// --- Comportement des catégories visibles
+		// ----------------------------
+		$sbform->openSelect("Comportement des catégories spécifiques visibles", array("id"=>"catid_module_show", "name"=>"catid_module_show", "" => ""), false);
 		$sbform->addOption('Choisissez une catégorie', array ("value"=>"", "selected"=>""));
 		foreach($categories as $row) {
-			if ($row['id'] == $catid)
+			if ($row['id'] == $catid_module_show)
 				$sbform->addOption($sbsanitize->displayLang($row['title']), array ("value"=>$row['id'], "selected"=>""));
 		else
 				$sbform->addOption($sbsanitize->displayLang($row['title']), array ("value"=>$row['id']));
 		}
-		$sbform->closeSelect("La catégorie choisie sera visible au démarrage du module si vous avez choisi \"catégorie spécifique\" à l'option \"Démarrage du module\"");
+		$sbform->closeSelect("La catégorie choisie déterminera le comportement de l'affichage des catégories spécifiques visibles. Option valable si vous avez choisi \"catégories spécifiques visibles\" à l'option \"Démarrage du module\"");
 		// ----------------------------
 		// --- Breadcrumb (fil d'ariane)
 		// ----------------------------
@@ -929,6 +948,8 @@ switch($action) {
 		// --- Close Form
 		// --------------------------------	
 		$sbform->closeForm ();
+		// Radio onchange
+		$sbsmarty->assign('radio_change', true);
 		// --------------------------------
 	break;
 	
