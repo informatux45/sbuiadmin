@@ -2,7 +2,7 @@
 /**
  * Plugin Name: SBUIADMIN NEWS
  * Description: Gestionnaire d'articles
- * Version: 0.1.1
+ * Version: 0.1.2
  * Author: BooBoo
  * Author URI: //www.informatux.com/
  */
@@ -15,7 +15,7 @@ if (!defined('SB_PATH')) {
 # Define some important stuff
 define('MODULEFILE', basename(__FILE__, ".php"));
 define('MODULENAME', 'News');
-define('MODULEVERSION','0.1.1');
+define('MODULEVERSION','0.1.2');
 
 # Include Module Common Infos
 include_once( SB_MODULES_DIR . MODULEFILE . DIRECTORY_SEPARATOR . 'common.php' );
@@ -33,11 +33,11 @@ $initOptions     = "SELECT * FROM {$module['tables']['newssett']} WHERE id = '1'
 $request_options = $sbsql->query($initOptions);
 $news_options    = $sbsql->assoc($request_options);
 $sbsmarty->assign('sbnews_options', $news_options);
-// --- Check start index or category
-// --- 0: Category list
-// --- 1: Category (catid)
+// --- Check start index or categories
+// --- 0: Categories list
+// --- 1: Categories (catids)
 if ($news_options['module_start'] && (!$_GET['op'])) {
-	$_GET['op'] = 'category';
+	$_GET['op'] = 'categories';
 	$_GET['id'] = $news_options['catid'];
 } elseif (!$news_options['module_start'] && (!$_GET['op'])) {
 	$_GET['op'] = false;
@@ -87,6 +87,63 @@ switch($op) {
 		// --------------------------
 		$module['theme_main'] = ($news_options['theme_view_cat']) ? $news_options['theme_view_cat'] : 'index';
 
+	break;
+
+	case "categories":
+		// --- Initialization
+		$news_page = (isset($_GET['l'])) ? intval($_GET['l']) : 0;
+		// --- Construct WHERE
+		$where_categories = "";
+		$all_categories   = explode("|", $news_options['catid']);
+		if ($all_categories) {
+			for($i = 0; $i < count($all_categories); ++$i) {
+				$category_id = $all_categories[$i];
+				$where_categories .= " (catid LIKE '%$category_id%' AND active = '1')";
+				if (($i + 1) < count($all_categories)) $where_categories .= " OR";
+			}
+		}
+		// --- SQL Request
+		$initQ = "SELECT * FROM {$module['tables']['news']} WHERE $where_categories ORDER BY date DESC ";
+		//die($initQ);
+		// --- Total NEWS
+		$queryT = $sbsql->query($initQ);
+		$totalT = $sbsql->numrows();
+
+		$query   = $initQ . "LIMIT $news_page, $news_per_page";
+		$request = $sbsql->query($query);
+		$result  = $sbsql->toarray($request);
+		// --- Assign Array
+		$sbsmarty->assign('all', $result);
+		// --- Assign News info Page
+		$sbsmarty->assign('news_per_page', $news_per_page);
+		$sbsmarty->assign('news_total',$totalT);
+		$sbsmarty->assign('news_page', $news_page);
+		$sbsmarty->assign('news_total', floor($totalT / $news_per_page));
+		
+		// --------------------------
+		// --- Assign Title Page
+		// --------------------------
+		$catid_module_show = $news_options['catid_module_show'];
+		$queryN   = "SELECT * FROM {$module['tables']['newscat']} WHERE id = '$catid_module_show'";
+		$requestN = $sbsql->query($queryN);
+		$assoc   = $sbsql->assoc($requestN);
+		// --- Infos
+		$sb_news_title = _CMS_NEWS_ALLNEWS;
+		// --- Assign news title
+		$sbsmarty->assign('sb_pages_title', $sb_news_title);
+		// --- Assign news category title (template)
+		$sbsmarty->assign('sbnews_cat_title', $sb_news_title);
+		$sbsmarty->assign('sbnews_cat_subtitle', '');
+		$sbsmarty->assign('sbnews_cat_tpl_list', $sbsanitize->sTrim($assoc['tpl_list']));
+		$sbsmarty->assign('sbnews_module_show', $assoc['module_show']);
+		$sbsmarty->assign('sbnews_module_show_masonry', $assoc['module_show_masonry']);
+		// --- Breadcrumb
+		$sbsmarty->assign('sbnews_nav1', _CMS_NEWS_ALLNEWS);
+
+		// --------------------------
+		// --- Choose theme view
+		// --------------------------
+		$module['theme_main'] = ($news_options['theme_view_list']) ? $news_options['theme_view_list'] : 'index';
 	break;
 
 	case "category": // Show a category of NEWS
