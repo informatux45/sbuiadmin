@@ -1,0 +1,28 @@
+# #######################################################
+# Rewrite URL dans un dossier racine + /new (par exemple)
+# Racine /
+# Répertoire new
+# Chemin /new
+# #######################################################
+
+### Fichier .HTACCESS
+-- Ligne 7 --
+Changer : ErrorDocument 404 index.php?p=pages&id=404
+Par : ErrorDocument 404 new/index.php?p=pages&id=404
+-- Ligne 34 --
+Changer : RewriteRule . /index.php [L]
+Par : RewriteRule . /new/index.php [L]
+
+# #######################################################
+
+### Fichier SBCONFIG.PHP
+-- Ligne 96 --
+Changer : define('SBSITESUBDIRECTORY', '');
+Par : define('SBSITESUBDIRECTORY', 'new');
+
+# #######################################################
+
+### Administration
+Rubrique :: Configuration :: Activation du Rewrite URL :: Activé (Checked)
+
+# #######################################################
