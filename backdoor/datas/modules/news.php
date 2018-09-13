@@ -1005,11 +1005,13 @@ switch($action) {
 			$assoc               = $sbsql->assoc($requestQ);
 			$module_show         = utf8_encode($assoc['module_show']);
 			$module_show_masonry = $assoc['module_show_masonry'];
-			
+			$title_fr            = $sbsanitize->displayLang($assoc['title']);
 			$sbsmarty->assign('assoc', $query_1);
 
 			// --- Debug SQL
 			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);						
+		} else {
+			$title_fr = $_POST['title_fr'];
 		}
 		
 		// --------------------------------		
@@ -1043,6 +1045,7 @@ switch($action) {
 		// --------------------------------	
 		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => "$formName"));
 		$sbform->addInput('hidden', '', array('name' => 'id', 'value' => "$id"));
+		if (!$_POST['form_submit']) $sbform->addInput('hidden', '', array('name' => 'title_fr', 'value' => "$title_fr"));
 		$sbform->addInput('submit', '', array('value' => "$btn_add_edit"));
 		$sbform->addInput('reset', '', array('value' => "Reset"));
 		// --------------------------------	
@@ -1050,8 +1053,6 @@ switch($action) {
 		// --------------------------------	
 		$sbform->closeForm ();
 		// --------------------------------
-		
-		$title_fr = $sbsanitize->displayLang($assoc['title']);
 	break;
 	
 }
