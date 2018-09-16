@@ -98,12 +98,15 @@ switch($op) {
 		if ($all_categories) {
 			for($i = 0; $i < count($all_categories); ++$i) {
 				$category_id = $all_categories[$i];
-				$where_categories .= " (catid LIKE '%$category_id%' AND active = '1')";
+				$where_categories .= " (t1.catid LIKE '%$category_id%' AND t1.active = '1')";
 				if (($i + 1) < count($all_categories)) $where_categories .= " OR";
 			}
 		}
 		// --- SQL Request
-		$initQ = "SELECT * FROM {$module['tables']['news']} WHERE $where_categories ORDER BY date DESC ";
+		$initQ = "SELECT t1.*, t2.title AS catname FROM {$module['tables']['news']} AS t1
+		          LEFT JOIN fud3hub17b_sb_news_category AS t2 ON (t1.catid = t2.id)
+		          WHERE $where_categories
+		          ORDER BY t1.date DESC ";
 		//die($initQ);
 		// --- Total NEWS
 		$queryT = $sbsql->query($initQ);
