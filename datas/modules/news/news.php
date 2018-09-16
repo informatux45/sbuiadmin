@@ -107,7 +107,6 @@ switch($op) {
 		          LEFT JOIN fud3hub17b_sb_news_category AS t2 ON (t1.catid = t2.id)
 		          WHERE $where_categories
 		          ORDER BY t1.date DESC ";
-		//die($initQ);
 		// --- Total NEWS
 		$queryT = $sbsql->query($initQ);
 		$totalT = $sbsql->numrows();
