@@ -51,6 +51,14 @@
 				<h3>
 					{$news.title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"}
 				</h3>
+				{if $news.catname}
+					<p class="sbnews-category">
+						{assign var=catid value="|"|explode:$news.catid} 
+						<a href='{seo url="index.php?p=news&op=category&id={$news.catid}" rewrite="news/category/{$catid[0]}/{$news.catname|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|strip_tags|@sbRewriteString|@strtolower}"}'>
+							{$news.catname|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"}
+						</a>
+					</p>
+				{/if}
 				<p class="sbnews-date">
 					{$news.date|sbConvertDate:"FR"}
 				</p>
