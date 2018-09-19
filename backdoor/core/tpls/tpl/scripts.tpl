@@ -151,6 +151,9 @@
 					if (response.success) {
 						//window.location.href="{$module_url}";
 					}
+				},
+				onError: function(id, name, errorReason, xhrOrXdr) {
+					alert(qq.format("Erreur sur le fichier n.{} - {}.  Raison: {}", id, name, errorReason));
 				}
 			}
         })
