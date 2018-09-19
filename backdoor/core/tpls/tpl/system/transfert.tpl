@@ -95,7 +95,7 @@
 
 			{* Display thumbnail on the fly OR in the cache if exist and if it's an image ;-) *}
 			{if $sbmedia|@sbGetIfIsImg}
-				<img src="thumb.php?src={$sbmedia}&size=x84&ignore=1&crop=0" title="{$sbmedia|@sbFilename|@sbRewriteTags}" />
+				<img src="thumb.php?src={$sbmedia}&size=x84" title="{$sbmedia|@sbFilename|@sbRewriteTags}" />
 			{else}
 				{insert name=sbFileOtherImg assign=other f=$sbmedia}
 				<span class="fa fa-{$other}-o fa-fw sbmedia-other"></span>
