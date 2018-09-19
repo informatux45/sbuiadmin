@@ -158,7 +158,7 @@
 								{* Display thumbnail on the fly OR in the cache if exist and if it's an image ;-) *}
 								{if $sbmedia|@sbGetIfIsImg}
 									<a class="sbmedia-display" href="{$sbmedia}" rel="facebox">
-										<img src="thumb.php?src={$sbmedia}&size=x84&ignore=1&crop=0" title="{$sbmedia|@sbFilename|@sbRewriteTags}" />
+										<img src="thumb.php?src={$sbmedia}&size=x84" title="{$sbmedia|@sbFilename|@sbRewriteTags}" />
 									</a>
 								{else}
 									{insert name=sbFileOtherImg assign=other f=$sbmedia}
