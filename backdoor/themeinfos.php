@@ -68,6 +68,7 @@ if ($_POST['form_submit']) {
 	$theme_infos_linkedin    = $sbsanitize->displayText($_POST['theme_infos_linkedin'], 'UTF-8', 1, 0);
 	$theme_infos_vimeo       = $sbsanitize->displayText($_POST['theme_infos_vimeo'], 'UTF-8', 1, 0);
 	$theme_infos_youtube     = $sbsanitize->displayText($_POST['theme_infos_youtube'], 'UTF-8', 1, 0);
+	$theme_infos_github      = $sbsanitize->displayText($_POST['theme_infos_github'], 'UTF-8', 1, 0);
 	
 	// --- EDIT
 	// UPDATE DATAS
@@ -84,6 +85,7 @@ if ($_POST['form_submit']) {
 	$query_linkedin    = "UPDATE $table SET content = '$theme_infos_linkedin' WHERE config = 'theme_infos_linkedin'";
 	$query_vimeo       = "UPDATE $table SET content = '$theme_infos_vimeo' WHERE config = 'theme_infos_vimeo'";
 	$query_youtube     = "UPDATE $table SET content = '$theme_infos_youtube' WHERE config = 'theme_infos_youtube'";
+	$query_github      = "UPDATE $table SET content = '$theme_infos_github' WHERE config = 'theme_infos_github'";
 	
 	$result_tel         = $sbsql->query($query_tel);
 	$result_address     = $sbsql->query($query_address);
@@ -98,8 +100,9 @@ if ($_POST['form_submit']) {
 	$result_linkedin    = $sbsql->query($query_linkedin);
 	$result_vimeo       = $sbsql->query($query_vimeo);
 	$result_youtube     = $sbsql->query($query_youtube);
+	$result_github      = $sbsql->query($query_github);
 	
-	if ($result_tel && $result_address && $result_email && $result_facebook  && $result_twitter && $result_youtube && $result_pinterest && $result_instagram && $result_skype && $result_viadeo && $result_linkedin && $result_vimeo && $result_google_plus) {
+	if ($result_tel && $result_address && $result_email && $result_facebook  && $result_twitter && $result_youtube && $result_pinterest && $result_instagram && $result_skype && $result_viadeo && $result_linkedin && $result_vimeo && $result_google_plus && $result_github) {
 		// --- Message SUCCES
 		$sb_msg_valid = 'Infos du thème modifiées avec succès';
 	} else {
@@ -125,6 +128,7 @@ $query = "SELECT config, content FROM $table WHERE config = 'theme_infos_tel'
 												OR config = 'theme_infos_linkedin'
 												OR config = 'theme_infos_vimeo'
 												OR config = 'theme_infos_google_plus'
+												OR config = 'theme_infos_github'
 												";
 $request = $sbsql->query($query);
 $assoc   = $sbsql->toarray($request);
@@ -159,6 +163,10 @@ $sbform->addInput('text', 'Email', array ('name' => 'theme_infos_email', 'value'
 $sbform->addTextarea('Adresse complète', $cs['theme_infos_address'], array('id' => 'theme_infos_address', 'name' => 'theme_infos_address'), false);
 // --------------------------------
 $sbform->addBreak('Réseaux sociaux');
+// --------------------------------
+// Github
+// --------------------------------	
+$sbform->addInput('text', 'Github', array ('name' => 'theme_infos_github', 'value' => $cs['theme_infos_github'], 'placeholder' => "Lien Github", 'icon' => 'github'), false);
 // --------------------------------
 // Facebook
 // --------------------------------	
