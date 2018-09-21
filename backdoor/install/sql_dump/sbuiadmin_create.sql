@@ -136,7 +136,8 @@ INSERT INTO `<DB_PREFIX>sb_config` (`id`, `config`, `content`) VALUES
 (48, 'theme_infos_viadeo', 'http://fr.viadeo.com/fr/profile/patrice.bouthier'),
 (49, 'theme_infos_vimeo', ''),
 (50, 'theme_infos_youtube', 'https://www.youtube.com/channel/UCLk-U6SQ6Syj1XXkvdVgoAQ'),
-(51, 'theme_infos_linkedin', '');
+(51, 'theme_infos_linkedin', ''),
+(52, 'theme_infos_github', '');
 
 -- --------------------------------------------------------
 
@@ -1060,7 +1061,7 @@ ALTER TABLE `<DB_PREFIX>sb_blocs_sort`
 -- AUTO_INCREMENT for table `sb_config`
 --
 ALTER TABLE `<DB_PREFIX>sb_config`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 --
 -- AUTO_INCREMENT for table `sb_contact`
 --
