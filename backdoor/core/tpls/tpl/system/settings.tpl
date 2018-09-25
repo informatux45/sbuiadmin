@@ -32,6 +32,11 @@
                 <!-- /.col-lg-6 -->
 				
                 <div class="col-lg-6">
+		
+                   {* ------------------------------------ *}
+                   {* --- Include Shared Panel Actions --- *}
+                   {include file='shared/shared-panel-actions.tpl'}
+		
                     <div class="panel panel-primary">
                         <div class="panel-heading">
                             <i class="fa fa-info-circle fa-fw"></i> Rappel de votre configuration
