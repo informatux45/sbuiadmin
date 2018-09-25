@@ -349,6 +349,9 @@ $sbsmarty->assign('page_title', 'Configuration');
 // ----------------------
 $sbsmarty->assign('sb_msg_error', $sb_msg_error);
 $sbsmarty->assign('sb_msg_valid', $sb_msg_valid);
+// --- Second submit Button
+$sbsmarty->assign('sb_form_id', $formName);
+$sbsmarty->assign('sb_form_submit_value', $btn_add_edit);
 
 // ----------------------
 // CLOSE SQL
