@@ -33,26 +33,26 @@
 		<div class="sbnews-single-next-prev">
 			{if $sbnews_options.news_next_prev == "title"}
 				{if $next_prev.next}
-					<a class="next_a" href="{seo url="index.php?p=news&op=article&id={$next_prev.next}" rewrite="news/article/{$next_prev.next}/{$next_prev.next_title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|@strip_tags|@sbRewriteString|@strtolower}"}">
+					<a rel="next" class="next_a" href="{seo url="index.php?p=news&op=article&id={$next_prev.next}" rewrite="news/article/{$next_prev.next}/{$next_prev.next_title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|@strip_tags|@sbRewriteString|@strtolower}"}">
 						&Leftarrow;&nbsp;{$next_prev.next_title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|@strip_tags|truncate:"40":"..."}
 					</a>
 				{/if}
 				{if $next_prev.prev}
-					<a class="prev_a" href="{seo url="index.php?p=news&op=article&id={$next_prev.prev}" rewrite="news/article/{$next_prev.prev}/{$next_prev.prev_title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|@strip_tags|@sbRewriteString|@strtolower}"}">
+					<a rel="prev" class="prev_a" href="{seo url="index.php?p=news&op=article&id={$next_prev.prev}" rewrite="news/article/{$next_prev.prev}/{$next_prev.prev_title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|@strip_tags|@sbRewriteString|@strtolower}"}">
 						{$next_prev.prev_title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|@strip_tags|truncate:"40":"..."}&nbsp;&Rightarrow;
 					</a>
 				{/if}
 			{else}
 				{if $next_prev.next}
 				<span class="next">
-					<a href="{seo url="index.php?p=news&op=article&id={$next_prev.next}" rewrite="news/article/{$next_prev.next}/{$next_prev.next_title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|@strip_tags|@sbRewriteString|@strtolower}"}">
+					<a rel="next" href="{seo url="index.php?p=news&op=article&id={$next_prev.next}" rewrite="news/article/{$next_prev.next}/{$next_prev.next_title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|@strip_tags|@sbRewriteString|@strtolower}"}">
 						&rsaquo;
 					</a>
 				</span>
 				{/if}
 				{if $next_prev.prev}
 				<span class="prev">
-					<a href="{seo url="index.php?p=news&op=article&id={$next_prev.prev}" rewrite="news/article/{$next_prev.prev}/{$next_prev.prev_title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|@strip_tags|@sbRewriteString|@strtolower}"}">
+					<a rel="prev" href="{seo url="index.php?p=news&op=article&id={$next_prev.prev}" rewrite="news/article/{$next_prev.prev}/{$next_prev.prev_title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|@strip_tags|@sbRewriteString|@strtolower}"}">
 						&lsaquo;
 					</a>
 				</span>
