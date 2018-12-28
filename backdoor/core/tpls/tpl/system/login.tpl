@@ -5,21 +5,6 @@
 	{* ------------------ Headers ----------------- *}
 	{include file='header.tpl' page='login'}
 	{* ---------------- End Headers --------------- *}
-	
-	{* ------------------------- *}
-	{* ---       VIDEOS      --- *}
-	{* --- Chaine INFORMATUX --- *}
-	{* ------------------------- *}
-	{* sM8BCNLo2pE : Foret       *}
-	{* es86J41Du-Y : Particules  *}
-	{* NY6xjlmFG7g : Plage       *}
-	{* bmYcOEhIHjY : Travail     *}
-	{* kyu_m1LYmaE : Feu de camp *}
-	{* 0l3uuAQCgRQ : Taxis NY    *}
-	{* LXBIv9XuXq0 : Pluie       *}
-	{* 8p0RJSp-xkw : Mosaique    *}
-	{* 5k4Y9FGKFTU : Plage 2     *}
-	{* ------------------------- *}
 
     <div class="container" id="bgcontainer">
         <div class="row">
