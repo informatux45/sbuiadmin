@@ -1,4 +1,4 @@
-    </div>
+    {if $page != 'login'}</div>{/if}
     <!-- /#wrapper -->
 
     <!-- Bootstrap Core JavaScript -->
@@ -109,7 +109,7 @@
 	{if $page == 'login'}
 		<script>
 			$(document).ready(function() {
-				$('body').tubular({literal}{{/literal}videoId: '{$sb_random_bg_video}'{literal}}{/literal});
+				//$('body').tubular({literal}{{/literal}videoId: '{$sb_random_bg_video}'{literal}}{/literal});
 			});
 		</script>
 	{/if}

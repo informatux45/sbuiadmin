@@ -25,7 +25,7 @@
     <link href="assets/bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link href="assets/dist/css/sb-admin-2.css" rel="stylesheet">
+    {if $page != 'login'}<link href="assets/dist/css/sb-admin-2.css" rel="stylesheet">{/if}
 
     <!-- Font Awesome latest -->
     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' type='text/css' media='all' />
@@ -40,7 +40,7 @@
 	<script src="assets/dist/js/sb-custom.js"></script>
 	
     <!-- Custom Admin CSS -->
-    <link href="assets/dist/css/sb-admin-custom.css" rel="stylesheet">
+    {if $page != 'login'}<link href="assets/dist/css/sb-admin-custom.css" rel="stylesheet">{/if}
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -55,7 +55,8 @@
 	{if $page == 'login'}
 		<!-- CSS to style background login page with pattern -->
 		{*<link rel="stylesheet" href="assets/dist/css/pattern{$sb_random_bg}.css">*}
-		<script type="text/javascript" charset="utf-8" src="assets/dist/js/jquery.tubular.1.0.js"></script>
+		{*<script type="text/javascript" charset="utf-8" src="assets/dist/js/jquery.tubular.1.0.js"></script>*}
+		<link href="assets/dist/css/sb-admin-custom-login.css" rel="stylesheet">
 	{/if}
 
 </head>
