@@ -2,7 +2,7 @@
 - CMS SBootstrap Admin Responsive
 - Projet initial : UIADMIN v3.0
 - Contributeurs : INFORMATUX
-- Version stable : 2.11
+- Version stable : 2.12
 - License: [GPLv3](http://www.gnu.org/licenses/gpl-3.0.fr.html "Licence publique générale GNU v3")
 
 ---
@@ -51,6 +51,9 @@ Demandez nous un accès ;-)
 ---
 
 ### Changelog
+
+**2.12**
+- Add session management
 
 **2.11**
 - Update ALL queries
