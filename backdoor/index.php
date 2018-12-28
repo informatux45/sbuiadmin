@@ -116,6 +116,59 @@ shuffle($sb_background);
 $rand_video    = array_rand($sb_background, 2);
 $sbsmarty->assign('sb_random_bg_video', $sb_background[$rand_video[1]]);
 
+// ----------------------
+// --- Initialisation
+// ----------------------
+$cookie_username = 'sbuiadmin_user_name';
+$cookie_pwdname  = 'sbuiadmin_user_password';
+$cookie_method   = 'sbuiadmin_user_method';
+$cookie_lifetime = intval(sbGetConfig("cookie-lifetime"));
+$rememberme      = ($_POST['remember'] == 'longtime') ? 'yes' : 'no';
+
+// ----------------------
+// Validation du cookie du user
+// s'il avait choisi de se loguer
+// pour une duree determinee
+// ✓ Remember me
+// ----------------------
+global $_COOKIE;
+// --- Automatic Login ---
+if (!$_SESSION['sbuiadmin_user_name'] || $_SESSION['sbuiadmin_user_name'] == NULL) {
+	// ------------------
+	// --- COOKIE Auth (Remember me)
+	// ------------------
+	$sbuiadmin_user_name     = trim($sbsanitize->stopXSS($_COOKIE['sbuiadmin_user_name']));
+	$sbuiadmin_user_password = $_COOKIE['sbuiadmin_user_password'];
+	$sbuiadmin_user_method   = $_COOKIE['sbuiadmin_user_method'];
+	// --- Check User
+	if ($sbusers->login($sbuiadmin_user_name, $sbuiadmin_user_password)) {
+		// --- Check if User is active
+		if (!$sbusers->checkUserIsActive($sbuiadmin_user_name)) {
+			// --- User is no more active
+			$sbsmarty->assign('sbuiadmin_access_code', 'E4');
+			$sbuiadmin_type = 'error';
+			$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_USER_ERROR, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
+			$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
+			// --- Destroy COOKIE
+		    setcookie('sbuiadmin_user_name', '', time() - 3600, "/");
+		    setcookie('sbuiadmin_user_password', '', time() - 3600, "/");
+		    setcookie('sbuiadmin_user_method', '', time() - 3600, "/");
+		    // --- Set sessions to NULL
+			$_SESSION = array();
+		    $_SESSION['sbuiadmin_user_name']     = NULL;
+		    $_SESSION['sbuiadmin_user_password'] = NULL;
+		    $_SESSION['sbuiadmin_user_method']   = NULL;
+			// --- Smarty display
+			$sbsmarty->display('system/login.tpl');
+			exit;
+		} else {
+			$_SESSION['sbuiadmin_user_name']     = trim($sbsanitize->stopXSS($_COOKIE['sbuiadmin_user_name']));
+			$_SESSION['sbuiadmin_user_password'] = $_COOKIE['sbuiadmin_user_password'];
+			$_SESSION['sbuiadmin_user_method']   = $_COOKIE['sbuiadmin_user_method'];
+		}
+	}
+}
+
 if (isset($_SESSION['sbuiadmin_user_name']) && isset($_SESSION['sbuiadmin_user_password'])) {
 	// ------------------
 	// --- SESSION Auth
@@ -204,6 +257,12 @@ if (($_POST['username'] && $_POST['password'])) {
 			// Assign SESSION
 			$_SESSION['sbuiadmin_user_name']     = $sbuiadmin_user_name;
 			$_SESSION['sbuiadmin_user_password'] = $sbuiadmin_user_password;
+			// Cookie is Remember me Checked
+			if ($rememberme == 'yes') {
+				setcookie('sbuiadmin_user_name', $_SESSION['sbuiadmin_user_name'], time() + $cookie_lifetime, "/");
+				setcookie('sbuiadmin_user_password', $_SESSION['sbuiadmin_user_password'], time() + $cookie_lifetime, "/");
+				setcookie('sbuiadmin_user_method', $cookie_method, time() + $cookie_lifetime, "/");
+			}
 			
 		}
 	} else {
@@ -236,13 +295,21 @@ if ($_GET['ac'] == 'logout') {
 	// ------------------
 	// Update LastLogin
 	$sbusers->updateAccessUserLogin($sbuiadmin_user_name, true);
+	// Start SESSION
 	session_start();
+	// --- Destroy COOKIE
+	setcookie('sbuiadmin_user_name', '', time() - 3600, "/");
+	setcookie('sbuiadmin_user_password', '', time() - 3600, "/");
+	setcookie('sbuiadmin_user_method', '', time() - 3600, "/");
+	// --- Set sessions to NULL
+	$_SESSION = array();
 	session_unset();
 	session_destroy();
 	session_write_close();
 	setcookie(session_name(),'',0,'/');
 	session_regenerate_id(true);
 	header("Location: " . trim($sb_link_settings[15]));
+	exit();
 }
 // ----------------------
 // Get Global Infos

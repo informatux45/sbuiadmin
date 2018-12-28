@@ -31,7 +31,7 @@ define('_AM_THEME_FILE',						SBUIADMIN_PATH . '/inc/admin/theme.txt');
 
 // ------------------------------------------
 // --- Defined Safe Pages
-$sb_safe_pages   = ['index','sandbox','settings','cache','server','dashboard','theme','themeinfos','database','explorer','users','logaccess','menu','pages','blocs','medias','transfert','cmsconfig','slider','news','contact','tabbs','toggle','gallery','gmaps','table','toolbarck'];
+$sb_safe_pages   = ['index','sandbox','settings','cache','server','dashboard','theme','themeinfos','session','database','explorer','users','logaccess','menu','pages','blocs','medias','transfert','cmsconfig','slider','news','contact','tabbs','toggle','gallery','gmaps','table','toolbarck'];
 // --- Defined Safe Modules
 $sb_safe_modules = explode(",", trim($sb_settings_config[8]));
 // ------------------------------------------

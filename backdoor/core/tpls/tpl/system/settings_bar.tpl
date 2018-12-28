@@ -7,6 +7,10 @@
 			Générale
 		</button>
 		&nbsp;
+		<button class="btn btn-outline btn-danger" type="button" onclick="location.href='index.php?p=session'">
+			Session
+		</button>
+		&nbsp;
 		<button class="btn btn-outline btn-danger" type="button" onclick="location.href='index.php?p=cache'">
 			Cache
 		</button>

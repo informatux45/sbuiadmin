@@ -137,7 +137,8 @@ INSERT INTO `<DB_PREFIX>sb_config` (`id`, `config`, `content`) VALUES
 (49, 'theme_infos_vimeo', ''),
 (50, 'theme_infos_youtube', 'https://www.youtube.com/channel/UCLk-U6SQ6Syj1XXkvdVgoAQ'),
 (51, 'theme_infos_linkedin', ''),
-(52, 'theme_infos_github', '');
+(52, 'theme_infos_github', ''),
+(53, 'cookie-lifetime', '86400');
 
 -- --------------------------------------------------------
 

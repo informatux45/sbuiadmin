@@ -60,6 +60,11 @@
 									<div class="form-group">
 										<input class="form-control" placeholder="Password" name="password" type="password" value="">
 									</div>
+									<div class="form-group">
+										<label for="remember" class="form-break-info">
+											<input class="" name="remember" type="checkbox" id="remember" value="longtime"> Se souvenir de moi
+										</label>
+									</div>
 
 									{if $smarty.const._AM_CAPTCHA_MODE}
 									<div class="form-group">
