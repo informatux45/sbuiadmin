@@ -35,7 +35,7 @@
 					<div class="container">
 						<center>
 							<div class="logo">
-								LOGO
+								<img src="{$smarty.const._AM_SITE_URL}img/icon-sbuiadmin-w.png" alt="SBUIADMIN">
 								<div class="clearfix"></div>
 							</div>
 							<div class="middle">
@@ -59,9 +59,20 @@
 													<a class="small-text" href="#">Forgot password?</a>
 												</span>
 												<span style="width: 48%; text-align:right;  display: inline-block;">
-													<button type="submit" value="Login" class="">
-														<span class="glyphicon glyphicon-log-in"> Login</span>
-													</button>
+													{if $smarty.const._AM_CAPTCHA_MODE}
+														<button
+															type="submit"
+															value="Login"
+															class="g-recaptcha"
+															data-sitekey="{$grecaptcha_publickey}"
+															data-callback="sbLoginOnSubmit">
+															<span class="glyphicon glyphicon-log-in"> Login</span>
+														</button>
+													{else}
+														<button type="submit" value="Login" class="">
+															<span class="glyphicon glyphicon-log-in"> Login</span>
+														</button>
+													{/if}
 												</span>
 											</div>
 										</fieldset>
@@ -76,28 +87,11 @@
 				</div>
 
 				{if $smarty.const._AM_CAPTCHA_MODE}
-				{*<div class="form-group">*}
 					{* Google Invisible ReCaptcha *}
 					<script src="https://www.google.com/recaptcha/api.js?hl=fr&remoteip={$smarty.server.REMOTE_ADDR}" async defer></script>
 					{* ================ *}
-				{*</div>*}
 				{/if}
-				<!-- Change this to a button or input when using this as a form -->
-				
-				{*if $smarty.const._AM_CAPTCHA_MODE}
-					{*<button
-						type="submit"
-						value="Login"
-						class="g-recaptcha btn btn-outline btn-primary"
-						data-sitekey="{$grecaptcha_publickey}"
-						data-callback="sbLoginOnSubmit">
-						<span class="glyphicon glyphicon-log-in"> Login</span>
-					</button>
-				{else}
-					<button type="submit" value="Login" class="btn btn-outline btn-primary">
-						<span class="glyphicon glyphicon-log-in"> Login</span>
-					</button>
-				{/if*}
+
 			{/if}
         </div>
 		

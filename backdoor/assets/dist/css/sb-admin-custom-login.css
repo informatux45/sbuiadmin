@@ -159,6 +159,11 @@ fieldset{
 	color: #fff;
 	font-size: 50px;
 	line-height: 125px;
+	width: 300px;
+}
+.logo img {
+	max-width: 80%;
+	width: 100%;
 }
 /* ---------------------------------- */
 input[type=checkbox]{
@@ -218,6 +223,8 @@ span.lblcheck {
 	font-size: 1.6em;
 	font-weight: 600;
 	width: 28%;
+	position: relative;
+	z-index: 1;
 }
 @media screen and (max-width: 640px) {
 	.alert-danger-custom {
