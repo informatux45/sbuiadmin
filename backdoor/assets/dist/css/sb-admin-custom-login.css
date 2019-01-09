@@ -211,3 +211,16 @@ span.lblcheck {
 	margin: -50px 0 0 70px;
 	position: absolute;
 }
+
+.alert-danger-custom {
+	text-align: center;
+	margin: 1em auto;
+	font-size: 1.6em;
+	font-weight: 600;
+	width: 28%;
+}
+@media screen and (max-width: 640px) {
+	.alert-danger-custom {
+		width: 80%;
+	}
+}

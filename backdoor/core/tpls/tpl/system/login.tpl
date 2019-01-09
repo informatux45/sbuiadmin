@@ -9,7 +9,7 @@
     <div class="container" id="bgcontainer">
         <div class="row">
 			{if $sbuiadmin_access_code}
-				<div class="alert alert-danger">
+				<div class="alert alert-danger alert-danger-custom">
 				{if $sbuiadmin_access_code == 'E1'}
 					{$smarty.const.SBUIADMIN_MSG_ERROR_E1}
 				{/if}
@@ -84,8 +84,8 @@
 				{/if}
 				<!-- Change this to a button or input when using this as a form -->
 				
-				{if $smarty.const._AM_CAPTCHA_MODE}
-					<button
+				{*if $smarty.const._AM_CAPTCHA_MODE}
+					{*<button
 						type="submit"
 						value="Login"
 						class="g-recaptcha btn btn-outline btn-primary"
@@ -94,10 +94,10 @@
 						<span class="glyphicon glyphicon-log-in"> Login</span>
 					</button>
 				{else}
-					{*<button type="submit" value="Login" class="btn btn-outline btn-primary">
+					<button type="submit" value="Login" class="btn btn-outline btn-primary">
 						<span class="glyphicon glyphicon-log-in"> Login</span>
-					</button>*}
-				{/if}
+					</button>
+				{/if*}
 			{/if}
         </div>
 		
