@@ -2080,7 +2080,7 @@ EOT;
 	* @return bool false
 	*/
 	public function __destruct () {
-		unset ($this);
+		//unset($this);
 	}
 	
 	
