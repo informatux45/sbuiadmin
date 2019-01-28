@@ -76,6 +76,20 @@ class sanitize extends sql {
 		}
 		return $text;
 	}
+	
+
+	/**
+	* Stripslashes on array
+	* @param  array  $value
+	* @return array
+	*/
+	function stripslashes_deep($value) {
+		$value = is_array($value) ?
+					array_map('stripslashes_deep', $value) :
+					stripslashes($value);
+	
+		return $value;
+	}
 
 
 	/**
