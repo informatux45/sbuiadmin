@@ -606,7 +606,7 @@ function sbGetMenuModule($param = '') {
 						$ret_module_menu .= '<li id="' . $module_name . '">';
 						
 						// Menu UL (Entries)
-						$ul_module_menu = count($module_menu[$module_name]['li']);
+						$ul_module_menu = @count($module_menu[$module_name]['li']);
 						
 						// Check if active menu
 						$class_active = ($request_url == _AM_SITE_URL . "index.php?p=" . $module_name && $ul_module_menu == 0) ? ' class="active" ' : ' ';
