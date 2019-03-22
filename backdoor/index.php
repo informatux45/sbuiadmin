@@ -133,7 +133,7 @@ $rememberme      = ($_POST['remember'] == 'longtime') ? 'yes' : 'no';
 // ----------------------
 global $_COOKIE;
 // --- Automatic Login ---
-if (!$_SESSION['sbuiadmin_user_name'] || $_SESSION['sbuiadmin_user_name'] == NULL) {
+if ( (!$_SESSION['sbuiadmin_user_name'] || $_SESSION['sbuiadmin_user_name'] == NULL) && $_COOKIE['sbuiadmin_user_password']) {
 	// ------------------
 	// --- COOKIE Auth (Remember me)
 	// ------------------
@@ -176,7 +176,9 @@ if (isset($_SESSION['sbuiadmin_user_name']) && isset($_SESSION['sbuiadmin_user_p
 	// --- Check Session
 	$sbuiadmin_user_name     = trim($sbsanitize->stopXSS($_SESSION['sbuiadmin_user_name']));
 	$sbuiadmin_user_password = $_SESSION['sbuiadmin_user_password'];
+	// --- Check User
 	if ($sbusers->login($sbuiadmin_user_name, $sbuiadmin_user_password)) {
+		// --- Check if User is active
 		if (!$sbusers->checkUserIsActive($sbuiadmin_user_name)) {
 			// --- User is no more active
 			$sbsmarty->assign('sbuiadmin_access_code', 'E4');
@@ -194,7 +196,9 @@ if (($_POST['username'] && $_POST['password'])) {
 	// ------------------
 	$sbuiadmin_user_name     = trim($sbsanitize->stopXSS($_POST['username']));
 	$sbuiadmin_user_password = trim($sbusers->encrypt($_POST['password']));
+	// --- Check User
 	if ($sbusers->login($sbuiadmin_user_name, $sbuiadmin_user_password)) {
+		// --- Check if User is active
 		if (!$sbusers->checkUserIsActive($sbuiadmin_user_name)) {
 			// --- User is no more active
 			$sbsmarty->assign('sbuiadmin_access_code', 'E4');
