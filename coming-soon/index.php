@@ -164,7 +164,9 @@ $coming_soon_video = ($cs['coming-soon-video'] == '') ? 'PF0L3gvSVcg' : $cs['com
 	
 	<!-- tab-content -->
 	
-	<div class="tab-content text-center"> 
+	<div class="tab-content text-center">
+		
+		<a target="_blank" rel="noopener" href="https://github.com/informatux45/sbuiadmin"><img style="position: absolute; top: 0; right: 0; border: 0; width: 115px; height: 115px;" src="images/sbuiadmin-fork-me-on-github-blue.png" alt="Fork me on GitHub - SBUIADMIN - INFORMATUX"></a>
 	  
 	  <!-- Countdown -->
 	  
