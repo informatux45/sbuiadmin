@@ -127,7 +127,13 @@
     define('EI_ALLOW_START_ALL_OVER', false);
     
     // *** sql dump file - file that includes SQL statements for instalation
-    define('EI_SQL_DUMP_FILE_CREATE', 'sql_dump/sbuiadmin_create.sql');
+    if (version_compare(phpversion(), '7.1.0', '<')) {
+        // Only for 7.0 PHP Version
+        define('EI_SQL_DUMP_FILE_CREATE', 'sql_dump/sbuiadmin_create.sql');
+    } else {
+        // For 7.1 PHP Version and more
+        define('EI_SQL_DUMP_FILE_CREATE', 'sql_dump/sbuiadmin_create_7.1_and_more.sql');
+    }
     define('EI_SQL_DUMP_FILE_UPDATE', 'sql_dump/update.sql');
     define('EI_SQL_DUMP_FILE_UN_INSTALL', 'sql_dump/un-install.sql');
 
