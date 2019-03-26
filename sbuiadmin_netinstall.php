@@ -1,10 +1,46 @@
 <?php
 /* *********************************
- * @link http://informatux.com/    *
+ * @link https://informatux.com/   *
  * @package SBUIADMIN              *
  * @file UTF-8                     *
  * ©INFORMATUX.COM                 *
+ * ©SBUIADMIN.FR                   *
  * ******************************* */
+
+// ––––––––––––––––––––––––––––––––––––––––––––––––––
+// CONSTANTS - URL
+// ––––––––––––––––––––––––––––––––––––––––––––––––––
+define('SBUIADMIN_NET_INSTALL_URL', 'https://dev.sbuiadmin.fr/update/net_install/');
+define('SBUIADMIN_NET_INSTALL_LATEST_URL', 'https://dev.sbuiadmin.fr/update/net_install/latest/');
+define('SBUIADMIN_NET_INSTALL_STABLE_URL', 'https://dev.sbuiadmin.fr/update/net_install/stable/');
+
+// ––––––––––––––––––––––––––––––––––––––––––––––––––
+// CONSTANTS - LANG FR
+// ––––––––––––––––––––––––––––––––––––––––––––––––––
+define('SBUIADMIN_TITLE_FR', "Net Installation SBUIADMIN");
+define('SBUIADMIN_INSTALL_SUCCESSFULLY_FR', "Fichiers installés ;-)<br>N'oubliez pas de supprimer le fichier netinstall");
+define('SBUIADMIN_DOWNLOAD_BUTTON_FR', "Télécharger");
+define('SBUIADMIN_GO_TO_ADMIN_FR', "Allez à votre administration");
+define('SBUIADMIN_SLOGAN_1_FR', "Pensez pour vos mobiles");
+define('SBUIADMIN_SLOGAN_2_FR', 'Styles conçus avec bootstrap');
+define('SBUIADMIN_SLOGAN_3_FR', 'Rapide pour commencer immédiatement');
+
+// ––––––––––––––––––––––––––––––––––––––––––––––––––
+// CONSTANTS - LANG EN
+// ––––––––––––––––––––––––––––––––––––––––––––––––––
+define('SBUIADMIN_TITLE_EN', "SBUIADMIN Net Installation");
+define('SBUIADMIN_INSTALL_SUCCESSFULLY_EN', "Installed files ;-)<br>Do not forget to delete the netinstall file");
+define('SBUIADMIN_DOWNLOAD_BUTTON_EN', "Download");
+define('SBUIADMIN_GO_TO_ADMIN_EN', 'Go to your Administration');
+define('SBUIADMIN_SLOGAN_1_EN', 'Built with mobile in mind');
+define('SBUIADMIN_SLOGAN_2_EN', 'Styles designed with bootstrap');
+define('SBUIADMIN_SLOGAN_3_EN', 'Quick to start with zero compiling');
+
+// --- Languages we support
+$available_languages = array("en", "fr");
+$browser_language    = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+$language            = ( in_array($browser_language, $available_languages) ) ? strtoupper($browser_language) : 'EN';
+
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -13,8 +49,8 @@
 	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
 	<meta charset="utf-8">
 	<title>SBUIADMIN Net Install</title>
-	<meta name="description" content="INFORMATUX, El BooBoo">
-	<meta name="author" content="BooBoo">
+	<meta name="description" content="SBUIADMIN, le CMS By INFORMATUX">
+	<meta name="author" content="INFORMATUX">
 	
 	<!-- Mobile Specific Metas
 	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
@@ -1043,7 +1079,7 @@ if ($_GET['a'] == 'install') {
 	if ($fatal_error == 0) {
 	  
 		$zipFile     = "sbuiadmin_latest.zip"; // Local Zip File Path
-		$url         = "http://dev.sbuiadmin.fr/update/net_install/$zipFile";
+		$url         = SBUIADMIN_NET_INSTALL_LATEST_URL . $zipFile;
 		$zipResource = fopen($zipFile, "w");
 		
 		// Get The Zip File From Server
@@ -1109,26 +1145,26 @@ if ($_GET['a'] == 'install') {
 		<div class="row">
 			<div class="one-half">
 				<section class="header">
-					  <h2 class="title">SBUIADMIN Net Installation</h2>
-					  <h3 id="sbuiadmin_admin_msg">Fichiers installés ;-)<br>N'oubliez pas de supprimer le fichier netinstall</h3>
-					  <a id="sbuiadmin_download" class="button button-primary" href="sbuiadmin_netinstall.php?a=install" onclick="javascript:loader()">Download</a>
-					  <img id="sbuiadmin_download_loader" src="http://dev.sbuiadmin.fr/update/net_install/gears.svg" style="height: 70px">
+					  <h2 class="title"><?php echo constant("SBUIADMIN_TITLE_$language"); ?></h2>
+					  <h3 id="sbuiadmin_admin_msg"><?php echo constant("SBUIADMIN_INSTALL_SUCCESSFULLY_$language"); ?></h3>
+					  <a id="sbuiadmin_download" class="button button-primary" href="<?php echo basename(__FILE__); ?>?a=install" onclick="javascript:loader()"><?php echo constant("SBUIADMIN_DOWNLOAD_BUTTON_$language"); ?></a>
+					  <img id="sbuiadmin_download_loader" src="<?php echo SBUIADMIN_NET_INSTALL_URL; ?>gears.svg" style="height: 70px">
 					  <br>
-					  <a id="sbuiadmin_admin" class="button button-success" href="./administration/index.php">Go to your Administration</a>
+					  <a id="sbuiadmin_admin" class="button button-success" href="./administration/index.php"><?php echo constant("SBUIADMIN_GO_TO_ADMIN_$language"); ?></a>
 					  <br>
 					  <a id="sbuiadmin_errors" class="button button-warning" href="#"><?php echo $errors; ?></a>
 					  <div class="value-props row">
 						<div class="four columns value-prop">
-						  <img class="value-img" src="http://dev.sbuiadmin.fr/update/net_install/feather.svg">
-						  Built with mobile in mind
+						  <img class="value-img" src="<?php echo SBUIADMIN_NET_INSTALL_URL; ?>feather.svg">
+						  <?php echo constant("SBUIADMIN_SLOGAN_1_$language"); ?>
 						</div>
 						<div class="four columns value-prop">
-						  <img class="value-img" src="http://dev.sbuiadmin.fr/update/net_install/pens.svg">
-						  Styles designed with bootstrap
+						  <img class="value-img" src="<?php echo SBUIADMIN_NET_INSTALL_URL; ?>pens.svg">
+						  <?php echo constant("SBUIADMIN_SLOGAN_2_$language"); ?>
 						</div>
 						<div class="four columns value-prop">
-						  <img class="value-img" src="http://dev.sbuiadmin.fr/update/net_install/watch.svg">
-						  Quick to start with zero compiling
+						  <img class="value-img" src="<?php echo SBUIADMIN_NET_INSTALL_URL; ?>watch.svg">
+						  <?php echo constant("SBUIADMIN_SLOGAN_3_$language"); ?>
 						</div>
 					  </div>
 					</section>
