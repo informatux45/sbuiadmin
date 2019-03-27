@@ -10,9 +10,11 @@
 // ––––––––––––––––––––––––––––––––––––––––––––––––––
 // CONSTANTS - URL
 // ––––––––––––––––––––––––––––––––––––––––––––––––––
-define('SBUIADMIN_NET_INSTALL_URL', 'https://dev.sbuiadmin.fr/update/net_install/');
-define('SBUIADMIN_NET_INSTALL_LATEST_URL', 'https://dev.sbuiadmin.fr/update/net_install/latest/');
-define('SBUIADMIN_NET_INSTALL_STABLE_URL', 'https://dev.sbuiadmin.fr/update/net_install/stable/');
+define('SBUIADMIN_DEV_URL', 'https://dev.sbuiadmin.fr/');
+define('SBUIADMIN_NET_INSTALL_DIR', 'update/net_install/');
+define('SBUIADMIN_NET_INSTALL_URL', SBUIADMIN_DEV_URL . SBUIADMIN_NET_INSTALL_DIR);
+define('SBUIADMIN_NET_INSTALL_LATEST_URL', SBUIADMIN_DEV_URL . SBUIADMIN_NET_INSTALL_DIR . 'latest/');
+define('SBUIADMIN_NET_INSTALL_STABLE_URL', SBUIADMIN_DEV_URL . SBUIADMIN_NET_INSTALL_DIR . 'stable/');
 
 // ––––––––––––––––––––––––––––––––––––––––––––––––––
 // CONSTANTS - LANG FR
@@ -1082,6 +1084,8 @@ if ($_GET['a'] == 'install') {
 		$url         = SBUIADMIN_NET_INSTALL_LATEST_URL . $zipFile;
 		$zipResource = fopen($zipFile, "w");
 		
+		// start output buffer
+		ob_start();
 		// Get The Zip File From Server
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
@@ -1100,6 +1104,8 @@ if ($_GET['a'] == 'install') {
 			$errors .= "[CURL] Error : ".curl_error($ch);
 		}
 		curl_close($ch);
+		// discard output buffer
+		ob_end_clean();
 		
 		/* Open the Zip file */
 		$zip         = new ZipArchive;
