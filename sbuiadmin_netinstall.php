@@ -10,6 +10,8 @@
 // ––––––––––––––––––––––––––––––––––––––––––––––––––
 // CONSTANTS - URL
 // ––––––––––––––––––––––––––––––––––––––––––––––––––
+$actual_link  = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+$redirect_url = pathinfo($actual_link, PATHINFO_DIRNAME);
 define('SBUIADMIN_DEV_URL', 'https://dev.sbuiadmin.fr/');
 define('SBUIADMIN_NET_INSTALL_DIR', 'update/net_install/');
 define('SBUIADMIN_NET_INSTALL_URL', SBUIADMIN_DEV_URL . SBUIADMIN_NET_INSTALL_DIR);
@@ -1079,6 +1081,10 @@ if ($_GET['a'] == 'install') {
 	
 	/* Check if fatal errors */
 	if ($fatal_error == 0) {
+		
+		// Time limit execution script
+		$time_limit = 60 * 5;
+		set_time_limit($time_limit);
 	  
 		$zipFile     = "sbuiadmin_latest.zip"; // Local Zip File Path
 		$url         = SBUIADMIN_NET_INSTALL_LATEST_URL . $zipFile;
@@ -1120,6 +1126,7 @@ if ($_GET['a'] == 'install') {
 		// Delete files / directory
 		unlink("$zipFile");
 		rrmdir("__MACOSX");
+
 	}
 	
 	if ($errors == '') {
