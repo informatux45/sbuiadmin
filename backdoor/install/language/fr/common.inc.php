@@ -127,9 +127,9 @@ $arrLang['settings_customer_url_info'] = "L'url de votre site client avec obliga
 $arrLang['settings_path_upload'] = "Répertoire d'uploads des médias";
 $arrLang['settings_path_upload_info'] = "Utiliser pour le répertoire d'uploads de vos médias, un chemin relatif tel que '../upload'. Vous pouvez modifier ce chemin à tout moment dans l'administration.";
 $arrLang['settings_recaptcha_public'] = "Clé <a href='https://www.google.com/recaptcha/admin' target='_blank'>Google INVISIBLE reCAPTCHA</a> : Clé publique";
-$arrLang['settings_recaptcha_public_info'] = "Clé Google INVISIBLE reCAPTCHA publique a indiqué. Créer cette clé depuis la console admin de votre compte Google Recaptcha.";
+$arrLang['settings_recaptcha_public_info'] = "Clé Google INVISIBLE reCAPTCHA publique a indiqué. Créer cette clé depuis la console admin de votre compte Google Recaptcha. Vous pouvez effectuer cette opération plus tard.";
 $arrLang['settings_recaptcha_private'] = "Clé <a href='https://www.google.com/recaptcha/admin' target='_blank'>Google INVISIBLE reCAPTCHA</a> : Clé secrète";
-$arrLang['settings_recaptcha_private_info'] = "Clé Google INVISIBLE reCAPTCHA privée a indiqué. Créer cette clé depuis la console admin de votre compte Google Recaptcha.";
+$arrLang['settings_recaptcha_private_info'] = "Clé Google INVISIBLE reCAPTCHA privée a indiqué. Créer cette clé depuis la console admin de votre compte Google Recaptcha. Vous pouvez effectuer cette opération plus tard.";
 $arrLang['settings_url_upload'] = "Url d'uploads des médias (http<span style='color: red; font-weight: bold;'>s</span>://..../upload)";
 $arrLang['settings_url_upload_info'] = "Url d'uploads de vos médias. Peut être modifié à tout instant depuis l'administration également.";
 $arrLang['short_open_tag'] = "Short Open Tag";

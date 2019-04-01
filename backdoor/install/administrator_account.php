@@ -37,9 +37,9 @@
 
 		// skip this step if admin account is not required
 		if(!EI_USE_ADMIN_ACCOUNT){
-			$_SESSION['settings_customer_name']             = '';
-			$_SESSION['settings_customer_url']             = '';
-			$_SESSION['settings_url_upload']                = '';
+			$_SESSION['settings_customer_name']     = '';
+			$_SESSION['settings_customer_url']      = '';
+			$_SESSION['settings_url_upload']        = '';
 			$_SESSION['settings_path_upload']       = '';
 			$_SESSION['settings_recaptcha_public']  = '';
 			$_SESSION['settings_recaptcha_private'] = '';
@@ -73,12 +73,12 @@
 		}else if($settings_path_upload == ''){
 			$focus_field = 'settings_path_upload';
 			$error_msg = lang_key('alert_settings_path_upload_wrong');	
-		}else if($settings_recaptcha_public == ''){
-			$focus_field = 'settings_recaptcha_public';
-			$error_msg = lang_key('alert_settings_recaptcha_public_wrong');	
-		}else if($settings_recaptcha_private == ''){
-			$focus_field = 'settings_recaptcha_private';
-			$error_msg = lang_key('alert_settings_recaptcha_private_wrong');	
+		//}else if($settings_recaptcha_public == ''){
+		//	$focus_field = 'settings_recaptcha_public';
+		//	$error_msg = lang_key('alert_settings_recaptcha_public_wrong');	
+		//}else if($settings_recaptcha_private == ''){
+		//	$focus_field = 'settings_recaptcha_private';
+		//	$error_msg = lang_key('alert_settings_recaptcha_private_wrong');	
 		}else{
 
 			if(EI_MODE == 'demo'){
@@ -205,12 +205,12 @@
 				<td><input name="settings_path_upload" id="settings_path_upload" class="form_text" size="28" value="<?php echo $settings_path_upload; ?>" onfocus="textboxOnFocus('notes_settings_path_upload')" onblur="textboxOnBlur('notes_settings_path_upload')" <?php if(EI_MODE != 'debug') echo 'autocomplete="off"'; ?> required="" /></td>
 			</tr>
 			<tr>
-				<td>&nbsp;<?php echo lang_key('settings_recaptcha_public'); ?>&nbsp;<span class="star">*</span></td>
-				<td><input name="settings_recaptcha_public" id="settings_recaptcha_public" class="form_text" size="28" value="<?php echo $settings_recaptcha_public; ?>" onfocus="textboxOnFocus('notes_settings_recaptcha_public')" onblur="textboxOnBlur('notes_settings_recaptcha_public')" <?php if(EI_MODE != 'debug') echo 'autocomplete="off"'; ?> required="" /></td>
+				<td>&nbsp;<?php echo lang_key('settings_recaptcha_public'); ?></td>
+				<td><input name="settings_recaptcha_public" id="settings_recaptcha_public" class="form_text" size="28" value="<?php echo $settings_recaptcha_public; ?>" onfocus="textboxOnFocus('notes_settings_recaptcha_public')" onblur="textboxOnBlur('notes_settings_recaptcha_public')" <?php if(EI_MODE != 'debug') echo 'autocomplete="off"'; ?> /></td>
 			</tr>
 			<tr>
-				<td>&nbsp;<?php echo lang_key('settings_recaptcha_private'); ?>&nbsp;<span class="star">*</span></td>
-				<td><input name="settings_recaptcha_private" id="settings_recaptcha_private" class="form_text" size="28" value="<?php echo $settings_recaptcha_private; ?>" onfocus="textboxOnFocus('notes_settings_recaptcha_private')" onblur="textboxOnBlur('notes_settings_recaptcha_private')" <?php if(EI_MODE != 'debug') echo 'autocomplete="off"'; ?> required="" /></td>
+				<td>&nbsp;<?php echo lang_key('settings_recaptcha_private'); ?></td>
+				<td><input name="settings_recaptcha_private" id="settings_recaptcha_private" class="form_text" size="28" value="<?php echo $settings_recaptcha_private; ?>" onfocus="textboxOnFocus('notes_settings_recaptcha_private')" onblur="textboxOnBlur('notes_settings_recaptcha_private')" <?php if(EI_MODE != 'debug') echo 'autocomplete="off"'; ?> /></td>
 			</tr>
 				<?php if(EI_USE_PASSWORD_ENCRYPTION){ ?>
 				<tr>
