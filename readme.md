@@ -42,7 +42,7 @@ Demandez nous un accès ;-)
 
 ![alt text](https://sbuiadmin.fr/demo_github/sbuiadmin-theme-1.jpg "Un thème (front)")
 
-![alt text](https://sbuiadmin.fr/demo_github/sbuiadmin-login-2.jpg "Login administration")
+![alt text](https://sbuiadmin.fr/demo_github/sbuiadmin-login-1.jpg "Login administration")
 
 ![alt text](https://sbuiadmin.fr/demo_github/sbuiadmin-admin-1.jpg "L'administration")
 
