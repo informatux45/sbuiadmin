@@ -201,8 +201,8 @@ switch($action) {
 		$sbform->addInput('text', "Nombre d'uploads simultanés", array ('name' => 'upload_limit', 'value' => "$sb_config_upload_limit", 'placeholder' => "Nombre d'uploads simultanés"), true, false);
 		$sbform->addInput('text', "Taille maximum autorisée", array ('name' => 'scaling_maxsize', 'value' => "$sb_config_scaling_maxsize", 'placeholder' => "Taille maximum autorisée en pixels"), true, false, "Taille en pixels maximum autorisée pour vos médias (largeur et hauteur)<br>Ex : <b>1024</b> (CORRECT) --- Ex : <b>1024px</b> (INCORRECT)");
 		$sbform->addInput('text', 'Modules', array ('name' => 'modules', 'value' => "$sb_config_modules", 'placeholder' => "Nom de vos modules"), false, false, "Nom de vos modules autorisés dans votre administration séparés par des virgules sans espace");
-		$sbform->addInput('text', "Google Recaptcha (Clé publique)", array ('name' => 'recaptcha_public', 'value' => "$sb_config_recaptcha_public", 'placeholder' => "Clé publique"), true, false, "Clé du site dans le code HTML que vous proposez à vos utilisateurs");
-		$sbform->addInput('text', 'Google Recaptcha (Clé secrète)', array ('name' => 'recaptcha_secret', 'value' => "$sb_config_recaptcha_secret", 'placeholder' => "Clé secrète"), true, false, "Clé pour toute communication entre votre site et Google. Veillez à ne pas la divulguer, car il s'agit d'une clé secrète.");
+		$sbform->addInput('text', "Google Recaptcha (Clé publique)", array ('name' => 'recaptcha_public', 'value' => "$sb_config_recaptcha_public", 'placeholder' => "Clé publique"), false, false, "Clé du site dans le code HTML que vous proposez à vos utilisateurs");
+		$sbform->addInput('text', 'Google Recaptcha (Clé secrète)', array ('name' => 'recaptcha_secret', 'value' => "$sb_config_recaptcha_secret", 'placeholder' => "Clé secrète"), false, false, "Clé pour toute communication entre votre site et Google. Veillez à ne pas la divulguer, car il s'agit d'une clé secrète.");
 		// Checkbox des modes debug
 		$tab_check = array();
 		$tab_check[0]['text']    = 'Debug général (ADMIN)';
