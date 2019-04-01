@@ -7,7 +7,7 @@
     define('EI_MODE', 'production');
     
     // *** version number of SBUIADMIN Installer
-    define('EI_VERSION', '2.0.2');
+    define('EI_VERSION', '2.1.0');
 
     // *** default language: en - English
     define('EI_DEFAULT_LANGUAGE', 'fr');
