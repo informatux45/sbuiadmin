@@ -124,7 +124,7 @@
 								$output_file .= $_SESSION['settings_recaptcha_public'] . "\n";
 								$output_file .= $_SESSION['settings_recaptcha_private'] . "\n";
 								$output_file .= $_SESSION['database_prefix'] . "\n";
-								$output_file .= "1" . "\n"; // Captcha
+								$output_file .= "0" . "\n"; // Captcha
 								$output_file .= "0" . "\n"; // Upgrade
 								$output_file .= "1" . "\n"; // Coming soon (maintenance)
 								$output_file .= "0" . "\n"; // Debug General Front
