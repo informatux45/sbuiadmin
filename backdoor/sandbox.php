@@ -380,19 +380,19 @@ switch($action) {
 		// ex: "extension" => "pdf"
 		// ex: "extension" => "pdf,xml,gif"
 		// ----------------------------
-		$sbform->addInput('text', 'Pdf only (Width popup MEDIAS)', array ('id'=>'inputPdf', 'name' => 'pdf', 'value' => "$photo", 'placeholder' => "Votre pdf", "medias"=>"", "extension" => "pdf", 'icon' => 'file-pdf-o'), false);
+		$sbform->addInput('text', 'Pdf only (With popup MEDIAS)', array ('id'=>'inputPdf', 'name' => 'pdf', 'value' => "$photo", 'placeholder' => "Votre pdf", "medias"=>"", "extension" => "pdf", 'icon' => 'file-pdf-o'), false);
 		// ----------------------------
 		// --- Photo (width popup medias)
 		// ----------------------------
-		$sbform->addInput('text', 'Photo (Width popup MEDIAS)', array ('id'=>'inputPhoto', 'name' => 'photo', 'value' => "$photo", 'placeholder' => "Votre photo", "medias"=>"", 'icon' => 'photo'), false);
+		$sbform->addInput('text', 'Photo (With popup MEDIAS)', array ('id'=>'inputPhoto', 'name' => 'photo', 'value' => "$photo", 'placeholder' => "Votre photo", "medias"=>"", 'icon' => 'photo'), false);
 		// ----------------------------
 		// --- Photo (width popup medias in SUBDIR)
 		// ----------------------------
-		$sbform->addInput('text', 'Photo (Width popup MEDIAS in SUBDIR)', array ('id'=>'inputPhoto', 'name' => 'photo', 'value' => "$photo", 'placeholder' => "Votre photo", "medias"=>"", 'icon' => 'photo', "dir" => _AM_MEDIAS_DIR . "/new", "subdir" => "new"), false);
+		$sbform->addInput('text', 'Photo (With popup MEDIAS in SUBDIR)', array ('id'=>'inputPhoto', 'name' => 'photo', 'value' => "$photo", 'placeholder' => "Votre photo", "medias"=>"", 'icon' => 'photo', "dir" => _AM_MEDIAS_DIR . "/new", "subdir" => "new"), false);
 		// ----------------------------
 		// --- Photo (width popup medias in SUBDIR AND Limit files to display)
 		// ----------------------------
-		$sbform->addInput('text', 'Photo (Width popup MEDIAS in SUBDIR AND Limit files display to 10)', array ('id'=>'inputPhoto', 'name' => 'photo', 'value' => "$photo", 'placeholder' => "Votre photo", "medias"=>"", 'icon' => 'photo', "dir" => _AM_MEDIAS_DIR . "/new", "subdir" => "new", "limitfiles" => 10), false);
+		$sbform->addInput('text', 'Photo (With popup MEDIAS in SUBDIR AND Limit files display to 10)', array ('id'=>'inputPhoto', 'name' => 'photo', 'value' => "$photo", 'placeholder' => "Votre photo", "medias"=>"", 'icon' => 'photo', "dir" => _AM_MEDIAS_DIR . "/new", "subdir" => "new", "limitfiles" => 10), false);
 		// ----------------------------
 		// -- Video (without popup media)
 		// ----------------------------
