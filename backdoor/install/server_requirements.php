@@ -140,7 +140,11 @@
 		$loaded_extensions = get_loaded_extensions();
 		$validations['php_curl'] = array(true, 'PHP Curl', in_array('curl', $loaded_extensions), lang_key('installed'), lang_key('not_installed'));
 		$validations['php_gd2'] = array(false, 'PHP Gd2', in_array('gd2', $loaded_extensions), lang_key('installed'), lang_key('not_installed'));
-		$validations['php_mcrypt'] = array(true, 'PHP mcrypt', in_array('mcrypt', $loaded_extensions), lang_key('installed'), lang_key('not_installed'));
+		if (version_compare(phpversion(), '7.1.0', '<')) {
+			$validations['php_mcrypt'] = array(true, 'PHP mcrypt', in_array('mcrypt', $loaded_extensions), lang_key('installed'), lang_key('not_installed'));
+		} else {
+			$validations['openssl_encrypt'] = array(true, 'OpenSSL encrypt', function_exists('openssl_encrypt'), lang_key('installed'), lang_key('not_installed'));
+		}
 	}
 	
 	if(EI_CHECK_MODES){
