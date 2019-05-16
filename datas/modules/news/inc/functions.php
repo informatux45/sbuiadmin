@@ -206,7 +206,7 @@ function shortcode_sbnews_blocks_recent($param = '') {
 				// --- Construct HTML
 				$items_html .= '<div class="sbnews-hentry-post sbnews-group">';
 				$items_html .= '<div class="sbnews-thumb-img">';
-				$items_html .= '<img src="'.SB_URL.'thumb.php?src=' . $media_dir . '/' . $row['image'].'&size=55x&ignore=1&zc=1" alt="'.$title.'" title="'.$title.'"></div>';
+				$items_html .= '<img src="'.SB_URL.'thumb.php?src=' . $media_dir . '/' . $row['image'].'&size=55x&zc=1" alt="'.$title.'" title="'.$title.'"></div>';
 				$items_html .= '<div class="text">';
 				$items_html .= '<a href="'.$url.'" title="'.$title.'" class="title">'.sbTruncate($sbsanitize->stripTags($title), $truncate, "...").'</a>';
 				$items_html .= '<a class="sbnews-read-more" href="'.$url.'">'._CMS_NEWS_READ_ITEM.'</a>';
