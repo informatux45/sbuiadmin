@@ -2,7 +2,7 @@
 
 			{* --- Page Title --- *}
 			<div class="row header-title-row">
-				<h3>{if $page_title}{$page_title|upper}{else}{$pageindex|upper}{/if}</h3>
+				<h3>{if $page_title}{$page_title|unescape:"htmlall"|upper}{else}{$pageindex|upper}{/if}</h3>
 				<div class="breadcrumbx">
 					{if $page_title}
 						<a href="{$smarty.const._AM_SITE_URL}"><i class="fa fa-home fa-fw"></i> Dashboard</a>
