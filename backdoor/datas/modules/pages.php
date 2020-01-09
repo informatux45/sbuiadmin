@@ -149,18 +149,19 @@ switch($action) {
 			$module_view     = $sbsanitize->displayText($_POST['module_view'], 'UTF-8', 1, 0);
 			$various_view    = $sbsanitize->displayText($_POST['various_view'], 'UTF-8', 1, 0);
 			$headpage        = $sbsanitize->displayText($_POST['headpage'], 'UTF-8', 1, 0);
+			$photo           = $sbsanitize->displayText($_POST['photo'], 'UTF-8', 1, 0);
 			$active          = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
 			$url_custom      = '';
 	
 			// ADD or EDIT
 			if ($formType == 'add') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table (menu,title,content,seo_url,url_custom,seo_keywords,seo_description,active,theme_view,module_view,various_view,headpage,sort)
-						  VALUES ('$menu','$title','$content','$seo_url','$url_custom','$seo_keywords','$seo_description','$active','$theme_view','$module_view','$various_view','$headpage','0')";
+				$query = "INSERT INTO $table (menu,title,content,seo_url,url_custom,seo_keywords,seo_description,active,theme_view,module_view,various_view,headpage,photo,sort)
+						  VALUES ('$menu','$title','$content','$seo_url','$url_custom','$seo_keywords','$seo_description','$active','$theme_view','$module_view','$various_view','$headpage','$photo','0')";
 				$result_add = $sbsql->query($query);
 				if ($result_add) {
 					// --- Vider les champs du formulaire
-					$menu_fr = $menu_en = $title_fr = $title_en = $content_fr = $content_en = $seo_url = $seo_keywords = $seo_description = $theme_view = $headpage = $module_view = $various_view = $active = '';
+					$menu_fr = $menu_en = $title_fr = $title_en = $content_fr = $content_en = $seo_url = $seo_keywords = $seo_description = $theme_view = $headpage = $photo = $module_view = $various_view = $active = '';
 					// --- Message SUCCESS
 					$sb_msg_valid = 'Page ajoutée avec succès';
 				} else {
@@ -181,6 +182,7 @@ switch($action) {
 										   ,module_view = '$module_view'
 										   ,various_view = '$various_view'
 										   ,headpage = '$headpage'
+										   ,photo = '$photo'
 										   WHERE id = '$id'";
 											 
 				$result_edit = $sbsql->query($query);
@@ -226,6 +228,7 @@ switch($action) {
 			$module_view     = $assoc['module_view'];
 			$various_view    = $assoc['various_view'];
 			$headpage        = $assoc['headpage'];
+			$photo           = $assoc['photo'];
 			$active          = $assoc['active'];
 
 			$sbsmarty->assign('assoc', $query_1);
@@ -330,6 +333,10 @@ switch($action) {
 		// --------------------------------
 		$sbform->addTextarea('SEO Keywords', $seo_keywords, array('id' => 'seo_keywords', 'name' => 'seo_keywords', 'style' => 'height: 70px !important;'), false, "Les mots clés doivent être séparés par des virgules");
 		$sbform->addTextarea('SEO Description', $seo_description, array('id' => 'seo_description', 'name' => 'seo_description', 'style' => 'height: 120px !important;'), false, "Google limite la META DESCRIPTION à 155 caractères aujourd'hui... Jusqu'à changement...");
+		// ----------------------------
+		// --- Photo (width popup medias)
+		// ----------------------------
+		$sbform->addInput('text', 'Image', array ('id'=>'inputPhoto', 'name' => 'photo', 'value' => "$photo", 'placeholder' => "Image", "medias"=>"", 'icon' => 'photo'), false, false, 'Voir la taille de votre image dans le "Choix du template (VIEW)"');
 		// ----------------------------
 		// --- Editeur Contenu FR / EN
 		// ----------------------------
