@@ -84,6 +84,12 @@ if ($sb_pages_active) {
 	// --------------------------
 	if ($assoc['headpage'])
 		$sbsmarty->assign('sb_page_headpage', $assoc['headpage']);
+	
+	// --------------------------
+	// --- Assign Image if exists (Banner)
+	// --------------------------
+	if ($assoc['photo'])
+		$sbsmarty->assign('sb_page_image', $assoc['photo']);
 
 	// --------------------------
 	// --- Add Template BLOCKS (depends on the theme view choosen)
