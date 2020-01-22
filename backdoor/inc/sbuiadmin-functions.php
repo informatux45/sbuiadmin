@@ -47,6 +47,8 @@
  * sbGetMenuModule
  * sbArrayOrderby
  * sbGetFileDocData
+ * sbEncryptStringWithSalt
+ * sbGenerateRandKey
  * -------------------------------
  * Available Smarty functions :
  * -------------------------------
@@ -728,6 +730,37 @@ function sbGetFileDocData($file, $searchword) {
 	} else {
 		return "N.C.";	
 	}
+}
+
+/**
+ * Get An Encrypt String With Salt
+ * string	string		$param $string
+ * hash		mode		$param hash (md5 Or hash)
+ * salt		string		$param $salt (salt key)
+ * return string
+ */
+function sbEncryptStringWithSalt($string, $hash = 'md5', $salt = '') {
+    if ($hash == 'md5') {
+		$pass_hash = md5("{$string}{$salt}");
+    } else  {
+		$pass_hash = hash("$hash", "{$string}{$salt}");
+    }
+    return $pass_hash;
+}
+
+/**
+ * Get A Random key
+ * length	int		$param $length (key length to generated)
+ * return string
+ */
+function sbGenerateRandKey($length = 64) {
+    $salt = '';
+    $base = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $microtime = function_exists('microtime') ? microtime() : time();
+    srand((double)$microtime * 1000000);
+    for($i=0; $i<=$length; $i++)
+	$salt.= substr($base, rand() % strlen($base), 1);
+    return $salt;
 }
 
 // -------------------------------------------------------------------
