@@ -104,7 +104,7 @@ switch($op) {
 		}
 		// --- SQL Request
 		$initQ = "SELECT t1.*, t2.title AS catname FROM {$module['tables']['news']} AS t1
-		          LEFT JOIN fud3hub17b_sb_news_category AS t2 ON (t1.catid = t2.id)
+		          LEFT JOIN {$module['tables']['newscat']} AS t2 ON (t1.catid = t2.id)
 		          WHERE $where_categories
 		          ORDER BY t1.date DESC ";
 		// --- Total NEWS
