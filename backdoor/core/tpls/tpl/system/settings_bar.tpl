@@ -30,5 +30,9 @@
 		<button class="btn btn-outline btn-danger" type="button" onclick="location.href='index.php?p=themeinfos'">
 			Thème infos
 		</button>
+		&nbsp;
+		<button class="btn btn-danger" type="button" onclick="window.open('{$smarty.const.SB_ADMIN_URL}assets/samples/')">
+			BOOTSTRAP Samples
+		</button>
 		
 </div>
