@@ -438,9 +438,9 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_flood` (
 DROP TABLE IF EXISTS `<DB_PREFIX>sb_logaccess`;
 CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_logaccess` (
   `id` int(11) NOT NULL,
-  `logaccess_type` varchar(10) NOT NULL,
+  `logaccess_type` varchar(20) NOT NULL,
   `logaccess_date` int(10) NOT NULL,
-  `logaccess_user` varchar(20) NOT NULL,
+  `logaccess_user` varchar(100) NOT NULL,
   `logaccess_event` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Table Activity log';
 
