@@ -51,7 +51,9 @@ if (!SBSMARTYBC) {
 // ----------------------
 $sbuiadmin_classes = array('sql', 'sanitize', 'users', 'page');
 foreach ($sbuiadmin_classes as $sbuiadmin_class) {
-    include(SB_ADMIN_DIR . "inc" . DIRECTORY_SEPARATOR . "class" . DIRECTORY_SEPARATOR . SBUIADMINID . "-" . $sbuiadmin_class . ".php");
+	$class_file = SB_ADMIN_DIR . "inc" . DIRECTORY_SEPARATOR . "class" . DIRECTORY_SEPARATOR . SBUIADMINID . "-" . $sbuiadmin_class . ".php";
+	if (file_exists($class_file))
+	    include( $class_file );
 }
 
 $sbsql      = new sql();
