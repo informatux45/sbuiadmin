@@ -93,7 +93,7 @@ $module_menu['blocs']['group'] = "user"; // user OR admin
 // -----------------------
 // Menu NEWS
 // -----------------------
-$module_menu['news']['main']  = "Articles";
+$module_menu['news']['main']  = "Actualités";
 $module_menu['news']['icon']  = "rss";
 $module_menu['news']['group'] = "user"; // user OR admin
 //$module_menu['news']['li'][0]['title'] = "Tous les articles";
