@@ -398,6 +398,15 @@ function sbGetFileList($HowToSearch, $Condition, $Directory, $AddPath) {
 	return $result;
 }
 
+/**
+ * Show date ISO in various format
+ * This method return string to display
+ *
+ * @param	$date		Date ISO Format from MySQL
+ * @param	$format		Format to return (ISO, US, UST, FR, FR2, FR3, FRT, FRH, YEAR)
+ *
+ * @return converted string
+ */
 function sbConvertDate($date, $format = 'ISO') {
 	switch(strtoupper($format)) {
 		// Format ISO (AAAA-MM-DD)
