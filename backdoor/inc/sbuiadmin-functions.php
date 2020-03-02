@@ -404,8 +404,18 @@ function sbConvertDate($date, $format = 'ISO') {
 		default: return strftime("%F", strtotime($date)); break;
 		// Format US (MM-DD-AAAA)
 		case "US": return strftime("%m/%d/%Y", strtotime($date)); break;
+		// Format US (MM-DD-AAAA HH:mm:ss)
+		case "UST": return strftime("%m/%d/%Y %T", strtotime($date)); break;
 		// Format FR (DD-MM-AAAA)
 		case "FR": return strftime("%d/%m/%Y", strtotime($date)); break;
+		// Format FR (DD-MM-AAAA)
+		case "FR2": return strftime("%d-%m-%Y", strtotime($date)); break;
+		// Format FR (DD-MM-AAAA à HH:mm:ss)
+		case "FR3": return strftime("%d-%m-%Y à %T", strtotime($date)); break;
+		// Format FR (DD-MM-AAAA HH:mm:ss) with time
+		case "FRT": return strftime("%d-%m-%Y %T", strtotime($date)); break;
+		// Format FRH (DD MM AAAA) Human readable
+		case "FRH": return strftime("%e %B %Y", strtotime($date)); break;
 		// Year (AAAA)
 		case "YEAR": return strftime("%Y", strtotime($date)); break;
 	}
