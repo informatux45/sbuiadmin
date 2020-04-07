@@ -114,6 +114,11 @@ if (file_exists($sb_functions_path)) require_once($sb_functions_path);
 $sb_custom_path = SB_PATH . "inc" . DIRECTORY_SEPARATOR . "cmscustom.php";
 if (file_exists($sb_custom_path)) require_once($sb_custom_path);
 
+// ----------------------
+// Anti flood PROTECTION
+// ----------------------
+sbIsFlood();
+
 // ------------------------ 
 // Get ALL functions Files Module CMS
 // ------------------------ 
