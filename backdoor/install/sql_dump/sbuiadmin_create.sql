@@ -36,6 +36,36 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_attempts` (
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `sb_blocked_history`
+--
+
+CREATE TABLE `<DB_PREFIX>sb_blocked_history` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `count` tinyint(4) UNSIGNED NOT NULL DEFAULT '1',
+  `blockedtime` bigint(20) NOT NULL,
+  `ip` varchar(20) NOT NULL,
+  `reason` varchar(255) NOT NULL,
+  `infos` text
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `sb_blocked_ip`
+--
+
+CREATE TABLE `<DB_PREFIX>sb_blocked_ip` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `ip` varchar(20) NOT NULL,
+  `count` tinyint(4) UNSIGNED NOT NULL DEFAULT '1',
+  `blockedtime` bigint(20) NOT NULL,
+  `expirationtime` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
+  `reason` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `sb_blocs`
 --
 
@@ -1149,6 +1179,27 @@ ALTER TABLE `<DB_PREFIX>sb_table_structure`
 --
 ALTER TABLE `<DB_PREFIX>sb_users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+--
+-- Index pour la table `sb_blocked_history`
+--
+ALTER TABLE `<DB_PREFIX>sb_blocked_history`
+  ADD PRIMARY KEY (`id`);
+--
+-- Index pour la table `sb_blocked_ip`
+--
+ALTER TABLE `<DB_PREFIX>sb_blocked_ip`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `ip` (`ip`);
+--
+-- AUTO_INCREMENT pour la table `sb_blocked_history`
+--
+ALTER TABLE `<DB_PREFIX>sb_blocked_history`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT pour la table `sb_blocked_ip`
+--
+ALTER TABLE `<DB_PREFIX>sb_blocked_ip`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;  
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
