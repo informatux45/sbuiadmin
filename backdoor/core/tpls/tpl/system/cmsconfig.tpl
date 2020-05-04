@@ -267,7 +267,7 @@ It was popularised in the 1960s with the release of Letraset sheets containing L
 						&nbsp;&nbsp;
 						<button type="button" class="btn btn-success" onclick="location.href='https://developers.google.com/speed/libraries/'">Google Hosted Libraries</button>
 						&nbsp;&nbsp;
-						<button type="button" class="btn btn-success" onclick="location.href='https://console.developers.google.com/apis/library?hl=FR'">Console Developers</button>
+						<button type="button" class="btn btn-success" onclick="location.href='https://search.google.com/search-console?hl=fr'">Console Developers</button>
 					</div>
 					<!-- /.panel-body -->
 				</div>
