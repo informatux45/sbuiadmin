@@ -22,7 +22,7 @@ define('_CMS_CONTACT_BUTTON_SEND',					'Envoyer');
 // -------------------------------------------------------------------------
 define('_CMS_CONTACT_FORM_SUCCESS',					"Votre message a été envoyé, nous vous contacterons très prochainement");
 define('_CMS_CONTACT_FORM_ERROR_CAPTCHA',			"Vérification captcha échouée, essayez à nouveau");
-define('_CMS_CONTACT_FORM_ERROR_CAPTCHA_EMPTY',		"La vérifcation reCAPTCHA doit être validée");
+define('_CMS_CONTACT_FORM_ERROR_CAPTCHA_EMPTY',		"La vérification reCAPTCHA doit être validée");
 define('_CMS_CONTACT_NOFORM',						'Formulaire non disponible !');
 define('_CMS_CONTACT_FORM_NOTFOUND',				"Formulaire inexistant !");
 define('_CMS_CONTACT_FORM_INACTIVE',				"Formulaire désactivé !");
