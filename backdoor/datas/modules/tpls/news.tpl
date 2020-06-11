@@ -120,7 +120,7 @@
                 <!-- /.col-lg-12 -->
 				{/if}
 				
-				{if (!$all || !$allcategory) && ($smarty.get.a && $smarty.get.a != 'category') }
+				{if (!$all || !$allcategory) && ($smarty.get.a && $smarty.get.a != 'category' && $smarty.get.a != 'del') }
 
 					<div class="col-lg-8">
 						<div class="panel panel-default">
