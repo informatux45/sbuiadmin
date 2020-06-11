@@ -10,7 +10,7 @@
  * ******************************* */
 
 /** Prevent direct access */
-if (basename($_SERVER['PHP_SELF']) == 'functions.php') { 
+if (basename($_SERVER['PHP_SELF']) == 'cmscustom.php') { 
 	die('You cannot load this page directly.');
 }; 
 
