@@ -401,15 +401,16 @@ switch($action) {
 		// -- Input CHECKBOX
 		// ----------------------------
 		$tab_check = array();
-		$tab_check[0]['text']    = 'Option 1';
-		$tab_check[0]['name']    = 'option_one';
-		$tab_check[0]['checked'] = ($option_one == 1) ? '1' : '0';
-		$tab_check[1]['text']    = 'Option 2';
-		$tab_check[1]['name']    = 'option_two';
-		$tab_check[1]['checked'] = ($option_two == 1) ? '1' : '0';
-		$tab_check[2]['text']    = 'Option 3';
-		$tab_check[2]['name']    = 'option_three';
-		$tab_check[2]['checked'] = ($option_three == 1) ? '1' : '0';
+		$tab_check[0]['text']     = 'Option 1';
+		$tab_check[0]['name']     = 'option_one';
+		$tab_check[0]['checked']  = ($option_one == 1) ? '1' : '0';
+		$tab_check[1]['text']     = 'Option 2';
+		$tab_check[1]['name']     = 'option_two';
+		$tab_check[1]['checked']  = ($option_two == 1) ? '1' : '0';
+		$tab_check[2]['text']     = 'Option 3';
+		$tab_check[2]['name']     = 'option_three';
+		$tab_check[2]['checked']  = ($option_three == 1) ? '1' : '0';
+		$tab_check[0]['disabled'] = "disabled";
 		$sbform->addCheckbox('Toutes vos options', $tab_check, '', false, '<br />');
 		// ----------------------------
 		// -- Input RADIO
