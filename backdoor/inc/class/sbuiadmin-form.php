@@ -612,7 +612,10 @@ class form extends sanitize {
 
 			if ($tabCheck[$i]['checked'] && $tabCheck[$i]['checked'] == '1')
 				$chaineTemp .= 'checked="checked" ';
-
+			
+			if ($tabCheck[$i]['disabled'] && $tabCheck[$i]['disabled'] == 'disabled')
+				$chaineTemp .= 'disabled="" ';
+			
 			$chaineTemp .= '/>&nbsp;&nbsp;';
 			$chaineTemp .= $tabCheck[$i]['text'].'&nbsp;';
 			$chaineTemp .= $separator;
