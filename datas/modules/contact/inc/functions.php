@@ -2,7 +2,7 @@
 /**
  * Plugin Name: SBUIADMIN CONTACT
  * Description: Gestionnaire de formulaire de contact
- * Version: 0.1.1
+ * Version: 0.1.2
  * Author: BooBoo
  * Author URI: //www.informatux.com/
  * File: functions.php
@@ -175,6 +175,7 @@ function shortcode_sbcontact($param = '') {
 	// --- Initialization
 	$id        = intval($param['id']);
 	$class     = $param['class'];
+	$formname  = (isset($param['form'])) ? trim($param['form']) : false;
 	$form_html = '';
 	$sendmail  = false;
 	// --- Tables
@@ -279,8 +280,10 @@ function shortcode_sbcontact($param = '') {
 			// --- --- --- --- --- --- ---
 			
 			// --- Initialization
+			$form_name  = ($formname) ? 'name="'.$formname.'" id="'.$formname.'" ' : '';
+			$form_class = ($class) ? ' class="'.$class.'"' : '';
 			$form_html .= '<a name="form_'.$id.'"></a>';
-			$form_html .= '<form action="http' . (($_SERVER['HTTPS'] == 'on') ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'].'#form_' . $id . '" method="post" class="' . $class . '">';
+			$form_html .= '<form '.$form_name.'action="http' . (($_SERVER['HTTPS'] == 'on') ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'].'#form_' . $id . '" method="post"'.$form_class.'>';
 			// --- Error / Success Message
 			//$form_html .= '<div class="usermessagea">';
 			if ($errMsg) {
@@ -326,7 +329,7 @@ function sbGetContactFormElements($string, $publickey = '', $sendmail = false) {
 	global $sbsanitize, $sbsql;
 	
 	// --- Types
-	$type_elements = ['TEXT','TXTAREA','SELECT','RECAPTCHA','SUBMIT'];
+	$type_elements = ['TEXT','CHECKBOX','TXTAREA','SELECT','RECAPTCHA','SUBMIT'];
 	
 	// ------------------------
 	// --- Get INPUTs
@@ -380,6 +383,25 @@ function sbContactFormConstructElement($param, $type = '', $publickey = '', $sen
 		default:
 		case "TEXT":
 			$type = 'text';
+			$input_html .= '<input';
+			foreach($param as $key => $val) {
+				// --- Check if required
+				if ($key == 'type')
+					$type = $val;
+				elseif ($key == 'required')
+					$required = true;
+				else {
+					if ($key == 'name') $keyname = $val;
+					$input_html .= ' ' . $key . '="' . $val . '"';
+				}
+			}
+			$input_html .= ($keyname && !$sendmail) ? 'value="' . $_POST[$keyname] . '"' : 'value=""';
+			$input_html .= ' type="'.$type.'"';
+			$input_html .= ($required) ? ' required>' : '>';
+		break;
+	
+		case "CHECKBOX":
+			$type = 'checkbox';
 			$input_html .= '<input';
 			foreach($param as $key => $val) {
 				// --- Check if required
