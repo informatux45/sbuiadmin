@@ -123,6 +123,9 @@
 							Champs TEXT avec obligation d'être rempli et placeholder<br>
 							<span style="font-weight: bold;">[TEXT name=telephone/required=required/placeholder=Votre téléphone]</span><br>
 							<br>
+							Champs CHECKBOX avec obligation d'être rempli<br>
+							<span style="font-weight: bold;">[CHECKBOX name=telephone/required=required]</span><br>
+							<br>
 							Champs TEXTAREA sans obligation d'être rempli<br>
 							<span style="font-weight: bold;">[TEXTAREA name=message]</span><br>
 							<br>
