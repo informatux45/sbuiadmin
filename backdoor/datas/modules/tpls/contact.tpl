@@ -38,7 +38,7 @@
 											{foreach from=$allcontact item=contact}
 												<tr class="{cycle values="odd,even"} gradeX">
 													<td>{$contact.title|unescape:"htmlall"|@sbDisplayLang}</td>
-													<td>[CS id={$contact.id} name=sbcontact class=your-class]</td>
+													<td>[CS id={$contact.id} name=sbcontact class=yourclass form=formname{$contact.id}]</td>
 													<td>
 														<span class="glyphicon glyphicon-eye-open {if $contact.active}green{else}red{/if}" title="Statut {if $contact.active}visible{else}non visible{/if}"></span>
 														&nbsp;
