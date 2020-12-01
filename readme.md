@@ -1,4 +1,4 @@
-# [SBUIADMIN](https://sbuiadmin.fr/)
+# [SBUIADMIN](https://github.com/informatux45/sbuiadmin/)
 - CMS SBootstrap Admin Responsive
 - Projet initial : UIADMIN v3.0
 - Contributeurs : INFORMATUX
@@ -28,25 +28,18 @@ Ready | Fonctionnalités
 *✓* | Développeurs (Templates Smarty, Sandbox, Debug Kint, Modules, ...)
 *✓* | Serveurs IIS / Unix / Linux / Windows
 
----
-
-### [CMS Test](https://sbuiadmin.fr/)
-
-Demo URL : https://sbuiadmin.fr/
-
-Demandez nous un accès ;-)
 
 ---
 
 ### Screenshots
 
-![alt text](https://sbuiadmin.fr/demo_github/sbuiadmin-theme-1.jpg "Un thème (front)")
+![alt text](https://informatux.com/tools/demo_github/sbuiadmin-theme-1.jpg "Un thème (front)")
 
-![alt text](https://sbuiadmin.fr/demo_github/sbuiadmin-login-1.jpg "Login administration")
+![alt text](https://informatux.com/tools/demo_github/sbuiadmin-login-1.jpg "Login administration")
 
-![alt text](https://sbuiadmin.fr/demo_github/sbuiadmin-admin-1.jpg "L'administration")
+![alt text](https://informatux.com/tools/demo_github/sbuiadmin-admin-1.jpg "L'administration")
 
-[D'autres copie d'écran ici...](https://sbuiadmin.fr/demo_img/ "SBUIADMIN Screenshots")
+[D'autres copie d'écran ici...](https://informatux.com/tools/demo_img/ "SBUIADMIN Screenshots")
 
 ---
 
