@@ -45,6 +45,10 @@ Ready | Fonctionnalités
 
 ### Changelog
 
+**2.31**
+- SMTP Configuration (Account module)
+- Add classes (Account, Cart, CSV)
+
 **2.30**
 - PHP 7.3 and 7.4 Ready
 
