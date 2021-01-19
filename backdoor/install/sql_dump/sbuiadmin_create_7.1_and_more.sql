@@ -138,7 +138,15 @@ INSERT INTO `<DB_PREFIX>sb_config` (`id`, `config`, `content`) VALUES
 (50, 'theme_infos_youtube', 'https://www.youtube.com/channel/UCLk-U6SQ6Syj1XXkvdVgoAQ'),
 (51, 'theme_infos_linkedin', ''),
 (52, 'theme_infos_github', ''),
-(53, 'cookie-lifetime', '86400');
+(53, 'cookie-lifetime', '86400'),
+(54, 'email_smtp', '0'),
+(55, 'email_smtp_host', ''),
+(56, 'email_smtp_auth', '0'),
+(57, 'email_smtp_port', ''),
+(58, 'email_smtp_username', ''),
+(59, 'email_smtp_password', ''),
+(60, 'email_smtp_secure', ''),
+(61, 'email_smtp_debug', '0');
 
 -- --------------------------------------------------------
 
