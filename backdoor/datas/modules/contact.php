@@ -266,6 +266,15 @@ switch($action) {
 			}
 			$email_publickey  = $sbsanitize->displayText($_POST['email_publickey'], 'UTF-8', 1, 0);
 			$email_privatekey = $sbsanitize->displayText($_POST['email_privatekey'], 'UTF-8', 1, 0);
+
+			$email_smtp          = $sbsanitize->displayText($_POST['email_smtp'], 'UTF-8', 1, 0);
+			$email_smtp_host     = $sbsanitize->displayText($_POST['email_smtp_host'], 'UTF-8', 1, 0);
+			$email_smtp_auth     = $sbsanitize->displayText($_POST['email_smtp_auth'], 'UTF-8', 1, 0);
+			$email_smtp_port     = $sbsanitize->displayText($_POST['email_smtp_port'], 'UTF-8', 1, 0);
+			$email_smtp_username = $sbsanitize->displayText($_POST['email_smtp_username'], 'UTF-8', 1, 0);
+			$email_smtp_password = $sbsanitize->displayText($_POST['email_smtp_password'], 'UTF-8', 1, 0);
+			$email_smtp_secure   = $sbsanitize->displayText($_POST['email_smtp_secure'], 'UTF-8', 1, 0);
+			$email_smtp_debug    = $sbsanitize->displayText($_POST['email_smtp_debug'], 'UTF-8', 1, 0);
 			
 			// --- EDIT
 			// UPDATE DATAS
@@ -273,12 +282,31 @@ switch($action) {
 			$query_email_subject    = "UPDATE $table_cmsconfig SET content = '$email_subject' WHERE config = 'email_subject'";
 			$query_email_publickey  = "UPDATE $table_cmsconfig SET content = '$email_publickey' WHERE config = 'email_publickey'";
 			$query_email_privatekey = "UPDATE $table_cmsconfig SET content = '$email_privatekey' WHERE config = 'email_privatekey'";
+
+			$query_email_smtp          = "UPDATE $table_cmsconfig SET content = '$email_smtp' WHERE config = 'email_smtp'";
+			$query_email_smtp_host     = "UPDATE $table_cmsconfig SET content = '$email_smtp_host' WHERE config = 'email_smtp_host'";
+			$query_email_smtp_auth     = "UPDATE $table_cmsconfig SET content = '$email_smtp_auth' WHERE config = 'email_smtp_auth'";
+			$query_email_smtp_port     = "UPDATE $table_cmsconfig SET content = '$email_smtp_port' WHERE config = 'email_smtp_port'";
+			$query_email_smtp_username = "UPDATE $table_cmsconfig SET content = '$email_smtp_username' WHERE config = 'email_smtp_username'";
+			$query_email_smtp_password = "UPDATE $table_cmsconfig SET content = '$email_smtp_password' WHERE config = 'email_smtp_password'";
+			$query_email_smtp_secure   = "UPDATE $table_cmsconfig SET content = '$email_smtp_secure' WHERE config = 'email_smtp_secure'";
+			$query_email_smtp_debug    = "UPDATE $table_cmsconfig SET content = '$email_smtp_debug' WHERE config = 'email_smtp_debug'";
 			
 			$result_edit_email_to         = $sbsql->query($query_email_to);
 			$result_edit_email_subject    = $sbsql->query($query_email_subject);
 			$result_edit_email_publickey  = $sbsql->query($query_email_publickey);
 			$result_edit_email_privatekey = $sbsql->query($query_email_privatekey);
-			if ($result_edit_email_to && $result_edit_email_publickey && $result_edit_email_privatekey && $result_edit_email_subject) {
+			
+			$result_edit_email_smtp          = $sbsql->query($query_email_smtp);
+			$result_edit_email_smtp_host     = $sbsql->query($query_email_smtp_host);
+			$result_edit_email_smtp_auth     = $sbsql->query($query_email_smtp_auth);
+			$result_edit_email_smtp_port     = $sbsql->query($query_email_smtp_port);
+			$result_edit_email_smtp_username = $sbsql->query($query_email_smtp_username);
+			$result_edit_email_smtp_password = $sbsql->query($query_email_smtp_password);
+			$result_edit_email_smtp_secure   = $sbsql->query($query_email_smtp_secure);
+			$result_edit_email_smtp_debug    = $sbsql->query($query_email_smtp_debug);
+			
+			if ($result_edit_email_to && $result_edit_email_publickey && $result_edit_email_privatekey && $result_edit_email_subject && $result_edit_email_smtp && $result_edit_email_smtp_host && $result_edit_email_smtp_auth && $result_edit_email_smtp_port && $result_edit_email_smtp_username && $result_edit_email_smtp_password && $result_edit_email_smtp_secure && $result_edit_email_smtp_debug) {
 				// --- Message SUCCES
 				$sb_msg_valid = 'Configuration EMAIL modifiée avec succès';
 			} else {
@@ -298,6 +326,7 @@ switch($action) {
 		$queryP   = "SELECT content FROM $table_cmsconfig WHERE config = 'email_publickey'";
 		$queryS   = "SELECT content FROM $table_cmsconfig WHERE config = 'email_privatekey'";
 		$queryA   = "SELECT content FROM $table_cmsconfig WHERE config = 'email_subject'";
+
 		$requestT = $sbsql->query($queryT);
 		$requestP = $sbsql->query($queryP);
 		$requestS = $sbsql->query($queryS);
@@ -306,6 +335,15 @@ switch($action) {
 		$assocP   = $sbsql->assoc($requestP);
 		$assocS   = $sbsql->assoc($requestS);
 		$assocA   = $sbsql->assoc($requestA);
+		
+		$assocEmail['email_smtp']          = $sbsql->assoc($sbsql->query( "SELECT content FROM $table_cmsconfig WHERE config = 'email_smtp'" ));
+		$assocEmail['email_smtp_host']     = $sbsql->assoc($sbsql->query( "SELECT content FROM $table_cmsconfig WHERE config = 'email_smtp_host'" ));
+		$assocEmail['email_smtp_auth']     = $sbsql->assoc($sbsql->query( "SELECT content FROM $table_cmsconfig WHERE config = 'email_smtp_auth'" ));
+		$assocEmail['email_smtp_port']     = $sbsql->assoc($sbsql->query( "SELECT content FROM $table_cmsconfig WHERE config = 'email_smtp_port'" ));
+		$assocEmail['email_smtp_username'] = $sbsql->assoc($sbsql->query( "SELECT content FROM $table_cmsconfig WHERE config = 'email_smtp_username'" ));
+		$assocEmail['email_smtp_password'] = $sbsql->assoc($sbsql->query( "SELECT content FROM $table_cmsconfig WHERE config = 'email_smtp_password'" ));
+		$assocEmail['email_smtp_secure']   = $sbsql->assoc($sbsql->query( "SELECT content FROM $table_cmsconfig WHERE config = 'email_smtp_secure'" ));
+		$assocEmail['email_smtp_debug']    = $sbsql->assoc($sbsql->query( "SELECT content FROM $table_cmsconfig WHERE config = 'email_smtp_debug'" ));
 		
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $queryT . "\n" . $queryP . "\n" . $queryS . "\n" . 'Form Type = '.$formType);						
@@ -318,20 +356,52 @@ switch($action) {
 		// --------------------------------
 		// Emails
 		// --------------------------------	
-		$sbform->addInput('text', 'Email(s)', array ('name' => 'email_to', 'value' => "{$assocT[content]}", 'placeholder' => "Email(s)", 'icon' => 'envelope-o'), false, false, "Email(s) séparés par des virgules à qui sera expédié le ou les messages du site");
+		$sbform->addInput('text', 'Email(s)', array ('name' => 'email_to', 'value' => $assocT['content'], 'placeholder' => "Email(s)", 'icon' => 'envelope-o'), false, false, "Email(s) séparés par des virgules à qui sera expédié le ou les messages du site");
 		// --------------------------------
 		// Sujet (Général)
 		// --------------------------------
 		$email_subject_title = ($getMultilang) ? 'Sujet (FR)' : 'Sujet' ;
-		$sbform->addInput('text', "$email_subject_title", array ('name' => 'email_subject_fr', 'value' => "{$sbsanitize->displayLang(utf8_encode($assocA[content]))}", 'placeholder' => "Email(s)", 'icon' => 'pencil'), false, false, "Sujet principal de vos formulaires (si un formulaire possède un sujet, celui-ci sera utilisé en priorité)");
+		$sbform->addInput('text', "$email_subject_title", array ('name' => 'email_subject_fr', 'value' => $sbsanitize->displayLang(utf8_encode($assocA['content'])), 'placeholder' => "Email(s)", 'icon' => 'pencil'), false, false, "Sujet principal de vos formulaires (si un formulaire possède un sujet, celui-ci sera utilisé en priorité)");
 		if ($getMultilang) {
-			$sbform->addInput('text', 'Sujet (EN)', array ('name' => 'email_subject_en', 'value' => "{$sbsanitize->displayLang(utf8_encode($assocA[content]), 'en')}", 'placeholder' => "Email(s)", 'icon' => 'pencil'), false, false, "Sujet (EN) principal de vos formulaires (si un formulaire possède un sujet, celui-ci sera utilisé en priorité)");
+			$sbform->addInput('text', 'Sujet (EN)', array ('name' => 'email_subject_en', 'value' => $sbsanitize->displayLang(utf8_encode($assocA['content']), 'en'), 'placeholder' => "Email(s)", 'icon' => 'pencil'), false, false, "Sujet (EN) principal de vos formulaires (si un formulaire possède un sujet, celui-ci sera utilisé en priorité)");
 		}
 		// --------------------------------
 		// Google RECAPTCHA Keys
 		// --------------------------------	
-		$sbform->addInput('text', "[GOOGLE RECAPTCHA] <span style='color: red;'>Clé du site</span>", array ('name' => 'email_publickey', 'value' => "{$assocP[content]}", 'placeholder' => "clé reCAPTCHA publique", 'icon' => '0Publique'), false, false, "Clé dans le code HTML que vous proposez à vos utilisateurs");
-		$sbform->addInput('text', "[GOOGLE RECAPTCHA] <span style='color: red;'>Clé secrète</span>", array ('name' => 'email_privatekey', 'value' => "{$assocS[content]}", 'placeholder' => "clé reCAPTCHA privée", 'icon' => '0Secrète'), false, false, "Clé pour toute communication entre votre site et Google. Veillez à ne pas la divulguer, car il s'agit d'une clé secrète");
+		$sbform->addInput('text', "[GOOGLE RECAPTCHA] <span style='color: red;'>Clé du site</span>", array ('name' => 'email_publickey', 'value' => $assocP['content'], 'placeholder' => "clé reCAPTCHA publique", 'icon' => '0Publique'), false, false, "Clé dans le code HTML que vous proposez à vos utilisateurs");
+		$sbform->addInput('text', "[GOOGLE RECAPTCHA] <span style='color: red;'>Clé secrète</span>", array ('name' => 'email_privatekey', 'value' => $assocS['content'], 'placeholder' => "clé reCAPTCHA privée", 'icon' => '0Secrète'), false, false, "Clé pour toute communication entre votre site et Google. Veillez à ne pas la divulguer, car il s'agit d'une clé secrète");
+		// --------------------------------
+		// SMTP configuration
+		// --------------------------------
+		// --- is smtp
+		$email_smtp = ($assocEmail['email_smtp']['content'] == 1) ? '1' : '0';
+		$sbform->addRadioYN('SMTP', true, array('id'=>'email_smtp', 'name'=>'email_smtp', 'checked'=>"$email_smtp"), 'activé', 'désactivé');
+		// --- is debug
+		$email_smtp_debug = ($assocEmail['email_smtp_debug']['content'] == 1) ? '1' : '0';
+		$sbform->addRadioYN('Debug', true, array('id'=>'email_smtp_debug', 'name'=>'email_smtp_debug', 'checked'=>"$email_smtp_debug"), 'activé', 'désactivé');
+		// --- Host
+		$sbform->addInput('text', "SMTP Host", array ('name' => 'email_smtp_host', 'value' => $assocEmail['email_smtp_host']['content'], 'placeholder' => "SMTP Host", 'style' => 'width: 250px;'), false);
+		// --- Authentification
+		$email_smtp_auth = ($assocEmail['email_smtp_auth']['content']) ? '1' : '0';
+		$sbform->addRadioYN('Authentification requise', true, array('id'=>'email_smtp_auth', 'name'=>'email_smtp_auth', 'checked'=>"$email_smtp_auth"), 'oui', 'non');
+		// --- SMTP Port
+		$sbform->addInput('text', "SMTP Port", array ('name' => 'email_smtp_port', 'value' => $assocEmail['email_smtp_port']['content'], 'placeholder' => "SMTP Port", 'style' => 'width: 100px;'), false);
+		// --- SMTP Username
+		$sbform->addInput('text', "SMTP Username", array ('name' => 'email_smtp_username', 'value' => $assocEmail['email_smtp_username']['content'], 'placeholder' => "SMTP Username", 'style' => 'width: 250px;'), false);
+		// --- SMTP Password
+		$sbform->addInput('text', "SMTP Mot de passe", array('name' => 'email_smtp_password', 'value' => $assocEmail['email_smtp_password']['content'], 'placeholder' => "SMTP Mot de passe", 'style' => 'width: 250px;'), false);
+		// --- SMTP Protocole
+		$sb_protocol = array('tls','starttls');
+		$sbform->openSelect("SMTP Protocole", array("id"=>"email_smtp_secure", "name"=>"email_smtp_secure", "style" => "width: 200px;"));
+		$sbform->addOption('Choisissez un protocole', array ("value"=>"", "selected"=>""));
+		for($i = 0; $i < count($sb_protocol); $i++) {
+			if ($sb_protocol[$i] == $assocEmail['email_smtp_secure']['content'])
+				$sbform->addOption($sb_protocol[$i], array ("value"=>$sb_protocol[$i], "selected"=>""));
+		else
+				$sbform->addOption($sb_protocol[$i], array ("value"=>$sb_protocol[$i]));
+		}
+		// --- Close Select
+		$sbform->closeSelect();
 		// --------------------------------			
 		// --- Hiddens / Buttons
 		// --------------------------------	
