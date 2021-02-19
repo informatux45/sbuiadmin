@@ -731,6 +731,7 @@ function insert_sbGetPlugins() {
 			$cms_plugins .= '<script src="'.SB_URL.'plugins/magnific-popup/dist/jquery.magnific-popup.min.js"></script>';
 			$cms_plugins .= '<script src="'.SB_URL.'plugins/magnific-popup/dist/jquery.magnific-popup-init.js"></script>';
 		}
+		// --------------------------
 		
 	}
 	
