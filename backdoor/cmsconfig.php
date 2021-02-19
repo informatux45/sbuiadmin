@@ -484,6 +484,7 @@ switch($action) {
 			$plugins .= ($_POST['fancybox'] === "on") ? "fancybox|" : "";
 			$plugins .= ($_POST['checkboxcss'] === "on") ? "checkboxcss|" : "";
 			$plugins .= ($_POST['appear'] === "on") ? "appear|" : "";
+			$plugins .= ($_POST['magnificpopup'] === "on") ? "magnificpopup|" : "";
 			$plugins = rtrim($plugins, "|");
 			
 			// --- EDIT
@@ -576,6 +577,17 @@ switch($action) {
 		$config_blocks = ($tab_appear[0]['checked']) ? 'config_blocks_active' : 'config_blocks';
 		$sbform->addAnything("<div class='$config_blocks'");
 		$sbform->addCheckbox('APPEAR / DISAPPEAR', $tab_appear, '', false, '<br />');
+		$sbform->addAnything('</div><div class="config_blocks"></div>');
+		// --------------------------------
+		// --- Plugin MAGNIFIC POPUP
+		// --------------------------------
+		$tab_magnificpopup = array();
+		$tab_magnificpopup[0]['text']    = 'Activé<br><br>'.sbHowToPlugins('Comment utiliser le plugin MAGNIFIC POPUP', 'magnificpopup/howto.html', 'Four', 'MAGNIFIC POPUP');
+		$tab_magnificpopup[0]['name']    = 'magnificpopup';
+		$tab_magnificpopup[0]['checked'] = (in_array("magnificpopup", $plugins)) ? '1' : '0';
+		$config_blocks = ($tab_magnificpopup[0]['checked']) ? 'config_blocks_active' : 'config_blocks';
+		$sbform->addAnything("<div class='$config_blocks'");
+		$sbform->addCheckbox('MAGNIFIC POPUP', $tab_magnificpopup, '', false, '<br />');
 		$sbform->addAnything('</div><div class="config_blocks"></div>');
 		// --------------------------------
 		// --- Hiddens / Buttons
