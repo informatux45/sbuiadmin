@@ -108,7 +108,7 @@ define('SBSITESUBDIRECTORY', '');
 // ------------------------ 
 // --- Defined Safe Pages
 // ------------------------ 
-$sb_safe_pages_cms = ['index','user','news','pages','download','gallery','search'];
+$sb_safe_pages_cms = ['index','user','news','pages','shop','account','download','gallery','search'];
 
 // ------------------------ 
 // --- Database
