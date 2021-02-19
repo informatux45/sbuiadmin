@@ -724,6 +724,14 @@ function insert_sbGetPlugins() {
 			$cms_plugins .= '<link href="'.SB_URL.'plugins/checkboxcss/checkboxcss.css" rel="stylesheet">';
 		}
 		
+		// --------------------------
+		// --- Plugin MAGNIFIC POPUP
+		// --------------------------
+		if (in_array('magnificpopup', $plugins_array)) {
+			$cms_plugins .= '<script src="'.SB_URL.'plugins/magnific-popup/dist/jquery.magnific-popup.min.js"></script>';
+			$cms_plugins .= '<script src="'.SB_URL.'plugins/magnific-popup/dist/jquery.magnific-popup-init.js"></script>';
+		}
+		
 	}
 	
 	return $cms_plugins;
