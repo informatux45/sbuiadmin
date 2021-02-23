@@ -2,7 +2,7 @@
 /**
  * Plugin Name: SBUIADMIN NEWS
  * Description: Gestionnaire d'articles
- * Version: 0.1.1
+ * Version: 0.1.2
  * Author: BooBoo
  * Author URI: //www.informatux.com/
  * File: functions.php
@@ -27,7 +27,7 @@ function shortcode_sbnews_item($param = '') {
 	// --- Tables
 	$table = _AM_DB_PREFIX . 'sb_news';
 	// --- SQL Slider
-	$query_item   = "SELECT * FROM $table WHERE id = '{$param['id']}'";
+	$query_item   = "SELECT * FROM $table WHERE id = '{$param['id']}' AND active = '1'";
 	$request_item = $sbsql->query($query_item);
 	$item_info    = $sbsql->assoc($request_item);
 	// --- Check if news exists
@@ -99,7 +99,7 @@ function shortcode_sbnews_latest($param = '') {
 	$query_item   = "SELECT t1.*, t2.title AS catname
 					 FROM $table AS t1
 					 LEFT JOIN $table_category AS t2 ON (t1.catid = t2.id)
-					 WHERE catid = '{$param['id']}'
+					 WHERE t1.catid = '{$param['id']}' AND t1.active = '1'
 					 ORDER BY date DESC LIMIT 1
 					 ";
 	$request_item = $sbsql->query($query_item);
@@ -181,7 +181,9 @@ function shortcode_sbnews_blocks_recent($param = '') {
 					FROM $table AS t1
 					LEFT JOIN $table_category AS t2 ON (t1.catid = t2.id) ";
 	if ($catid)
-		$query_item .= "WHERE catid = '$catid' ";
+		$query_item .= "WHERE t1.catid = '$catid' AND t1.active = '1' ";
+	else
+		$query_item .= "WHERE t1.active = '1' ";
 	$query_item .= "ORDER BY date DESC LIMIT $limit";
 	$request_item = $sbsql->query($query_item);
 	$items_info   = $sbsql->toarray($request_item);
