@@ -23,6 +23,54 @@
 		{if $sbnews_nav2}
 			&nbsp;&raquo;&nbsp;<span class="sbnews_breadcrumb_name">{$sbnews_nav2}</span>
 		{/if}
+		
+		<!-- ===== BREADCRUMB (JSON) ===== -->
+		<script type="application/ld+json">
+			{literal}{{/literal}
+				"@context": "http://schema.org",
+				"@type": "BreadcrumbList",
+				"itemListElement":
+					[{literal}{{/literal}
+						"@type": "ListItem",
+						"position": 1,
+						"item": {literal}{{/literal}
+							"@id": "{seo url="index.php?p=news" rewrite="news"}",
+							"name": "{$smarty.const._CMS_NEWS_NEWS}"
+						{literal}}{/literal}
+					{literal}}{/literal},
+					{if $sbnews_nav1 AND !$sbnews_nav2}
+						{literal}{{/literal}
+							"@type": "ListItem",
+							"position": 2,
+							"item": {literal}{{/literal}
+								"@id": "",
+								"name": "{$sbnews_nav1}"
+							{literal}}{/literal}
+						{literal}}{/literal},
+					{elseif $sbnews_nav1 AND $sbnews_nav2}
+						{literal}{{/literal}
+							"@type": "ListItem",
+							"position": 2,
+							"item": {literal}{{/literal}
+								"@id": "{seo url="index.php?p=news&op=category&id={$sbnews_item_cat_id}" rewrite="news/category/{$sbnews_item_cat_id}/{$sbnews_item_cat_title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|strip_tags|@sbRewriteString|@strtolower}"}",
+								"name": "{$sbnews_nav1}"
+							{literal}}{/literal}
+						{literal}}{/literal},
+					{/if}
+					{if $sbnews_nav2}
+						{literal}{{/literal}
+							"@type": "ListItem",
+							"position": 3,
+							"item": {literal}{{/literal}
+								"@id": "",
+								"name": "{$sbnews_nav2}"
+							{literal}}{/literal}
+						{literal}}{/literal}
+					{/if}
+				]
+			{literal}}{/literal}
+		</script>
+		
 	</div>
 
 {/if}
