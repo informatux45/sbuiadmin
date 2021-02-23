@@ -17,7 +17,7 @@
 		{if $sbnews_nav1 AND !$sbnews_nav2}
 			&nbsp;&raquo;&nbsp;<span class="sbnews_breadcrumb_name">{$sbnews_nav1}</span>
 		{elseif $sbnews_nav1 AND $sbnews_nav2}
-			&nbsp;&raquo;&nbsp;<span class="sbnews_breadcrumb_name"><a href="{seo url="index.php?p=news&op=category&id={$sbnews_item_cat_id}" rewrite="news/category/{$sbnews_item_cat_id}/{$sbnews_item_cat_title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|strip_tags|@sbRewriteString|@strtolower}"}">{$sbnews_nav1}</a></span>
+			&nbsp;&raquo;&nbsp;<span class="sbnews_breadcrumb_name"><a href="{seo url="index.php?p=news&op=category&id={$sbnews_item_cat_id}" rewrite="news/category/{$sbnews_item_cat_id}/{$sbnews_item_cat_title|@sbDisplayLang:"`$smarty.session.lang`"|strip_tags|@sbRewriteString|unescape:"htmlall"|@strtolower}"}">{$sbnews_nav1}</a></span>
 		{/if}
 		    
 		{if $sbnews_nav2}
