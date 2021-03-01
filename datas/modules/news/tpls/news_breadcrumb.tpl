@@ -52,7 +52,7 @@
 							"@type": "ListItem",
 							"position": 2,
 							"item": {literal}{{/literal}
-								"@id": "{seo url="index.php?p=news&op=category&id={$sbnews_item_cat_id}" rewrite="news/category/{$sbnews_item_cat_id}/{$sbnews_item_cat_title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|strip_tags|@sbRewriteString|@strtolower}"}",
+								"@id": "{seo url="index.php?p=news&op=category&id={$sbnews_item_cat_id}" rewrite="news/category/{$sbnews_item_cat_id}/{$sbnews_item_cat_title|@sbDisplayLang:"`$smarty.session.lang`"|strip_tags|@sbRewriteString|unescape:"htmlall"|@strtolower}"}",
 								"name": "{$sbnews_nav1}"
 							{literal}}{/literal}
 						{literal}}{/literal},
