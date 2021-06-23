@@ -132,7 +132,7 @@ switch($op) {
 					}
 					
 					// --- Send email
-					$status = $email->Send();
+					$status = $PHPMailer->Send();
 					@$PHPMailer->ClearAddresses();
 					@$PHPMailer->ClearAttachments();
 					
