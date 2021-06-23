@@ -108,7 +108,6 @@ switch($op) {
 						// --- Increase html content
 						if ($k != 'g-recaptcha-response' && $k != 'submit') $htmlContent .= '<p><b>'.str_replace("-", " ", $k).' :</b> '.$sbsanitize->nl2Br($v).'</p>';
 					}
-					$htmlContent .= 'T: '.sbGetConfig('email_smtp_username').'<br>';
 					// --- Email Construct
 					@$PHPMailer->setFrom($email, "$name");
 					@$PHPMailer->ClearAllRecipients();
