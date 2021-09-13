@@ -63,12 +63,19 @@ if ($_GET['ext']) {
 $sbfiles_new = array();
 $sbfiles     = array();
 
+// Limit files
+$limit_files = (isset($_GET['limitfiles']) && intval($_GET['limitfiles']) > 0) ? intval($_GET['limitfiles']) : false;
+
 // --- Change the key to filectime 
 for($i = 0; $i < count($sbfiles_arr); $i++) {
 	if (!is_null($sbfiles_arr[$i])) {
 		$key = (filectime($sbfiles_arr[$i])) ? filectime($sbfiles_arr[$i]) : $i;
 		$sbfiles_new[$i]['file'] = $sbfiles_arr[$i];
 		$sbfiles_new[$i]['time'] = $key;
+		if ($limit_files) {
+			// Check if counter reached out
+			if ($i == $limit_files) break;
+		}
 	}
 }
 // --- Sort by Last arrived and next by filename
