@@ -114,7 +114,18 @@ $sb_safe_pages_cms = ['index','user','news','pages','shop','account','download',
 // --- Database
 // ------------------------ 
 define('_AM_SITE_TITLE',   trim($sb_settings_config[0]));
-define('_AM_DB_HOST',      trim($sb_settings_config[2]));
+// Search if there is a socket
+if (strpos(trim($sb_settings_config[2]), ":") !== false) {
+	// Define socket
+	list($db_host, $db_socket) = explode(":", trim($sb_settings_config[2]));
+	define('_AM_DB_HOST',	$db_host);
+	define('_AM_DB_SOCKET',	$db_socket);
+} else {
+	// Pas de socket
+	define('_AM_DB_HOST',	trim($sb_settings_config[2]));
+	define('_AM_DB_SOCKET', false);
+}
+define('_AM_DB_PORT',	   3306);
 define('_AM_DB_NAME',      trim($sb_settings_config[3]));
 define('_AM_DB_USER',      trim($sb_settings_config[4]));
 define('_AM_DB_PWD',       trim($sb_settings_config[5]));
