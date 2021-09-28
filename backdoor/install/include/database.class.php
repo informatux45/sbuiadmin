@@ -4,7 +4,7 @@
  *	Class Database (PDO Extension)
  *  ---------------------------- 
  *  Description : encapsulates database operations & properties with PDO
- *  Updated	    : 22.05.2013
+ *  Updated	    : 28.09.2021 (INFORMATUX)
  *  Version     : 1.0.7
  *	Written by  : ApPHP
  *	Used in     : DataGridWizard, AdminPanel, EasyInstaller
@@ -204,23 +204,32 @@ class Database
 		}
 
 		$port = (!empty($this->port)) ? ';port='.$this->port : '';
+		
+		if (strpos($this->host, ":") !== false) {
+			// Define socket
+			list($db_host, $db_socket) = explode(":", $this->host);
+			$_db_host = $db_host . ';unix_socket='.$db_socket;
+		} else {
+			// Pas de socket
+			$_db_host = $this->host;
+		}
 
 		try{
 			switch($this->db_driver){
 				case 'mssql':
-                    $this->dbh = new PDO('mssql:host='.$this->host.$port.';dbname='.$this->database, $this->user, $this->password);
+                    $this->dbh = new PDO('mssql:host='.$_db_host.$port.';dbname='.$this->database, $this->user, $this->password);
 					break;
                 case 'sqlsrv': 
-                    $this->dbh = new PDO('sqlsrv:Server='.$this->host.$port.';Database='.$this->database, $this->user, $this->password);
+                    $this->dbh = new PDO('sqlsrv:Server='.$_db_host.$port.';Database='.$this->database, $this->user, $this->password);
 					break;
 				case 'sybase': 
-					$this->dbh = new PDO('sybase:host='.$this->host.$port.';dbname='.$this->database, $this->user, $this->password);
+					$this->dbh = new PDO('sybase:host='.$_db_host.$port.';dbname='.$this->database, $this->user, $this->password);
 					break;
 				case 'sqlite':
 					$this->dbh = new PDO('sqlite:my/database/path/database.db');
 					break;
 				case 'pgsql':
-					$this->dbh = new PDO('pgsql:host='.$this->host.$port.';dbname='.$this->database, $this->user, $this->password);
+					$this->dbh = new PDO('pgsql:host='.$_db_host.$port.';dbname='.$this->database, $this->user, $this->password);
 					break;
                 case 'ibm': 
                     $this->dbh = new PDO('ibm:'.$this->database, $this->user, $this->password);
@@ -229,12 +238,12 @@ class Database
 					// Look for valid parameters in product\10.2.0\server\NETWORK\ADMIN	
 					// Example: $tns = '(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = private-22269fa)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = XE) ))';
 					$port = (!empty($this->port)) ? $this->port : '1521';
-					$tns = '(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = '.$this->host.')(PORT = '.$port.')) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = '.$this->database.') ))';
+					$tns = '(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = '.$_db_host.')(PORT = '.$port.')) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = '.$this->database.') ))';
 					$this->dbh = new PDO('oci:dbname='.$tns, $this->user, $this->password);
 					break;
 				case 'mysql':
 				default:
-					$this->dbh = new PDO($this->db_driver.':host='.$this->host.$port.';dbname='.$this->database, $this->user, $this->password);
+					$this->dbh = new PDO($this->db_driver.':host='.$_db_host.$port.';dbname='.$this->database, $this->user, $this->password);
                     $this->dbh->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
                     if($this->persistent_connection) $this->dbh->setAttribute(PDO::ATTR_PERSISTENT, true);
 					break;
