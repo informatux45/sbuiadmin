@@ -23,6 +23,8 @@ class sql extends smarty {
     var $user       = _AM_DB_USER;
     var $pass       = _AM_DB_PWD;
     var $base       = _AM_DB_NAME;
+    var $port       = _AM_DB_PORT;
+    var $socket     = _AM_DB_SOCKET;
     var $connect_id = 0;
     var $error;
     var $debug      = NULL;
@@ -30,7 +32,11 @@ class sql extends smarty {
     var $query      = "";
 
     function connect() {
-       $this->connect_id = mysqli_connect($this->host, $this->user, $this->pass, $this->base);
+        if ($this->socket === false) {
+            $this->connect_id = mysqli_connect($this->host, $this->user, $this->pass, $this->base);
+        } else {
+            $this->connect_id = mysqli_connect($this->host, $this->user, $this->pass, $this->base, $this->port, $this->socket);            
+        }
         if (mysqli_connect_errno()) {
             //$this->dump(mysqli_connect_error() . ' (' . mysqli_errno($this->connect_id) . ')', 'Connect MYSQLI DB (Error)');
             return false;
