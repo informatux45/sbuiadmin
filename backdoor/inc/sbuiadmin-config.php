@@ -62,7 +62,18 @@ define('_AM_SMARTY_CACHE_LIFETIME',				120);
 define('_AM_SMARTY_BACKWARDS_COMPATIBILITY',	true); // Don't change this ;-)
 // ------------------------------------------
 // --- MySQL Config (Host Client)
-define('_AM_DB_HOST',							trim($sb_settings_config[2]));
+// Search if there is a socket
+if (strpos(trim($sb_settings_config[2]), ":") !== false) {
+	// Define socket
+	list($db_host, $db_socket) = explode(":", trim($sb_settings_config[2]));
+	define('_AM_DB_HOST',	$db_host);
+	define('_AM_DB_SOCKET',	$db_socket);
+} else {
+	// Pas de socket
+	define('_AM_DB_HOST',	trim($sb_settings_config[2]));
+	define('_AM_DB_SOCKET', false);
+}
+define('_AM_DB_PORT',							3306);
 define('_AM_DB_NAME',							trim($sb_settings_config[3]));
 define('_AM_DB_USER',							trim($sb_settings_config[4]));
 define('_AM_DB_PWD',							trim($sb_settings_config[5]));
