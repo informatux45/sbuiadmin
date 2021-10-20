@@ -25,7 +25,8 @@ session_start([
 // Global defined
 // ----------------------
 defined('SBUIADMIN_PATH') or define('SBUIADMIN_PATH', dirname(__FILE__));
-defined('SBUIADMIN_URL') or define('SBUIADMIN_URL', $_SERVER['SERVER_NAME'].dirname($_SERVER["REQUEST_URI"].'?').'/');
+$PORT = (!in_array($_SERVER['SERVER_PORT'], [80, 443])) ? ":$_SERVER[SERVER_PORT]" : '';
+defined('SBUIADMIN_URL') or define('SBUIADMIN_URL', $_SERVER['SERVER_NAME'].$PORT.dirname($_SERVER["REQUEST_URI"].'?').'/');
 defined('SBUIADMIN_BASE') or define('SBUIADMIN_BASE', basename(__FILE__));
 defined('SBUIADMIN_NAME') or define('SBUIADMIN_NAME', 'SBuiadmin');
 defined('SBUIADMIN_ID') or define('SBUIADMIN_ID', 'sbuiadmin');
