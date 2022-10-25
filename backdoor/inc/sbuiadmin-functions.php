@@ -630,7 +630,13 @@ function sbGetMenuModule($param = '') {
 						$ul_module_menu = @count($module_menu[$module_name]['li']);
 						
 						// Check if active menu
-						$class_active = ($request_url == _AM_SITE_URL . "index.php?p=" . $module_name && $ul_module_menu == 0) ? ' class="active" ' : ' ';
+					        if ($request_url == _AM_SITE_URL . "index.php?p=" . $module_name && $ul_module_menu == 0) {
+					     		$class_active = ' class="active" ';
+					        } elseif (trim($_GET['p']) == $module_name && $ul_module_menu == 0) {
+					     		$class_active = ' class="active" ';
+					        } else {
+							$class_active = ' ';
+						}
 						
 						// Main menu
 						$ret_module_menu .= '<a'.$class_active.'href="index.php?p=' . $module_name . '">';
