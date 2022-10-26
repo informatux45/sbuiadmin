@@ -630,12 +630,14 @@ function sbGetMenuModule($param = '') {
 						$ul_module_menu = @count($module_menu[$module_name]['li']);
 						
 						// Check if active menu
-					        if ($request_url == _AM_SITE_URL . "index.php?p=" . $module_name && $ul_module_menu == 0) {
-					     		$class_active = ' class="active" ';
-					        } elseif (trim($_GET['p']) == $module_name && $ul_module_menu == 0) {
-					     		$class_active = ' class="active" ';
-					        } else {
-							$class_active = ' ';
+						if ($request_url == _AM_SITE_URL . "index.php?p=" . $module_name && $ul_module_menu == 0) {
+						     $class_active = ' class="active" ';
+						} elseif (trim($_GET['p']) == $module_name && $ul_module_menu == 0) {
+						     $class_active = ' class="active" ';
+						} elseif ( (trim($_GET['p']) == 'session' || trim($_GET['p']) == 'cache' || trim($_GET['p']) == 'dashboard' || trim($_GET['p']) == 'toolbarck' || trim($_GET['p']) == 'theme' || trim($_GET['p']) == 'themeinfos') && $module_name == 'settings' && $ul_module_menu == 0) {
+						     $class_active = ' class="active" ';
+						} else {
+						     $class_active = ' ';
 						}
 						
 						// Main menu
