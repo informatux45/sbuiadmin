@@ -636,6 +636,14 @@ switch($action) {
 
 			// --- Debug SQL
 			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);						
+		} else {
+			// --- Get Cat ID
+			$catid = intval($_GET['id']);
+			// --- Recuperation des donnees
+			$query_1   = "SELECT title, $action FROM $table_category WHERE id = '$catid'";
+			$requestQ  = $sbsql->query($query_1);
+			$assoc     = $sbsql->assoc($requestQ);
+			$title_fr  = $sbsanitize->displayLang($assoc['title']); // Legende
 		}
 		
 		// --------------------------------		
