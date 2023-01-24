@@ -5,6 +5,10 @@
 {include file='news/tpls/news_breadcrumb.tpl'}
 
 {if $item}
+
+	{* Stat VIEWED *}
+	{insert name="sbGetNewsViewed" id="{$item.id}"}
+
 	{* Check if TPL_SINGLE custom *}
 	{if $sbnews_item_tpl_single != ''}
 	
