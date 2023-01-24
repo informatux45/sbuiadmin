@@ -229,4 +229,36 @@ function shortcode_sbnews_blocks_recent($param = '') {
 	}
 }
 
+/**
+ * Increment Stats viewed (Smarty function)
+ * @param   id    Article ID
+ * @return void
+ */
+if (!function_exists("insert_sbGetNewsViewed")) {
+	function insert_sbGetNewsViewed($param) {
+		global $sbsql;
+		// --- Initialize
+		$id    = $param['id'];
+		$table = _AM_DB_PREFIX . 'sb_news';
+		// --- Check if ID
+		if (!$id) return false;
+		// --- Update VIEWED (Increment)
+		$result = $sbsql->query( "UPDATE $table SET viewed = viewed + 1 WHERE id = '$id'" );
+	}
+}
+
+/**
+ * Increment Stats viewed (PHP function)
+ * @param   id    Article ID
+ * @return void
+ */
+if (!function_exists("sbGetNewsViewed")) {
+	function sbGetNewsViewed($id) {
+		$param = [
+			'id' => $id
+		];
+		insert_sbGetNewsViewed($param);
+	}
+}
+
 ?>
