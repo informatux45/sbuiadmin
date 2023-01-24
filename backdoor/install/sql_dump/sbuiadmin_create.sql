@@ -521,6 +521,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_news` (
   `desc_full` text NOT NULL,
   `image` varchar(200) DEFAULT NULL,
   `date` varchar(10) NOT NULL,
+  `viewed` int(11) DEFAULT NULL,
   `active` tinyint(4) NOT NULL COMMENT '0: inactive, 1: active'
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
