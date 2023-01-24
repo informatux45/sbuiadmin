@@ -140,6 +140,10 @@
 		{/if}
 		
 	{/if}
+	
+	<div class="related-posts-viewed">
+		<i class="fa fa-archive"></i>&nbsp;&nbsp;Posté le {$item.date|sbConvertDate:"FR"}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-eye" title="Article vu {$item.viewed} fois"></i>&nbsp;&nbsp;{$item.viewed}
+	</div>
 
 {else}
 
