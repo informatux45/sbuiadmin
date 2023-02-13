@@ -261,13 +261,13 @@ It was popularised in the 1960s with the release of Letraset sheets containing L
 					</div>
 					<!-- /.panel-heading -->
 					<div class="panel-body">
-						<button type="button" class="btn btn-success" onclick="location.href='https://www.google.com/webmasters/tools/home?hl=fr'">Webmaster TOOLS</button>
+						<button type="button" class="btn btn-success" onclick="window.open('https://www.google.com/webmasters/tools/home?hl=fr')">Webmaster TOOLS</button>
 						&nbsp;&nbsp;
-						<button type="button" class="btn btn-success" onclick="location.href='https://www.google.com/webmasters/tools/submit-url'">Google ADDURL</button>
+						<button type="button" class="btn btn-success" onclick="window.open('https://www.google.com/webmasters/tools/submit-url')">Google ADDURL</button>
 						&nbsp;&nbsp;
-						<button type="button" class="btn btn-success" onclick="location.href='https://developers.google.com/speed/libraries/'">Google Hosted Libraries</button>
+						<button type="button" class="btn btn-success" onclick="window.open('https://developers.google.com/speed/libraries/')">Google Hosted Libraries</button>
 						&nbsp;&nbsp;
-						<button type="button" class="btn btn-success" onclick="location.href='https://search.google.com/search-console?hl=fr'">Console Developers</button>
+						<button type="button" class="btn btn-success" onclick="window.open('https://search.google.com/search-console?hl=fr')">Console Developers</button>
 					</div>
 					<!-- /.panel-body -->
 				</div>
