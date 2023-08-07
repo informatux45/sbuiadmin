@@ -611,7 +611,7 @@ function sbGetMenuModule($param = '') {
 			$module_name = pathinfo($modules_dir[$i], PATHINFO_FILENAME);
 			
 			// --- Check if Module infos exists
-			if ($module_menu[$module_name]['main'] && is_array($module_menu[$module_name]['main'])) {
+			if ($module_menu[$module_name]['main']) {
 				
 				// --- Check if user is authorized to view menu (Global)
 				if (($module_menu[$module_name]['group'] == 'admin' && $sbuiadmin_user_type == 'admin')
