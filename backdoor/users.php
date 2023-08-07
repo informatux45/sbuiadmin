@@ -292,16 +292,16 @@ switch($action) {
 			// Create random variable
 			$_randstring = substr(str_shuffle(str_repeat("0123456789abcdefghijklmnopqrstuvwxyz", 5)), 0, 5);
 			// Initialize each array
-			$_{$_randstring} = [];
+			$_mmodule[$_randstring] = [];
 			// Module Text
 			$main_text = '<i class="fa fa-'.$module_menu[$key]['icon'].' fa-fw"></i> ' . $module_menu[$key]['main'] . '<br>' . "&nbsp;&nbsp;&nbsp;&nbsp;<span class='help-block'>" . 'Module : '.$key.'</span>';
-			$_{$_randstring}[0]['text']    = 'Désactivé';
-			$_{$_randstring}[0]['name']    = 'menu[]';
-			$_{$_randstring}[0]['value']   = $key;
-			$_{$_randstring}[0]['checked'] = (in_array($key, $array_menu)) ? '1' : '0';
-			$config_blocks = ($_{$_randstring}[0]['checked'] == '0') ? 'config_blocks_active' : 'config_blocks_desactived';
+			$_mmodule[$_randstring][0]['text']    = 'Désactivé';
+			$_mmodule[$_randstring][0]['name']    = 'menu[]';
+			$_mmodule[$_randstring][0]['value']   = $key;
+			$_mmodule[$_randstring][0]['checked'] = (in_array($key, $array_menu)) ? '1' : '0';
+			$config_blocks = ($_mmodule[$_randstring][0]['checked'] == '0') ? 'config_blocks_active' : 'config_blocks_desactived';
 			$sbform->addAnything("<div class='$config_blocks'");
-			$sbform->addCheckbox((($module_menu[$key]['group'] == 'admin') ? '<span style="color: red;">'.$main_text.'</span>' : $main_text), $_{$_randstring}, '', false, '<br />');
+			$sbform->addCheckbox((($module_menu[$key]['group'] == 'admin') ? '<span style="color: red;">'.$main_text.'</span>' : $main_text), $_mmodule[$_randstring], '', false, '<br />');
 			$sbform->addAnything("</div>");
 		}
 		$sbform->addAnything("<p style='clear: both'>Cochez les entrées du menu qui ne sont pas autorisées pour cet utilisateur.<br>Les entrées nommées en <span style='color: red;'>rouge</span> sont les modules accessibles uniquement par les administrateurs (Groupe Admin).</p>");
