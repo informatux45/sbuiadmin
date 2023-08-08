@@ -68,10 +68,10 @@ if (file_exists($sbuiadmin_install_dir)) {
 }
 if (file_exists($sbuiadmin_htaccess)) {
 	// --- Rename htaccess TO .htaccess
-	$sbuiadmin_copy_htaccess = @copy($sbuiadmin_htaccess, $sbuiadmin_dot_htaccess);
+	$sbuiadmin_copy_htaccess = copy($sbuiadmin_htaccess, $sbuiadmin_dot_htaccess);
 	if ($sbuiadmin_copy_htaccess) {
 		// --- Access to Admin and remove install file
-		@unlink($sbuiadmin_htaccess);
+		unlink($sbuiadmin_htaccess);
 	}
 }
 if (is_dir(SBUIADMIN_PATH . '/install')) {
@@ -376,13 +376,14 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 	// Check if module or system
 	$sb_path_file_sys_mod = (file_exists("$sb_get_page.php")) ? '' : 'datas/modules/';
 	
-	// --- Control if PHP file exist
-	if (file_exists("{$sb_path_file_sys_mod}{$sb_get_page}.php") && $sb_get_page != 'index') {
+	// --- Control if PHP file exists
+	$controlIfPhpFileExists = $sb_path_file_sys_mod.$sb_get_page.".php";
+	if (file_exists($controlIfPhpFileExists) && $sb_get_page != 'index') {
 		// Yes, so include
-		sb_global_include("{$sb_path_file_sys_mod}{$sb_get_page}.php");
+		sb_global_include($controlIfPhpFileExists);
 	} else {
 		// No, so show error message
-		if (_AM_SITE_DEBUG && $sb_get_page != 'index') echo "Fichier php '{$sb_path_file_sys_mod}{$sb_get_page}' inexistant !";
+		if (_AM_SITE_DEBUG && $sb_get_page != 'index') echo "Fichier php '$controlIfPhpFileExists' inexistant !";
 	}
 	// Display template page
 	// Check if non admin and authorized page
@@ -405,7 +406,7 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 				$sbsmarty->assign('sb_dashboard_status1_link', trim($sb_dashboard[3]));
 				$sbsmarty->assign('sb_dashboard_status1_icon', trim($sb_dashboard[4]));
 				$sbsmarty->assign('sb_dashboard_status1_tbcol', trim($sb_dashboard[5]));
-				$query_1  = "SELECT {$sb_dashboard[5]} FROM {$sb_dashboard[1]} ORDER BY {$sb_dashboard[5]} DESC";
+				$query_1  = "SELECT ".$sb_dashboard[5]." FROM ".$sb_dashboard[1]." ORDER BY {$sb_dashboard[5]} DESC";
 				$request1 = $sbsql->query($query_1);
 				$result1  = $sbsql->toarray($request1);
 				$sbsmarty->assign('sb_dashboard_status1_cpt', $sbsql->numrows());
@@ -416,7 +417,7 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 				$sbsmarty->assign('sb_dashboard_status2_link', trim($sb_dashboard[8]));
 				$sbsmarty->assign('sb_dashboard_status2_icon', trim($sb_dashboard[9]));
 				$sbsmarty->assign('sb_dashboard_status2_tbcol', trim($sb_dashboard[10]));
-				$query_2  = "SELECT {$sb_dashboard[10]} FROM {$sb_dashboard[6]} ORDER BY {$sb_dashboard[10]} DESC";
+				$query_2  = "SELECT ".$sb_dashboard[10]." FROM ".$sb_dashboard[6]." ORDER BY {$sb_dashboard[10]} DESC";
 				$request2 = $sbsql->query($query_2);
 				$result2  = $sbsql->toarray($request2);
 				$sbsmarty->assign('sb_dashboard_status2_cpt', $sbsql->numrows());
@@ -427,7 +428,7 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 				$sbsmarty->assign('sb_dashboard_status3_link', trim($sb_dashboard[13]));
 				$sbsmarty->assign('sb_dashboard_status3_icon', trim($sb_dashboard[14]));
 				$sbsmarty->assign('sb_dashboard_status3_tbcol', trim($sb_dashboard[15]));
-				$query_3  = "SELECT {$sb_dashboard[15]} FROM {$sb_dashboard[11]} ORDER BY {$sb_dashboard[15]} DESC";
+				$query_3  = "SELECT ".$sb_dashboard[15]." FROM ".$sb_dashboard[11]." ORDER BY {$sb_dashboard[15]} DESC";
 				if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $sb_dashboard[15]);
 				$request3 = $sbsql->query($query_3);
 				$result3  = $sbsql->toarray($request3);
@@ -439,7 +440,7 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 				$sbsmarty->assign('sb_dashboard_status4_link', trim($sb_dashboard[18]));
 				$sbsmarty->assign('sb_dashboard_status4_icon', trim($sb_dashboard[19]));
 				$sbsmarty->assign('sb_dashboard_status4_tbcol', trim($sb_dashboard[20]));
-				$query_4  = "SELECT {$sb_dashboard[20]} FROM {$sb_dashboard[16]} ORDER BY {$sb_dashboard[20]} DESC";
+				$query_4  = "SELECT ".$sb_dashboard[20]." FROM ".$sb_dashboard[16]." ORDER BY {$sb_dashboard[20]} DESC";
 				$request4 = $sbsql->query($query_4);
 				$result4  = $sbsql->toarray($request4);
 				$sbsmarty->assign('sb_dashboard_status4_cpt', $sbsql->numrows());
