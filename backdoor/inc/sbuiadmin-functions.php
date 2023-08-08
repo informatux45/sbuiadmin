@@ -318,8 +318,8 @@ function sbModifiedFileTime($filename, $date = "en") {
 /**
 * Get physical file listing
 */
-define("BY_EXTENSION", 1);
-define("BY_EXPRESSION", 2);
+defined('BY_EXTENSION') OR define("BY_EXTENSION", 1);
+defined('BY_EXPRESSION') OR define("BY_EXPRESSION", 2);
 
 function sbGetFileList($HowToSearch, $Condition, $Directory, $AddPath) {
 	//-------------------------------------------------------------
@@ -362,7 +362,7 @@ function sbGetFileList($HowToSearch, $Condition, $Directory, $AddPath) {
 	//---------------------------------
 	// Add trailing slash to directory.
 	//---------------------------------
-	if (!preg_match("/\/${1}/", $Directory)) $Directory .= "/";
+	$Directory = rtrim($Directory, '/') . '/';
 
 	//--------------------------------------------
 	// Loop while we still have directory entries.
@@ -375,7 +375,7 @@ function sbGetFileList($HowToSearch, $Condition, $Directory, $AddPath) {
 		// Add entries based on extension.
 		//--------------------------------
 		if ($HowToSearch == BY_EXTENSION)
-		if (preg_match("/$Condition${1}/", $dirEntry)) $add = true;
+		if (preg_match("/$Condition/", $dirEntry)) $add = true;
 		
 		//---------------------------------------------------------
 		// Add entries based on Perl-compatible regular-expression.
@@ -627,7 +627,7 @@ function sbGetMenuModule($param = '') {
 						$ret_module_menu .= '<li id="' . $module_name . '">';
 						
 						// Menu UL (Entries)
-						$ul_module_menu = @count($module_menu[$module_name]['li']);
+                  $ul_module_menu = count((array)$module_menu[$module_name]['li']);
 						
 						// Check if active menu
 						if ($request_url == _AM_SITE_URL . "index.php?p=" . $module_name && $ul_module_menu == 0) {
