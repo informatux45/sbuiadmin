@@ -14,7 +14,7 @@
 // Blocking direct access to plugin      -=
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 defined('SBUIADMIN_PATH') or die('Are you crazy!');
- 
+
 // ----------------------
 // INCLUDES by array
 // ----------------------
@@ -31,32 +31,18 @@ sb_global_include(SBUIADMIN_PATH . '/inc/admin/version.php');
 // ----------------------
 // INCLUDE Debug Class
 // ---------------------- 
-sb_global_include(SBUIADMIN_PATH . '/inc/debug/Kint.class.php');
+require(SBUIADMIN_PATH . '/inc/debug/kint.phar');
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // ADMIN Lang
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 sb_global_include(_AM_SITE_LANG_DIR . _AM_SITE_LANG . '.php');
 
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Template core config
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-if (!_AM_SMARTY_BACKWARDS_COMPATIBILITY) {
-	// ------------------------------------------------------
-	// --- Smarty Class
-	// ------------------------------------------------------
-	sb_global_include(_AM_SMARTY_DIR . 'Smarty.class.php');
-	$sbsmarty = new Smarty();
-} else {
-	// ------------------------------------------------------
-	// --- SmartyBC - Backwards Compatibility Wrapper
-	// --- TODO: SmartyBC allows: {php} and {include_php} 
-	// ------------------------------------------------------
-	sb_global_include(_AM_SMARTY_DIR . 'SmartyBC.class.php');
-	$sbsmarty = new SmartyBC();
-}
-
+// ------------------------------------------------------
+// --- Smarty Class
+// ------------------------------------------------------
+sb_global_include(_AM_SMARTY_DIR . 'Smarty.class.php');
+$sbsmarty = new Smarty();
 
 // ----------------------
 // CLASSES by array

@@ -10,7 +10,7 @@
  */
 function smarty_function_sbdebug($params, Smarty_Internal_Template $template) {
     // Global include CLASS File
-	//sb_global_include(SBUIADMIN_PATH . '/inc/debug/Kint.class.php');
+	//sb_global_include(SBMAGIC_PATH . '/inc/debug/Kint.class.php');
 
 	// ----------------------------------------------------------
 	// USAGE :

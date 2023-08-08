@@ -59,7 +59,6 @@ defined('_AM_UPGRADE_MODE') OR define('_AM_UPGRADE_MODE', (trim($sb_settings_con
 defined('_AM_SMARTY_FORCE_COMPILE') OR define('_AM_SMARTY_FORCE_COMPILE', true);
 defined('_AM_SMARTY_CACHING') OR define('_AM_SMARTY_CACHING', false);
 defined('_AM_SMARTY_CACHE_LIFETIME') OR define('_AM_SMARTY_CACHE_LIFETIME', 120);
-defined('_AM_SMARTY_BACKWARDS_COMPATIBILITY') OR define('_AM_SMARTY_BACKWARDS_COMPATIBILITY', true); // Don't change this ;-)
 // ------------------------------------------
 // --- MySQL Config (Host Client)
 // Search if there is a socket
