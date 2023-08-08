@@ -132,7 +132,7 @@ class user extends sql {
         $sql       = "SELECT $field FROM " . _AM_DB_PREFIX . "sb_users WHERE username = '$sbuiadmin_user'";
         $result    = $this->query($sql);
         $user_info = $this->assoc($result);
-        if ($user_info[$field]) {
+        if (isset($user_info[$field])) {
             return $user_info[$field];
         } else {
             return false;

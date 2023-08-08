@@ -98,7 +98,7 @@ class upgrade extends sanitize {
 	//see http://bugs.php.net/bug.php?id=27609
 	//see http://bugs.php.net/bug.php?id=30931
 
-	    if ($path{strlen($path)-1} == '/') { // recursively return a temporary file path
+	    if ((strlen($path)-1) == '/') { // recursively return a temporary file path
 			// create directory
 			$create_dir = mkdir($path, 0777, true);
 			if (!is_dir($path))

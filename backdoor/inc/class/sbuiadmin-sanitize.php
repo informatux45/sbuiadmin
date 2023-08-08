@@ -58,7 +58,7 @@ class sanitize extends sql {
 	* @return string
 	**/
 	function addSlashes($text) {
-		if (!get_magic_quotes_gpc()) {
+		if (!function_exists("get_magic_quotes_gpc")) {
 			$text = addslashes($text);
 		}
 		return $text;
@@ -71,7 +71,7 @@ class sanitize extends sql {
 	* @return string
 	*/
 	function stripSlashesGPC($text) {
-		if (get_magic_quotes_gpc()) {
+		if (function_exists("get_magic_quotes_gpc") && get_magic_quotes_gpc()) {
 			$text = stripslashes($text);
 		}
 		return $text;

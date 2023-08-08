@@ -66,8 +66,8 @@ if (isset($_GET['del']) && $_GET['del'] != '') {
 // with an array of extensions
 // -----------------------
 $sbfiles_arr = $sbmedias->scan(_AM_MEDIAS_DIR, $sbfiles_medias_exts_allowed);
-$sbfiles_new = array();
-$sbfiles     = array();
+$sbfiles_new = [];
+$sbfiles     = [];
 
 // --- Change the key to filectime 
 for($i = 0; $i < count($sbfiles_arr); $i++) {
