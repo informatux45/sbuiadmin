@@ -16,7 +16,7 @@
 defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
 
-class sql extends smarty {
+class sql extends Smarty {
     var $host       = _AM_DB_HOST;
     var $user       = _AM_DB_USER;
     var $pass       = _AM_DB_PWD;

@@ -18,7 +18,7 @@
 defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
 
-class page extends SmartyBC {
+class page extends Smarty {
 
 	/**
 	* Format Header Module Page
