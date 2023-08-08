@@ -1,16 +1,14 @@
 <?php
-/** *****************************************************************************
-*                      INFORMATUX MySQLi class (UTF8)                           *
-/** *****************************************************************************
-* @author     Patrice BOUTHIER <contact[at]informatux.com>                      *
-* @copyright  1996-2016 INFORMATUX                                              *
-* @link       http://www.informatux.com/                                        *
-* @since      1.0                                                               *
-* @version    CVS: 1.8                                                          *
-* ----------------------------------------------------------------------------- *
-* Copyright (c) 2011, INFORMATUX Solutions and web development                  *
-* All rights reserved.                                                          *
-***************************************************************************** **/
+/**
+ * MySQLI Class
+ * SBUIADMIN Class
+ *
+ * @link https://dev.informatux.com/
+ *
+ * @package SBUIADMIN
+ * @file UTF-8
+ * ©INFORMATUX.COM
+ */
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Blocking direct access to plugin      -=
@@ -50,7 +48,7 @@ class sql extends smarty {
         // Check if DB connect ID
         if (!$this->connect_id) $this->connect();
         // Check Request SQL
-        $this->result_id = @mysqli_query($this->connect_id, $query);
+        $this->result_id = mysqli_query($this->connect_id, $query);
         if ($this->result_id) {
             $this->query = trim($query);
             $this->error = '';
@@ -58,82 +56,87 @@ class sql extends smarty {
             return $this->result_id;
         } else {
             //$this->dump(mysqli_error(), 'Query SQL (error)');
-            $this->error = @mysqli_error($this->connect_id);
+            $this->error = mysqli_error($this->connect_id);
             return false;
         }
     }
     function lastinsertid() {
-        return @mysqli_insert_id($this->connect_id);
+        return mysqli_insert_id($this->connect_id);
     }
     function numrows() {
         if (isset($this->result_id)) {
-            if (preg_match('`^select`i', $this->query)) return @mysqli_num_rows($this->result_id);
+            if (preg_match('`^select`i', $this->query)) return mysqli_num_rows($this->result_id);
             if (preg_match('`^(insert|update|delete)`i', $this->query)) return mysqli_affected_rows($this->result_id);
         } else {
             return count($this->records);
         }
     }
     function object($query) {
-        return @mysqli_fetch_object($query);
+        return mysqli_fetch_object($query);
     }
     function getArray($query, $mode = 'ASSOC') {
         switch ($mode) {
             case 'NUM':
-                return @mysqli_fetch_array($query, MYSQLI_NUM);
+                return mysqli_fetch_array($query, MYSQLI_NUM);
             break;
             case 'BOTH':
-                return @mysqli_fetch_array($query, MYSQLI_BOTH);
+                return mysqli_fetch_array($query, MYSQLI_BOTH);
             break;
             case 'ASSOC':
-                return @mysqli_fetch_array($query, MYSQLI_ASSOC);
+                return mysqli_fetch_array($query, MYSQLI_ASSOC);
             break;
             default:
-                return @mysqli_fetch_assoc($query);
+                return mysqli_fetch_assoc($query);
         }
     }
     function assoc($query) {
-        return @mysqli_fetch_assoc($query);
+        if (!$query) return false;
+        return mysqli_fetch_assoc($query);
     }
     function toarray($result) {
+        if (!$result) return false;
         $res_array = array();
-        for ($count = 0; $row = @mysqli_fetch_array($result); $count++) {
+        for ($count = 0; $row = mysqli_fetch_array($result); $count++) {
             $res_array[$count] = $row;
         }
         return $res_array;
     }
     function error() {
-        return @mysqli_error($this->connect_id);
+        if (!$this->connect_id) $this->connect();
+        return mysqli_error($this->connect_id);
     }
     function close() {
-        return @mysqli_close($this->connect_id);
+        if (!$this->connect_id) $this->connect();
+        return mysqli_close($this->connect_id);
     }
     function free() {
-        return @mysqli_free_result($this->connect_id);
+        //if (!$this->connect_id) $this->connect();
+        //return mysqli_free_result($this->connect_id);
     }
     function escape_string($escapestr) {
-        return @mysqli_real_escape_string($this->connect_id, $escapestr);
+        return mysqli_real_escape_string($this->connect_id, $escapestr);
     }
     function optimize($tbl_name) {
         if (!$this->connect_id) $this->connect();
         $query = "OPTIMIZE TABLE $tbl_name";
-        if ($this->result_id = @mysqli_query($this->connect_id, $query)) {
+        if ($this->result_id = mysqli_query($this->connect_id, $query)) {
             $this->query = trim($query);
             $this->error = '';
             return $this->result_id;
         } else {
-            $this->error = @mysqli_error($this->connect_id);
+            $this->error = mysqli_error($this->connect_id);
             return false;
         }
     }
     function truncate($tbl_name) {
         //if (!$this->connect_id) $this->connect();
         $query = "TRUNCATE TABLE $tbl_name";
-        if ($this->result_id = @mysqli_query($this->connect_id, $query)) {
+        if ($this->result_id = mysqli_query($this->connect_id, $query)) {
             $this->query = trim($query);
             $this->error = '';
             return $this->result_id;
         } else {
-            $this->error = @mysqli_error($this->connect_id);
+            $this->error = mysqli_error($this->connect_id);
             return false;
         }
     }

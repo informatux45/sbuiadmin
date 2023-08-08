@@ -19,12 +19,12 @@ defined('SBUIADMIN_PATH') or die('Are you crazy!');
 // Don't remove this setting              -
 // ----------------------------------------
 // --- Admin Settings File
-define('_AM_SETTINGS_FILE',						SBUIADMIN_PATH . '/inc/admin/settings.txt');
+defined('_AM_SETTINGS_FILE') OR define('_AM_SETTINGS_FILE', SBUIADMIN_PATH . '/inc/admin/settings.txt');
 $sb_settings_config = file(_AM_SETTINGS_FILE);
 // --- Admin Dashboard File
-define('_AM_DASHBOARD_FILE',					SBUIADMIN_PATH . '/inc/admin/dashboard.txt');
+defined('_AM_DASHBOARD_FILE') OR define('_AM_DASHBOARD_FILE', SBUIADMIN_PATH . '/inc/admin/dashboard.txt');
 // --- Front Theme File
-define('_AM_THEME_FILE',						SBUIADMIN_PATH . '/inc/admin/theme.txt');
+defined('_AM_THEME_FILE') OR define('_AM_THEME_FILE', SBUIADMIN_PATH . '/inc/admin/theme.txt');
 // ----------------------------------------
 // ----------------------------------------
 // ----------------------------------------
@@ -36,9 +36,9 @@ $sb_safe_pages   = ['index','sandbox','settings','cache','server','dashboard','t
 $sb_safe_modules = explode(",", trim($sb_settings_config[8]));
 // ------------------------------------------
 // --- Debug
-define('_AM_SITE_DEBUG',						(trim($sb_settings_config[9]) == 1) ? true : false);
-define('_AM_SITE_DEBUG_FORM',					(trim($sb_settings_config[10]) == 1) ? true : false);
-define('_AM_SMARTY_DEBUGGING',					(trim($sb_settings_config[11]) == 1) ? true : false);
+defined('_AM_SITE_DEBUG') OR define('_AM_SITE_DEBUG', (trim($sb_settings_config[9]) == 1) ? true : false);
+defined('_AM_SITE_DEBUG_FORM') OR define('_AM_SITE_DEBUG_FORM', (trim($sb_settings_config[10]) == 1) ? true : false);
+defined('_AM_SMARTY_DEBUGGING') OR define('_AM_SMARTY_DEBUGGING', (trim($sb_settings_config[11]) == 1) ? true : false);
 // ------------------------------------------
 // DEGUB Mode
 if (_AM_SITE_DEBUG) {
@@ -50,34 +50,34 @@ if (_AM_SITE_DEBUG) {
 }
 // ------------------------------------------
 // CAPTCHA Mode
-define('_AM_CAPTCHA_MODE',						(trim($sb_settings_config[22]) == 1) ? true : false);
+defined('_AM_CAPTCHA_MODE') OR define('_AM_CAPTCHA_MODE', (trim($sb_settings_config[22]) == 1) ? true : false);
 // ------------------------------------------
 // UPGRADE Mode
-define('_AM_UPGRADE_MODE',						(trim($sb_settings_config[23]) == 1) ? true : false);
+defined('_AM_UPGRADE_MODE') OR define('_AM_UPGRADE_MODE', (trim($sb_settings_config[23]) == 1) ? true : false);
 // ------------------------------------------
 // --- Smarty CONFIG
-define('_AM_SMARTY_FORCE_COMPILE',				true);
-define('_AM_SMARTY_CACHING',					false);
-define('_AM_SMARTY_CACHE_LIFETIME',				120);
-define('_AM_SMARTY_BACKWARDS_COMPATIBILITY',	true); // Don't change this ;-)
+defined('_AM_SMARTY_FORCE_COMPILE') OR define('_AM_SMARTY_FORCE_COMPILE', true);
+defined('_AM_SMARTY_CACHING') OR define('_AM_SMARTY_CACHING', false);
+defined('_AM_SMARTY_CACHE_LIFETIME') OR define('_AM_SMARTY_CACHE_LIFETIME', 120);
+defined('_AM_SMARTY_BACKWARDS_COMPATIBILITY') OR define('_AM_SMARTY_BACKWARDS_COMPATIBILITY', true); // Don't change this ;-)
 // ------------------------------------------
 // --- MySQL Config (Host Client)
 // Search if there is a socket
 if (strpos(trim($sb_settings_config[2]), ":") !== false) {
 	// Define socket
 	list($db_host, $db_socket) = explode(":", trim($sb_settings_config[2]));
-	define('_AM_DB_HOST',	$db_host);
-	define('_AM_DB_SOCKET',	$db_socket);
+	defined('_AM_DB_HOST') OR define('_AM_DB_HOST',	$db_host);
+	defined('_AM_DB_SOCKET') OR define('_AM_DB_SOCKET',	$db_socket);
 } else {
 	// Pas de socket
-	define('_AM_DB_HOST',	trim($sb_settings_config[2]));
-	define('_AM_DB_SOCKET', false);
+	defined('_AM_DB_HOST') OR define('_AM_DB_HOST', trim($sb_settings_config[2]));
+	defined('_AM_DB_SOCKET') OR define('_AM_DB_SOCKET', false);
 }
-define('_AM_DB_PORT',							3306);
-define('_AM_DB_NAME',							trim($sb_settings_config[3]));
-define('_AM_DB_USER',							trim($sb_settings_config[4]));
-define('_AM_DB_PWD',							trim($sb_settings_config[5]));
-define('_AM_DB_PREFIX',							trim($sb_settings_config[21]));
+defined('_AM_DB_PORT') OR define('_AM_DB_PORT', 3306);
+defined('_AM_DB_NAME') OR define('_AM_DB_NAME', trim($sb_settings_config[3]));
+defined('_AM_DB_USER') OR define('_AM_DB_USER', trim($sb_settings_config[4]));
+defined('_AM_DB_PWD') OR define('_AM_DB_PWD', trim($sb_settings_config[5]));
+defined('_AM_DB_PREFIX') OR define('_AM_DB_PREFIX', trim($sb_settings_config[21]));
 
 // ------------------------------------------
 // ---------------- MEDIAS ------------------
@@ -90,16 +90,13 @@ define('_AM_DB_PREFIX',							trim($sb_settings_config[21]));
 // --- Ne pas mettre le "/" à la fin
 $sbfiles_medias_dirs_allowed = trim($sb_settings_config[6]);
 // --- Pour vos formulaires ;-)
-define('_AM_MEDIAS_DIR', trim($sb_settings_config[6]));
-define('_AM_MEDIAS_URL', trim($sb_settings_config[13]));
-
+defined('_AM_MEDIAS_DIR') OR define('_AM_MEDIAS_DIR', trim($sb_settings_config[6]));
+defined('_AM_MEDIAS_URL') OR define('_AM_MEDIAS_URL', trim($sb_settings_config[13]));
 // --- Array of allowed extensions
 //$sbfiles_medias_exts_allowed = array("jpg","jpeg","bmp","png","pdf", "xml", "txt", "mp4");
 $sbfiles_medias_exts_allowed = explode(",", trim($sb_settings_config[12]));
-
 // --- Define item Limit (Multiple uploads simultaneously)
-define('_AM_MEDIAS_ITEM_LIMIT',					trim($sb_settings_config[14]));
-
+defined('_AM_MEDIAS_ITEM_LIMIT') OR define('_AM_MEDIAS_ITEM_LIMIT', trim($sb_settings_config[14]));
 // --- Define size Limit for your customers
 // Usage :
 // ==> 10KB
@@ -108,12 +105,12 @@ define('_AM_MEDIAS_ITEM_LIMIT',					trim($sb_settings_config[14]));
 // ==> 2.5MB
 // ==> 1GB
 // ==> 1TB
-define('_AM_MEDIAS_SIZE_LIMIT',	trim($sb_settings_config[7]));
+defined('_AM_MEDIAS_SIZE_LIMIT') OR define('_AM_MEDIAS_SIZE_LIMIT', trim($sb_settings_config[7]));
 // --- Define scaling image max (Combined width AND height)
 // unit of measuring: pixels
 // Usage :
 // ==> 1024
-define('_AM_MEDIAS_SCALING_SIXE_MAX',			trim($sb_settings_config[18]));
+defined('_AM_MEDIAS_SCALING_SIXE_MAX') OR define('_AM_MEDIAS_SCALING_SIXE_MAX', trim($sb_settings_config[18]));
 // ------------------------------------------
 
 // ------------------------------------------
@@ -133,42 +130,29 @@ $sbadministrators = explode(",", trim($sb_settings_config[1]));
 // -----------------------------------------------------------------------------------
 // -----------------------------------------------------------------------------------
 // -----------------------------------------------------------------------------------
-
 // --- Protocol
-define('_AM_SITE_PROTOCOL',						$_SERVER['REQUEST_SCHEME'] . '://');
-
+defined('_AM_SITE_PROTOCOL') OR define('_AM_SITE_PROTOCOL', $_SERVER['REQUEST_SCHEME'] . '://');
 // --- Smarty DIR
-define('_AM_SMARTY_DIR',						SBUIADMIN_PATH .'/core/');
-
+defined('_AM_SMARTY_DIR') OR define('_AM_SMARTY_DIR', SBUIADMIN_PATH .'/core/');
 // --- Site DIR
-define('_AM_SITE_DIR',							SBUIADMIN_PATH . '/');
+defined('_AM_SITE_DIR') OR define('_AM_SITE_DIR', SBUIADMIN_PATH . '/');
 // --- Site URL
-define('_AM_SITE_URL',							_AM_SITE_PROTOCOL . SBUIADMIN_URL);
-
-// --- Site IMG DIR
-define('_AM_SITE_IMG_DIR',						SBUIADMIN_PATH . '/img/');
-// --- Site IMG URL
-define('_AM_SITE_IMG_URL',						_AM_SITE_PROTOCOL . SBUIADMIN_URL . 'img/');
-
+defined('_AM_SITE_URL') OR define('_AM_SITE_URL', _AM_SITE_PROTOCOL . SBUIADMIN_URL);
 // --- Site UPLOAD DIR
-define('_AM_SITE_IMG_DIR',						SBUIADMIN_PATH . '/upload/');
+defined('_AM_SITE_IMG_DIR') OR define('_AM_SITE_IMG_DIR', SBUIADMIN_PATH . '/upload/');
 // --- Site UPLOAD URL
-define('_AM_SITE_IMG_URL',						_AM_SITE_PROTOCOL . SBUIADMIN_URL . 'upload/');
-
+defined('_AM_SITE_IMG_URL') OR define('_AM_SITE_IMG_URL',_AM_SITE_PROTOCOL . SBUIADMIN_URL . 'upload/');
 // --- Site LANG / DIR / URL
-define('_AM_SITE_LANG',							'french');
-define('_AM_SITE_LANG_DIR',						SBUIADMIN_PATH . '/lang/');
-define('_AM_SITE_LANG_URL',						_AM_SITE_PROTOCOL . SBUIADMIN_URL . 'lang/');
-
+defined('_AM_SITE_LANG') OR define('_AM_SITE_LANG', 'french');
+defined('_AM_SITE_LANG_DIR') OR define('_AM_SITE_LANG_DIR', SBUIADMIN_PATH . '/lang/');
+defined('_AM_SITE_LANG_URL') OR define('_AM_SITE_LANG_URL', _AM_SITE_PROTOCOL . SBUIADMIN_URL . 'lang/');
 // --- Customer name
-define('_AM_SITE_CUSTOMER_NAME',				trim($sb_settings_config[0]));
-
+defined('_AM_SITE_CUSTOMER_NAME') OR define('_AM_SITE_CUSTOMER_NAME', trim($sb_settings_config[0]));
 // ------------------------------------------
 // --- Defined Safe Pages Admins Only
 $sb_admin_pages = array('sandbox','settings','server','dashboard','theme','cache','toolbarck','database','explorer','users');
-
 // --- Server Config
 $sb_version_php = explode('-',PHP_VERSION);
-define('_AM_SERVER_PHP_VERSION_ID',				$sb_version_php[0]);
+defined('_AM_SERVER_PHP_VERSION_ID') OR define('_AM_SERVER_PHP_VERSION_ID', $sb_version_php[0]);
 
 ?>
