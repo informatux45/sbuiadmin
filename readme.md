@@ -2,7 +2,7 @@
 - CMS SBootstrap Admin Responsive
 - Projet initial : UIADMIN v3.0
 - Contributeurs : INFORMATUX
-- Version stable : 2.30
+- Version stable : 3.01
 - License: [GPLv3](http://www.gnu.org/licenses/gpl-3.0.fr.html "Licence publique générale GNU v3")
 
 ---
@@ -11,9 +11,9 @@
 
 Ready | Fonctionnalités
 --- | ---
-*✓* | PHP 7.x Ready / MySQL 5.7 Ready
+*✓* | PHP 8.2 / MariaDB 10.5 / MySQL
 *✓* | HTML 5 / CSS 3
-*✓* | Bootstrap Ready
+*✓* | Bootstrap
 *✓* | Installeur en ligne
 *✓* | Responsive design (frontend / administration)
 *✓* | Livré avec 5 thèmes
