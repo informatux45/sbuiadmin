@@ -196,7 +196,7 @@ if (!file_exists($file_temp)) {
         // I know supressing errors is bad, but calling exif_read_data on invalid
         // or corrupted data returns a fatal error and there's no way to validate
         // the EXIF data before calling the function.
-        $exif = @exif_read_data($src, EXIF);
+        $exif = @exif_read_data($src, NULL);
         if (isset($exif['Orientation'])) {
             $degree = 0;
             $mirror = false;
@@ -256,8 +256,8 @@ if (!file_exists($file_temp)) {
         $crop = 0;
         $trim = 1;
     }
-    $trim_w = ($trim) ? 1 : ($w == '') ? 1 : 0;
-    $trim_h = ($trim) ? 1 : ($h == '') ? 1 : 0;
+    $trim_w = ($trim) ? 1 : ( ($w == '') ? 1 : 0 );
+    $trim_h = ($trim) ? 1 : ( ($h == '') ? 1 : 0 );
     if ($crop) {
         $w1 = (($w0 / $h0) > ($w / $h)) ? floor($w0 * $h / $h0) : $w;
         $h1 = (($w0 / $h0) < ($w / $h)) ? floor($h0 * $w / $w0) : $h;
