@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="SBUIADMIN User Interface Administration | Powered by Smarty {$smarty.version} | Design by SBadmin 2 Bootstrap">
+    <meta name="description" content="SBUIADMIN User Interface Administration {$smarty.const._AM_START_VERSION} | Powered by Smarty {$smarty.version} | Design by SBadmin 2 Bootstrap">
     <meta name="author" content="INFORMATUX">
 
 	<link rel="apple-touch-icon" sizes="180x180" href="img/favicons/apple-touch-icon.png">

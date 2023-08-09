@@ -3,7 +3,7 @@
 {* -------------- *}
 
 	{* ------------------ Headers ----------------- *}
-	{include file='sb_header.tpl' module=$module_page}
+	{include file='sb_header.tpl' module=$module_page page='false'}
 	{* ---------------- End Headers --------------- *}
 			
 			{* ------------------------------------------------ *}
@@ -14,7 +14,7 @@
 
             <div class="row">
 				
-				{if $all}
+				{if isset($all) && !isset($smarty.get.a)}
                 <div class="col-lg-12">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
@@ -34,7 +34,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-										{if $allnew}
+										{if isset($allnew)}
 											{foreach from=$allnew item=news}
 												<tr class="{cycle values="odd,even"} gradeX">
 													<td>{$news.date|unescape:"htmlall"}</td>
@@ -64,7 +64,7 @@
                 <!-- /.col-lg-12 -->
 				{/if}
 				
-				{if $allcat}
+				{if isset($allcat)}
 				
                 <div class="col-lg-12">
                     <div class="panel panel-primary">
@@ -120,7 +120,7 @@
                 <!-- /.col-lg-12 -->
 				{/if}
 				
-				{if (!$all || !$allcategory) && ($smarty.get.a && $smarty.get.a != 'category' && $smarty.get.a != 'del' && $smarty.get.a != 'categorydel') }
+				{if (!isset($all) || !isset($allcategory)) && (isset($smarty.get.a) && $smarty.get.a != 'category' && $smarty.get.a != 'del' && $smarty.get.a != 'categorydel') }
 
 					<div class="col-lg-8">
 						<div class="panel panel-default">
@@ -144,7 +144,7 @@
 						{include file='shared/shared-panel-actions.tpl'}
 						{* ------------------------------------ *}
 						{* ------------------------------------ *}
-						{if $smarty.get.a == 'edit' || $smarty.get.a == 'add'}
+						{if isset($smarty.get.a) && ($smarty.get.a == 'edit' || $smarty.get.a == 'add')}
 						<div class="panel panel-default">
 								<div class="panel-heading">
 									Exemple d'articles (layout)
@@ -157,7 +157,7 @@
 						<!-- /.panel -->
 						{/if}
 							
-						{if $smarty.get.a == 'tpl_list' OR $smarty.get.a == 'tpl_single'}
+						{if isset($smarty.get.a) && ($smarty.get.a == 'tpl_list' OR $smarty.get.a == 'tpl_single')}
 
 								<div class="panel panel-red">
 									<div class="panel-heading">
@@ -234,7 +234,7 @@
 
 						{/if}
 
-						{if $smarty.get.a != 'tpl_list' AND $smarty.get.a != 'tpl_single' AND $smarty.get.a != 'settings' AND $smarty.get.a != 'edit'}
+						{if isset($smarty.get.a) && $smarty.get.a != 'tpl_list' && $smarty.get.a != 'tpl_single' && $smarty.get.a != 'settings' && $smarty.get.a != 'edit' && $smarty.get.a != 'categoryadd' && $smarty.get.a != 'add'}
 
 							<div class="panel panel-success">
 								<div class="panel-heading">
@@ -344,5 +344,5 @@
 		});
 		</script>
 			
-	{include file='sb_footer.tpl'}
+	{include file='sb_footer.tpl' page='false' pagef='false'}
 

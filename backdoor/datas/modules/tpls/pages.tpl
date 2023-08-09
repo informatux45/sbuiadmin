@@ -3,7 +3,7 @@
 {* -------------- *}
 
 	{* ------------------ Headers ----------------- *}
-	{include file='sb_header.tpl' module=$module_page}
+	{include file='sb_header.tpl' module=$module_page page='false'}
 	{* ---------------- End Headers --------------- *}
 			
 			{* ------------------------------------------------ *}
@@ -106,7 +106,7 @@
 				</div>
 				<!-- /.col-lg-4 -->
 
-				{if $show_headpage}
+				{if isset($show_headpage)}
 					{include file='shared/shared-slider-4col.tpl'}
 				{/if}
 
@@ -136,5 +136,5 @@
 		});
 		</script>
 			
-	{include file='sb_footer.tpl'}
+	{include file='sb_footer.tpl' page='false' pagef='false'}
 

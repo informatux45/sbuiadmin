@@ -19,19 +19,19 @@
 			Shortcodes
 		</button>
 		
-		{if $smarty.get.a == 'category'}
+		{if isset($smarty.get.a) && $smarty.get.a == 'category'}
 			&nbsp;
 			<button class="btn btn-success" type="button" onclick="location.href='index.php?p=news&a=sort'">
 				Trier les catégories
 			</button>
 		{/if}
 		
-		{if $smarty.get.a == 'tpl_single'}
+		{if isset($smarty.get.a) && $smarty.get.a == 'tpl_single'}
 			&nbsp;
 			<button class="btn btn-success" type="button" onclick="location.href='index.php?p=news&a=tpl_list&id={$smarty.get.id}'">
 				Template LIST
 			</button>
-		{elseif $smarty.get.a == 'tpl_list'}
+		{elseif isset($smarty.get.a) && $smarty.get.a == 'tpl_list'}
 			&nbsp;
 			<button class="btn btn-success" type="button" onclick="location.href='index.php?p=news&a=tpl_single&id={$smarty.get.id}'">
 				Template SINGLE
@@ -50,7 +50,7 @@
 		
 </div>
 
-{if !$smarty.get.a}
+{if !isset($smarty.get.a)}
 <div class="panel panel-yellow">
 	<div class="panel-heading">
 		INFOS News
