@@ -611,7 +611,7 @@ function sbGetMenuModule($param = '') {
 			$module_name = pathinfo($modules_dir[$i], PATHINFO_FILENAME);
 			
 			// --- Check if Module infos exists
-			if ($module_menu[$module_name]['main']) {
+			if (isset($module_menu[$module_name]['main'])) {
 				
 				// --- Check if user is authorized to view menu (Global)
 				if (($module_menu[$module_name]['group'] == 'admin' && $sbuiadmin_user_type == 'admin')
@@ -632,9 +632,9 @@ function sbGetMenuModule($param = '') {
 						// Check if active menu
 						if ($request_url == _AM_SITE_URL . "index.php?p=" . $module_name && $ul_module_menu == 0) {
 						     $class_active = ' class="active" ';
-						} elseif (trim($_GET['p']) == $module_name && $ul_module_menu == 0) {
+						} elseif (isset($_GET['p']) && trim($_GET['p']) == $module_name && $ul_module_menu == 0) {
 						     $class_active = ' class="active" ';
-						} elseif ( (trim($_GET['p']) == 'session' || trim($_GET['p']) == 'cache' || trim($_GET['p']) == 'dashboard' || trim($_GET['p']) == 'toolbarck' || trim($_GET['p']) == 'theme' || trim($_GET['p']) == 'themeinfos') && $module_name == 'settings' && $ul_module_menu == 0) {
+						} elseif ( isset($_GET['p']) && (trim($_GET['p']) == 'session' || trim($_GET['p']) == 'cache' || trim($_GET['p']) == 'dashboard' || trim($_GET['p']) == 'toolbarck' || trim($_GET['p']) == 'theme' || trim($_GET['p']) == 'themeinfos') && $module_name == 'settings' && $ul_module_menu == 0) {
 						     $class_active = ' class="active" ';
 						} else {
 						     $class_active = ' ';

@@ -3,7 +3,7 @@
 {* -------------- *}
 
 	{* ------------------ Headers ----------------- *}
-	{include file='sb_header.tpl' module=$module_page pageindex='Dashboard'}
+	{include file='sb_header.tpl' module=$module_page pageindex='Dashboard' page='false'}
 	{* ---------------- End Headers --------------- *}
 
 			{if $sbuiadmin_user_type == 'admin'}
@@ -363,4 +363,4 @@
 		});
 		</script>
 
-	{include file='sb_footer.tpl'}
+	{include file='sb_footer.tpl' page='false' pagef='false'}

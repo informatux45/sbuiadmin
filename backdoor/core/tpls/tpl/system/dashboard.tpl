@@ -3,7 +3,7 @@
 {* -------------- *}
 
 	{* ------------------ Headers ----------------- *}
-	{include file='sb_header.tpl' module=$module_page}
+	{include file='sb_header.tpl' module=$module_page page='false'}
 	{* ---------------- End Headers --------------- *}
 			
 			{* ------------------------------------------------ *}
@@ -56,7 +56,7 @@
 											Tables SQL
 										</td>
 										<td>
-											{$sb_dashboard_tables}
+											{if $sb_dashboard_tables}{$sb_dashboard_tables}{/if}
 										</td>
 									</tr>
 									<tr class="gradeX warning">
@@ -184,7 +184,7 @@
 											[STATUS 4] Table SQL
 										</td>
 										<td>
-											{$sb_dashboard_status4_table}
+											{if $sb_dashboard_status4_table}{$sb_dashboard_status4_table}{/if}
 										</td>
 									</tr>
 									<tr class="gradeX success">
@@ -192,7 +192,7 @@
 											[STATUS 4] Table (champs)
 										</td>
 										<td>
-											{$sb_dashboard_status4_tbcol}
+											{if $sb_dashboard_status4_tbcol}{$sb_dashboard_status4_tbcol}{/if}
 										</td>
 									</tr>
 									<tr class="gradeX success">
@@ -200,7 +200,7 @@
 											[STATUS 4] Titre
 										</td>
 										<td>
-											{$sb_dashboard_status4_title}
+											{if $sb_dashboard_status4_title}{$sb_dashboard_status4_title}{/if}
 										</td>
 									</tr>
 									<tr class="gradeX success">
@@ -208,7 +208,7 @@
 											[STATUS 4] Lien relatif
 										</td>
 										<td>
-											{$sb_dashboard_status4_link}
+											{if $sb_dashboard_status4_link}{$sb_dashboard_status4_link}{/if}
 										</td>
 									</tr>
 									<tr class="gradeX success">
@@ -216,7 +216,7 @@
 											[STATUS 4] Icône
 										</td>
 										<td>
-											{$sb_dashboard_status4_icon}
+											{if $sb_dashboard_status4_icon}{$sb_dashboard_status4_icon}{/if}
 										</td>
 									</tr>
 								</tbody>
@@ -241,4 +241,4 @@
 		});
 		</script>
 
-	{include file='sb_footer.tpl'}
+	{include file='sb_footer.tpl' page='false' pagef='false'}

@@ -123,27 +123,27 @@ if ($_POST['form_submit']) {
 // --- Ouverture du fichier
 $sb_dashboard = file($sb_dashboard_file);
 // --- Initialisation
-$sb_dashboard_tables        = trim($sb_dashboard[0]);
-$sb_dashboard_status1_table = trim($sb_dashboard[1]);
-$sb_dashboard_status1_title = trim($sb_dashboard[2]);
-$sb_dashboard_status1_link  = trim($sb_dashboard[3]);
-$sb_dashboard_status1_icon  = trim($sb_dashboard[4]);
-$sb_dashboard_status1_tbcol = trim($sb_dashboard[5]);
-$sb_dashboard_status2_table = trim($sb_dashboard[6]);
-$sb_dashboard_status2_title = trim($sb_dashboard[7]);
-$sb_dashboard_status2_link  = trim($sb_dashboard[8]);
-$sb_dashboard_status2_icon  = trim($sb_dashboard[9]);
-$sb_dashboard_status2_tbcol = trim($sb_dashboard[10]);
-$sb_dashboard_status3_table = trim($sb_dashboard[11]);
-$sb_dashboard_status3_title = trim($sb_dashboard[12]);
-$sb_dashboard_status3_link  = trim($sb_dashboard[13]);
-$sb_dashboard_status3_icon  = trim($sb_dashboard[14]);
-$sb_dashboard_status3_tbcol = trim($sb_dashboard[15]);
-$sb_dashboard_status4_table = trim($sb_dashboard[16]);
-$sb_dashboard_status4_title = trim($sb_dashboard[17]);
-$sb_dashboard_status4_link  = trim($sb_dashboard[18]);
-$sb_dashboard_status4_icon  = trim($sb_dashboard[19]);
-$sb_dashboard_status4_tbcol = trim($sb_dashboard[20]);
+$sb_dashboard_tables        = (isset($sb_dashboard[0])) ? trim($sb_dashboard[0]) : false;
+$sb_dashboard_status1_table = (isset($sb_dashboard[1])) ? trim($sb_dashboard[1]) : false;
+$sb_dashboard_status1_title = (isset($sb_dashboard[2])) ? trim($sb_dashboard[2]) : false;
+$sb_dashboard_status1_link  = (isset($sb_dashboard[3])) ? trim($sb_dashboard[3]) : false;
+$sb_dashboard_status1_icon  = (isset($sb_dashboard[4])) ? trim($sb_dashboard[4]) : false;
+$sb_dashboard_status1_tbcol = (isset($sb_dashboard[5])) ? trim($sb_dashboard[5]) : false;
+$sb_dashboard_status2_table = (isset($sb_dashboard[6])) ? trim($sb_dashboard[6]) : false;
+$sb_dashboard_status2_title = (isset($sb_dashboard[7])) ? trim($sb_dashboard[7]) : false;
+$sb_dashboard_status2_link  = (isset($sb_dashboard[8])) ? trim($sb_dashboard[8]) : false;
+$sb_dashboard_status2_icon  = (isset($sb_dashboard[9])) ? trim($sb_dashboard[9]) : false;
+$sb_dashboard_status2_tbcol = (isset($sb_dashboard[10])) ? trim($sb_dashboard[10]) : false;
+$sb_dashboard_status3_table = (isset($sb_dashboard[11])) ? trim($sb_dashboard[11]) : false;
+$sb_dashboard_status3_title = (isset($sb_dashboard[12])) ? trim($sb_dashboard[12]) : false;
+$sb_dashboard_status3_link  = (isset($sb_dashboard[13])) ? trim($sb_dashboard[13]) : false;
+$sb_dashboard_status3_icon  = (isset($sb_dashboard[14])) ? trim($sb_dashboard[14]) : false;
+$sb_dashboard_status3_tbcol = (isset($sb_dashboard[15])) ? trim($sb_dashboard[15]) : false;
+$sb_dashboard_status4_table = (isset($sb_dashboard[16])) ? trim($sb_dashboard[16]) : false;
+$sb_dashboard_status4_title = (isset($sb_dashboard[17])) ? trim($sb_dashboard[17]) : false;
+$sb_dashboard_status4_link  = (isset($sb_dashboard[18])) ? trim($sb_dashboard[18]) : false;
+$sb_dashboard_status4_icon  = (isset($sb_dashboard[19])) ? trim($sb_dashboard[19]) : false;
+$sb_dashboard_status4_tbcol = (isset($sb_dashboard[20])) ? trim($sb_dashboard[20]) : false;
 
 // --- Debug SQL
 if (_AM_SITE_DEBUG) $sbsmarty->assign('file_content', $sb_dashboard);						

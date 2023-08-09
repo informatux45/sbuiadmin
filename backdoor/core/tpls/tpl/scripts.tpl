@@ -105,14 +105,6 @@
 	});
 	</script>
 	{/if}
-	
-	{if $page == 'login'}
-		<script>
-			$(document).ready(function() {
-				//$('body').tubular({literal}{{/literal}videoId: '{$sb_random_bg_video}'{literal}}{/literal});
-			});
-		</script>
-	{/if}
 
 	{if $pagef == 'upload'}
 	{*<link href="inc/js/upload/fine-uploader.min.css" media="screen" rel="stylesheet" type="text/css" />*}

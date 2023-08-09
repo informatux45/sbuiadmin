@@ -76,7 +76,11 @@ if (_AM_UPGRADE_MODE) {
 		$sbsmarty->assign('sbuiadmin_upgrade_core', false);
 		ob_flush(); // the buffer contents are discarded
 	}
+} else {
+    $sbsmarty->assign('sbuiadmin_upgrade_core', false);
+    $sbsmarty->assign('sbuiadmin_upgrade_core_filelist', false);
 }
+$sbsmarty->assign('sbuiadmin_upgrade_modules', false);
 // ------------------
 
 // ------------------
@@ -93,9 +97,5 @@ $sbsmarty->debugging = _AM_SMARTY_DEBUGGING;
 // ------------------
 $sbsmarty->caching = _AM_SMARTY_CACHING;
 $sbsmarty->cache_lifetime = _AM_SMARTY_CACHE_LIFETIME;
-// ------------------
-
-// ------------------
-
 // ------------------
 ?>

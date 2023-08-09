@@ -7,8 +7,8 @@
 					{if $page_title}
 						<a href="{$smarty.const._AM_SITE_URL}"><i class="fa fa-home fa-fw"></i> Dashboard</a>
 						&nbsp;&raquo;&nbsp;
-						<a href="{if $smarty.get.p}{$smarty.const._AM_SITE_URL}index.php?p={$smarty.get.p}{else}#{/if}">{$page_title|lower|@ucfirst}</a>
-						{if $smarty.get.a}
+						<a href="{if isset($smarty.get.p)}{$smarty.const._AM_SITE_URL}index.php?p={$smarty.get.p}{else}#{/if}">{$page_title|lower|@ucfirst}</a>
+						{if isset($smarty.get.a)}
 							&nbsp;&raquo;&nbsp;
 							{$smarty.get.a|lower|@ucfirst}
 						{/if}

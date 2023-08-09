@@ -61,7 +61,7 @@
 
 </head>
 
-<body class="{if $page == 'login'}login-pattern{/if}{if $smarty.get.p == 'transfert'} margin10{/if}">
+<body class="{if $page == 'login'}login-pattern{/if}{if isset($smarty.get.p) && $smarty.get.p == 'transfert'} margin10{/if}">
 	
     <div id="outdated">
         <h6>Your browser is out-of-date!</h6>

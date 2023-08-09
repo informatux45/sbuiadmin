@@ -37,10 +37,13 @@ define('SBDEBUG', (trim($sb_settings_config[25]) == 1 ? true : false));
 
 # Language (default fr_FR)
 define('SBLANG', 'fr_FR');
+define('SBLANG_CODE', 'UTF-8');
+define('SBLANG_REST', 'fra');
 	
 # Set PHP locale
 # http://php.net/manual/en/function.setlocale.php
-setlocale(LC_ALL, SBLANG);
+# Ex: setlocale(LC_ALL, 'fr_FR.UTF-8', 'fra');
+setlocale(LC_ALL, SBLANG.".".SBLANG_CODE, SBLANG_REST);
 
 # Define default timezone of server, accepts php timezone string
 # valid timeszones can be found here http://www.php.net/manual/en/timezones.php

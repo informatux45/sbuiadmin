@@ -112,6 +112,6 @@
 	</script>
 	{/if}
 
-{include file='scripts.tpl' page='login'}
+{include file='scripts.tpl' page='login' pagef='false'}
 
 {include file='footer.tpl'}
