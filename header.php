@@ -34,17 +34,9 @@ include_once(SB_PATH . "datas" . DIRECTORY_SEPARATOR . "lang" . DIRECTORY_SEPARA
 // ------------------------
 // Template core config
 // ------------------------
-if (!SBSMARTYBC) {
-	// --- Smarty Class
-	include(SB_SMARTY_DIR . 'Smarty.class.php');
-	$sbsmarty = new Smarty();
-} else {
-	// --- SmartyBC - Backwards Compatibility Wrapper
-	// --- TODO: SmartyBC allows: {php} and {include_php} 
-	include(SB_SMARTY_DIR . 'SmartyBC.class.php');
-	$sbsmarty = new SmartyBC();
-}
-
+// --- Smarty Class
+include(SB_SMARTY_DIR . 'Smarty.class.php');
+$sbsmarty = new Smarty();
 
 // ----------------------
 // CLASSES by array

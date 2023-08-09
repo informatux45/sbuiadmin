@@ -22,7 +22,7 @@ function apphp_db_install($sql_dump_file) {
 	$sql_dump = str_ireplace('<DB_PREFIX>', $database_prefix, $sql_dump);
 
     // disabling magic quotes at runtime
-    if(get_magic_quotes_runtime()){
+    if(function_exists("get_magic_quotes_runtime")){
         function stripslashes_runtime(&$value){
             $value = stripslashes($value);	
         }
