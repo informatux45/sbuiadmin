@@ -7,7 +7,8 @@
  * @file UTF-8                     *
  * ©INFORMATUX.COM                 *
  * ******************************* */
-
+error_reporting(1);
+ini_set('display_errors', 1);
 // ----------------------
 // SESSION Initialisation
 // ----------------------
@@ -27,8 +28,7 @@ include_once('../header.php');
 // ----------------------
 // Force DEBUG Off
 // ----------------------
-error_reporting(0);
-ini_set('display_errors', 0);
+
 
 // ----------------------
 // Define Globals
@@ -200,19 +200,19 @@ $coming_soon_video = ($cs['coming-soon-video'] == '') ? 'PF0L3gvSVcg' : $cs['com
 			<h2>Contactez nous</h2>
 		  </header>
 		  <?php
-			if ($cs['coming-soon-email'] != '') {
-				echo "<h3><a href='mailto:{$cs[coming-soon-email]}'>";
+			if (isset($cs['coming-soon-email']) && $cs['coming-soon-email'] != '') {
+				echo "<h3><a href='mailto:".$cs['coming-soon-email']."'>";
 				echo $cs['coming-soon-email'];
 				echo '</a></h3>';
 			}
 			echo '<ul class="contact-infos">';
-			if ($cs['coming-soon-address'] != '' || $cs['coming-soon-tel'] != '') {
+			if ((isset($cs['coming-soon-address']) && $cs['coming-soon-address'] != '') || (isset($cs['coming-soon-tel']) && $cs['coming-soon-tel'] != '')) {
 				if ($cs['coming-soon-address'] != '') {
 					echo "<li><i class='fa fa-map-marker' aria-hidden='true'></i> ";
 					echo $cs['coming-soon-address'];
 					echo '</li>';
 				}
-				if ($cs['coming-soon-tel'] != '') {
+				if (isset($cs['coming-soon-tel']) && $cs['coming-soon-tel'] != '') {
 					echo "<li><i class='fa fa-phone' aria-hidden='true'></i> ";
 					echo "<a href='tel:" . $cs['coming-soon-tel'] . "'>";
 					echo $cs['coming-soon-tel'];
