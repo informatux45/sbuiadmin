@@ -11,7 +11,7 @@
 
 Ready | Fonctionnalités
 --- | ---
-*✓* | PHP 8.2 / MariaDB 10.5 / MySQL
+*✓* | PHP 8.1 / MariaDB 10.5 / MySQL
 *✓* | HTML 5 / CSS 3
 *✓* | Bootstrap
 *✓* | Installeur en ligne
