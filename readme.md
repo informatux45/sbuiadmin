@@ -45,6 +45,12 @@ Ready | Fonctionnalités
 
 ### Changelog
 
+**3.01**
+- Update many libraries (kint, smarty, ...)
+- PHP 8.0 and 8.1 Ready
+- New admin theme colors
+- Admin menu grouping (Dropdown buttons)
+
 **2.31**
 - SMTP Configuration (Account module)
 - Add classes (Account, Cart, CSV)
