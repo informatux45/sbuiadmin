@@ -31,7 +31,7 @@ defined('_AM_THEME_FILE') OR define('_AM_THEME_FILE', SBUIADMIN_PATH . '/inc/adm
 
 // ------------------------------------------
 // --- Defined Safe Pages
-$sb_safe_pages   = ['index','sandbox','settings','cache','server','dashboard','theme','themeinfos','session','database','explorer','users','logaccess','menu','pages','blocs','medias','transfert','cmsconfig','slider','news','contact','tabbs','toggle','gallery','gmaps','table','toolbarck'];
+$sb_safe_pages = ['index','sandbox','settings','cache','server','dashboard','theme','themeinfos','session','database','explorer','users','logaccess','menu','pages','blocs','medias','transfert','cmsconfig','slider','news','contact','tabbs','toggle','gallery','gmaps','table','toolbarck'];
 // --- Defined Safe Modules
 $sb_safe_modules = explode(",", trim($sb_settings_config[8]));
 // ------------------------------------------
@@ -138,9 +138,9 @@ defined('_AM_SITE_DIR') OR define('_AM_SITE_DIR', SBUIADMIN_PATH . '/');
 // --- Site URL
 defined('_AM_SITE_URL') OR define('_AM_SITE_URL', _AM_SITE_PROTOCOL . SBUIADMIN_URL);
 // --- Site UPLOAD DIR
-defined('_AM_SITE_IMG_DIR') OR define('_AM_SITE_IMG_DIR', SBUIADMIN_PATH . '/upload/');
+defined('_AM_SITE_IMG_DIR') OR define('_AM_SITE_IMG_DIR', SBUIADMIN_PATH . '/img/');
 // --- Site UPLOAD URL
-defined('_AM_SITE_IMG_URL') OR define('_AM_SITE_IMG_URL',_AM_SITE_PROTOCOL . SBUIADMIN_URL . 'upload/');
+defined('_AM_SITE_IMG_URL') OR define('_AM_SITE_IMG_URL',_AM_SITE_PROTOCOL . SBUIADMIN_URL . 'img/');
 // --- Site LANG / DIR / URL
 defined('_AM_SITE_LANG') OR define('_AM_SITE_LANG', 'french');
 defined('_AM_SITE_LANG_DIR') OR define('_AM_SITE_LANG_DIR', SBUIADMIN_PATH . '/lang/');

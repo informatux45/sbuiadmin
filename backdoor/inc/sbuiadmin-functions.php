@@ -627,6 +627,7 @@ function sbGetMenuModule($param = '') {
 						$ret_module_menu .= '<li id="' . $module_name . '">';
 						
 						// Menu UL (Entries)
+                  $module_menu[$module_name]['li'] = (isset($module_menu[$module_name]['li'])) ? $module_menu[$module_name]['li'] : [];
                   $ul_module_menu = count((array)$module_menu[$module_name]['li']);
 						
 						// Check if active menu
@@ -649,7 +650,7 @@ function sbGetMenuModule($param = '') {
 						// --- Check if there is menu entries
 						if ($ul_module_menu > 0) {
 							// Menu UL (if entries)
-							$collapse_in = ($_GET['p'] == $module_name) ? ' collapse in' : '';
+							$collapse_in = (isset($_GET['p']) && $_GET['p'] == $module_name) ? ' collapse in' : '';
 							$ret_module_menu .= '<ul class="nav nav-second-level' . $collapse_in . '">';
 							
 							// Menu LI (choices)
