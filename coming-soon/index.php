@@ -172,8 +172,8 @@ $coming_soon_video = ($cs['coming-soon-video'] == '') ? 'PF0L3gvSVcg' : $cs['com
 	  
 	  <section id="home" class="tab-pane fade in active">
 		<article role="countdown" class="countdown-pan">
-		  <div id="countdown" class="text-center"></div>
-		  <p><?php echo utf8_encode($cs['coming-soon-title2']) ?></p>
+		  <!--<div id="countdown" class="text-center"></div>-->
+		  <p><?php echo html_entity_decode( utf8_encode($cs['coming-soon-title2']) ) ?></p>
 		</article>
 	  </section>
 	  
@@ -246,7 +246,7 @@ $coming_soon_video = ($cs['coming-soon-video'] == '') ? 'PF0L3gvSVcg' : $cs['com
 	  
 	  <nav role="nav" id="header-nav" class="nav navy">
 		<ul class="nav nav-tabs">
-		  <li class="active"><a data-toggle="tab" href="#home" title="Countdown">Lancement</a></li>
+		  <li class="active"><a data-toggle="tab" href="#home" title="Countdown">Maintenance</a></li>
 		  <?php
 			if ($cs['coming-soon-text'])
 				echo '<li><a data-toggle="tab" href="#menu1" title="Introduction">A propos de nous</a></li>';
@@ -315,7 +315,7 @@ $coming_soon_video = ($cs['coming-soon-video'] == '') ? 'PF0L3gvSVcg' : $cs['com
 <script src="js/bootstrap.min.js" type="text/javascript"></script> 
 
 <!-- jquery.countdown -->
-<script>
+<!--<script>
 	// set the date we're counting down to
 	<?php
 		$coming_soon_date = $cs['coming-soon-date'];
@@ -323,7 +323,7 @@ $coming_soon_video = ($cs['coming-soon-video'] == '') ? 'PF0L3gvSVcg' : $cs['com
 	?>
 	var target_date = new Date('<?php echo $date_year; ?>, <?php echo $date_month; ?>, <?php echo $date_day; ?>').getTime();
 </script>
-<script src="js/countdown-js.js" type="text/javascript"></script>
+<script src="js/countdown-js.js" type="text/javascript"></script>-->
 
 <?php if ($coming_soon_type == 'video') { ?>
 <!-- Video --> 
