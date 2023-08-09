@@ -381,14 +381,18 @@ if (!function_exists("sbIsFlood")) {
 				// --------------------------------
 				// --- IP INFOS (Country, region, city, ...)
 				// --------------------------------
-				// --- set API access key 
-				$access_key = '59e2bd4d1e90dff9a34464e614939d44';
-				// --- Initialize CURL
-				$ch = curl_init('http://api.ipstack.com/'.$user_ip.'?access_key='.$access_key.'&language=fr&output=json');
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-				// --- Store the data
-				$history_json = curl_exec($ch);
-				curl_close($ch);
+				if (isset($config_ip_infos_access_key)) {
+					// --- set API access key 
+					$access_key = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+					// --- Initialize CURL
+					$ch = curl_init('http://api.ipstack.com/'.$user_ip.'?access_key='.$access_key.'&language=fr&output=json');
+					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+					// --- Store the data
+					$history_json = curl_exec($ch);
+					curl_close($ch);
+				} else {
+					$history_json = "unknown";
+				}
 				// --------------------------------
 				$query_history  = "INSERT INTO $table_history (count,blockedtime,ip,reason,infos)
 								   VALUES ('$history_count','$history_blocked','$history_ip','$history_reason','$history_json')";

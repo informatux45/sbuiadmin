@@ -36,6 +36,36 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_attempts` (
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `sb_blocked_history`
+--
+
+CREATE TABLE `<DB_PREFIX>sb_blocked_history` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `count` tinyint(4) UNSIGNED NOT NULL DEFAULT '1',
+  `blockedtime` bigint(20) NOT NULL,
+  `ip` varchar(20) NOT NULL,
+  `reason` varchar(255) NOT NULL,
+  `infos` text
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `sb_blocked_ip`
+--
+
+CREATE TABLE `<DB_PREFIX>sb_blocked_ip` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `ip` varchar(20) NOT NULL,
+  `count` tinyint(4) UNSIGNED NOT NULL DEFAULT '1',
+  `blockedtime` bigint(20) NOT NULL,
+  `expirationtime` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
+  `reason` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `sb_blocs`
 --
 

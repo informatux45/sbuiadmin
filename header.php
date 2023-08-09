@@ -109,7 +109,7 @@ if (file_exists($sb_custom_path)) require_once($sb_custom_path);
 // ----------------------
 // Anti flood PROTECTION
 // ----------------------
-sbIsFlood();
+if (!file_exists(SBADMIN."/install.php")) sbIsFlood();
 
 // ------------------------ 
 // Get ALL functions Files Module CMS

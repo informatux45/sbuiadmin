@@ -7,7 +7,7 @@
     define('EI_MODE', 'production');
     
     // *** version number of SBUIADMIN Installer
-    define('EI_VERSION', '2.1.0');
+    define('EI_VERSION', '2.2.0');
 
     // *** default language: en - English
     define('EI_DEFAULT_LANGUAGE', 'fr');
@@ -34,7 +34,7 @@
     // *** check for PHP minimum version number (true, false) -
     //     checks if a minimum required version of PHP runs on a server
     define('EI_CHECK_PHP_MINIMUM_VERSION', true);
-    define('EI_PHP_MINIMUM_VERSION', '7.0.0');
+    define('EI_PHP_MINIMUM_VERSION', '7.2.0');
     
     // *** check or not config directory for writability
     define('EI_CHECK_CONFIG_DIR_WRITABILITY', false);
