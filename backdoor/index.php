@@ -382,6 +382,8 @@ $sbsmarty->assign([
 	,'page_title' => false
 	,'sort' => false
 	,'all' => false
+	,'sbtranfer_media' => false
+	,'sb_table_header' => false
 ]);
 
 // --------------------------------
@@ -400,6 +402,7 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 		// No, so show error message
 		if (_AM_SITE_DEBUG && $sb_get_page != 'index') echo "Fichier php '$controlIfPhpFileExists' inexistant !";
 	}
+	
 	// Display template page
 	// Check if non admin and authorized page
 	if (in_array($sb_get_page, $sb_admin_pages) && $sbuiadmin_user_type != 'admin')

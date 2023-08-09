@@ -19,26 +19,26 @@ if (basename($_SERVER['PHP_SELF']) == 'sbconfig.php') {
 
 # Change the administrative panel folder name
 # Don't miss to change the htaccess file in administration
-define('SBADMIN', 'backdoor');
+defined ('SBADMIN') OR define('SBADMIN', 'backdoor');
 
 # Get files configuration (theme / general)
 $sb_theme_config    = file(dirname(__FILE__) . DIRECTORY_SEPARATOR . SBADMIN . DIRECTORY_SEPARATOR .'inc' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'theme.txt');
 $sb_settings_config = file(dirname(__FILE__) . DIRECTORY_SEPARATOR . SBADMIN . DIRECTORY_SEPARATOR .'inc' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'settings.txt');
 
 # Default max width of images
-define('SBIMAGEWIDTH', '1024');
+defined ('SBIMAGEWIDTH') OR define('SBIMAGEWIDTH', '1024');
 
 # Define SBUIADMIN ID Files
-define('SBUIADMINID', 'sbuiadmin');
+defined ('SBUIADMINID') OR define('SBUIADMINID', 'sbuiadmin');
 
 # Turn on debug mode
 # Default: false
-define('SBDEBUG', (trim($sb_settings_config[25]) == 1 ? true : false));
+defined ('SBDEBUG') OR define('SBDEBUG', (trim($sb_settings_config[25]) == 1 ? true : false));
 
 # Language (default fr_FR)
-define('SBLANG', 'fr_FR');
-define('SBLANG_CODE', 'UTF-8');
-define('SBLANG_REST', 'fra');
+defined ('SBLANG') OR define('SBLANG', 'fr_FR');
+defined ('SBLANG_CODE') OR define('SBLANG_CODE', 'UTF-8');
+defined ('SBLANG_REST') OR define('SBLANG_REST', 'fra');
 	
 # Set PHP locale
 # http://php.net/manual/en/function.setlocale.php
@@ -47,56 +47,56 @@ setlocale(LC_ALL, SBLANG.".".SBLANG_CODE, SBLANG_REST);
 
 # Define default timezone of server, accepts php timezone string
 # valid timeszones can be found here http://www.php.net/manual/en/timezones.php
-define('SBTIMEZONE', 'Europe/Paris');
+defined ('SBTIMEZONE') OR define('SBTIMEZONE', 'Europe/Paris');
 date_default_timezone_set(SBTIMEZONE);
 
 # Set email from address
-define('SBFROMEMAIL', 'noreply@mysite.fr');
+defined ('SBFROMEMAIL') OR define('SBFROMEMAIL', 'noreply@mysite.fr');
 
 # Theme directory
-define('SBTHEME', trim($sb_theme_config[0]));
+defined ('SBTHEME') OR define('SBTHEME', trim($sb_theme_config[0]));
 
 # Module activated onto index page
 # False, if you don't have module for index page
 # Overriden by module page if a homepage is created
-define('SBMODULEINDEX', false);
+defined('SBMODULEINDEX') OR define('SBMODULEINDEX', false);
 
 # Backwards Compatibility Wrapper (Smarty)
-define('SBSMARTYBC', true);
+defined('SBSMARTYBC') OR define('SBSMARTYBC', true);
 
 # Define force compile TPL Smarty
 # Don't let this option to TRUE in production
 # Default: true
-define('SBSMARTYFORCECOMPILE', (trim($sb_settings_config[27]) == 1 ? true : false));
+defined('SBSMARTYFORCECOMPILE') OR define('SBSMARTYFORCECOMPILE', (trim($sb_settings_config[27]) == 1 ? true : false));
 
 # Enable caching smarty TPL
 # Default: false
-define('SBSMARTYCACHING', (trim($sb_settings_config[29]) == 1 ? true : false));
+defined('SBSMARTYCACHING') OR define('SBSMARTYCACHING', (trim($sb_settings_config[29]) == 1 ? true : false));
 
 # Define lifetime of cache Smarty
 # Only available if SMARTY CACHING is true
 # Default: 120
-define('SBSMARTYCACHELIFETIME', (isset($sb_settings_config[30]) && trim($sb_settings_config[30]) > 0 ? trim($sb_settings_config[30]) : 120));
+defined('SBSMARTYCACHELIFETIME') OR define('SBSMARTYCACHELIFETIME', (isset($sb_settings_config[30]) && trim($sb_settings_config[30]) > 0 ? trim($sb_settings_config[30]) : 120));
 
 # Enable Smarty Debug
 # Default: false
-define('SBSMARTYDEBUG', (trim($sb_settings_config[26]) == 1 ? true : false));
+defined('SBSMARTYDEBUG') OR define('SBSMARTYDEBUG', (trim($sb_settings_config[26]) == 1 ? true : false));
 
 # Enable access to classes/files/functions Admin
-define('SBUIADMIN_PATH', true);
+defined('SBUIADMIN_PATH') OR define('SBUIADMIN_PATH', true);
 
 # Enable rewrite url
 # Default: false
-define('SBREWRITEURL', (trim($sb_settings_config[28]) == 1 ? true : false));
+defined('SBREWRITEURL') OR define('SBREWRITEURL', (trim($sb_settings_config[28]) == 1 ? true : false));
 
 # Enable maintenance mode (Coming soon)
-define('SBMAINTENANCE', (trim($sb_settings_config[24]) == 1 ? true : false));
+defined('SBMAINTENANCE') OR define('SBMAINTENANCE', (trim($sb_settings_config[24]) == 1 ? true : false));
 
 # Define Subdirectory Site
 # if is visible in your url
 # Default: false
 # Ex: http://site.com/dir/
-define('SBSITESUBDIRECTORY', '');
+defined('SBSITESUBDIRECTORY') OR define('SBSITESUBDIRECTORY', 'projets/sbuiadmin');
 
 # Defined Safe Modules created by you (developer)
 //$sb_safe_modules_cms = ['your_new_module','your_new_module2'];
@@ -116,27 +116,27 @@ $sb_safe_pages_cms = ['index','user','news','pages','shop','account','download',
 // ------------------------ 
 // --- Database
 // ------------------------ 
-define('_AM_SITE_TITLE',   trim($sb_settings_config[0]));
+defined('_AM_SITE_TITLE') OR define('_AM_SITE_TITLE',   trim($sb_settings_config[0]));
 // Search if there is a socket
 if (strpos(trim($sb_settings_config[2]), ":") !== false) {
 	// Define socket
 	list($db_host, $db_socket) = explode(":", trim($sb_settings_config[2]));
-	define('_AM_DB_HOST',	$db_host);
-	define('_AM_DB_SOCKET',	$db_socket);
+	defined('_AM_DB_HOST') OR define('_AM_DB_HOST',	$db_host);
+	defined('_AM_DB_SOCKET') OR define('_AM_DB_SOCKET',	$db_socket);
 } else {
 	// Pas de socket
-	define('_AM_DB_HOST',	trim($sb_settings_config[2]));
-	define('_AM_DB_SOCKET', false);
+	defined('_AM_DB_HOST') OR define('_AM_DB_HOST',	trim($sb_settings_config[2]));
+	defined('_AM_DB_SOCKET') OR define('_AM_DB_SOCKET', false);
 }
-define('_AM_DB_PORT',	   3306);
-define('_AM_DB_NAME',      trim($sb_settings_config[3]));
-define('_AM_DB_USER',      trim($sb_settings_config[4]));
-define('_AM_DB_PWD',       trim($sb_settings_config[5]));
-define('_AM_MEDIAS_DIR',   trim($sb_settings_config[6]));
-define('_AM_MEDIAS_URL',   trim($sb_settings_config[13]));
-define('_AM_GC_PUBLIC',    trim($sb_settings_config[19]));
-define('_AM_GC_PRIVATE',   trim($sb_settings_config[20]));
-define('_AM_DB_PREFIX',    trim($sb_settings_config[21]));
+defined('_AM_DB_PORT') OR define('_AM_DB_PORT', 3306);
+defined('_AM_DB_NAME') OR define('_AM_DB_NAME', trim($sb_settings_config[3]));
+defined('_AM_DB_USER') OR define('_AM_DB_USER', trim($sb_settings_config[4]));
+defined('_AM_DB_PWD') OR define('_AM_DB_PWD', trim($sb_settings_config[5]));
+defined('_AM_MEDIAS_DIR') OR define('_AM_MEDIAS_DIR', trim($sb_settings_config[6]));
+defined('_AM_MEDIAS_URL') OR define('_AM_MEDIAS_URL', trim($sb_settings_config[13]));
+defined('_AM_GC_PUBLIC') OR define('_AM_GC_PUBLIC', trim($sb_settings_config[19]));
+defined('_AM_GC_PRIVATE') OR define('_AM_GC_PRIVATE', trim($sb_settings_config[20]));
+defined('_AM_DB_PREFIX') OR define('_AM_DB_PREFIX', trim($sb_settings_config[21]));
 
 // ------------------------ 
 // --- Protocol

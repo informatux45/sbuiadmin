@@ -237,7 +237,7 @@ switch($action) {
 		// --------------------------------
 		$formName        = "edit_form";
 		$formType        = "editfield";
-		$btn_add_edit    = ($_GET['id'] > 0 && $action != 'delfield') ? "Modifier" : "Ajouter";
+		$btn_add_edit    = (isset($_GET['id']) && $_GET['id'] > 0 && $action != 'delfield') ? "Modifier" : "Ajouter";
 		$legend_add_edit = "Ajouter / Modifier les colonnes du ".strtolower($text)." &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 		// Contents table
 		$tid             = intval($_GET['tid']); // Table ID
@@ -247,7 +247,7 @@ switch($action) {
 		$tabname         = $result_table->name;
 		$sbsmarty->assign('tabname', $tabname);
 
-		if ($_POST['form_submit']) {
+		if (isset($_POST['form_submit'])) {
 
 			// Injection des données
 			$id           = intval($_POST['id']);
@@ -298,7 +298,7 @@ switch($action) {
 			
 		}
 		// --------------------------------
-		if ($formType == 'editfield' && !$_POST['form_submit'] && $_GET['id']) {
+		if ($formType == 'editfield' && !isset($_POST['form_submit']) && isset($_GET['id'])) {
 			// --- Recuperation des donnees
 			$id           = intval($_GET['id']);
 			$query_1      = "SELECT * FROM $table_structure WHERE id = $id";
@@ -361,7 +361,7 @@ switch($action) {
 		// --- Hiddens / Buttons
 		// --------------------------------	
 		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => "$formName"));
-		$sbform->addInput('hidden', '', array('name' => 'tid', 'value' => "{$_GET[tid]}"));
+		$sbform->addInput('hidden', '', array('name' => 'tid', 'value' => $_GET['tid']));
 		if ($formType == 'editfield' && $id > 0 && $action != 'delfield') $sbform->addInput('hidden', '', array('name' => 'id', 'value' => "$id"));
 		$sbform->addInput('submit', '', array('value' => "$btn_add_edit"));
 		$sbform->addInput('reset', '', array('value' => "Reset"));
@@ -378,7 +378,7 @@ switch($action) {
 		$sb_table_header = ['Tri', 'Titre', 'Type', 'Target', 'Actions'];
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		// --------------------------------
-		$query_structure   = "SELECT * FROM $table_structure WHERE tid = '" . intval($_GET[tid]) . "' ORDER BY sort ASC";
+		$query_structure   = "SELECT * FROM $table_structure WHERE tid = '" . intval($_GET['tid']) . "' ORDER BY sort ASC";
 		$request_structure = $sbsql->query($query_structure);
 		$result_structure  = $sbsql->toarray($request_structure);
 		
@@ -411,7 +411,7 @@ switch($action) {
 		// --------------------------------
 		$formName        = "edit_form";
 		$formType        = "editdatas";
-		$btn_add_edit    = ($_GET['id'] > 0 && $action != 'deldatas') ? "Modifier" : "Ajouter";
+		$btn_add_edit    = (isset($_GET['id']) && $_GET['id'] > 0 && $action != 'deldatas') ? "Modifier" : "Ajouter";
 		$legend_add_edit = "Ajouter / Modifier les données du $text (<span style='color: red;'>%s</span>)";
 		// Contents table
 		$tid             = intval($_GET['tid']); // Table ID
@@ -421,7 +421,7 @@ switch($action) {
 		$tabname         = $result_table->name;
 		$sbsmarty->assign('tabname', $tabname);
 
-		if ($_POST['form_submit']) {
+		if (isset($_POST['form_submit'])) {
 			// Initialize Array / JSON
 			$kv      = array();
 			$content = "";
@@ -491,7 +491,7 @@ switch($action) {
 			$tid = $title_fr = $title_en = $field_type = $field_target = $active = '';
 		}
 		// --------------------------------
-		if ($formType == 'editdatas' && !$_POST['form_submit'] && $_GET['id']) {
+		if ($formType == 'editdatas' && !isset($_POST['form_submit']) && isset($_GET['id'])) {
 			// --- Recuperation des donnees
 			$id           = intval($_GET['id']);
 			$query_1      = "SELECT * FROM $table_datas WHERE id = $id ORDER BY sort ASC";
@@ -511,7 +511,7 @@ switch($action) {
 			// --- Debug SQL
 			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);						
 		} else {
-			$name = $sbsanitize->displayLang(utf8_encode($_POST['title_fr'])); // Legende
+			if (isset($_POST['title_fr'])) $name = $sbsanitize->displayLang(utf8_encode($_POST['title_fr'])); // Legende
 		}
 		
 		// --------------------------------		
@@ -567,7 +567,7 @@ switch($action) {
 		// --- Hiddens / Buttons
 		// --------------------------------	
 		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => "$formName"));
-		$sbform->addInput('hidden', '', array('name' => 'tid', 'value' => "{$_GET[tid]}"));
+		$sbform->addInput('hidden', '', array('name' => 'tid', 'value' => $_GET['tid']));
 		if ($formType == 'editdatas' && $id > 0 && $action != 'deldatas') $sbform->addInput('hidden', '', array('name' => 'id', 'value' => "$id"));
 		$sbform->addInput('submit', '', array('value' => "$btn_add_edit"));
 		$sbform->addInput('reset', '', array('value' => "Reset"));

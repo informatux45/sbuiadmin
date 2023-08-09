@@ -3,7 +3,7 @@
 {* -------------- *}
 
 	{* ------------------ Headers ----------------- *}
-	{include file='sb_header.tpl' module=$module_page}
+	{include file='sb_header.tpl' module=$module_page page='false'}
 	{* ---------------- End Headers --------------- *}
 			
 			{* ------------------------------------------------ *}
@@ -21,7 +21,7 @@
                 </div>
                 <!-- /.col-lg-12 -->
 				
-				{if $all}
+				{if isset($all) && !isset($smarty.get.a)}
                 <div class="col-lg-12">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
@@ -41,7 +41,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-										{if $allslider}
+										{if isset($allslider)}
 											{foreach from=$allslider item=slider}
 												<tr class="{cycle values="odd,even"} gradeX">
 													<td>{$slider.title|unescape:"htmlall"|@sbDisplayLang}</td>
@@ -75,7 +75,7 @@
                 <!-- /.col-lg-12 -->
 				{/if}
 				
-				{if $allphoto}
+				{if isset($allphoto)}
 				
                 <div class="col-lg-12">
                     <div class="panel panel-primary">
@@ -123,28 +123,28 @@
                 <!-- /.col-lg-12 -->
 				{/if}
 				
-				{if (!$all || !$allphoto) && ($smarty.get.a && $smarty.get.a != 'photo') }
-				{if $smarty.get.a == 'edit' || $smarty.get.a == 'add'}
-					<style>
-					/* --- Icons 2 (form) --- */
-					.input-group-addon, .input-group-btn { width: auto !important; }
-					</style>
-				{/if}
-                <div class="col-lg-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <span class="fa fa-sliders fa-fw"></span> <strong>{$legend_add_edit}</strong>
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-							{* Afficher le formulaire ADD/EDIT *}
-							{include_php file='form.php'}
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-12 -->
+				{if (!isset($all) || !isset($allphoto)) && (isset($smarty.get.a) && $smarty.get.a != 'photo') }
+					{if $smarty.get.a == 'edit' || $smarty.get.a == 'add'}
+						<style>
+						/* --- Icons 2 (form) --- */
+						.input-group-addon, .input-group-btn { width: auto !important; }
+						</style>
+					{/if}
+					<div class="col-lg-12">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<span class="fa fa-sliders fa-fw"></span> <strong>{$legend_add_edit}</strong>
+							</div>
+							<!-- /.panel-heading -->
+							<div class="panel-body">
+								{* Afficher le formulaire ADD/EDIT *}
+								{include_php file='form.php'}
+							</div>
+							<!-- /.panel-body -->
+						</div>
+						<!-- /.panel -->
+					</div>
+					<!-- /.col-lg-12 -->
 				{/if}
 				
             </div>
@@ -177,5 +177,5 @@
 		});
 		</script>
 			
-	{include file='sb_footer.tpl'}
+	{include file='sb_footer.tpl' page='false' pagef='false'}
 

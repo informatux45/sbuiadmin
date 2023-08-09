@@ -3,7 +3,7 @@
 {* -------------- *}
 
 	{* ------------------ Headers ----------------- *}
-	{include file='sb_header.tpl' module=$module_page}
+	{include file='sb_header.tpl' module=$module_page page='false'}
 	{* ---------------- End Headers --------------- *}
 			
 			{* ------------------------------------------------ *}
@@ -14,7 +14,7 @@
 
             <div class="row">
 				
-				{if $all}
+				{if isset($all) && !isset($smarty.get.a)}
 
 					<div class="col-lg-12">
 
@@ -82,7 +82,7 @@
 				{/if}
 
 				{if !$all}
-					<div class="col-lg-{if $smarty.get.a == 'sortstructure' || $smarty.get.a == 'sortdatas'}12{else}8{/if}">
+					<div class="col-lg-{if isset($smarty.get.a) && ($smarty.get.a == 'sortstructure' || $smarty.get.a == 'sortdatas')}12{else}8{/if}">
 						<div class="panel panel-default">
 							<div class="panel-heading">
 								<span class="fa fa-list-alt fa-fw"></span> <strong>{$legend_add_edit}</strong>
@@ -107,7 +107,7 @@
 							</div>
 							<div class="panel-body">
 								<p>
-									{if $allstructure || $smarty.get.a == 'editfield'}
+									{if isset($allstructure) || $smarty.get.a == 'editfield'}
 										<u>Les types de champs utilisés pour une colonne de votre tableau :</u>
 										<br>
 										<b>date</b>: Input DATE<br>
@@ -123,7 +123,7 @@
 										<b>blank</b>: Ouvre le lien dans un nouvel onglet<br>
 										<b>lightbox</b>: Ouvre votre lien dans une lightbox (NB: <i>Ne pas oublier d'activer la lightbox dans les plugins de l'administration</i>)<br>
 										<b>lightbox_fancy</b>: Ouvre votre lien dans une lightbox FANCYBOX (NB: <i>Ne pas oublier d'activer la lightbox dans les plugins de l'administration</i>)<br>
-									{elseif $alldatas || $smarty.get.a == 'editdatas'}
+									{elseif isset($alldatas) || $smarty.get.a == 'editdatas'}
 										Saissisez les données de votre tableau par entrée (ligne).<br>
 										<br>
 										Si vous souhaitez modifier la structure de votre tableau, cliquez sur
@@ -216,7 +216,7 @@
 					
 				{/if}
 				
-				{if $allstructure}
+				{if isset($allstructure)}
 
 					<div class="col-lg-12">
 						<div class="panel panel-primary">
@@ -272,7 +272,7 @@
 					
 				{/if}
 				
-				{if $alldatas}
+				{if isset($alldatas)}
 
 					<div class="col-lg-12">
 						<div class="panel panel-primary">
@@ -376,5 +376,4 @@
 		});
 		</script>
 			
-	{include file='sb_footer.tpl'}
-
+	{include file='sb_footer.tpl' page='false' pagef='false'}
