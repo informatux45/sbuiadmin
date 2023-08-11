@@ -55,7 +55,7 @@
                 <!-- /.col-lg-6 -->
 				
                 <div class="col-lg-12">
-                    <div class="panel panel-primary">
+                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <span class="fa fa-copy fa-fw"></span> <strong>{if $all}Gestion de vos blocs{else}{$legend_add_edit}{/if}</strong>
                         </div>

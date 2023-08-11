@@ -16,7 +16,7 @@
 				
 				{if isset($all) && !isset($smarty.get.a)}
                 <div class="col-lg-12">
-                    <div class="panel panel-primary">
+                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <span class="fa fa-rss fa-fw"></span> <strong>{if $all}Gestion de vos articles{else}{$legend_add_edit}{/if}</strong>
                         </div>
@@ -67,7 +67,7 @@
 				{if isset($allcat)}
 				
                 <div class="col-lg-12">
-                    <div class="panel panel-primary">
+                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <span class="fa fa-rss fa-fw"></span> <strong>{if $allcat}Gestion de vos catégories{else}{$legend_add_edit}{/if}</strong>
                         </div>

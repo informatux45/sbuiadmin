@@ -19,7 +19,7 @@
     <title>{$smarty.const._AM_SITE_CUSTOMER_NAME}</title>
 
     <!-- Bootstrap Core CSS -->
-    <link href="assets/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
 
     <!-- MetisMenu CSS -->
     <link href="assets/bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">

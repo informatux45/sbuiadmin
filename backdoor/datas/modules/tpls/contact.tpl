@@ -16,7 +16,7 @@
 				
 				{if $all}
                 <div class="col-lg-12">
-                    <div class="panel panel-primary">
+                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <span class="fa fa-envelope-o fa-fw"></span> <strong>{if $all}Gestion de vos formulaires de contact{else}{$legend_add_edit}{/if}</strong>
                         </div>
@@ -85,7 +85,7 @@
 					{include file='shared/shared-panel-actions.tpl'}
 					{* ------------------------------------ *}
 					{* ------------------------------------ *}
-                    <div class="panel panel-primary">
+                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <span class="fa fa-exclamation-circle fa-fw"></span> <strong>AIDE</strong>
                         </div>

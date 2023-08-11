@@ -15,7 +15,7 @@
             <div class="row">
 				
 				<div class="col-lg-12">
-					<div class="panel panel-info">
+					<div class="panel panel-default">
 						<div class="panel-heading">
 							<h4 class="panel-title">
 								<a data-toggle="collapse" data-parent="#accordion" href="#collapse" aria-expanded="false" class="collapsed"><i class="fa fa-arrow-circle-down"></i> Que fait TABBS ?</a>
@@ -43,7 +43,7 @@
 				{if $all}
 
 					<div class="col-lg-12">
-						<div class="panel panel-primary">
+						<div class="panel panel-default">
 							<div class="panel-heading">
 								<span class="fa fa-list-alt fa-fw"></span> <strong>{if $all}Gestion de vos tabbs{else}{$legend_add_edit}{/if}</strong>
 							</div>
@@ -93,7 +93,7 @@
 				
 				{if $allt}
                 <div class="col-lg-12">
-                    <div class="panel panel-primary">
+                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <span class="fa fa-list-alt fa-fw"></span> <strong>Gestion de vos onglets</strong>
                         </div>

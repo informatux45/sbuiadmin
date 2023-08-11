@@ -25,7 +25,7 @@
 				
 				{if isset($all) && !isset($smarty.get.a)}
                 <div class="col-lg-12">
-                    <div class="panel panel-primary">
+                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <span class="fa fa-sliders fa-fw"></span> <strong>{if $all}Gestion de vos slider{else}{$legend_add_edit}{/if}</strong>
                         </div>
@@ -80,7 +80,7 @@
 				{if isset($allphoto)}
 				
                 <div class="col-lg-12">
-                    <div class="panel panel-primary">
+                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <span class="fa fa-sliders fa-fw"></span> <strong>{if $allphoto}Gestion de vos slider{else}{$legend_add_edit}{/if}</strong>
                         </div>

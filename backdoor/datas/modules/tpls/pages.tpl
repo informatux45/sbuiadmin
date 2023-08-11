@@ -15,7 +15,7 @@
             <div class="row">
 				{if $all}
                 <div class="col-lg-12">
-                    <div class="panel panel-primary">
+                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <span class="fa fa-copy fa-fw"></span> <strong>{if $all}Gestion de vos pages{else}{$legend_add_edit}{/if}</strong>
                         </div>

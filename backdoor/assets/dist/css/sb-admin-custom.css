@@ -67,7 +67,7 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 }
 #side-menu li.user-profile{
   /*background: rgba(0, 0, 0, 1) url(../../../img/user-bg.jpg) no-repeat scroll center center / cover;*/
-	background-color: #2E313D;
+	background-color: #4e73df;
   text-transform: capitalize;
   color: rgba(255, 255, 255, 1);
 }
@@ -77,8 +77,9 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 }
 .sidebar ul li a.active {
   color: #fff !important;
-  background: rgba(41, 44, 54, 1);
+  background: #4e73df;
   text-shadow: 1px 1px 1px #444;
+  font-weight: bold;
 }
 .fa-menu-i {
   color: rgba(255, 255, 255, 0.3);
@@ -91,7 +92,7 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
   color: #fff;
 }
 .nav {
-  background-color: #2E313D;
+  background-color: #4e73df;
 }
 .nav > li > a:focus, .nav > li > a:hover {
 	background-color: inherit;
@@ -141,7 +142,7 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
   font-weight: 600;
   height: 3.1em;
   width: 250px;
-  background-color: #2e313d;
+  background-color: #4e73df;
   /*padding: 1em 0 1em 2em;*/
 }
 #brand-sbuiadmin .sbuiadmin-logo { /* Customizes Idea icon */
@@ -170,10 +171,10 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 .navbar-left li a {
   min-height: 50px;
   padding: 12px;
-	color: #999 !important;
+	color: #4e73df !important;
 }
 .navbar-left li a:hover {
-	color: black !important;
+	color: #2e59d9 !important;
 }
 .navbar-left li a i {
 	font-size: 1.8em;
@@ -257,10 +258,10 @@ a.navbar-brand, .text-primary {
   outline: none;
 }
 .navbar-right li.dropdown a.dropdown-toggle, .navbar-right li a {
-  color: #999;
+  color: #4e73df;
 }
 .navbar-right li.dropdown a.dropdown-toggle:hover, .navbar-right li.dropdown.open a.dropdown-toggle, .navbar-right li a:hover {
-  color: #000;
+  color: #2e59d9;
 }
 .row #footer-sec {
   margin-left: -30px;
@@ -287,11 +288,11 @@ a.navbar-brand, .text-primary {
   width: 100%;
 }
 .panel-primary {
-  border-color: #53a0bc !important;
+  border-color: #4e73df !important;
 }
 .panel-primary > .panel-heading {
-  background-color: #53a0bc !important;
-  border-color: #53a0bc !important;
+  background-color: #4e73df !important;
+  border-color: #4e73df !important;
   color: #fff;
 }
 .theme_img {

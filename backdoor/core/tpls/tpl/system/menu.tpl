@@ -14,7 +14,7 @@
 
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="panel panel-{if $all}primary{else}default{/if}">
+                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <span class="fa {if $sort}fa-th-list{else}fa-copy{/if} fa-fw"></span> <strong>{if $all}Gestion de vos menus{else}{$legend_add_edit}{/if}</strong>
                         </div>

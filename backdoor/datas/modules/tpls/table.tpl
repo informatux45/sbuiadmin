@@ -30,7 +30,7 @@
 							<!-- /.panel-body -->
 						</div>
 
-						<div class="panel panel-primary">
+						<div class="panel panel-default">
 							<div class="panel-heading">
 								<span class="fa fa-list-alt fa-fw"></span> <strong>{if $all}Gestion de vos tableaux{else}{$legend_add_edit}{/if}</strong>
 							</div>
@@ -101,7 +101,7 @@
 					{*if $allstructure || $alldatas || $alldatasempty || $allstructureempty*}
 					{if $smarty.get.a != 'sortstructure' && $smarty.get.a != 'sortdatas'}
 					<div class="col-lg-4">
-						<div class="panel panel-primary">
+						<div class="panel panel-default">
 							<div class="panel-heading">
 								<i class="fa fa-info-circle fa-fw"></i> Aide
 							</div>
@@ -219,7 +219,7 @@
 				{if isset($allstructure)}
 
 					<div class="col-lg-12">
-						<div class="panel panel-primary">
+						<div class="panel panel-default">
 							<div class="panel-heading">
 								<span class="fa fa-list-alt fa-fw"></span> <strong>Gestion des colonnes du tableau &laquo; {$tabname} &raquo;</strong>
 								&nbsp;&nbsp;
@@ -275,7 +275,7 @@
 				{if isset($alldatas)}
 
 					<div class="col-lg-12">
-						<div class="panel panel-primary">
+						<div class="panel panel-default">
 							<div class="panel-heading">
 								<span class="fa fa-list-alt fa-fw"></span> <strong>Gestion des données du tableau &laquo; {$tabname} &raquo;</strong>
 								&nbsp;&nbsp;

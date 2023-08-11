@@ -32,11 +32,13 @@ Ready | Fonctionnalités
 
 ### Screenshots
 
+![alt text](https://informatux.com/tools/demo_github/sbuiadmin-theme-2.jpg "Un thème (front)")
+
 ![alt text](https://informatux.com/tools/demo_github/sbuiadmin-theme-1.jpg "Un thème (front)")
 
 ![alt text](https://informatux.com/tools/demo_github/sbuiadmin-login-1.jpg "Login administration")
 
-![alt text](https://informatux.com/tools/demo_github/sbuiadmin-admin-1.jpg "L'administration")
+![alt text](https://informatux.com/tools/demo_github/sbuiadmin-admin-2.jpg "L'administration")
 
 [D'autres copie d'écran ici...](https://informatux.com/tools/demo_img/ "SBUIADMIN Screenshots")
 
