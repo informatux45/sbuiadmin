@@ -9,9 +9,9 @@
 			<span class="caret"></span>
 		</button>
 		<ul class="dropdown-menu pull-right" role="menu">
-			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=tabbs">Tous les tabbs</a></li>
+			<li><a href="{$smarty.const._AM_SITE_URL}index.php?p=tabbs">Tous les tabbs</a></li>
 			<li class="divider"></li>
-			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=tabbs&a=add">+1 tabbs</a></li>
+			<li><a href="{$smarty.const._AM_SITE_URL}index.php?p=tabbs&a=add">+1 tabbs</a></li>
 		</ul>
 	</div>
 	&nbsp;&nbsp;
@@ -21,13 +21,13 @@
 			<span class="caret"></span>
 		</button>
 		<ul class="dropdown-menu pull-right" role="menu">
-			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=tabbs&a=alltabs">Tous les onglets</a></li>
+			<li><a href="{$smarty.const._AM_SITE_URL}index.php?p=tabbs&a=alltabs">Tous les onglets</a></li>
 			<li class="divider"></li>
-			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=tabbs&a=tabadd">+1 onglet</a></li>
+			<li><a href="{$smarty.const._AM_SITE_URL}index.php?p=tabbs&a=tabadd">+1 onglet</a></li>
 		</ul>
 	</div>
 	
-	{if $smarty.get.a == 'edit'}
+	{if isset($smarty.get.a) && $smarty.get.a == 'edit'}
 	&nbsp;
 	<button class="btn btn-warning" type="button" onclick="location.href='index.php?p=tabbs&a=sort&tid={$smarty.get.id}'">
 		Trier les onglets

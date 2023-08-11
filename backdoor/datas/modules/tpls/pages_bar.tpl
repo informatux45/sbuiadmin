@@ -9,10 +9,10 @@
 			<span class="caret"></span>
 		</button>
 		<ul class="dropdown-menu pull-right" role="menu">
-			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=pages">Toutes les pages</a></li>
+			<li><a href="{$smarty.const._AM_SITE_URL}index.php?p=pages">Toutes les pages</a></li>
 			<li class="divider"></li>
-			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=pages&a=add">+1 page</a></li>
-			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=pages&a=addcustom">+1 page (Custom)</a></li>
+			<li><a href="{$smarty.const._AM_SITE_URL}index.php?p=pages&a=add">+1 page</a></li>
+			<li><a href="{$smarty.const._AM_SITE_URL}index.php?p=pages&a=addcustom">+1 page (Custom)</a></li>
 		</ul>
 	</div>
 	&nbsp;&nbsp;
@@ -22,9 +22,9 @@
 			<span class="caret"></span>
 		</button>
 		<ul class="dropdown-menu pull-right" role="menu">
-			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=blocs">Tous les blocs</a></li>
+			<li><a href="{$smarty.const._AM_SITE_URL}index.php?p=blocs">Tous les blocs</a></li>
 			<li class="divider"></li>
-			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=blocs&a=add">+1 bloc</a></li>
+			<li><a href="{$smarty.const._AM_SITE_URL}index.php?p=blocs&a=add">+1 bloc</a></li>
 		</ul>
 	</div>
 	&nbsp;&nbsp;

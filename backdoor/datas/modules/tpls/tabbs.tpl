@@ -3,7 +3,7 @@
 {* -------------- *}
 
 	{* ------------------ Headers ----------------- *}
-	{include file='sb_header.tpl' module=$module_page}
+	{include file='sb_header.tpl' module=$module_page page='false'}
 	{* ---------------- End Headers --------------- *}
 			
 			{* ------------------------------------------------ *}
@@ -18,7 +18,7 @@
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<h4 class="panel-title">
-								<a data-toggle="collapse" data-parent="#accordion" href="#collapse" aria-expanded="false" class="collapsed"><i class="fa fa-arrow-circle-down"></i> Que fait TABBS ?</a>
+								<a data-toggle="collapse" data-parent="#accordion" href="#collapse" aria-expanded="false" class="collapsed"><i class="fa fa-arrow-circle-down"></i> &nbsp;&nbsp;Que fait TABBS ?</a>
 							</h4>
 						</div>
 						<div id="collapse" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
@@ -40,7 +40,7 @@
 					</div>
 				</div>
 				
-				{if $all}
+				{if isset($all)}
 
 					<div class="col-lg-12">
 						<div class="panel panel-default">
@@ -61,7 +61,7 @@
 											</tr>
 										</thead>
 										<tbody>
-											{if $alltabb}
+											{if isset($alltabb)}
 												{foreach from=$alltabb item=tabbs}
 													<tr class="{cycle values="odd,even"} gradeX">
 														<td>{$tabbs.name|unescape:"htmlall"|@sbDisplayLang}</td>
@@ -91,7 +91,7 @@
 					<!-- /.col-lg-12 -->
 				{/if}
 				
-				{if $allt}
+				{if isset($allt)}
                 <div class="col-lg-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -139,7 +139,7 @@
                 <!-- /.col-lg-12 -->
 				{/if}
 
-				{if (!$all || !$alltabs) && ($smarty.get.a && $smarty.get.a != 'alltabs' && $smarty.get.a != 'del' && $smarty.get.a != 'tabdel') }
+				{if (!isset($all) || !isset($alltabs)) && (isset($smarty.get.a) && $smarty.get.a != 'alltabs' && $smarty.get.a != 'del' && $smarty.get.a != 'tabdel') }
 					<div class="col-lg-12">
 						<div class="panel panel-default">
 							<div class="panel-heading">
@@ -190,5 +190,5 @@
 		});
 		</script>
 			
-	{include file='sb_footer.tpl'}
+	{include file='sb_footer.tpl' page='false' pagef='false'}
 

@@ -488,7 +488,7 @@ function sbGetConfig($config, $langdefault = 'fr') {
 	$request = $sbsql->query($query);
 	$result  = $sbsql->object($request);
 	
-	$lang    = ($_SESSION['lang'] != '') ? $_SESSION['lang'] : $langdefault;
+	$lang    = (isset($_SESSION['lang']) && $_SESSION['lang'] != '') ? $_SESSION['lang'] : $langdefault;
 	
 	return ($sbsanitize->displayText($sbsanitize->displayLang($result->content, $lang)));
 }

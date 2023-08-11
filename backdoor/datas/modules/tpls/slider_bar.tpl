@@ -8,10 +8,10 @@
 			<span class="caret"></span>
 		</button>
 		<ul class="dropdown-menu pull-right" role="menu">
-			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=slider">Tous les sliders</a></li>
+			<li><a href="{$smarty.const._AM_SITE_URL}index.php?p=slider">Tous les sliders</a></li>
 			<li class="divider"></li>
-			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=slider&a=add">+1 slider</a></li>
-			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=slider&a=photoadd">+1 photo / vidéo</a></li>
+			<li><a href="{$smarty.const._AM_SITE_URL}index.php?p=slider&a=add">+1 slider</a></li>
+			<li><a href="{$smarty.const._AM_SITE_URL}index.php?p=slider&a=photoadd">+1 photo / vidéo</a></li>
 		</ul>
 	</div>
 

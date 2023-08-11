@@ -9,9 +9,9 @@
 			<span class="caret"></span>
 		</button>
 		<ul class="dropdown-menu pull-right" role="menu">
-			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=news">Tous les articles</a></li>
+			<li><a href="{$smarty.const._AM_SITE_URL}index.php?p=news">Tous les articles</a></li>
 			<li class="divider"></li>
-			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=news&a=add">+1 article</a></li>
+			<li><a href="{$smarty.const._AM_SITE_URL}index.php?p=news&a=add">+1 article</a></li>
 		</ul>
 	</div>
 	&nbsp;&nbsp;
@@ -21,9 +21,9 @@
 			<span class="caret"></span>
 		</button>
 		<ul class="dropdown-menu pull-right" role="menu">
-			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=news&a=category">Toutes les catégories</a></li>
+			<li><a href="{$smarty.const._AM_SITE_URL}index.php?p=news&a=category">Toutes les catégories</a></li>
 			<li class="divider"></li>
-			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=news&a=categoryadd">+1 catégorie</a></li>
+			<li><a href="{$smarty.const._AM_SITE_URL}index.php?p=news&a=categoryadd">+1 catégorie</a></li>
 		</ul>
 	</div>
 	&nbsp;&nbsp;

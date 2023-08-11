@@ -9,9 +9,9 @@
 			<span class="caret"></span>
 		</button>
 		<ul class="dropdown-menu pull-right" role="menu">
-			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=menu">Tous les menus</a></li>
+			<li><a href="{$smarty.const._AM_SITE_URL}index.php?p=menu">Tous les menus</a></li>
 			<li class="divider"></li>
-			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=menu&a=add">+1 menu</a></li>
+			<li><a href="{$smarty.const._AM_SITE_URL}index.php?p=menu&a=add">+1 menu</a></li>
 		</ul>
 	</div>
 
