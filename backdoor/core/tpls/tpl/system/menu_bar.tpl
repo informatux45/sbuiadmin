@@ -3,28 +3,30 @@
 <div class="well well-sm">
 	{*<h4>Actions</h4>*}
 
-	<button class="btn btn-outline btn-primary" type="button" onclick="location.href='index.php?p=menu'">
-		Tous les menus
-	</button>
+	<div class="btn-group">
+		<button type="button" class="btn btn-outline btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+			Menu
+			<span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu pull-right" role="menu">
+			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=menu">Tous les menus</a></li>
+			<li class="divider"></li>
+			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=menu&a=add">+1 menu</a></li>
+		</ul>
+	</div>
 
-	{if isset($smarty.get.id)}
-	&nbsp;
+	{if isset($smarty.get.id) && $smarty.get.a != 'sort'}
+	&nbsp;&nbsp;
 	<button class="btn btn-success" type="button" onclick="location.href='index.php?p=menu&a=sort&id={$smarty.get.id}'">
 		Trier les pages du menu
 	</button>
 	{/if}
 
 	{if isset($smarty.get.a) && $smarty.get.a == 'sort'}
-	&nbsp;
+	&nbsp;&nbsp;
 	<button class="btn btn-warning" type="button" onclick="location.href='index.php?p=menu&a=edit&id={$smarty.get.id}'">
 		Retour au menu
 	</button>
 	{/if}
-
-	<br><br>
-	
-	<button class="btn btn-info" type="button" onclick="location.href='index.php?p=menu&a=add'">
-		<span class="glyphicon glyphicon-plus">1 menu </span>
-	</button>
 		
 </div>

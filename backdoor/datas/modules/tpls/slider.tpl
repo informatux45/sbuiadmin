@@ -14,12 +14,14 @@
 
             <div class="row">
 				
+				{if isset($all) && !isset($smarty.get.a)}
                 <div class="col-lg-12">
                     <div class="well">
 						<img src="img/screenshot-slider.jpg" style="width: 675px; max-width: 100%;" alt="" />
                     </div>
                 </div>
                 <!-- /.col-lg-12 -->
+				{/if}
 				
 				{if isset($all) && !isset($smarty.get.a)}
                 <div class="col-lg-12">
@@ -130,7 +132,7 @@
 						.input-group-addon, .input-group-btn { width: auto !important; }
 						</style>
 					{/if}
-					<div class="col-lg-12">
+					<div class="col-lg-8">
 						<div class="panel panel-default">
 							<div class="panel-heading">
 								<span class="fa fa-sliders fa-fw"></span> <strong>{$legend_add_edit}</strong>
@@ -144,7 +146,22 @@
 						</div>
 						<!-- /.panel -->
 					</div>
-					<!-- /.col-lg-12 -->
+					<!-- /.col-lg-8 -->
+					<div class="col-lg-4">
+						{* ------------------------------------ *}
+						{* --- Include Shared Panel Actions --- *}
+						{include file='shared/shared-panel-actions.tpl'}
+						{* ------------------------------------ *}
+						{* ------------------------------------ *}
+						<div class="panel panel-primary">
+							<div class="panel-heading">
+								<span class="fa fa-exclamation-circle fa-fw"></span> <strong>AIDE</strong>
+							</div>
+							<!-- /.panel-heading -->
+							<div class="panel-body">
+								<img src="img/screenshot-slider.jpg" style="width: 100%; max-width: 675px;" alt="" />
+							</div>
+						</div>
 				{/if}
 				
             </div>

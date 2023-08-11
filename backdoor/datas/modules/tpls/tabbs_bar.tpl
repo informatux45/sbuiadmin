@@ -2,14 +2,30 @@
 
 <div class="well well-sm">
 	{*<h4>Actions</h4>*}
-
-	<button class="btn btn-outline btn-primary" type="button" onclick="location.href='index.php?p=tabbs'">
-		Tous les tabbs
-	</button>
-	&nbsp;	
-	<button class="btn btn-outline btn-primary" type="button" onclick="location.href='index.php?p=tabbs&a=alltabs'">
-		Tous les onglets
-	</button>
+	
+	<div class="btn-group">
+		<button type="button" class="btn btn-outline btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+			Tabbs
+			<span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu pull-right" role="menu">
+			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=tabbs">Tous les tabbs</a></li>
+			<li class="divider"></li>
+			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=tabbs&a=add">+1 tabbs</a></li>
+		</ul>
+	</div>
+	&nbsp;&nbsp;
+	<div class="btn-group">
+		<button type="button" class="btn btn-outline btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+			Onglets
+			<span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu pull-right" role="menu">
+			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=tabbs&a=alltabs">Tous les onglets</a></li>
+			<li class="divider"></li>
+			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=tabbs&a=tabadd">+1 onglet</a></li>
+		</ul>
+	</div>
 	
 	{if $smarty.get.a == 'edit'}
 	&nbsp;
@@ -17,15 +33,5 @@
 		Trier les onglets
 	</button>		
 	{/if}
-
-	<br><br>
-	
-	<button class="btn btn-info" type="button" onclick="location.href='index.php?p=tabbs&a=add'">
-		<span class="glyphicon glyphicon-plus">1 tabbs </span>
-	</button>		
-	&nbsp;
-	<button class="btn btn-info" type="button" onclick="location.href='index.php?p=tabbs&a=tabadd'">
-		<span class="glyphicon glyphicon-plus">1 onglet </span>
-	</button>
 
 </div>
