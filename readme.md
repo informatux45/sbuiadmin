@@ -1,6 +1,5 @@
 # [SBUIADMIN](https://github.com/informatux45/sbuiadmin/)
 - CMS SBootstrap Admin Responsive
-- Projet initial : UIADMIN v3.0
 - Contributeurs : INFORMATUX
 - Version stable : 3.01
 - License: [GPLv3](http://www.gnu.org/licenses/gpl-3.0.fr.html "Licence publique générale GNU v3")
