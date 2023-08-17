@@ -22,10 +22,10 @@ Ready | Fonctionnalités
 *✓* | 6 modules (Articles, Slider, Contact Form, Tables, Tabbs)
 *✓* | Gestion des blocs
 *✓* | Contenu additionnels HTML (Smarty ready)
-*✓* | Administration déplaçable (Répertoire)
+*✓* | Administration renommable (Répertoire) et autonome
 *✓* | Google Invisible Recaptcha Ready
 *✓* | Développeurs (Templates Smarty, Sandbox, Debug Kint, Modules, ...)
-*✓* | Serveurs IIS / Unix / Linux / Windows
+*✓* | Serveurs Linux / Apache (Recommandés)
 
 
 ---
@@ -51,6 +51,7 @@ Ready | Fonctionnalités
 - PHP 8.0 and 8.1 Ready
 - New admin theme colors
 - Admin menu grouping (Dropdown buttons)
+- Clean up code
 
 **2.31**
 - SMTP Configuration (Account module)
