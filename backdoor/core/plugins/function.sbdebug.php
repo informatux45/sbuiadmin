@@ -64,7 +64,7 @@ function smarty_function_sbdebug($params, Smarty_Internal_Template $template) {
 	
 	// If file_content
 	if ($params['file_content'] != '')
-		$result .- Kint::dump($params['file_content']);
+		$result .= Kint::dump($params['file_content']);
 	
     return $result;
 
