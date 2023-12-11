@@ -18,5 +18,16 @@
 	<button class="btn btn-primary" type="button" onclick="window.open('https://fr.gravatar.com/')">
 		Gravatar
 	</button>
+	&nbsp;
+	<div class="btn-group">
+		<button type="button" class="btn btn-outline btn-danger dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+			IPs Bloquées
+			<span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu pull-right" role="menu">
+			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=users&a=blockedip">IP(s) Bloquée(s)</a></li>
+			<li><a href="{$sbsmarty.const._AM_SITE_URL}index.php?p=users&a=blockedipsettings">Param&egrave;tres</a></li>
+		</ul>
+	</div>
 
 </div>

@@ -36,8 +36,10 @@ $sb_msg_valid = false;
 // --------------------------------------------
 // --------------------------------------------
 
-$table       = _AM_DB_PREFIX . "sb_users";
-$text        = "Utilisateur";
+$table = _AM_DB_PREFIX . "sb_users";
+$table_blockedip = _AM_DB_PREFIX . "sb_blocked_ip";
+$text  = "Utilisateur";
+$sbsmarty->assign('sb_form_submit_value', 'Modifier');
 
 $action = $_GET['a'];
 switch($action) {
@@ -219,6 +221,7 @@ switch($action) {
 		$formType        = "menu";
 		$btn_add_edit    = "Modifier";
 		$legend_add_edit = "Modifier les autorisations de menu de &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
+		$sbsmarty->assign('allmenu', true);
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
@@ -312,6 +315,44 @@ switch($action) {
 		$sbform->addInput('reset', '', array('value' => "Reset"));
 		// --- Close Form
 		$sbform->closeForm ();
+	break;
+
+	case "delblockedip":
+	case "blockedip":
+		// Action DELETE
+		if ($action == 'delblockedip') {
+			$get_id   = intval($_GET['id']);
+			$query_2  = "DELETE FROM $table_blockedip WHERE id = '$get_id'";
+			$request  = $sbsql->query($query_2);
+			
+			if ($request)
+				$sb_msg_valid = $text . ' débloquée avec succès';
+			else
+				$sb_msg_error = 'Error: Write Error (DEL)!';
+		}
+
+		// Initialisation
+		$sb_table_header =  array('id', 'IP', 'Bloquée le', 'Expire le', 'Infos', 'Raison', 'action');
+		$sbsmarty->assign('sb_table_header', $sb_table_header);
+		
+		// Contents table
+		$query     = "SELECT * FROM $table_blockedip";
+		$request2  = $sbsql->query($query);
+		$result2   = $sbsql->toarray($request2);
+		
+		$sbsmarty->assign('allips', true);
+		$sbsmarty->assign('allblockedip', $result2);
+		$sbsmarty->assign('text', 'Gestion des IPs Bloquées');
+		
+		// --- Debug SQL
+		if (_AM_SITE_DEBUG) {
+			$alldel_debug = 'ALL: ' . $query;
+			if (isset($action) && $action == 'delblockedip') {				  
+				$alldel_debug .= "\n" . 'DEL: ' . $query_2;
+			}
+			$sbsmarty->assign('sbdebugsql', $alldel_debug);
+		}
+		
 	break;
 
 }

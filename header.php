@@ -41,7 +41,7 @@ $sbsmarty = new Smarty();
 // ----------------------
 // CLASSES by array
 // ----------------------
-$sbuiadmin_classes = array('sql', 'sanitize', 'users', 'page');
+$sbuiadmin_classes = array('sql', 'sanitize', 'users', 'page', 'flood');
 foreach ($sbuiadmin_classes as $sbuiadmin_class) {
 	$class_file = SB_ADMIN_DIR . "inc" . DIRECTORY_SEPARATOR . "class" . DIRECTORY_SEPARATOR . SBUIADMINID . "-" . $sbuiadmin_class . ".php";
 	if (file_exists($class_file))
@@ -52,6 +52,7 @@ $sbsql      = new sql();
 $sbsanitize = new sanitize();
 $sbusers    = new user();
 $sbpage     = new page();
+$sbflood    = new flood();
 
 // ----------------------
 // Include Mobile Detect
@@ -109,7 +110,14 @@ if (file_exists($sb_custom_path)) require_once($sb_custom_path);
 // ----------------------
 // Anti flood PROTECTION
 // ----------------------
-if (!file_exists(SBADMIN."/install.php")) sbIsFlood();
+if (!file_exists(SBADMIN."/install.php")) {
+	// --- Check if Blocked IP
+	$user_ip = sbGetUserIP();
+	$is_ip_blocked = sbIsBlockedIP($user_ip);
+	if ($is_ip_blocked == $user_ip) header("Location:403.html");
+	// --- Check FLOOD 
+	$sbflood->floodCheck();
+}
 
 // ------------------------ 
 // Get ALL functions Files Module CMS

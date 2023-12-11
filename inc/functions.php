@@ -2,7 +2,7 @@
 /* ******************************* *
  * Function File                   *
  * ------------------------------- *
- * @link http://informatux.com/    *
+ * @link https://informatux.com/    *
  * @package Functions              *
  * @package SBUIADMIN              *
  * @file UTF-8                     *
@@ -362,146 +362,26 @@ if (!function_exists("insert_sbGetUserIP")) {
 }
 
 /**
- * Blocked IP
- * @return void
- */
-if (!function_exists("sbIsFlood")) {
-	function sbIsFlood() {
-		global $sbsql, $sbsanitize;
-		$table         = _AM_DB_PREFIX . 'sb_blocked_ip';
-		$table_history = _AM_DB_PREFIX . 'sb_blocked_history';
-		$user_ip       = trim( $sbsanitize->stopXSS(sbGetUserIP()) );
-		$flood   = [
-			 'method'     => 'block'          // redirect | throttle | block
-			,'expiration' => 1 * 24 * 60 * 60 // 1 jour; 24 heures; 60 minutes; 60 secondes
-			,'how_many'   => 5                // Combien de fois avant le blocage définitif
-			,'request'    => 2                // Derniere requete en secondes
-			,'message'    => 'Blocked'        // Message à l'IP bloquée
-			,'reason'     => 'Too many connexion in %s request(s) that last %s second(s) each one'
-		];
-		// --------------------------------
-		// Get counter of Blocked IP
-		// --------------------------------
-		$ip_blocked_count = sbIsBlockedIP($user_ip);
-		// --- Check if IP is blocked
-		if (isset($ip_blocked_count) && $ip_blocked_count >= $flood['how_many']) {
-			// --------------------------------
-			// Check expiration time
-			// --------------------------------
-			$ip_infos = sbGetInfoBlockedIP($user_ip);
-			if ( $ip_infos['expirationtime'] > time() ) {
-				// --------------------------------
-				// --- IP Always Blocked
-				// --------------------------------
-				die( $flood['message'] );
-				// --------------------------------
-			} else {
-				// --------------------------------
-				// --- Add the Banned IP to history DB
-				// --------------------------------
-				$history_count   = $ip_infos['count'];
-				$history_ip      = $ip_infos['ip'];
-				$history_reason  = $ip_infos['reason'];
-				$history_blocked = $ip_infos['blockedtime'];
-				// --------------------------------
-				// --- IP INFOS (Country, region, city, ...)
-				// --------------------------------
-				if (isset($config_ip_infos_access_key)) {
-					// --- set API access key 
-					$access_key = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
-					// --- Initialize CURL
-					$ch = curl_init('http://api.ipstack.com/'.$user_ip.'?access_key='.$access_key.'&language=fr&output=json');
-					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-					// --- Store the data
-					$history_json = curl_exec($ch);
-					curl_close($ch);
-				} else {
-					$history_json = "unknown";
-				}
-				// --------------------------------
-				$query_history  = "INSERT INTO $table_history (count,blockedtime,ip,reason,infos)
-								   VALUES ('$history_count','$history_blocked','$history_ip','$history_reason','$history_json')";
-				$result_history = $sbsql->query($query_history);
-				// --------------------------------
-				// --- Remove IP From DB
-				// --------------------------------
-				$query_remove_ip   = "DELETE FROM $table WHERE ip = '$user_ip'";
-				$request_remove_ip = $sbsql->query($query_remove_ip);
-				// --------------------------------
-			}
-		}
-		// --------------------------------
-		// User makes too many requests in a short period of time
-		// --------------------------------
-		if ($_SESSION['sb_last_session_request'] > time() - $flood['request']) {
-			// --------------------------------
-			// users will be redirected / throttling / blocking
-			// --------------------------------
-			switch($flood['method']) {
-				default:
-					die( $flood['message'] );
-				break;
-				case "redirect":
-					die( $flood['message'] );
-				break;
-				case "throttle":
-					die( $flood['message'] );
-				break;
-				case "block":
-					// --------------------------------
-					// Get counter of Blocked IP
-					// --------------------------------
-					if ( isset($ip_blocked_count) && $ip_blocked_count < $flood['how_many']) {
-						// --------------------------------
-						// Update count
-						// --------------------------------
-						$count  = $ip_blocked_count + 1;
-						$reason = sprintf( $flood['reason'], $count, $flood['request'] );
-						$query_update_count  = "UPDATE $table SET count = '$count', reason = '$reason' WHERE ip = '$user_ip'";
-						$result_update_count = $sbsql->query($query_update_count);
-						// --------------------------------
-					} else {
-						// --------------------------------
-						// Insert IP in DB
-						// --------------------------------
-						$blockedtime    = time();
-						$expirationtime = $blockedtime + $flood['expiration'];
-						$reason         = sprintf( $flood['reason'], $flood['how_many'], $flood['request'] );
-						// --------------------------------
-						$query_new_ip   = "INSERT INTO $table (ip,blockedtime,expirationtime,reason)
-										   VALUES ('$user_ip','$blockedtime','$expirationtime','$reason')";
-						$result__new_ip = $sbsql->query($query_new_ip);
-						// --------------------------------
-					}
-				break;
-			}
-		}
-		// --------------------------------
-		$_SESSION['sb_last_session_request'] = time();
-		// --------------------------------
-	}
-}
-if (!function_exists("insert_sbIsFlood")) {
-	function insert_sbIsFlood() {
-		return (function_exists("sbIsFlood")) ? sbIsFlood() : false;
-	}
-}
-
-/**
  * Check if IP is blocked
  * @return string/void		expiration time OR false
  */
 if (!function_exists("sbIsBlockedIP")) {
 	function sbIsBlockedIP( $ip = '') {
-		global $sbsql, $sbsanitize;
-		$table   = _AM_DB_PREFIX . 'sb_blocked_ip';
-		$user_ip = trim( $sbsanitize->stopXSS( (empty($ip)) ? sbGetUserIP() : $ip ) );
-
-		$query   = "SELECT count FROM $table WHERE ip = '$user_ip'";
+		global $sbsql, $sbsanitize, $sbflood;
+		$time_flood   = $sbflood->expiration;    // 1 jour; 24 heures; 60 minutes; 60 secondes
+		$how_many     = $sbflood->how_many;      // Combien de fois avant le blocage définitif
+		$last_request = $sbflood->last_request;  // Derniere requete en secondes
+		$table        = _AM_DB_PREFIX . 'sb_blocked_ip';
+		$user_ip      = trim( $sbsanitize->stopXSS( (empty($ip)) ? sbGetUserIP() : $ip ) );
+		
+		// Supprimer tout ceux dont le temps a expiré
+		$sbsql->query("DELETE FROM $table WHERE expirationtime + $time_flood < " . time());
+		// Chercher si l'ip est présente dans la table
+		$query   = "SELECT ip FROM $table WHERE ip = '$user_ip'";
 		$request = $sbsql->query($query);
 		$user    = $sbsql->assoc($request);
 
-		return $user['count'];
+		return $user['ip'];
 	}
 }
 if (!function_exists("insert_sbIsBlockedIP")) {

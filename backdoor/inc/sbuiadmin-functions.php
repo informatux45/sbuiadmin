@@ -54,6 +54,7 @@
  * -------------------------------
  * insert_sbFileOtherImg
  * insert_sbGetBrowser
+ * insert_sbExplodeJson
  * ---------------------------- */
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -829,6 +830,38 @@ function insert_sbGetBrowser($param) {
     elseif (strpos($user_agent, 'MSIE') || strpos($user_agent, 'Trident/7')) return 'IE';
    
     return 'Other';
+}
+
+/**
+ * Return JSON array
+ *
+ * @return string
+ */
+if (!function_exists("insert_sbExplodeJson")) {
+	function insert_sbExplodeJson($param) {
+		$client_info = "";
+		$json = json_decode($param['json'], true);
+      if (json_last_error() === JSON_ERROR_NONE) {
+         foreach($json as $key => $row) {
+            if ($key == 'location') {
+               foreach($row as $k => $v) {
+                  if ($k == 'languages') {
+                     foreach($v[0] as $ke => $va) {
+                        $client_info .= $ke . ' : ' . $va . '<br>';
+                     }
+                  } else {
+                     $client_info .= $k . ' : ' . $v . '<br>';
+                  }
+               }
+            } else {
+               $client_info .= $key . ' : ' . $row . '<br>';
+            }
+         }
+      } else {
+         $client_info = $param['json'];
+      }
+		return $client_info;
+	}
 }
 
 ?>
