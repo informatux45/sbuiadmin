@@ -42,8 +42,10 @@ class flood extends sql {
     ];
 
     function __construct() {
-        $this->memcache = new Memcache ();
-        $this->memcache->connect ( self::HOST, self::PORT );
+        if (class_exists('Memcache') && extension_loaded('memcache') && function_exists('memcache_connect')) {
+            $this->memcache = new Memcache ();
+            $this->memcache->connect ( self::HOST, self::PORT );
+        }
     }
 
     function addUserlimit($key, $time) {

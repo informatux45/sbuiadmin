@@ -52,7 +52,7 @@ $sbsql      = new sql();
 $sbsanitize = new sanitize();
 $sbusers    = new user();
 $sbpage     = new page();
-$sbflood    = new flood();
+if (class_exists('Memcache') && extension_loaded('memcache') && function_exists('memcache_connect')) $sbflood = new flood();
 
 // ----------------------
 // Include Mobile Detect
@@ -115,8 +115,10 @@ if (!file_exists(SBADMIN."/install.php")) {
 	$user_ip = sbGetUserIP();
 	$is_ip_blocked = sbIsBlockedIP($user_ip);
 	if ($is_ip_blocked == $user_ip) header("Location:403.html");
-	// --- Check FLOOD 
-	$sbflood->floodCheck();
+	// --- Check FLOOD
+	if (class_exists('Memcache') && extension_loaded('memcache') && function_exists('memcache_connect')) {
+		$sbflood->floodCheck();
+	}
 }
 
 // ------------------------ 
