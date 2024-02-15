@@ -243,6 +243,7 @@ switch($action) {
 			// Injection des données
 			$id            = intval($_POST['id']);
 			$horsename     = $sbsanitize->displayText($_POST['horsename'], 'UTF-8', 1, 0);
+			$tags          = sbGetTagifyDatas($_POST['tags']); // Tags
 			$sire_dam_info = $sbsanitize->displayText($_POST['sire_dam_info'], 'UTF-8', 1, 0);
 			$breeder       = $sbsanitize->displayText($_POST['breeder'], 'UTF-8', 1, 0);
 			$sale          = $sbsanitize->displayText($_POST['sale'], 'UTF-8', 1, 0);
@@ -327,6 +328,7 @@ switch($action) {
 			$sire_dam_info = utf8_encode($assoc['sire_dam_info']);
 			$breeder       = utf8_encode($assoc['breeder']);
 			$sale          = utf8_encode($assoc['sale']);
+			$tags          = $assoc['tags'];
 			$photo         = $assoc['photo'];
 			$active        = $assoc['active'];
 
@@ -374,6 +376,10 @@ switch($action) {
 		// --- Input COLOR PICKER
 		// ----------------------------		
 		$sbform->addColor ('Couleur (Color PICKER)', array('id' => 'color', 'name' => 'name'), false);
+		// -----------------------------------
+		// --- Caisses
+		// -----------------------------------
+		$sbform->addTagify ('Tags', array('name' => 'inputTags', 'value' => $tags, 'placeholder' => 'Indiquez le nom des caisses', 'style' => 'width: 500px;'), false, 'Ajouter des noms et valider par la touche Entrée de votre clavier.<br>Vous pouvez trier les noms en drag & drop.<br>Ne pas utilisez le caractère "<strong>,</strong>" (Virgule).');
 		// ----------------------------
 		// --- Pdf only (width popup medias)
 		// You can add more exts separate by coma
@@ -401,16 +407,15 @@ switch($action) {
 		// -- Input CHECKBOX
 		// ----------------------------
 		$tab_check = array();
-		$tab_check[0]['text']     = 'Option 1';
-		$tab_check[0]['name']     = 'option_one';
-		$tab_check[0]['checked']  = ($option_one == 1) ? '1' : '0';
-		$tab_check[1]['text']     = 'Option 2';
-		$tab_check[1]['name']     = 'option_two';
-		$tab_check[1]['checked']  = ($option_two == 1) ? '1' : '0';
-		$tab_check[2]['text']     = 'Option 3';
-		$tab_check[2]['name']     = 'option_three';
-		$tab_check[2]['checked']  = ($option_three == 1) ? '1' : '0';
-		$tab_check[0]['disabled'] = "disabled";
+		$tab_check[0]['text']    = 'Option 1';
+		$tab_check[0]['name']    = 'option_one';
+		$tab_check[0]['checked'] = ($option_one == 1) ? '1' : '0';
+		$tab_check[1]['text']    = 'Option 2';
+		$tab_check[1]['name']    = 'option_two';
+		$tab_check[1]['checked'] = ($option_two == 1) ? '1' : '0';
+		$tab_check[2]['text']    = 'Option 3';
+		$tab_check[2]['name']    = 'option_three';
+		$tab_check[2]['checked'] = ($option_three == 1) ? '1' : '0';
 		$sbform->addCheckbox('Toutes vos options', $tab_check, '', false, '<br />');
 		// ----------------------------
 		// -- Input RADIO

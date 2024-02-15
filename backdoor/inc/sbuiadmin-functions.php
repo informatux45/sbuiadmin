@@ -21,6 +21,7 @@
  * sbDisplayMediaSize
  * sbDisplayMediaMime
  * sbDisplayFileExtension
+ * sbGetTagifyDatas
  * sbRewriteTags
  * sbRewriteToId
  * sbFilename
@@ -175,6 +176,28 @@ function sbDisplayFileExtension($filename) {
 	$extension = $extension[0];
 
 	return strtolower($extension);
+}
+
+if (!function_exists("sbGetTagifyDatas")) {
+   function sbGetTagifyDatas($datas) {
+      global $sbsmarty, $sbsanitize;
+      if (empty(trim($datas))) {
+         $return = false;
+      } else {
+         $returns = json_decode(trim($datas));
+         if (_AM_SITE_DEBUG) $sbsmarty->append('sbdebugsql', $returns);
+         if (array_keys( $returns, true )) {
+            $return = "";
+            foreach($returns as $row) {
+               $return .= $sbsanitize->displayText($row->value, 'UTF-8', 1, 0) . ",";
+            }
+            rtrim($return, ",");
+         } else {
+            $return = false;
+         }
+      }
+      return $return;
+   }
 }
 
 function sbRewriteTags($string) {

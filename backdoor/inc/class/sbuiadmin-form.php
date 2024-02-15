@@ -910,6 +910,101 @@ class form extends sanitize {
 	
 	/**
 	* Construct form (body)
+	* add a form element (input tags with drag & drop)
+	* @return html code
+	*/
+	public function addTagify($label = '', $arrArgs = array (), $isRequired = false, $helpDsc = '') {
+		$elem = 'text';
+		if (!array_key_exists ($elem, $this -> inputArr)) {
+			throw new Exception ($elem . ' n\'est pas un élément valide');
+		}
+
+		if (!array_key_exists ('name', $arrArgs) && $elem !== 'submit' && $elem !== 'reset') {
+			$arrArgs['name'] = 'default';
+		}
+
+		$cpt = count ($this -> formElementArr);
+		$this -> formElementArr[$cpt][$elem] = array ();
+		$arrTemp = array_merge ($this -> eventArr, $this -> commonArr, $this -> inputArr[$elem]);
+
+		foreach ($arrTemp as $clef => $val) {
+			if (array_key_exists ($clef, $arrArgs)) {
+				$this -> formElementArr[$cpt][$elem][$clef] = $arrArgs[$clef];
+			}
+		}
+		
+		// Show the label for the element
+		$chaineTemp .= $this -> isRequired ($isRequired, $label, '', 'red');
+
+		// Show the form element
+		//$chaineTemp .= '<input type="'.$elem.'" ';
+		$chaineTemp .= '<input ';
+		
+		foreach ($this -> formElementArr[$cpt][$elem] as $clef => $val) {
+			if ($clef === 'id')
+				$dateId = $val;
+			$chaineTemp .= $clef.'="'.$val.'" ';
+		}
+
+		$chaineRequired = ($isRequired == true) ? ' required="true" bname="' . $label . '" ' : '';
+		$chaineTemp    .= $chaineRequired;
+
+		$chaineTemp .= '/>&nbsp;';
+		$chaineTemp .= '<link rel="stylesheet" href="'.SB_ADMIN_URL.'assets/dist/js/vendor/tagify/tagify.css">';
+		$chaineTemp .= '<script src="'.SB_ADMIN_URL.'assets/dist/js/vendor/tagify/tagify.min.js"></script>';
+		$chaineTemp .= '<link rel="stylesheet" href="'.SB_ADMIN_URL.'assets/dist/js/vendor/tagify/dragsort.css" media="print" onload="this.media=\'all\'">';
+		$chaineTemp .= '<script src="'.SB_ADMIN_URL.'assets/dist/js/vendor/tagify/dragsort.js"></script>';
+		$chaineTemp .= '<style>';
+		if (_AM_SITE_DEBUG) {
+			$chaineTemp .= '.tagify+input, .tagify+textarea {
+								position: initial !important;
+								left: 0 !important;
+								transform: none !important;
+								width: 100%;
+								margin-top: .2em;
+								min-height: 11ch;
+								background: powderblue;
+							}';
+		}
+		$chaineTemp .= '.tagify{
+							margin: .2em;
+							min-width: 400px;
+						}
+						</style>';
+		$chaineTemp .= '<script type="text/javascript">';
+		$chaineTemp .= '(() => {
+							var inputElm = document.querySelector(\'input[name='.$arrArgs['name'].']\')
+							
+							let tagify = new Tagify(inputElm)
+							
+							var dragsort = new DragSort(tagify.DOM.scope, {
+								selector:\'.\'+tagify.settings.classNames.tag,
+								callbacks: {
+									dragEnd: onDragEnd
+								}
+							})
+							
+							function onDragEnd(elm){
+								tagify.updateValueByDOMTags()
+							}
+							
+						})();';
+		$chaineTemp .= '</script>';
+		
+		$chaineTemp .= '</div>';
+		
+		// If help
+		if ($helpDsc != '')
+			$chaineTemp .= '<p class="help-block">' . $helpDsc . '</p>';
+		else
+			$chaineTemp .= '<p></p>';
+
+		$this -> formBuffer['elements'][$cpt] = $chaineTemp;
+	}
+	
+	
+	/**
+	* Construct form (body)
 	* add a form element (country select)
 	* @return html code
 	*/
