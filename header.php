@@ -94,6 +94,8 @@ $sbsmarty->debugging = SBSMARTYDEBUG;
 $sbsmarty->caching = SBSMARTYCACHING;
 $sbsmarty->cache_lifetime = SBSMARTYCACHELIFETIME;
 // ------------------
+$sbsmarty->error_reporting = E_ALL & ~E_NOTICE & ~E_WARNING;
+// ------------------
 
 // ------------------------ 
 // Functions CMS
