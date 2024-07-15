@@ -22,7 +22,7 @@ include_once( SB_MODULES_DIR . MODFILE . DIRECTORY_SEPARATOR . 'common.php' );
 global $modpage, $sbsmarty, $sbsanitize, $sbsql, $sbpage;
 
 # Define TPL to show (view)
-$id       = $sbsanitize->stopXSS($_GET['id']);
+$id       = (isset($_GET['id'])) ? $sbsanitize->stopXSS($_GET['id']) : '';
 $template = 'index';
 # Assign template main
 $modpage['template_main'] = MODFILE . '_' . $template . '.tpl';
