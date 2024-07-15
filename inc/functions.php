@@ -368,9 +368,15 @@ if (!function_exists("insert_sbGetUserIP")) {
 if (!function_exists("sbIsBlockedIP")) {
 	function sbIsBlockedIP( $ip = '') {
 		global $sbsql, $sbsanitize, $sbflood;
-		$time_flood   = $sbflood->expiration;    // 1 jour; 24 heures; 60 minutes; 60 secondes
-		$how_many     = $sbflood->how_many;      // Combien de fois avant le blocage définitif
-		$last_request = $sbflood->last_request;  // Derniere requete en secondes
+		if (class_exists('Memcache') && extension_loaded('memcache') && function_exists('memcache_connect')) {
+			$time_flood   = $sbflood->expiration;    // 1 jour; 24 heures; 60 minutes; 60 secondes
+			$how_many     = $sbflood->how_many;      // Combien de fois avant le blocage définitif
+			$last_request = $sbflood->last_request;  // Derniere requete en secondes
+		} else {
+			$time_flood   = 1 * 24 * 60 * 60; // 1 jour; 24 heures; 60 minutes; 60 secondes
+			$how_many     = 3;  // Combien de fois avant le blocage définitif
+			$last_request = 2;  // Derniere requete en secondes
+		}
 		$table        = _AM_DB_PREFIX . 'sb_blocked_ip';
 		$user_ip      = trim( $sbsanitize->stopXSS( (empty($ip)) ? sbGetUserIP() : $ip ) );
 		
