@@ -114,7 +114,7 @@ if (!file_exists(SBADMIN."/install.php")) {
 	// --- Check if Blocked IP
 	$user_ip = sbGetUserIP();
 	$is_ip_blocked = sbIsBlockedIP($user_ip);
-	if ($is_ip_blocked == $user_ip) header("Location:403.html");
+	if (isset($is_ip_blocked) && $is_ip_blocked == $user_ip) header("Location:403.html");
 	// --- Check FLOOD
 	if (class_exists('Memcache') && extension_loaded('memcache') && function_exists('memcache_connect')) {
 		$sbflood->floodCheck();
