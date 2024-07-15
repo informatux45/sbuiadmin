@@ -446,7 +446,7 @@ if (!function_exists("insert_sbGetMenuCms")) {
 		$menu_ul_class = trim($param['mclass']);
 		$menu_ul_id    = trim($param['mid']);
 		$menu_lang     = trim($param['mlang']);
-		$menu_type     = trim($param['mtype']);
+		$menu_type     = (isset($param['mtype'])) ? trim($param['mtype']) : '';
 		
 		$menu_entries  = explode("|", $assoc['pages']);
 		
@@ -463,7 +463,7 @@ if (!function_exists("insert_sbGetMenuCms")) {
 			if ($assoc2) {
 				// Check if active menu
 				$seo_url_rewrite = $sbsanitize->sTrim(strtolower(sbRewriteString($assoc2['seo_url'])));
-				$seo_url_id      = $sbsanitize->sTrim($_GET['id']);
+				$seo_url_id      = (isset($_GET['id'])) ? $sbsanitize->sTrim($_GET['id']) : '';
 				// Seo / Normal URL
 				$seo_normal_url = sbGetSeoUrl("index.php?p=pages&id={$assoc2['seo_url']}", $assoc2['seo_url'], false);
 				// Increase Menu
@@ -1058,7 +1058,7 @@ if (!function_exists("insert_sbGetThemeOption")) {
 		global $theme;
 		# Initialize
 		$option_name = $param['option'];
-		$option_num  = $param['n'];    
+		$option_num  = (isset($param['n'])) ? $param['n'] : '';
 		# Get option string
 		if (!empty($option_num))
 			$option_string = $theme[$option_name][$option_num];
