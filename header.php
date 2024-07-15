@@ -59,6 +59,7 @@ if (class_exists('Memcache') && extension_loaded('memcache') && function_exists(
 // ----------------------
 include_once('plugins/mobile-detect/Mobile_Detect.php');
 $mobile_detect = 'classic';
+$sb_custom_detection = '';
 if (class_exists('Mobile_Detect')) {
 	$sbMobileDetect = new Mobile_Detect;
 	$sb_isMobile    = $sbMobileDetect->isMobile();
@@ -67,7 +68,6 @@ if (class_exists('Mobile_Detect')) {
 	// Layout Type
 	$mobile_detect = ($sb_isMobile ? ($sb_isTablet ? 'tablet' : 'mobile') : 'computer');
 	// Custom detection methods
-	$sb_custom_detection = '';
 	foreach($sbMobileDetect->getRules() as $name => $regex) {
 		$sb_check_custom = $sbMobileDetect->{'is'.$name}();
 		if ($sb_check_custom)
