@@ -377,8 +377,8 @@ if (!function_exists("sbIsBlockedIP")) {
 			$how_many     = 3;  // Combien de fois avant le blocage définitif
 			$last_request = 2;  // Derniere requete en secondes
 		}
-		$table        = _AM_DB_PREFIX . 'sb_blocked_ip';
-		$user_ip      = trim( $sbsanitize->stopXSS( (empty($ip)) ? sbGetUserIP() : $ip ) );
+		$table   = _AM_DB_PREFIX . 'sb_blocked_ip';
+		$user_ip = trim( $sbsanitize->stopXSS( (empty($ip)) ? sbGetUserIP() : $ip ) );
 		
 		// Supprimer tout ceux dont le temps a expiré
 		$sbsql->query("DELETE FROM $table WHERE expirationtime + $time_flood < " . time());
@@ -387,7 +387,7 @@ if (!function_exists("sbIsBlockedIP")) {
 		$request = $sbsql->query($query);
 		$user    = $sbsql->assoc($request);
 
-		return $user['ip'];
+		return ($user) ? $user['ip'] : false;
 	}
 }
 if (!function_exists("insert_sbIsBlockedIP")) {
