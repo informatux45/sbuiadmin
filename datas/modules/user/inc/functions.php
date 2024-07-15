@@ -30,8 +30,8 @@ function shortcode_sbuser($param = '') {
 	// --- Initialization
 	$icon_text = $icon_menu = $class_menu = $class_href = $user_html = "";
 	// --- Assign variables
-	$icon_text  = ($param['icontext'] == '1') ? true : false;
-	$icon_menu  = ($param['menu'] == 'li') ? true : false;
+	$icon_text  = (isset($param['icontext']) && $param['icontext'] == '1') ? true : false;
+	$icon_menu  = (isset($param['menu']) && $param['menu'] == 'li') ? true : false;
 	$class_menu = (isset($param['menu_class'])) ? $param['menu_class'] : "";
 	$class_href = (isset($param['href_class'])) ? $param['href_class'] : "";
 	// --- Initialization URL
