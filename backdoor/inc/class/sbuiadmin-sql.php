@@ -30,10 +30,21 @@ class sql extends Smarty {
     var $query      = "";
 
     function connect() {
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
         if ($this->socket === false) {
-            $this->connect_id = mysqli_connect($this->host, $this->user, $this->pass, $this->base);
+            try {
+                $this->connect_id = mysqli_connect($this->host, $this->user, $this->pass, $this->base);
+            } catch (Exception $e) {
+                echo $e->getMessage();
+                exit;
+            }
         } else {
-            $this->connect_id = mysqli_connect($this->host, $this->user, $this->pass, $this->base, $this->port, $this->socket);            
+            try {
+                $this->connect_id = mysqli_connect($this->host, $this->user, $this->pass, $this->base, $this->port, $this->socket);
+            } catch (Exception $e) {
+                echo $e->getMessage();
+                exit;
+            } 
         }
         if (mysqli_connect_errno()) {
             //$this->dump(mysqli_connect_error() . ' (' . mysqli_errno($this->connect_id) . ')', 'Connect MYSQLI DB (Error)');
@@ -59,6 +70,8 @@ class sql extends Smarty {
             $this->error = mysqli_error($this->connect_id);
             return false;
         }
+        /* Fermeture de la connexion */
+        mysqli_close($this->connect_id);
     }
     function lastinsertid() {
         return mysqli_insert_id($this->connect_id);
