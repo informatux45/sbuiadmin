@@ -1,7 +1,7 @@
 # [SBUIADMIN](https://github.com/informatux45/sbuiadmin/)
 - CMS SBootstrap Admin Responsive
 - Contributeurs : INFORMATUX
-- Version stable : 3.01
+- Version stable : 4.00
 - License: [GPLv3](http://www.gnu.org/licenses/gpl-3.0.fr.html "Licence publique générale GNU v3")
 
 ---
@@ -10,7 +10,7 @@
 
 Ready | Fonctionnalités
 --- | ---
-*✓* | PHP 8.1 / MariaDB 10.5 / MySQL
+*✓* | PHP 8.2 / MariaDB 10.5 / MySQL
 *✓* | HTML 5 / CSS 3
 *✓* | Bootstrap
 *✓* | Installeur en ligne
@@ -45,6 +45,13 @@ Ready | Fonctionnalités
 ---
 
 ### Changelog
+
+**4.00**
+- Update Smarty libraries
+- Add Smarty plugins / modifiers
+- PHP 8.2 Ready
+- SQL Class reporting
+- Clean up code
 
 **3.01**
 - Update many libraries (kint, smarty, ...)
