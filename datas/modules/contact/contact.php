@@ -50,7 +50,7 @@ $result  = $sbsql->toarray($request);
 foreach($result as $val) {
 	switch($val['config']) {
 		case "email_to": $email_to = $sbsanitize->sTrim($val['content']); break;
-		case "email_subject": $subject = $sbsanitize->displayLang(utf8_encode($val['content'])); break;
+		case "email_subject": $subject = $sbsanitize->displayLang(sb_utf8_encode($val['content'])); break;
 		case "email_publickey": $publickey = $sbsanitize->sTrim($val['content']); break;
 		case "email_privatekey": $privatekey = $sbsanitize->sTrim($val['content']); break;
 	}

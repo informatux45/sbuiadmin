@@ -37,7 +37,7 @@ if (!empty($publickey) && !empty($privatekey) && $captcha_active) {
 }
 
 # Define TPL to show (view)
-if (!$_GET['op']) {
+if (!isset($_GET['op'])) {
 	$op       = 'index';
 	$template = 'index';
 } else {
@@ -57,7 +57,7 @@ switch($op) {
 		// ----------------------
 		// check if POST (Login)
 		// ----------------------
-		if (($_POST['username'] && $_POST['password'])) {
+		if (isset($_POST['username']) && isset($_POST['password'])) {
 			// ------------------
 			// --- Form auth
 			// ------------------
@@ -150,7 +150,7 @@ switch($op) {
 		// --------------------------
 		// --- Logout
 		// --------------------------
-		if ($_GET['ac'] == 'logout') {
+		if (isset($_GET['ac']) && $_GET['ac'] == 'logout') {
 			// ------------------
 			// --- Logout required
 			// ------------------

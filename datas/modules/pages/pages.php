@@ -34,8 +34,8 @@ $query   = "SELECT * FROM {$modpage['tables']['pages']} WHERE seo_url = '$id'";
 $request = $sbsql->query($query);
 $assoc   = $sbsql->assoc($request);
 // --- Assign Array
-$sb_pages_title   = $sbsanitize->displayLang(utf8_encode($assoc['title']), $_SESSION['lang']);
-$sb_pages_content = $sbsanitize->displayLang(utf8_encode($assoc['content']), $_SESSION['lang']);
+$sb_pages_title   = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']);
+$sb_pages_content = $sbsanitize->displayLang(sb_utf8_encode($assoc['content']), $_SESSION['lang']);
 $sb_pages_active  = $assoc['active'];
 
 if ($sb_pages_active) {

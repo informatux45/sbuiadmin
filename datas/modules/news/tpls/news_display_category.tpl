@@ -42,20 +42,20 @@
 		<div class="sbnews {cycle values="even,odd"}">
 
 			<div class="sbnews-div-l">
-				<a class="" href="{seo url="index.php?p=news&op=article&id={$news.id}" rewrite="news/article/{$news.id}/{$news.title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|strip_tags|@sbRewriteString|@strtolower}"}">
-					<img src="{if $news.image}{$smarty.const._AM_MEDIAS_URL}/{$news.image}{else}{$smarty.const.SB_MODULES_URL}{$smarty.const.MODULEFILE}/images/news-img.jpg{/if}" alt="{$news.title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"}" style="width: 100%;">
+				<a class="" href="{seo url="index.php?p=news&op=article&id={$news.id}" rewrite="news/article/{$news.id}/{$news.title|unescape:"htmlall"|sbDisplayLang:"`$smarty.session.lang`"|strip_tags|sbRewriteString|strtolower}"}">
+					<img src="{if $news.image}{$smarty.const._AM_MEDIAS_URL}/{$news.image}{else}{$smarty.const.SB_MODULES_URL}{$smarty.const.MODULEFILE}/images/news-img.jpg{/if}" alt="{$news.title|unescape:"htmlall"|sbDisplayLang:"`$smarty.session.lang`"}" style="width: 100%;">
 				</a>
 			</div>
 		
 			<div class="sbnews-div-r">
 				<h3>
-					{$news.title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"}
+					{$news.title|unescape:"htmlall"|sbDisplayLang:"`$smarty.session.lang`"}
 				</h3>
 				{if $news.catname}
 					<p class="sbnews-category">
 						{assign var=catid value="|"|explode:$news.catid} 
-						<a href='{seo url="index.php?p=news&op=category&id={$news.catid}" rewrite="news/category/{$catid[0]}/{$news.catname|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|strip_tags|@sbRewriteString|@strtolower}"}'>
-							{$news.catname|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"}
+						<a href='{seo url="index.php?p=news&op=category&id={$news.catid}" rewrite="news/category/{$catid[0]}/{$news.catname|unescape:"htmlall"|sbDisplayLang:"`$smarty.session.lang`"|strip_tags|sbRewriteString|strtolower}"}'>
+							{$news.catname|unescape:"htmlall"|sbDisplayLang:"`$smarty.session.lang`"}
 						</a>
 					</p>
 				{/if}
@@ -64,13 +64,13 @@
 				</p>
 				<p class="sbnews-p">
 					{if $no_masonry == "true"}
-						{$news.desc_short|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"}
+						{$news.desc_short|unescape:"htmlall"|sbDisplayLang:"`$smarty.session.lang`"}
 					{else}
-						{$news.desc_short|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|truncate:60:".."}
+						{$news.desc_short|unescape:"htmlall"|sbDisplayLang:"`$smarty.session.lang`"|truncate:60:".."}
 					{/if}
 				</p>
 				<span class="sbnews-link-item">
-					<a href="{seo url="index.php?p=news&op=article&id={$news.id}" rewrite="news/article/{$news.id}/{$news.title|unescape:"htmlall"|@sbDisplayLang:"`$smarty.session.lang`"|strip_tags|@sbRewriteString|@strtolower}"}">
+					<a href="{seo url="index.php?p=news&op=article&id={$news.id}" rewrite="news/article/{$news.id}/{$news.title|unescape:"htmlall"|sbDisplayLang:"`$smarty.session.lang`"|strip_tags|sbRewriteString|strtolower}"}">
 						{$smarty.const._CMS_NEWS_READ_ITEM}
 					</a>
 				</span>

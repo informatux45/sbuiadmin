@@ -306,7 +306,7 @@ if (!function_exists("sbGetSeo")) {
 		
 		if ($result) {
 			foreach($result as $row) {
-				$cs[$row['config']] = utf8_encode($row['content']);
+				$cs[$row['config']] = sb_utf8_encode($row['content']);
 			}
 			
 			if ($key == 'keywords') {
@@ -1011,7 +1011,7 @@ if (!function_exists("insert_sbGetSeoMetas")) {
 			// Loop all Metas
 			foreach($result as $row) {
 				// Initialize
-				$cs[$row['config']] = utf8_encode($row['content']);
+				$cs[$row['config']] = sb_utf8_encode($row['content']);
 				// Instantiate
 				if (!empty($cs[$row['config']])) {
 					switch($row['config']) {

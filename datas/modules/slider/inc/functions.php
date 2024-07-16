@@ -13,7 +13,6 @@ if (!defined('SB_PATH')) {
 	die('You cannot load this file directly!');
 }
 
-
 function shortcode_sbslider($param = '') {
 	global $sbsanitize, $sbsql;
 	// --- Tables
@@ -43,7 +42,7 @@ function shortcode_sbslider($param = '') {
 			if ($row['type'] == 'video')
 				$slider_html .= '<li>' . $sbsanitize->displayText($row['photo'], 'UTF-8', 0, 1) . '</li>';
 			else	
-				$slider_html .= '<li><img src="' . _AM_MEDIAS_URL . DIRECTORY_SEPARATOR . $row['photo'] . '" title="' . $sbsanitize->displayLang(utf8_encode($row['title'])) . '" /></li>';
+				$slider_html .= '<li><img src="' . _AM_MEDIAS_URL . DIRECTORY_SEPARATOR . $row['photo'] . '" title="' . $sbsanitize->displayLang(sb_utf8_encode($row['title'])) . '" /></li>';
 		}
 		$slider_html .= '</ul>';
 		// --- Slider options

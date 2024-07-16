@@ -53,7 +53,7 @@ function shortcode_sbcontactajax($param = '') {
 			foreach($result as $val) {
 				switch($val['config']) {
 					case "email_to": $email_to = $sbsanitize->sTrim($val['content']); break;
-					case "email_subject": $subject = $sbsanitize->displayLang(utf8_encode($val['content'])); break;
+					case "email_subject": $subject = $sbsanitize->displayLang(sb_utf8_encode($val['content'])); break;
 					case "email_publickey": $publickey = $sbsanitize->sTrim($val['content']); break;
 					case "email_privatekey": $privatekey = $sbsanitize->sTrim($val['content']); break;
 				}
@@ -204,7 +204,7 @@ function shortcode_sbcontact($param = '') {
 			foreach($result as $val) {
 				switch($val['config']) {
 					case "email_to": $email_to = $sbsanitize->sTrim($val['content']); break;
-					case "email_subject": $subject = $sbsanitize->displayLang(utf8_encode($val['content'])); break;
+					case "email_subject": $subject = $sbsanitize->displayLang(sb_utf8_encode($val['content'])); break;
 					case "email_publickey": $publickey = $sbsanitize->sTrim($val['content']); break;
 					case "email_privatekey": $privatekey = $sbsanitize->sTrim($val['content']); break;
 				}
@@ -216,7 +216,7 @@ function shortcode_sbcontact($param = '') {
 			$request_contact = $sbsql->query($query_contact);
 			$result_contact  = $sbsql->assoc($request_contact);
 			if ($result_contact['recipients'] != '') $email_to = $sbsanitize->sTrim($result_contact['recipients']);
-			if ($sbsanitize->displayLang(utf8_encode($result_contact['subject'])) != '') $subject = $sbsanitize->displayLang(utf8_encode($result_contact['subject']));
+			if ($sbsanitize->displayLang(sb_utf8_encode($result_contact['subject'])) != '') $subject = $sbsanitize->displayLang(sb_utf8_encode($result_contact['subject']));
 			# ################################################
 			# Check if form is submitted
 			if(isset($_POST['submitform']) && !empty($_POST['submitform'])) {

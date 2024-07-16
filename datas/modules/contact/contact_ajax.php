@@ -64,7 +64,7 @@ $result  = $sbsql->toarray($request);
 foreach($result as $val) {
 	switch($val['config']) {
 		case "email_to": $email_to = $sbsanitize->sTrim($val['content']); break;
-		case "email_subject": $subject = $sbsanitize->displayLang(utf8_encode($val['content'])); break;
+		case "email_subject": $subject = $sbsanitize->displayLang(sb_utf8_encode($val['content'])); break;
 		case "email_publickey": $publickey = $sbsanitize->sTrim($val['content']); break;
 		case "email_privatekey": $privatekey = $sbsanitize->sTrim($val['content']); break;
 	}
@@ -90,7 +90,7 @@ $query_contact   = "SELECT recipients, subject FROM {$module['tables']['contact'
 $request_contact = $sbsql->query($query_contact);
 $result_contact  = $sbsql->assoc($request_contact);
 if ($result_contact['recipients'] != '') $email_to = $sbsanitize->sTrim($result_contact['recipients']);
-if ($sbsanitize->displayLang(utf8_encode($result_contact['subject'])) != '') $subject = $sbsanitize->displayLang(utf8_encode($result_contact['subject']));
+if ($sbsanitize->displayLang(sb_utf8_encode($result_contact['subject'])) != '') $subject = $sbsanitize->displayLang(sb_utf8_encode($result_contact['subject']));
 # --------------------------------------------------
 
 // --------------------------

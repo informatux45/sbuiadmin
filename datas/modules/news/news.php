@@ -175,21 +175,21 @@ switch($op) {
 		$requestN = $sbsql->query($queryN);
 		$assoc   = $sbsql->assoc($requestN);
 		// --- Infos
-		//$sb_news_title = _CMS_NEWS_NEWS . ' ' . $sbsanitize->displayLang(utf8_encode($assoc['title']), $_SESSION['lang']);
-		$sb_news_title = $sbsanitize->displayLang(utf8_encode($assoc['title']), $_SESSION['lang']);
+		//$sb_news_title = _CMS_NEWS_NEWS . ' ' . $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']);
+		$sb_news_title = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']);
 		if ($assoc['subtitle'] != '')
-			$sb_news_title .= ' - ' . $sbsanitize->displayLang(utf8_encode($assoc['subtitle']), $_SESSION['lang']);
+			$sb_news_title .= ' - ' . $sbsanitize->displayLang(sb_utf8_encode($assoc['subtitle']), $_SESSION['lang']);
 		// --- Assign news title
 		$sbsmarty->assign('sb_pages_title', $sb_news_title);
-		//$sbsmarty->assign('page_id', strtolower(sbRewriteString($sbsanitize->displayLang(utf8_encode($assoc['title']), $_SESSION['lang']))));
+		//$sbsmarty->assign('page_id', strtolower(sbRewriteString($sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']))));
 		// --- Assign news category title (template)
-		$sbsmarty->assign('sbnews_cat_title', $sbsanitize->displayLang(utf8_encode($assoc['title']), $_SESSION['lang']));
-		$sbsmarty->assign('sbnews_cat_subtitle', $sbsanitize->displayLang(utf8_encode($assoc['subtitle']), $_SESSION['lang']));
+		$sbsmarty->assign('sbnews_cat_title', $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']));
+		$sbsmarty->assign('sbnews_cat_subtitle', $sbsanitize->displayLang(sb_utf8_encode($assoc['subtitle']), $_SESSION['lang']));
 		$sbsmarty->assign('sbnews_cat_tpl_list', $sbsanitize->sTrim($assoc['tpl_list']));
 		$sbsmarty->assign('sbnews_module_show', $assoc['module_show']);
 		$sbsmarty->assign('sbnews_module_show_masonry', $assoc['module_show_masonry']);
 		// --- Breadcrumb
-		$sbsmarty->assign('sbnews_nav1', $sbsanitize->displayLang(utf8_encode($assoc['title']), $_SESSION['lang']));
+		$sbsmarty->assign('sbnews_nav1', $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']));
 
 		// --------------------------
 		// --- Choose theme view
@@ -214,20 +214,20 @@ switch($op) {
 		$requestN = $sbsql->query($queryN);
 		$assoc    = $sbsql->assoc($requestN);
 		// --- Check if type
-		//$sb_news_title = _CMS_NEWS_NEWS . ' ' . $sbsanitize->displayLang(utf8_encode($assoc['title']), $_SESSION['lang']);
-		$sb_news_title = $sbsanitize->displayLang(utf8_encode($assoc['title']), $_SESSION['lang']) . ' - ' . $sbsanitize->displayLang(utf8_encode($item['title']), $_SESSION['lang']);
+		//$sb_news_title = _CMS_NEWS_NEWS . ' ' . $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']);
+		$sb_news_title = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']) . ' - ' . $sbsanitize->displayLang(sb_utf8_encode($item['title']), $_SESSION['lang']);
 		if ($assoc['subtitle'] != '')
-			$sb_news_title .= ' - ' . $sbsanitize->displayLang(utf8_encode($assoc['subtitle']), $_SESSION['lang']);
+			$sb_news_title .= ' - ' . $sbsanitize->displayLang(sb_utf8_encode($assoc['subtitle']), $_SESSION['lang']);
 		// --- Assign news title
 		$sbsmarty->assign('sb_pages_title', $sb_news_title);
-		//$sbsmarty->assign('page_id', strtolower(sbRewriteString($sbsanitize->displayLang(utf8_encode($item['title']), $_SESSION['lang']))));
+		//$sbsmarty->assign('page_id', strtolower(sbRewriteString($sbsanitize->displayLang(sb_utf8_encode($item['title']), $_SESSION['lang']))));
 		// --- Assign news category title (template)
 		$sbsmarty->assign('sbnews_item_cat_id', intval($assoc['id']));
-		$sbsmarty->assign('sbnews_item_cat_title', $sbsanitize->displayLang(utf8_encode($assoc['title']), $_SESSION['lang']));
+		$sbsmarty->assign('sbnews_item_cat_title', $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']));
 		$sbsmarty->assign('sbnews_item_tpl_single', $sbsanitize->sTrim($assoc['tpl_single']));
 		// --- Breadcrumb
-		$sbsmarty->assign('sbnews_nav1', $sbsanitize->displayLang(utf8_encode($assoc['title']), $_SESSION['lang']));
-		$sbsmarty->assign('sbnews_nav2',  $sbsanitize->displayLang(utf8_encode($item['title']), $_SESSION['lang']));
+		$sbsmarty->assign('sbnews_nav1', $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']));
+		$sbsmarty->assign('sbnews_nav2',  $sbsanitize->displayLang(sb_utf8_encode($item['title']), $_SESSION['lang']));
 		
 		// --- SQL Request (Next / Prev)
 		$query_np = "SELECT (SELECT id FROM {$module['tables']['news']} s1 WHERE s1.date < s.date AND s1.active = 1 AND catid = '$catid' ORDER BY date DESC LIMIT 1 OFFSET 0) as next,
