@@ -1,3 +1,7 @@
+<style>
+	body { background-color: #FFF9E5 !important; }
+</style>
+
 {include file='header.tpl' page='false'}
 
 	<!-- Fine Uploader Gallery template
@@ -85,9 +89,9 @@
 
 	{foreach $medias_all as $sbmedia}
 		
-		{if $smarty.get.editor == 'ck'}
+		{if isset($smarty.get.editor) && $smarty.get.editor == 'ck'}
 			<p class="sbmedia" target="_parent" onclick="sbTransfertCkeditor('{$smarty.const._AM_MEDIAS_URL}/{$sbmedia|@sbFileRealname}')">
-		{elseif $smarty.get.editor == 'tiny'}
+		{elseif isset($smarty.get.editor) && $smarty.get.editor == 'tiny'}
 			<p class="sbmedia" target="_parent" onclick='sbTransfertTiny("{$sbmedia}","{$smarty.get.id}","{$smarty.const._AM_MEDIAS_URL}")'>
 		{else}
 			<p class="sbmedia" target="_parent" onclick='sbTransfert("{$sbmedia}","{$smarty.get.id}")'>
@@ -134,7 +138,7 @@
 		$('#fine-uploader-gallery').fineUploader({
 			template: 'qq-template-gallery',
 			request: {
-				endpoint: 'server/php/sbUploadServer.php{if $smarty.get.subdir}?subdir={$smarty.get.subdir}{/if}'
+				endpoint: 'server/php/sbUploadServer.php{if isset($smarty.get.subdir)}?subdir={$smarty.get.subdir}{/if}'
 			},
 			scaling: {
 				sendOriginal: false,
@@ -150,7 +154,7 @@
 				}
 			},
 			validation: {
-				allowedExtensions: [{foreach $sbfiles_medias_exts_allowed as $ext_allowed}"{$ext_allowed}"{if !$ext_allowed@last},{/if}{/foreach}],
+				allowedExtensions: [{if isset($sbfiles_medias_exts_allowed)}{foreach $sbfiles_medias_exts_allowed as $ext_allowed}"{$ext_allowed}"{if !$ext_allowed@last},{/if}{/foreach}{else}"jpg,jpeg,png,gif,pdf,xml,mp4"{/if}],
 				itemLimit: {$smarty.const._AM_MEDIAS_ITEM_LIMIT},
 				sizeLimit: {$smarty.const._AM_MEDIAS_SIZE_LIMIT|@sbToByteSize}, // Bytes
 			},

@@ -12,7 +12,7 @@
 			
 			{include file='system/users_bar.tpl'}
 			
-			{if $allips}
+			{if isset($allips)}
 				<div class="row">
 					<div class="col-lg-12">
 						<div class="alert alert-warning" style="border: 3px solid;">
@@ -34,13 +34,13 @@
 				
 				<div class="row">
 					<div class="col-lg-12">
-						<div class="panel panel-{if $allips}primary{else}default{/if}">
+						<div class="panel panel-{if isset($allips)}primary{else}default{/if}">
 							<div class="panel-heading">
 								<span class="fa fa-lock fa-fw"></span> <strong>Gestion des IPs bloqu&eacute;es</strong>
 							</div>
 							<!-- /.panel-heading -->
 							<div class="panel-body">
-								{if $allips}
+								{if isset($allips)}
 								<div class="dataTable_wrapper">
 									<table class="table table-striped table-bordered table-hover" id="dataTables-blockedip">
 										<thead>

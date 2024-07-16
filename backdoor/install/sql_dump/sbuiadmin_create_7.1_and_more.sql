@@ -513,8 +513,9 @@ INSERT INTO `<DB_PREFIX>sb_menu` (`id`, `name`, `tag`, `pages`, `active`) VALUES
 
 DROP TABLE IF EXISTS `<DB_PREFIX>sb_news`;
 CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_news` (
-  `id` int(11) NOT NULL,
+  `id` bigint(20) NOT NULL,
   `catid` varchar(50) NOT NULL COMMENT 'Categories',
+  `viewed` bigint(20) NOT NULL,
   `title` text NOT NULL,
   `subtitle` text NOT NULL,
   `desc_short` text NOT NULL,

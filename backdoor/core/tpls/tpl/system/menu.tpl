@@ -16,11 +16,11 @@
                 <div class="col-lg-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <span class="fa {if $sort}fa-th-list{else}fa-copy{/if} fa-fw"></span> <strong>{if $all}Gestion de vos menus{else}{$legend_add_edit}{/if}</strong>
+                            <span class="fa {if isset($sort)}fa-th-list{else}fa-copy{/if} fa-fw"></span> <strong>{if isset($all)}Gestion de vos menus{else}{$legend_add_edit}{/if}</strong>
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
-							{if $all}
+							{if isset($all)}
                             <div class="dataTable_wrapper">
                                 <table class="table table-striped table-bordered table-hover" id="dataTables-menus">
                                     <thead>
@@ -33,7 +33,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-										{if $allmenu}
+										{if isset($allmenu)}
 											{foreach from=$allmenu item=page}
 												<tr class="{cycle values="odd,even"} gradeX">
 													<td>{$page.name|unescape:"htmlall"}</td>
