@@ -80,7 +80,7 @@ $module_menu['cmsconfig']['li'][6]['link']  = "index.php?p=cmsconfig&op=fonts";
 $module_menu['cmsconfig']['li'][7]['title'] = SBUIADMIN_MENU_CMSCONFIG_SEO;
 $module_menu['cmsconfig']['li'][7]['link']  = "index.php?p=cmsconfig&op=seo";
 
-$module_menu['menu']['main']  = "Menu";
+$module_menu['menu']['main']  = SBUIADMIN_MENU_MENU;
 $module_menu['menu']['icon']  = "th-list";
 $module_menu['menu']['group'] = "user"; // user OR admin
 
@@ -95,60 +95,60 @@ $module_menu['menu']['group'] = "user"; // user OR admin
 // -----------------------
 // Menu NEWS
 // -----------------------
-$module_menu['news']['main']  = "Actualités";
+$module_menu['news']['main']  = SBUIADMIN_MENU_NEWS;
 $module_menu['news']['icon']  = "rss";
 $module_menu['news']['group'] = "user"; // user OR admin
-$module_menu['news']['li'][0]['title'] = "Tous les articles";
+$module_menu['news']['li'][0]['title'] = SBUIADMIN_MENU_NEWS_ALL;
 $module_menu['news']['li'][0]['link']  = "index.php?p=news";
-$module_menu['news']['li'][1]['title'] = "Toutes les catégories";
+$module_menu['news']['li'][1]['title'] = SBUIADMIN_MENU_NEWS_CATEGORIES;
 $module_menu['news']['li'][1]['link']  = "index.php?p=news&a=category";
-$module_menu['news']['li'][2]['title'] = "Paramètres";
+$module_menu['news']['li'][2]['title'] = SBUIADMIN_MENU_NEWS_SETTINGS;
 $module_menu['news']['li'][2]['link']  = "index.php?p=news&a=settings";
 
 // -----------------------
 // Menu PAGES
 // -----------------------
-$module_menu['pages']['main']  = "Pages";
+$module_menu['pages']['main']  = SBUIADMIN_MENU_PAGES;
 $module_menu['pages']['icon']  = "copy";
 $module_menu['pages']['group'] = "user"; // user OR admin
-$module_menu['pages']['li'][0]['title'] = "Toutes les pages";
+$module_menu['pages']['li'][0]['title'] = SBUIADMIN_MENU_PAGES_ALL;
 $module_menu['pages']['li'][0]['link']  = "index.php?p=pages";
-$module_menu['pages']['li'][1]['title'] = "Tous les blocs";
+$module_menu['pages']['li'][1]['title'] = SBUIADMIN_MENU_PAGES_BLOCS;
 $module_menu['pages']['li'][1]['link']  = "index.php?p=blocs";
 
 // -----------------------
 // Menu CONTACT (Forms)
 // -----------------------
-$module_menu['contact']['main']  = "Contact";
+$module_menu['contact']['main']  = SBUIADMIN_MENU_CONTACT;
 $module_menu['contact']['icon']  = "envelope";
 $module_menu['contact']['group'] = "user"; // user OR admin
-$module_menu['contact']['li'][0]['title'] = "Tous les formulaires";
+$module_menu['contact']['li'][0]['title'] = SBUIADMIN_MENU_CONTACT_ALL;
 $module_menu['contact']['li'][0]['link']  = "index.php?p=contact";
-$module_menu['contact']['li'][1]['title'] = "Paramètres";
+$module_menu['contact']['li'][1]['title'] = SBUIADMIN_MENU_CONTACT_SETTINGS;
 $module_menu['contact']['li'][1]['link']  = "index.php?p=contact&a=settings";
 
 // -----------------------
 // Menu SLIDER
 // -----------------------
-$module_menu['slider']['main']  = "Sliders";
+$module_menu['slider']['main']  = SBUIADMIN_MENU_SLIDERS;
 $module_menu['slider']['icon']  = "sliders";
 $module_menu['slider']['group'] = "user"; // user OR admin
 
 // -----------------------
 // Menu TABBS
 // -----------------------
-$module_menu['tabbs']['main']  = "Tabbs";
+$module_menu['tabbs']['main']  = SBUIADMIN_MENU_TABBS;
 $module_menu['tabbs']['icon']  = "list-alt";
 $module_menu['tabbs']['group'] = "user"; // user OR admin
-$module_menu['tabbs']['li'][0]['title'] = "Tous les tabbs";
+$module_menu['tabbs']['li'][0]['title'] = SBUIADMIN_MENU_TABBS_ALL;
 $module_menu['tabbs']['li'][0]['link']  = "index.php?p=tabbs";
-$module_menu['tabbs']['li'][1]['title'] = "Tous les onglets";
+$module_menu['tabbs']['li'][1]['title'] = SBUIADMIN_MENU_TABBS_ONGLETS;
 $module_menu['tabbs']['li'][1]['link']  = "index.php?p=tabbs&a=alltabs";
 
 // -----------------------
 // Menu TABLE
 // -----------------------
-$module_menu['table']['main']  = "Tableaux";
+$module_menu['table']['main']  = SBUIADMIN_MENU_TABLES;
 $module_menu['table']['icon']  = "table";
 $module_menu['table']['group'] = "user"; // user OR admin
 
