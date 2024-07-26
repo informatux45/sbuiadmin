@@ -96,7 +96,7 @@ defined('SBMAINTENANCE') OR define('SBMAINTENANCE', (trim($sb_settings_config[24
 # if is visible in your url
 # Default: false
 # Ex: http://site.com/dir/
-defined('SBSITESUBDIRECTORY') OR define('SBSITESUBDIRECTORY', 'projets/sbuiadmin');
+defined('SBSITESUBDIRECTORY') OR define('SBSITESUBDIRECTORY', '');
 
 # Defined Safe Modules created by you (developer)
 //$sb_safe_modules_cms = ['your_new_module','your_new_module2'];
