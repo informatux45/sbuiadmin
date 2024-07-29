@@ -60,7 +60,8 @@ CREATE TABLE `<DB_PREFIX>sb_blocked_ip` (
   `count` tinyint(4) UNSIGNED NOT NULL DEFAULT '1',
   `blockedtime` bigint(20) NOT NULL,
   `expirationtime` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
-  `reason` varchar(255) NOT NULL
+  `reason` varchar(255) NOT NULL,
+  `infos` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -952,6 +953,18 @@ INSERT INTO `<DB_PREFIX>sb_users` (`id`, `username`, `password`, `email`, `login
 --
 
 --
+-- Indexes pour la table `sb_blocked_history`
+--
+ALTER TABLE `<DB_PREFIX>sb_blocked_history`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `sb_blocked_ip`
+--
+ALTER TABLE `<DB_PREFIX>sb_blocked_ip`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `sb_blocs`
 --
 ALTER TABLE `<DB_PREFIX>sb_blocs`
@@ -1089,6 +1102,16 @@ ALTER TABLE `<DB_PREFIX>sb_users`
 -- AUTO_INCREMENT for dumped tables
 --
 
+--
+-- AUTO_INCREMENT pour la table `sb_blocked_history`
+--
+ALTER TABLE `<DB_PREFIX>sb_blocked_history`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT pour la table `sb_blocked_ip`
+--
+ALTER TABLE `<DB_PREFIX>sb_blocked_ip`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `sb_blocs`
 --
