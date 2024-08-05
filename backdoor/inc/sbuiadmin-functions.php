@@ -930,7 +930,7 @@ function sbGetMenuModule($param = '') {
 		
 		for($i = 0; $i < count($modules_dir); $i++) {
 			// --- Get Module name
-			$module_name = pathinfo($modules_dir[$i], PATHINFO_FILENAME);
+			if (isset($modules_dir[$i])) $module_name = pathinfo($modules_dir[$i], PATHINFO_FILENAME);
 			
 			// --- Check if Module infos exists
 			if (isset($module_menu[$module_name]['main'])) {
