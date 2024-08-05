@@ -33,6 +33,7 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 .green {color: green;}
 .grey {color: grey;}
 .yellow {color: #f0ad4e;}
+.orange {color: #FF9400;}
 
 .fright {float: right;}
 .fleft {float: left;}
@@ -504,17 +505,18 @@ select[class=ui-datepicker-month], select[class=ui-datepicker-year] {
   /*background-color: #eee !important;*/
   padding: 0;
   color: white;
+  margin-top: 3em;
 }
 .form-break-info h4 {
-  font-size: 1em;
+  font-size: 1.5em;
   line-height: 1.4em;
   margin: 0;
-  padding: 4px 4px 4px 45px;
+  padding: 4px 4px 4px 15px;
   text-align: left;
   width: 100%;
-  color: black;
-  border: 2px solid black;
-  border-radius: 4px;
+  color: #4e73df;
+  border-bottom: 2px solid #4e73df;
+  /*border-radius: 4px;*/
   background-color: #eee;
 }
 .input-group-addon:first-child, .input-group-addon:last-child {
