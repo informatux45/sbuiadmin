@@ -10,21 +10,21 @@
             <!-- .row -->
             <div class="row">
 				
-				{if $sb_warning_installer_lock || $sb_warning_install_file || $sb_warning_admin_user}
+				{if isset($sb_warning_installer_lock) || isset($sb_warning_install_file) || isset($sb_warning_admin_user)}
 					<div class="col-lg-12">
-					{if $sb_warning_installer_lock}
+					{if isset($sb_warning_installer_lock)}
 						<div class="alert alert-danger">
 							Le répertoire INSTALL existe toujours ! Supprimer le !! <a class='alert-link' href='#'>Vite</a> !!!
 						</div>
 					{/if}
 					
-					{if $sb_warning_install_file}
+					{if isset($sb_warning_install_file)}
 						<div class="alert alert-danger">
 							Le fichier INSTALL.PHP existe toujours ! Supprimer le !! <a class='alert-link' href='#'>Vite</a> !!!
 						</div>
 					{/if}
 					
-					{if $sb_warning_admin_user}
+					{if isset($sb_warning_admin_user)}
 						<div class="alert alert-danger">
 							L'utilisateur <a href="index.php?p=users">ADMIN</a> existe toujours ! Créez d'autres utilisateurs et supprimer le !! <a class='alert-link' href='#'>Vite</a> !!!
 						</div>
