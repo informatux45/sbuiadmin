@@ -950,10 +950,10 @@ class form extends sanitize {
 		$chaineTemp    .= $chaineRequired;
 
 		$chaineTemp .= '/>&nbsp;';
-		$chaineTemp .= '<link rel="stylesheet" href="'.SB_ADMIN_URL.'assets/dist/js/vendor/tagify/tagify.css">';
-		$chaineTemp .= '<script src="'.SB_ADMIN_URL.'assets/dist/js/vendor/tagify/tagify.min.js"></script>';
-		$chaineTemp .= '<link rel="stylesheet" href="'.SB_ADMIN_URL.'assets/dist/js/vendor/tagify/dragsort.css" media="print" onload="this.media=\'all\'">';
-		$chaineTemp .= '<script src="'.SB_ADMIN_URL.'assets/dist/js/vendor/tagify/dragsort.js"></script>';
+		$chaineTemp .= '<link rel="stylesheet" href="'.SBUIADMIN_URL.'assets/dist/js/vendor/tagify/tagify.css">';
+		$chaineTemp .= '<script src="'.SBUIADMIN_URL.'assets/dist/js/vendor/tagify/tagify.min.js"></script>';
+		$chaineTemp .= '<link rel="stylesheet" href="'.SBUIADMIN_URL.'assets/dist/js/vendor/tagify/dragsort.css" media="print" onload="this.media=\'all\'">';
+		$chaineTemp .= '<script src="'.SBUIADMIN_URL.'assets/dist/js/vendor/tagify/dragsort.js"></script>';
 		$chaineTemp .= '<style>';
 		if (_AM_SITE_DEBUG) {
 			$chaineTemp .= '.tagify+input, .tagify+textarea {
