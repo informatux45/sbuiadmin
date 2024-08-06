@@ -18,13 +18,13 @@
 						</div>
 					{/if}
 					
-					{if isset($sb_warning_install_file)}
+					{if isset($sb_warning_install_file) && $sb_warning_install_file == true}
 						<div class="alert alert-danger">
 							Le fichier INSTALL.PHP existe toujours ! Supprimer le !! <a class='alert-link' href='#'>Vite</a> !!!
 						</div>
 					{/if}
 					
-					{if isset($sb_warning_admin_user)}
+					{if isset($sb_warning_admin_user) && $sb_warning_admin_user == true}
 						<div class="alert alert-danger">
 							L'utilisateur <a href="index.php?p=users">ADMIN</a> existe toujours ! Créez d'autres utilisateurs et supprimer le !! <a class='alert-link' href='#'>Vite</a> !!!
 						</div>
