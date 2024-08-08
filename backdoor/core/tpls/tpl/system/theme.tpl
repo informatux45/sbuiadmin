@@ -27,6 +27,8 @@
 								Version: <i>{$sb_theme_config_file|@sbGetFileDocData:"Version"}</i>
 								<br>
 								Auteur: <i>{if $sb_theme_config_file|@sbGetFileDocData:"Author_URI"}<a target="_blank" href="{$sb_theme_config_file|@sbGetFileDocData:"Author_URI"}">{$sb_theme_config_file|@sbGetFileDocData:"Author"}</a>{else}{$sb_theme_config_file|@sbGetFileDocData:"Author"}{/if}</i>
+								<br>
+								Documentation: <i>{if $sb_theme_config_file|@sbGetFileDocData:"Documentation"}<a target="_blank" href="{$sb_theme_config_file|@sbGetFileDocData:"Documentation"}">{$sb_theme_config_file|@sbGetFileDocData:"Documentation"}</a>{else}{$sb_theme_config_file|@sbGetFileDocData:"Documentation"}{/if}</i>
 							</div>
 							{if $sb_themes[theme] != $sb_theme_name}
 							<div class="theme_activate">
