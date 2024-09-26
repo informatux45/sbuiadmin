@@ -403,7 +403,7 @@ class form extends sanitize {
 				$media_photo = '<div id="' . $id . 'Thumb" class="' . $media_class . ' icon-transfert">';
 				if ($photo || $photo != "") {
 					if (file_exists($media_dir.DIRECTORY_SEPARATOR.$photo)) {
-						$media_photo .= '<img class="transfert-media-img" src="'.$media_dir.'/'.$photo.'" alt="'.$photo.'" title="'.$photo.'" />';
+						$media_photo .= '<img class="transfert-media-img" src="'.$media_dir.'/'.$photo.'?v='.time().'" alt="'.$photo.'" title="'.$photo.'" />';
 					} else {
 						$media_photo .= '<img class="transfert-media-img-remove" src="img/broken-image-100.svg" alt="'.$photo.'" title="'.$photo.'" />';
 					}
