@@ -29,6 +29,9 @@ defined('SBUIADMIN_GLOBAL_LAST_LOGIN') OR define("SBUIADMIN_GLOBAL_LAST_LOGIN", 
 defined('SBUIADMIN_GLOBAL_SETTINGS') OR define("SBUIADMIN_GLOBAL_SETTINGS", "Param&egrave;tres");
 defined('SBUIADMIN_GLOBAL_LOGOUT') OR define("SBUIADMIN_GLOBAL_LOGOUT", "D&eacute;connexion");
 defined('SBUIADMIN_GLOBAL_HI') OR define("SBUIADMIN_GLOBAL_HI", "Bonjour");
+defined('SBUIADMIN_GLOBAL_PREV') OR define("SBUIADMIN_GLOBAL_PREV", "Précédent");
+defined('SBUIADMIN_GLOBAL_NEXT') OR define("SBUIADMIN_GLOBAL_NEXT", "Suivant");
+defined('SBUIADMIN_GLOBAL_PAGE_INFOS') or define('SBUIADMIN_GLOBAL_PAGE_INFOS', "%s à %s sur %s résultats");
  
 // --------------------------------
 //          MENU (MAIN)           -
