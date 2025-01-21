@@ -31,10 +31,15 @@ class page extends Smarty {
 	
 	public function paginate($datas, $infos = false) {
 		// ----------------------------------------------
-		$url     = $datas['url'] . '&';
-		$total   = $datas['total'];
-		$by_page = $datas['by_page'];
+		$url         = $datas['url'] . '&';
+		$total       = $datas['total'];
+		$by_page     = $datas['by_page'];
 		$currentPage = $datas['page'];
+		$data_infos  = [
+			 'start' => (($currentPage+1)*$by_page)-$by_page+1
+			,'end'   => ($currentPage+1)*$by_page
+			,'total' => $total
+		];
 		// ----------------------------------------------
 
 		// ----------------------------------------------
@@ -79,7 +84,7 @@ class page extends Smarty {
 			</style>';
 		// ----------------------------------------------
 		if (isset($infos) && $infos == true) {
-			$pagination .= $this->paginateInfos($datas);
+			$pagination .= $this->paginateInfos($data_infos);
 			$pagination .= '<br>';
 		}
 		// ----------------------------------------------
