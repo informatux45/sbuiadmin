@@ -1,6 +1,6 @@
 <?php
 /** *****************************************************************************
-*                     INFORMATUX pagintation class (UTF8)                       *
+*                     INFORMATUX pagination class (UTF8)                        *
 /** *****************************************************************************
 * @author     Patrice BOUTHIER <contact[at]informatux.com>                      *
 * @copyright  1996-2025 INFORMATUX                                              *
