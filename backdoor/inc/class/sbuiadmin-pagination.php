@@ -326,9 +326,11 @@ class pagination {
     }
 	
 	public function getPageInfos() {
+        $start  = (($this->getCurrentPage())*$this->getItemsPerPage())-$this->getItemsPerPage()+1;
+        $end    = $this->getCurrentPage()*$this->getItemsPerPage();
 		$datas  = [
-			 'start' => (($this->getCurrentPage())*$this->getItemsPerPage())-$this->getItemsPerPage()+1
-			,'end'   => ($this->getCurrentPage())*$this->getItemsPerPage()
+			 'start' => $start
+			,'end'   => ($end > $this->getTotalItems()) ? $this->getTotalItems() : $end
 			,'total' => $this->getTotalItems()
 		];
 		return sprintf($this->pageInfos, $datas['start'], $datas['end'], $datas['total']);
