@@ -47,7 +47,7 @@ $sbsmarty = new Smarty();
 // ----------------------
 // CLASSES by array
 // ----------------------
-$sbuiadmin_classes = array('sql', 'sanitize', 'users', 'medias', 'form', 'page', 'upgrade');
+$sbuiadmin_classes = array('sql', 'sanitize', 'users', 'medias', 'form', 'page', 'pagination', 'upgrade');
 foreach ($sbuiadmin_classes as $sbuiadmin_class) {
     sb_global_include(SBUIADMIN_PATH . '/inc/class/' . SBUIADMIN_ID . '-' . $sbuiadmin_class . '.php');
 }
