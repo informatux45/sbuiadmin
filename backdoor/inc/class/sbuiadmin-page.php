@@ -3,12 +3,12 @@
 *                      INFORMATUX page class (UTF8)                             *
 /** *****************************************************************************
 * @author     Patrice BOUTHIER <contact[at]informatux.com>                      *
-* @copyright  1996-2016 INFORMATUX                                              *
+* @copyright  1996-2025 INFORMATUX                                              *
 * @link       http://www.informatux.com/                                        *
 * @since      1.0                                                               *
 * @version    CVS: 1.8                                                          *
 * ----------------------------------------------------------------------------- *
-* Copyright (c) 2011, INFORMATUX Solutions and web development                  *
+* Copyright (c) 2005 - 2025, INFORMATUX Solutions and web development           *
 * All rights reserved.                                                          *
 ***************************************************************************** **/
 
