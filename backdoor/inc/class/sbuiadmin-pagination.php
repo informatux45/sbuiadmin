@@ -1,8 +1,16 @@
 <?php
-/**
- * PHP Pagination Class
- * Simple pagination class
-*/
+/** *****************************************************************************
+*                     INFORMATUX pagintation class (UTF8)                       *
+/** *****************************************************************************
+* @author     Patrice BOUTHIER <contact[at]informatux.com>                      *
+* @copyright  1996-2025 INFORMATUX                                              *
+* @link       http://www.informatux.com/                                        *
+* @since      1.0                                                               *
+* @version    CVS: 1.8                                                          *
+* ----------------------------------------------------------------------------- *
+* Copyright (c) 2005 - 2025, INFORMATUX Solutions and web development           *
+* All rights reserved.                                                          *
+***************************************************************************** **/
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Blocking direct access to plugin      -=
