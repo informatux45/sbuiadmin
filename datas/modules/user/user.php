@@ -71,7 +71,7 @@ switch($op) {
 					$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_USER_ERROR, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
 					$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
 				} else {
-					if (_CMS_USER_CAPTCHA_MODE == "true") {
+					if (defined("_CMS_USER_CAPTCHA_MODE") && _CMS_USER_CAPTCHA_MODE == "true") {
 						// --- Check Google Recaptcha
 						if (isset($_POST['g-recaptcha-response']) && !empty($_POST['g-recaptcha-response'])) {
 							function getCurlData($url) {
