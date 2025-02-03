@@ -154,7 +154,7 @@
 				}
 			},
 			validation: {
-				allowedExtensions: [{if isset($sbfiles_medias_exts_allowed)}{foreach $sbfiles_medias_exts_allowed as $ext_allowed}"{$ext_allowed}"{if !$ext_allowed@last},{/if}{/foreach}{else}"jpg,jpeg,png,gif,pdf,xml,mp4"{/if}],
+				allowedExtensions: [{if isset($sbfiles_medias_exts_allowed)}{foreach $sbfiles_medias_exts_allowed as $ext_allowed}"{$ext_allowed}"{if !$ext_allowed@last},{/if}{/foreach}{else}"(jpg,jpeg,png,gif,pdf,xml,mp4)"{/if}],
 				itemLimit: {$smarty.const._AM_MEDIAS_ITEM_LIMIT},
 				sizeLimit: {$smarty.const._AM_MEDIAS_SIZE_LIMIT|@sbToByteSize}, // Bytes
 			},
