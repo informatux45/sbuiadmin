@@ -8,18 +8,18 @@
 
     <div class="container" id="bgcontainer">
         <div class="row">
-			{if $sbuiadmin_access_code}
+			{if isset($sbuiadmin_access_code)}
 				<div class="alert alert-danger alert-danger-custom">
-				{if $sbuiadmin_access_code == 'E1'}
+				{if isset($sbuiadmin_access_code) && $sbuiadmin_access_code == 'E1'}
 					{$smarty.const.SBUIADMIN_MSG_ERROR_E1}
 				{/if}
-				{if $sbuiadmin_access_code == 'E2'}
+				{if isset($sbuiadmin_access_code) && $sbuiadmin_access_code == 'E2'}
 					{$smarty.const.SBUIADMIN_MSG_ERROR_E2}
 				{/if}
-				{if $sbuiadmin_access_code == 'E3'}
+				{if isset($sbuiadmin_access_code) && $sbuiadmin_access_code == 'E3'}
 					{$smarty.const.SBUIADMIN_MSG_ERROR_E3}
 				{/if}
-				{if $sbuiadmin_access_code == 'E4'}
+				{if isset($sbuiadmin_access_code) && $sbuiadmin_access_code == 'E4'}
 					{$smarty.const.SBUIADMIN_MSG_ERROR_E4}
 				{/if}
 				</div>
