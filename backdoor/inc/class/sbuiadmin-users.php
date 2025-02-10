@@ -83,9 +83,11 @@ class user extends sql {
 	*/
 	function updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user = 'admin') {
 		// --- Update the Access Log file if exist
+		$_sbuiadmin_event = $sbsanitize->htmlEntities($sbuiadmin_event);
+		$_sbuiadmin_user  = $sbsanitize->htmlEntities($sbuiadmin_user);
 		$sql = "INSERT INTO " . _AM_DB_PREFIX . "sb_logaccess
 				(`logaccess_type`, `logaccess_date`, `logaccess_user`, `logaccess_event`)
-				VALUES ('$sbuiadmin_type', UNIX_TIMESTAMP(), '$sbuiadmin_user', '$sbuiadmin_event')";
+				VALUES ('$sbuiadmin_type', UNIX_TIMESTAMP(), '$_sbuiadmin_user', '$_sbuiadmin_event')";
 		$result = $this->query($sql);
 		if (!$result)
 			return false;
