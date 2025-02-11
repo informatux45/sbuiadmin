@@ -218,7 +218,7 @@ class user extends sql {
 			$encryption_key = base64_decode($key);
 			// To decrypt, split the encrypted data from our IV - our unique separator used was "::"
 			list($encrypted_data, $iv2) = explode('::', base64_decode($encrypted_text), 2);
-			$decrypted = openssl_decrypt($encrypted_data, 'aes-256-cbc', $encryption_key, 0, $iv2);
+			$decrypted = @openssl_decrypt($encrypted_data, 'aes-256-cbc', $encryption_key, 0, $iv2);
 			return $decrypted;
 		}
 	}
