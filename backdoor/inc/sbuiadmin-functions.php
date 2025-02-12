@@ -921,12 +921,16 @@ function sbGetMenuModule($param = '') {
 
 	if (!empty($modules_dir)) {
 		// --- Get User Authorizations
-		$id         = $sbusers->getUserInfo($_SESSION['sbuiadmin_user_name'], 'id');
-		$table      = _AM_DB_PREFIX . "sb_users";
-		$query      = "SELECT menu FROM $table WHERE id = $id";
-		$request    = $sbsql->query($query);
-		$user_auth  = $sbsql->assoc($request);
-		$auth_array = explode("|", $user_auth['menu']);
+		$id = $sbusers->getUserInfo($_SESSION['sbuiadmin_user_name'], 'id');
+	      	if (isset($id) && $id > 0) {
+		 	$table      = _AM_DB_PREFIX . "sb_users";
+		 	$query      = "SELECT menu FROM $table WHERE id = $id";
+		 	$request    = $sbsql->query($query);
+		 	$user_auth  = $sbsql->assoc($request);
+		 	$auth_array = explode("|", $user_auth['menu']);
+	      	} else {
+		 	$auth_array = [];
+	      	}
 		
 		for($i = 0; $i < count($modules_dir); $i++) {
 			// --- Get Module name
