@@ -295,7 +295,7 @@ if (!file_exists($file_temp)) {
     imagefill($im, 0, 0, $bg);
     switch ($type) {
         case 1:
-            imagecopyresampled($im, $oi, $x, $y, 0, 0, $w1, $h1, $w0, $h0);
+            imagecopyresampled($im, $oi, ceil($x), ceil($y), 0, 0, ceil($w1), ceil($h1), ceil($w0), ceil($h0));
             if ($sharpen && version_compare(PHP_VERSION, '5.1.0', '>=')) {
                 imageconvolution($im, $matrix, $divisor, 0);
             }
@@ -305,7 +305,7 @@ if (!file_exists($file_temp)) {
             imagegif($im, $file_temp);
             break;
         case 2:
-            imagecopyresampled($im, $oi, $x, $y, 0, 0, $w1, $h1, $w0, $h0);
+            imagecopyresampled($im, $oi, ceil($x), ceil($y), 0, 0, ceil($w1), ceil($h1), ceil($w0), ceil($h0));
             if ($sharpen && version_compare(PHP_VERSION, '5.1.0', '>=')) {
                 imageconvolution($im, $matrix, $divisor, 0);
             }
