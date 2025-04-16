@@ -11,6 +11,10 @@
 		Session
 	</button>
 	&nbsp;
+	<button class="btn {if $smarty.get.p == 'server'}{else}btn-outline{/if} btn-primary" type="button" onclick="location.href='index.php?p=server'">
+		Serveur
+	</button>
+	&nbsp;
 	<button class="btn {if $smarty.get.p == 'cache'}{else}btn-outline{/if} btn-primary" type="button" onclick="location.href='index.php?p=cache'">
 		Cache
 	</button>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Serveur (Live)</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f7fafc;
+      color: #2d3748;
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
+
+    body.dark-mode {
+      background: #1a202c;
+      color: #edf2f7;
+    }
+
+    h1 {
+      text-align: center;
+      color: #f87171;
+    }
+
+    .dashboard {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .card {
+      background: #edf2f7;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      color: #2d3748;
+      width: 280px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .dark-mode .card {
+      background: #2d3748;
+      color: #edf2f7;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card h2 {
+      color: #f87171;
+    }
+
+    .alert {
+      border: 2px solid #ef4444;
+      background: #fef2f2;
+    }
+
+    .dark-mode .alert {
+      background: #fff5f5;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: auto !important;
+    }
+
+	.mode-toggle {
+		position: fixed;
+		top: 20px;
+		right: 20px;
+		background-color: #8255ff;
+		color: white;
+		padding: 10px 20px;
+		border: 4px double #2d00aa;
+		border-radius: 5px;
+		cursor: pointer;
+		font-size: 1rem;
+	}
+
+    .mode-toggle:hover {
+      background-color: #f43f5e;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      color: #4a5568;
+    }
+
+    .dark-mode .footer {
+      color: #aaa;
+    }
+
+    /* Media queries pour responsive */
+    @media (max-width: 768px) {
+      .dashboard {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .card {
+        width: 100% !important;
+        max-width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <button class="mode-toggle" id="modeToggle">☀️ <i class="fa-solid fa-angle-right"></i> 🌙</button>
+
+  <h1>Dashboard Serveur (Live)</h1>
+
+  <div class="dashboard">
+    <div class="card" id="diskCard">
+      <h2><i class="fa-solid fa-hard-drive"></i>&nbsp;&nbsp;Disque</h2>
+      <canvas id="diskChart"></canvas>
+      <p id="diskDetails">Chargement...</p>
+    </div>
+
+    <div class="card" id="ramCard">
+      <h2><i class="fas fa-memory"></i>&nbsp;&nbsp;RAM</h2>
+      <canvas id="ramChart"></canvas>
+      <p id="ramDetails">Chargement...</p>
+    </div>
+
+    <div class="card" id="cpuCard">
+      <h2><i class="fas fa-microchip"></i>&nbsp;&nbsp;CPU</h2>
+      <p id="cpuModel"></p>
+      <p id="cpuCores"></p>
+      <p id="cpuLoad"></p>
+      <p id="cpuTemp"></p>
+    </div>
+
+    <div class="card">
+      <h2><i class="fas fa-network-wired"></i>&nbsp;&nbsp;Réseau</h2>
+      <p id="netRx"></p>
+      <p id="netTx"></p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>Dashboard Serveur - Données en temps réel</p>
+  </div>
+
+  <script>
+    const diskChart = new Chart(document.getElementById('diskChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Utilisé (Go)', 'Libre (Go)'],
+        datasets: [{ data: [0, 0], backgroundColor: ['#f87171', '#34d399'] }]
+      }
+    });
+
+    const ramChart = new Chart(document.getElementById('ramChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Utilisé (Go)', 'Libre (Go)'],
+        datasets: [{ data: [0, 0], backgroundColor: ['#60a5fa', '#a7f3d0'] }]
+      }
+    });
+
+    async function refreshDashboard() {
+      try {
+        const res = await fetch('status.php');
+        const data = await res.json();
+
+        const usedRamInGb = (data.ram.used_mb / 1024).toFixed(2);
+        const freeRamInGb = (data.ram.free_mb / 1024).toFixed(2);
+
+        ramChart.data.datasets[0].data = [usedRamInGb, freeRamInGb];
+        ramChart.update();
+
+        diskChart.data.datasets[0].data = [data.disk.used_gb, data.disk.free_gb];
+        diskChart.update();
+		
+		document.getElementById('cpuModel').textContent = "Modèle : " + data.cpu.model;
+		document.getElementById('cpuCores').textContent = "Coeurs : " + data.cpu.cores;
+		document.getElementById('cpuLoad').textContent = "Charge : " + data.cpu.load + " %";
+		document.getElementById('cpuTemp').textContent = data.cpu.temp_c ? "Température : " + data.cpu.temp_c + " °C" : "";
+
+
+        document.getElementById('netRx').textContent = `Reçu : ${data.network.rx_mb} Mo`;
+        document.getElementById('netTx').textContent = `Envoyé : ${data.network.tx_mb} Mo`;
+
+        document.getElementById('diskDetails').innerHTML = `Espace libre : ${data.disk.free_gb} Go<br/>Espace total : ${data.disk.total_gb} Go`;
+        document.getElementById('ramDetails').innerHTML = `RAM libre : ${freeRamInGb} Go<br/>RAM totale : ${(data.ram.total_mb / 1024).toFixed(2)} Go`;
+
+        document.getElementById('diskCard').classList.toggle('alert', data.disk.free_gb < 10);
+        document.getElementById('ramCard').classList.toggle('alert', freeRamInGb < 0.5);
+        document.getElementById('cpuCard').classList.toggle('alert', data.cpu.load > 70);
+      } catch (e) {
+        console.error("Erreur lors du chargement des données :", e);
+      }
+    }
+
+    document.getElementById('modeToggle').addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      //document.getElementById('modeToggle').textContent = isDark ? 'Passer en mode clair' : 'Passer en mode sombre';
+      document.getElementById('modeToggle').innerHTML = isDark ? '🌙 <i class="fa-solid fa-angle-right"></i> ☀️' : '☀️ <i class="fa-solid fa-angle-right"></i> 🌙';
+    });
+
+    setInterval(refreshDashboard, 5000);
+    refreshDashboard();
+  </script>
+</body>
+</html>
