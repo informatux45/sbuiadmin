@@ -32,9 +32,9 @@ Ready | Fonctionnalités
 
 ### Screenshots
 
-![Un thème (front)]([https://informatux.ddns.net:744/home/tools/demo_github/sbuiadmin-theme-2.jpg "Un thème (front)")
+![Un thème (front)](https://informatux.ddns.net:744/home/tools/demo_github/sbuiadmin-theme-2.jpg "Un thème (front)")
 
-![Un thème (front)]([https://informatux.ddns.net:744/home/tools/demo_github/sbuiadmin-theme-1.jpg "Un thème (front)")
+![Un thème (front)](https://informatux.ddns.net:744/home/tools/demo_github/sbuiadmin-theme-1.jpg "Un thème (front)")
 
 ![Login administration](https://informatux.ddns.net:744/home/tools/demo_github/sbuiadmin-login-1.jpg "Login administration")
 
@@ -100,5 +100,6 @@ Ready | Fonctionnalités
 
 **1.00**
 - First version.
+
 
 
