@@ -15,6 +15,25 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
+/**
+ * A simple handler to display fatal error information for debugging.
+ */
+function __fatalHandler() {
+    $error = error_get_last();
+
+    // Check if it's a core/fatal error
+    if ($error !== null && in_array($error['type'], [
+        E_ERROR, E_PARSE, E_CORE_ERROR, E_CORE_WARNING,
+        E_COMPILE_ERROR, E_COMPILE_WARNING, E_RECOVERABLE_ERROR
+    ])) {
+        echo "<pre>Fatal Error:\n";
+        var_dump($error);
+        echo "</pre>";
+        die; // Terminate script execution
+    }
+}
+register_shutdown_function('__fatalHandler');
+
 // ----------------------
 // INCLUDES by array
 // ----------------------
