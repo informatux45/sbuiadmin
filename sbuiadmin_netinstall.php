@@ -10,1184 +10,565 @@
 // ––––––––––––––––––––––––––––––––––––––––––––––––––
 // CONSTANTS - URL
 // ––––––––––––––––––––––––––––––––––––––––––––––––––
-$actual_link  = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+$actual_link  = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 $redirect_url = pathinfo($actual_link, PATHINFO_DIRNAME);
-define('SBUIADMIN_DEV_URL', 'https://dev.sbuiadmin.fr/');
-define('SBUIADMIN_NET_INSTALL_DIR', 'update/net_install/');
-define('SBUIADMIN_NET_INSTALL_URL', SBUIADMIN_DEV_URL . SBUIADMIN_NET_INSTALL_DIR);
+define('SBUIADMIN_DEV_URL',              'https://client.informatux.com/');
+define('SBUIADMIN_NET_INSTALL_DIR',      'master/net_install/');
+define('SBUIADMIN_NET_INSTALL_URL',      SBUIADMIN_DEV_URL . SBUIADMIN_NET_INSTALL_DIR);
 define('SBUIADMIN_NET_INSTALL_LATEST_URL', SBUIADMIN_DEV_URL . SBUIADMIN_NET_INSTALL_DIR . 'latest/');
 define('SBUIADMIN_NET_INSTALL_STABLE_URL', SBUIADMIN_DEV_URL . SBUIADMIN_NET_INSTALL_DIR . 'stable/');
+
+// Timeouts cURL (secondes)
+define('SBUIADMIN_CURL_CONNECT_TIMEOUT', 15);   // connexion TCP
+define('SBUIADMIN_CURL_TIMEOUT',         180);  // transfert total (zip peut être lourd)
 
 // ––––––––––––––––––––––––––––––––––––––––––––––––––
 // CONSTANTS - LANG FR
 // ––––––––––––––––––––––––––––––––––––––––––––––––––
-define('SBUIADMIN_TITLE_FR', "Net Installation SBUIADMIN");
-define('SBUIADMIN_INSTALL_SUCCESSFULLY_FR', "Fichiers installés ;-)<br>N'oubliez pas de supprimer le fichier netinstall");
-define('SBUIADMIN_DOWNLOAD_BUTTON_FR', "Télécharger");
-define('SBUIADMIN_GO_TO_ADMIN_FR', "Allez à votre administration");
-define('SBUIADMIN_SLOGAN_1_FR', "Pensez pour vos mobiles");
-define('SBUIADMIN_SLOGAN_2_FR', 'Styles conçus avec bootstrap');
-define('SBUIADMIN_SLOGAN_3_FR', 'Rapide pour commencer immédiatement');
+define('SBUIADMIN_TITLE_FR',               'Net Installation SBUIADMIN');
+define('SBUIADMIN_INSTALL_SUCCESSFULLY_FR','Installation réussie ✓<br>Pensez à supprimer ce fichier netinstall.');
+define('SBUIADMIN_DOWNLOAD_BUTTON_FR',     'Installer SBUIADMIN');
+define('SBUIADMIN_GO_TO_ADMIN_FR',         'Accéder à l\'administration');
+define('SBUIADMIN_SLOGAN_1_FR',            'Pensé pour vos mobiles');
+define('SBUIADMIN_SLOGAN_2_FR',            'Styles conçus avec Bootstrap');
+define('SBUIADMIN_SLOGAN_3_FR',            'Opérationnel immédiatement');
 
 // ––––––––––––––––––––––––––––––––––––––––––––––––––
 // CONSTANTS - LANG EN
 // ––––––––––––––––––––––––––––––––––––––––––––––––––
-define('SBUIADMIN_TITLE_EN', "SBUIADMIN Net Installation");
-define('SBUIADMIN_INSTALL_SUCCESSFULLY_EN', "Installed files ;-)<br>Do not forget to delete the netinstall file");
-define('SBUIADMIN_DOWNLOAD_BUTTON_EN', "Download");
-define('SBUIADMIN_GO_TO_ADMIN_EN', 'Go to your Administration');
-define('SBUIADMIN_SLOGAN_1_EN', 'Built with mobile in mind');
-define('SBUIADMIN_SLOGAN_2_EN', 'Styles designed with bootstrap');
-define('SBUIADMIN_SLOGAN_3_EN', 'Quick to start with zero compiling');
+define('SBUIADMIN_TITLE_EN',               'SBUIADMIN Net Installation');
+define('SBUIADMIN_INSTALL_SUCCESSFULLY_EN','Installation complete ✓<br>Remember to delete this netinstall file.');
+define('SBUIADMIN_DOWNLOAD_BUTTON_EN',     'Install SBUIADMIN');
+define('SBUIADMIN_GO_TO_ADMIN_EN',         'Go to Administration');
+define('SBUIADMIN_SLOGAN_1_EN',            'Built with mobile in mind');
+define('SBUIADMIN_SLOGAN_2_EN',            'Styles designed with Bootstrap');
+define('SBUIADMIN_SLOGAN_3_EN',            'Quick to start immediately');
 
-// --- Languages we support
-$available_languages = array("en", "fr");
-$browser_language    = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
-$language            = ( in_array($browser_language, $available_languages) ) ? strtoupper($browser_language) : 'EN';
+// ––––––––––––––––––––––––––––––––––––––––––––––––––
+// LANGUAGE DETECTION
+// ––––––––––––––––––––––––––––––––––––––––––––––––––
+$available_languages = ['en', 'fr'];
+$browser_language    = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? 'en', 0, 2);
+$language            = in_array($browser_language, $available_languages) ? strtoupper($browser_language) : 'EN';
 
-?>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-	<!-- Basic Page Needs
-	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
-	<meta charset="utf-8">
-	<title>SBUIADMIN Net Install</title>
-	<meta name="description" content="SBUIADMIN, le CMS By INFORMATUX">
-	<meta name="author" content="INFORMATUX">
-	
-	<!-- Mobile Specific Metas
-	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	
-	<!-- FONT
-	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
-	<link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
-	<!-- Normalize -->	
-	<style>
-		/*! normalize.css v3.0.2 | MIT License | git.io/normalize */
-		
-		/**
-		 * 1. Set default font family to sans-serif.
-		 * 2. Prevent iOS text size adjust after orientation change, without disabling
-		 *    user zoom.
-		 */
-		
-		html {
-		  font-family: sans-serif; /* 1 */
-		  -ms-text-size-adjust: 100%; /* 2 */
-		  -webkit-text-size-adjust: 100%; /* 2 */
-		}
-		
-		/**
-		 * Remove default margin.
-		 */
-		
-		body {
-		  margin: 0;
-		}
-		
-		/* HTML5 display definitions
-		   ========================================================================== */
-		
-		/**
-		 * Correct `block` display not defined for any HTML5 element in IE 8/9.
-		 * Correct `block` display not defined for `details` or `summary` in IE 10/11
-		 * and Firefox.
-		 * Correct `block` display not defined for `main` in IE 11.
-		 */
-		
-		article,
-		aside,
-		details,
-		figcaption,
-		figure,
-		footer,
-		header,
-		hgroup,
-		main,
-		menu,
-		nav,
-		section,
-		summary {
-		  display: block;
-		}
-		
-		/**
-		 * 1. Correct `inline-block` display not defined in IE 8/9.
-		 * 2. Normalize vertical alignment of `progress` in Chrome, Firefox, and Opera.
-		 */
-		
-		audio,
-		canvas,
-		progress,
-		video {
-		  display: inline-block; /* 1 */
-		  vertical-align: baseline; /* 2 */
-		}
-		
-		/**
-		 * Prevent modern browsers from displaying `audio` without controls.
-		 * Remove excess height in iOS 5 devices.
-		 */
-		
-		audio:not([controls]) {
-		  display: none;
-		  height: 0;
-		}
-		
-		/**
-		 * Address `[hidden]` styling not present in IE 8/9/10.
-		 * Hide the `template` element in IE 8/9/11, Safari, and Firefox < 22.
-		 */
-		
-		[hidden],
-		template {
-		  display: none;
-		}
-		
-		/* Links
-		   ========================================================================== */
-		
-		/**
-		 * Remove the gray background color from active links in IE 10.
-		 */
-		
-		a {
-		  background-color: transparent;
-		}
-		
-		/**
-		 * Improve readability when focused and also mouse hovered in all browsers.
-		 */
-		
-		a:active,
-		a:hover {
-		  outline: 0;
-		}
-		
-		/* Text-level semantics
-		   ========================================================================== */
-		
-		/**
-		 * Address styling not present in IE 8/9/10/11, Safari, and Chrome.
-		 */
-		
-		abbr[title] {
-		  border-bottom: 1px dotted;
-		}
-		
-		/**
-		 * Address style set to `bolder` in Firefox 4+, Safari, and Chrome.
-		 */
-		
-		b,
-		strong {
-		  font-weight: bold;
-		}
-		
-		/**
-		 * Address styling not present in Safari and Chrome.
-		 */
-		
-		dfn {
-		  font-style: italic;
-		}
-		
-		/**
-		 * Address variable `h1` font-size and margin within `section` and `article`
-		 * contexts in Firefox 4+, Safari, and Chrome.
-		 */
-		
-		h1 {
-		  font-size: 2em;
-		  margin: 0.67em 0;
-		}
-		
-		/**
-		 * Address styling not present in IE 8/9.
-		 */
-		
-		mark {
-		  background: #ff0;
-		  color: #000;
-		}
-		
-		/**
-		 * Address inconsistent and variable font size in all browsers.
-		 */
-		
-		small {
-		  font-size: 80%;
-		}
-		
-		/**
-		 * Prevent `sub` and `sup` affecting `line-height` in all browsers.
-		 */
-		
-		sub,
-		sup {
-		  font-size: 75%;
-		  line-height: 0;
-		  position: relative;
-		  vertical-align: baseline;
-		}
-		
-		sup {
-		  top: -0.5em;
-		}
-		
-		sub {
-		  bottom: -0.25em;
-		}
-		
-		/* Embedded content
-		   ========================================================================== */
-		
-		/**
-		 * Remove border when inside `a` element in IE 8/9/10.
-		 */
-		
-		img {
-		  border: 0;
-		}
-		
-		/**
-		 * Correct overflow not hidden in IE 9/10/11.
-		 */
-		
-		svg:not(:root) {
-		  overflow: hidden;
-		}
-		
-		/* Grouping content
-		   ========================================================================== */
-		
-		/**
-		 * Address margin not present in IE 8/9 and Safari.
-		 */
-		
-		figure {
-		  margin: 1em 40px;
-		}
-		
-		/**
-		 * Address differences between Firefox and other browsers.
-		 */
-		
-		hr {
-		  -moz-box-sizing: content-box;
-		  box-sizing: content-box;
-		  height: 0;
-		}
-		
-		/**
-		 * Contain overflow in all browsers.
-		 */
-		
-		pre {
-		  overflow: auto;
-		}
-		
-		/**
-		 * Address odd `em`-unit font size rendering in all browsers.
-		 */
-		
-		code,
-		kbd,
-		pre,
-		samp {
-		  font-family: monospace, monospace;
-		  font-size: 1em;
-		}
-		
-		/* Forms
-		   ========================================================================== */
-		
-		/**
-		 * Known limitation: by default, Chrome and Safari on OS X allow very limited
-		 * styling of `select`, unless a `border` property is set.
-		 */
-		
-		/**
-		 * 1. Correct color not being inherited.
-		 *    Known issue: affects color of disabled elements.
-		 * 2. Correct font properties not being inherited.
-		 * 3. Address margins set differently in Firefox 4+, Safari, and Chrome.
-		 */
-		
-		button,
-		input,
-		optgroup,
-		select,
-		textarea {
-		  color: inherit; /* 1 */
-		  font: inherit; /* 2 */
-		  margin: 0; /* 3 */
-		}
-		
-		/**
-		 * Address `overflow` set to `hidden` in IE 8/9/10/11.
-		 */
-		
-		button {
-		  overflow: visible;
-		}
-		
-		/**
-		 * Address inconsistent `text-transform` inheritance for `button` and `select`.
-		 * All other form control elements do not inherit `text-transform` values.
-		 * Correct `button` style inheritance in Firefox, IE 8/9/10/11, and Opera.
-		 * Correct `select` style inheritance in Firefox.
-		 */
-		
-		button,
-		select {
-		  text-transform: none;
-		}
-		
-		/**
-		 * 1. Avoid the WebKit bug in Android 4.0.* where (2) destroys native `audio`
-		 *    and `video` controls.
-		 * 2. Correct inability to style clickable `input` types in iOS.
-		 * 3. Improve usability and consistency of cursor style between image-type
-		 *    `input` and others.
-		 */
-		
-		button,
-		html input[type="button"], /* 1 */
-		input[type="reset"],
-		input[type="submit"] {
-		  -webkit-appearance: button; /* 2 */
-		  cursor: pointer; /* 3 */
-		}
-		
-		/**
-		 * Re-set default cursor for disabled elements.
-		 */
-		
-		button[disabled],
-		html input[disabled] {
-		  cursor: default;
-		}
-		
-		/**
-		 * Remove inner padding and border in Firefox 4+.
-		 */
-		
-		button::-moz-focus-inner,
-		input::-moz-focus-inner {
-		  border: 0;
-		  padding: 0;
-		}
-		
-		/**
-		 * Address Firefox 4+ setting `line-height` on `input` using `!important` in
-		 * the UA stylesheet.
-		 */
-		
-		input {
-		  line-height: normal;
-		}
-		
-		/**
-		 * It's recommended that you don't attempt to style these elements.
-		 * Firefox's implementation doesn't respect box-sizing, padding, or width.
-		 *
-		 * 1. Address box sizing set to `content-box` in IE 8/9/10.
-		 * 2. Remove excess padding in IE 8/9/10.
-		 */
-		
-		input[type="checkbox"],
-		input[type="radio"] {
-		  box-sizing: border-box; /* 1 */
-		  padding: 0; /* 2 */
-		}
-		
-		/**
-		 * Fix the cursor style for Chrome's increment/decrement buttons. For certain
-		 * `font-size` values of the `input`, it causes the cursor style of the
-		 * decrement button to change from `default` to `text`.
-		 */
-		
-		input[type="number"]::-webkit-inner-spin-button,
-		input[type="number"]::-webkit-outer-spin-button {
-		  height: auto;
-		}
-		
-		/**
-		 * 1. Address `appearance` set to `searchfield` in Safari and Chrome.
-		 * 2. Address `box-sizing` set to `border-box` in Safari and Chrome
-		 *    (include `-moz` to future-proof).
-		 */
-		
-		input[type="search"] {
-		  -webkit-appearance: textfield; /* 1 */
-		  -moz-box-sizing: content-box;
-		  -webkit-box-sizing: content-box; /* 2 */
-		  box-sizing: content-box;
-		}
-		
-		/**
-		 * Remove inner padding and search cancel button in Safari and Chrome on OS X.
-		 * Safari (but not Chrome) clips the cancel button when the search input has
-		 * padding (and `textfield` appearance).
-		 */
-		
-		input[type="search"]::-webkit-search-cancel-button,
-		input[type="search"]::-webkit-search-decoration {
-		  -webkit-appearance: none;
-		}
-		
-		/**
-		 * Define consistent border, margin, and padding.
-		 */
-		
-		fieldset {
-		  border: 1px solid #c0c0c0;
-		  margin: 0 2px;
-		  padding: 0.35em 0.625em 0.75em;
-		}
-		
-		/**
-		 * 1. Correct `color` not being inherited in IE 8/9/10/11.
-		 * 2. Remove padding so people aren't caught out if they zero out fieldsets.
-		 */
-		
-		legend {
-		  border: 0; /* 1 */
-		  padding: 0; /* 2 */
-		}
-		
-		/**
-		 * Remove default vertical scrollbar in IE 8/9/10/11.
-		 */
-		
-		textarea {
-		  overflow: auto;
-		}
-		
-		/**
-		 * Don't inherit the `font-weight` (applied by a rule above).
-		 * NOTE: the default cannot safely be changed in Chrome and Safari on OS X.
-		 */
-		
-		optgroup {
-		  font-weight: bold;
-		}
-		
-		/* Tables
-		   ========================================================================== */
-		
-		/**
-		 * Remove most spacing between table cells.
-		 */
-		
-		table {
-		  border-collapse: collapse;
-		  border-spacing: 0;
-		}
-		
-		td,
-		th {
-		  padding: 0;
-		}
-	</style>
-	<!-- Skeleton -->
-	<style>
-		/*
-		* Skeleton V2.0.4
-		* Copyright 2014, Dave Gamache
-		* www.getskeleton.com
-		* Free to use under the MIT license.
-		* http://www.opensource.org/licenses/mit-license.php
-		* 12/29/2014
-		*/
-		
-		
-		/* Table of contents
-		––––––––––––––––––––––––––––––––––––––––––––––––––
-		- Grid
-		- Base Styles
-		- Typography
-		- Links
-		- Buttons
-		- Forms
-		- Lists
-		- Code
-		- Tables
-		- Spacing
-		- Utilities
-		- Clearing
-		- Media Queries
-		*/
-		
-		
-		/* Grid
-		–––––––––––––––––––––––––––––––––––––––––––––––––– */
-		.container {
-		  position: relative;
-		  width: 100%;
-		  max-width: 960px;
-		  margin: 0 auto;
-		  padding: 0 20px;
-		  box-sizing: border-box; }
-		.column,
-		.columns {
-		  width: 100%;
-		  float: left;
-		  box-sizing: border-box; }
-		
-		/* For devices larger than 400px */
-		@media (min-width: 400px) {
-		  .container {
-			width: 85%;
-			padding: 0; }
-		}
-		
-		/* For devices larger than 550px */
-		@media (min-width: 550px) {
-		  .container {
-			width: 80%; }
-		  .column,
-		  .columns {
-			margin-left: 4%; }
-		  .column:first-child,
-		  .columns:first-child {
-			margin-left: 0; }
-		
-		  .one.column,
-		  .one.columns                    { width: 4.66666666667%; }
-		  .two.columns                    { width: 13.3333333333%; }
-		  .three.columns                  { width: 22%;            }
-		  .four.columns                   { width: 30.6666666667%; }
-		  .five.columns                   { width: 39.3333333333%; }
-		  .six.columns                    { width: 48%;            }
-		  .seven.columns                  { width: 56.6666666667%; }
-		  .eight.columns                  { width: 65.3333333333%; }
-		  .nine.columns                   { width: 74.0%;          }
-		  .ten.columns                    { width: 82.6666666667%; }
-		  .eleven.columns                 { width: 91.3333333333%; }
-		  .twelve.columns                 { width: 100%; margin-left: 0; }
-		
-		  .one-third.column               { width: 30.6666666667%; }
-		  .two-thirds.column              { width: 65.3333333333%; }
-		
-		  .one-half.column                { width: 48%; }
-		
-		  /* Offsets */
-		  .offset-by-one.column,
-		  .offset-by-one.columns          { margin-left: 8.66666666667%; }
-		  .offset-by-two.column,
-		  .offset-by-two.columns          { margin-left: 17.3333333333%; }
-		  .offset-by-three.column,
-		  .offset-by-three.columns        { margin-left: 26%;            }
-		  .offset-by-four.column,
-		  .offset-by-four.columns         { margin-left: 34.6666666667%; }
-		  .offset-by-five.column,
-		  .offset-by-five.columns         { margin-left: 43.3333333333%; }
-		  .offset-by-six.column,
-		  .offset-by-six.columns          { margin-left: 52%;            }
-		  .offset-by-seven.column,
-		  .offset-by-seven.columns        { margin-left: 60.6666666667%; }
-		  .offset-by-eight.column,
-		  .offset-by-eight.columns        { margin-left: 69.3333333333%; }
-		  .offset-by-nine.column,
-		  .offset-by-nine.columns         { margin-left: 78.0%;          }
-		  .offset-by-ten.column,
-		  .offset-by-ten.columns          { margin-left: 86.6666666667%; }
-		  .offset-by-eleven.column,
-		  .offset-by-eleven.columns       { margin-left: 95.3333333333%; }
-		
-		  .offset-by-one-third.column,
-		  .offset-by-one-third.columns    { margin-left: 34.6666666667%; }
-		  .offset-by-two-thirds.column,
-		  .offset-by-two-thirds.columns   { margin-left: 69.3333333333%; }
-		
-		  .offset-by-one-half.column,
-		  .offset-by-one-half.columns     { margin-left: 52%; }
-		
-		}
-		
-		
-		/* Base Styles
-		–––––––––––––––––––––––––––––––––––––––––––––––––– */
-		/* NOTE
-		html is set to 62.5% so that all the REM measurements throughout Skeleton
-		are based on 10px sizing. So basically 1.5rem = 15px :) */
-		html {
-		  font-size: 62.5%; }
-		body {
-		  font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
-		  line-height: 1.6;
-		  font-weight: 400;
-		  font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-		  color: #222; }
-		
-		
-		/* Typography
-		–––––––––––––––––––––––––––––––––––––––––––––––––– */
-		h1, h2, h3, h4, h5, h6 {
-		  margin-top: 0;
-		  margin-bottom: 2rem;
-		  font-weight: 300; }
-		h1 { font-size: 4.0rem; line-height: 1.2;  letter-spacing: -.1rem;}
-		h2 { font-size: 3.6rem; line-height: 1.25; letter-spacing: -.1rem; }
-		h3 { font-size: 3.0rem; line-height: 1.3;  letter-spacing: -.1rem; }
-		h4 { font-size: 2.4rem; line-height: 1.35; letter-spacing: -.08rem; }
-		h5 { font-size: 1.8rem; line-height: 1.5;  letter-spacing: -.05rem; }
-		h6 { font-size: 1.5rem; line-height: 1.6;  letter-spacing: 0; }
-		
-		/* Larger than phablet */
-		@media (min-width: 550px) {
-		  h1 { font-size: 5.0rem; }
-		  h2 { font-size: 4.2rem; }
-		  h3 { font-size: 3.6rem; }
-		  h4 { font-size: 3.0rem; }
-		  h5 { font-size: 2.4rem; }
-		  h6 { font-size: 1.5rem; }
-		}
-		
-		p {
-		  margin-top: 0; }
-		
-		
-		/* Links
-		–––––––––––––––––––––––––––––––––––––––––––––––––– */
-		a {
-		  color: #1EAEDB; }
-		a:hover {
-		  color: #0FA0CE; }
-		
-		
-		/* Buttons
-		–––––––––––––––––––––––––––––––––––––––––––––––––– */
-		.button,
-		button,
-		input[type="submit"],
-		input[type="reset"],
-		input[type="button"] {
-		  display: inline-block;
-		  height: 38px;
-		  padding: 0 30px;
-		  color: #555;
-		  text-align: center;
-		  font-size: 11px;
-		  font-weight: 600;
-		  line-height: 38px;
-		  letter-spacing: .1rem;
-		  text-transform: uppercase;
-		  text-decoration: none;
-		  white-space: nowrap;
-		  background-color: transparent;
-		  border-radius: 4px;
-		  border: 1px solid #bbb;
-		  cursor: pointer;
-		  box-sizing: border-box; }
-		.button:hover,
-		button:hover,
-		input[type="submit"]:hover,
-		input[type="reset"]:hover,
-		input[type="button"]:hover,
-		.button:focus,
-		button:focus,
-		input[type="submit"]:focus,
-		input[type="reset"]:focus,
-		input[type="button"]:focus {
-		  color: #333;
-		  border-color: #888;
-		  outline: 0; }
-		.button.button-primary,
-		button.button-primary,
-		input[type="submit"].button-primary,
-		input[type="reset"].button-primary,
-		input[type="button"].button-primary {
-		  color: #FFF;
-		  background-color: #33C3F0;
-		  border-color: #33C3F0; }
-		.button.button-primary:hover,
-		button.button-primary:hover,
-		input[type="submit"].button-primary:hover,
-		input[type="reset"].button-primary:hover,
-		input[type="button"].button-primary:hover,
-		.button.button-primary:focus,
-		button.button-primary:focus,
-		input[type="submit"].button-primary:focus,
-		input[type="reset"].button-primary:focus,
-		input[type="button"].button-primary:focus {
-		  color: #FFF;
-		  background-color: #1EAEDB;
-		  border-color: #1EAEDB; }
-		.button.button-success,
-		button.button-success,
-		input[type="submit"].button-success,
-		input[type="reset"].button-success,
-		input[type="button"].button-success {
-		  color: #FFF;
-		  background-color: green;
-		  border-color: green; }
-		.button.button-success:hover,
-		button.button-success:hover,
-		input[type="submit"].button-success:hover,
-		input[type="reset"].button-success:hover,
-		input[type="button"].button-success:hover,
-		.button.button-success:focus,
-		button.button-success:focus,
-		input[type="submit"].button-success:focus,
-		input[type="reset"].button-success:focus,
-		input[type="button"].button-success:focus {
-		  color: #FFF;
-		  background-color: green;
-		  border-color: green; }
-		.button.button-warning,
-		button.button-warning,
-		input[type="submit"].button-warning,
-		input[type="reset"].button-warning,
-		input[type="button"].button-warning {
-		  color: #FFF;
-		  background-color: red;
-		  border-color: red; }
-		.button.button-warning:hover,
-		button.button-warning:hover,
-		input[type="submit"].button-warning:hover,
-		input[type="reset"].button-warning:hover,
-		input[type="button"].button-warning:hover,
-		.button.button-success:focus,
-		button.button-success:focus,
-		input[type="submit"].button-warning:focus,
-		input[type="reset"].button-warning:focus,
-		input[type="button"].button-warning:focus {
-		  color: #FFF;
-		  background-color: red;
-		  border-color: red; }		
-		
-		/* Forms
-		–––––––––––––––––––––––––––––––––––––––––––––––––– */
-		input[type="email"],
-		input[type="number"],
-		input[type="search"],
-		input[type="text"],
-		input[type="tel"],
-		input[type="url"],
-		input[type="password"],
-		textarea,
-		select {
-		  height: 38px;
-		  padding: 6px 10px; /* The 6px vertically centers text on FF, ignored by Webkit */
-		  background-color: #fff;
-		  border: 1px solid #D1D1D1;
-		  border-radius: 4px;
-		  box-shadow: none;
-		  box-sizing: border-box; }
-		/* Removes awkward default styles on some inputs for iOS */
-		input[type="email"],
-		input[type="number"],
-		input[type="search"],
-		input[type="text"],
-		input[type="tel"],
-		input[type="url"],
-		input[type="password"],
-		textarea {
-		  -webkit-appearance: none;
-			 -moz-appearance: none;
-				  appearance: none; }
-		textarea {
-		  min-height: 65px;
-		  padding-top: 6px;
-		  padding-bottom: 6px; }
-		input[type="email"]:focus,
-		input[type="number"]:focus,
-		input[type="search"]:focus,
-		input[type="text"]:focus,
-		input[type="tel"]:focus,
-		input[type="url"]:focus,
-		input[type="password"]:focus,
-		textarea:focus,
-		select:focus {
-		  border: 1px solid #33C3F0;
-		  outline: 0; }
-		label,
-		legend {
-		  display: block;
-		  margin-bottom: .5rem;
-		  font-weight: 600; }
-		fieldset {
-		  padding: 0;
-		  border-width: 0; }
-		input[type="checkbox"],
-		input[type="radio"] {
-		  display: inline; }
-		label > .label-body {
-		  display: inline-block;
-		  margin-left: .5rem;
-		  font-weight: normal; }
-		
-		
-		/* Lists
-		–––––––––––––––––––––––––––––––––––––––––––––––––– */
-		ul {
-		  list-style: circle inside; }
-		ol {
-		  list-style: decimal inside; }
-		ol, ul {
-		  padding-left: 0;
-		  margin-top: 0; }
-		ul ul,
-		ul ol,
-		ol ol,
-		ol ul {
-		  margin: 1.5rem 0 1.5rem 3rem;
-		  font-size: 90%; }
-		li {
-		  margin-bottom: 1rem; }
-		
-		
-		/* Code
-		–––––––––––––––––––––––––––––––––––––––––––––––––– */
-		code {
-		  padding: .2rem .5rem;
-		  margin: 0 .2rem;
-		  font-size: 90%;
-		  white-space: nowrap;
-		  background: #F1F1F1;
-		  border: 1px solid #E1E1E1;
-		  border-radius: 4px; }
-		pre > code {
-		  display: block;
-		  padding: 1rem 1.5rem;
-		  white-space: pre; }
-		
-		
-		/* Tables
-		–––––––––––––––––––––––––––––––––––––––––––––––––– */
-		th,
-		td {
-		  padding: 12px 15px;
-		  text-align: left;
-		  border-bottom: 1px solid #E1E1E1; }
-		th:first-child,
-		td:first-child {
-		  padding-left: 0; }
-		th:last-child,
-		td:last-child {
-		  padding-right: 0; }
-		
-		
-		/* Spacing
-		–––––––––––––––––––––––––––––––––––––––––––––––––– */
-		button,
-		.button {
-		  margin-bottom: 1rem; }
-		input,
-		textarea,
-		select,
-		fieldset {
-		  margin-bottom: 1.5rem; }
-		pre,
-		blockquote,
-		dl,
-		figure,
-		table,
-		p,
-		ul,
-		ol,
-		form {
-		  margin-bottom: 2.5rem; }
-		
-		
-		/* Utilities
-		–––––––––––––––––––––––––––––––––––––––––––––––––– */
-		.u-full-width {
-		  width: 100%;
-		  box-sizing: border-box; }
-		.u-max-full-width {
-		  max-width: 100%;
-		  box-sizing: border-box; }
-		.u-pull-right {
-		  float: right; }
-		.u-pull-left {
-		  float: left; }
-		
-		
-		/* Misc
-		–––––––––––––––––––––––––––––––––––––––––––––––––– */
-		hr {
-		  margin-top: 3rem;
-		  margin-bottom: 3.5rem;
-		  border-width: 0;
-		  border-top: 1px solid #E1E1E1; }
-		
-		
-		/* Clearing
-		–––––––––––––––––––––––––––––––––––––––––––––––––– */
-		
-		/* Self Clearing Goodness */
-		.container:after,
-		.row:after,
-		.u-cf {
-		  content: "";
-		  display: table;
-		  clear: both; }
-		
-		
-		/* Media Queries
-		–––––––––––––––––––––––––––––––––––––––––––––––––– */
-		/*
-		Note: The best way to structure the use of media queries is to create the queries
-		near the relevant code. For example, if you wanted to change the styles for buttons
-		on small devices, paste the mobile query code up in the buttons section and style it
-		there.
-		*/
-		
-		
-		/* Larger than mobile */
-		@media (min-width: 400px) {}
-		
-		/* Larger than phablet (also point when grid becomes active) */
-		@media (min-width: 550px) {}
-		
-		/* Larger than tablet */
-		@media (min-width: 750px) {}
-		
-		/* Larger than desktop */
-		@media (min-width: 1000px) {}
-		
-		/* Larger than Desktop HD */
-		@media (min-width: 1200px) {}
-	</style>
-	<!-- Custom style -->
-	<style>
-		.header {
-			margin-top: 18rem;
-		}
-		.header {
-			text-align: center;
-		}
-		.container::after, .row::after, .u-cf {
-			clear: both;
-			content: "";
-			display: table;
-		}
-		.container {
-			max-width: 800px;
-		}
-		.container {
-			width: 80%;
-		}
-		.container {
-			padding: 0;
-		}
-		.container {
-			box-sizing: border-box;
-			margin: 0 auto;
-			position: relative;
-		}
-		h2 {
-			font-size: 4.2rem;
-			letter-spacing: -0.1rem;
-			line-height: 1.25;
-		}
-		h1, h2, h3, h4, h5, h6 {
-			font-weight: 300;
-			margin-bottom: 2rem;
-			margin-top: 0;
-		}
-		.value-props {
-			margin-bottom: 7rem;
-			margin-top: 9rem;
-		}
-		.value-img {
-			margin-bottom: 1rem;
-			margin-left: auto;
-			margin-right: auto;
-		}
-		.value-img {
-			display: block;
-			text-align: center;
-		}
-		#sbuiadmin_admin, #sbuiadmin_errors, #sbuiadmin_download_loader, #sbuiadmin_admin_msg {
-			display: none;
-		}
-	</style>
-	
-	<script type="text/javascript">
-	  function loader() {
-		document.getElementById("sbuiadmin_download_loader").style.display = "inline-block";
-		document.getElementById("sbuiadmin_download").style.display = "none";
-	  }
-	</script>
-	
-</head>
-	
-<body>
+// ––––––––––––––––––––––––––––––––––––––––––––––––––
+// HELPERS
+// ––––––––––––––––––––––––––––––––––––––––––––––––––
 
-<?php
-
-// Désactiver le rapport d'erreurs
-error_reporting(0);
-
-function rrmdir($src) {
+/**
+ * Suppression récursive d'un dossier, avec vérification d'existence.
+ */
+function rrmdir(string $src): void
+{
+    if (!is_dir($src)) return;
     $dir = opendir($src);
-    while(false !== ( $file = readdir($dir)) ) {
-        if (( $file != '.' ) && ( $file != '..' )) {
-            $full = $src . '/' . $file;
-            if ( is_dir($full) ) {
-                rrmdir($full);
-            }
-            else {
-                unlink($full);
-            }
-        }
+    while (false !== ($file = readdir($dir))) {
+        if ($file === '.' || $file === '..') continue;
+        $full = $src . '/' . $file;
+        is_dir($full) ? rrmdir($full) : unlink($full);
     }
     closedir($dir);
     rmdir($src);
 }
 
-// Function test CURL
-function _is_curl_installed() {
-    if  (in_array  ('curl', get_loaded_extensions())) {
-        return true;
-    }
-    else {
-        return false;
-    }
+/**
+ * Vérifie si cURL est disponible.
+ */
+function _is_curl_installed(): bool
+{
+    return function_exists('curl_version');
 }
 
-if ($_GET['a'] == 'install') {
-	
-	?>
-	<style>
-		#sbuiadmin_download_loader {display: inline-block;}
-	</style>
-	<?php
+// ––––––––––––––––––––––––––––––––––––––––––––––––––
+// INSTALLATION
+// ––––––––––––––––––––––––––––––––––––––––––––––––––
+$errors      = '';
+$fatal_error = 0;
+$do_install  = isset($_GET['a']) && $_GET['a'] === 'install';
 
-	$errors      = "";
-	$fatal_error = 0;
-	
-	/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
-	/*               TESTS             */
-	/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
-	/* Test if ZipArchive class exists */
-	if (!class_exists('ZipArchive')) {
-		$errors .= 'FATAL ERROR :: [CLASS] ZIPARCHIVE is not installed';
-		$fatal_error++;
-	}
-	/* Test if Curl class exists */
-	if (!function_exists('curl_version')) {
-		$errors .= 'FATAL ERROR :: [FUNCTION] CURL is not installed';
-		$fatal_error++;	  
-	}
-	/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
-	
-	/* Check if fatal errors */
-	if ($fatal_error == 0) {
-		
-		// Time limit execution script
-		$time_limit = 60 * 5;
-		set_time_limit($time_limit);
-	  
-		$zipFile     = "sbuiadmin_latest.zip"; // Local Zip File Path
-		$url         = SBUIADMIN_NET_INSTALL_LATEST_URL . $zipFile;
-		$zipResource = fopen($zipFile, "w");
-		
-		// start output buffer
-		ob_start();
-		// Get The Zip File From Server
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_FAILONERROR, true);
-		curl_setopt($ch, CURLOPT_HEADER, 0);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_AUTOREFERER, true);
-		curl_setopt($ch, CURLOPT_BINARYTRANSFER,true);
-		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0); 
-		curl_setopt($ch, CURLOPT_FILE, $zipResource);
-		//
-		$page = curl_exec($ch);
-		if (!$page) {
-			$errors .= "[CURL] Error : ".curl_error($ch);
-		}
-		curl_close($ch);
-		// discard output buffer
-		ob_end_clean();
-		
-		/* Open the Zip file */
-		$zip         = new ZipArchive;
-		$extractPath = "./";
-		if ($zip->open($zipFile) != "true") {
-			$errors .= " :: [UNZIP] Error - Unable to open the Zip File";
-		} 
-		/* Extract Zip File */
-		$zip->extractTo($extractPath);
-		$zip->close();
-		
-		// Delete files / directory
-		unlink("$zipFile");
-		rrmdir("__MACOSX");
+if ($do_install) {
 
-	}
-	
-	if ($errors == '') {
-		?>
-		<style>
-			#sbuiadmin_download {display: none;}
-			#sbuiadmin_admin {display: inline-block;}
-			#sbuiadmin_admin_msg {display: inline-block;}
-			#sbuiadmin_download_loader {display: none;}
-		</style>
-		<?php
-	} else {
-		?>
-		<style>
-			#sbuiadmin_download {display: none;}
-			#sbuiadmin_errors {display: inline-block;}
-			#sbuiadmin_download_loader {display: none;}
-		</style>
-		<?php
-	}
+    /* --- Prérequis --- */
+    if (!class_exists('ZipArchive')) {
+        $errors      .= 'FATAL ERROR :: [CLASS] ZipArchive n\'est pas installé sur ce serveur.';
+        $fatal_error++;
+    }
+    if (!_is_curl_installed()) {
+        $errors      .= 'FATAL ERROR :: [FUNCTION] cURL n\'est pas installé sur ce serveur.';
+        $fatal_error++;
+    }
 
+    if ($fatal_error === 0) {
+
+        // Laisser le temps au script de terminer
+        set_time_limit(SBUIADMIN_CURL_TIMEOUT + 30);
+
+        $zipFile     = 'sbuiadmin_latest.zip';
+        $url         = SBUIADMIN_NET_INSTALL_LATEST_URL . $zipFile;
+        $zipResource = fopen($zipFile, 'w');
+
+        if ($zipResource === false) {
+            $errors .= '[FILE] Impossible de créer le fichier temporaire ' . $zipFile . '. Vérifiez les permissions d\'écriture.';
+        } else {
+
+            // --- Téléchargement cURL ---
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL            => $url,
+                CURLOPT_FAILONERROR    => true,
+                CURLOPT_HEADER         => false,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_AUTOREFERER    => true,
+                CURLOPT_BINARYTRANSFER => true,
+                CURLOPT_CONNECTTIMEOUT => SBUIADMIN_CURL_CONNECT_TIMEOUT,
+                CURLOPT_TIMEOUT        => SBUIADMIN_CURL_TIMEOUT,
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_SSL_VERIFYPEER => 0,
+                CURLOPT_FILE           => $zipResource,
+            ]);
+
+            $success = curl_exec($ch);
+            $curlErr = curl_error($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            fclose($zipResource);
+
+            if (!$success || $curlErr) {
+                $errors .= '[CURL] Erreur de téléchargement' . "\n"
+                         . 'URL    : ' . $url . "\n"
+                         . 'HTTP   : ' . $httpCode . "\n"
+                         . 'Détail : ' . ($curlErr ?: 'inconnue');
+                @unlink($zipFile);
+            } elseif (!file_exists($zipFile) || filesize($zipFile) < 1024) {
+                $errors .= '[CURL] Le fichier téléchargé est vide ou corrompu' . "\n"
+                         . 'URL    : ' . $url . "\n"
+                         . 'Taille : ' . (file_exists($zipFile) ? filesize($zipFile) : 0) . ' octets';
+                @unlink($zipFile);
+            } else {
+
+                // --- Extraction (sans le dossier racine de l'archive ex: sbuiadmin-master/) ---
+                $zip        = new ZipArchive();
+                $openResult = $zip->open($zipFile);
+
+                if ($openResult !== true) {
+                    $errors .= '[UNZIP] Impossible d\'ouvrir le fichier ZIP (code : ' . $openResult . ').';
+                } else {
+                    $destPath = dirname(__FILE__) . DIRECTORY_SEPARATOR;
+
+                    // Déterminer le préfixe du dossier racine (ex: "sbuiadmin-master/")
+                    $rootPrefix = '';
+                    if ($zip->numFiles > 0) {
+                        $firstEntry = $zip->getNameIndex(0);
+                        // Si la première entrée est un dossier, c'est notre préfixe
+                        if (substr($firstEntry, -1) === '/') {
+                            $rootPrefix = $firstEntry;
+                        } else {
+                            $parts = explode('/', $firstEntry);
+                            if (count($parts) > 1) {
+                                $rootPrefix = $parts[0] . '/';
+                            }
+                        }
+                    }
+
+                    // Extraire fichier par fichier en retirant le préfixe racine
+                    for ($i = 0; $i < $zip->numFiles; $i++) {
+                        $entryName = $zip->getNameIndex($i);
+
+                        // Ignorer le dossier racine lui-même et __MACOSX
+                        if ($entryName === $rootPrefix) continue;
+                        if (strpos($entryName, '__MACOSX') !== false) continue;
+
+                        // Retirer le préfixe racine
+                        $relativePath = $rootPrefix !== ''
+                            ? substr($entryName, strlen($rootPrefix))
+                            : $entryName;
+
+                        if ($relativePath === '' || $relativePath === false) continue;
+
+                        $targetPath = $destPath . $relativePath;
+
+                        if (substr($entryName, -1) === '/') {
+                            // C'est un dossier
+                            if (!is_dir($targetPath)) {
+                                mkdir($targetPath, 0755, true);
+                            }
+                            chmod($targetPath, 0755);
+                        } else {
+                            // C'est un fichier — créer le dossier parent si besoin
+                            $targetDir = dirname($targetPath);
+                            if (!is_dir($targetDir)) {
+                                mkdir($targetDir, 0755, true);
+                            }
+                            $stream = $zip->getStream($entryName);
+                            if ($stream !== false) {
+                                file_put_contents($targetPath, stream_get_contents($stream));
+                                fclose($stream);
+                                chmod($targetPath, 0644);
+                            }
+                        }
+                    }
+
+                    $zip->close();
+                }
+
+                @unlink($zipFile);
+                rrmdir('__MACOSX');
+            }
+        }
+    }
 }
-
 ?>
+<!DOCTYPE html>
+<html lang="<?php echo strtolower($language); ?>">
+<head>
+    <meta charset="utf-8">
+    <title>SBUIADMIN Net Install</title>
+    <meta name="description" content="SBUIADMIN, le CMS By INFORMATUX">
+    <meta name="author" content="INFORMATUX">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        /* ── Reset minimal ── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { font-size: 62.5%; }
 
-	<!-- Primary Page Layout
-	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
-	<div class="container">
-		<div class="row">
-			<div class="one-half">
-				<section class="header">
-					  <h2 class="title"><?php echo constant("SBUIADMIN_TITLE_$language"); ?></h2>
-					  <h3 id="sbuiadmin_admin_msg"><?php echo constant("SBUIADMIN_INSTALL_SUCCESSFULLY_$language"); ?></h3>
-					  <a id="sbuiadmin_download" class="button button-primary" href="<?php echo basename(__FILE__); ?>?a=install" onclick="javascript:loader()"><?php echo constant("SBUIADMIN_DOWNLOAD_BUTTON_$language"); ?></a>
-					  <img id="sbuiadmin_download_loader" src="<?php echo SBUIADMIN_NET_INSTALL_URL; ?>gears.svg" style="height: 70px">
-					  <br>
-					  <a id="sbuiadmin_admin" class="button button-success" href="./administration/index.php"><?php echo constant("SBUIADMIN_GO_TO_ADMIN_$language"); ?></a>
-					  <br>
-					  <a id="sbuiadmin_errors" class="button button-warning" href="#"><?php echo $errors; ?></a>
-					  <div class="value-props row">
-						<div class="four columns value-prop">
-						  <img class="value-img" src="<?php echo SBUIADMIN_NET_INSTALL_URL; ?>feather.svg">
-						  <?php echo constant("SBUIADMIN_SLOGAN_1_$language"); ?>
-						</div>
-						<div class="four columns value-prop">
-						  <img class="value-img" src="<?php echo SBUIADMIN_NET_INSTALL_URL; ?>pens.svg">
-						  <?php echo constant("SBUIADMIN_SLOGAN_2_$language"); ?>
-						</div>
-						<div class="four columns value-prop">
-						  <img class="value-img" src="<?php echo SBUIADMIN_NET_INSTALL_URL; ?>watch.svg">
-						  <?php echo constant("SBUIADMIN_SLOGAN_3_$language"); ?>
-						</div>
-					  </div>
-					</section>
-			</div>
-		</div>
-	</div>
+        /* ── Tokens ── */
+        :root {
+            --c-bg:        #0d1117;
+            --c-surface:   #161b22;
+            --c-border:    #30363d;
+            --c-accent:    #4f9cf9;
+            --c-accent-dk: #1f6feb;
+            --c-success:   #3fb950;
+            --c-error:     #f85149;
+            --c-text:      #e6edf3;
+            --c-muted:     #8b949e;
+            --r:           12px;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-body:    'Inter', sans-serif;
+        }
 
-<!-- End Document
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+        body {
+            background: var(--c-bg);
+            color: var(--c-text);
+            font-family: var(--font-body);
+            font-size: 1.5em;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        /* ── Card ── */
+        .card {
+            background: var(--c-surface);
+            border: 1px solid var(--c-border);
+            border-radius: var(--r);
+            width: 100%;
+            max-width: 520px;
+            padding: 4rem 4rem 3.5rem;
+            text-align: center;
+        }
+
+        /* ── Logo / Badge ── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(79,156,249,.12);
+            border: 1px solid rgba(79,156,249,.3);
+            border-radius: 99px;
+            padding: 0.4rem 1.2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--c-accent);
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            margin-bottom: 2.4rem;
+        }
+        .badge::before {
+            content: '';
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--c-accent);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: .3; }
+        }
+
+        /* ── Title ── */
+        h1 {
+            font-family: var(--font-display);
+            font-size: 3.2rem;
+            font-weight: 700;
+            letter-spacing: -.03em;
+            color: var(--c-text);
+            margin-bottom: .8rem;
+        }
+        .subtitle {
+            font-size: 1.4rem;
+            color: var(--c-muted);
+            margin-bottom: 3.2rem;
+        }
+
+        /* ── Button principal ── */
+        .btn-install {
+            display: inline-flex;
+            align-items: center;
+            gap: .8rem;
+            background: var(--c-accent);
+            color: #fff;
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            padding: 1.2rem 3rem;
+            border-radius: var(--r);
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: background .2s, transform .15s;
+            margin-bottom: 3.2rem;
+        }
+        .btn-install:hover  { background: var(--c-accent-dk); transform: translateY(-1px); }
+        .btn-install:active { transform: translateY(0); }
+
+        /* ── Progress ── */
+        .progress-wrap {
+            margin-bottom: 3.2rem;
+        }
+        .progress-label {
+            font-size: 1.3rem;
+            color: var(--c-muted);
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        .progress-bar {
+            height: 6px;
+            background: var(--c-border);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--c-accent), #a5d8ff);
+            border-radius: 99px;
+            animation: progress-anim 3s ease-in-out infinite;
+        }
+        @keyframes progress-anim {
+            0%   { width: 5%;   opacity: 1; }
+            70%  { width: 85%;  opacity: 1; }
+            90%  { width: 92%;  opacity: .8; }
+            100% { width: 95%;  opacity: 1; }
+        }
+        .spinner {
+            width: 22px; height: 22px;
+            border: 3px solid rgba(79,156,249,.2);
+            border-top-color: var(--c-accent);
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: .6rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── État succès ── */
+        .state-success {
+            margin-bottom: 3.2rem;
+        }
+        .checkmark {
+            width: 56px; height: 56px;
+            background: rgba(63,185,80,.12);
+            border: 2px solid var(--c-success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.6rem;
+            font-size: 2.4rem;
+        }
+        .state-success h2 {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--c-success);
+            margin-bottom: .6rem;
+        }
+        .state-success p {
+            font-size: 1.3rem;
+            color: var(--c-muted);
+        }
+        .btn-admin {
+            display: inline-flex;
+            align-items: center;
+            gap: .6rem;
+            background: var(--c-success);
+            color: #fff;
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 600;
+            padding: 1rem 2.4rem;
+            border-radius: var(--r);
+            text-decoration: none;
+            transition: opacity .2s;
+            margin-top: 1.6rem;
+        }
+        .btn-admin:hover { opacity: .85; }
+
+        /* ── État erreur ── */
+        .state-error {
+            background: rgba(248,81,73,.08);
+            border: 1px solid rgba(248,81,73,.3);
+            border-radius: var(--r);
+            padding: 1.6rem 2rem;
+            text-align: left;
+            margin-bottom: 2.4rem;
+        }
+        .state-error .error-title {
+            font-family: var(--font-display);
+            font-weight: 600;
+            color: var(--c-error);
+            font-size: 1.4rem;
+            margin-bottom: .6rem;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+        .state-error .error-body {
+            font-size: 1.25rem;
+            color: var(--c-muted);
+            font-family: 'Courier New', monospace;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+
+        /* ── Feature pills ── */
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            padding-top: 2.4rem;
+            border-top: 1px solid var(--c-border);
+            margin-top: .4rem;
+        }
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            background: rgba(255,255,255,.04);
+            border: 1px solid var(--c-border);
+            border-radius: 99px;
+            padding: .5rem 1.2rem;
+            font-size: 1.2rem;
+            color: var(--c-muted);
+        }
+        .feature span { font-size: 1.4rem; }
+
+        /* ── Visibility helpers ── */
+        .hidden { display: none !important; }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+
+        <!-- Badge -->
+        <div class="badge">SBUIADMIN</div>
+
+        <!-- Titre -->
+        <h1><?php echo constant('SBUIADMIN_TITLE_' . $language); ?></h1>
+        <p class="subtitle">Version latest &mdash; <?php echo date('Y'); ?></p>
+
+        <?php if ($do_install && $errors === ''): ?>
+        <!-- ══ ÉTAT : SUCCÈS ══ -->
+        <div class="state-success">
+            <div class="checkmark">✓</div>
+            <h2><?php $language === 'FR' ? print('Installation réussie') : print('Installation complete'); ?></h2>
+            <p><?php echo constant('SBUIADMIN_INSTALL_SUCCESSFULLY_' . $language); ?></p>
+            <a class="btn-admin" href="./administration/index.php">
+                <?php echo constant('SBUIADMIN_GO_TO_ADMIN_' . $language); ?> →
+            </a>
+        </div>
+
+        <?php elseif ($do_install && $errors !== ''): ?>
+        <!-- ══ ÉTAT : ERREUR ══ -->
+        <div class="state-error">
+            <div class="error-title">⚠ <?php $language === 'FR' ? print('Erreur d\'installation') : print('Installation error'); ?></div>
+            <div class="error-body"><?php echo htmlspecialchars($errors); ?></div>
+        </div>
+        <a class="btn-install" href="<?php echo basename(__FILE__); ?>?a=install">
+            ↺ <?php $language === 'FR' ? print('Réessayer') : print('Retry'); ?>
+        </a>
+
+        <?php else: ?>
+        <!-- ══ ÉTAT : PRÊT ══ -->
+        <a id="btn-install"
+           class="btn-install"
+           href="<?php echo basename(__FILE__); ?>?a=install"
+           onclick="startInstall(event)">
+            ⬇ <?php echo constant('SBUIADMIN_DOWNLOAD_BUTTON_' . $language); ?>
+        </a>
+
+        <!-- Progress (masqué jusqu'au clic) -->
+        <div id="progress-wrap" class="progress-wrap hidden">
+            <div class="progress-label">
+                <span><span class="spinner"></span><?php $language === 'FR' ? print('Téléchargement en cours…') : print('Downloading…'); ?></span>
+                <span id="progress-timeout"></span>
+            </div>
+            <div class="progress-bar"><div class="progress-bar-fill"></div></div>
+        </div>
+
+        <?php endif; ?>
+
+        <!-- Feature pills -->
+        <div class="features">
+            <div class="feature"><span>📱</span> <?php echo constant('SBUIADMIN_SLOGAN_1_' . $language); ?></div>
+            <div class="feature"><span>🎨</span> <?php echo constant('SBUIADMIN_SLOGAN_2_' . $language); ?></div>
+            <div class="feature"><span>⚡</span> <?php echo constant('SBUIADMIN_SLOGAN_3_' . $language); ?></div>
+        </div>
+
+    </div>
+
+    <script>
+    (function () {
+        var TIMEOUT_SEC = <?php echo SBUIADMIN_CURL_TIMEOUT; ?>;
+
+        function startInstall(e) {
+            var btn  = document.getElementById('btn-install');
+            var wrap = document.getElementById('progress-wrap');
+            var tick = document.getElementById('progress-timeout');
+
+            if (!btn || !wrap) return; // laisse le lien fonctionner normalement
+
+            btn.classList.add('hidden');
+            wrap.classList.remove('hidden');
+
+            // Compte à rebours indicatif
+            var elapsed = 0;
+            var timer = setInterval(function () {
+                elapsed++;
+                var remaining = TIMEOUT_SEC - elapsed;
+                if (remaining <= 0) {
+                    clearInterval(timer);
+                    tick.textContent = '';
+                } else {
+                    tick.textContent = remaining + 's';
+                }
+            }, 1000);
+        }
+
+        // Expose globalement pour le onclick inline
+        window.startInstall = startInstall;
+    })();
+    </script>
 
 </body>
-
 </html>
