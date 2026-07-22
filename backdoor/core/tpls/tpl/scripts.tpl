@@ -1,6 +1,15 @@
     {if $page != 'login'}</div>{/if}
     <!-- /#wrapper -->
 
+    {if $page == 'login'}
+    <!-- Adminator theme JS bundle -->
+    <script defer src="assets/adminator/runtime.js"></script>
+    <script defer src="assets/adminator/vendor-fullcalendar.js"></script>
+    <script defer src="assets/adminator/vendor-chartjs.js"></script>
+    <script defer src="assets/adminator/vendors.js"></script>
+    <script defer src="assets/adminator/2026.js"></script>
+    {/if}
+
     <!-- Bootstrap Core JavaScript -->
     <script src="assets/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 

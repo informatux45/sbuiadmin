@@ -16,7 +16,8 @@
 defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
 /**
- * A simple handler to display fatal error information for debugging.
+ * Fatal error handler: logs the error, then shows a debug dump (dev) or a
+ * custom 500 page (production) depending on _AM_SITE_DEBUG.
  */
 function __fatalHandler() {
     $error = error_get_last();
@@ -26,9 +27,27 @@ function __fatalHandler() {
         E_ERROR, E_PARSE, E_CORE_ERROR, E_CORE_WARNING,
         E_COMPILE_ERROR, E_COMPILE_WARNING, E_RECOVERABLE_ERROR
     ])) {
-        echo "<pre>Fatal Error:\n";
-        var_dump($error);
-        echo "</pre>";
+        error_log(sprintf(
+            'SBUIADMIN fatal error: %s in %s:%d',
+            $error['message'], $error['file'], $error['line']
+        ));
+
+        if (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        http_response_code(500);
+
+        if (defined('_AM_SITE_DEBUG') && _AM_SITE_DEBUG) {
+            echo "<pre>Fatal Error:\n";
+            var_dump($error);
+            echo "</pre>";
+        } elseif (defined('SBUIADMIN_PATH') && is_readable(SBUIADMIN_PATH . '/500.html')) {
+            $page = file_get_contents(SBUIADMIN_PATH . '/500.html');
+            $message = !empty($error['message']) ? $error['message'] : 'Aucun détail disponible.';
+            echo str_replace('__ERROR_MESSAGE__', htmlspecialchars($message, ENT_QUOTES, 'UTF-8'), $page);
+        } else {
+            echo '<h1>500 - Internal Server Error</h1>';
+        }
         die; // Terminate script execution
     }
 }

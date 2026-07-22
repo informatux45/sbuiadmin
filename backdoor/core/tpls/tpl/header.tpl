@@ -18,6 +18,26 @@
 
     <title>{$smarty.const._AM_SITE_CUSTOMER_NAME}</title>
 
+    <!-- Adminator dark-mode bootstrap: must run before first paint to avoid a flash of the wrong theme -->
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem('dash26-theme');
+                var theme = stored || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+
+    {if $page == 'login'}
+    <!-- Adminator theme (self-hosted fonts + compiled CSS bundle) -->
+    <link href="assets/adminator/fonts/fonts.css" rel="stylesheet">
+    <link href="assets/adminator/style.css" rel="stylesheet">
+    {/if}
+
+    {if $page != 'login'}
     <!-- Bootstrap Core CSS -->
     <link href="assets/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
 
@@ -25,11 +45,12 @@
     <link href="assets/bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    {if $page != 'login'}<link href="assets/dist/css/sb-admin-2.css" rel="stylesheet">{/if}
+    <link href="assets/dist/css/sb-admin-2.css" rel="stylesheet">
 
     <!-- Font Awesome latest -->
     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' type='text/css' media='all' />
-	
+    {/if}
+
 	<!-- OutdatedBrowser -->
 	<link rel="stylesheet" href="inc/plugins/outdatedbrowser/outdatedbrowser.min.css">
 	
@@ -39,8 +60,10 @@
 	<!-- JS customs scripts -->
 	<script src="assets/dist/js/sb-custom.js"></script>
 	
+    {if $page != 'login'}
     <!-- Custom Admin CSS -->
-    {if $page != 'login'}<link href="assets/dist/css/sb-admin-custom.css" rel="stylesheet">{/if}
+    <link href="assets/dist/css/sb-admin-custom.css" rel="stylesheet">
+    {/if}
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -52,21 +75,17 @@
     <!-- jQuery -->
     <script src="assets/bower_components/jquery/dist/jquery.min.js"></script>
 	
-	{if $page == 'login'}
-		<!-- CSS to style background login page with pattern -->
-		{*<link rel="stylesheet" href="assets/dist/css/pattern{$sb_random_bg}.css">*}
-		{*<script type="text/javascript" charset="utf-8" src="assets/dist/js/jquery.tubular.1.0.js"></script>*}
-		<link href="assets/dist/css/sb-admin-custom-login.css" rel="stylesheet">
-	{/if}
 
 </head>
 
-<body class="{if $page == 'login'}login-pattern{/if}{if isset($smarty.get.p) && $smarty.get.p == 'transfert'} margin10{/if}">
-	
+<body class="{if isset($smarty.get.p) && $smarty.get.p == 'transfert'}margin10{/if}">
+
+    {if $page != 'login'}
     <div id="outdated">
         <h6>Your browser is out-of-date!</h6>
         <p>Update your browser to view SBUIADMIN Software correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a></p>
         <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
     </div> <!-- OutdatedBrowser -->
-	
+    {/if}
+
     {if $page != 'login'}<div id="wrapper">{/if}
