@@ -22,13 +22,21 @@
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
-                            <div class="dataTable_wrapper">
-                                <table class="table table-striped table-bordered table-hover" id="dataTables-contact">
+                            <div class="data-toolbar">
+								<div class="data-toolbar-left">
+									<div class="input-icon" style="flex:1;max-width:320px">
+										<span class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+										<input class="input" type="search" placeholder="Rechercher..." data-datatable-search="dataTables-contact">
+									</div>
+								</div>
+							</div>
+							<div style="overflow-x:auto">
+                                <table class="data-table" id="dataTables-contact" data-datatable>
                                     <thead>
                                         <tr>
                                             {foreach from=$sb_table_header item=header}
-												<th>
-													{$header}
+												<th{if $header@last} data-sort="false"{/if}>
+													{$header}{if !$header@last} <span class="sort"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>{/if}
 												</th>
 											{/foreach}
                                         </tr>
@@ -36,23 +44,32 @@
                                     <tbody>
 										{if $allcontact}
 											{foreach from=$allcontact item=contact}
-												<tr class="{cycle values="odd,even"} gradeX">
+												<tr class="data-row">
 													<td>{$contact.title|unescape:"htmlall"|@sbDisplayLang}</td>
 													<td>[CS id={$contact.id} name=sbcontact class=yourclass form=formname{$contact.id}]</td>
 													<td>
-														<span class="glyphicon glyphicon-eye-open {if $contact.active}green{else}red{/if}" title="Statut {if $contact.active}visible{else}non visible{/if}"></span>
-														&nbsp;
-														<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit&id={$contact.id}" title="Modifier"></a>
-														&nbsp;
-														<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$contact.id}" title="Supprimer"></a>
+														<div class="data-cell-actions">
+															<span class="btn--icon" style="color:{if $contact.active}var(--success){else}var(--danger){/if}" title="Statut {if $contact.active}visible{else}non visible{/if}">
+																<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+															</span>
+															<a class="btn--icon" href="{$module_url}&a=edit&id={$contact.id}" title="Modifier">
+																<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"/></svg>
+															</a>
+															<a class="btn--icon jConfirm" href="{$module_url}&a=del&id={$contact.id}" title="Supprimer">
+																<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
+															</a>
+														</div>
 													</td>
-												</tr>										
+												</tr>
 											{/foreach}
 										{/if}
                                     </tbody>
                                 </table>
                             </div>
-                            <!-- /.table-responsive -->
+							<div class="data-foot" data-datatable-foot="dataTables-contact">
+								<div class="data-foot-info" data-foot-info></div>
+								<div class="pager"></div>
+							</div>
 
                         </div>
                         <!-- /.panel-body -->
@@ -160,15 +177,6 @@
 		<!-- ------------------------------------------------------------ -->
 		<!-- Page-Level Scripts - Use this space this write your own code -->
 		<!-- ------------------------------------------------------------ -->
-		<script>
-		$(document).ready(function() {
-			$('#dataTables-contact').DataTable({
-					order: [ 0, 'desc' ],
-					responsive: true,
-					"lengthMenu": [25, 50, 75, 100, 150]
-			});	
-		});
-		</script>
 			
 	{include file='sb_footer.tpl' page='false' pagef='false'}
 

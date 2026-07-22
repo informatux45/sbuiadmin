@@ -22,13 +22,21 @@
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
-                            <div class="dataTable_wrapper">
-                                <table class="table table-striped table-bordered table-hover" id="dataTables-news">
+                            <div class="data-toolbar">
+								<div class="data-toolbar-left">
+									<div class="input-icon" style="flex:1;max-width:320px">
+										<span class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+										<input class="input" type="search" placeholder="Rechercher un article..." data-datatable-search="dataTables-news">
+									</div>
+								</div>
+							</div>
+							<div style="overflow-x:auto">
+                                <table class="data-table" id="dataTables-news" data-datatable>
                                     <thead>
                                         <tr>
                                             {foreach from=$sb_table_header item=header}
-												<th>
-													{$header}
+												<th{if $header@last} data-sort="false"{/if}>
+													{$header}{if !$header@last} <span class="sort"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>{/if}
 												</th>
 											{/foreach}
                                         </tr>
@@ -36,25 +44,34 @@
                                     <tbody>
 										{if isset($allnew)}
 											{foreach from=$allnew item=news}
-												<tr class="{cycle values="odd,even"} gradeX">
+												<tr class="data-row">
 													<td>{$news.date|unescape:"htmlall"}</td>
 													<td>{$news.title|unescape:"htmlall"|@sbDisplayLang}</td>
 													<td>{$news.catname|unescape:"htmlall"|@sbDisplayLang}</td>
 													<td>[CS id={$news.id} name=sbnews_item]</td>
 													<td>
-														<span class="glyphicon glyphicon-eye-open {if $news.active}green{else}red{/if}" title="Statut {if $news.active}visible{else}non visible{/if}"></span>
-														&nbsp;
-														<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit&id={$news.id}" title="Modifier"></a>
-														&nbsp;
-														<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$news.id}" title="Supprimer"></a>
+														<div class="data-cell-actions">
+															<span class="btn--icon" style="color:{if $news.active}var(--success){else}var(--danger){/if}" title="Statut {if $news.active}visible{else}non visible{/if}">
+																<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+															</span>
+															<a class="btn--icon" href="{$module_url}&a=edit&id={$news.id}" title="Modifier">
+																<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"/></svg>
+															</a>
+															<a class="btn--icon jConfirm" href="{$module_url}&a=del&id={$news.id}" title="Supprimer">
+																<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
+															</a>
+														</div>
 													</td>
-												</tr>										
+												</tr>
 											{/foreach}
 										{/if}
                                     </tbody>
                                 </table>
                             </div>
-                            <!-- /.table-responsive -->
+							<div class="data-foot" data-datatable-foot="dataTables-news">
+								<div class="data-foot-info" data-foot-info></div>
+								<div class="pager"></div>
+							</div>
 
                         </div>
                         <!-- /.panel-body -->
@@ -73,13 +90,21 @@
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
-                            <div class="dataTable_wrapper">
-                                <table class="table table-striped table-bordered table-hover" id="dataTables-categories">
+                            <div class="data-toolbar">
+								<div class="data-toolbar-left">
+									<div class="input-icon" style="flex:1;max-width:320px">
+										<span class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+										<input class="input" type="search" placeholder="Rechercher..." data-datatable-search="dataTables-categories">
+									</div>
+								</div>
+							</div>
+							<div style="overflow-x:auto">
+                                <table class="data-table" id="dataTables-categories" data-datatable>
                                     <thead>
                                         <tr>
                                             {foreach from=$sb_table_header item=header}
-												<th>
-													{$header}
+												<th{if $header@last} data-sort="false"{/if}>
+													{$header}{if !$header@last} <span class="sort"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>{/if}
 												</th>
 											{/foreach}
                                         </tr>
@@ -87,30 +112,42 @@
                                     <tbody>
 										{if $allcategory}
 											{foreach from=$allcategory item=category}
-												<tr class="{cycle values="odd,even"} gradeX">
+												<tr class="data-row">
 													<td>{$category.sort}</td>
 													<td>{$category.title|unescape:"htmlall"|@sbDisplayLang}</td>
 													<td>[CS id={$category.id} name=sbnews_latest]</td>
 													<td>
-														<span class="glyphicon glyphicon-eye-open {if $category.active}green{else}red{/if}" title="Statut {if $category.active}visible{else}non visible{/if}"></span>
-														&nbsp;
-														<a class="glyphicon glyphicon-object-align-top yellow" href="{$module_url}&a=tpl_list&id={$category.id}" title="TPL LIST"></a>
-														&nbsp;
-														<a class="glyphicon glyphicon-object-align-left yellow" href="{$module_url}&a=tpl_single&id={$category.id}" title="TPL SINGLE"></a>
-														&nbsp;
-														<a class="glyphicon glyphicon-wrench green" href="{$module_url}&a=settingscategory&id={$category.id}" title="Paramètres"></a>
-														&nbsp;
-														<a class="glyphicon glyphicon-cog" href="{$module_url}&a=categoryedit&id={$category.id}" title="Modifier"></a>
-														&nbsp;
-														<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=categorydel&id={$category.id}" title="Supprimer"></a>
+														<div class="data-cell-actions">
+															<span class="btn--icon" style="color:{if $category.active}var(--success){else}var(--danger){/if}" title="Statut {if $category.active}visible{else}non visible{/if}">
+																<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+															</span>
+															<a class="btn--icon" href="{$module_url}&a=tpl_list&id={$category.id}" title="TPL LIST">
+																<svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+															</a>
+															<a class="btn--icon" href="{$module_url}&a=tpl_single&id={$category.id}" title="TPL SINGLE">
+																<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+															</a>
+															<a class="btn--icon" href="{$module_url}&a=settingscategory&id={$category.id}" title="Paramètres">
+																<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+															</a>
+															<a class="btn--icon" href="{$module_url}&a=categoryedit&id={$category.id}" title="Modifier">
+																<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"/></svg>
+															</a>
+															<a class="btn--icon jConfirm" href="{$module_url}&a=categorydel&id={$category.id}" title="Supprimer">
+																<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
+															</a>
+														</div>
 													</td>
-												</tr>										
+												</tr>
 											{/foreach}
 										{/if}
                                     </tbody>
                                 </table>
                             </div>
-                            <!-- /.table-responsive -->
+							<div class="data-foot" data-datatable-foot="dataTables-categories">
+								<div class="data-foot-info" data-foot-info></div>
+								<div class="pager"></div>
+							</div>
 
                         </div>
                         <!-- /.panel-body -->
@@ -119,7 +156,7 @@
                 </div>
                 <!-- /.col-lg-12 -->
 				{/if}
-				
+
 				{if (!isset($all) || !isset($allcategory)) && (isset($smarty.get.a) && $smarty.get.a != 'category' && $smarty.get.a != 'del' && $smarty.get.a != 'categorydel') }
 
 					<div class="col-lg-8">
@@ -304,16 +341,6 @@
 		<script src="inc/plugins/ace/ace.js" type="text/javascript" charset="utf-8"></script>
 		<script>
 		$(document).ready(function() {
-			$('#dataTables-news').DataTable({
-					order: [ 0, 'desc' ],
-					responsive: true,
-					"lengthMenu": [25, 50, 75, 100, 150]
-			});
-			$('#dataTables-categories').DataTable({
-					order: [ 0, 'asc' ],
-					responsive: true,
-					"lengthMenu": [25, 50, 75, 100, 150]
-			});
 			{if $sort}
 				$( "#sortable" ).sortable({
 					axis: "y",

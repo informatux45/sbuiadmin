@@ -39,7 +39,7 @@
                         <!-- /.panel-heading -->
                         <div class="panel-body">
 							{* HTML Text Formatted *}
-							<table class="table table-striped table-bordered table-hover" id="dataTables-settings">
+							<table class="data-table" id="dataTables-settings">
 								<thead>
 									<tr>
 										<th>
@@ -51,7 +51,7 @@
 									</tr>
 								</thead>
 								<tbody>
-									<tr class="danger gradeX">
+									<tr class="data-row" style="background:var(--danger-soft)">
 										<td>
 											Tables SQL
 										</td>
@@ -59,7 +59,7 @@
 											{if $sb_dashboard_tables}{$sb_dashboard_tables}{/if}
 										</td>
 									</tr>
-									<tr class="gradeX warning">
+									<tr class="data-row" style="background:var(--warning-soft)">
 										<td>
 											[STATUS 1] Table SQL
 										</td>
@@ -67,7 +67,7 @@
 											{$sb_dashboard_status1_table}
 										</td>
 									</tr>
-									<tr class="gradeX warning">
+									<tr class="data-row" style="background:var(--warning-soft)">
 										<td>
 											[STATUS 1] Table (champs)
 										</td>
@@ -75,7 +75,7 @@
 											{$sb_dashboard_status1_tbcol}
 										</td>
 									</tr>
-									<tr class="gradeX warning">
+									<tr class="data-row" style="background:var(--warning-soft)">
 										<td>
 											[STATUS 1] Titre
 										</td>
@@ -83,7 +83,7 @@
 											{$sb_dashboard_status1_title}
 										</td>
 									</tr>
-									<tr class="gradeX warning">
+									<tr class="data-row" style="background:var(--warning-soft)">
 										<td>
 											[STATUS 1] Lien relatif
 										</td>
@@ -91,7 +91,7 @@
 											{$sb_dashboard_status1_link}
 										</td>
 									</tr>
-									<tr class="gradeX warning">
+									<tr class="data-row" style="background:var(--warning-soft)">
 										<td>
 											[STATUS 1] Icône
 										</td>
@@ -99,7 +99,7 @@
 											{$sb_dashboard_status1_icon}
 										</td>
 									</tr>
-									<tr class="gradeX success">
+									<tr class="data-row" style="background:var(--success-soft)">
 										<td>
 											[STATUS 2] Table SQL
 										</td>
@@ -107,7 +107,7 @@
 											{$sb_dashboard_status2_table}
 										</td>
 									</tr>
-									<tr class="gradeX success">
+									<tr class="data-row" style="background:var(--success-soft)">
 										<td>
 											[STATUS 2] Table (champs)
 										</td>
@@ -115,7 +115,7 @@
 											{$sb_dashboard_status2_tbcol}
 										</td>
 									</tr>
-									<tr class="gradeX success">
+									<tr class="data-row" style="background:var(--success-soft)">
 										<td>
 											[STATUS 2] Titre
 										</td>
@@ -123,7 +123,7 @@
 											{$sb_dashboard_status2_title}
 										</td>
 									</tr>
-									<tr class="gradeX success">
+									<tr class="data-row" style="background:var(--success-soft)">
 										<td>
 											[STATUS 2] Lien relatif
 										</td>
@@ -131,7 +131,7 @@
 											{$sb_dashboard_status2_link}
 										</td>
 									</tr>
-									<tr class="gradeX success">
+									<tr class="data-row" style="background:var(--success-soft)">
 										<td>
 											[STATUS 2] Icône
 										</td>
@@ -139,7 +139,7 @@
 											{$sb_dashboard_status2_icon}
 										</td>
 									</tr>
-									<tr class="gradeX warning">
+									<tr class="data-row" style="background:var(--warning-soft)">
 										<td>
 											[STATUS 3] Table SQL
 										</td>
@@ -147,7 +147,7 @@
 											{$sb_dashboard_status3_table}
 										</td>
 									</tr>
-									<tr class="gradeX warning">
+									<tr class="data-row" style="background:var(--warning-soft)">
 										<td>
 											[STATUS 3] Table (champs)
 										</td>
@@ -155,7 +155,7 @@
 											{$sb_dashboard_status3_tbcol}
 										</td>
 									</tr>
-									<tr class="gradeX warning">
+									<tr class="data-row" style="background:var(--warning-soft)">
 										<td>
 											[STATUS 3] Titre
 										</td>
@@ -163,7 +163,7 @@
 											{$sb_dashboard_status3_title}
 										</td>
 									</tr>
-									<tr class="gradeX warning">
+									<tr class="data-row" style="background:var(--warning-soft)">
 										<td>
 											[STATUS 3] Lien relatif
 										</td>
@@ -171,7 +171,7 @@
 											{$sb_dashboard_status3_link}
 										</td>
 									</tr>
-									<tr class="gradeX warning">
+									<tr class="data-row" style="background:var(--warning-soft)">
 										<td>
 											[STATUS 3] Icône
 										</td>
@@ -179,7 +179,7 @@
 											{$sb_dashboard_status3_icon}
 										</td>
 									</tr>
-									<tr class="gradeX success">
+									<tr class="data-row" style="background:var(--success-soft)">
 										<td>
 											[STATUS 4] Table SQL
 										</td>
@@ -187,7 +187,7 @@
 											{if $sb_dashboard_status4_table}{$sb_dashboard_status4_table}{/if}
 										</td>
 									</tr>
-									<tr class="gradeX success">
+									<tr class="data-row" style="background:var(--success-soft)">
 										<td>
 											[STATUS 4] Table (champs)
 										</td>
@@ -195,7 +195,7 @@
 											{if $sb_dashboard_status4_tbcol}{$sb_dashboard_status4_tbcol}{/if}
 										</td>
 									</tr>
-									<tr class="gradeX success">
+									<tr class="data-row" style="background:var(--success-soft)">
 										<td>
 											[STATUS 4] Titre
 										</td>
@@ -203,7 +203,7 @@
 											{if $sb_dashboard_status4_title}{$sb_dashboard_status4_title}{/if}
 										</td>
 									</tr>
-									<tr class="gradeX success">
+									<tr class="data-row" style="background:var(--success-soft)">
 										<td>
 											[STATUS 4] Lien relatif
 										</td>
@@ -211,7 +211,7 @@
 											{if $sb_dashboard_status4_link}{$sb_dashboard_status4_link}{/if}
 										</td>
 									</tr>
-									<tr class="gradeX success">
+									<tr class="data-row" style="background:var(--success-soft)">
 										<td>
 											[STATUS 4] Icône
 										</td>

@@ -41,13 +41,21 @@
 							<!-- /.panel-heading -->
 							<div class="panel-body">
 								{if isset($allips)}
-								<div class="dataTable_wrapper">
-									<table class="table table-striped table-bordered table-hover" id="dataTables-blockedip">
+								<div class="data-toolbar">
+									<div class="data-toolbar-left">
+										<div class="input-icon" style="flex:1;max-width:320px">
+											<span class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+											<input class="input" type="search" placeholder="Rechercher..." data-datatable-search="dataTables-blockedip">
+										</div>
+									</div>
+								</div>
+								<div style="overflow-x:auto">
+									<table class="data-table" id="dataTables-blockedip" data-datatable data-page-size="15">
 										<thead>
 											<tr>
 												{foreach from=$sb_table_header item=header}
-													<th>
-														{$header}
+													<th{if $header@last} data-sort="false"{/if}>
+														{$header}{if !$header@last} <span class="sort"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>{/if}
 													</th>
 												{/foreach}
 											</tr>
@@ -55,13 +63,15 @@
 										<tbody>
 											{if $allblockedip}
 												{foreach from=$allblockedip item=blockedip}
-													<tr class="{cycle values="odd,even"} gradeX">
+													<tr class="data-row">
 														<td>{$blockedip.id}</td>
 														<td>{$blockedip.ip}</td>
-														<td>{$blockedip.blockedtime|date_format:'%d-%m-%Y à %H:%M:%S'}</td>
-														<td>{$blockedip.expirationtime|date_format:'%d-%m-%Y à %H:%M:%S'}</td>
+														<td data-sort-value="{$blockedip.blockedtime}">{$blockedip.blockedtime|date_format:'%d-%m-%Y à %H:%M:%S'}</td>
+														<td data-sort-value="{$blockedip.expirationtime}">{$blockedip.expirationtime|date_format:'%d-%m-%Y à %H:%M:%S'}</td>
 														<td>
-															<button class="btn btn-default glyphicon glyphicon-eye-open" title="Voir le détail" data-toggle="modal" data-target="#blocked{$blockedip.id}"></button>
+															<button class="btn--icon" aria-label="Voir le détail" data-toggle="modal" data-target="#blocked{$blockedip.id}">
+																<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+															</button>
 															<!-- Modal -->
 															<div class="modal fade" id="blocked{$blockedip.id}" tabindex="-1" role="dialog" aria-labelledby="blocked{$blockedip.id}Label" aria-hidden="true">
 																<div class="modal-dialog" role="document">
@@ -83,11 +93,15 @@
 																		</div>
 																	</div>
 																</div>
-															</div>	
+															</div>
 														</td>
 														<td>{$blockedip.reason}</td>
 														<td>
-															<a class="glyphicon glyphicon-remove red" onclick="return confirm('Vous souhaitez débloquer cette adresse IP ?')" href="{$module_url}&a=delblockedip&id={$blockedip.id}" title="Débloquer"></a>
+															<div class="data-cell-actions">
+																<button class="btn--icon" aria-label="Débloquer" onclick="if(confirm('Vous souhaitez débloquer cette adresse IP ?')) window.location.href='{$module_url}&a=delblockedip&id={$blockedip.id}';">
+																	<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
+																</button>
+															</div>
 														</td>
 													</tr>
 												{/foreach}
@@ -95,7 +109,10 @@
 										</tbody>
 									</table>
 								</div>
-								<!-- /.table-responsive -->
+								<div class="data-foot" data-datatable-foot="dataTables-blockedip">
+									<div class="data-foot-info" data-foot-info></div>
+									<div class="pager"></div>
+								</div>
 								{/if}
 							</div>
 							<!-- /.panel-body -->
@@ -139,13 +156,21 @@
 							<!-- /.panel-heading -->
 							<div class="panel-body">
 								{if $all}
-								<div class="dataTable_wrapper">
-									<table class="table table-striped table-bordered table-hover" id="dataTables-users">
+								<div class="data-toolbar">
+									<div class="data-toolbar-left">
+										<div class="input-icon" style="flex:1;max-width:320px">
+											<span class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+											<input class="input" type="search" placeholder="Rechercher un utilisateur..." data-datatable-search="dataTables-users">
+										</div>
+									</div>
+								</div>
+								<div style="overflow-x:auto">
+									<table class="data-table" id="dataTables-users" data-datatable data-page-size="25">
 										<thead>
 											<tr>
 												{foreach from=$sb_table_header item=header}
-													<th>
-														{$header}
+													<th{if $header@first || $header@last} data-sort="false"{/if}>
+														{$header}{if !$header@first && !$header@last} <span class="sort"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>{/if}
 													</th>
 												{/foreach}
 											</tr>
@@ -153,30 +178,40 @@
 										<tbody>
 											{if $alluser}
 												{foreach from=$alluser item=user}
-													<tr class="{cycle values="odd,even"} gradeX">
-														<td><img src="{$user.email|@sbGetGravatar}" class="img-thumbnail" /></td>
+													<tr class="data-row">
+														<td><img src="{$user.email|@sbGetGravatar}" style="width:28px;height:28px;border-radius:50%;" /></td>
 														<td>{$user.username|@sbGetUserGroup|upper}</td>
 														<td>{$user.username}</td>
 														<td>{$user.email}</td>
-														<td>{$user.lastlogin|date_format:"%d.%m.%Y - %R"}</td>
+														<td data-sort-value="{$user.lastlogin}">{$user.lastlogin|date_format:"%d.%m.%Y - %R"}</td>
 														<td>
-															<span class="glyphicon glyphicon-eye-open {if $user.active}green{else}red{/if}" title="Statut {if $user.active}visible{else}non visible{/if}"></span>
-															&nbsp;
-															<a class="glyphicon glyphicon-list yellow" href="{$module_url}&a=menu&id={$user.id}" title="Autorisation menu"></a>
-															&nbsp;
-															<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit&id={$user.id}" title="Modifier"></a>
-															&nbsp;												
-															{if $user.username != $sbuiadmin_user_name}
-																<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$user.id}" title="Supprimer"></a>
-															{/if}
+															<div class="data-cell-actions">
+																<span class="btn--icon" style="color:{if $user.active}var(--success){else}var(--danger){/if}" title="Statut {if $user.active}visible{else}non visible{/if}">
+																	<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+																</span>
+																<a class="btn--icon" href="{$module_url}&a=menu&id={$user.id}" title="Autorisation menu">
+																	<svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+																</a>
+																<a class="btn--icon" href="{$module_url}&a=edit&id={$user.id}" title="Modifier">
+																	<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"/></svg>
+																</a>
+																{if $user.username != $sbuiadmin_user_name}
+																	<a class="btn--icon jConfirm" href="{$module_url}&a=del&id={$user.id}" title="Supprimer">
+																		<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
+																	</a>
+																{/if}
+															</div>
 														</td>
-													</tr>										
+													</tr>
 												{/foreach}
 											{/if}
 										</tbody>
 									</table>
 								</div>
-								<!-- /.table-responsive -->
+								<div class="data-foot" data-datatable-foot="dataTables-users">
+									<div class="data-foot-info" data-foot-info></div>
+									<div class="pager"></div>
+								</div>
 								{/if}
 							</div>
 							<!-- /.panel-body -->
@@ -222,11 +257,6 @@
 		<!-- ------------------------------------------------------------ -->
 		<script>
 		$(document).ready(function() {
-			$('#dataTables-users').DataTable({
-					order: [ 0, 'asc' ],
-					responsive: true,
-					"lengthMenu": [25, 50, 75, 100, 150]
-			});
 			{if $sort}
 				$( "#sortable" ).sortable({
 					axis: "y",

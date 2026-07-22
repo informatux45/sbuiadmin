@@ -31,13 +31,21 @@
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
-                            <div class="dataTable_wrapper">
-                                <table class="table table-striped table-bordered table-hover" id="dataTables-sliders">
+                            <div class="data-toolbar">
+								<div class="data-toolbar-left">
+									<div class="input-icon" style="flex:1;max-width:320px">
+										<span class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+										<input class="input" type="search" placeholder="Rechercher..." data-datatable-search="dataTables-sliders">
+									</div>
+								</div>
+							</div>
+							<div style="overflow-x:auto">
+                                <table class="data-table" id="dataTables-sliders" data-datatable>
                                     <thead>
                                         <tr>
                                             {foreach from=$sb_table_header item=header}
-												<th>
-													{$header}
+												<th{if $header@last} data-sort="false"{/if}>
+													{$header}{if !$header@last} <span class="sort"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>{/if}
 												</th>
 											{/foreach}
                                         </tr>
@@ -45,29 +53,40 @@
                                     <tbody>
 										{if isset($allslider)}
 											{foreach from=$allslider item=slider}
-												<tr class="{cycle values="odd,even"} gradeX">
+												<tr class="data-row">
 													<td>{$slider.title|unescape:"htmlall"|@sbDisplayLang}</td>
 													<td>{$slider.mode|unescape:"htmlall"}</td>
 													<td>{$slider.cpt_img|default:0}</td>
 													<td>[CS id={$slider.id} name=sbslider]</td>
 													<td>
-														<span class="glyphicon glyphicon-eye-open {if $slider.active}green{else}red{/if}" title="Statut {if $slider.active}visible{else}non visible{/if}"></span>
-														&nbsp;
-														<a class="glyphicon glyphicon-picture" href="{$module_url}&a=photo&sid={$slider.id}" title="Toutes les photos"></a>
-														&nbsp;
-														<a class="glyphicon glyphicon-sort-by-attributes" href="{$module_url}&a=sort&sid={$slider.id}" title="Trier les photos"></a>
-														&nbsp;
-														<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit&id={$slider.id}" title="Modifier"></a>
-														&nbsp;
-														<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$slider.id}" title="Supprimer"></a>
+														<div class="data-cell-actions">
+															<span class="btn--icon" style="color:{if $slider.active}var(--success){else}var(--danger){/if}" title="Statut {if $slider.active}visible{else}non visible{/if}">
+																<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+															</span>
+															<a class="btn--icon" href="{$module_url}&a=photo&sid={$slider.id}" title="Toutes les photos">
+																<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+															</a>
+															<a class="btn--icon" href="{$module_url}&a=sort&sid={$slider.id}" title="Trier les photos">
+																<svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+															</a>
+															<a class="btn--icon" href="{$module_url}&a=edit&id={$slider.id}" title="Modifier">
+																<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"/></svg>
+															</a>
+															<a class="btn--icon jConfirm" href="{$module_url}&a=del&id={$slider.id}" title="Supprimer">
+																<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
+															</a>
+														</div>
 													</td>
-												</tr>										
+												</tr>
 											{/foreach}
 										{/if}
                                     </tbody>
                                 </table>
                             </div>
-                            <!-- /.table-responsive -->
+							<div class="data-foot" data-datatable-foot="dataTables-sliders">
+								<div class="data-foot-info" data-foot-info></div>
+								<div class="pager"></div>
+							</div>
 
                         </div>
                         <!-- /.panel-body -->
@@ -86,36 +105,53 @@
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
-                            <div class="dataTable_wrapper">
-                                <table class="table table-striped table-bordered table-hover" id="dataTables-photos">
+                            <div class="data-toolbar">
+								<div class="data-toolbar-left">
+									<div class="input-icon" style="flex:1;max-width:320px">
+										<span class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+										<input class="input" type="search" placeholder="Rechercher..." data-datatable-search="dataTables-photos">
+									</div>
+								</div>
+							</div>
+							<div style="overflow-x:auto">
+                                <table class="data-table" id="dataTables-photos" data-datatable>
                                     <thead>
                                         <tr>
                                             {foreach from=$sb_table_header item=header}
-												<th>
-													{$header}
+												<th{if $header@last} data-sort="false"{/if}>
+													{$header}{if !$header@last} <span class="sort"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>{/if}
 												</th>
 											{/foreach}
                                         </tr>
                                     </thead>
                                     <tbody>
 										{foreach from=$allphoto item=photo}
-											<tr class="{cycle values="odd,even"} gradeX">
+											<tr class="data-row">
 												<td>{$photo.sort}</td>
 												<td>{$photo.photo}</td>
 												<td>{$photo.title|unescape:"htmlall"|@sbDisplayLang}</td>
 												<td>
-													<span class="glyphicon glyphicon-eye-open {if $photo.active}green{else}red{/if}" title="Statut {if $photo.active}visible{else}non visible{/if}"></span>
-													&nbsp;
-													<a class="glyphicon glyphicon-cog" href="{$module_url}&a=photoedit&id={$photo.id}&sid={$sid}" title="Modifier"></a>
-													&nbsp;
-													<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=delphoto&sid={$sid}&id={$photo.id}" title="Supprimer"></a>
+													<div class="data-cell-actions">
+														<span class="btn--icon" style="color:{if $photo.active}var(--success){else}var(--danger){/if}" title="Statut {if $photo.active}visible{else}non visible{/if}">
+															<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+														</span>
+														<a class="btn--icon" href="{$module_url}&a=photoedit&id={$photo.id}&sid={$sid}" title="Modifier">
+															<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"/></svg>
+														</a>
+														<a class="btn--icon jConfirm" href="{$module_url}&a=delphoto&sid={$sid}&id={$photo.id}" title="Supprimer">
+															<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
+														</a>
+													</div>
 												</td>
-											</tr>										
+											</tr>
 										{/foreach}
                                     </tbody>
                                 </table>
                             </div>
-                            <!-- /.table-responsive -->
+							<div class="data-foot" data-datatable-foot="dataTables-photos">
+								<div class="data-foot-info" data-foot-info></div>
+								<div class="pager"></div>
+							</div>
 
                         </div>
                         <!-- /.panel-body -->
@@ -172,14 +208,6 @@
 		<!-- ------------------------------------------------------------ -->
 		<script>
 		$(document).ready(function() {
-			$('#dataTables-sliders').DataTable({
-					responsive: true,
-					"lengthMenu": [25, 50, 75, 100, 150]
-			});
-			$('#dataTables-photos').DataTable({
-					responsive: true,
-					"lengthMenu": [25, 50, 75, 100, 150]
-			});			
 			{if $sort}
 				$( "#sortable" ).sortable({
 					axis: "y",

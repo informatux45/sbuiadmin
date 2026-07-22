@@ -36,13 +36,21 @@
 							</div>
 							<!-- /.panel-heading -->
 							<div class="panel-body">
-								<div class="dataTable_wrapper">
-									<table class="table table-striped table-bordered table-hover" id="dataTables-table">
+								<div class="data-toolbar">
+									<div class="data-toolbar-left">
+										<div class="input-icon" style="flex:1;max-width:320px">
+											<span class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+											<input class="input" type="search" placeholder="Rechercher..." data-datatable-search="dataTables-table">
+										</div>
+									</div>
+								</div>
+								<div style="overflow-x:auto">
+									<table class="data-table" id="dataTables-table" data-datatable>
 										<thead>
 											<tr>
 												{foreach from=$sb_table_header item=header}
-													<th>
-														{$header}
+													<th{if $header@last} data-sort="false"{/if}>
+														{$header}{if !$header@last} <span class="sort"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>{/if}
 													</th>
 												{/foreach}
 											</tr>
@@ -50,28 +58,39 @@
 										<tbody>
 										{if $alltable}
 											{foreach from=$alltable item=table}
-												<tr class="{cycle values="odd,even"} gradeX">
+												<tr class="data-row">
 													<td>{$table.name|unescape:"htmlall"|@sbDisplayLang}</td>
 													<td>[CS id={$table.id} name=sbtable]</td>
 													<td>{$table.type}</td>
 													<td>
-														<span class="glyphicon glyphicon-eye-open {if $table.active}green{else}red{/if}" title="Statut {if $table.active}visible{else}non visible{/if}"></span>
-														&nbsp;
-														<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit&id={$table.id}" title="Modifier"></a>
-														&nbsp;
-														<a class="glyphicon glyphicon-wrench" href="{$module_url}&a=editfield&tid={$table.id}" title="Modifier la structure"></a>
-														&nbsp;
-														<a class="glyphicon glyphicon-sort-by-attributes" href="{$module_url}&a=editdatas&tid={$table.id}" title="Modifier les données"></a>
-														&nbsp;
-														<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$table.id}" title="Supprimer"></a>
+														<div class="data-cell-actions">
+															<span class="btn--icon" style="color:{if $table.active}var(--success){else}var(--danger){/if}" title="Statut {if $table.active}visible{else}non visible{/if}">
+																<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+															</span>
+															<a class="btn--icon" href="{$module_url}&a=edit&id={$table.id}" title="Modifier">
+																<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"/></svg>
+															</a>
+															<a class="btn--icon" href="{$module_url}&a=editfield&tid={$table.id}" title="Modifier la structure">
+																<svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+															</a>
+															<a class="btn--icon" href="{$module_url}&a=editdatas&tid={$table.id}" title="Modifier les données">
+																<svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+															</a>
+															<a class="btn--icon jConfirm" href="{$module_url}&a=del&id={$table.id}" title="Supprimer">
+																<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
+															</a>
+														</div>
 													</td>
-												</tr>										
+												</tr>
 											{/foreach}
 										{/if}
 										</tbody>
 									</table>
 								</div>
-								<!-- /.table-responsive -->
+								<div class="data-foot" data-datatable-foot="dataTables-table">
+									<div class="data-foot-info" data-foot-info></div>
+									<div class="pager"></div>
+								</div>
 	
 							</div>
 							<!-- /.panel-body -->
@@ -229,13 +248,21 @@
 							</div>
 							<!-- /.panel-heading -->
 							<div class="panel-body">
-								<div class="dataTable_wrapper">
-									<table class="table table-striped table-bordered table-hover" id="dataTables-tablestructure">
+								<div class="data-toolbar">
+									<div class="data-toolbar-left">
+										<div class="input-icon" style="flex:1;max-width:320px">
+											<span class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+											<input class="input" type="search" placeholder="Rechercher..." data-datatable-search="dataTables-tablestructure">
+										</div>
+									</div>
+								</div>
+								<div style="overflow-x:auto">
+									<table class="data-table" id="dataTables-tablestructure" data-datatable>
 										<thead>
 											<tr>
 												{foreach from=$sb_table_header item=header}
-													<th>
-														{$header}
+													<th{if $header@last} data-sort="false"{/if}>
+														{$header}{if !$header@last} <span class="sort"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>{/if}
 													</th>
 												{/foreach}
 											</tr>
@@ -243,25 +270,34 @@
 										<tbody>
 										{if $allstructure}
 											{foreach from=$allstructure item=column}
-												<tr class="{cycle values="odd,even"} gradeX"{if !$column.active} style="background-color: yellow;"{/if}>
+												<tr class="data-row"{if !$column.active} style="background:var(--warning-soft)"{/if}>
 													<td>{$column.sort}</td>
 													<td>{$column.title|unescape:"htmlall"|@sbDisplayLang}</td>
 													<td>{$column.field_type}</td>
 													<td>{$column.field_target}</td>
 													<td>
-														<span class="glyphicon glyphicon-eye-open {if $column.active}green{else}red{/if}" title="Statut {if $column.active}visible{else}non visible{/if}"></span>
-														&nbsp;
-														<a class="glyphicon glyphicon-cog" href="{$module_url}&a=editfield&tid={$column.tid}&id={$column.id}" title="Modifier"></a>
-														&nbsp;
-														<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=delfield&tid={$column.tid}&id={$column.id}" title="Supprimer"></a>
+														<div class="data-cell-actions">
+															<span class="btn--icon" style="color:{if $column.active}var(--success){else}var(--danger){/if}" title="Statut {if $column.active}visible{else}non visible{/if}">
+																<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+															</span>
+															<a class="btn--icon" href="{$module_url}&a=editfield&tid={$column.tid}&id={$column.id}" title="Modifier">
+																<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"/></svg>
+															</a>
+															<a class="btn--icon jConfirm" href="{$module_url}&a=delfield&tid={$column.tid}&id={$column.id}" title="Supprimer">
+																<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
+															</a>
+														</div>
 													</td>
-												</tr>										
+												</tr>
 											{/foreach}
 										{/if}
 										</tbody>
 									</table>
 								</div>
-								<!-- /.table-responsive -->
+								<div class="data-foot" data-datatable-foot="dataTables-tablestructure">
+									<div class="data-foot-info" data-foot-info></div>
+									<div class="pager"></div>
+								</div>
 	
 							</div>
 							<!-- /.panel-body -->
@@ -285,14 +321,22 @@
 							</div>
 							<!-- /.panel-heading -->
 							<div class="panel-body">
-								<div class="dataTable_wrapper">
-									<table class="table table-striped table-bordered table-hover" id="dataTables-tablestructure">
-										<h5 style="margin-bottom: 20px; color: red;">Les colonnes en rouge sont désactivées et ne sont pas affichées sur votre site !</h5>
+								<p style="margin-bottom: 16px; color: var(--danger);">Les colonnes en rouge sont désactivées et ne sont pas affichées sur votre site !</p>
+								<div class="data-toolbar">
+									<div class="data-toolbar-left">
+										<div class="input-icon" style="flex:1;max-width:320px">
+											<span class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+											<input class="input" type="search" placeholder="Rechercher..." data-datatable-search="dataTables-tabledata">
+										</div>
+									</div>
+								</div>
+								<div style="overflow-x:auto">
+									<table class="data-table" id="dataTables-tabledata" data-datatable>
 										<thead>
 											<tr>
 												{foreach from=$sb_table_header item=header}
-													<th>
-														{$header}
+													<th{if $header@last} data-sort="false"{/if}>
+														{$header}{if !$header@last} <span class="sort"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>{/if}
 													</th>
 												{/foreach}
 											</tr>
@@ -300,23 +344,31 @@
 										<tbody>
 										{if $alldatas}
 											{foreach from=$alldatas item=datas}
-												<tr class="{cycle values="odd,even"} gradeX">
+												<tr class="data-row">
 													<td>
 														{$datas.sort}
 													</td>
 													{insert name=jsondata datas="`$datas.content`"}
 													<td>
-														<a class="glyphicon glyphicon-cog" href="{$module_url}&a=editdatas&tid={$datas.tid}&id={$datas.id}" title="Modifier"></a>
-														&nbsp;
-														<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=deldatas&tid={$datas.tid}&id={$datas.id}" title="Supprimer"></a>
+														<div class="data-cell-actions">
+															<a class="btn--icon" href="{$module_url}&a=editdatas&tid={$datas.tid}&id={$datas.id}" title="Modifier">
+																<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"/></svg>
+															</a>
+															<a class="btn--icon jConfirm" href="{$module_url}&a=deldatas&tid={$datas.tid}&id={$datas.id}" title="Supprimer">
+																<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
+															</a>
+														</div>
 													</td>
-												</tr>										
+												</tr>
 											{/foreach}
 										{/if}
 										</tbody>
 									</table>
 								</div>
-								<!-- /.table-responsive -->
+								<div class="data-foot" data-datatable-foot="dataTables-tabledata">
+									<div class="data-foot-info" data-foot-info></div>
+									<div class="pager"></div>
+								</div>
 	
 							</div>
 							<!-- /.panel-body -->
@@ -351,17 +403,6 @@
 		<!-- ------------------------------------------------------------ -->
 		<script>
 		$(document).ready(function() {
-			$('#dataTables-table').DataTable({
-					order: [ 1, 'desc' ],
-					responsive: true,
-					"lengthMenu": [25, 50, 75, 100, 150]
-			});
-			
-			$('#dataTables-tablestructure').DataTable({
-					order: [ [0, 'asc'] ],
-					responsive: true,
-					"lengthMenu": [25, 50, 75, 100, 150]
-			});
 			{if $sort}
 				$( "#sortable" ).sortable({
 					axis: "y",

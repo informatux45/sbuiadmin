@@ -44,7 +44,7 @@
                         <!-- /.panel-heading -->
                         <div class="panel-body">
 							{* HTML Text Formatted *}
-							<table class="table table-striped table-bordered table-hover" id="dataTables-settings">
+							<table class="data-table" id="dataTables-settings">
 								<thead>
 									<tr>
 										<th>
@@ -56,7 +56,7 @@
 									</tr>
 								</thead>
 								<tbody>
-									<tr class="info gradeX">
+									<tr class="data-row">
 										<td>
 											Nom du client
 										</td>
@@ -64,7 +64,7 @@
 											{$sb_config_customer_name}
 										</td>
 									</tr>
-									<tr class="gradeX">
+									<tr class="data-row">
 										<td>
 											Nom des Administrateurs
 										</td>
@@ -72,7 +72,7 @@
 											{$sb_config_administrators}
 										</td>
 									</tr>
-									<tr class="info gradeX">
+									<tr class="data-row">
 										<td>
 											Database Host
 										</td>
@@ -80,7 +80,7 @@
 											{$sb_config_dbhost}
 										</td>
 									</tr>
-									<tr class="gradeX">
+									<tr class="data-row">
 										<td>
 											Database Name
 										</td>
@@ -88,7 +88,7 @@
 											{$sb_config_dbname}
 										</td>
 									</tr>
-									<tr class="info gradeX">
+									<tr class="data-row">
 										<td>
 											Database User
 										</td>
@@ -96,7 +96,7 @@
 											{$sb_config_dbuser}
 										</td>
 									</tr>
-									<tr class="gradeX">
+									<tr class="data-row">
 										<td>
 											Database Password
 										</td>
@@ -104,7 +104,7 @@
 											{$sb_config_dbpwd}
 										</td>
 									</tr>
-									<tr class="info gradeX">
+									<tr class="data-row">
 										<td>
 											Database Prefix Table
 										</td>
@@ -112,7 +112,7 @@
 											{$sb_config_dbprefix}
 										</td>
 									</tr>
-									<tr class="gradeX">
+									<tr class="data-row">
 										<td>
 											Répertoire d'uploads
 										</td>
@@ -121,7 +121,7 @@
 										</td>
 									</tr>
 									</tr>
-									<tr class="info gradeX">
+									<tr class="data-row">
 										<td>
 											URL d'uploads
 										</td>
@@ -129,7 +129,7 @@
 											{$sb_config_urluploads}
 										</td>
 									</tr>
-									<tr class="gradeX">
+									<tr class="data-row">
 										<td>
 											Upload Max autorisé
 										</td>
@@ -137,7 +137,7 @@
 											{$sb_config_upload_max}
 										</td>
 									</tr>
-									<tr class="info gradeX">
+									<tr class="data-row">
 										<td>
 											Upload Extensions autorisées
 										</td>
@@ -145,7 +145,7 @@
 											{$sb_config_upload_exts}
 										</td>
 									</tr>
-									<tr class="gradeX">
+									<tr class="data-row">
 										<td>
 											Nombre d'uploads simultanés autorisées
 										</td>
@@ -153,7 +153,7 @@
 											{$sb_config_upload_limit}
 										</td>
 									</tr>
-									<tr class="info gradeX">
+									<tr class="data-row">
 										<td>
 											Taille maximum autorisée pour vos médias (px)<br>(hauteur et largeur confondues)
 										</td>
@@ -161,7 +161,7 @@
 											{$sb_config_scaling_maxsize}
 										</td>
 									</tr>
-									<tr class="gradeX">
+									<tr class="data-row">
 										<td>
 											Nom des modules autorisés
 										</td>
@@ -169,7 +169,7 @@
 											{$sb_config_modules}
 										</td>
 									</tr>
-									<tr class="info gradeX">
+									<tr class="data-row">
 										<td>
 											Google ReCaptcha Clé Publique
 										</td>
@@ -177,7 +177,7 @@
 											{$sb_config_recaptcha_public}
 										</td>
 									</tr>
-									<tr class="gradeX">
+									<tr class="data-row">
 										<td>
 											Google ReCaptcha Clé Secrète
 										</td>
@@ -185,7 +185,7 @@
 											{$sb_config_recaptcha_secret}
 										</td>
 									</tr>
-									<tr class="info gradeX">
+									<tr class="data-row">
 										<td>
 											Mode debug général (Kint)
 										</td>
@@ -193,7 +193,7 @@
 											{if $sb_config_debug_general == 1}Activé{else}Désactivé{/if}
 										</td>
 									</tr>
-									<tr class="gradeX">
+									<tr class="data-row">
 										<td>
 											Mode debug formulaire
 										</td>
@@ -201,7 +201,7 @@
 											{if $sb_config_debug_form == 1}Activé{else}Désactivé{/if}
 										</td>
 									</tr>
-									<tr class="info gradeX">
+									<tr class="data-row">
 										<td>
 											Mode debug Smarty
 										</td>
@@ -209,7 +209,7 @@
 											{if $sb_config_debug_smarty == 1}Activé{else}Désactivé{/if}
 										</td>
 									</tr>
-									<tr class="gradeX">
+									<tr class="data-row">
 										<td>
 											Sandbox
 										</td>
@@ -217,7 +217,7 @@
 											{if $sb_config_sandbox == 1}Activé{else}Désactivé{/if}
 										</td>
 									</tr>
-									<tr class="info gradeX">
+									<tr class="data-row">
 										<td>
 											CMS
 										</td>
@@ -225,7 +225,7 @@
 											{if $sb_config_cms == 1}Activé{else}Désactivé{/if}
 										</td>
 									</tr>
-									<tr class="gradeX">
+									<tr class="data-row">
 										<td>
 											Captcha (Login)
 										</td>
@@ -233,7 +233,7 @@
 											{if $sb_config_captcha_mode == 1}Activé{else}Désactivé{/if}
 										</td>
 									</tr>
-									<tr class="info gradeX">
+									<tr class="data-row">
 										<td>
 											Mode UPGRADE
 										</td>

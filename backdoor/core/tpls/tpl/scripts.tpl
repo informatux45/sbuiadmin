@@ -4,6 +4,7 @@
     <script defer src="assets/adminator/vendor-chartjs.js"></script>
     <script defer src="assets/adminator/vendors.js"></script>
     <script defer src="assets/adminator/2026.js"></script>
+    <script defer src="assets/adminator/datatable.js"></script>
 
     {if $page != 'login'}
     <!-- Bootstrap Core JavaScript: still required by content pages not yet migrated (data-toggle
@@ -12,10 +13,6 @@
     {/if}
 
 	{if $page != 'login'}
-    <!-- DataTables JavaScript -->
-    <script src="assets/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
-    <script src="assets/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
-	
     <!-- jConfirm -->	
 	<link href="inc/js/jconfirm/jConfirm-v2.min.css" media="screen" rel="stylesheet" type="text/css" />
 	<script src="inc/js/jconfirm/jConfirm-v2.min.js" type="text/javascript"></script>

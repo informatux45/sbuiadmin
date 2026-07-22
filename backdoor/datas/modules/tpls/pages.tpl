@@ -21,13 +21,21 @@
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
-                            <div class="dataTable_wrapper">
-                                <table class="table table-striped table-bordered table-hover" id="dataTables-pages">
+                            <div class="data-toolbar">
+								<div class="data-toolbar-left">
+									<div class="input-icon" style="flex:1;max-width:320px">
+										<span class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+										<input class="input" type="search" placeholder="Rechercher..." data-datatable-search="dataTables-pages">
+									</div>
+								</div>
+							</div>
+							<div style="overflow-x:auto">
+                                <table class="data-table" id="dataTables-pages" data-datatable>
                                     <thead>
                                         <tr>
                                             {foreach from=$sb_table_header item=header}
-												<th>
-													{$header}
+												<th{if $header@last} data-sort="false"{/if}>
+													{$header}{if !$header@last} <span class="sort"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>{/if}
 												</th>
 											{/foreach}
                                         </tr>
@@ -35,27 +43,36 @@
                                     <tbody>
 										{if $allpage}
 											{foreach from=$allpage item=page}
-												<tr class="{cycle values="odd,even"} gradeX">
+												<tr class="data-row">
 													<td>{$page.title|unescape:"htmlall"|@sbDisplayLang}</td>
 													<td>{$page.theme_view|unescape:"htmlall"}</td>
 													<td>{$page.module_view|unescape:"htmlall"}</td>
 													<td><a href="{$seo_url_cms}{$page.seo_url|unescape:"htmlall"}" target="_blank">{$page.seo_url|unescape:"htmlall"}</a></td>
 													<td>
-														<span class="glyphicon glyphicon-eye-open {if $page.active}green{else}red{/if}" title="Statut {if $page.active}visible{else}non visible{/if}"></span>
-														&nbsp;
-														<a class="glyphicon glyphicon-cog" href="{$module_url}&a=edit{if $page.url_custom != ''}custom{/if}&id={$page.id}" title="Modifier"></a>
-														{if $page.seo_url != '' || $page.url_custom != ''}
-														&nbsp;
-														<a class="glyphicon glyphicon-remove red jConfirm" href="{$module_url}&a=del&id={$page.id}" title="Supprimer"></a>
-														{/if}
+														<div class="data-cell-actions">
+															<span class="btn--icon" style="color:{if $page.active}var(--success){else}var(--danger){/if}" title="Statut {if $page.active}visible{else}non visible{/if}">
+																<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+															</span>
+															<a class="btn--icon" href="{$module_url}&a=edit{if $page.url_custom != ''}custom{/if}&id={$page.id}" title="Modifier">
+																<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"/></svg>
+															</a>
+															{if $page.seo_url != '' || $page.url_custom != ''}
+															<a class="btn--icon jConfirm" href="{$module_url}&a=del&id={$page.id}" title="Supprimer">
+																<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
+															</a>
+															{/if}
+														</div>
 													</td>
-												</tr>										
+												</tr>
 											{/foreach}
 										{/if}
                                     </tbody>
                                 </table>
                             </div>
-                            <!-- /.table-responsive -->
+							<div class="data-foot" data-datatable-foot="dataTables-pages">
+								<div class="data-foot-info" data-foot-info></div>
+								<div class="pager"></div>
+							</div>
 
                         </div>
                         <!-- /.panel-body -->
@@ -120,10 +137,6 @@
 		<!-- ------------------------------------------------------------ -->
 		<script>
 		$(document).ready(function() {
-			$('#dataTables-pages').DataTable({
-					responsive: true,
-					"lengthMenu": [25, 50, 75, 100, 150]
-			});
 			$("#theme_view").change(function () {
 				var str = $( "select#theme_view option:selected" ).val();
 				var new_theme_view = $( "select#theme_view option:selected" ).attr('rel') + 'screenshot-'+str+'.jpg';

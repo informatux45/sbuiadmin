@@ -21,13 +21,21 @@
                         <!-- /.panel-heading -->
                         <div class="panel-body">
 							{if $all}
-                            <div class="dataTable_wrapper">
-                                <table class="table table-striped table-bordered table-hover" id="dataTables-logaccess">
+							<div class="data-toolbar">
+								<div class="data-toolbar-left">
+									<div class="input-icon" style="flex:1;max-width:320px">
+										<span class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+										<input class="input" type="search" placeholder="Rechercher..." data-datatable-search="dataTables-logaccess">
+									</div>
+								</div>
+							</div>
+							<div style="overflow-x:auto">
+                                <table class="data-table" id="dataTables-logaccess" data-datatable data-page-size="50">
                                     <thead>
                                         <tr>
                                             {foreach from=$sb_table_header item=header}
 												<th>
-													{$header}
+													{$header} <span class="sort"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
 												</th>
 											{/foreach}
                                         </tr>
@@ -35,19 +43,22 @@
                                     <tbody>
 										{if $allaccess}
 											{foreach from=$allaccess item=log}
-												<tr class="{if $log.logaccess_type == 'error'}danger{else}{cycle values="odd,even"} gradeX{/if}">
+												<tr class="data-row"{if $log.logaccess_type == 'error'} style="background:var(--danger-soft)"{/if}>
 													<td>{$log.id}</td>
-													<td>{$log.logaccess_date|date_format:"%d.%m.%Y - %R"}</td>
+													<td data-sort-value="{$log.logaccess_date}">{$log.logaccess_date|date_format:"%d.%m.%Y - %R"}</td>
 													<td>{$log.logaccess_user}</td>
 													<td>{$log.logaccess_type}</td>
 													<td>{$log.logaccess_event}</td>
-												</tr>										
+												</tr>
 											{/foreach}
 										{/if}
                                     </tbody>
                                 </table>
                             </div>
-                            <!-- /.table-responsive -->
+							<div class="data-foot" data-datatable-foot="dataTables-logaccess">
+								<div class="data-foot-info" data-foot-info></div>
+								<div class="pager"></div>
+							</div>
 							{else}
 								{* Afficher le formulaire ADD/EDIT *}
 								{include_php file='form.php'}
@@ -64,15 +75,6 @@
 		<!-- ------------------------------------------------------------ -->
 		<!-- Page-Level Scripts - Use this space this write your own code -->
 		<!-- ------------------------------------------------------------ -->
-		<script>
-		$(document).ready(function() {
-			$('#dataTables-logaccess').DataTable({
-					order: [ 0, 'desc' ],
-					responsive: true,
-					"lengthMenu": [50, 75, 100, 200, 500]
-			});
-		});
-		</script>
 			
 	{include file='sb_footer.tpl' page='false' pagef='false'}
 
