@@ -8,7 +8,7 @@
 
     <div class="container" id="bgcontainer">
         <div class="row">
-			{if isset($sbuiadmin_access_code)}
+			{if $sbuiadmin_access_code}
 				<div class="alert alert-danger alert-danger-custom">
 				{if isset($sbuiadmin_access_code) && $sbuiadmin_access_code == 'E1'}
 					{$smarty.const.SBUIADMIN_MSG_ERROR_E1}
