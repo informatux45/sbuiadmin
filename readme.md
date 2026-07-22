@@ -1,6 +1,6 @@
 # [SBUIADMIN](https://github.com/informatux45/sbuiadmin/)
 - CMS SBootstrap Admin Responsive
-- Contributeurs : INFORMATUX
+- Contributeurs : [informatux45](https://github.com/informatux45)
 - Version stable : 4.10
 - License: [GPLv3](http://www.gnu.org/licenses/gpl-3.0.fr.html "Licence publique générale GNU v3")
 
