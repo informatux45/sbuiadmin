@@ -907,7 +907,7 @@ function sbGetMenuModule($param = '') {
 							 ,_AM_SITE_DIR.'menu.php'
 							 ,_AM_SITE_DIR.'blocs.php'
 							];
-			$modules_dir = array_intersect($modules_order, $modules_dir);
+			$modules_dir = array_values(array_intersect($modules_order, $modules_dir));
 		break;
 		case "main":
 			// --- Assign Path Modules

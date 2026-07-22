@@ -291,6 +291,8 @@ switch($action) {
 		// ----------------------------
 		// --- Tableau des modules
 		$array_menu = explode("|", $menu);
+		// --- Wrapper for floated .config_blocks (form is flex-column)
+		$sbform->addAnything('<div style="overflow:hidden">');
 		foreach($module_menu as $key => $val) {
 			// Create random variable
 			$_randstring = substr(str_shuffle(str_repeat("0123456789abcdefghijklmnopqrstuvwxyz", 5)), 0, 5);
@@ -307,6 +309,7 @@ switch($action) {
 			$sbform->addCheckbox((($module_menu[$key]['group'] == 'admin') ? '<span style="color: red;">'.$main_text.'</span>' : $main_text), $_mmodule[$_randstring], '', false, '<br />');
 			$sbform->addAnything("</div>");
 		}
+		$sbform->addAnything('</div>');
 		$sbform->addAnything("<p style='clear: both'>Cochez les entrées du menu qui ne sont pas autorisées pour cet utilisateur.<br>Les entrées nommées en <span style='color: red;'>rouge</span> sont les modules accessibles uniquement par les administrateurs (Groupe Admin).</p>");
 		// --- Hiddens / Buttons
 		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => "$formName"));

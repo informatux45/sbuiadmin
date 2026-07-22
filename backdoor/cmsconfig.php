@@ -524,6 +524,10 @@ switch($action) {
 		$sbform->openForm(array('action' => "$formAction", 'name' => "$formName", 'id' => "$formName", 'reloadpage' => "$formAction", 'submitpage' => "$formAction"));
 		// --- Add inputs and more
 		// --------------------------------
+		// --- Wrapper for floated .config_blocks (form is flex-column)
+		// --------------------------------
+		$sbform->addAnything('<div style="overflow:hidden">');
+		// --------------------------------
 		// --- Plugin JQUERY Latest
 		// --------------------------------
 		$tab_jquery = array();
@@ -589,6 +593,7 @@ switch($action) {
 		$sbform->addAnything("<div class='$config_blocks'");
 		$sbform->addCheckbox('MAGNIFIC POPUP', $tab_magnificpopup, '', false, '<br />');
 		$sbform->addAnything('</div><div class="config_blocks"></div>');
+		$sbform->addAnything('</div>');
 		// --------------------------------
 		// --- Hiddens / Buttons
 		// --------------------------------

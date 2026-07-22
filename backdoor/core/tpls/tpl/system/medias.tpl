@@ -138,6 +138,7 @@
 						</div>
                     </div>
 							{* HTML Text Formatted *}
+							<div style="overflow:hidden">
 							{foreach $medias_all as $sbmedia}
 								{if $sbtranfer_media == true}
 									<p class="sbmedia" target="_parent" onclick='transfert("{$sbmedia}","{$sbid}")'>
@@ -185,6 +186,7 @@
 							{foreachelse}
 
 							{/foreach}
+							</div>
                 </section>
             </div>
             <!-- /.grid -->

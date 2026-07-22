@@ -88,6 +88,7 @@
 	<div id="fine-uploader-gallery" style="margin-bottom:22px"></div>
 
 	<div class="card">
+	<div style="overflow:hidden">
 	{foreach $medias_all as $sbmedia}
 		
 		{if isset($smarty.get.editor) && $smarty.get.editor == 'ck'}
@@ -130,6 +131,7 @@
 		</p>
 
 	{/foreach}
+	</div>
 	</div>
 	<!-- /.card -->
 

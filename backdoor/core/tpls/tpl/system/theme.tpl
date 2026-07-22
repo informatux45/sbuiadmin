@@ -21,6 +21,7 @@
 							<h2 class="card-title">{$sb_themes[theme]|capitalize}{if $sb_themes[theme] == $sb_theme_name} (Activé){/if}</h2>
 						</div>
 					</div>
+							<div style="overflow:hidden">
 							<img class="theme_img" src="thumb.php?src={$smarty.const.SB_URL}theme/{$sb_themes[theme]}/screenshot-index.jpg&size=200x180&ignore=1&crop=0" title="Thème {$sb_themes[theme]}" />
 							{* --- Description from header file config --- *}
 							<div class="theme_description">
@@ -32,6 +33,7 @@
 								Auteur: <i>{if $sb_theme_config_file|@sbGetFileDocData:"Author_URI"}<a target="_blank" href="{$sb_theme_config_file|@sbGetFileDocData:"Author_URI"}">{$sb_theme_config_file|@sbGetFileDocData:"Author"}</a>{else}{$sb_theme_config_file|@sbGetFileDocData:"Author"}{/if}</i>
 								<br>
 								Documentation: <i>{if $sb_theme_config_file|@sbGetFileDocData:"Documentation" && $sb_theme_config_file|@sbGetFileDocData:"Documentation" != 'N.C.'}<a target="_blank" href="{$sb_theme_config_file|@sbGetFileDocData:"Documentation"}">{$sb_theme_config_file|@sbGetFileDocData:"Documentation"}</a>{else}{$sb_theme_config_file|@sbGetFileDocData:"Documentation"}{/if}</i>
+							</div>
 							</div>
 							{if $sb_themes[theme] != $sb_theme_name}
 							<div class="theme_activate" style="margin-top:14px">
