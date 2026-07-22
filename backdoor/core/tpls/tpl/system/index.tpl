@@ -15,11 +15,8 @@
 			</section>
 
 			{if $sbuiadmin_user_type == 'admin'}
-            <!-- .row -->
-            <div class="row">
-				
 				{if isset($sb_warning_installer_lock) || isset($sb_warning_install_file) || isset($sb_warning_admin_user)}
-					<div class="col-lg-12" style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+					<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
 					{if isset($sb_warning_installer_lock)}
 						<div class="alert danger">
 							<span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg></span>
@@ -55,326 +52,186 @@
 					</div>
 				{/if}
 
-                <div class="col-lg-3 col-md-6">
-                    <div class="panel panel-red">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-xs-3">
-                                    <i class="fa fa-users fa-4x"></i>
-                                </div>
-                                <div class="col-xs-9 text-right">
-                                    <div class="huge">{$sb_users_cpt|default:0}</div>
-                                    <div>Utilisateurs</div>
-                                </div>
-                            </div>
-                        </div>
-                        <a href="index.php?p=users">
-                            <div class="panel-footer">
-                                <span class="pull-left">Détails utilisateurs</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
+			<div class="kpi-grid" aria-label="Aperçu système">
+				<a href="index.php?p=users" class="kpi-card">
+					<div class="kpi-top">
+						<div class="kpi-identity">
+							<div class="kpi-icon primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+							<div class="kpi-label">Utilisateurs</div>
+						</div>
+					</div>
+					<div class="kpi-value">{$sb_users_cpt|default:0}</div>
+				</a>
 
-                <div class="col-lg-3 col-md-6">
-                    <div class="panel panel-red">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-xs-3">
-                                    <i class="fa fa-gears fa-4x"></i>
-                                </div>
-                                <div class="col-xs-9 text-right">
-                                    <div class="huge">{$smarty.const._AM_SERVER_PHP_VERSION_ID}</div>
-                                    <div>Version PHP</div>
-                                </div>
-                            </div>
-                        </div>
-                        <a href="index.php?p=database">
-                            <div class="panel-footer">
-                                <span class="pull-left">Détails configuration serveur</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
+				<a href="index.php?p=database" class="kpi-card">
+					<div class="kpi-top">
+						<div class="kpi-identity">
+							<div class="kpi-icon info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="8" rx="2"/><rect x="2" y="13" width="20" height="8" rx="2"/><path d="M6 7h.01M6 17h.01"/></svg></div>
+							<div class="kpi-label">Version PHP</div>
+						</div>
+					</div>
+					<div class="kpi-value" style="font-size:28px">{$smarty.const._AM_SERVER_PHP_VERSION_ID}</div>
+				</a>
 
-                <div class="col-lg-3 col-md-6">
-                    <div class="panel panel-red">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-xs-3">
-                                    <i class="fa fa-database fa-4x"></i>
-                                </div>
-                                <div class="col-xs-9 text-right">
-                                    <div class="huge">{$smarty.const._AM_DB_HOST}</div>
-                                    <div>DB Host</div>
-                                </div>
-                            </div>
-                        </div>
-                        <a href="index.php?p=settings">
-                            <div class="panel-footer">
-                                <span class="pull-left">Détails configuration</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-				
-                <div class="col-lg-3 col-md-6">
-                    <div class="panel panel-red">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-xs-3">
-                                    <i class="fa fa-upload fa-4x"></i>
-                                </div>
-                                <div class="col-xs-9 text-right">
-                                    <div class="huge">{$smarty.const._AM_MEDIAS_SIZE_LIMIT}</div>
-                                    <div>Upload limit</div>
-                                </div>
-                            </div>
-                        </div>
-                        <a href="index.php?p=settings">
-                            <div class="panel-footer">
-                                <span class="pull-left">Détails paramètres</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
+				<a href="index.php?p=settings" class="kpi-card">
+					<div class="kpi-top">
+						<div class="kpi-identity">
+							<div class="kpi-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg></div>
+							<div class="kpi-label">DB Host</div>
+						</div>
+					</div>
+					<div class="kpi-value" style="font-size:22px">{$smarty.const._AM_DB_HOST}</div>
+				</a>
 
-            <!-- /.row -->
-            </div>
+				<a href="index.php?p=settings" class="kpi-card">
+					<div class="kpi-top">
+						<div class="kpi-identity">
+							<div class="kpi-icon warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></div>
+							<div class="kpi-label">Upload limit</div>
+						</div>
+					</div>
+					<div class="kpi-value" style="font-size:28px">{$smarty.const._AM_MEDIAS_SIZE_LIMIT}</div>
+				</a>
+			</div>
 			{/if}
 
 
-            <!-- .row -->
-            <div class="row">
-				
-				
+			<div class="kpi-grid" aria-label="Statuts configurables">
 				{if $sb_dashboard_status1_table != ''}
-                <div class="col-lg-3 col-md-6">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-xs-3">
-                                    <i class="fa fa-{$sb_dashboard_status1_icon} fa-4x"></i>
-                                </div>
-                                <div class="col-xs-9 text-right">
-                                    <div class="huge">{$sb_dashboard_status1_cpt|default:0}</div>
-                                    <div>{$sb_dashboard_status1_title|@sbDisplayLang}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <a href="{$sb_dashboard_status1_link}">
-                            <div class="panel-footer">
-                                <span class="pull-left">Détails</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-				{/if}
-				
-				{if $sb_dashboard_status2_table != ''}
-                <div class="col-lg-3 col-md-6">
-                    <div class="panel panel-green">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-xs-3">
-                                    <i class="fa fa-{$sb_dashboard_status2_icon} fa-4x"></i>
-                                </div>
-                                <div class="col-xs-9 text-right">
-                                    <div class="huge">{$sb_dashboard_status2_cpt|default:0}</div>
-                                    <div>{$sb_dashboard_status2_title|@sbDisplayLang}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <a href="{$sb_dashboard_status2_link}">
-                            <div class="panel-footer">
-                                <span class="pull-left">Détails</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-				{/if}
-				
-				{if $sb_dashboard_status3_table != ''}
-                <div class="col-lg-3 col-md-6">
-                    <div class="panel panel-yellow">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-xs-3">
-                                    <i class="fa fa-{$sb_dashboard_status3_icon} fa-4x"></i>
-                                </div>
-                                <div class="col-xs-9 text-right">
-                                    <div class="huge">{$sb_dashboard_status3_cpt|default:0}</div>
-                                    <div>{$sb_dashboard_status3_title|@sbDisplayLang}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <a href="{$sb_dashboard_status3_link}">
-                            <div class="panel-footer">
-                                <span class="pull-left">Détails</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-				{/if}
-				
-				{if $sb_dashboard_status4_table != ''}
-                <div class="col-lg-3 col-md-6">
-                    <div class="panel panel-red">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-xs-3">
-                                    <i class="fa fa-{$sb_dashboard_status4_icon} fa-4x"></i>
-                                </div>
-                                <div class="col-xs-9 text-right">
-                                    <div class="huge">{$sb_dashboard_status4_cpt|default:0}</div>
-                                    <div>{$sb_dashboard_status4_title|@sbDisplayLang}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <a href="{$sb_dashboard_status4_link}">
-                            <div class="panel-footer">
-                                <span class="pull-left">Détails</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-				{/if}
-				
-            </div>
-            <!-- /.row -->
-			
-			
-			<!-- .row -->
-            <div class="row">
-				
-				{if $sb_dashboard_status1_table != ''}
-                <div class="col-lg-4">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-{$sb_dashboard_status1_icon} fa-fw"></i> {$sb_dashboard_status1_title}
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-                            <div class="list-group">
-								{foreach from=$sb_dashboard_status1_all item=status1all}
-									{if $status1all@iteration == 11}{break}{/if}
-									<a href="#" class="list-group-item">
-										<i class="fa fa-th-list fa-fw"></i> {$status1all.$sb_dashboard_status1_tbcol|@sbDisplayLang|unescape:"htmlall"}
-										{*<span class="pull-right text-muted small"><em>4 minutes ago</em></span>*}
-									</a>
-								{/foreach}
-                            </div>
-                            <!-- /.list-group -->
-                            <a href="{$sb_dashboard_status1_link}" class="btn btn-default btn-block">Voir {$sb_dashboard_status1_title|@strtolower}</a>
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                </div>
-                <!-- /.col-lg-4 -->
+				<a href="{$sb_dashboard_status1_link}" class="kpi-card">
+					<div class="kpi-top">
+						<div class="kpi-identity">
+							<div class="kpi-icon success"><i class="fa fa-{$sb_dashboard_status1_icon}"></i></div>
+							<div class="kpi-label">{$sb_dashboard_status1_title|@sbDisplayLang}</div>
+						</div>
+					</div>
+					<div class="kpi-value">{$sb_dashboard_status1_cpt|default:0}</div>
+				</a>
 				{/if}
 
 				{if $sb_dashboard_status2_table != ''}
-                <div class="col-lg-4">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-{$sb_dashboard_status2_icon} fa-fw"></i> {$sb_dashboard_status2_title}
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-                            <div class="list-group">
-								{foreach from=$sb_dashboard_status2_all item=status2all}
-									{if $status2all@iteration == 11}{break}{/if}
-									<a href="#" class="list-group-item">
-										<i class="fa fa-th-list fa-fw"></i> {$status2all.$sb_dashboard_status2_tbcol|@sbDisplayLang|unescape:"htmlall"}
-										{*<span class="pull-right text-muted small"><em>4 minutes ago</em></span>*}
-									</a>
-								{/foreach}
-                            </div>
-                            <!-- /.list-group -->
-                            <a href="{$sb_dashboard_status2_link}" class="btn btn-default btn-block">Voir {$sb_dashboard_status2_title|@strtolower}</a>
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                </div>
-                <!-- /.col-lg-4 -->
+				<a href="{$sb_dashboard_status2_link}" class="kpi-card">
+					<div class="kpi-top">
+						<div class="kpi-identity">
+							<div class="kpi-icon info"><i class="fa fa-{$sb_dashboard_status2_icon}"></i></div>
+							<div class="kpi-label">{$sb_dashboard_status2_title|@sbDisplayLang}</div>
+						</div>
+					</div>
+					<div class="kpi-value">{$sb_dashboard_status2_cpt|default:0}</div>
+				</a>
 				{/if}
-				
+
 				{if $sb_dashboard_status3_table != ''}
-                <div class="col-lg-4">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-{$sb_dashboard_status3_icon} fa-fw"></i> {$sb_dashboard_status3_title}
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-                            <div class="list-group">
-								{foreach from=$sb_dashboard_status3_all item=status3all}
-									{if $status3all@iteration == 11}{break}{/if}
-									<a href="#" class="list-group-item">
-										<i class="fa fa-th-list fa-fw"></i> {$status3all.$sb_dashboard_status3_tbcol|@sbDisplayLang|unescape:"htmlall"}
-										{*<span class="pull-right text-muted small"><em>4 minutes ago</em></span>*}
-									</a>
-								{/foreach}
-                            </div>
-                            <!-- /.list-group -->
-                            <a href="{$sb_dashboard_status3_link}" class="btn btn-default btn-block">Voir {$sb_dashboard_status3_title|@strtolower}</a>
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                </div>
-                <!-- /.col-lg-4 -->
+				<a href="{$sb_dashboard_status3_link}" class="kpi-card">
+					<div class="kpi-top">
+						<div class="kpi-identity">
+							<div class="kpi-icon warning"><i class="fa fa-{$sb_dashboard_status3_icon}"></i></div>
+							<div class="kpi-label">{$sb_dashboard_status3_title|@sbDisplayLang}</div>
+						</div>
+					</div>
+					<div class="kpi-value">{$sb_dashboard_status3_cpt|default:0}</div>
+				</a>
 				{/if}
 
-			</div>
-			<!-- /.row -->
-				
-			<!-- .row -->
-            <div class="row">
-				
 				{if $sb_dashboard_status4_table != ''}
-                <div class="col-lg-4">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-{$sb_dashboard_status4_icon} fa-fw"></i> {$sb_dashboard_status4_title}
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-                            <div class="list-group">
-								{foreach from=$sb_dashboard_status4_all item=status4all}
-									{if $status4all@iteration == 11}{break}{/if}
-									<a href="#" class="list-group-item">
-										<i class="fa fa-th-list fa-fw"></i> {$status4all.$sb_dashboard_status4_tbcol|@sbDisplayLang|unescape:"htmlall"}
-										{*<span class="pull-right text-muted small"><em>4 minutes ago</em></span>*}
-									</a>
-								{/foreach}
-                            </div>
-                            <!-- /.list-group -->
-                            <a href="{$sb_dashboard_status4_link}" class="btn btn-default btn-block">Voir {$sb_dashboard_status4_title|@strtolower}</a>
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                </div>
-                <!-- /.col-lg-4 -->
+				<a href="{$sb_dashboard_status4_link}" class="kpi-card">
+					<div class="kpi-top">
+						<div class="kpi-identity">
+							<div class="kpi-icon danger"><i class="fa fa-{$sb_dashboard_status4_icon}"></i></div>
+							<div class="kpi-label">{$sb_dashboard_status4_title|@sbDisplayLang}</div>
+						</div>
+					</div>
+					<div class="kpi-value">{$sb_dashboard_status4_cpt|default:0}</div>
+				</a>
+				{/if}
+			</div>
+			
+			
+			<div class="grid">
+				{if $sb_dashboard_status1_table != ''}
+				<section class="col-4 card">
+					<div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Récent</span>
+							<h2 class="card-title"><i class="fa fa-{$sb_dashboard_status1_icon} fa-fw"></i> {$sb_dashboard_status1_title|@sbDisplayLang}</h2>
+						</div>
+						<a class="card-action" href="{$sb_dashboard_status1_link}">Voir tout <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+					</div>
+					<div>
+						{foreach from=$sb_dashboard_status1_all item=status1all}
+							{if $status1all@iteration == 11}{break}{/if}
+							<a href="#" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-soft);color:var(--t-base);font-size:13px">
+								<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;color:var(--t-light)"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+								{$status1all.$sb_dashboard_status1_tbcol|@sbDisplayLang|unescape:"htmlall"}
+							</a>
+						{/foreach}
+					</div>
+				</section>
 				{/if}
 
+				{if $sb_dashboard_status2_table != ''}
+				<section class="col-4 card">
+					<div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Récent</span>
+							<h2 class="card-title"><i class="fa fa-{$sb_dashboard_status2_icon} fa-fw"></i> {$sb_dashboard_status2_title|@sbDisplayLang}</h2>
+						</div>
+						<a class="card-action" href="{$sb_dashboard_status2_link}">Voir tout <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+					</div>
+					<div>
+						{foreach from=$sb_dashboard_status2_all item=status2all}
+							{if $status2all@iteration == 11}{break}{/if}
+							<a href="#" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-soft);color:var(--t-base);font-size:13px">
+								<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;color:var(--t-light)"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+								{$status2all.$sb_dashboard_status2_tbcol|@sbDisplayLang|unescape:"htmlall"}
+							</a>
+						{/foreach}
+					</div>
+				</section>
+				{/if}
+
+				{if $sb_dashboard_status3_table != ''}
+				<section class="col-4 card">
+					<div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Récent</span>
+							<h2 class="card-title"><i class="fa fa-{$sb_dashboard_status3_icon} fa-fw"></i> {$sb_dashboard_status3_title|@sbDisplayLang}</h2>
+						</div>
+						<a class="card-action" href="{$sb_dashboard_status3_link}">Voir tout <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+					</div>
+					<div>
+						{foreach from=$sb_dashboard_status3_all item=status3all}
+							{if $status3all@iteration == 11}{break}{/if}
+							<a href="#" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-soft);color:var(--t-base);font-size:13px">
+								<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;color:var(--t-light)"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+								{$status3all.$sb_dashboard_status3_tbcol|@sbDisplayLang|unescape:"htmlall"}
+							</a>
+						{/foreach}
+					</div>
+				</section>
+				{/if}
+
+				{if $sb_dashboard_status4_table != ''}
+				<section class="col-4 card">
+					<div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Récent</span>
+							<h2 class="card-title"><i class="fa fa-{$sb_dashboard_status4_icon} fa-fw"></i> {$sb_dashboard_status4_title|@sbDisplayLang}</h2>
+						</div>
+						<a class="card-action" href="{$sb_dashboard_status4_link}">Voir tout <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+					</div>
+					<div>
+						{foreach from=$sb_dashboard_status4_all item=status4all}
+							{if $status4all@iteration == 11}{break}{/if}
+							<a href="#" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-soft);color:var(--t-base);font-size:13px">
+								<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;color:var(--t-light)"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+								{$status4all.$sb_dashboard_status4_tbcol|@sbDisplayLang|unescape:"htmlall"}
+							</a>
+						{/foreach}
+					</div>
+				</section>
+				{/if}
 			</div>
-			<!-- /.row -->
 			
 		<!-- ------------------------------------------------------------ -->
 		<!-- Page-Level Scripts - Use this space this write your own code -->
