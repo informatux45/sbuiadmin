@@ -12,26 +12,21 @@
 		
 			{include file='system/settings_bar.tpl'}
 
-			<div class="row">
-		
-		        <div class="col-lg-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <span class="fa fa-cubes fa-fw"></span> <strong>Vider les caches FRONT & ADMIN</strong>
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
+			<div class="grid">
+
+		        <section class="col-12 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Maintenance</span>
+							<h2 class="card-title">Vider les caches FRONT & ADMIN</h2>
+						</div>
+                    </div>
 							{* Afficher le formulaire ADD/EDIT *}
 							{include_php file='form.php'}
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-12 -->
+                </section>
 
             </div>
-            <!-- /.row -->
+            <!-- /.grid -->
 	
 		<!-- ------------------------------------------------------------ -->
 		<!-- Page-Level Scripts - Use this space this write your own code -->

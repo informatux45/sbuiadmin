@@ -11,42 +11,32 @@
 			{* ------------------------------------------------ *}
 
 			{* Notes col lg 6 *}
-			<div class="row">
-				
-                <div class="col-lg-6">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-folder-open fa-fw"></i> Vos fichiers
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
+			<div class="grid">
+
+                <section class="col-6 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Fichiers</span>
+							<h2 class="card-title">Vos fichiers</h2>
+						</div>
+                    </div>
 							{* HTML Text Formatted *}
 							{$filetree}
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-6 -->
+                </section>
 
-                <div class="col-lg-6">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-eye fa-fw"></i> Visualiser
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
+                <section class="col-6 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Fichiers</span>
+							<h2 class="card-title">Visualiser</h2>
+						</div>
+                    </div>
 							{* HTML Text Formatted *}
 							<div id="filetree_view"></div>
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-6 -->
+                </section>
 
             </div>
-            <!-- /.row -->
+            <!-- /.grid -->
 
 		<!-- ------------------------------------------------------------ -->
 		<!-- Page-Level Scripts - Use this space this write your own code -->

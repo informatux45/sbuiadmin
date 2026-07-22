@@ -1,42 +1,33 @@
 {* CMS Config Bar Buttons action *}
 
-<div class="well well-sm">
-	{*<h4>Actions</h4>*}
-
-	<button class="btn {if $smarty.get.p == 'settings'}{else}btn-outline{/if} btn-primary" type="button" onclick="location.href='index.php?p=settings'">
-		Générale
-	</button>
-	&nbsp;
-	<button class="btn {if $smarty.get.p == 'session'}{else}btn-outline{/if} btn-primary" type="button" onclick="location.href='index.php?p=session'">
-		Session
-	</button>
-	&nbsp;
-	<button class="btn {if $smarty.get.p == 'server'}{else}btn-outline{/if} btn-primary" type="button" onclick="location.href='index.php?p=server'">
-		Serveur
-	</button>
-	&nbsp;
-	<button class="btn {if $smarty.get.p == 'cache'}{else}btn-outline{/if} btn-primary" type="button" onclick="location.href='index.php?p=cache'">
-		Cache
-	</button>
-	&nbsp;
-	<button class="btn {if $smarty.get.p == 'dashboard'}{else}btn-outline{/if} btn-primary" type="button" onclick="location.href='index.php?p=dashboard'">
-		Dashboard
-	</button>
-	&nbsp;
-	<button class="btn {if $smarty.get.p == 'toolbarck'}{else}btn-outline{/if} btn-primary" type="button" onclick="location.href='index.php?p=toolbarck'">
-		Toolbar CKEditor
-	</button>
-	&nbsp;
-	<button class="btn {if $smarty.get.p == 'theme'}{else}btn-outline{/if} btn-primary" type="button" onclick="location.href='index.php?p=theme'">
-		Thème
-	</button>
-	&nbsp;
-	<button class="btn {if $smarty.get.p == 'themeinfos'}{else}btn-outline{/if} btn-primary" type="button" onclick="location.href='index.php?p=themeinfos'">
-		Thème infos
-	</button>
-	&nbsp;
-	<button class="btn btn-info" type="button" onclick="window.open('{$smarty.const.SB_ADMIN_URL}assets/samples/')">
-		BOOTSTRAP Samples
-	</button>
-		
+<div class="data-toolbar" style="margin-bottom:20px">
+	<div class="data-toolbar-left" style="flex-wrap:wrap">
+		<button class="btn {if $smarty.get.p == 'settings'}btn--primary{else}btn--ghost{/if}" type="button" onclick="location.href='index.php?p=settings'">
+			Générale
+		</button>
+		<button class="btn {if $smarty.get.p == 'session'}btn--primary{else}btn--ghost{/if}" type="button" onclick="location.href='index.php?p=session'">
+			Session
+		</button>
+		<button class="btn {if $smarty.get.p == 'server'}btn--primary{else}btn--ghost{/if}" type="button" onclick="location.href='index.php?p=server'">
+			Serveur
+		</button>
+		<button class="btn {if $smarty.get.p == 'cache'}btn--primary{else}btn--ghost{/if}" type="button" onclick="location.href='index.php?p=cache'">
+			Cache
+		</button>
+		<button class="btn {if $smarty.get.p == 'dashboard'}btn--primary{else}btn--ghost{/if}" type="button" onclick="location.href='index.php?p=dashboard'">
+			Dashboard
+		</button>
+		<button class="btn {if $smarty.get.p == 'toolbarck'}btn--primary{else}btn--ghost{/if}" type="button" onclick="location.href='index.php?p=toolbarck'">
+			Toolbar CKEditor
+		</button>
+		<button class="btn {if $smarty.get.p == 'theme'}btn--primary{else}btn--ghost{/if}" type="button" onclick="location.href='index.php?p=theme'">
+			Thème
+		</button>
+		<button class="btn {if $smarty.get.p == 'themeinfos'}btn--primary{else}btn--ghost{/if}" type="button" onclick="location.href='index.php?p=themeinfos'">
+			Thème infos
+		</button>
+		<button class="btn btn--ghost" type="button" onclick="window.open('{$smarty.const.SB_ADMIN_URL}assets/samples/')">
+			BOOTSTRAP Samples
+		</button>
+	</div>
 </div>

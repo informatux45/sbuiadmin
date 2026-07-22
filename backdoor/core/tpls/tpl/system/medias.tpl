@@ -11,15 +11,15 @@
 			{* ------------------------------------------------ *}
 
 			{* Notes 6 col *}
-			<div class="row">
-				
-                <div class="col-lg-6">
-                    <div class="panel panel-info">
-                        <div class="panel-heading">
-                            <span class="fa fa-upload"></span> <strong>Upload medias</strong>
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
+			<div class="grid">
+
+                <section class="col-6 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Médias</span>
+							<h2 class="card-title">Upload medias</h2>
+						</div>
+                    </div>
 
 							<!-- Fine Uploader Gallery template
 							====================================================================== -->
@@ -104,20 +104,15 @@
 							====================================================================== -->
 							<div id="fine-uploader-gallery"></div>
 
-                        </div>
-                        <!-- /.panel-body -->
+                </section>
+
+                <section class="col-6 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Médias</span>
+							<h2 class="card-title">Informations</h2>
+						</div>
                     </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-6 -->
-				
-                <div class="col-lg-6">
-                    <div class="panel panel-warning">
-                        <div class="panel-heading">
-                            <span class="fa fa-info-circle"></span> <strong>Informations</strong>
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
 							<ul>
 								<li>Upload des fichiers : {if $media_ini_get_file_uploads}<span class="green">ON</span>{else}<span class="red">OFF</span>{/if}</li>
 								<li>Taille post maximum autorisée (post_max_size) : {$media_ini_get_post_max_size}</li>
@@ -127,26 +122,21 @@
 								<li>Répertoire de depôt : {foreach $sbfiles_medias_dirs_allowed as $dir_allowed}<span class="sbmedia_ext_allowed">{$dir_allowed}</span> {foreachelse}Aucun{/foreach}</li>
 								<li>Nombre de fichiers uploadables simultanément : {$smarty.const._AM_MEDIAS_ITEM_LIMIT}</li>
 							</ul>
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-6 -->
+                </section>
 
             </div>
-            <!-- /.row -->
-			
+            <!-- /.grid -->
+
 
 			{* Notes full width *}
-			<div class="row">
-                <div class="col-lg-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <span class="fa fa-desktop"></span> <strong>Medias</strong>
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
+			<div class="grid">
+                <section class="col-12 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Médias</span>
+							<h2 class="card-title">Medias</h2>
+						</div>
+                    </div>
 							{* HTML Text Formatted *}
 							{foreach $medias_all as $sbmedia}
 								{if $sbtranfer_media == true}
@@ -193,16 +183,11 @@
 								
 								</p>
 							{foreachelse}
-							
+
 							{/foreach}
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-12 -->
+                </section>
             </div>
-            <!-- /.row -->
+            <!-- /.grid -->
 
 		{*include file='scripts.tpl' pagef='upload'*}
 

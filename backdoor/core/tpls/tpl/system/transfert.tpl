@@ -1,5 +1,5 @@
 <style>
-	body { background-color: #FFF9E5 !important; }
+	body { background-color: var(--bg-body) !important; padding: 22px; }
 </style>
 
 {include file='header.tpl' page='false'}
@@ -85,8 +85,9 @@
 	
 	<!-- Fine Uploader DOM Element
 	====================================================================== -->
-	<div id="fine-uploader-gallery"></div>
+	<div id="fine-uploader-gallery" style="margin-bottom:22px"></div>
 
+	<div class="card">
 	{foreach $medias_all as $sbmedia}
 		
 		{if isset($smarty.get.editor) && $smarty.get.editor == 'ck'}
@@ -127,9 +128,11 @@
 			<span class="sbmedia-mime">{$sbmedia|@sbDisplayMediaMime}</span>
 		
 		</p>
-		
+
 	{/foreach}
-	
+	</div>
+	<!-- /.card -->
+
 	<link href="inc/js/upload/fine-uploader-gallery.min.css" media="screen" rel="stylesheet" type="text/css" />
 	<script src="inc/js/upload/jquery.fine-uploader.min.js"></script>
 	<script>

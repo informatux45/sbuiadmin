@@ -1,7 +1,7 @@
 # [SBUIADMIN](https://github.com/informatux45/sbuiadmin/)
 - CMS SBootstrap Admin Responsive
 - Contributeurs : INFORMATUX
-- Version stable : 4.00
+- Version stable : 4.10
 - License: [GPLv3](http://www.gnu.org/licenses/gpl-3.0.fr.html "Licence publique générale GNU v3")
 
 ---
@@ -45,6 +45,11 @@ Ready | Fonctionnalités
 ---
 
 ### Changelog
+
+**4.10**
+- Refonte complète de la charte graphique de l'administration (thème Adminator, mode sombre inclus)
+- Modernisation des librairies JS legacy (DataTables, confirmations, lightbox) en vanilla JS
+- Nouvelle page d'erreur 500 avec détail de l'erreur
 
 **4.00**
 - Update Smarty libraries

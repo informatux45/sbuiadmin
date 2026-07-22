@@ -217,6 +217,20 @@ a {
 	background: var(--bg-muted) !important;
 	border-top-color: var(--border) !important;
 }
+
+/* system/theme.tpl: theme picker cards keep the legacy theme_block/theme_block_active
+   classes for JS-free active-state marking, but the old green gradient background
+   from sb-admin-custom.css clashes with .card's own background — override it with
+   a simple accent border instead. */
+.theme_block {
+	overflow: visible !important;
+	min-height: 0 !important;
+}
+.theme_block_active {
+	background: var(--bg-card) !important;
+	border-color: var(--success) !important;
+	box-shadow: 0 0 0 1px var(--success);
+}
 .cke_contents, .cke_contents iframe {
 	background: var(--bg-card) !important;
 }

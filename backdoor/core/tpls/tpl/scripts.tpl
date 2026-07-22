@@ -6,6 +6,7 @@
     <script defer src="assets/adminator/2026.js"></script>
     <script defer src="assets/adminator/datatable.js"></script>
     <script defer src="assets/adminator/confirm.js"></script>
+    <script defer src="assets/adminator/lightbox.js"></script>
 
     {if $page != 'login'}
     <!-- Bootstrap Core JavaScript: still required by content pages not yet migrated (data-toggle
@@ -14,13 +15,9 @@
     {/if}
 
 	{if $page != 'login'}
-    <!-- jscroll -->	
+    <!-- jscroll -->
 	{*<script src="inc/js/jscroll/jquery.jscroll.min.js" type="text/javascript"></script>*}
-	
-    <!-- Facebox (lightbox) -->	
-	<link href="inc/js/facebox/facebox.css" media="screen" rel="stylesheet" type="text/css" />
-	<script src="inc/js/facebox/facebox.js" type="text/javascript"></script>
-	
+
 	<!-- OutdatedBrowser -->
 	<script src="inc/plugins/outdatedbrowser/outdatedbrowser.min.js"></script>
     <!-- OutdatedBrowser plugin call -->
@@ -59,15 +56,8 @@
 			container: "body"
 		})
 		// -----------------------------------------------------
-		// Enable lightbox
-		// USAGE : add --> rel="facebox" <-- to your links
-		// Web : http://defunkt.io/facebox/
-		$('a[rel*=facebox], img[rel*=facebox]').facebox({
-			loadingImage : 'inc/js/facebox/loading.gif',
-			closeImage   : 'inc/js/facebox/closelabel.png'
-		});
-		// -----------------------------------------------------
-		// Delete confirmations are now handled globally by assets/adminator/confirm.js
+		// Lightbox (rel="facebox") and delete confirmations are now handled globally by
+		// assets/adminator/lightbox.js and assets/adminator/confirm.js
 		// via the data-confirm="..." attribute — see scripts.tpl's <script> includes above.
 		// -----------------------------------------------------
 		// Enable infinite scroll

@@ -13,32 +13,29 @@
 			{include file='system/settings_bar.tpl'}
 			
 			{* Notes col lg 6 *}
-			<div class="row">
-                
-				<div class="col-lg-6">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-dashboard fa-fw"></i> Configuration
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
+			<div class="grid">
+
+				<section class="col-6 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Dashboard</span>
+							<h2 class="card-title">Configuration</h2>
+						</div>
+                    </div>
 							{* Afficher le formulaire EDIT *}
 							{include_php file='form.php'}
+                </section>
+
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-head">
+							<div class="card-title-wrap">
+								<span class="eyebrow">Dashboard</span>
+								<h2 class="card-title">Rappel de votre configuration</h2>
+							</div>
                         </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-6 -->
-				
-                <div class="col-lg-6">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <i class="fa fa-info-circle fa-fw"></i> Rappel de votre configuration
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
 							{* HTML Text Formatted *}
+							<div style="overflow-x:auto">
 							<table class="data-table" id="dataTables-settings">
 								<thead>
 									<tr>
@@ -221,15 +218,14 @@
 									</tr>
 								</tbody>
 							</table>
-                        </div>
-                        <!-- /.panel-body -->
+							</div>
                     </div>
-                    <!-- /.panel -->
+                    <!-- /.card -->
                 </div>
-                <!-- /.col-lg-6 -->
-				
+                <!-- /.col-6 -->
+
             </div>
-            <!-- /.row -->
+            <!-- /.grid -->
 
 		<!-- ------------------------------------------------------------ -->
 		<!-- Page-Level Scripts - Use this space this write your own code -->

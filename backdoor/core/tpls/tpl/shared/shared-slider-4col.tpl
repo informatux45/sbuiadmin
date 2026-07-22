@@ -1,6 +1,6 @@
 {* --- SHARED SLIDER INSERT HEADPAGE ---- *}
 
-<div class="col-lg-4">
+<div class="col-4">
 	<div class="card">
 		<div class="card-head">
 			<div class="card-title-wrap">
@@ -19,4 +19,4 @@
 	</div>
 	<!-- /.card -->
 </div>
-<!-- /.col-lg-4 -->
+<!-- /.col-4 -->

@@ -14,27 +14,22 @@
 			
 			<style></style>
 
-			<div class="row">
-		
-		        <div class="col-lg-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <span class="fa fa-cubes fa-fw"></span> <strong>Données serveur en temps réel</strong>
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
+			<div class="grid">
+
+		        <section class="col-12 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Maintenance</span>
+							<h2 class="card-title">Données serveur en temps réel</h2>
+						</div>
+                    </div>
 
 							<iframe src="server/status/dashboard.html" width="100%" height="650px" style="border: none;"></iframe>
 
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-12 -->
+                </section>
 
             </div>
-            <!-- /.row -->
+            <!-- /.grid -->
 	
 		<!-- ------------------------------------------------------------ -->
 		<!-- Page-Level Scripts - Use this space this write your own code -->

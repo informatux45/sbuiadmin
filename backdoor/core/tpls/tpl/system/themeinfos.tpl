@@ -13,48 +13,42 @@
 			{include file='system/settings_bar.tpl'}
 			
 			{* Notes col lg 6 *}
-			<div class="row">
-                
-				<div class="col-lg-7">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-magic fa-fw"></i> {$legend_add_edit}
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
+			<div class="grid">
+
+				<section class="col-8 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Thème</span>
+							<h2 class="card-title">{$legend_add_edit}</h2>
+						</div>
+                    </div>
 							{* Afficher le formulaire EDIT *}
 							{include_php file='form.php'}
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-7 -->
-				
-				<div class="col-lg-5">
+                </section>
+
+				<div class="col-4">
 					{* ------------------------------------ *}
 					{* --- Include Shared Panel Actions --- *}
 					{include file='shared/shared-panel-actions.tpl'}
 					{* ------------------------------------ *}
 					{* ------------------------------------ *}
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<span class="fa fa-columns fa-fw"></span> <strong>Aperçu du thème actuel</strong>
+					<div class="card">
+						<div class="card-head">
+							<div class="card-title-wrap">
+								<span class="eyebrow">Thème</span>
+								<h2 class="card-title">Aperçu du thème actuel</h2>
+							</div>
 						</div>
-						<!-- /.panel-heading -->
-						<div class="panel-body">
 							<div class="theme_view">
 								<img id="img_theme_view" src="{$sb_theme_view}" title="" />
 							</div>
-						</div>
-						<!-- /.panel-body -->
 					</div>
-					<!-- /.panel -->
+					<!-- /.card -->
 				</div>
-				<!-- /.col-lg-4 -->
-				
+				<!-- /.col-4 -->
+
             </div>
-            <!-- /.row -->
+            <!-- /.grid -->
 
 		<!-- ------------------------------------------------------------ -->
 		<!-- Page-Level Scripts - Use this space this write your own code -->

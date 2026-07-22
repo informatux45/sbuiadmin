@@ -12,14 +12,14 @@
 			
 			{include file='system/menu_bar.tpl'}
 
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <span class="fa {if isset($sort)}fa-th-list{else}fa-copy{/if} fa-fw"></span> <strong>{if isset($all)}Gestion de vos menus{else}{$legend_add_edit}{/if}</strong>
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
+            <div class="grid">
+                <section class="col-12 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Menus</span>
+							<h2 class="card-title">{if isset($all)}Gestion de vos menus{else}{$legend_add_edit}{/if}</h2>
+						</div>
+                    </div>
 							{if isset($all)}
 							<div class="data-toolbar">
 								<div class="data-toolbar-left">
@@ -73,14 +73,9 @@
 								{* Afficher le formulaire ADD/EDIT *}
 								{include_php file='form.php'}
 							{/if}
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-12 -->
+                </section>
             </div>
-            <!-- /.row -->
+            <!-- /.grid -->
 	
 		<!-- ------------------------------------------------------------ -->
 		<!-- Page-Level Scripts - Use this space this write your own code -->

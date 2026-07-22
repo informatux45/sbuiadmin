@@ -14,32 +14,26 @@
 				
         {if $action_edit != 'fonts' && $action_edit != 'seo'}
 
-			<div class="row">
-		
-		        <div class="col-lg-8">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <span class="fa fa-gears fa-fw"></span> <strong>{$legend_add_edit}</strong>
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
+			<div class="grid">
+
+		        <section class="col-8 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Configuration CMS</span>
+							<h2 class="card-title">{$legend_add_edit}</h2>
+						</div>
+                    </div>
 							{* Afficher le formulaire ADD/EDIT *}
 							{include_php file='form.php'}
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-8 -->
+                </section>
 
-                <div class="col-lg-4">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <span class="fa fa-exclamation-circle fa-fw"></span> <strong>AIDE</strong>
+                <div class="col-4">
+                    <div class="card">
+                        <div class="card-head">
+							<div class="card-title-wrap">
+								<h2 class="card-title">Aide</h2>
+							</div>
                         </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-							
 							{if $action_edit == 'headerfooter'}
 								{$cmsconfig_headerfooter_help}							
 							{elseif $action_edit == 'email'}
@@ -53,16 +47,14 @@
 							{else}
 								{$cmsconfig_help}
 							{/if}
-							
-                        </div>
-                        <!-- /.panel-body -->
+
                     </div>
-                    <!-- /.panel -->
+                    <!-- /.card -->
                 </div>
-                <!-- /.col-lg-4 -->
+                <!-- /.col-4 -->
 
             </div>
-            <!-- /.row -->
+            <!-- /.grid -->
 	
 		<!-- ------------------------------------------------------------ -->
 		<!-- Page-Level Scripts - Use this space this write your own code -->
@@ -89,38 +81,24 @@
 		
 	{elseif $action_edit == 'fonts'}
 	
-		<div class="row">
-			<div class="col-lg-12">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<span class="fa fa-gears fa-fw"></span> <strong>{$legend_add_edit}</strong>
-					</div>
-					<!-- /.panel-heading -->
-					<div class="panel-body">
-						Placer le tag suivant dans le HEADER de votre thème pour activer l'utilisation des Google Fonts : <span style='font-weight: bold; color: green;'>&lbrace;insert name="sbGetFonts"&rbrace;</span>
-					</div>
-					<!-- /.panel-body -->
+		<div class="grid">
+			<section class="col-12">
+				<div class="alert info">
+					<span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
+					<div class="body">Placer le tag suivant dans le HEADER de votre thème pour activer l'utilisation des Google Fonts : <span style='font-weight: bold; color: var(--success);'>&lbrace;insert name="sbGetFonts"&rbrace;</span></div>
 				</div>
-				<!-- /.panel -->
-			</div>
-			<!-- /.col-lg-12 -->
-		</div>
-		<!-- /.row -->
-		
-		<div class="row">
-			
-		        <div class="col-lg-6">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <span class="fa fa-google fa-fw"></span> <strong>GOOGLE FONT SELECTOR</strong>
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-							<input id="font" type="text" />
-							
-							&nbsp;&nbsp;
-							
-							<select id="select" class="form-control">
+			</section>
+
+		        <section class="col-6 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Fonts</span>
+							<h2 class="card-title">Google Font Selector</h2>
+						</div>
+                    </div>
+							<input id="font" class="input" type="text" style="margin-bottom:10px" />
+
+							<select id="select" class="select">
 								<option value="">Weight</option>
 								<option value="100">100</option>
 								<option value="200">200</option>
@@ -135,7 +113,7 @@
 						
 							&nbsp;&nbsp;
 							
-							<select id="style" class="form-control">
+							<select id="style" class="select">
 								<option value="">Style</option>
 								<option value="normal">normal</option>
 								<option value="italic">italic</option>
@@ -144,7 +122,7 @@
 							
 							&nbsp;&nbsp;
 							
-							<select id="size" class="form-control">
+							<select id="size" class="select">
 								<option value="">Size</option>
 								<option value="10px">10px</option>
 								<option value="12px">12px</option>
@@ -170,42 +148,32 @@ It was popularised in the 1960s with the release of Letraset sheets containing L
 							
 							<hr />
 							
-							<input id="font-generator-button" type="text" class="form-control" value=''>
+							<input id="font-generator-button" type="text" class="input" value=''>
 							&nbsp;&nbsp;
-							<button type="button" class="btn btn-outline btn-success" onclick="appendChildGenerator()">insérer</button>
+							<button type="button" class="btn btn--primary" onclick="appendChildGenerator()">insérer</button>
 							
 							<hr />
 							
 							<u>Usage en CSS :</u><p><pre>font-family: '<span id="font-usage-css"></span>', sans-serif;</pre></p>
-                        </div>
-                        <!-- /.panel-body -->
+                </section>
+
+		        <section class="col-6 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Fonts</span>
+							<h2 class="card-title">Modifier le code des fonts (polices)</h2>
+						</div>
                     </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-8 -->
-				
-		        <div class="col-lg-6">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <span class="fa fa-font fa-fw"></span> <strong>Modifier le code des fonts (polices)</strong>
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
 							{* Afficher le formulaire ADD/EDIT *}
 							{include_php file='form.php'}
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-4 -->
-			
+                </section>
+
 		</div>
-		<!-- /.row -->
+		<!-- /.grid -->
 		
 		<link rel="stylesheet" type="text/css" href="inc/plugins/googlefonts/fontselect.css" />
 		<style>
-			select.form-control { width: 100px; float: right; }
+			select.select { width: 100px; float: right; }
 			textarea.fonts-textarea { width: 100%; height: 200px !important; border: 0 !important; }
 			input#font-generator-button { width: 370px; float: left; border: 1px solid #5cb85c; background-color: #d2ff9c }
 			pre { background-color: #fffb97; }
@@ -252,70 +220,51 @@ It was popularised in the 1960s with the release of Letraset sheets containing L
 	
 	{elseif $action_edit == 'seo'}
 	
-		<div class="row">
+		<div class="grid">
 
-			<div class="col-lg-12">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<span class="fa fa-external-link fa-fw"></span> <strong>Liens</strong>
+			<section class="col-12 card">
+				<div class="card-head">
+					<div class="card-title-wrap">
+						<span class="eyebrow">SEO</span>
+						<h2 class="card-title">Liens</h2>
 					</div>
-					<!-- /.panel-heading -->
-					<div class="panel-body">
-						<button type="button" class="btn btn-success" onclick="window.open('https://www.google.com/webmasters/tools/home?hl=fr')">Webmaster TOOLS</button>
-						&nbsp;&nbsp;
-						<button type="button" class="btn btn-success" onclick="window.open('https://www.google.com/webmasters/tools/submit-url')">Google ADDURL</button>
-						&nbsp;&nbsp;
-						<button type="button" class="btn btn-success" onclick="window.open('https://developers.google.com/speed/libraries/')">Google Hosted Libraries</button>
-						&nbsp;&nbsp;
-						<button type="button" class="btn btn-success" onclick="window.open('https://search.google.com/search-console?hl=fr')">Console Developers</button>
-					</div>
-					<!-- /.panel-body -->
 				</div>
-				<!-- /.panel -->
-			</div>
-			<!-- /.col-lg-12 -->
+						<button type="button" class="btn btn--primary" onclick="window.open('https://www.google.com/webmasters/tools/home?hl=fr')">Webmaster TOOLS</button>
+						<button type="button" class="btn btn--primary" onclick="window.open('https://www.google.com/webmasters/tools/submit-url')">Google ADDURL</button>
+						<button type="button" class="btn btn--primary" onclick="window.open('https://developers.google.com/speed/libraries/')">Google Hosted Libraries</button>
+						<button type="button" class="btn btn--primary" onclick="window.open('https://search.google.com/search-console?hl=fr')">Console Developers</button>
+			</section>
 
-			<div class="col-lg-6">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<span class="fa fa-lightbulb-o fa-fw"></span> <strong>{$legend_add_edit}</strong>
+			<section class="col-6 card">
+				<div class="card-head">
+					<div class="card-title-wrap">
+						<span class="eyebrow">SEO</span>
+						<h2 class="card-title">{$legend_add_edit}</h2>
 					</div>
-					<!-- /.panel-heading -->
-					<div class="panel-body">
+				</div>
 						{* Afficher le formulaire ADD/EDIT *}
 						{include_php file='form.php'}
-					</div>
-					<!-- /.panel-body -->
-				</div>
-				<!-- /.panel -->
-			</div>
-			<!-- /.col-lg-6 -->
+			</section>
 
-			<div class="col-lg-6">
-				<div class="panel panel-primary">
-					<div class="panel-heading">
-						<span class="fa fa-sitemap fa-fw"></span> <strong>Sitemap</strong>
+			<section class="col-6 card">
+				<div class="card-head">
+					<div class="card-title-wrap">
+						<span class="eyebrow">SEO</span>
+						<h2 class="card-title">Sitemap</h2>
 					</div>
-					<!-- /.panel-heading -->
-					<div class="panel-body">
+				</div>
 						<p>
-							<button type="button" class="btn btn-outline btn-primary btn-lg" onclick="sbSeoSitemap()">Générer le sitemap.xml</button>
+							<button type="button" class="btn btn--primary" onclick="sbSeoSitemap()">Générer le sitemap.xml</button>
 							<span id="seo-sitemap-loader" style="visibility: hidden;">&nbsp;&nbsp;&nbsp;<img src="img/loader.gif" alt="" /><i>&nbsp;&nbsp;Création en cours...</i></span>
 						</p>
-						<br>
-						<div class="form-group">
-							<label for="">Sitemap générateur (Résultat)</label><br>
-							<textarea id="seo-sitemap" style="height: 177px !important;" name="seo_sitemap" class="form-control" disabled="disabled"></textarea>
+						<div class="field">
+							<label class="field-label" for="seo-sitemap">Sitemap générateur (Résultat)</label>
+							<textarea id="seo-sitemap" class="textarea" style="height: 177px !important;" name="seo_sitemap" disabled="disabled"></textarea>
 						</div>
-					</div>
-					<!-- /.panel-body -->
-				</div>
-				<!-- /.panel -->
-			</div>
-			<!-- /.col-lg-6 -->
+			</section>
 
 		</div>
-		<!-- /.row -->
+		<!-- /.grid -->
 		
 		<script>
 			function sbSeoSitemap() {

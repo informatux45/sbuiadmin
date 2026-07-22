@@ -13,8 +13,8 @@
 			{include file='system/users_bar.tpl'}
 			
 			{if isset($allips)}
-				<div class="row">
-					<div class="col-lg-12">
+				<div class="grid">
+					<section class="col-12">
 						<div class="alert warning">
 							<span class="ico"><svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg></span>
 							<div class="body">
@@ -30,17 +30,15 @@
 								<p>L'attaque par HTTP flood repose sur le fait que de nombreuses demandes de ce type sont faites simultanément sur une longue période de temps. Un botnet (ou « réseau de machines zombies ») est généralement utilisé pour augmenter le volume des demandes. L'attaque par HTTP flood est conçue de sorte que le serveur alloue la plus grande ressource possible à chaque requête. Dans une situation normale, cela est voulu, car le serveur ne reçoit pas des milliers ou des centaines de milliers de demandes par minute. Compte tenu du nombre élevé de demandes et d'appels, l'attaquant s'attend toutefois à ce que le serveur soit surchargé par les demandes à forte intensité de traitement et à ce que la page ou l'application Web ne s'affiche plus correctement.</p>
 							</div>
 						</div>
-					</div>
-				</div>
-				
-				<div class="row">
-					<div class="col-lg-12">
-						<div class="panel panel-{if isset($allips)}primary{else}default{/if}">
-							<div class="panel-heading">
-								<span class="fa fa-lock fa-fw"></span> <strong>Gestion des IPs bloqu&eacute;es</strong>
+					</section>
+
+					<section class="col-12 card">
+						<div class="card-head">
+							<div class="card-title-wrap">
+								<span class="eyebrow">Utilisateurs</span>
+								<h2 class="card-title">Gestion des IPs bloquées</h2>
 							</div>
-							<!-- /.panel-heading -->
-							<div class="panel-body">
+						</div>
 								{if isset($allips)}
 								<div class="data-toolbar">
 									<div class="data-toolbar-left">
@@ -115,47 +113,31 @@
 									<div class="pager"></div>
 								</div>
 								{/if}
-							</div>
-							<!-- /.panel-body -->
-						</div>
-						<!-- /.panel -->
-					</div>
-					<!-- /.col-lg-12 -->
+					</section>
 				</div>
-				<!-- /.row -->
+				<!-- /.grid -->
 			{/if}
-			
+
 			{* Notes full width *}
 			{if $all}
-				<div class="row">
-					<div class="col-lg-12">
-						<div class="panel panel-warning">
-							<div class="panel-heading">
-								<span class="fa fa-info-circle"></span> <strong>Vos informations</strong>
+				<div class="grid">
+					<section class="col-12">
+						<div class="alert primary">
+							<span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
+							<div class="body">
+								<div class="title">Vos informations</div>
+								Vous êtes connecté sous l'utilisateur : <strong>{$sbuiadmin_user_name}</strong> &middot; Votre groupe d'utilisateur : {$sbuiadmin_user_type|@strtoupper}
 							</div>
-							<!-- /.panel-heading -->
-							<div class="panel-body">
-								{* HTML Text Formatted *}
-								Vous êtes connecté sous l'utilisateur : <span style="color: red;">{$sbuiadmin_user_name}</span>
-								<br>
-								Votre groupe d'utilisateur : {$sbuiadmin_user_type|@strtoupper}
-							</div>
-							<!-- /.panel-body -->
 						</div>
-						<!-- /.panel -->
-					</div>
-					<!-- /.col-lg-12 -->
-				</div>
-				<!-- /.row -->
-	
-				<div class="row">
-					<div class="col-lg-12">
-						<div class="panel panel-{if $all}primary{else}default{/if}">
-							<div class="panel-heading">
-								<span class="fa {if $sort}fa-th-list{else}fa-user{/if} fa-fw"></span> <strong>{if $all}Gestion de vos utilisateurs{else}{$legend_add_edit}{/if}</strong>
+					</section>
+
+					<section class="col-12 card">
+						<div class="card-head">
+							<div class="card-title-wrap">
+								<span class="eyebrow">Utilisateurs</span>
+								<h2 class="card-title">{if $all}Gestion de vos utilisateurs{else}{$legend_add_edit}{/if}</h2>
 							</div>
-							<!-- /.panel-heading -->
-							<div class="panel-body">
+						</div>
 								{if $all}
 								<div class="data-toolbar">
 									<div class="data-toolbar-left">
@@ -214,43 +196,36 @@
 									<div class="pager"></div>
 								</div>
 								{/if}
-							</div>
-							<!-- /.panel-body -->
-						</div>
-						<!-- /.panel -->
-					</div>
-					<!-- /.col-lg-12 -->
+					</section>
 				</div>
-				<!-- /.row -->
+				<!-- /.grid -->
 			{/if}
-			
+
 			{if !$all && $smarty.get.a != 'blockedip' && $smarty.get.a != 'delblockedip'}
-				<div class="col-lg-{if $allmenu}12{else}8{/if}">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<span class="fa fa-group fa-fw"></span> <strong>{$legend_add_edit|unescape:"htmlall"} - {$smarty.get.a}</strong>
+				<div class="grid">
+					<section class="{if $allmenu}col-12{else}col-8{/if} card">
+						<div class="card-head">
+							<div class="card-title-wrap">
+								<span class="eyebrow">Utilisateurs</span>
+								<h2 class="card-title">{$legend_add_edit|unescape:"htmlall"} - {$smarty.get.a}</h2>
+							</div>
 						</div>
-						<!-- /.panel-heading -->
-						<div class="panel-body">
 							{* Afficher le formulaire ADD/EDIT *}
 							{include_php file='form.php'}
-						</div>
-						<!-- /.panel-body -->
+					</section>
+
+					{if !$allmenu}
+					<div class="col-4">
+						{* ------------------------------------ *}
+						{* --- Include Shared Panel Actions --- *}
+						{include file='shared/shared-panel-actions.tpl'}
+						{* ------------------------------------ *}
+						{* ------------------------------------ *}
 					</div>
-					<!-- /.panel -->
+					<!-- /.col-4 -->
+					{/if}
 				</div>
-				<!-- /.col-lg-8 -->
-				
-				{if !$allmenu}
-				<div class="col-lg-4">
-					{* ------------------------------------ *}
-					{* --- Include Shared Panel Actions --- *}
-					{include file='shared/shared-panel-actions.tpl'}
-					{* ------------------------------------ *}
-					{* ------------------------------------ *}
-				</div>
-				<!-- /.col-lg-4 -->
-				{/if}
+				<!-- /.grid -->
 			{/if}
 	
 		<!-- ------------------------------------------------------------ -->

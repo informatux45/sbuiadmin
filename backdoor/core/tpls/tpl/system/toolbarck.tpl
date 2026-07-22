@@ -13,64 +13,48 @@
 			{include file='system/settings_bar.tpl'}
 
 			{* Notes full width *}
-			<div class="row">
-                <div class="col-lg-12">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <i class="fa fa-info-circle fa-fw"></i> Information
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-							{* HTML Text Formatted *}
-							<p style="color: red;"><strong>Si vous activez la configuration de la toolbar de CKEditor, celle-ci sera activée sur tous les éditeurs CKEditor présents dans les formulaires de votre administration.<br>Elle prendra effet en remplacement des configurations BASIC, SIMPLE, FULL.</strong></p>
+			<div class="grid">
+                <section class="col-12">
+					<div class="alert info">
+						<span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
+						<div class="body">
+							<strong>Si vous activez la configuration de la toolbar de CKEditor, celle-ci sera activée sur tous les éditeurs CKEditor présents dans les formulaires de votre administration.<br>Elle prendra effet en remplacement des configurations BASIC, SIMPLE, FULL.</strong>
+							<br><br>
 							Une fois que vous avez configuré votre toolbar, copiez la configuration dans le fichier suivant :<br>
 							<i>{$smarty.const._AM_SITE_DIR}inc/admin/<strong>ckeditor.php</strong></i>
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-12 -->
+						</div>
+					</div>
+                </section>
             </div>
-            <!-- /.row -->
-			
-			<div class="row">
-                <div class="col-lg-12">
-                    <div class="panel panel-red">
-                        <div class="panel-heading">
-                            <i class="fa fa-cubes fa-fw"></i> {$legend_add_edit}
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
+            <!-- /.grid -->
+
+			<div class="grid">
+                <section class="col-12 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">CKEditor</span>
+							<h2 class="card-title">{$legend_add_edit}</h2>
+						</div>
+                    </div>
 							{* Afficher le formulaire ADD/EDIT *}
 							{include_php file='form.php'}
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-12 -->
+                </section>
             </div>
-            <!-- /.row -->
+            <!-- /.grid -->
 
 			{* Notes 12 col *}
-			<div class="row">
-                <div class="col-lg-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-cube fa-fw"></i> Toolbar Configurator
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-							<iframe src="inc/js/editor/ckeditor/samples/toolbarconfigurator/index.html#basic" width="100%" height="1000px" style="border: none;"></iframe>
-                        </div>
-                        <!-- /.panel-body -->
+			<div class="grid">
+                <section class="col-12 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">CKEditor</span>
+							<h2 class="card-title">Toolbar Configurator</h2>
+						</div>
                     </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-12 -->
+							<iframe src="inc/js/editor/ckeditor/samples/toolbarconfigurator/index.html#basic" width="100%" height="1000px" style="border: none;"></iframe>
+                </section>
             </div>
-            <!-- /.row -->
+            <!-- /.grid -->
 
 		<!-- ------------------------------------------------------------ -->
 		<!-- Page-Level Scripts - Use this space this write your own code -->
