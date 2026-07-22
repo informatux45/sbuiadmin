@@ -5,6 +5,7 @@
     <script defer src="assets/adminator/vendors.js"></script>
     <script defer src="assets/adminator/2026.js"></script>
     <script defer src="assets/adminator/datatable.js"></script>
+    <script defer src="assets/adminator/confirm.js"></script>
 
     {if $page != 'login'}
     <!-- Bootstrap Core JavaScript: still required by content pages not yet migrated (data-toggle
@@ -13,10 +14,6 @@
     {/if}
 
 	{if $page != 'login'}
-    <!-- jConfirm -->	
-	<link href="inc/js/jconfirm/jConfirm-v2.min.css" media="screen" rel="stylesheet" type="text/css" />
-	<script src="inc/js/jconfirm/jConfirm-v2.min.js" type="text/javascript"></script>
-
     <!-- jscroll -->	
 	{*<script src="inc/js/jscroll/jquery.jscroll.min.js" type="text/javascript"></script>*}
 	
@@ -70,20 +67,8 @@
 			closeImage   : 'inc/js/facebox/closelabel.png'
 		});
 		// -----------------------------------------------------
-		// Enable jConfirm box
-		// USAGE : add --> class="jConfirm"
-		//         add --> href="url.php"
-		//         to your button, tag a, ...
-		// Web : http://flwebsites.biz/jConfirm/
-		$('.jConfirm').jConfirm({ 
-			message: "Sûr de vouloir supprimer ceci ?", 
-			confirm: "OK", 
-			cancel: "Ou pas...", 
-			openNow: false,
-			callback: function(elem){
-				window.location.href = elem.attr('href'); 
-			} 
-		});
+		// Delete confirmations are now handled globally by assets/adminator/confirm.js
+		// via the data-confirm="..." attribute — see scripts.tpl's <script> includes above.
 		// -----------------------------------------------------
 		// Enable infinite scroll
 		// USAGE : add --> class="infinite-scroll" to your div
@@ -94,9 +79,9 @@
 		var num = 50; //number of pixels before modifying styles
 		$(window).bind('scroll', function () {
 			if ($(window).scrollTop() > num) {
-				$('.sbmenufixed').addClass('fixed panel-red').removeClass('panel-primary');
+				$('.sbmenufixed').addClass('fixed');
 			} else {
-				$('.sbmenufixed').removeClass('fixed panel-red').addClass('panel-primary');
+				$('.sbmenufixed').removeClass('fixed');
 			}
 		});
 		// -----------------------------------------------------

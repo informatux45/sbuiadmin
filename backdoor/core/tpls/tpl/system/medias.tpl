@@ -187,7 +187,7 @@
 								<span class="sbmedia-mime">{$sbmedia|@sbDisplayMediaMime}</span>
 								
 								{* Display Delete Button *}
-								<a class="btn btn-info btn-circle sbmedia-delete jConfirm" type="button" href="{$module_short_url}&del={$sbmedia}">
+								<a class="btn btn-info btn-circle sbmedia-delete" data-confirm="Sûr de vouloir supprimer ceci ?" type="button" href="{$module_short_url}&del={$sbmedia}">
 									<i class="fa fa-times"></i>
 								</a>
 								
