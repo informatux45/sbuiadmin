@@ -324,6 +324,8 @@ class form extends sanitize {
 				$chaineTemp .= 'class="' . $btnClass . '" ';
 			}
 
+			$chaineTemp .= 'style="align-self:flex-start" ';
+
 			$chaineTemp .= '/>&nbsp;&nbsp;';
 				
 		} else {
