@@ -12,25 +12,22 @@
 			
 			{include file='slider_bar.tpl'}
 
-            <div class="row">
-				
+            <div class="grid">
+
 				{if isset($all) && !isset($smarty.get.a)}
-                <div class="col-lg-12">
-                    <div class="well">
-						<img src="img/screenshot-slider.jpg" style="width: 675px; max-width: 100%;" alt="" />
-                    </div>
-                </div>
-                <!-- /.col-lg-12 -->
+                <section class="col-12 card">
+					<img src="img/screenshot-slider.jpg" style="width: 675px; max-width: 100%;border-radius:8px" alt="" />
+                </section>
 				{/if}
-				
+
 				{if isset($all) && !isset($smarty.get.a)}
-                <div class="col-lg-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <span class="fa fa-sliders fa-fw"></span> <strong>{if $all}Gestion de vos slider{else}{$legend_add_edit}{/if}</strong>
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
+                <section class="col-12 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Slider</span>
+							<h2 class="card-title">Gestion de vos slider</h2>
+						</div>
+                    </div>
                             <div class="data-toolbar">
 								<div class="data-toolbar-left">
 									<div class="input-icon" style="flex:1;max-width:320px">
@@ -88,23 +85,18 @@
 								<div class="pager"></div>
 							</div>
 
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-12 -->
+                </section>
 				{/if}
-				
+
 				{if isset($allphoto)}
-				
-                <div class="col-lg-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <span class="fa fa-sliders fa-fw"></span> <strong>{if $allphoto}Gestion de vos slider{else}{$legend_add_edit}{/if}</strong>
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
+
+                <section class="col-12 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Slider</span>
+							<h2 class="card-title">{if $allphoto}Gestion de vos slider{else}{$legend_add_edit}{/if}</h2>
+						</div>
+                    </div>
                             <div class="data-toolbar">
 								<div class="data-toolbar-left">
 									<div class="input-icon" style="flex:1;max-width:320px">
@@ -153,55 +145,41 @@
 								<div class="pager"></div>
 							</div>
 
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-12 -->
+                </section>
 				{/if}
-				
+
 				{if (!isset($all) || !isset($allphoto)) && (isset($smarty.get.a) && $smarty.get.a != 'photo') }
-					{if $smarty.get.a == 'edit' || $smarty.get.a == 'add'}
-						<style>
-						/* --- Icons 2 (form) --- */
-						.input-group-addon, .input-group-btn { width: auto !important; }
-						</style>
-					{/if}
-					<div class="col-lg-8">
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<span class="fa fa-sliders fa-fw"></span> <strong>{$legend_add_edit}</strong>
+					<section class="col-8 card">
+						<div class="card-head">
+							<div class="card-title-wrap">
+								<span class="eyebrow">Slider</span>
+								<h2 class="card-title">{$legend_add_edit}</h2>
 							</div>
-							<!-- /.panel-heading -->
-							<div class="panel-body">
-								{* Afficher le formulaire ADD/EDIT *}
-								{include_php file='form.php'}
-							</div>
-							<!-- /.panel-body -->
 						</div>
-						<!-- /.panel -->
-					</div>
-					<!-- /.col-lg-8 -->
-					<div class="col-lg-4">
+							{* Afficher le formulaire ADD/EDIT *}
+							{include_php file='form.php'}
+					</section>
+					<div class="col-4">
 						{* ------------------------------------ *}
 						{* --- Include Shared Panel Actions --- *}
 						{include file='shared/shared-panel-actions.tpl'}
 						{* ------------------------------------ *}
 						{* ------------------------------------ *}
-						<div class="panel panel-primary">
-							<div class="panel-heading">
-								<span class="fa fa-exclamation-circle fa-fw"></span> <strong>AIDE</strong>
+						<div class="card">
+							<div class="card-head">
+								<div class="card-title-wrap">
+									<h2 class="card-title">Aide</h2>
+								</div>
 							</div>
-							<!-- /.panel-heading -->
-							<div class="panel-body">
-								<img src="img/screenshot-slider.jpg" style="width: 100%; max-width: 675px;" alt="" />
-							</div>
+							<img src="img/screenshot-slider.jpg" style="width: 100%; max-width: 675px;border-radius:8px" alt="" />
 						</div>
+						<!-- /.card -->
+					</div>
+					<!-- /.col-4 -->
 				{/if}
-				
+
             </div>
-            <!-- /.row -->
+            <!-- /.grid -->
 	
 		<!-- ------------------------------------------------------------ -->
 		<!-- Page-Level Scripts - Use this space this write your own code -->

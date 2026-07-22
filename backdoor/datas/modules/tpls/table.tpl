@@ -12,30 +12,27 @@
 			
 			{include file='table_bar.tpl'}
 
-            <div class="row">
-				
+            <div class="grid">
+
 				{if isset($all) && !isset($smarty.get.a)}
 
-					<div class="col-lg-12">
-
-						<div class="panel panel-warning">
-							<div class="panel-heading">
-								<span class="fa fa-info-circle"></span> <strong>Informations</strong>
-							</div>
-							<!-- /.panel-heading -->
-							<div class="panel-body">
-								
+					<section class="col-12">
+						<div class="alert warning" style="margin-bottom:20px">
+							<span class="ico"><svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg></span>
+							<div class="body">
+								<div class="title">Informations</div>
 								La suppression d'un tableau comporte <b class="red">la perte</b> de toutes ses données et de sa structure !
 							</div>
-							<!-- /.panel-body -->
 						</div>
+					</section>
 
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<span class="fa fa-list-alt fa-fw"></span> <strong>{if $all}Gestion de vos tableaux{else}{$legend_add_edit}{/if}</strong>
+					<section class="col-12 card">
+						<div class="card-head">
+							<div class="card-title-wrap">
+								<span class="eyebrow">Tableaux</span>
+								<h2 class="card-title">Gestion de vos tableaux</h2>
 							</div>
-							<!-- /.panel-heading -->
-							<div class="panel-body">
+						</div>
 								<div class="data-toolbar">
 									<div class="data-toolbar-left">
 										<div class="input-icon" style="flex:1;max-width:320px">
@@ -91,40 +88,31 @@
 									<div class="data-foot-info" data-foot-info></div>
 									<div class="pager"></div>
 								</div>
-	
-							</div>
-							<!-- /.panel-body -->
-						</div>
-						<!-- /.panel -->
-					</div>
-					<!-- /.col-lg-12 -->
+
+					</section>
 				{/if}
 
 				{if !$all}
-					<div class="col-lg-{if isset($smarty.get.a) && ($smarty.get.a == 'sortstructure' || $smarty.get.a == 'sortdatas')}12{else}8{/if}">
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<span class="fa fa-list-alt fa-fw"></span> <strong>{$legend_add_edit}</strong>
+					<section class="{if isset($smarty.get.a) && ($smarty.get.a == 'sortstructure' || $smarty.get.a == 'sortdatas')}col-12{else}col-8{/if} card">
+						<div class="card-head">
+							<div class="card-title-wrap">
+								<span class="eyebrow">Tableaux</span>
+								<h2 class="card-title">{$legend_add_edit}</h2>
 							</div>
-							<!-- /.panel-heading -->
-							<div class="panel-body">
-								{* Afficher le formulaire ADD/EDIT *}
-								{include_php file='form.php'}
-							</div>
-							<!-- /.panel-body -->
 						</div>
-						<!-- /.panel -->
-					</div>
-					<!-- /.col-lg-8 -->
-					
+							{* Afficher le formulaire ADD/EDIT *}
+							{include_php file='form.php'}
+					</section>
+
 					{*if $allstructure || $alldatas || $alldatasempty || $allstructureempty*}
 					{if $smarty.get.a != 'sortstructure' && $smarty.get.a != 'sortdatas'}
-					<div class="col-lg-4">
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<i class="fa fa-info-circle fa-fw"></i> Aide
+					<div class="col-4">
+						<div class="card">
+							<div class="card-head">
+								<div class="card-title-wrap">
+									<h2 class="card-title">Aide</h2>
+								</div>
 							</div>
-							<div class="panel-body">
 								<p>
 									{if isset($allstructure) || $smarty.get.a == 'editfield'}
 										<u>Les types de champs utilisés pour une colonne de votre tableau :</u>
@@ -227,27 +215,26 @@
 										<!-- /.modal -->
 									{/if}
 								</p>
-							</div>
 						</div>
+						<!-- /.card -->
 					</div>
-					<!-- /.col-lg-4 -->
+					<!-- /.col-4 -->
 					{/if}
 					
 				{/if}
 				
 				{if isset($allstructure)}
 
-					<div class="col-lg-12">
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<span class="fa fa-list-alt fa-fw"></span> <strong>Gestion des colonnes du tableau &laquo; {$tabname} &raquo;</strong>
-								&nbsp;&nbsp;
-								<button class="btn btn-danger" type="button" onclick="location.href='index.php?p=table&a=sortstructure&tid={$smarty.get.tid}'">
-									Trier les colonnes
-								</button>
+					<section class="col-12 card">
+						<div class="card-head">
+							<div class="card-title-wrap">
+								<span class="eyebrow">Tableaux</span>
+								<h2 class="card-title">Gestion des colonnes du tableau &laquo; {$tabname} &raquo;</h2>
 							</div>
-							<!-- /.panel-heading -->
-							<div class="panel-body">
+							<button class="btn btn--primary" type="button" onclick="location.href='index.php?p=table&a=sortstructure&tid={$smarty.get.tid}'">
+								Trier les colonnes
+							</button>
+						</div>
 								<div class="data-toolbar">
 									<div class="data-toolbar-left">
 										<div class="input-icon" style="flex:1;max-width:320px">
@@ -298,29 +285,23 @@
 									<div class="data-foot-info" data-foot-info></div>
 									<div class="pager"></div>
 								</div>
-	
-							</div>
-							<!-- /.panel-body -->
-						</div>
-						<!-- /.panel -->
-					</div>
-					<!-- /.col-lg-12 -->
-					
+
+					</section>
+
 				{/if}
-				
+
 				{if isset($alldatas)}
 
-					<div class="col-lg-12">
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<span class="fa fa-list-alt fa-fw"></span> <strong>Gestion des données du tableau &laquo; {$tabname} &raquo;</strong>
-								&nbsp;&nbsp;
-								<button class="btn btn-danger" type="button" onclick="location.href='index.php?p=table&a=sortdatas&tid={$smarty.get.tid}'">
-									Trier les données
-								</button>
+					<section class="col-12 card">
+						<div class="card-head">
+							<div class="card-title-wrap">
+								<span class="eyebrow">Tableaux</span>
+								<h2 class="card-title">Gestion des données du tableau &laquo; {$tabname} &raquo;</h2>
 							</div>
-							<!-- /.panel-heading -->
-							<div class="panel-body">
+							<button class="btn btn--primary" type="button" onclick="location.href='index.php?p=table&a=sortdatas&tid={$smarty.get.tid}'">
+								Trier les données
+							</button>
+						</div>
 								<p style="margin-bottom: 16px; color: var(--danger);">Les colonnes en rouge sont désactivées et ne sont pas affichées sur votre site !</p>
 								<div class="data-toolbar">
 									<div class="data-toolbar-left">
@@ -369,13 +350,8 @@
 									<div class="data-foot-info" data-foot-info></div>
 									<div class="pager"></div>
 								</div>
-	
-							</div>
-							<!-- /.panel-body -->
-						</div>
-						<!-- /.panel -->
-					</div>
-					<!-- /.col-lg-12 -->
+
+					</section>
 					
 					{*<div class="col-lg-12">
 						<div class="panel panel-default">
@@ -396,8 +372,8 @@
 				{/if}
 				
             </div>
-            <!-- /.row -->
-	
+            <!-- /.grid -->
+
 		<!-- ------------------------------------------------------------ -->
 		<!-- Page-Level Scripts - Use this space this write your own code -->
 		<!-- ------------------------------------------------------------ -->

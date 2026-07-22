@@ -16,11 +16,12 @@ main.content {
 }
 
 /* Adminator's .grid ships only .col-6/.col-12 — filling in the missing
-   3- and 4-column spans used when porting pages to .grid/.card layouts. */
+   3/4/8-column spans used when porting pages to .grid/.card layouts. */
 .col-3 { grid-column: span 3; }
 .col-4 { grid-column: span 4; }
+.col-8 { grid-column: span 8; }
 @media (max-width: 720px) {
-	.col-3, .col-4 { grid-column: span 12; }
+	.col-3, .col-4, .col-8 { grid-column: span 12; }
 }
 
 /* .sbmenufixed (shared-panel-actions.tpl): sticks to top:0 on scroll via

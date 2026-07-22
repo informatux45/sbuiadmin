@@ -12,43 +12,41 @@
 			
 			{include file='tabbs_bar.tpl'}
 
-            <div class="row">
-				
-				<div class="col-lg-12">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<h4 class="panel-title">
-								<a data-toggle="collapse" data-parent="#accordion" href="#collapse" aria-expanded="false" class="collapsed"><i class="fa fa-arrow-circle-down"></i> &nbsp;&nbsp;Que fait TABBS ?</a>
-							</h4>
-						</div>
-						<div id="collapse" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
-							<div class="panel-body">
-								<p style="font-size: 1.2em;">
-									TABBS permet :
-									<ol>
-										<li>d'afficher des contenus dans des onglets</li>
-										<li>de créez autant d'onglets que vous le souhaitez</li>
-										<li>d'insérer du texte, du code HTML, des shortcodes</li>
-									</ol>
-									Les onglets sont responsives et vous pouvez les customiser par CSS.
-								</p>
-								<p>
-									<img src="img/modules/tabbs_example_1.png" alt="Exemple TABBS" style="max-width: 100%;" />
-								</p>
-							</div>
+            <div class="grid">
+
+				<section class="col-12 card">
+					<div class="card-head">
+						<div class="card-title-wrap">
+							<h2 class="card-title">
+								<a data-toggle="collapse" data-parent="#accordion" href="#collapse" aria-expanded="false" class="collapsed" style="color:inherit"><i class="fa fa-arrow-circle-down"></i> &nbsp;&nbsp;Que fait TABBS ?</a>
+							</h2>
 						</div>
 					</div>
-				</div>
-				
+					<div id="collapse" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+						<p style="font-size: 1.2em;">
+							TABBS permet :
+							<ol>
+								<li>d'afficher des contenus dans des onglets</li>
+								<li>de créez autant d'onglets que vous le souhaitez</li>
+								<li>d'insérer du texte, du code HTML, des shortcodes</li>
+							</ol>
+							Les onglets sont responsives et vous pouvez les customiser par CSS.
+						</p>
+						<p>
+							<img src="img/modules/tabbs_example_1.png" alt="Exemple TABBS" style="max-width: 100%;" />
+						</p>
+					</div>
+				</section>
+
 				{if isset($all)}
 
-					<div class="col-lg-12">
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<span class="fa fa-list-alt fa-fw"></span> <strong>{if $all}Gestion de vos tabbs{else}{$legend_add_edit}{/if}</strong>
+					<section class="col-12 card">
+						<div class="card-head">
+							<div class="card-title-wrap">
+								<span class="eyebrow">Tabbs</span>
+								<h2 class="card-title">Gestion de vos tabbs</h2>
 							</div>
-							<!-- /.panel-heading -->
-							<div class="panel-body">
+						</div>
 								<div class="data-toolbar">
 									<div class="data-toolbar-left">
 										<div class="input-icon" style="flex:1;max-width:320px">
@@ -100,23 +98,18 @@
 									<div class="data-foot-info" data-foot-info></div>
 									<div class="pager"></div>
 								</div>
-	
-							</div>
-							<!-- /.panel-body -->
-						</div>
-						<!-- /.panel -->
-					</div>
-					<!-- /.col-lg-12 -->
+
+					</section>
 				{/if}
-				
+
 				{if isset($allt)}
-                <div class="col-lg-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <span class="fa fa-list-alt fa-fw"></span> <strong>Gestion de vos onglets</strong>
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
+                <section class="col-12 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Tabbs</span>
+							<h2 class="card-title">Gestion de vos onglets</h2>
+						</div>
+                    </div>
                             <div class="data-toolbar">
 								<div class="data-toolbar-left">
 									<div class="input-icon" style="flex:1;max-width:320px">
@@ -166,34 +159,24 @@
 								<div class="pager"></div>
 							</div>
 
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-12 -->
+                </section>
 				{/if}
 
 				{if (!isset($all) || !isset($alltabs)) && (isset($smarty.get.a) && $smarty.get.a != 'alltabs' && $smarty.get.a != 'del' && $smarty.get.a != 'tabdel') }
-					<div class="col-lg-12">
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<span class="fa fa-list-alt fa-fw"></span> <strong>{$legend_add_edit}</strong>
+					<section class="col-12 card">
+						<div class="card-head">
+							<div class="card-title-wrap">
+								<span class="eyebrow">Tabbs</span>
+								<h2 class="card-title">{$legend_add_edit}</h2>
 							</div>
-							<!-- /.panel-heading -->
-							<div class="panel-body">
-								{* Afficher le formulaire ADD/EDIT *}
-								{include_php file='form.php'}
-							</div>
-							<!-- /.panel-body -->
 						</div>
-						<!-- /.panel -->
-					</div>
-					<!-- /.col-lg-12 -->
+							{* Afficher le formulaire ADD/EDIT *}
+							{include_php file='form.php'}
+					</section>
 				{/if}
-				
+
             </div>
-            <!-- /.row -->
+            <!-- /.grid -->
 	
 		<!-- ------------------------------------------------------------ -->
 		<!-- Page-Level Scripts - Use this space this write your own code -->

@@ -12,15 +12,15 @@
 			
 			{include file='pages_bar.tpl'}
 
-            <div class="row">
+            <div class="grid">
 				{if $all}
-                <div class="col-lg-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <span class="fa fa-copy fa-fw"></span> <strong>{if $all}Gestion de vos pages{else}{$legend_add_edit}{/if}</strong>
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
+                <section class="col-12 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Pages</span>
+							<h2 class="card-title">Gestion de vos pages</h2>
+						</div>
+                    </div>
                             <div class="data-toolbar">
 								<div class="data-toolbar-left">
 									<div class="input-icon" style="flex:1;max-width:320px">
@@ -74,54 +74,42 @@
 								<div class="pager"></div>
 							</div>
 
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-12 -->
-				
-				{else}
-				
-                <div class="col-lg-8">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <span class="fa fa-copy fa-fw"></span> <strong>{if $all}Gestion de vos pages{else}{$legend_add_edit}{/if}</strong>
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-							{* Afficher le formulaire ADD/EDIT *}
-							{include_php file='form.php'}
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-8 -->
+                </section>
 
-				<div class="col-lg-4">
+				{else}
+
+                <section class="col-8 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Pages</span>
+							<h2 class="card-title">{$legend_add_edit}</h2>
+						</div>
+                    </div>
+						{* Afficher le formulaire ADD/EDIT *}
+						{include_php file='form.php'}
+                </section>
+
+				<div class="col-4">
 					{* ------------------------------------ *}
 					{* --- Include Shared Panel Actions --- *}
 					{include file='shared/shared-panel-actions.tpl'}
 					{* ------------------------------------ *}
 					{* ------------------------------------ *}
 					{if $smarty.get.a != 'addcustom' AND $smarty.get.a != 'editcustom'}
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<span class="fa fa-columns fa-fw"></span> <strong>Choix du template (VIEW)</strong>
-						</div>
-						<!-- /.panel-heading -->
-						<div class="panel-body">
-							<div class="theme_view">
-								<img id="img_theme_view" src="" title="" />
+					<div class="card">
+						<div class="card-head">
+							<div class="card-title-wrap">
+								<h2 class="card-title">Choix du template (VIEW)</h2>
 							</div>
 						</div>
-						<!-- /.panel-body -->
+						<div class="theme_view">
+							<img id="img_theme_view" src="" title="" />
+						</div>
 					</div>
-					<!-- /.panel -->
+					<!-- /.card -->
 					{/if}
 				</div>
-				<!-- /.col-lg-4 -->
+				<!-- /.col-4 -->
 
 				{if isset($show_headpage)}
 					{include file='shared/shared-slider-4col.tpl'}
@@ -130,7 +118,7 @@
 
 				{/if}
             </div>
-            <!-- /.row -->
+            <!-- /.grid -->
 	
 		<!-- ------------------------------------------------------------ -->
 		<!-- Page-Level Scripts - Use this space this write your own code -->

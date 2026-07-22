@@ -12,16 +12,16 @@
 			
 			{include file='news_bar.tpl'}
 
-            <div class="row">
-				
+            <div class="grid">
+
 				{if isset($all) && !isset($smarty.get.a)}
-                <div class="col-lg-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <span class="fa fa-rss fa-fw"></span> <strong>{if $all}Gestion de vos articles{else}{$legend_add_edit}{/if}</strong>
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
+                <section class="col-12 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Articles</span>
+							<h2 class="card-title">Gestion de vos articles</h2>
+						</div>
+                    </div>
                             <div class="data-toolbar">
 								<div class="data-toolbar-left">
 									<div class="input-icon" style="flex:1;max-width:320px">
@@ -73,23 +73,18 @@
 								<div class="pager"></div>
 							</div>
 
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-12 -->
+                </section>
 				{/if}
-				
+
 				{if isset($allcat)}
-				
-                <div class="col-lg-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <span class="fa fa-rss fa-fw"></span> <strong>{if $allcat}Gestion de vos catégories{else}{$legend_add_edit}{/if}</strong>
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
+
+                <section class="col-12 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Articles</span>
+							<h2 class="card-title">Gestion de vos catégories</h2>
+						</div>
+                    </div>
                             <div class="data-toolbar">
 								<div class="data-toolbar-left">
 									<div class="input-icon" style="flex:1;max-width:320px">
@@ -149,58 +144,48 @@
 								<div class="pager"></div>
 							</div>
 
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-12 -->
+                </section>
 				{/if}
 
 				{if (!isset($all) || !isset($allcategory)) && (isset($smarty.get.a) && $smarty.get.a != 'category' && $smarty.get.a != 'del' && $smarty.get.a != 'categorydel') }
 
-					<div class="col-lg-8">
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<span class="fa fa-rss fa-fw"></span> <strong>{$legend_add_edit}</strong>
+					<section class="col-8 card">
+						<div class="card-head">
+							<div class="card-title-wrap">
+								<span class="eyebrow">Articles</span>
+								<h2 class="card-title">{$legend_add_edit}</h2>
 							</div>
-							<!-- /.panel-heading -->
-							<div class="panel-body">
-								{* Afficher le formulaire ADD/EDIT *}
-								{include_php file='form.php'}
-							</div>
-							<!-- /.panel-body -->
 						</div>
-						<!-- /.panel -->
-					</div>
-					<!-- /.col-lg-12 -->
-					
-					<div class="col-lg-4">
+							{* Afficher le formulaire ADD/EDIT *}
+							{include_php file='form.php'}
+					</section>
+
+					<div class="col-4">
 						{* ------------------------------------ *}
 						{* --- Include Shared Panel Actions --- *}
 						{include file='shared/shared-panel-actions.tpl'}
 						{* ------------------------------------ *}
 						{* ------------------------------------ *}
 						{if isset($smarty.get.a) && ($smarty.get.a == 'edit' || $smarty.get.a == 'add')}
-						<div class="panel panel-default">
-								<div class="panel-heading">
-									Exemple d'articles (layout)
+						<div class="card" style="margin-bottom:20px">
+							<div class="card-head">
+								<div class="card-title-wrap">
+									<h2 class="card-title">Exemple d'articles (layout)</h2>
 								</div>
-							<div class="panel-body">
-								<img src="img/news-template.jpg" alt="" style="width: 100%;">
 							</div>
-							<!-- /.panel-body -->
+							<img src="img/news-template.jpg" alt="" style="width: 100%;border-radius:8px">
 						</div>
-						<!-- /.panel -->
+						<!-- /.card -->
 						{/if}
 							
 						{if isset($smarty.get.a) && ($smarty.get.a == 'tpl_list' OR $smarty.get.a == 'tpl_single')}
 
-								<div class="panel panel-red">
-									<div class="panel-heading">
-										Variables à utiliser dans votre code {if $smarty.get.a == 'tpl_list'}TPL LIST{else}TPL SINGLE{/if}
+								<div class="card" style="margin-bottom:20px;border-left:3px solid var(--danger)">
+									<div class="card-head">
+										<div class="card-title-wrap">
+											<h2 class="card-title">Variables à utiliser dans votre code {if $smarty.get.a == 'tpl_list'}TPL LIST{else}TPL SINGLE{/if}</h2>
+										</div>
 									</div>
-									<div class="panel-body">
 										<p>
 											{if $smarty.get.a == 'tpl_list'}
 												{literal}
@@ -263,8 +248,7 @@
 												{/literal}
 											{/if}
 										</p>
-									</div>
-									<div class="panel-footer">
+									<div style="border-top:1px solid var(--border-soft);margin-top:14px;padding-top:14px">
 										<a href="http://www.smarty.net/" target="_blank">Voir Doc smarty pour plus d'infos</a>
 									</div>
 								</div>
@@ -273,15 +257,16 @@
 
 						{if isset($smarty.get.a) && $smarty.get.a != 'tpl_list' && $smarty.get.a != 'tpl_single' && $smarty.get.a != 'settings' && $smarty.get.a != 'edit' && $smarty.get.a != 'categoryadd' && $smarty.get.a != 'add'}
 
-							<div class="panel panel-success">
-								<div class="panel-heading">
-									Templates Catégorie
+							<div class="card">
+								<div class="card-head">
+									<div class="card-title-wrap">
+										<h2 class="card-title">Templates Catégorie</h2>
+									</div>
 								</div>
-								<div class="panel-body">
 									<p style="text-align: center;">
 										<b>Modifier le template de l'intro (LIST)</b>
 										<br>
-										<button onclick="location.href='index.php?p=news&a=tpl_list&id={$smarty.get.id}'" type="button" class="btn btn-success">
+										<button onclick="location.href='index.php?p=news&a=tpl_list&id={$smarty.get.id}'" type="button" class="btn btn--primary">
 											Template LIST
 										</button>
 									</p>
@@ -289,23 +274,23 @@
 									<p style="text-align: center;">
 										<b>Modifier le template de l'article (SINGLE)</b>
 										<br>
-										<button onclick="location.href='index.php?p=news&a=tpl_single&id={$smarty.get.id}'" type="button" class="btn btn-success">
+										<button onclick="location.href='index.php?p=news&a=tpl_single&id={$smarty.get.id}'" type="button" class="btn btn--primary">
 											Template SINGLE
 										</button>
 									</p>
-								</div>
 							</div>
+							<!-- /.card -->
 
 						{/if}
 
 					</div>
-					<!-- /.col-lg-4 -->
-				
+					<!-- /.col-4 -->
+
 				{/if}
-				
+
             </div>
-            <!-- /.row -->
-				
+            <!-- /.grid -->
+
 			<div class="modal fade" id="sbnews_shortcodes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 				<div class="modal-dialog">
 					<div class="modal-content">
