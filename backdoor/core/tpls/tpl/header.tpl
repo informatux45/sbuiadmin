@@ -31,39 +31,37 @@
         })();
     </script>
 
-    {if $page == 'login'}
     <!-- Adminator theme (self-hosted fonts + compiled CSS bundle) -->
     <link href="assets/adminator/fonts/fonts.css" rel="stylesheet">
     <link href="assets/adminator/style.css" rel="stylesheet">
-    {/if}
 
     {if $page != 'login'}
+    <!-- Legacy stack: still required by content pages not yet migrated to Adminator (Phases 4-6) -->
     <!-- Bootstrap Core CSS -->
     <link href="assets/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
-
-    <!-- MetisMenu CSS -->
-    <link href="assets/bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
     <link href="assets/dist/css/sb-admin-2.css" rel="stylesheet">
 
-    <!-- Font Awesome latest -->
-    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' type='text/css' media='all' />
+    <!-- Font Awesome (self-hosted, no CDN) -->
+    <link rel="stylesheet" href="assets/bower_components/font-awesome/css/font-awesome.min.css">
+
+    <!-- Custom Admin CSS -->
+    <link href="assets/dist/css/sb-admin-custom.css" rel="stylesheet">
+
+    <!-- Compatibility bridge: maps legacy Bootstrap classes onto Adminator's design tokens so
+         not-yet-migrated content pages look consistent under the new chrome. Removed in Phase 7. -->
+    <link href="assets/adminator/bridge.css" rel="stylesheet">
     {/if}
 
 	<!-- OutdatedBrowser -->
 	<link rel="stylesheet" href="inc/plugins/outdatedbrowser/outdatedbrowser.min.css">
-	
+
 	<!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
 	<link rel="stylesheet" href="assets/dist/css/jquery.fileupload.css">
 
 	<!-- JS customs scripts -->
 	<script src="assets/dist/js/sb-custom.js"></script>
-	
-    {if $page != 'login'}
-    <!-- Custom Admin CSS -->
-    <link href="assets/dist/css/sb-admin-custom.css" rel="stylesheet">
-    {/if}
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -87,5 +85,3 @@
         <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
     </div> <!-- OutdatedBrowser -->
     {/if}
-
-    {if $page != 'login'}<div id="wrapper">{/if}

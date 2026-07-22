@@ -2,8 +2,12 @@
 {* ALL FOOTER INCLUDE FILES *}
 {* ------------------------ *}
 
+        </main>
+        <!-- /.content -->
         </div>
-        <!-- /#page-wrapper -->
+        <!-- /.main -->
+        </div>
+        <!-- /.shell -->
 
 {include file='scripts.tpl'}
 

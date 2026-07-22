@@ -945,53 +945,49 @@ function sbGetMenuModule($param = '') {
 					|| ($module_menu[$module_name]['group'] == 'user' && $sbuiadmin_user_type == 'user')) {
 					
 					// --- Check if user is authorized to view menu (Personnalized)
-					if (!in_array($module_name, $auth_array)) {			
+					if (!in_array($module_name, $auth_array)) {
 						// Init Current URL
 						$request_url = 'http' . (($_SERVER['HTTPS'] == 'on') ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-						
-						// Init menu
-						$ret_module_menu .= '<li id="' . $module_name . '">';
-						
+
 						// Menu UL (Entries)
                   $module_menu[$module_name]['li'] = (isset($module_menu[$module_name]['li'])) ? $module_menu[$module_name]['li'] : [];
                   $ul_module_menu = count((array)$module_menu[$module_name]['li']);
-						
+
 						// Check if active menu
 						if ($request_url == _AM_SITE_URL . "index.php?p=" . $module_name && $ul_module_menu == 0) {
-						     $class_active = ' class="active" ';
+						     $class_active = ' is-active';
 						} elseif (isset($_GET['p']) && trim($_GET['p']) == $module_name && $ul_module_menu == 0) {
-						     $class_active = ' class="active" ';
+						     $class_active = ' is-active';
 						} elseif ( isset($_GET['p']) && (trim($_GET['p']) == 'session' || trim($_GET['p']) == 'cache' || trim($_GET['p']) == 'dashboard' || trim($_GET['p']) == 'toolbarck' || trim($_GET['p']) == 'theme' || trim($_GET['p']) == 'themeinfos') && $module_name == 'settings' && $ul_module_menu == 0) {
-						     $class_active = ' class="active" ';
+						     $class_active = ' is-active';
 						} else {
-						     $class_active = ' ';
+						     $class_active = '';
 						}
-						
-						// Main menu
-						$ret_module_menu .= '<a'.$class_active.'href="index.php?p=' . $module_name . '">';
-						$ret_module_menu .= '<i class="fa fa-' . $module_menu[$module_name]['icon'].' fa-fw fa-menu-i"></i> '. $module_menu[$module_name]['main'];
-						if ($ul_module_menu) $ret_module_menu .= '<span class="fa arrow"></span>';
-						$ret_module_menu .= '</a>';
-						
+
 						// --- Check if there is menu entries
 						if ($ul_module_menu > 0) {
-							// Menu UL (if entries)
-							$collapse_in = (isset($_GET['p']) && $_GET['p'] == $module_name) ? ' collapse in' : '';
-							$ret_module_menu .= '<ul class="nav nav-second-level' . $collapse_in . '">';
-							
-							// Menu LI (choices)
+							// Item with a submenu
+							$collapse_in = (isset($_GET['p']) && $_GET['p'] == $module_name) ? ' is-open' : '';
+							$ret_module_menu .= '<div class="nav-item-group' . $collapse_in . '" data-nav-group id="' . $module_name . '">';
+							$ret_module_menu .= '<a class="nav-link" href="javascript:void(0)" data-nav-toggle>';
+							$ret_module_menu .= '<i class="fa fa-' . $module_menu[$module_name]['icon'].' fa-fw"></i><span>'. $module_menu[$module_name]['main'] . '</span>';
+							$ret_module_menu .= '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 18 6-6-6-6"/></svg>';
+							$ret_module_menu .= '</a>';
+							$ret_module_menu .= '<div class="nav-submenu">';
+
+							// Menu entries (choices)
 							for($j = 0; $j < $ul_module_menu; $j++) {
-								$class_active = ($request_url == _AM_SITE_URL . $module_menu[$module_name]['li'][$j]['link']) ? ' class="active" ' : ' ';
-								$ret_module_menu .= '<li id="ss-' . strtolower(sbRewriteToId($module_menu[$module_name]['li'][$j]['title'])) . '">';
-								$ret_module_menu .= '<a'.$class_active.'href="'.$module_menu[$module_name]['li'][$j]['link'].'">'.$module_menu[$module_name]['li'][$j]['title'].'</a>';
-								$ret_module_menu .= '</li>';
+								$class_active = ($request_url == _AM_SITE_URL . $module_menu[$module_name]['li'][$j]['link']) ? ' is-active' : '';
+								$ret_module_menu .= '<a class="' . trim($class_active) . '" id="ss-' . strtolower(sbRewriteToId($module_menu[$module_name]['li'][$j]['title'])) . '" href="'.$module_menu[$module_name]['li'][$j]['link'].'">'.$module_menu[$module_name]['li'][$j]['title'].'</a>';
 							}
-							
-							// End of UL
-							$ret_module_menu .= '</ul>';
-							
-							// End of menu
-							$ret_module_menu .= '</li>';
+
+							$ret_module_menu .= '</div>'; // /.nav-submenu
+							$ret_module_menu .= '</div>'; // /.nav-item-group
+						} else {
+							// Flat item, no submenu
+							$ret_module_menu .= '<a class="nav-link' . $class_active . '" id="' . $module_name . '" href="index.php?p=' . $module_name . '">';
+							$ret_module_menu .= '<i class="fa fa-' . $module_menu[$module_name]['icon'].' fa-fw"></i><span>'. $module_menu[$module_name]['main'] . '</span>';
+							$ret_module_menu .= '</a>';
 						}
 					}
 				}	

@@ -6,6 +6,6 @@
 
 {include file='navigation.tpl' active=$module}
 
-        <div id="page-wrapper">
-			
+        <main class="content">
+
 			{include file='header_tpl.tpl'}

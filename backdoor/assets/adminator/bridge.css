@@ -1,0 +1,190 @@
+/*
+ * Compatibility bridge — maps legacy Bootstrap 3 classes onto Adminator's
+ * design tokens so content pages not yet migrated to the new theme (Phases
+ * 4-6) stay visually consistent (incl. dark mode) under the new chrome.
+ * Loaded only on pages still using the legacy stack. Delete in Phase 7
+ * once nothing references Bootstrap classes anymore.
+ */
+
+body {
+	background: var(--bg-body);
+	color: var(--t-base);
+}
+
+main.content {
+	max-width: 100%;
+}
+
+/* .sbmenufixed (shared-panel-actions.tpl): sticks to top:0 on scroll via
+   scripts.tpl's jQuery handler, which now collides with the sticky
+   .d-topbar (height:60px). Push it below the topbar instead. */
+.fixed.sbmenufixed {
+	top: 70px;
+	z-index: 9;
+}
+
+/* Panels / wells -> card look */
+.panel,
+.well {
+	background: var(--bg-card);
+	border: 1px solid var(--border);
+	border-radius: 14px;
+	box-shadow: var(--shadow-card);
+	color: var(--t-base);
+}
+.panel-heading {
+	background: var(--bg-muted);
+	border-bottom: 1px solid var(--border);
+	color: var(--t-base);
+	border-top-left-radius: 14px;
+	border-top-right-radius: 14px;
+}
+.panel-footer {
+	background: var(--bg-muted);
+	border-top: 1px solid var(--border);
+}
+.panel-default > .panel-heading {
+	background: var(--bg-muted);
+	color: var(--t-base);
+}
+
+/* Tables */
+.table {
+	color: var(--t-base);
+}
+.table > thead > tr > th,
+.table > tbody > tr > td,
+.table > tbody > tr > th {
+	border-color: var(--border);
+}
+.table-striped > tbody > tr:nth-of-type(odd) {
+	background: var(--bg-muted);
+}
+.table-hover > tbody > tr:hover {
+	background: var(--bg-hover);
+}
+.dataTables_wrapper,
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+	color: var(--t-muted);
+}
+
+/* Forms */
+.form-control {
+	background: var(--bg-card);
+	border: 1px solid var(--border);
+	color: var(--t-base);
+}
+.form-control:focus {
+	border-color: var(--primary);
+	box-shadow: 0 0 0 3px var(--primary-ring);
+}
+.input-group-addon {
+	background: var(--bg-muted);
+	border: 1px solid var(--border);
+	color: var(--t-muted);
+}
+label {
+	color: var(--t-base);
+}
+
+/* Buttons */
+.btn-default {
+	background: var(--bg-card);
+	border-color: var(--border);
+	color: var(--t-base);
+}
+.btn-primary {
+	background: var(--primary);
+	border-color: var(--primary);
+}
+.btn-danger {
+	background: var(--danger);
+	border-color: var(--danger);
+}
+.btn-success {
+	background: var(--success);
+	border-color: var(--success);
+}
+.btn-info {
+	background: var(--info);
+	border-color: var(--info);
+}
+.btn-warning {
+	background: var(--warning);
+	border-color: var(--warning);
+}
+
+/* Dropdowns, modals, tabs (Bootstrap JS still driving these until Phase 7) */
+.dropdown-menu {
+	background: var(--bg-card);
+	border: 1px solid var(--border);
+	box-shadow: var(--shadow-lg);
+	color: var(--t-base);
+}
+.dropdown-menu > li > a {
+	color: var(--t-base);
+}
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+	background: var(--bg-hover);
+	color: var(--t-base);
+}
+.dropdown-menu .divider {
+	background: var(--border);
+}
+
+.modal-content {
+	background: var(--bg-card);
+	border: none;
+	border-radius: 14px;
+	box-shadow: var(--shadow-lg);
+	color: var(--t-base);
+}
+.modal-header,
+.modal-footer {
+	border-color: var(--border);
+}
+.modal-backdrop {
+	background: var(--overlay);
+}
+
+.nav-tabs {
+	border-bottom-color: var(--border);
+}
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+	background: var(--bg-card);
+	border-color: var(--border);
+	color: var(--primary);
+}
+.nav-tabs > li > a {
+	color: var(--t-muted);
+}
+.tab-content {
+	background: var(--bg-card);
+	border: 1px solid var(--border);
+	border-top: none;
+	color: var(--t-base);
+}
+
+/* Labels / badges */
+.label-default { background: var(--bg-muted); color: var(--t-muted); }
+.label-primary { background: var(--primary); }
+.label-danger { background: var(--danger); }
+.label-success { background: var(--success); }
+.label-warning { background: var(--warning); }
+.label-info { background: var(--info); }
+
+/* Bootstrap alerts still emitted by some legacy code paths */
+.alert-success { background: var(--success-soft); border-color: var(--success); color: var(--t-base); }
+.alert-danger { background: var(--danger-soft); border-color: var(--danger); color: var(--t-base); }
+.alert-warning { background: var(--warning-soft); border-color: var(--warning); color: var(--t-base); }
+.alert-info { background: var(--info-soft); border-color: var(--info); color: var(--t-base); }
+
+a {
+	color: var(--primary);
+}

@@ -1,23 +1,5 @@
-{* Header TPL *}
+{* Header TPL — page title/breadcrumb now live in navigation.tpl's topbar (.crumbs) *}
 
-			{* --- Page Title --- *}
-			<div class="row header-title-row">
-				<h3>{if $page_title}{$page_title|unescape:"htmlall"|upper}{else}{$pageindex|upper}{/if}</h3>
-				<div class="breadcrumbx">
-					{if $page_title}
-						<a href="{$smarty.const._AM_SITE_URL}"><i class="fa fa-home fa-fw"></i> Dashboard</a>
-						&nbsp;&raquo;&nbsp;
-						<a href="{if isset($smarty.get.p)}{$smarty.const._AM_SITE_URL}index.php?p={$smarty.get.p}{else}#{/if}">{$page_title|lower|@ucfirst}</a>
-						{if isset($smarty.get.a)}
-							&nbsp;&raquo;&nbsp;
-							{$smarty.get.a|lower|@ucfirst}
-						{/if}
-					{else}
-						<i class="fa fa-home fa-fw"></i> Dashboard
-					{/if}
-				</div>
-			</div>
-			
 			{if $smarty.const._AM_SITE_DEBUG}
 				{* --------------------------------------- *}
 				{* Smarty Function                         *}
@@ -27,22 +9,24 @@
 				{sbdebug debugsql=$sbdebugsql odump=$sbodump file_content=$file_content}
 				<p></p>
 			{/if}
-			
+
 			{* Message status if action *}
 			{if $sb_msg_error || $sb_msg_valid}
 
 				{if $sb_msg_valid}
 					{* --- Message status VALID --- *}
-					<div class="alert alert-success alert-dismissable">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-						{$sb_msg_valid}
+					<div class="alert success">
+						<span class="ico"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+						<div class="body">{$sb_msg_valid}</div>
+						<button type="button" class="close" aria-label="Fermer" onclick="this.closest('.alert').style.display='none'">&times;</button>
 					</div>
 				{elseif $sb_msg_error}
-					{* --- Message status VALID --- *}
-					<div class="alert alert-danger alert-dismissable">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-						 {$sb_msg_error}
+					{* --- Message status ERROR --- *}
+					<div class="alert danger">
+						<span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg></span>
+						<div class="body">{$sb_msg_error}</div>
+						<button type="button" class="close" aria-label="Fermer" onclick="this.closest('.alert').style.display='none'">&times;</button>
 					</div>
 				{/if}
-				
+
 			{/if}
