@@ -15,19 +15,20 @@
 			{if isset($allips)}
 				<div class="row">
 					<div class="col-lg-12">
-						<div class="alert alert-warning" style="border: 3px solid;">
-							<div style="float: left; display: block; clear: both; margin: 0 1em 0em 0;">
-								<a class="sbmedia-display" href="{$smarty.const.SB_ADMIN_URL}img/ddos-attack-http-flood-example.png" rel="facebox">
+						<div class="alert warning">
+							<span class="ico"><svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg></span>
+							<div class="body">
+								<div class="title">Anti-Flood</div>
+								<a class="sbmedia-display" href="{$smarty.const.SB_ADMIN_URL}img/ddos-attack-http-flood-example.png" rel="facebox" style="float: left; display: block; margin: 0 1em 0.5em 0;">
 									<img src="{$smarty.const.SB_ADMIN_URL}img/ddos-attack-http-flood-example-thumbnail.jpg" alt="">
 								</a>
+								<p>Une attaque par HTTP flood est une forme particulière d'attaque DDoS (Distributed Denial of Service). Il s'agit d'une tentative de faire planter le site Web ou l'application en le visitant depuis différents endroits. Une attaque par HTTP flood est souvent appelée layer 7 attack. La « Layer 7 », pour « couche 7 » en français, fait référence à la « couche application » du modèle OSI. Le modèle indique qu'Internet se compose de sept couches.</p>
+								<p>Une attaque dans cette couche consiste à prendre des ressources du réseau ou du serveur. Dès que le matériel ne dispose plus de ressources suffisantes, le client a besoin de plus de temps pour répondre aux demandes. Comme d'innombrables demandes sont encore adressées au matériel, une surcharge constante du système est créée et le serveur ou l'ensemble du réseau n'est plus accessible.</p>
+								<p>Quand les attaquants ont recours au HTTP flood, ils essaient de provoquer un crash du serveur en utilisant des requêtes normales.</p>
+								<p>Une attaque par HTTP flood est basée sur les requêtes GET ou POST du client. Le client, c'est-à-dire le navigateur qui appelle la page Web, envoie une de ces demandes, le serveur traite la demande et renvoie le résultat au client.</p>
+								<p>La requête GET est utilisée pour récupérer des contenus statiques tels que des images ou des blocs de texte. Une demande POST est utilisée lorsque l'accès à des ressources dynamiques est requis. En termes simples, la méthode GET reçoit des données du serveur et la méthode POST envoie des données au serveur. Les deux méthodes peuvent être utilisées dans l'attaque, mais la méthode POST est davantage utilisée car elle implique un traitement plus complexe pour le serveur.</p>
+								<p>L'attaque par HTTP flood repose sur le fait que de nombreuses demandes de ce type sont faites simultanément sur une longue période de temps. Un botnet (ou « réseau de machines zombies ») est généralement utilisé pour augmenter le volume des demandes. L'attaque par HTTP flood est conçue de sorte que le serveur alloue la plus grande ressource possible à chaque requête. Dans une situation normale, cela est voulu, car le serveur ne reçoit pas des milliers ou des centaines de milliers de demandes par minute. Compte tenu du nombre élevé de demandes et d'appels, l'attaquant s'attend toutefois à ce que le serveur soit surchargé par les demandes à forte intensité de traitement et à ce que la page ou l'application Web ne s'affiche plus correctement.</p>
 							</div>
-							<h4>Anti-Flood</h4>
-							<p>Une attaque par HTTP flood est une forme particulière d'attaque DDoS (Distributed Denial of Service). Il s'agit d'une tentative de faire planter le site Web ou l'application en le visitant depuis différents endroits. Une attaque par HTTP flood est souvent appelée layer 7 attack. La « Layer 7 », pour « couche 7 » en français, fait référence à la « couche application » du modèle OSI. Le modèle indique qu'Internet se compose de sept couches.</p>
-							<p>Une attaque dans cette couche consiste à prendre des ressources du réseau ou du serveur. Dès que le matériel ne dispose plus de ressources suffisantes, le client a besoin de plus de temps pour répondre aux demandes. Comme d'innombrables demandes sont encore adressées au matériel, une surcharge constante du système est créée et le serveur ou l'ensemble du réseau n'est plus accessible.</p>
-							<p>Quand les attaquants ont recours au HTTP flood, ils essaient de provoquer un crash du serveur en utilisant des requêtes normales.</p>
-							<p>Une attaque par HTTP flood est basée sur les requêtes GET ou POST du client. Le client, c'est-à-dire le navigateur qui appelle la page Web, envoie une de ces demandes, le serveur traite la demande et renvoie le résultat au client.</p>
-							<p>La requête GET est utilisée pour récupérer des contenus statiques tels que des images ou des blocs de texte. Une demande POST est utilisée lorsque l'accès à des ressources dynamiques est requis. En termes simples, la méthode GET reçoit des données du serveur et la méthode POST envoie des données au serveur. Les deux méthodes peuvent être utilisées dans l'attaque, mais la méthode POST est davantage utilisée car elle implique un traitement plus complexe pour le serveur.</p>
-							<p>L'attaque par HTTP flood repose sur le fait que de nombreuses demandes de ce type sont faites simultanément sur une longue période de temps. Un botnet (ou « réseau de machines zombies ») est généralement utilisé pour augmenter le volume des demandes. L'attaque par HTTP flood est conçue de sorte que le serveur alloue la plus grande ressource possible à chaque requête. Dans une situation normale, cela est voulu, car le serveur ne reçoit pas des milliers ou des centaines de milliers de demandes par minute. Compte tenu du nombre élevé de demandes et d'appels, l'attaquant s'attend toutefois à ce que le serveur soit surchargé par les demandes à forte intensité de traitement et à ce que la page ou l'application Web ne s'affiche plus correctement.</p>
 						</div>
 					</div>
 				</div>

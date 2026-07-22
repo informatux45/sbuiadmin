@@ -6,27 +6,50 @@
 	{include file='sb_header.tpl' module=$module_page pageindex='Dashboard' page='false'}
 	{* ---------------- End Headers --------------- *}
 
+			<section class="hero">
+				<div class="hero-text">
+					<span class="eyebrow">{$sb_dashboard_date_fr}</span>
+					<h1 class="hero-title">Bon retour, <span class="accent">{$sbuiadmin_user_name}</span></h1>
+					<p class="hero-sub">Voici un aperçu de votre back-office {$smarty.const._AM_SITE_CUSTOMER_NAME}.</p>
+				</div>
+			</section>
+
 			{if $sbuiadmin_user_type == 'admin'}
             <!-- .row -->
             <div class="row">
 				
 				{if isset($sb_warning_installer_lock) || isset($sb_warning_install_file) || isset($sb_warning_admin_user)}
-					<div class="col-lg-12">
+					<div class="col-lg-12" style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
 					{if isset($sb_warning_installer_lock)}
-						<div class="alert alert-danger">
-							Le répertoire INSTALL existe toujours ! Supprimer le !! <a class='alert-link' href='#'>Vite</a> !!!
+						<div class="alert danger">
+							<span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg></span>
+							<div class="body">
+								<div class="title">Le répertoire INSTALL existe toujours</div>
+								Supprimez-le au plus vite ! <a href="#">Vite</a> !!!
+							</div>
+							<button type="button" class="close" aria-label="Fermer" onclick="this.closest('.alert').style.display='none'"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
 						</div>
 					{/if}
-					
+
 					{if isset($sb_warning_install_file) && $sb_warning_install_file == true}
-						<div class="alert alert-danger">
-							Le fichier INSTALL.PHP existe toujours ! Supprimer le !! <a class='alert-link' href='#'>Vite</a> !!!
+						<div class="alert danger">
+							<span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg></span>
+							<div class="body">
+								<div class="title">Le fichier INSTALL.PHP existe toujours</div>
+								Supprimez-le au plus vite ! <a href="#">Vite</a> !!!
+							</div>
+							<button type="button" class="close" aria-label="Fermer" onclick="this.closest('.alert').style.display='none'"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
 						</div>
 					{/if}
-					
+
 					{if isset($sb_warning_admin_user) && $sb_warning_admin_user == true}
-						<div class="alert alert-danger">
-							L'utilisateur <a href="index.php?p=users">ADMIN</a> existe toujours ! Créez d'autres utilisateurs et supprimer le !! <a class='alert-link' href='#'>Vite</a> !!!
+						<div class="alert danger">
+							<span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg></span>
+							<div class="body">
+								<div class="title">L'utilisateur ADMIN existe toujours</div>
+								Créez d'autres utilisateurs et supprimez-le ! <a href="index.php?p=users">Vite</a> !!!
+							</div>
+							<button type="button" class="close" aria-label="Fermer" onclick="this.closest('.alert').style.display='none'"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
 						</div>
 					{/if}
 					</div>

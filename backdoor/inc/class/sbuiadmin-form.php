@@ -246,8 +246,8 @@ class form extends sanitize {
 										<script type="text/javascript" src="inc/js/jquery/ui/i18n/ui.datepicker-fr.js"></script>
 										<script type="text/javascript" src="inc/js/editor/ckeditor/ckeditor.js"></script>
 									  ';
-		$this -> formBuffer['open'] .= "\n" . '<form ';
-		
+		$this -> formBuffer['open'] .= "\n" . '<form style="display:flex;flex-direction:column;gap:14px" ';
+
 		foreach ($this -> formAttributeArr as $clef => $val) {
 			if ($clef == 'id')
 				$this -> formBuffer['formId'] = $val;
@@ -257,11 +257,6 @@ class form extends sanitize {
 				$this -> formBuffer['open'] .= $clef.'="'.$val.'" ';
 		}
 		$this -> formBuffer['open'] .= '>' . "\n";
-		
-		// Define open & close input
-		$this -> formBuffer['open_div'] .= '<div class="form-group">';
-		$this -> formBuffer['close_div'] .= '</div>';
-		$this -> formBuffer['close_div'] .= '</div>';		
 	}
 	
 	// fermer le formulaire
@@ -325,8 +320,8 @@ class form extends sanitize {
 			}
 
 			if (!isset($chaineClass)) {
-				$submitClass = ($elem == 'submit') ? ' btn-submit' : '';
-				$chaineTemp .= 'class="btn btn-default' . $submitClass . '" ';
+				$btnClass = ($elem == 'submit') ? 'btn btn--primary btn-submit' : 'btn btn--ghost';
+				$chaineTemp .= 'class="' . $btnClass . '" ';
 			}
 
 			$chaineTemp .= '/>&nbsp;&nbsp;';
@@ -343,12 +338,12 @@ class form extends sanitize {
 			// Show the form element
 			if ($labelInputGroup != '') {
 				if (substr($labelInputGroup, 0 ,1) == '0')
-					$chaineTemp .= '<span class="input-group-addon">' . substr($labelInputGroup, 1) . '</span>';				
+					$chaineTemp .= '<span class="ico">' . substr($labelInputGroup, 1) . '</span>';
 				else
-					$chaineTemp .= '<span class="input-group-addon"><i class="fa fa-' . $labelInputGroup . '"></i></span>';
+					$chaineTemp .= '<span class="ico"><i class="fa fa-' . $labelInputGroup . '"></i></span>';
 			}
 
-			$chaineTemp .= '<input class="form-control" type="'.$elem.'" ';
+			$chaineTemp .= '<input class="input" type="'.$elem.'" ';
 
 			// BNAME Obligatoire pour le script de validation
 			// Meme si le champs n'est pas obligatoire ou
@@ -388,13 +383,19 @@ class form extends sanitize {
 			}
 			
 			$chaineTemp .= '/>';
-			
+
+			// Close .input-icon, opened by isRequired() when $labelInputGroup is set
+			if ($labelInputGroup != '') {
+				$chaineTemp .= '</div>';
+			}
+
 			// Si deuxieme icon (icon2)
 			if ($labelInputGroup2 != '')
-				$chaineTemp .= '<span class="input-group-addon">' . $labelInputGroup2 . '</span>';
-			
+				$chaineTemp .= '<span class="field-help">' . $labelInputGroup2 . '</span>';
+
+			// Close .field, opened by isRequired()
 			$chaineTemp .= '</div>';
-			
+
 			$media_dir = (isset($dir) && $dir != '') ? $dir : _AM_MEDIAS_DIR;
 			
 			// Si icon1 present et si icon = photo
@@ -459,7 +460,7 @@ class form extends sanitize {
 
 		// Show the form element
 		for ($i = 0; $i < count($tabRadio); $i++) {
-			$chaineTemp .= '<input type="'.$elem.'" ';
+			$chaineTemp .= '<label class="check" style="margin-right:16px;margin-bottom:6px"><input type="'.$elem.'" ';
 
 			$chaineTemp .= 'value="'.$tabRadio[$i]['value'].'" ';
 
@@ -476,11 +477,10 @@ class form extends sanitize {
 			if ($isRequired == true && $i == count($tabRadio)-1)
 				$chaineTemp .= ' required="true" bname="' . $label . '" ';
 
-			$chaineTemp .= '/>&nbsp;&nbsp;';
-			$chaineTemp .= $tabRadio[$i]['text'].'&nbsp;';
-			$chaineTemp .= $separator;
+			$chaineTemp .= '/> <span class="box"></span>';
+			$chaineTemp .= $tabRadio[$i]['text'].'</label>';
 		}
-		
+
 		$chaineTemp .= '</div>';
 		
 		// If help
@@ -532,13 +532,12 @@ class form extends sanitize {
 
 		// Show the form element radio YES
 		// if checked => value="1"
-		//$chaineTemp .= $this -> formBuffer['open_td2'];
-		$chaineTemp .= '<input type="'.$elem.'" ';
+		$chaineTemp .= '<label class="check" style="margin-right:16px;margin-bottom:6px"><input type="'.$elem.'" ';
 
 		foreach ($this -> formElementArr[$cpt][$elem] as $clef => $val) {
 			if ($clef === 'checked' && $val == 1) {
 				$chaineTemp .= 'checked="checked" ';
-				
+
 			} elseif ($clef !== 'checked') {
 				$chaineTemp .= $clef.'="'.$val.'" ';
 			}
@@ -548,12 +547,11 @@ class form extends sanitize {
 		$chaineRequired = ($isRequired == true) ? ' required="true" bname="' . $label . '" ' : '';
 		$chaineTemp    .= $chaineRequired;
 
-		$chaineTemp .= '/>&nbsp;'.$yes;
+		$chaineTemp .= '/> <span class="box"></span>'.$yes.'</label>';
 
 		// Show the form element radio NO
 		// if checked => value="0"
-		$chaineTemp .= $separator;
-		$chaineTemp .= '<input type="'.$elem.'" ';
+		$chaineTemp .= '<label class="check" style="margin-right:16px;margin-bottom:6px"><input type="'.$elem.'" ';
 
 		foreach ($this -> formElementArr[$cpt][$elem] as $clef => $val) {
 			if ($clef === 'checked' && $val === '0')
@@ -563,7 +561,7 @@ class form extends sanitize {
 		}
 		$chaineTemp .= 'value="0" ';
 
-		$chaineTemp .= '/>&nbsp;'.$no;
+		$chaineTemp .= '/> <span class="box"></span>'.$no.'</label>';
 
 		$chaineTemp .= '</div>';
 		
@@ -597,13 +595,13 @@ class form extends sanitize {
 
 		// Show the tab form elements
 		for ($i = 0; $i < count($tabCheck); $i++) {
-			$chaineTemp .= '<input type="'.$elem.'" ';
+			$chaineTemp .= '<label class="check" style="margin-right:16px;margin-bottom:6px"><input type="'.$elem.'" ';
 			$chaineTemp .= 'name="'.$tabCheck[$i]['name'].'" ';
 
 			foreach ($this -> formElementArr[$cpt][$elem] as $clef => $val) {
 				$chaineTemp .= $clef.'="'.$val.'" ';
 			}
-			
+
 			if ($tabCheck[$i]['value'])
 				$chaineTemp .= 'value="' .$tabCheck[$i]['value'].'" ';
 
@@ -612,13 +610,12 @@ class form extends sanitize {
 
 			if ($tabCheck[$i]['checked'] && $tabCheck[$i]['checked'] == '1')
 				$chaineTemp .= 'checked="checked" ';
-			
+
 			if ($tabCheck[$i]['disabled'] && $tabCheck[$i]['disabled'] == 'disabled')
 				$chaineTemp .= 'disabled="" ';
-			
-			$chaineTemp .= '/>&nbsp;&nbsp;';
-			$chaineTemp .= $tabCheck[$i]['text'].'&nbsp;';
-			$chaineTemp .= $separator;
+
+			$chaineTemp .= '/> <span class="box"></span>';
+			$chaineTemp .= $tabCheck[$i]['text'].'</label>';
 			//$this -> formElementArr[$cpt][$elem]['name ('.($i+1).')'] = $tabCheck[$i]['name'];
 			//$this -> formElementArr[$cpt][$elem]['text ('.($i+1).')'] = $tabCheck[$i]['text'];
 		}
@@ -668,9 +665,9 @@ class form extends sanitize {
 
 		$chaineRequired = ($isRequired == true) ? ' required="true" bname="' . $label . '" ' : '';
 		$chaineTemp    .= $chaineRequired;
-		
+
 		$chaineValid    = ($valid != '') ? $valid : '';
-		$chaineTemp    .= 'class="form-control'.$chaineRequired.$chaineValid.'"';
+		$chaineTemp    .= 'class="textarea'.$chaineValid.'"';
 
 		$chaineTemp .= '>'.$txt.'</textarea>';
 
@@ -760,7 +757,7 @@ class form extends sanitize {
 		}
 		
 		// Classes
-		$chaineTemp .= ($chaineClasses != '') ? ' class="form-control ' . $chaineClasses . '"' : ' class="form-control"';
+		$chaineTemp .= ($chaineClasses != '') ? ' class="select ' . $chaineClasses . '"' : ' class="select"';
 
 		$chaineTemp .= ($isRequired == true) ? ' required="true" bname="' . $label . '"' : '';
 
@@ -851,8 +848,8 @@ class form extends sanitize {
 		$chaineTemp .= $this -> isRequired ($isRequired, $label, '', 'red', 'calendar');
 
 		// Show the form element
-		$chaineTemp .= '<span class="input-group-addon group-calendar"><i class="fa fa-calendar"></i></span>';
-		$chaineTemp .= '<input type="'.$elem.'" ';
+		$chaineTemp .= '<span class="ico"><i class="fa fa-calendar"></i></span>';
+		$chaineTemp .= '<input class="input" type="'.$elem.'" ';
 
 		foreach ($this -> formElementArr[$cpt][$elem] as $clef => $val) {
 			if ($clef === 'id')
@@ -896,8 +893,9 @@ class form extends sanitize {
 		//if ($localization != 'en')
 		//	$chaineTemp .= '<script type="text/javascript" src="inc/js/jquery/ui/i18n/ui.datepicker-'.$localization.'.js"></script>';
 
-		$chaineTemp .= '</div>';
-		
+		// Close .input-icon then .field, both opened by isRequired()
+		$chaineTemp .= '</div></div>';
+
 		// If help
 		if ($helpDsc != '')
 			$chaineTemp .= '<p class="help-block">' . $helpDsc . '</p>';
@@ -906,8 +904,8 @@ class form extends sanitize {
 
 		$this -> formBuffer['elements'][$cpt] = $chaineTemp;
 	}
-	
-	
+
+
 	/**
 	* Construct form (body)
 	* add a form element (input tags with drag & drop)
@@ -2030,7 +2028,7 @@ EOT;
 		$chaineTemp .= $this -> isRequired ($isRequired, $label);
 
 		// Show the form element
-		$chaineTemp .= '<input type="'.$elem.'" ';
+		$chaineTemp .= '<input class="input" type="'.$elem.'" ';
 
 		foreach ($this -> formElementArr[$cpt][$elem] as $clef => $val) {
 			if ($clef == 'id')
@@ -2106,34 +2104,21 @@ EOT;
 	* @return html code (string)
 	*/
 	public function isRequired ($fieldRequired, $label, $labelFor = '', $colorRequired = 'red', $labelInputGroup = '') {
-		
-		if ($labelInputGroup != '') {
-			
-			if ($fieldRequired === true) {
-				$chaineTemp .= '<label for="' . $labelFor . '" class="form_required">';
-				$chaineTemp .= $label . '&nbsp;<span style="color: ' . $colorRequired . '">*</span>';
-			} else {
-				$chaineTemp .= '<label for="' . $labelFor . '">';
-				$chaineTemp .= $label;
-			}
-	
-			$chaineTemp .= '</label><br>';
 
-			$chaineTemp .= '<div class="form-group input-group input-group-icon">';		
-		
+		$chaineTemp = '<div class="field">';
+
+		if ($fieldRequired === true) {
+			$chaineTemp .= '<label for="' . $labelFor . '" class="field-label form_required">';
+			$chaineTemp .= $label . ' <span class="req">*</span>';
 		} else {
-			
-			$chaineTemp .= '<div class="form-group">';
-		
-			if ($fieldRequired === true) {
-				$chaineTemp .= '<label for="' . $labelFor . '" class="form_required">';
-				$chaineTemp .= $label . '&nbsp;<span style="color: ' . $colorRequired . '">*</span>';
-			} else {
-				$chaineTemp .= '<label for="' . $labelFor . '">';
-				$chaineTemp .= $label;
-			}
-	
-			$chaineTemp .= '</label><br>';
+			$chaineTemp .= '<label for="' . $labelFor . '" class="field-label">';
+			$chaineTemp .= $label;
+		}
+
+		$chaineTemp .= '</label>';
+
+		if ($labelInputGroup != '') {
+			$chaineTemp .= '<div class="input-icon">';
 		}
 
 		return $chaineTemp;

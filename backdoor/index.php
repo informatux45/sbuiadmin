@@ -412,6 +412,13 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 			// System
 			if ($sb_get_page == 'index') {
 				$sbsmarty->assign('module_page', $sb_get_page);
+
+				// --- Date du jour en français (indépendant de la locale système)
+				$sb_fr_days   = array('Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi');
+				$sb_fr_months = array('', 'janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre');
+				$sb_now       = time();
+				$sbsmarty->assign('sb_dashboard_date_fr', $sb_fr_days[date('w', $sb_now)] . ' ' . date('j', $sb_now) . ' ' . $sb_fr_months[(int)date('n', $sb_now)] . ' ' . date('Y', $sb_now));
+
 				// Traitement page DASHBOARD (INDEX ADMIN)
 				$sb_dashboard_file = _AM_DASHBOARD_FILE;
 				// --- Ouverture du fichier

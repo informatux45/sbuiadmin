@@ -188,3 +188,50 @@ label {
 a {
 	color: var(--primary);
 }
+
+/* Phase 3 — shared form builder: new .field/.input/.select/.textarea/.check
+   classes are the theme's own (no bridging needed). What's below covers the
+   third-party widgets the form builder still embeds as-is (CKEditor, jQuery
+   UI datepicker/colorpicker) so they don't look broken in dark mode. */
+.field-label.form_required {
+	color: var(--t-base);
+}
+.cke_chrome {
+	background: var(--bg-card) !important;
+	border-color: var(--border) !important;
+}
+.cke_top {
+	background: var(--bg-muted) !important;
+	border-bottom-color: var(--border) !important;
+}
+.cke_bottom {
+	background: var(--bg-muted) !important;
+	border-top-color: var(--border) !important;
+}
+.cke_contents, .cke_contents iframe {
+	background: var(--bg-card) !important;
+}
+.ui-datepicker {
+	background: var(--bg-card);
+	border: 1px solid var(--border);
+	border-radius: 10px;
+	box-shadow: var(--shadow-lg);
+	color: var(--t-base);
+}
+.ui-datepicker .ui-datepicker-header {
+	background: var(--bg-muted);
+	border-radius: 8px;
+	color: var(--t-base);
+}
+.ui-datepicker td a {
+	color: var(--t-base);
+}
+.ui-datepicker td a.ui-state-active {
+	background: var(--primary) !important;
+	color: var(--t-inverse) !important;
+}
+.colorpicker {
+	background: var(--bg-card);
+	border: 1px solid var(--border);
+	box-shadow: var(--shadow-lg);
+}
