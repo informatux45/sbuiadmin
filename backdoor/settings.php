@@ -196,12 +196,15 @@ switch($action) {
 		// --- Add inputs and more
 		$sbform->addInput('text', 'Nom du client', array ('name' => 'customer_name', 'value' => "$sb_config_customer_name", 'placeholder' => "Nom de votre client"), true, false, "Visible dans la barre d'administration");
 		$sbform->addInput('text', 'URL du site client', array ('name' => 'url_customer', 'value' => "$sb_config_url_customer", 'placeholder' => "URL du site de votre client (http://...)"), true, false, "Ajoute un lien sur le nom de votre client (header)");
+		$sbform->addBreak('Les administrateurs');
 		$sbform->addInput('text', 'Administrateurs', array ('name' => 'administrators', 'value' => "$sb_config_administrators", 'placeholder' => "Nom des administrateurs"), true, false, "Login des admins séparés par des virgules sans espace");
+		$sbform->addBreak('Base de données');
 		$sbform->addInput('text', 'DB Host', array ('name' => 'dbhost', 'value' => "$sb_config_dbhost", 'placeholder' => "Database Host"), true, false);
 		$sbform->addInput('text', 'DB Name', array ('name' => 'dbname', 'value' => "$sb_config_dbname", 'placeholder' => "Database Name"), true, false);
 		$sbform->addInput('text', 'DB User', array ('name' => 'dbuser', 'value' => "$sb_config_dbuser", 'placeholder' => "Database User"), true, false);
 		$sbform->addInput('text', 'DB Password', array ('name' => 'dbpwd', 'value' => "$sb_config_dbpwd", 'placeholder' => "Database Password"), true, false);
-		$sbform->addInput('text', 'DB Prefix', array ('name' => 'dbprefix', 'value' => "$sb_config_dbprefix", 'placeholder' => "Database Prefix table"), false, false);		
+		$sbform->addInput('text', 'DB Prefix', array ('name' => 'dbprefix', 'value' => "$sb_config_dbprefix", 'placeholder' => "Database Prefix table"), false, false);
+		$sbform->addBreak('Configuration médias');
 		$sbform->addInput('text', 'Répertoire d\'upload', array ('name' => 'diruploads', 'value' => "$sb_config_diruploads", 'placeholder' => "Répertoire de l'upload"), true, false, "ex:  <strong>../votre_repertoire</strong>  -  s'il se trouve juste en dessous de l'arborescence du répertoire d'administration<br>Chemin relatif (obligatoirement), pas d'absolu !!! - Ne pas mettre le  <span style='color: red;'>/</span>  à la fin");
 		$sbform->addInput('text', 'URL d\'upload', array ('name' => 'urluploads', 'value' => "$sb_config_urluploads", 'placeholder' => "URL de l'upload (http://...)"), true, false, "Ne pas mettre le  <span style='color: red;'>/</span>  à la fin");
 		$sbform->addInput('text', 'Taille max. autorisée pour l\'upload des médias (client)', array ('name' => 'upload_max', 'value' => "$sb_config_upload_max", 'placeholder' => "Répertoire de l'upload"), true, false, "Usage : 10KB, 10.5KB, 2MB, 2.5MB, 1GB, 1TB");
@@ -210,9 +213,18 @@ switch($action) {
 		$sbform->addInput('text', "Nombre d'uploads simultanés", array ('name' => 'upload_limit', 'value' => "$sb_config_upload_limit", 'placeholder' => "Nombre d'uploads simultanés"), true, false);
 		$sbform->addInput('text', "Taille maximum autorisée", array ('name' => 'scaling_maxsize', 'value' => "$sb_config_scaling_maxsize", 'placeholder' => "Taille maximum autorisée en pixels"), true, false, "Taille en pixels maximum autorisée pour vos médias (largeur et hauteur)<br>Ex : <b>1024</b> (CORRECT) --- Ex : <b>1024px</b> (INCORRECT)");
 		$sbform->addInput('text', 'Médias par page', array ('name' => 'medias_per_page', 'value' => "$sb_config_medias_per_page", 'placeholder' => "Nombre de médias par page"), true, false, "Nombre d'images affichées par page dans le module Médias");
+		$sbform->addBreak('Modules');
 		$sbform->addInput('text', 'Modules', array ('name' => 'modules', 'value' => "$sb_config_modules", 'placeholder' => "Nom de vos modules"), false, false, "Nom de vos modules autorisés dans votre administration séparés par des virgules sans espace");
+		$sbform->addBreak('Captcha (Google reCAPTCHA)');
 		$sbform->addInput('text', "Google Recaptcha (Clé publique)", array ('name' => 'recaptcha_public', 'value' => "$sb_config_recaptcha_public", 'placeholder' => "Clé publique"), false, false, "Clé du site dans le code HTML que vous proposez à vos utilisateurs");
 		$sbform->addInput('text', 'Google Recaptcha (Clé secrète)', array ('name' => 'recaptcha_secret', 'value' => "$sb_config_recaptcha_secret", 'placeholder' => "Clé secrète"), false, false, "Clé pour toute communication entre votre site et Google. Veillez à ne pas la divulguer, car il s'agit d'une clé secrète.");
+		// Checkbox du mode CAPTCHA
+		$tab_check_4 = array();
+		$tab_check_4[0]['text']    = 'Activé';
+		$tab_check_4[0]['name']    = 'captcha_mode';
+		$tab_check_4[0]['checked'] = ($sb_config_captcha_mode == 1) ? '1' : '0';
+		$sbform->addCheckbox('Activation du mode CAPTCHA (Login)', $tab_check_4, '', false, '<br />', "Permet d'activer le captcha lors du login");
+		$sbform->addBreak('Debug');
 		// Checkbox des modes debug
 		$tab_check = array();
 		$tab_check[0]['text']    = 'Debug général (ADMIN)';
@@ -234,6 +246,7 @@ switch($action) {
 		$tab_check_7[1]['name']    = 'debug_smarty_front';
 		$tab_check_7[1]['checked'] = ($sb_config_debug_smarty_front == 1) ? '1' : '0';
 		$sbform->addCheckbox('Activation des différents modes de DEBUG (FRONT)', $tab_check_7, '', false, '<br />', "Activation des modes DEBUG (FRONT) Inline, Smarty (core)");
+		$sbform->addBreak('Fonctionnalités');
 		// Checkbox du Sandbox
 		$tab_check_2 = array();
 		$tab_check_2[0]['text']    = 'Sandbox';
@@ -246,12 +259,6 @@ switch($action) {
 		$tab_check_3[0]['name']    = 'cms';
 		$tab_check_3[0]['checked'] = ($sb_config_cms == 1) ? '1' : '0';
 		$sbform->addCheckbox('Activation du CMS', $tab_check_3, '', false, '<br />', "Permet d'afficher la gestion du menu<br>Activer SBUIADMIN en CMS (si coché) ou en Administration Autonome (si non coché)");
-		// Checkbox du mode CAPTCHA
-		$tab_check_4 = array();
-		$tab_check_4[0]['text']    = 'Activé';
-		$tab_check_4[0]['name']    = 'captcha_mode';
-		$tab_check_4[0]['checked'] = ($sb_config_captcha_mode == 1) ? '1' : '0';
-		$sbform->addCheckbox('Activation du mode CAPTCHA (Login)', $tab_check_4, '', false, '<br />', "Permet d'activer le captcha lors du login");
 		// Checkbox du mode UPGRADE
 		$tab_check_5 = array();
 		$tab_check_5[0]['text']    = 'Activé';
@@ -270,6 +277,7 @@ switch($action) {
 		$tab_check_8[0]['name']    = 'rewrite_url';
 		$tab_check_8[0]['checked'] = ($sb_config_rewrite_url == 1) ? '1' : '0';
 		$sbform->addCheckbox('Activation du Rewrite URL', $tab_check_8, '', false, '<br />', "Permet d'activer la réécriture d'adresse (URLs courtes)");
+		$sbform->addBreak('Performance (Smarty)');
 		// Smarty force compile tpls
 		$tab_check_9 = array();
 		$tab_check_9[0]['text']    = 'Smarty Force Compile (FRONT)';

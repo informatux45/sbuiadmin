@@ -1,0 +1,26 @@
+.sbfaq {
+	margin: 0 0 20px 0;
+}
+.sbfaq-item {
+	border: 1px solid #e0e0e0;
+	border-radius: 6px;
+	margin-bottom: 8px;
+	padding: 10px 15px;
+}
+.sbfaq-question {
+	cursor: pointer;
+	font-weight: bold;
+	list-style: none;
+}
+.sbfaq-question::-webkit-details-marker {
+	display: none;
+}
+.sbfaq-question::before {
+	content: "+ ";
+}
+.sbfaq-item[open] .sbfaq-question::before {
+	content: "− ";
+}
+.sbfaq-response {
+	margin-top: 10px;
+}

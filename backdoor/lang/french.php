@@ -89,5 +89,7 @@ defined('SBUIADMIN_MENU_TABBS_ALL') or define("SBUIADMIN_MENU_TABBS_ALL", "Tous 
 defined('SBUIADMIN_MENU_TABBS_ONGLETS') or define("SBUIADMIN_MENU_TABBS_ONGLETS", "Tous les onglets");
 // ** Tableaux
 defined('SBUIADMIN_MENU_TABLES') or define("SBUIADMIN_MENU_TABLES", "Tableaux");
+// ** FAQ
+defined('SBUIADMIN_MENU_FAQ') or define("SBUIADMIN_MENU_FAQ", "FAQ");
 
 ?>

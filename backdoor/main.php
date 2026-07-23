@@ -156,4 +156,11 @@ $module_menu['table']['main']  = SBUIADMIN_MENU_TABLES;
 $module_menu['table']['icon']  = "table";
 $module_menu['table']['group'] = "user"; // user OR admin
 
+// -----------------------
+// Menu FAQ
+// -----------------------
+$module_menu['faq']['main']  = SBUIADMIN_MENU_FAQ;
+$module_menu['faq']['icon']  = "question-circle";
+$module_menu['faq']['group'] = "user"; // user OR admin
+
 ?>

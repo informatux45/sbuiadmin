@@ -31,7 +31,7 @@ defined('_AM_THEME_FILE') OR define('_AM_THEME_FILE', SBUIADMIN_PATH . '/inc/adm
 
 // ------------------------------------------
 // --- Defined Safe Pages
-$sb_safe_pages = ['index','sandbox','settings','cache','server','dashboard','theme','themeinfos','session','database','explorer','users','logaccess','menu','pages','blocs','medias','transfert','cmsconfig','slider','news','contact','tabbs','toggle','gallery','gmaps','table','toolbarck'];
+$sb_safe_pages = ['index','sandbox','settings','cache','server','dashboard','theme','themeinfos','session','database','explorer','users','logaccess','menu','pages','blocs','medias','transfert','cmsconfig','slider','news','contact','tabbs','toggle','gallery','gmaps','table','toolbarck','faq'];
 // --- Defined Safe Modules
 $sb_safe_modules = explode(",", trim($sb_settings_config[8]));
 // ------------------------------------------
