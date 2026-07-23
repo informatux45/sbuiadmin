@@ -10,7 +10,7 @@
 			{*       Write your own code after this line        *}
 			{* ------------------------------------------------ *}
 			
-			{include file='system/settings_bar.tpl'}
+			{include file='shared/shared-settings-hero.tpl'}
 
 			{* Notes full width *}
 			<div class="grid">
@@ -32,7 +32,6 @@
                 <section class="col-12 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">CKEditor</span>
 							<h2 class="card-title">{$legend_add_edit}</h2>
 						</div>
                     </div>
@@ -47,7 +46,6 @@
                 <section class="col-12 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">CKEditor</span>
 							<h2 class="card-title">Toolbar Configurator</h2>
 						</div>
                     </div>

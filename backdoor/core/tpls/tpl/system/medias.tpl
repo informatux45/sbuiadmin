@@ -10,6 +10,17 @@
 			{*       Write your own code after this line        *}
 			{* ------------------------------------------------ *}
 
+			<section class="hero">
+				<div class="hero-text">
+					<span class="eyebrow">Bibliothèque</span>
+					<h1 class="hero-title">Médias</h1>
+					<p class="hero-sub">Importez, organisez et gérez tous les fichiers médias de votre site.</p>
+				</div>
+				<div class="hero-actions">
+					<a class="btn btn--outline-primary" href="{$smarty.const._AM_SITE_URL}index.php?p=settings">Configuration</a>
+				</div>
+			</section>
+
 			{* Notes 6 col *}
 			<div class="grid">
 
@@ -115,7 +126,7 @@
 								<li>Upload des fichiers : {if $media_ini_get_file_uploads}<span class="green">ON</span>{else}<span class="red">OFF</span>{/if}</li>
 								<li>Taille post maximum autorisée (post_max_size) : {$media_ini_get_post_max_size}</li>
 								<li>Taille upload maximum autorisée (upload_max_filesize) : {$media_ini_get_upload_max_filesize}</li>
-								<li>Taille maximum autorisée à l'upload (<a href="{$smarty.const._AM_SITE_URL}index.php?p=settings">Configuration)</a> : <span class="red">{$smarty.const._AM_MEDIAS_SIZE_LIMIT}</span>
+								<li>Taille maximum autorisée à l'upload : <span class="red">{$smarty.const._AM_MEDIAS_SIZE_LIMIT}</span>
 									<br><small style="color:var(--warning)">Si des fichiers volumineux (ou autres) ne passent pas à l'upload, vérifiez directement la configuration serveur (upload_max_filesize / post_max_size ci-dessus).</small>
 								</li>
 								<li>Types de fichier autorisés : {foreach $sbfiles_medias_exts_allowed as $ext_allowed}<span class="sbmedia_ext_allowed">{$ext_allowed}</span> {foreachelse}Aucune{/foreach}</li>

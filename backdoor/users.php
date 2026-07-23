@@ -355,7 +355,69 @@ switch($action) {
 			}
 			$sbsmarty->assign('sbdebugsql', $alldel_debug);
 		}
-		
+
+	break;
+
+	case "blockedipsettings":
+		// --------------------------------
+		// --- Initialize Form
+		// --------------------------------
+		$formName        = "blockedip_settings_form";
+		$formType        = "blockedipsettings";
+		$btn_add_edit    = "Modifier";
+		$legend_add_edit = "Paramètres anti-flood (IPs bloquées)";
+		$sb_settings_file = _AM_SETTINGS_FILE;
+
+		// --------------------------------
+		// --- Control form submit --------
+		// --------------------------------
+		if ($_POST['form_submit']) {
+			// Ne touche qu'aux 3 lignes anti-flood (32-34) - le reste du fichier
+			// (DB, uploads, reCAPTCHA...) est préservé tel quel.
+			$sb_settings_current = file($sb_settings_file);
+			$sb_settings_current[32] = (($_POST['flood_enabled'] === "on") ? "1" : "0") . "\n";
+			$sb_settings_current[33] = $sbsanitize->displayText($_POST['flood_expiration'], 'UTF-8', 1, 0) . "\n";
+			$sb_settings_current[34] = $sbsanitize->displayText($_POST['flood_login_delay'], 'UTF-8', 1, 0) . "\n";
+
+			$result_edit = file_put_contents($sb_settings_file, implode('', $sb_settings_current), FILE_USE_INCLUDE_PATH | LOCK_EX);
+
+			if ($result_edit) {
+				$sb_msg_valid = 'Configuration modifiée avec succès';
+			} else {
+				$sb_msg_error = 'Error: Write Error (EDIT)!';
+			}
+		}
+
+		// --------------------------------
+		// --- Ouverture du fichier
+		$sb_settings_current      = file($sb_settings_file);
+		$sb_config_flood_enabled  = trim($sb_settings_current[32]);
+		$sb_config_flood_expiration = trim($sb_settings_current[33]);
+		$sb_config_flood_login_delay = trim($sb_settings_current[34]);
+
+		// --------------------------------
+		// --- Define variables
+		$formAction = $module_url . "&a=" . $formType;
+		// --- Form construct
+		$sbform->openForm(array('action' => "$formAction", 'name' => "$formName", 'id' => "$formName", 'reloadpage' => "$formAction", 'submitpage' => "$formAction"));
+		// Checkbox activation
+		$tab_check_flood = array();
+		$tab_check_flood[0]['text']    = 'Activé';
+		$tab_check_flood[0]['name']    = 'flood_enabled';
+		$tab_check_flood[0]['checked'] = ($sb_config_flood_enabled == 1) ? '1' : '0';
+		$sbform->addCheckbox('Activation du blocage anti-flood (login)', $tab_check_flood, '', false, '<br />', "Bloque automatiquement une IP qui multiplie les tentatives de connexion trop rapidement. Nécessite Memcache sur le serveur - reste sans effet si indisponible.");
+		$sbform->addInput('text', "Durée de blocage (secondes)", array('name' => 'flood_expiration', 'value' => "$sb_config_flood_expiration", 'placeholder' => "86400"), true, false, "Ex : 86400 = 1 jour");
+		$sbform->addInput('text', "Délai minimum entre deux tentatives de connexion (secondes)", array('name' => 'flood_login_delay', 'value' => "$sb_config_flood_login_delay", 'placeholder' => "4"), true, false, "Une nouvelle tentative avant l'écoulement de ce délai déclenche le blocage de l'IP.");
+		// --- Hiddens / Buttons
+		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => "$formName"));
+		$sbform->addInput('submit', '', array('value' => "$btn_add_edit"));
+		$sbform->addInput('reset', '', array('value' => "Reset"));
+		// --- Close Form
+		$sbform->closeForm();
+
+		$sbsmarty->assign('allipsettings', true);
+		$sbsmarty->assign('sb_form_id', $formName);
+		$sbsmarty->assign('sb_form_submit_value', $btn_add_edit);
 	break;
 
 }

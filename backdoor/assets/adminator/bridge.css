@@ -16,6 +16,48 @@ main.content {
 	max-width: 100%;
 }
 
+/* Sidebar: the group-toggle link (ex: "Configuration") of a submenu that
+   contains the page currently being browsed - same look as :hover, so the
+   active section stays visible in the collapsed/top-level menu too, not
+   just on the individual submenu entry. */
+.nav-link.is-current {
+	background: var(--bg-hover);
+	color: var(--t-base);
+}
+
+/* Sidebar: the active submenu entry itself - same hover look instead of the
+   theme's default blue/primary treatment, to stay visually consistent with
+   the parent group's is-current look above. */
+.nav-submenu a.is-active {
+	background: var(--bg-hover);
+	color: var(--t-base);
+	font-weight: 600;
+}
+
+/* .hero and .grid each get their own stacking context from the theme's own
+   entrance animation (animation + opacity/transform) — .grid comes after
+   .hero in the DOM, so it paints on top regardless of any z-index used
+   inside .hero (ex: a .dd-menu dropdown in .hero-actions). Give .hero an
+   explicit stacking context of its own, above .grid's default one. */
+.hero {
+	position: relative;
+	z-index: 2;
+}
+
+/* .grid's entrance animation ends on transform:translateY(0) - not the
+   "none" keyword - and with fill-mode "both" that non-none transform value
+   sticks around forever after the animation completes. Per spec, any
+   ancestor with a non-none transform becomes the containing block for
+   descendant position:fixed elements instead of the viewport, which is
+   exactly why .sbmenufixed (shared-panel-actions.tpl, nested inside a
+   .card inside .grid) scrolled away with the page instead of sticking.
+   Switch to fill-mode "backwards": still holds the 0% state during
+   .grid's animation-delay (no flash of unanimated content), but reverts
+   to .grid's own un-animated styles (transform: none) once it's done. */
+.grid {
+	animation-fill-mode: backwards;
+}
+
 /* Adminator's .grid ships only .col-6/.col-12 — filling in the missing
    3/4/8-column spans used when porting pages to .grid/.card layouts. */
 .col-3 { grid-column: span 3; }
@@ -25,10 +67,16 @@ main.content {
 	.col-3, .col-4, .col-8 { grid-column: span 12; }
 }
 
-/* .sbmenufixed (shared-panel-actions.tpl): sticks to top:0 on scroll via
-   scripts.tpl's jQuery handler, which now collides with the sticky
-   .d-topbar (height:60px). Push it below the topbar instead. */
-.fixed.sbmenufixed {
+/* .sbmenufixed (shared-panel-actions.tpl): scripts.tpl's jQuery scroll handler
+   toggles a .fixed class dynamically (never present in the template source),
+   which is why Phase 7's static-analysis cleanup missed it and dropped the
+   base position:fixed rule inherited from the removed sb-admin-custom.css -
+   the panel never actually stuck to the viewport. top is pushed to 70px
+   (instead of the original 0) to clear the sticky .d-topbar (height:60px). */
+.sbmenufixed.fixed {
+	position: fixed;
+	right: 0;
+	min-width: 20em;
 	top: 70px;
 	z-index: 9;
 }
@@ -85,15 +133,15 @@ a {
 }
 
 /* system/theme.tpl: theme picker cards keep the legacy theme_block/theme_block_active
-   classes for JS-free active-state marking, but the old green gradient background
-   from sb-admin-custom.css clashes with .card's own background — override it with
-   a simple accent border instead. */
+   classes for JS-free active-state marking. The original sb-admin-custom.css gradient
+   was a fully-opaque bright green that clashed with .card and didn't adapt to dark
+   mode - replaced with a light gradient built from the theme's own success tokens. */
 .theme_block {
 	overflow: visible !important;
 	min-height: 0 !important;
 }
 .theme_block_active {
-	background: var(--bg-card) !important;
+	background: linear-gradient(180deg, var(--success-soft), var(--bg-card) 65%) !important;
 	border-color: var(--success) !important;
 	box-shadow: 0 0 0 1px var(--success);
 }

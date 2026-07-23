@@ -115,6 +115,19 @@ defined('_AM_MEDIAS_PER_PAGE') OR define('_AM_MEDIAS_PER_PAGE', trim($sb_setting
 // ------------------------------------------
 
 // ------------------------------------------
+// ------- Anti-flood (login) ---------------
+// ------------------------------------------
+// --- Master switch: kept OFF by default the first time this ships, since
+// it's brand new and depends on Memcache being reachable - turn on from
+// Utilisateurs > IP(s) bloquée(s) > Paramètres IP bloquées once verified.
+defined('_AM_FLOOD_ENABLED') OR define('_AM_FLOOD_ENABLED', trim($sb_settings_config[32]) == 1);
+// --- How long a blocked IP stays blocked (seconds)
+defined('_AM_FLOOD_EXPIRATION') OR define('_AM_FLOOD_EXPIRATION', (int)trim($sb_settings_config[33]));
+// --- Minimum delay allowed between two login attempts from the same IP (seconds)
+defined('_AM_FLOOD_LOGIN_DELAY') OR define('_AM_FLOOD_LOGIN_DELAY', (int)trim($sb_settings_config[34]));
+// ------------------------------------------
+
+// ------------------------------------------
 // --- Users identified like Adminitrators
 // Administrators are allowed to access to:
 // . Manage USERS

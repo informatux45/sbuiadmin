@@ -10,15 +10,14 @@
 			{*       Write your own code after this line        *}
 			{* ------------------------------------------------ *}
 
-			{include file='system/settings_bar.tpl'}
-			
+			{include file='shared/shared-settings-hero.tpl'}
+
 			{* Notes col lg 6 *}
 			<div class="grid">
 
 				<section class="col-6 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">Paramètres</span>
 							<h2 class="card-title">Configuration</h2>
 						</div>
                     </div>
@@ -35,7 +34,6 @@
                     <div class="card">
                         <div class="card-head">
 							<div class="card-title-wrap">
-								<span class="eyebrow">Paramètres</span>
 								<h2 class="card-title">Rappel de votre configuration</h2>
 							</div>
                         </div>

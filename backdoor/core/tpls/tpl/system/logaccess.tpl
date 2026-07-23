@@ -10,13 +10,20 @@
 			{*       Write your own code after this line        *}
 			{* ------------------------------------------------ *}
 			
+			<section class="hero">
+				<div class="hero-text">
+					<span class="eyebrow">Sécurité</span>
+					<h1 class="hero-title">Journaux</h1>
+					<p class="hero-sub">Historique des connexions et tentatives d'accès à l'administration.</p>
+				</div>
+			</section>
+
 			{*include file='system/logaccess_bar.tpl'*}
 
             <div class="grid">
                 <section class="col-12 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">Sécurité</span>
 							<h2 class="card-title">Journaux de connexion</h2>
 						</div>
                     </div>

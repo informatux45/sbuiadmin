@@ -10,7 +10,7 @@
 		{*       Write your own code after this line        *}
 		{* ------------------------------------------------ *}
 		
-			{include file='system/settings_bar.tpl'}
+			{include file='shared/shared-settings-hero.tpl'}
 			
 			<style></style>
 
@@ -19,7 +19,6 @@
 		        <section class="col-12 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">Maintenance</span>
 							<h2 class="card-title">Données serveur en temps réel</h2>
 						</div>
                     </div>

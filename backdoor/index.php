@@ -197,6 +197,15 @@ if (isset($_SESSION['sbuiadmin_user_name']) && isset($_SESSION['sbuiadmin_user_p
 }
 if ((isset($_POST['username']) && $_POST['username']) && (isset($_POST['password']) && $_POST['password'])) {
 	// ------------------
+	// --- Anti-flood: rate-limit login attempts by IP, before checking
+	// credentials at all (Utilisateurs > IP(s) bloquée(s) > Paramètres IP
+	// bloquée(s)). No-ops on its own if Memcache isn't reachable.
+	// ------------------
+	if (_AM_FLOOD_ENABLED) {
+		$sbflood = new flood();
+		$sbflood->floodCheck('LOGIN');
+	}
+	// ------------------
 	// --- Form auth
 	// ------------------
 	$sbuiadmin_user_name     = trim($sbsanitize->stopXSS($_POST['username']));

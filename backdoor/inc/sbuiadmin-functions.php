@@ -1006,19 +1006,55 @@ function sbGetMenuModule($param = '') {
 
 						// --- Check if there is menu entries
 						if ($ul_module_menu > 0) {
-							// Item with a submenu
-							$collapse_in = (isset($_GET['p']) && $_GET['p'] == $module_name) ? ' is-open' : '';
+							// Item with a submenu - open when the current page is either the
+							// module itself, or any of its submenu entries (ex: "settings" has
+							// entries pointing to p=session, p=server, p=cache... not just
+							// p=settings, so a plain $_GET['p'] == $module_name check only kept
+							// the group open for the very first entry).
+							$collapse_in = '';
+							if (isset($_GET['p'])) {
+								if (trim($_GET['p']) == $module_name) {
+									$collapse_in = ' is-open';
+								} else {
+									foreach ((array)$module_menu[$module_name]['li'] as $sub_li) {
+										if (empty($sub_li['link'])) continue;
+										parse_str((string)parse_url($sub_li['link'], PHP_URL_QUERY), $sub_li_params);
+										if (isset($sub_li_params['p']) && $sub_li_params['p'] == trim($_GET['p'])) {
+											$collapse_in = ' is-open';
+											break;
+										}
+									}
+								}
+							}
+							// Highlight the group's own toggle link (like a permanent hover)
+							// whenever the browsed page belongs to this section, so the active
+							// section is visible even when the submenu covers several distinct
+							// p= values and no single child looks like an obvious "parent" match.
+							$is_current_section = ($collapse_in != '') ? ' is-current' : '';
 							$ret_module_menu .= '<div class="nav-item-group' . $collapse_in . '" data-nav-group id="' . $module_name . '">';
-							$ret_module_menu .= '<a class="nav-link" href="javascript:void(0)" data-nav-toggle>';
+							$ret_module_menu .= '<a class="nav-link' . $is_current_section . '" href="javascript:void(0)" data-nav-toggle>';
 							$ret_module_menu .= '<i class="fa fa-' . $module_menu[$module_name]['icon'].' fa-fw"></i><span>'. $module_menu[$module_name]['main'] . '</span>';
 							$ret_module_menu .= '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 18 6-6-6-6"/></svg>';
 							$ret_module_menu .= '</a>';
 							$ret_module_menu .= '<div class="nav-submenu">';
 
-							// Menu entries (choices)
+							// Menu entries (choices) - matched on the link's own p= (and a=, when
+							// present) query params rather than exact full-URL string equality,
+							// which broke as soon as the real request URL carried anything the
+							// menu's own href didn't (trailing params, ordering...).
 							for($j = 0; $j < $ul_module_menu; $j++) {
-								$class_active = ($request_url == _AM_SITE_URL . $module_menu[$module_name]['li'][$j]['link']) ? ' is-active' : '';
-								$ret_module_menu .= '<a class="' . trim($class_active) . '" id="ss-' . strtolower(sbRewriteToId($module_menu[$module_name]['li'][$j]['title'])) . '" href="'.$module_menu[$module_name]['li'][$j]['link'].'">'.$module_menu[$module_name]['li'][$j]['title'].'</a>';
+								$class_active = '';
+								if (!empty($module_menu[$module_name]['li'][$j]['link']) && isset($_GET['p'])) {
+									parse_str((string)parse_url($module_menu[$module_name]['li'][$j]['link'], PHP_URL_QUERY), $li_params);
+									$a_matches = isset($li_params['a'])
+										? (isset($_GET['a']) && $li_params['a'] == trim($_GET['a']))
+										: !isset($_GET['a']);
+									if (isset($li_params['p']) && $li_params['p'] == trim($_GET['p']) && $a_matches) {
+										$class_active = ' is-active';
+									}
+								}
+								$link_target  = !empty($module_menu[$module_name]['li'][$j]['target']) ? ' target="' . $module_menu[$module_name]['li'][$j]['target'] . '"' : '';
+								$ret_module_menu .= '<a class="' . trim($class_active) . '" id="ss-' . strtolower(sbRewriteToId($module_menu[$module_name]['li'][$j]['title'])) . '" href="'.$module_menu[$module_name]['li'][$j]['link'].'"'.$link_target.'>'.$module_menu[$module_name]['li'][$j]['title'].'</a>';
 							}
 
 							$ret_module_menu .= '</div>'; // /.nav-submenu

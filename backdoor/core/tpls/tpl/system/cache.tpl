@@ -10,14 +10,13 @@
 		{*       Write your own code after this line        *}
 		{* ------------------------------------------------ *}
 		
-			{include file='system/settings_bar.tpl'}
+			{include file='shared/shared-settings-hero.tpl'}
 
 			<div class="grid">
 
 		        <section class="col-12 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">Maintenance</span>
 							<h2 class="card-title">Vider les caches FRONT & ADMIN</h2>
 						</div>
                     </div>

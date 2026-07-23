@@ -10,13 +10,20 @@
 			{*       Write your own code after this line        *}
 			{* ------------------------------------------------ *}
 			
+			<section class="hero">
+				<div class="hero-text">
+					<span class="eyebrow">Menus</span>
+					<h1 class="hero-title">Menu</h1>
+					<p class="hero-sub">Gérez la structure et l'ordre des menus affichés sur votre site.</p>
+				</div>
+			</section>
+
 			{include file='system/menu_bar.tpl'}
 
             <div class="grid">
                 <section class="col-12 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">Menus</span>
 							<h2 class="card-title">{if isset($all)}Gestion de vos menus{else}{$legend_add_edit}{/if}</h2>
 						</div>
                     </div>

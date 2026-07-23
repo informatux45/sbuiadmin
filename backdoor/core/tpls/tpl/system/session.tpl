@@ -10,7 +10,7 @@
 			{*       Write your own code after this line        *}
 			{* ------------------------------------------------ *}
 			
-			{include file='system/settings_bar.tpl'}
+			{include file='shared/shared-settings-hero.tpl'}
 			
 			{* Notes col lg 6 *}
 			<div class="grid">
@@ -18,7 +18,6 @@
 				<section class="col-8 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">Session</span>
 							<h2 class="card-title">{$legend_add_edit}</h2>
 						</div>
                     </div>

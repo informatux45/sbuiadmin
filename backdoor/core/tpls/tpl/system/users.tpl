@@ -10,8 +10,36 @@
 			{*       Write your own code after this line        *}
 			{* ------------------------------------------------ *}
 			
-			{include file='system/users_bar.tpl'}
-			
+			<section class="hero">
+				<div class="hero-text">
+					<span class="eyebrow">Utilisateurs</span>
+					<h1 class="hero-title">{if isset($allips)}IPs bloquées{else}Tous les utilisateurs{/if}</h1>
+					<p class="hero-sub">Gérez les comptes administrateurs et les droits d'accès aux modules.</p>
+				</div>
+				<div class="hero-actions">
+					<div class="dd-wrap">
+						<button class="btn btn--outline-primary" data-dropdown aria-label="Actions utilisateurs">
+							{if isset($smarty.get.a) && $smarty.get.a == 'add'}+1 utilisateur
+							{elseif isset($smarty.get.a) && $smarty.get.a == 'blockedipsettings'}Paramètres IP bloquées
+							{elseif isset($allips)}IP(s) bloquée(s)
+							{else}Tous les utilisateurs
+							{/if}
+							<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+						</button>
+						<div class="dd-menu" role="menu">
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=users"{if !isset($smarty.get.a) && !isset($allips)} style="color:var(--primary);font-weight:600"{/if}>Tous les utilisateurs</a>
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=users&a=add"{if isset($smarty.get.a) && $smarty.get.a == 'add'} style="color:var(--primary);font-weight:600"{/if}>+1 utilisateur</a>
+							<a class="dd-menu-item" style="color:var(--danger)" href="{$smarty.const._AM_SITE_URL}index.php?p=settings">+1 administrateur</a>
+							<div class="dd-divider"></div>
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=users&a=blockedip"{if isset($allips) && (!isset($smarty.get.a) || $smarty.get.a != 'blockedipsettings')} style="color:var(--primary);font-weight:600"{/if}>IP(s) bloquée(s)</a>
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=users&a=blockedipsettings"{if isset($smarty.get.a) && $smarty.get.a == 'blockedipsettings'} style="color:var(--primary);font-weight:600"{/if}>Paramètres IP bloquées</a>
+							<div class="dd-divider"></div>
+							<a class="dd-menu-item" href="https://fr.gravatar.com/" target="_blank">Gravatar</a>
+						</div>
+					</div>
+				</div>
+			</section>
+
 			{if isset($allips)}
 				<div class="grid">
 					<section class="col-12">
@@ -35,7 +63,6 @@
 					<section class="col-12 card">
 						<div class="card-head">
 							<div class="card-title-wrap">
-								<span class="eyebrow">Utilisateurs</span>
 								<h2 class="card-title">Gestion des IPs bloquées</h2>
 							</div>
 						</div>
@@ -118,6 +145,29 @@
 				<!-- /.grid -->
 			{/if}
 
+			{if isset($allipsettings)}
+				<div class="grid">
+					<section class="col-8 card">
+						<div class="card-head">
+							<div class="card-title-wrap">
+								<h2 class="card-title">{$legend_add_edit}</h2>
+							</div>
+						</div>
+								{* Afficher le formulaire EDIT *}
+								{include_php file='form.php'}
+					</section>
+
+					<div class="col-4">
+						{* ------------------------------------ *}
+						{* --- Include Shared Panel Actions --- *}
+						{include file='shared/shared-panel-actions.tpl'}
+						{* ------------------------------------ *}
+					</div>
+					<!-- /.col-4 -->
+				</div>
+				<!-- /.grid -->
+			{/if}
+
 			{* Notes full width *}
 			{if $all}
 				<div class="grid">
@@ -134,7 +184,6 @@
 					<section class="col-12 card">
 						<div class="card-head">
 							<div class="card-title-wrap">
-								<span class="eyebrow">Utilisateurs</span>
 								<h2 class="card-title">{if $all}Gestion de vos utilisateurs{else}{$legend_add_edit}{/if}</h2>
 							</div>
 						</div>
@@ -201,12 +250,11 @@
 				<!-- /.grid -->
 			{/if}
 
-			{if !$all && $smarty.get.a != 'blockedip' && $smarty.get.a != 'delblockedip'}
+			{if !$all && $smarty.get.a != 'blockedip' && $smarty.get.a != 'delblockedip' && $smarty.get.a != 'blockedipsettings'}
 				<div class="grid">
 					<section class="{if $allmenu}col-12{else}col-8{/if} card">
 						<div class="card-head">
 							<div class="card-title-wrap">
-								<span class="eyebrow">Utilisateurs</span>
 								<h2 class="card-title">{$legend_add_edit|unescape:"htmlall"} - {$smarty.get.a}</h2>
 							</div>
 						</div>

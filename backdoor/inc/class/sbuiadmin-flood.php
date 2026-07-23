@@ -33,18 +33,35 @@ class flood extends sql {
     private $timeLimitUser = [
         "DEFAULT" => 1,
         "CHAT"    => 3,
-        "LOGIN"   => 4 
+        "LOGIN"   => 4
     ];
     private $timeLimitProcess = [
         "DEFAULT" => 0.1,
         "CHAT"    => 1.5,
-        "LOGIN"   => 0.1 
+        "LOGIN"   => 0.1
     ];
 
     function __construct() {
+        // --- Pull the configurable bits from Paramètres > Utilisateurs > IP(s)
+        // bloquée(s) > Paramètres IP bloquées, when defined, without breaking
+        // callers that don't rely on sbuiadmin-config.php having run.
+        if (defined('_AM_FLOOD_EXPIRATION') && _AM_FLOOD_EXPIRATION > 0) {
+            $this->expiration = _AM_FLOOD_EXPIRATION;
+        }
+        if (defined('_AM_FLOOD_LOGIN_DELAY') && _AM_FLOOD_LOGIN_DELAY > 0) {
+            $this->timeLimitUser['LOGIN'] = _AM_FLOOD_LOGIN_DELAY;
+        }
+        // --- Memcache is optional: floodCheck() no-ops instead of fataling
+        // when it isn't reachable, so a Memcache hiccup never locks out login.
         if (class_exists('Memcache') && extension_loaded('memcache') && function_exists('memcache_connect')) {
-            $this->memcache = new Memcache ();
-            $this->memcache->connect ( self::HOST, self::PORT );
+            try {
+                $this->memcache = new Memcache();
+                if (!@$this->memcache->connect(self::HOST, self::PORT)) {
+                    $this->memcache = null;
+                }
+            } catch (Exception $e) {
+                $this->memcache = null;
+            }
         }
     }
 
@@ -61,6 +78,11 @@ class flood extends sql {
     }
     
     public function getUserInfosIPSTACK($user_ip) {
+        // --- No real API key configured (still the placeholder) - skip the
+        // external call entirely rather than waiting on a request doomed to fail.
+        if (empty($this->ip_user_infos) || $this->ip_user_infos === 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx') {
+            return "Infos indisponibles (clé API ipstack non configurée).";
+        }
         // --------------------------------
         // --- IP INFOS (Country, region, city, ...)
         // --------------------------------
@@ -100,6 +122,13 @@ class flood extends sql {
     }
 
     public function floodCheck($action = "DEFAULT") {
+        // --- Memcache unreachable (not installed, down, misconfigured...):
+        // silently skip rather than fatal - anti-flood is a bonus safety net,
+        // it must never be the reason legitimate logins stop working.
+        if (!$this->memcache) {
+            return;
+        }
+
         $ip = $this->quickIP ();
         $ipKey = "flood" . $action . sha1 ( $ip );
 
