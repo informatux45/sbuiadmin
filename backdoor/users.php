@@ -292,21 +292,23 @@ switch($action) {
 		// --- Tableau des modules
 		$array_menu = explode("|", $menu);
 		// --- Wrapper for floated .config_blocks (form is flex-column)
-		$sbform->addAnything('<div style="overflow:hidden">');
+		$sbform->addAnything('<div class="rights-toggle-grid" style="overflow:hidden">');
 		foreach($module_menu as $key => $val) {
 			// Create random variable
 			$_randstring = substr(str_shuffle(str_repeat("0123456789abcdefghijklmnopqrstuvwxyz", 5)), 0, 5);
 			// Initialize each array
 			$_mmodule[$_randstring] = [];
 			// Module Text
-			$main_text = '<i class="fa fa-'.$module_menu[$key]['icon'].' fa-fw"></i> ' . $module_menu[$key]['main'] . '<br>' . "&nbsp;&nbsp;&nbsp;&nbsp;<span class='help-block'>" . 'Module : '.$key.'</span>';
+			$main_text = '<i class="fa fa-'.$module_menu[$key]['icon'].' fa-fw"></i> ' . $module_menu[$key]['main'];
+			$module_subtitle = "<span class='help-block'>" . 'Module : '.$key.'</span>';
 			$_mmodule[$_randstring][0]['text']    = 'Désactivé';
 			$_mmodule[$_randstring][0]['name']    = 'menu[]';
 			$_mmodule[$_randstring][0]['value']   = $key;
 			$_mmodule[$_randstring][0]['checked'] = (in_array($key, $array_menu)) ? '1' : '0';
 			$config_blocks = ($_mmodule[$_randstring][0]['checked'] == '0') ? 'config_blocks_active' : 'config_blocks_desactived';
-			$sbform->addAnything("<div class='$config_blocks'");
+			$sbform->addAnything("<div class='$config_blocks'>");
 			$sbform->addCheckbox((($module_menu[$key]['group'] == 'admin') ? '<span style="color: red;">'.$main_text.'</span>' : $main_text), $_mmodule[$_randstring], '', false, '<br />');
+			$sbform->addAnything($module_subtitle);
 			$sbform->addAnything("</div>");
 		}
 		$sbform->addAnything('</div>');

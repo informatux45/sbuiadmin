@@ -526,73 +526,79 @@ switch($action) {
 		// --------------------------------
 		// --- Wrapper for floated .config_blocks (form is flex-column)
 		// --------------------------------
-		$sbform->addAnything('<div style="overflow:hidden">');
+		$sbform->addAnything('<div class="plugins-toggle-grid" style="overflow:hidden">');
 		// --------------------------------
 		// --- Plugin JQUERY Latest
 		// --------------------------------
 		$tab_jquery = array();
-		$tab_jquery[0]['text']    = 'Activé<br><br>'.sbHowToPlugins('Comment utiliser le plugin JQUERY', 'jquery/howto.html', 'zero', 'JQUERY');
+		$tab_jquery[0]['text']    = 'Activé';
 		$tab_jquery[0]['name']    = 'jquery';
 		$tab_jquery[0]['checked'] = (in_array("jquery", $plugins)) ? '1' : '0';
 		$config_blocks = ($tab_jquery[0]['checked'] == '1') ? 'config_blocks_active' : 'config_blocks';
-		$sbform->addAnything("<div class='$config_blocks'");
+		$sbform->addAnything("<div class='$config_blocks'>");
 		$sbform->addCheckbox('JQUERY (Latest)', $tab_jquery, '', false, '<br />');
+		$sbform->addAnything(sbHowToPlugins('Comment utiliser le plugin JQUERY', 'jquery/howto.html', 'zero', 'JQUERY'));
 		$sbform->addAnything("</div>");
 		// --------------------------------
 		// --- Plugin LIGHTBOX
 		// --------------------------------
 		$tab_lightbox = array();
-		$tab_lightbox[0]['text']    = 'Activé<br><br>'.sbHowToPlugins('Comment utiliser le plugin LIGHTBOX', 'lightbox/howto.html', 'One', 'LIGHTBOX');
+		$tab_lightbox[0]['text']    = 'Activé';
 		$tab_lightbox[0]['name']    = 'lightbox';
 		$tab_lightbox[0]['checked'] = (in_array("lightbox", $plugins)) ? '1' : '0';
 		$config_blocks = ($tab_lightbox[0]['checked'] == '1') ? 'config_blocks_active' : 'config_blocks';
-		$sbform->addAnything("<div class='$config_blocks'");
+		$sbform->addAnything("<div class='$config_blocks'>");
 		$sbform->addCheckbox('LIGHTBOX', $tab_lightbox, '', false, '<br />');
+		$sbform->addAnything(sbHowToPlugins('Comment utiliser le plugin LIGHTBOX', 'lightbox/howto.html', 'One', 'LIGHTBOX'));
 		$sbform->addAnything('</div>');
 		// --------------------------------
 		// --- Plugin FANCYBOX
 		// --------------------------------
 		$tab_fancybox = array();
-		$tab_fancybox[0]['text']    = 'Activé<br><br>'.sbHowToPlugins('Comment utiliser le plugin FANCYBOX', 'fancybox/howto.html', 'Two', 'FANCYBOX');
+		$tab_fancybox[0]['text']    = 'Activé';
 		$tab_fancybox[0]['name']    = 'fancybox';
 		$tab_fancybox[0]['checked'] = (in_array("fancybox", $plugins)) ? '1' : '0';
 		$config_blocks = ($tab_fancybox[0]['checked']) ? 'config_blocks_active' : 'config_blocks';
-		$sbform->addAnything("<div class='$config_blocks'");
+		$sbform->addAnything("<div class='$config_blocks'>");
 		$sbform->addCheckbox('FANCYBOX', $tab_fancybox, '', false, '<br />');
+		$sbform->addAnything(sbHowToPlugins('Comment utiliser le plugin FANCYBOX', 'fancybox/howto.html', 'Two', 'FANCYBOX'));
 		$sbform->addAnything('</div>');
 		// --------------------------------
 		// --- Plugin CHECKBOXCSS
 		// --------------------------------
 		$tab_checkboxcss = array();
-		$tab_checkboxcss[0]['text']    = 'Activé<br><br>'.sbHowToPlugins('Comment utiliser le plugin CHECKBOXCSS', 'checkboxcss/howto.html', 'Three', 'CHECKBOXCSS');
+		$tab_checkboxcss[0]['text']    = 'Activé';
 		$tab_checkboxcss[0]['name']    = 'checkboxcss';
 		$tab_checkboxcss[0]['checked'] = (in_array("checkboxcss", $plugins)) ? '1' : '0';
 		$config_blocks = ($tab_checkboxcss[0]['checked']) ? 'config_blocks_active' : 'config_blocks';
-		$sbform->addAnything("<div class='$config_blocks'");
+		$sbform->addAnything("<div class='$config_blocks'>");
 		$sbform->addCheckbox('CHECKBOXCSS', $tab_checkboxcss, '', false, '<br />');
+		$sbform->addAnything(sbHowToPlugins('Comment utiliser le plugin CHECKBOXCSS', 'checkboxcss/howto.html', 'Three', 'CHECKBOXCSS'));
 		$sbform->addAnything('</div>');
 		// --------------------------------
 		// --- Plugin APPEAR / DISAPPEAR
 		// --------------------------------
 		$tab_appear = array();
-		$tab_appear[0]['text']    = 'Activé<br><br>'.sbHowToPlugins('Comment utiliser le plugin APPEAR / DISAPPEAR', 'appear/howto.html', 'Four', 'APPEAR / DISAPPEAR');
+		$tab_appear[0]['text']    = 'Activé';
 		$tab_appear[0]['name']    = 'appear';
 		$tab_appear[0]['checked'] = (in_array("appear", $plugins)) ? '1' : '0';
 		$config_blocks = ($tab_appear[0]['checked']) ? 'config_blocks_active' : 'config_blocks';
-		$sbform->addAnything("<div class='$config_blocks'");
+		$sbform->addAnything("<div class='$config_blocks'>");
 		$sbform->addCheckbox('APPEAR / DISAPPEAR', $tab_appear, '', false, '<br />');
-		$sbform->addAnything('</div><div class="config_blocks"></div>');
+		$sbform->addAnything(sbHowToPlugins('Comment utiliser le plugin APPEAR / DISAPPEAR', 'appear/howto.html', 'Four', 'APPEAR / DISAPPEAR'));
+		$sbform->addAnything('</div>');
 		// --------------------------------
 		// --- Plugin MAGNIFIC POPUP
 		// --------------------------------
 		$tab_magnificpopup = array();
-		$tab_magnificpopup[0]['text']    = 'Activé<br><br>'.sbHowToPlugins('Comment utiliser le plugin MAGNIFIC POPUP', 'magnificpopup/howto.html', 'Four', 'MAGNIFIC POPUP');
+		$tab_magnificpopup[0]['text']    = 'Activé';
 		$tab_magnificpopup[0]['name']    = 'magnificpopup';
 		$tab_magnificpopup[0]['checked'] = (in_array("magnificpopup", $plugins)) ? '1' : '0';
 		$config_blocks = ($tab_magnificpopup[0]['checked']) ? 'config_blocks_active' : 'config_blocks';
-		$sbform->addAnything("<div class='$config_blocks'");
+		$sbform->addAnything("<div class='$config_blocks'>");
 		$sbform->addCheckbox('MAGNIFIC POPUP', $tab_magnificpopup, '', false, '<br />');
-		$sbform->addAnything('</div><div class="config_blocks"></div>');
+		$sbform->addAnything(sbHowToPlugins('Comment utiliser le plugin MAGNIFIC POPUP', 'magnificpopup/howto.html', 'Five', 'MAGNIFIC POPUP'));
+		$sbform->addAnything('</div>');
 		$sbform->addAnything('</div>');
 		// --------------------------------
 		// --- Hiddens / Buttons

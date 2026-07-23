@@ -2323,7 +2323,11 @@ EOT;
 	// ajouter n'importe quoi
 	public function addAnything ($any) {
 	  $cpt = count ($this -> formElementArr);
-	  $this -> formBuffer['anything'][$cpt] = $any;
+	  if (isset ($this -> formBuffer['anything'][$cpt])) {
+		$this -> formBuffer['anything'][$cpt] .= $any;
+	  } else {
+		$this -> formBuffer['anything'][$cpt] = $any;
+	  }
 	}
 	
 	

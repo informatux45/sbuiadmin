@@ -81,6 +81,127 @@ main.content {
 	z-index: 9;
 }
 
+/* .config_blocks / .config_blocks_active / .config_blocks_desactived
+   (cmsconfig.php "Plugins" tab, users.php menu-rights grid): confirmed
+   in use during Phase 7's audit but never actually ported to this file,
+   so the toggle blocks had no width/float at all and stacked full-width
+   instead of forming a grid. Re-implemented with theme tokens instead of
+   the original hardcoded colors (lightgrey/red/greenyellow). */
+.config_blocks,
+.config_blocks_active,
+.config_blocks_desactived {
+	width: 200px;
+	height: 110px;
+	padding: 10px;
+	border-radius: 8px;
+	float: left;
+	text-align: center;
+	margin: 0 10px 10px 0;
+	overflow: hidden;
+}
+.config_blocks {
+	border: 1px solid var(--border);
+	background: var(--bg-muted);
+}
+.config_blocks_active {
+	border: 1px solid var(--success);
+	background: var(--success-soft);
+}
+.config_blocks_desactived {
+	border: 1px solid var(--danger);
+	background: var(--danger-soft);
+}
+/* cmsconfig.php "Plugins" tab only (.plugins-toggle-grid wrapper) - live
+   green-gradient feedback the instant "Activé" is (un)checked, same look
+   as .theme_block_active. Scoped to this wrapper specifically: users.php
+   reuses .config_blocks_active/.config_blocks_desactived with inverted
+   semantics (checked = restricted = red), so a global :checked rule would
+   miscolor that page.
+   .config_blocks_active is rendered once from the saved DB state - left
+   as-is it stayed green after unchecking a saved-active plugin (until the
+   next reload). The checked state alone must drive the colour here, so
+   the static class is neutralised back to the plain look first. */
+.plugins-toggle-grid .config_blocks_active {
+	border: 1px solid var(--border);
+	background: var(--bg-muted);
+}
+.plugins-toggle-grid .config_blocks:has(input:checked),
+.plugins-toggle-grid .config_blocks_active:has(input:checked) {
+	background: linear-gradient(180deg, var(--success-soft), var(--bg-card) 65%) !important;
+	border-color: var(--success) !important;
+	box-shadow: 0 0 0 1px var(--success);
+}
+/* users.php menu-rights grid (.rights-toggle-grid wrapper): same live
+   feedback as the Plugins tab, but inverted - here "checked" means the
+   menu entry is restricted/disabled for this user, so checked = red,
+   unchecked = green. Both static classes are neutralised first so the
+   live checkbox state is always the single source of truth. */
+.rights-toggle-grid .config_blocks_active,
+.rights-toggle-grid .config_blocks_desactived {
+	border: 1px solid var(--border);
+	background: var(--bg-muted);
+}
+.rights-toggle-grid .config_blocks_active:has(input:checked),
+.rights-toggle-grid .config_blocks_desactived:has(input:checked) {
+	background: linear-gradient(180deg, var(--danger-soft), var(--bg-card) 65%) !important;
+	border-color: var(--danger) !important;
+	box-shadow: 0 0 0 1px var(--danger);
+}
+.rights-toggle-grid .config_blocks_active:not(:has(input:checked)),
+.rights-toggle-grid .config_blocks_desactived:not(:has(input:checked)) {
+	background: linear-gradient(180deg, var(--success-soft), var(--bg-card) 65%) !important;
+	border-color: var(--success) !important;
+	box-shadow: 0 0 0 1px var(--success);
+}
+/* "Module : key" caption - moved out of .field-label via addAnything()
+   (same fix as the Plugins howto button: .field-label is display:flex,
+   so the <br> that used to separate it from the module name never
+   actually broke the line, it just got shoved to the side or overflowed). */
+.rights-toggle-grid .help-block {
+	display: block;
+	margin-top: 4px;
+	font-size: 11px;
+	color: var(--t-muted);
+	font-style: italic;
+}
+/* .field-label is itself display:flex (theme default) - text-align:center
+   on .config_blocks doesn't center a flex box's own content, it needs
+   justify-content on the label itself. */
+.config_blocks .field-label,
+.config_blocks_active .field-label,
+.config_blocks_desactived .field-label {
+	justify-content: center;
+}
+.config_blocks .check,
+.config_blocks_active .check,
+.config_blocks_desactived .check {
+	justify-content: center;
+}
+/* sbHowToPlugins() emits a Bootstrap-era "btn btn-primary btn-xs" button
+   (its modal is handled by our own vanilla modal.js, Bootstrap's CSS is
+   gone). It's now a sibling of .check (added via addAnything() right
+   after addCheckbox(), not inside the checkbox's own <label> anymore -
+   .check is display:flex, so every child incl. <br> became its own flex
+   item side by side and the <br><br> that used to sit inside it never
+   actually produced a line break, only accidental width-driven wrapping
+   on long labels ever made it look right). .field's column layout puts
+   this on its own line below the checkbox reliably regardless of text
+   length. */
+.config_blocks .btn.btn-primary.btn-xs,
+.config_blocks_active .btn.btn-primary.btn-xs,
+.config_blocks_desactived .btn.btn-primary.btn-xs {
+	background: var(--primary-soft);
+	color: var(--primary);
+	border-radius: 6px;
+	padding: 3px 10px;
+	font-size: 11px;
+	font-weight: 600;
+	white-space: normal;
+	max-width: 100%;
+	margin: 4px auto 0;
+	width: fit-content;
+}
+
 a {
 	color: var(--primary);
 }

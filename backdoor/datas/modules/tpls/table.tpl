@@ -10,7 +10,38 @@
 			{*       Write your own code after this line        *}
 			{* ------------------------------------------------ *}
 			
-			{include file='table_bar.tpl'}
+			<section class="hero">
+				<div class="hero-text">
+					<span class="eyebrow">Tableaux</span>
+					<h1 class="hero-title">Tableaux</h1>
+					<p class="hero-sub">Créez et gérez des tableaux de données personnalisés.</p>
+				</div>
+				<div class="hero-actions">
+					<div class="dd-wrap">
+						<button class="btn btn--outline-primary" data-dropdown>
+							Tableaux
+							<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+						</button>
+						<div class="dd-menu" role="menu" style="min-width:220px">
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=table">Tous les tableaux</a>
+							<div class="dd-divider"></div>
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=table&a=add">+1 tableau</a>
+						</div>
+					</div>
+
+					{if isset($smarty.get.a) && ($smarty.get.a == 'editfield' || $smarty.get.a == 'delfield' || $smarty.get.a == 'sortstructure' || $smarty.get.a == 'sortdatas')}
+					<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=table&a=editdatas&tid={$smarty.get.tid}'">
+						Ses données
+					</button>
+					{/if}
+
+					{if isset($smarty.get.a) && ($smarty.get.a == 'editdatas' || $smarty.get.a == 'deldatas' || $smarty.get.a == 'sortstructure' || $smarty.get.a == 'sortdatas')}
+					<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=table&a=editfield&tid={$smarty.get.tid}'">
+						Sa structure
+					</button>
+					{/if}
+				</div>
+			</section>
 
             <div class="grid">
 
@@ -29,7 +60,6 @@
 					<section class="col-12 card">
 						<div class="card-head">
 							<div class="card-title-wrap">
-								<span class="eyebrow">Tableaux</span>
 								<h2 class="card-title">Gestion de vos tableaux</h2>
 							</div>
 						</div>
@@ -96,7 +126,6 @@
 					<section class="{if isset($smarty.get.a) && ($smarty.get.a == 'sortstructure' || $smarty.get.a == 'sortdatas')}col-12{else}col-8{/if} card">
 						<div class="card-head">
 							<div class="card-title-wrap">
-								<span class="eyebrow">Tableaux</span>
 								<h2 class="card-title">{$legend_add_edit}</h2>
 							</div>
 						</div>
@@ -228,7 +257,6 @@
 					<section class="col-12 card">
 						<div class="card-head">
 							<div class="card-title-wrap">
-								<span class="eyebrow">Tableaux</span>
 								<h2 class="card-title">Gestion des colonnes du tableau &laquo; {$tabname} &raquo;</h2>
 							</div>
 							<button class="btn btn--primary" type="button" onclick="location.href='index.php?p=table&a=sortstructure&tid={$smarty.get.tid}'">
@@ -295,7 +323,6 @@
 					<section class="col-12 card">
 						<div class="card-head">
 							<div class="card-title-wrap">
-								<span class="eyebrow">Tableaux</span>
 								<h2 class="card-title">Gestion des données du tableau &laquo; {$tabname} &raquo;</h2>
 							</div>
 							<button class="btn btn--primary" type="button" onclick="location.href='index.php?p=table&a=sortdatas&tid={$smarty.get.tid}'">

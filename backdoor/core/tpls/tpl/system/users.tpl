@@ -13,8 +13,16 @@
 			<section class="hero">
 				<div class="hero-text">
 					<span class="eyebrow">Utilisateurs</span>
-					<h1 class="hero-title">{if isset($allips)}IPs bloquées{else}Tous les utilisateurs{/if}</h1>
+					{if isset($allipsettings)}
+					<h1 class="hero-title">Paramètres IP bloquées</h1>
+					<p class="hero-sub">Configurez le blocage automatique des IP en cas de tentatives de connexion trop rapprochées.</p>
+					{elseif isset($allips)}
+					<h1 class="hero-title">IPs bloquées</h1>
+					<p class="hero-sub">Consultez et débloquez les adresses IP bloquées automatiquement par l'anti-flood.</p>
+					{else}
+					<h1 class="hero-title">Tous les utilisateurs</h1>
 					<p class="hero-sub">Gérez les comptes administrateurs et les droits d'accès aux modules.</p>
+					{/if}
 				</div>
 				<div class="hero-actions">
 					<div class="dd-wrap">

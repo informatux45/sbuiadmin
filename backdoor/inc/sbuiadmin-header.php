@@ -97,6 +97,13 @@ $sbform     = new form();
 $sbpage     = new page();
 $sbmedias   = new medias();
 
+// bridge.css is edited frequently during development - .htaccess sends
+// max-age=3600 on .css, so a plain URL can serve a stale copy through any
+// intermediate proxy/CDN for up to an hour even after a browser cache
+// clear. Tie the URL to the file's own mtime so it only changes when the
+// file actually does.
+$sbsmarty->assign('bridge_css_version', @filemtime(SBUIADMIN_PATH . '/assets/adminator/bridge.css'));
+
 // ------------------
 // --- Check for upgrade (CORE)
 // ------------------

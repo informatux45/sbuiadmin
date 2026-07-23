@@ -40,7 +40,7 @@
 
     <!-- Adminator theme extension: grid gap-fills, third-party widget dark-mode skinning,
          and small custom classes ported from the removed sb-admin-2/sb-admin-custom stack -->
-    <link href="assets/adminator/bridge.css" rel="stylesheet">
+    <link href="assets/adminator/bridge.css?v={$bridge_css_version}" rel="stylesheet">
 
 	<!-- OutdatedBrowser -->
 	<link rel="stylesheet" href="inc/plugins/outdatedbrowser/outdatedbrowser.min.css">

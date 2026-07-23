@@ -10,7 +10,27 @@
 			{*       Write your own code after this line        *}
 			{* ------------------------------------------------ *}
 			
-			{include file='contact_bar.tpl'}
+			<section class="hero">
+				<div class="hero-text">
+					<span class="eyebrow">Contact</span>
+					<h1 class="hero-title">Contact</h1>
+					<p class="hero-sub">Gérez vos formulaires de contact et leurs champs.</p>
+				</div>
+				<div class="hero-actions">
+					<div class="dd-wrap">
+						<button class="btn btn--outline-primary" data-dropdown>
+							Formulaires
+							<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+						</button>
+						<div class="dd-menu" role="menu" style="min-width:220px">
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=contact">Tous les formulaires</a>
+							<div class="dd-divider"></div>
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=contact&a=add">+1 formulaire</a>
+						</div>
+					</div>
+					<a class="btn btn--outline-primary" href="{$smarty.const._AM_SITE_URL}index.php?p=contact&a=settings">Paramètres</a>
+				</div>
+			</section>
 
             <div class="grid">
 
@@ -18,7 +38,6 @@
                 <section class="col-12 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">Contact</span>
 							<h2 class="card-title">Gestion de vos formulaires de contact</h2>
 						</div>
                     </div>
@@ -78,7 +97,6 @@
                 <section class="col-8 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">Contact</span>
 							<h2 class="card-title">{$legend_add_edit}</h2>
 						</div>
                     </div>

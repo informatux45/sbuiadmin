@@ -10,7 +10,86 @@
 			{*       Write your own code after this line        *}
 			{* ------------------------------------------------ *}
 			
-			{include file='news_bar.tpl'}
+			<section class="hero">
+				<div class="hero-text">
+					<span class="eyebrow">Articles</span>
+					<h1 class="hero-title">Actualités</h1>
+					<p class="hero-sub">Gérez vos articles et actualités.</p>
+				</div>
+				<div class="hero-actions">
+					<div class="dd-wrap">
+						<button class="btn btn--outline-primary" data-dropdown>
+							Articles
+							<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+						</button>
+						<div class="dd-menu" role="menu" style="min-width:220px">
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=news">Tous les articles</a>
+							<div class="dd-divider"></div>
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=news&a=add">+1 article</a>
+						</div>
+					</div>
+					<div class="dd-wrap">
+						<button class="btn btn--outline-primary" data-dropdown>
+							Catégories
+							<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+						</button>
+						<div class="dd-menu" role="menu" style="min-width:220px">
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=news&a=category">Toutes les catégories</a>
+							<div class="dd-divider"></div>
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=news&a=categoryadd">+1 catégorie</a>
+						</div>
+					</div>
+					<a class="btn btn--outline-primary" href="{$smarty.const._AM_SITE_URL}index.php?p=news&a=settings">Paramètres</a>
+					<button class="btn btn--ghost" type="button" data-toggle="modal" data-target="#sbnews_shortcodes">
+						Shortcodes
+					</button>
+
+					{if isset($smarty.get.a) && $smarty.get.a == 'category'}
+						<button class="btn btn--primary" type="button" onclick="location.href='index.php?p=news&a=sort'">
+							Trier les catégories
+						</button>
+					{/if}
+
+					{if isset($smarty.get.a) && $smarty.get.a == 'tpl_single'}
+						<button class="btn btn--primary" type="button" onclick="location.href='index.php?p=news&a=tpl_list&id={$smarty.get.id}'">
+							Template LIST
+						</button>
+					{elseif isset($smarty.get.a) && $smarty.get.a == 'tpl_list'}
+						<button class="btn btn--primary" type="button" onclick="location.href='index.php?p=news&a=tpl_single&id={$smarty.get.id}'">
+							Template SINGLE
+						</button>
+					{/if}
+				</div>
+			</section>
+
+			{if !isset($smarty.get.a)}
+			<div class="card" style="margin-bottom:20px">
+				<div class="card-head">
+					<div class="card-title-wrap">
+						<span class="eyebrow">Aperçu</span>
+						<h2 class="card-title">Infos News</h2>
+					</div>
+				</div>
+				<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px">
+					<div class="stat-cell">
+						<div class="stat-cell-label">Articles totaux</div>
+						<div class="stat-cell-value">{$total_news}</div>
+					</div>
+					<div class="stat-cell">
+						<div class="stat-cell-label">Articles actifs</div>
+						<div class="stat-cell-value">{$total_news_active}</div>
+					</div>
+					<div class="stat-cell">
+						<div class="stat-cell-label">Catégories totales</div>
+						<div class="stat-cell-value">{$total_categories}</div>
+					</div>
+					<div class="stat-cell">
+						<div class="stat-cell-label">Catégories actives</div>
+						<div class="stat-cell-value">{$total_categories_active}</div>
+					</div>
+				</div>
+			</div>
+			{/if}
 
             <div class="grid">
 
@@ -18,7 +97,6 @@
                 <section class="col-12 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">Articles</span>
 							<h2 class="card-title">Gestion de vos articles</h2>
 						</div>
                     </div>
@@ -81,7 +159,6 @@
                 <section class="col-12 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">Articles</span>
 							<h2 class="card-title">Gestion de vos catégories</h2>
 						</div>
                     </div>
@@ -152,7 +229,6 @@
 					<section class="col-8 card">
 						<div class="card-head">
 							<div class="card-title-wrap">
-								<span class="eyebrow">Articles</span>
 								<h2 class="card-title">{$legend_add_edit}</h2>
 							</div>
 						</div>

@@ -9,9 +9,61 @@
 		{* ------------------------------------------------ *}
 		{*       Write your own code after this line        *}
 		{* ------------------------------------------------ *}
-		
-		{include file='system/cmsconfig_bar.tpl'}
-				
+
+		<section class="hero">
+			<div class="hero-text">
+				<span class="eyebrow">Configuration CMS</span>
+				<h1 class="hero-title">
+					{if $action_edit == 'css'}CSS
+					{elseif $action_edit == 'javascript'}Javascript
+					{elseif $action_edit == 'comingsoon'}Coming Soon
+					{elseif $action_edit == 'multilang'}Multilangue
+					{elseif $action_edit == 'plugins'}Plugins
+					{elseif $action_edit == 'fonts'}Polices
+					{elseif $action_edit == 'seo'}SEO
+					{else}Header / Footer
+					{/if}
+				</h1>
+				<p class="hero-sub">
+					{if $action_edit == 'css'}Ajoutez du CSS personnalisé injecté dans le header du site.
+					{elseif $action_edit == 'javascript'}Ajoutez du code Javascript personnalisé injecté dans le site.
+					{elseif $action_edit == 'comingsoon'}Configurez la page affichée en mode maintenance.
+					{elseif $action_edit == 'multilang'}Gérez les langues disponibles sur le site.
+					{elseif $action_edit == 'plugins'}Activez les plugins JS/CSS tiers du site.
+					{elseif $action_edit == 'fonts'}Choisissez et générez le code d'intégration des Google Fonts.
+					{elseif $action_edit == 'seo'}Outils de référencement et génération du sitemap.
+					{else}Personnalisez le header et le footer du site.
+					{/if}
+				</p>
+			</div>
+			<div class="hero-actions">
+				<div class="dd-wrap">
+					<button class="btn btn--outline-primary" data-dropdown aria-label="Sections CMS config">
+						{if $action_edit == 'css'}CSS
+						{elseif $action_edit == 'javascript'}Javascript
+						{elseif $action_edit == 'comingsoon'}Coming Soon
+						{elseif $action_edit == 'multilang'}Multilangue
+						{elseif $action_edit == 'plugins'}Plugins
+						{elseif $action_edit == 'fonts'}Polices
+						{elseif $action_edit == 'seo'}SEO
+						{else}Header / Footer
+						{/if}
+						<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+					</button>
+					<div class="dd-menu" role="menu">
+						<a class="dd-menu-item" href="index.php?p=cmsconfig"{if $action_edit == 'headerfooter'} style="color:var(--primary);font-weight:600"{/if}>Header / Footer</a>
+						<a class="dd-menu-item" href="index.php?p=cmsconfig&op=css"{if $action_edit == 'css'} style="color:var(--primary);font-weight:600"{/if}>CSS</a>
+						<a class="dd-menu-item" href="index.php?p=cmsconfig&op=javascript"{if $action_edit == 'javascript'} style="color:var(--primary);font-weight:600"{/if}>Javascript</a>
+						<a class="dd-menu-item" href="index.php?p=cmsconfig&op=comingsoon"{if $action_edit == 'comingsoon'} style="color:var(--primary);font-weight:600"{/if}>Coming Soon</a>
+						<a class="dd-menu-item" href="index.php?p=cmsconfig&op=multilang"{if $action_edit == 'multilang'} style="color:var(--primary);font-weight:600"{/if}>Multilangue</a>
+						<a class="dd-menu-item" href="index.php?p=cmsconfig&op=plugins"{if $action_edit == 'plugins'} style="color:var(--primary);font-weight:600"{/if}>Plugins</a>
+						<a class="dd-menu-item" href="index.php?p=cmsconfig&op=fonts"{if $action_edit == 'fonts'} style="color:var(--primary);font-weight:600"{/if}>Polices</a>
+						<a class="dd-menu-item" href="index.php?p=cmsconfig&op=seo"{if $action_edit == 'seo'} style="color:var(--primary);font-weight:600"{/if}>SEO</a>
+					</div>
+				</div>
+			</div>
+		</section>
+
         {if $action_edit != 'fonts' && $action_edit != 'seo'}
 
 			<div class="grid">
@@ -19,7 +71,6 @@
 		        <section class="col-8 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">Configuration CMS</span>
 							<h2 class="card-title">{$legend_add_edit}</h2>
 						</div>
                     </div>
@@ -92,7 +143,6 @@
 		        <section class="col-6 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">Fonts</span>
 							<h2 class="card-title">Google Font Selector</h2>
 						</div>
                     </div>
@@ -160,7 +210,6 @@ It was popularised in the 1960s with the release of Letraset sheets containing L
 		        <section class="col-6 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">Fonts</span>
 							<h2 class="card-title">Modifier le code des fonts (polices)</h2>
 						</div>
                     </div>
@@ -225,20 +274,20 @@ It was popularised in the 1960s with the release of Letraset sheets containing L
 			<section class="col-12 card">
 				<div class="card-head">
 					<div class="card-title-wrap">
-						<span class="eyebrow">SEO</span>
 						<h2 class="card-title">Liens</h2>
 					</div>
 				</div>
-						<button type="button" class="btn btn--primary" onclick="window.open('https://www.google.com/webmasters/tools/home?hl=fr')">Webmaster TOOLS</button>
-						<button type="button" class="btn btn--primary" onclick="window.open('https://www.google.com/webmasters/tools/submit-url')">Google ADDURL</button>
-						<button type="button" class="btn btn--primary" onclick="window.open('https://developers.google.com/speed/libraries/')">Google Hosted Libraries</button>
-						<button type="button" class="btn btn--primary" onclick="window.open('https://search.google.com/search-console?hl=fr')">Console Developers</button>
+						<div style="display:flex;flex-wrap:wrap;gap:10px">
+							<button type="button" class="btn btn--primary" onclick="window.open('https://www.google.com/webmasters/tools/home?hl=fr')">Webmaster TOOLS</button>
+							<button type="button" class="btn btn--primary" onclick="window.open('https://www.google.com/webmasters/tools/submit-url')">Google ADDURL</button>
+							<button type="button" class="btn btn--primary" onclick="window.open('https://developers.google.com/speed/libraries/')">Google Hosted Libraries</button>
+							<button type="button" class="btn btn--primary" onclick="window.open('https://search.google.com/search-console?hl=fr')">Console Developers</button>
+						</div>
 			</section>
 
 			<section class="col-6 card">
 				<div class="card-head">
 					<div class="card-title-wrap">
-						<span class="eyebrow">SEO</span>
 						<h2 class="card-title">{$legend_add_edit}</h2>
 					</div>
 				</div>
@@ -249,7 +298,6 @@ It was popularised in the 1960s with the release of Letraset sheets containing L
 			<section class="col-6 card">
 				<div class="card-head">
 					<div class="card-title-wrap">
-						<span class="eyebrow">SEO</span>
 						<h2 class="card-title">Sitemap</h2>
 					</div>
 				</div>

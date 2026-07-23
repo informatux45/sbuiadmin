@@ -10,7 +10,51 @@
 			{*       Write your own code after this line        *}
 			{* ------------------------------------------------ *}
 			
-			{include file='slider_bar.tpl'}
+			<section class="hero">
+				<div class="hero-text">
+					<span class="eyebrow">Slider</span>
+					<h1 class="hero-title">Slider</h1>
+					<p class="hero-sub">Gérez vos sliders et leurs photos ou vidéos.</p>
+				</div>
+				<div class="hero-actions">
+					<div class="dd-wrap">
+						<button class="btn btn--outline-primary" data-dropdown>
+							Sliders
+							<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+						</button>
+						<div class="dd-menu" role="menu" style="min-width:220px">
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=slider">Tous les sliders</a>
+							<div class="dd-divider"></div>
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=slider&a=add">+1 slider</a>
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=slider&a=photoadd">+1 photo / vidéo</a>
+						</div>
+					</div>
+
+					{if isset($smarty.get.a) && $smarty.get.a == 'photo'}
+						<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=slider&a=sort&sid={$sid}'">
+							Trier les photos
+						</button>
+						<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=slider&a=edit&id={$sid}'">
+							Retour aux paramètres du slider
+						</button>
+					{/if}
+
+					{if isset($smarty.get.a) && $smarty.get.a == 'edit'}
+						<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=slider&a=photo&sid={$smarty.get.id}'">
+							Toutes les photos
+						</button>
+					{/if}
+
+					{if isset($smarty.get.a) && ($smarty.get.a == 'sort' || $smarty.get.a == 'photoedit')}
+						<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=slider&a=photo&sid={$sid}'">
+							Retour aux photos
+						</button>
+						<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=slider&a=edit&id={$sid}'">
+							Retour aux paramètres du slider
+						</button>
+					{/if}
+				</div>
+			</section>
 
             <div class="grid">
 
@@ -24,7 +68,6 @@
                 <section class="col-12 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">Slider</span>
 							<h2 class="card-title">Gestion de vos slider</h2>
 						</div>
                     </div>
@@ -93,7 +136,6 @@
                 <section class="col-12 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">Slider</span>
 							<h2 class="card-title">{if $allphoto}Gestion de vos slider{else}{$legend_add_edit}{/if}</h2>
 						</div>
                     </div>
@@ -152,7 +194,6 @@
 					<section class="col-8 card">
 						<div class="card-head">
 							<div class="card-title-wrap">
-								<span class="eyebrow">Slider</span>
 								<h2 class="card-title">{$legend_add_edit}</h2>
 							</div>
 						</div>

@@ -10,14 +10,44 @@
 			{*       Write your own code after this line        *}
 			{* ------------------------------------------------ *}
 			
-			{include file='datas/modules/tpls/pages_bar.tpl'}
+			<section class="hero">
+				<div class="hero-text">
+					<span class="eyebrow">Pages</span>
+					<h1 class="hero-title">Blocs</h1>
+					<p class="hero-sub">Gérez les blocs de contenu réutilisables de votre site.</p>
+				</div>
+				<div class="hero-actions">
+					<div class="dd-wrap">
+						<button class="btn btn--outline-primary" data-dropdown>
+							Pages
+							<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+						</button>
+						<div class="dd-menu" role="menu" style="min-width:220px">
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=pages">Toutes les pages</a>
+							<div class="dd-divider"></div>
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=pages&a=add">+1 page</a>
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=pages&a=addcustom">+1 page (Custom)</a>
+						</div>
+					</div>
+					<div class="dd-wrap">
+						<button class="btn btn--outline-primary" data-dropdown>
+							Blocs
+							<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+						</button>
+						<div class="dd-menu" role="menu" style="min-width:220px">
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=blocs">Tous les blocs</a>
+							<div class="dd-divider"></div>
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=blocs&a=add">+1 bloc</a>
+						</div>
+					</div>
+				</div>
+			</section>
 
             <div class="grid">
 				{if $all}
                 <section class="col-6 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">Blocs</span>
 							<h2 class="card-title">Trier vos blocs par page</h2>
 						</div>
                     </div>
@@ -33,7 +63,6 @@
                 <section class="col-6 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">Blocs</span>
 							<h2 class="card-title">Trier vos blocs par module</h2>
 						</div>
                     </div>
@@ -49,7 +78,6 @@
                 <section class="col-12 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">Blocs</span>
 							<h2 class="card-title">{if $all}Gestion de vos blocs{else}{$legend_add_edit}{/if}</h2>
 						</div>
                     </div>
@@ -108,7 +136,6 @@
                 <section class="col-8 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">Blocs</span>
 							<h2 class="card-title">{if $all}Gestion de vos blocs{else}{$legend_add_edit}{/if}</h2>
 						</div>
                     </div>
@@ -125,7 +152,6 @@
                     <div class="card">
 						<div class="card-head">
 							<div class="card-title-wrap">
-								<span class="eyebrow">Blocs</span>
 								<h2 class="card-title">Exemple de grille (layout)</h2>
 							</div>
 						</div>
