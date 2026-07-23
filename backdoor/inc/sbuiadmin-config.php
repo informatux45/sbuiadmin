@@ -110,6 +110,8 @@ defined('_AM_MEDIAS_SIZE_LIMIT') OR define('_AM_MEDIAS_SIZE_LIMIT', trim($sb_set
 // Usage :
 // ==> 1024
 defined('_AM_MEDIAS_SCALING_SIXE_MAX') OR define('_AM_MEDIAS_SCALING_SIXE_MAX', trim($sb_settings_config[18]));
+// --- Define number of media items shown per page (Medias listing pagination)
+defined('_AM_MEDIAS_PER_PAGE') OR define('_AM_MEDIAS_PER_PAGE', trim($sb_settings_config[31]));
 // ------------------------------------------
 
 // ------------------------------------------

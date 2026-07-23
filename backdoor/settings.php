@@ -70,6 +70,7 @@ $sb_msg_valid = false;
  * 28 - Rewrite Url
  * 29 - Smarty Caching
  * 30 - Smarty Caching Lifetime
+ * 31 - Médias par page (module Médias)
  * ---------------------------- */
 $sb_settings_file = _AM_SETTINGS_FILE;
 
@@ -125,7 +126,8 @@ switch($action) {
 			$sb_output_file .= ($_POST['rewrite_url'] === "on") ? "1"."\n" : "0"."\n";
 			$sb_output_file .= ($_POST['smarty_caching'] === "on") ? "1"."\n" : "0"."\n";
 			$sb_output_file .= $sbsanitize->displayText($_POST['smarty_caching_time'], 'UTF-8', 1, 0) . "\n";
-			
+			$sb_output_file .= $sbsanitize->displayText($_POST['medias_per_page'], 'UTF-8', 1, 0) . "\n";
+
 			// Locker le fichier pour qu'une seule personne a la fois ecrive dedans
 			$result_edit = file_put_contents($sb_settings_file, $sb_output_file, FILE_USE_INCLUDE_PATH | LOCK_EX);
 											 
@@ -135,6 +137,12 @@ switch($action) {
 					// -------------------------------------------
 					// --- Message SUCCES
 					$sb_msg_valid = 'Configuration modifiée avec succès';
+					// --- Répercute la taille max. d'upload sur les limites PHP serveur
+					// (.htaccess pour mod_php, .user.ini pour PHP-FPM/CGI)
+					$sb_upload_max_bytes = sbToByteSize($sbsanitize->displayText($_POST['upload_max'], 'UTF-8', 1, 0));
+					if ($sb_upload_max_bytes) {
+						sbSyncUploadLimits($sb_upload_max_bytes);
+					}
 				} else {
 					// --- Message ERROR
 					$sb_msg_error = 'Error: Write Error (EDIT)!';
@@ -176,7 +184,8 @@ switch($action) {
 		$sb_config_rewrite_url         = $sb_settings[28];
 		$sb_config_smarty_caching      = $sb_settings[29];
 		$sb_config_smarty_caching_time = $sb_settings[30];
-		
+		$sb_config_medias_per_page     = $sb_settings[31];
+
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) $sbsmarty->assign('file_content', $sb_settings);						
 		// --------------------------------		
@@ -200,6 +209,7 @@ switch($action) {
 		$sbform->addInput('text', 'Extensions autorisées', array ('name' => 'upload_exts', 'value' => "$sb_config_upload_exts", 'placeholder' => "Extensions autorisées"), true, false, "Extensions autorisées à l'upload dans votre administration séparés par des virgules sans espace");
 		$sbform->addInput('text', "Nombre d'uploads simultanés", array ('name' => 'upload_limit', 'value' => "$sb_config_upload_limit", 'placeholder' => "Nombre d'uploads simultanés"), true, false);
 		$sbform->addInput('text', "Taille maximum autorisée", array ('name' => 'scaling_maxsize', 'value' => "$sb_config_scaling_maxsize", 'placeholder' => "Taille maximum autorisée en pixels"), true, false, "Taille en pixels maximum autorisée pour vos médias (largeur et hauteur)<br>Ex : <b>1024</b> (CORRECT) --- Ex : <b>1024px</b> (INCORRECT)");
+		$sbform->addInput('text', 'Médias par page', array ('name' => 'medias_per_page', 'value' => "$sb_config_medias_per_page", 'placeholder' => "Nombre de médias par page"), true, false, "Nombre d'images affichées par page dans le module Médias");
 		$sbform->addInput('text', 'Modules', array ('name' => 'modules', 'value' => "$sb_config_modules", 'placeholder' => "Nom de vos modules"), false, false, "Nom de vos modules autorisés dans votre administration séparés par des virgules sans espace");
 		$sbform->addInput('text', "Google Recaptcha (Clé publique)", array ('name' => 'recaptcha_public', 'value' => "$sb_config_recaptcha_public", 'placeholder' => "Clé publique"), false, false, "Clé du site dans le code HTML que vous proposez à vos utilisateurs");
 		$sbform->addInput('text', 'Google Recaptcha (Clé secrète)', array ('name' => 'recaptcha_secret', 'value' => "$sb_config_recaptcha_secret", 'placeholder' => "Clé secrète"), false, false, "Clé pour toute communication entre votre site et Google. Veillez à ne pas la divulguer, car il s'agit d'une clé secrète.");
@@ -338,6 +348,7 @@ $sbsmarty->assign('sb_config_smarty_force_tpls', trim($sb_config_smarty_force_tp
 $sbsmarty->assign('sb_config_rewrite_url', trim($sb_config_rewrite_url));
 $sbsmarty->assign('sb_config_smarty_caching', trim($sb_config_smarty_caching));
 $sbsmarty->assign('sb_config_smarty_caching_time', trim($sb_config_smarty_caching_time));
+$sbsmarty->assign('sb_config_medias_per_page', trim($sb_config_medias_per_page));
 
 // ----------------------
 // ASSIGN Page TITLE

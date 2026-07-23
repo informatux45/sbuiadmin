@@ -273,45 +273,55 @@ class pagination {
         }
 		
 		$html = '<style>
+			.pagination-wrap {
+				text-align: center;
+			}
+			.pagination-info {
+				color: var(--t-muted);
+				font-size: 11px;
+			}
 			.pagination {
 				list-style-type: none;
 				padding: 10px 0;
 				display: inline-flex;
-				justify-content: space-between;
+				flex-wrap: wrap;
+				justify-content: center;
 				box-sizing: border-box;
 			}
 			.pagination li {
 				box-sizing: border-box;
 				padding-right: 10px;
 			}
-			.pagination li a {
+			.pagination li a, .pagination li span {
 				box-sizing: border-box;
-				background-color: #e2e6e6;
-				padding: 8px;
+				background-color: var(--bg-muted);
+				padding: 8px 12px;
 				text-decoration: none;
 				font-size: 12px;
 				font-weight: bold;
-				color: #616872;
+				color: var(--t-muted);
 				border-radius: 4px;
+				display: inline-block;
 			}
 			.pagination li a:hover {
-				background-color: #d4dada;
+				background-color: var(--bg-hover);
 			}
 			.pagination .next a, .pagination .prev a {
 				text-transform: uppercase;
 				font-size: 12px;
 			}
-			.pagination .currentpage a {
-				background-color: #518acb;
-				color: #fff;
+			.pagination .active a {
+				background-color: var(--primary);
+				color: var(--t-inverse);
 			}
-			.pagination .currentpage a:hover {
-				background-color: #518acb;
+			.pagination .active a:hover {
+				background-color: var(--primary);
 			}
 			</style>';
 
-		$html .= $this->getPageInfos() . '<br>';
-			
+		$html .= '<div class="pagination-wrap">';
+		$html .= '<div class="pagination-info">' . $this->getPageInfos() . '</div>';
+
         $html .= '<ul class="pagination">';
         if ($this->getPrevUrl()) {
             $html .= '<li><a href="' . htmlspecialchars($this->getPrevUrl()) . '">&laquo; '. $this->previousText .'</a></li>';
@@ -329,6 +339,7 @@ class pagination {
             $html .= '<li><a href="' . htmlspecialchars($this->getNextUrl()) . '">'. $this->nextText .' &raquo;</a></li>';
         }
         $html .= '</ul>';
+        $html .= '</div>';
 
         return $html;
     }

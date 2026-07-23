@@ -101,13 +101,15 @@
                 sizeLimit: {$smarty.const._AM_MEDIAS_SIZE_LIMIT|@sbToByteSize}, // Bytes
             },
 			callbacks: {
-				onComplete: function(id, name, response) {
-					if (response.success) {
-						//window.location.href="{$module_url}";
-					}
-				},
 				onError: function(id, name, errorReason, xhrOrXdr) {
 					alert(qq.format("Erreur sur le fichier n.{} - {}.  Raison: {}", id, name, errorReason));
+				},
+				onAllComplete: function(succeeded, failed) {
+					// Reload once the whole batch is done (not per file) so newly
+					// uploaded medias show up immediately in the list below.
+					if (succeeded.length > 0) {
+						window.location.href = "{$module_url}";
+					}
 				}
 			}
         })

@@ -211,6 +211,62 @@ a {
 	text-decoration: none;
 }
 
+/* system/medias.tpl, system/transfert.tpl: media thumbnail box (float layout,
+   wrapped in a block-formatting-context <div style="overflow:hidden">) — this
+   base rule was dropped by mistake in Phase 7 (only .sbmedia-delete/
+   .sbmedia_ext_allowed were ported), regressing the thumbnails to stacked
+   full-width blocks instead of a grid. */
+p.sbmedia {
+	border: 1px dashed #767677;
+	display: block;
+	float: left;
+	height: 160px;
+	margin: 5px;
+	position: relative;
+	text-align: center;
+	text-decoration: none;
+	width: 140px;
+}
+p.sbmedia:hover {
+	background-color: var(--bg-hover);
+	cursor: pointer;
+}
+p.sbmedia img {
+	display: block;
+	height: 84px;
+	margin: 0 auto;
+	max-width: 124px;
+	padding: 10px 5px;
+}
+p.sbmedia > span {
+	bottom: 0;
+	color: var(--t-muted);
+	display: block;
+	font-size: 0.77em;
+	font-weight: bold;
+	line-height: 1em;
+	padding: 0 2px;
+	position: relative;
+	text-align: center;
+	text-decoration: none;
+}
+p.sbmedia > span.sbmedia-realname {
+	font-weight: normal;
+	line-height: 1.65em;
+}
+p.sbmedia > span.sbmedia-weight, p.sbmedia > span.sbmedia-mime, p.sbmedia > span.sbmedia-info {
+	font-size: 0.77em;
+	font-weight: normal;
+	line-height: 1.2em;
+}
+p.sbmedia > span.sbmedia-other {
+	color: var(--info);
+	display: inline-block;
+	font-size: 64px;
+	height: 73px;
+	margin-top: 11px;
+}
+
 /* system/medias.tpl: delete overlay button on each thumbnail. */
 .sbmedia_ext_allowed {
 	font-weight: bold;
@@ -224,9 +280,11 @@ a {
 	display: flex;
 	height: 22px !important;
 	justify-content: center;
-	margin: -160px 0 0 53px;
 	position: absolute;
+	right: -8px;
+	top: -8px;
 	width: 22px !important;
+	z-index: 1;
 }
 .sbmedia-delete:hover {
 	background: var(--danger);
@@ -299,6 +357,14 @@ a {
 [data-tip]:focus-visible::after, [data-tip]:focus-visible::before {
 	opacity: 1;
 	visibility: visible;
+}
+
+/* navigation.tpl: "Mises à jour"/"Informations" dropdown items have no leading
+   avatar/icon element (unlike the theme's own demo dropdowns), so the single
+   .dd-body child lands in .dd-item's first 36px grid column instead of the
+   1fr one — squeezing the text and wrapping it almost word by word. */
+.dd-item > .dd-body:only-child {
+	grid-column: 1 / -1;
 }
 
 /* #themeToggle: tooltip names the theme you'll switch TO, not the current one. */

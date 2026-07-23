@@ -16,7 +16,6 @@
                 <section class="col-6 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">Médias</span>
 							<h2 class="card-title">Upload medias</h2>
 						</div>
                     </div>
@@ -109,7 +108,6 @@
                 <section class="col-6 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">Médias</span>
 							<h2 class="card-title">Informations</h2>
 						</div>
                     </div>
@@ -117,7 +115,9 @@
 								<li>Upload des fichiers : {if $media_ini_get_file_uploads}<span class="green">ON</span>{else}<span class="red">OFF</span>{/if}</li>
 								<li>Taille post maximum autorisée (post_max_size) : {$media_ini_get_post_max_size}</li>
 								<li>Taille upload maximum autorisée (upload_max_filesize) : {$media_ini_get_upload_max_filesize}</li>
-								<li>Taille maximum autorisée à l'upload (<a href="{$smarty.const._AM_SITE_URL}index.php?p=settings">Configuration)</a> : <span class="red">{$smarty.const._AM_MEDIAS_SIZE_LIMIT}</span></li>
+								<li>Taille maximum autorisée à l'upload (<a href="{$smarty.const._AM_SITE_URL}index.php?p=settings">Configuration)</a> : <span class="red">{$smarty.const._AM_MEDIAS_SIZE_LIMIT}</span>
+									<br><small style="color:var(--warning)">Si des fichiers volumineux (ou autres) ne passent pas à l'upload, vérifiez directement la configuration serveur (upload_max_filesize / post_max_size ci-dessus).</small>
+								</li>
 								<li>Types de fichier autorisés : {foreach $sbfiles_medias_exts_allowed as $ext_allowed}<span class="sbmedia_ext_allowed">{$ext_allowed}</span> {foreachelse}Aucune{/foreach}</li>
 								<li>Répertoire de depôt : {foreach $sbfiles_medias_dirs_allowed as $dir_allowed}<span class="sbmedia_ext_allowed">{$dir_allowed}</span> {foreachelse}Aucun{/foreach}</li>
 								<li>Nombre de fichiers uploadables simultanément : {$smarty.const._AM_MEDIAS_ITEM_LIMIT}</li>
@@ -129,16 +129,15 @@
 
 
 			{* Notes full width *}
-			<div class="grid">
+			<div class="grid" style="margin-top:20px">
                 <section class="col-12 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
 							<span class="eyebrow">Médias</span>
-							<h2 class="card-title">Medias</h2>
 						</div>
                     </div>
 							{* HTML Text Formatted *}
-							<div style="overflow:hidden">
+							<div style="overflow:hidden;padding-top:10px">
 							{foreach $medias_all as $sbmedia}
 								{if $sbtranfer_media == true}
 									<p class="sbmedia" target="_parent" onclick='transfert("{$sbmedia}","{$sbid}")'>
@@ -178,7 +177,7 @@
 								<span class="sbmedia-mime">{$sbmedia|@sbDisplayMediaMime}</span>
 								
 								{* Display Delete Button *}
-								<a class="sbmedia-delete" data-confirm="Sûr de vouloir supprimer ceci ?" type="button" href="{$module_short_url}&del={$sbmedia}">
+								<a class="sbmedia-delete" data-confirm="Sûr de vouloir supprimer ceci ?" type="button" href="{$module_short_url}&del={$sbmedia}{if isset($smarty.get.page)}&page={$smarty.get.page}{/if}">
 									<i class="fa fa-times"></i>
 								</a>
 								
@@ -187,6 +186,9 @@
 
 							{/foreach}
 							</div>
+							{if $sbpagination}
+							<div style="margin-top:10px">{$sbpagination}</div>
+							{/if}
                 </section>
             </div>
             <!-- /.grid -->

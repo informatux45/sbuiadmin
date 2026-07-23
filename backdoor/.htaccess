@@ -6,3 +6,19 @@ deny from all
 
 # Prevent directory listings
 Options All -Indexes
+
+# Raise PHP upload limits to match the app's own configured max upload size
+# (Paramètres généraux > Taille max. autorisée pour l'upload des médias).
+# Requires mod_php - ignored under PHP-FPM (adjust the pool/php.ini instead).
+<IfModule mod_php.c>
+php_value upload_max_filesize 100M
+php_value post_max_size 105M
+</IfModule>
+<IfModule mod_php7.c>
+php_value upload_max_filesize 100M
+php_value post_max_size 105M
+</IfModule>
+<IfModule php_module>
+php_value upload_max_filesize 100M
+php_value post_max_size 105M
+</IfModule>

@@ -282,12 +282,51 @@ function sbToByteSize($p_sFormatted) {
     return $iUnits * pow(1024, $aUnits[$sUnit]);
 }
 
+/**
+ * Keep the server's PHP upload limits in sync with the "Taille max. autorisée
+ * pour l'upload" CMS setting, so large uploads don't need a manual server
+ * config step. Updates backdoor/.htaccess (mod_php) and backdoor/.user.ini
+ * (PHP-FPM/CGI) in place - whichever one the server actually honors takes
+ * effect, the other is a harmless no-op. post_max_size is kept a bit above
+ * upload_max_filesize to leave room for the rest of the multipart form.
+ *
+ * @param int $bytes Max upload size in bytes (ex: from sbToByteSize()).
+ */
+function sbSyncUploadLimits($bytes) {
+    if (!$bytes || $bytes <= 0) return;
+
+    $uploadMb = max(1, (int)ceil($bytes / (1024 * 1024)));
+    $postMb   = $uploadMb + 5;
+
+    $targets = array(
+        SBUIADMIN_PATH . '/.htaccess' => array(
+            '/^php_value upload_max_filesize .*$/m' => 'php_value upload_max_filesize ' . $uploadMb . 'M',
+            '/^php_value post_max_size .*$/m'       => 'php_value post_max_size ' . $postMb . 'M',
+        ),
+        SBUIADMIN_PATH . '/.user.ini' => array(
+            '/^upload_max_filesize\s*=.*$/m' => 'upload_max_filesize = ' . $uploadMb . 'M',
+            '/^post_max_size\s*=.*$/m'       => 'post_max_size = ' . $postMb . 'M',
+        ),
+    );
+
+    foreach ($targets as $path => $patterns) {
+        if (!is_file($path) || !is_writable($path)) continue;
+        $content = file_get_contents($path);
+        if ($content === false) continue;
+        $content = preg_replace(array_keys($patterns), array_values($patterns), $content);
+        file_put_contents($path, $content, LOCK_EX);
+    }
+}
+
 function sbGetInfoImg($image_path, $info = 'width') {
    // Get infos image
-   $file_image = array_values(getimagesize($image_path));
+   $file_image = getimagesize($image_path);
+   if ($file_image === false)
+	  return 0; // Not an image (getimagesize failed, ex: PDF/video/other)
+   $file_image = array_values($file_image);
    //use list on new array
    list($width, $height, $type, $attr) = $file_image;
-   
+
    switch($info) {
 	  default:       return $width;  break;
 	  case "height": return $height; break;
@@ -298,11 +337,12 @@ function sbGetInfoImg($image_path, $info = 'width') {
 
 function sbGetIfIsImg($image_path) {
    // Get if infos image
-   $file = array_values(getimagesize($image_path));
-   //use list on new array
-   list($width, $height, $type, $attr) = $file;
-   
-   if ($width > 0)
+   $file = getimagesize($image_path);
+
+   if ($file === false)
+	  return false; // Not an image (getimagesize failed, ex: PDF/video/other)
+
+   if ($file[0] > 0)
 	  return true; // Is an image
    else
 	  return false; // Is not an image

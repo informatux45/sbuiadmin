@@ -84,7 +84,24 @@ foreach($sbfiles_new as $key => $val) {
 	$sbfiles[] = str_replace("\\", "/", $val['file']);
 }
 
-$sbsmarty->assign('medias_all', $sbfiles);
+// -----------------------
+// Pagination
+// -----------------------
+$sb_medias_per_page = (int)_AM_MEDIAS_PER_PAGE > 0 ? (int)_AM_MEDIAS_PER_PAGE : 24;
+$sb_medias_page      = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+$sbpagination        = new pagination(count($sbfiles), $sb_medias_per_page, $sb_medias_page, $module_short_url . '&page=(:num)');
+
+// Clamp to the last valid page if the requested page is now out of range
+// (e.g. the "médias par page" setting just changed and reduced the page count)
+if ($sbpagination->getNumPages() > 0 && $sb_medias_page > $sbpagination->getNumPages()) {
+	$sb_medias_page = $sbpagination->getNumPages();
+	$sbpagination->setCurrentPage($sb_medias_page);
+}
+
+$sbfiles_page        = array_slice($sbfiles, ($sb_medias_page - 1) * $sb_medias_per_page, $sb_medias_per_page);
+
+$sbsmarty->assign('medias_all', $sbfiles_page);
+$sbsmarty->assign('sbpagination', $sbpagination);
 
 // --- ASSIGN sbfile medias infos
 $sbsmarty->assign('sbfiles_medias_exts_allowed', $sbfiles_medias_exts_allowed);
