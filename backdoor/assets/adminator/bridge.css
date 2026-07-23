@@ -258,6 +258,53 @@ a {
 .tabbs-collapse { display: none; }
 .tabbs-collapse.is-open { display: block; }
 
+/* Topbar icon tooltips (navigation.tpl), same visual language as the theme's own
+   .popover-demo/.pop demo component (ui.html) but with real show/hide behavior,
+   and anchored below the trigger instead of above. */
+[data-tip] { position: relative; }
+[data-tip]::after {
+	background: var(--t-base);
+	border-radius: 6px;
+	box-shadow: var(--shadow-lg);
+	color: var(--bg-card);
+	content: attr(data-tip);
+	font-size: 11.5px;
+	font-weight: 500;
+	left: 50%;
+	opacity: 0;
+	padding: 6px 10px;
+	pointer-events: none;
+	position: absolute;
+	top: calc(100% + 10px);
+	transform: translateX(-50%);
+	transition: opacity .15s ease;
+	visibility: hidden;
+	white-space: nowrap;
+	z-index: 20;
+}
+[data-tip]::before {
+	border: 5px solid transparent;
+	border-bottom: 5px solid var(--t-base);
+	content: "";
+	left: 50%;
+	opacity: 0;
+	position: absolute;
+	top: 100%;
+	transform: translateX(-50%);
+	transition: opacity .15s ease;
+	visibility: hidden;
+	z-index: 20;
+}
+[data-tip]:hover::after, [data-tip]:hover::before,
+[data-tip]:focus-visible::after, [data-tip]:focus-visible::before {
+	opacity: 1;
+	visibility: visible;
+}
+
+/* #themeToggle: tooltip names the theme you'll switch TO, not the current one. */
+:root[data-theme="light"] #themeToggle::after { content: "Mode sombre"; }
+:root[data-theme="dark"] #themeToggle::after { content: "Mode clair"; }
+
 /* Adminator overrides */
 .eyebrow { font-size: 20px; }
 .card-title-wrap .eyebrow { margin-bottom: 14px; }

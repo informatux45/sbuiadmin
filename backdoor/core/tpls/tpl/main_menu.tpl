@@ -2,6 +2,8 @@
 {* --- Main Menu --- *}
 {* ----------------- *}
 
+<div class="nav-label">Workspace</div>
+
 {* ----------------------------------- *}
 {* Dashboard - Don't Remove this entry *}
 {* ----------------------------------- *}

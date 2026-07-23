@@ -18,24 +18,11 @@
 		</nav>
 
 		<div class="sidebar-footer">
-			<div class="dd-wrap">
-				<div class="workspace" data-dropdown tabindex="0" role="button" aria-label="Menu utilisateur">
-					<img src="{$sbuiadmin_user_email|@sbGetGravatar}" alt="" style="width:36px;height:36px;border-radius:50%;flex-shrink:0;">
-					<div class="workspace-text">
-						<div class="workspace-name">{$sbuiadmin_user_name}</div>
-						<div class="workspace-role">{$smarty.const.SBUIADMIN_GLOBAL_LAST_LOGIN} {$sbuiadmin_user_last_login}</div>
-					</div>
-					<svg class="workspace-chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m6 9 6 6 6-6"/></svg>
-				</div>
-				<div class="dd-menu dd-profile" role="menu">
-					<div class="dd-profile-head">
-						<div class="dd-profile-name">{$sbuiadmin_user_name}</div>
-						<div class="dd-profile-email">{$smarty.const.SBUIADMIN_GLOBAL_LAST_LOGIN} {$sbuiadmin_user_last_login}</div>
-					</div>
-					<a class="dd-menu-item danger" href="{$smarty.const._AM_SITE_URL}?ac=logout" title="{$smarty.const.SBUIADMIN_GLOBAL_LOGOUT}">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-						{$smarty.const.SBUIADMIN_GLOBAL_LOGOUT}
-					</a>
+			<div class="workspace">
+				<img src="{$sbuiadmin_user_email|@sbGetGravatar}" alt="" style="width:36px;height:36px;border-radius:50%;flex-shrink:0;">
+				<div class="workspace-text">
+					<div class="workspace-name">{$sbuiadmin_user_name}</div>
+					<div class="workspace-role">{$smarty.const.SBUIADMIN_GLOBAL_LAST_LOGIN} {$sbuiadmin_user_last_login}</div>
 				</div>
 			</div>
 		</div>
@@ -60,12 +47,12 @@
 				{/if}
 			</div>
 			<div class="topbar-actions">
-				<a class="icon-btn" target="_blank" href="{if $sb_url_customer != ''}{$sb_url_customer}{else}index.php{/if}" title="Aller sur le site {$smarty.const._AM_SITE_CUSTOMER_NAME}" aria-label="Voir le site">
+				<a class="icon-btn" target="_blank" href="{if $sb_url_customer != ''}{$sb_url_customer}{else}index.php{/if}" data-tip="Aller sur le site {$smarty.const._AM_SITE_CUSTOMER_NAME}" aria-label="Voir le site">
 					<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg>
 				</a>
 
 				<div class="dd-wrap">
-					<button class="icon-btn" data-dropdown aria-label="Mises à jour"{if $sbuiadmin_upgrade_core || $sbuiadmin_upgrade_modules} style="color:var(--warning)"{/if}>
+					<button class="icon-btn" data-dropdown aria-label="Mises à jour" data-tip="Mises à jour"{if $sbuiadmin_upgrade_core || $sbuiadmin_upgrade_modules} style="color:var(--warning)"{/if}>
 						<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
 						{if $sbuiadmin_upgrade_core || $sbuiadmin_upgrade_modules}<span class="count warning">!</span>{/if}
 					</button>
@@ -105,7 +92,7 @@
 				</div>
 
 				<div class="dd-wrap">
-					<button class="icon-btn" data-dropdown aria-label="Informations" title="Credits SBUIADMIN">
+					<button class="icon-btn" data-dropdown aria-label="Informations" data-tip="Credits SBUIADMIN">
 						<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
 					</button>
 					<div class="dd-menu" role="menu">
@@ -119,7 +106,36 @@
 					</div>
 				</div>
 
-				<button id="themeToggle" class="icon-btn" aria-label="Changer de thème"></button>
+				<button id="themeToggle" class="icon-btn" aria-label="Changer de thème" data-tip="Changer de thème"></button>
+
+				<div class="dd-wrap">
+					<img src="{$sbuiadmin_user_email|@sbGetGravatar}" alt="" class="avatar" data-dropdown tabindex="0" role="button" aria-label="Menu utilisateur" style="object-fit:cover">
+					<div class="dd-menu dd-profile" role="menu">
+						<div class="dd-profile-head">
+							<div class="dd-profile-name">{$sbuiadmin_user_name}</div>
+							<div class="dd-profile-email">{$smarty.const.SBUIADMIN_GLOBAL_LAST_LOGIN} {$sbuiadmin_user_last_login}</div>
+						</div>
+						{if $sbuiadmin_user_type == 'admin'}
+						<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=settings">
+							<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+							Réglages
+						</a>
+						{/if}
+						<div class="dd-menu-item" style="cursor:default;opacity:.5" title="Bientôt disponible">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+							Profil
+						</div>
+						<div class="dd-menu-item" style="cursor:default;opacity:.5" title="Bientôt disponible">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+							Messages
+						</div>
+						<div class="dd-divider"></div>
+						<a class="dd-menu-item danger" href="{$smarty.const._AM_SITE_URL}?ac=logout" title="{$smarty.const.SBUIADMIN_GLOBAL_LOGOUT}">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+							{$smarty.const.SBUIADMIN_GLOBAL_LOGOUT}
+						</a>
+					</div>
+				</div>
 			</div>
 		</header>
 
