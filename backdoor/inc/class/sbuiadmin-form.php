@@ -311,7 +311,7 @@ class form extends sanitize {
 		} elseif ($elem == 'submit' || $elem == 'reset') {
 
 			// Show the form element
-			$chaineTemp = '&nbsp;&nbsp;<input type="'.$elem.'" ';
+			$chaineTemp = '<input type="'.$elem.'" ';
 
 			foreach ($this -> formElementArr[$cpt][$elem] as $clef => $val) {
 				if ($clef == 'class')
@@ -324,10 +324,21 @@ class form extends sanitize {
 				$chaineTemp .= 'class="' . $btnClass . '" ';
 			}
 
-			$chaineTemp .= 'style="align-self:flex-start" ';
+			$chaineTemp .= '/>';
 
-			$chaineTemp .= '/>&nbsp;&nbsp;';
-				
+			// submit/reset are almost always added back-to-back (addInput('submit', ...)
+			// then addInput('reset', ...)) but each becomes its own top-level flex child
+			// of the flex-column form, so they stacked instead of sitting side by side.
+			// Join a reset into the preceding submit's row when it directly follows it.
+			$btnRowMarker = '<!--btnrow-->';
+			$prevCpt = $cpt - 1;
+			if ($elem == 'reset' && isset($this -> formBuffer['elements'][$prevCpt]) && substr($this -> formBuffer['elements'][$prevCpt], -(strlen($btnRowMarker) + 6)) === $btnRowMarker . '</div>') {
+				$this -> formBuffer['elements'][$prevCpt] = substr($this -> formBuffer['elements'][$prevCpt], 0, -(strlen($btnRowMarker) + 6));
+				$chaineTemp .= '</div>';
+			} else {
+				$chaineTemp = '<div style="align-self:flex-start;display:flex;gap:10px">' . $chaineTemp . $btnRowMarker . '</div>';
+			}
+
 		} else {
 			
 			// Check in DIV into
