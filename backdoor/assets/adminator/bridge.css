@@ -121,22 +121,28 @@ a {
 	margin-top: -10px;
 }
 
-/* inc/class/sbuiadmin-form.php addBreak(): section divider used across forms. */
+/* inc/class/sbuiadmin-form.php addBreak(): section divider used across forms.
+   Accent-bar label instead of the original heavy boxed callout (fond gris +
+   bordure bleue épaisse) or the too-faint all-muted-caps first pass. */
 .well.form-break-info {
 	background: none;
+	border-top: 1px solid var(--border);
 	color: var(--t-base);
-	margin-top: 3em;
-	padding: 0;
+	margin-top: 8px;
+	padding: 18px 0 0;
 }
 .form-break-info h4 {
 	background: var(--bg-muted);
-	border-bottom: 2px solid var(--primary);
-	color: var(--primary);
-	font-size: 1.5em;
-	line-height: 1.4em;
+	border-left: 3px solid var(--primary);
+	color: var(--t-base);
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: .04em;
+	line-height: 1.2;
 	margin: 0;
-	padding: 4px 4px 4px 15px;
+	padding: 8px 0 8px 10px;
 	text-align: left;
+	text-transform: uppercase;
 	width: 100%;
 }
 
