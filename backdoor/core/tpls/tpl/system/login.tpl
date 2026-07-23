@@ -22,7 +22,7 @@
 
 		<main class="auth-main">
 			<div class="auth-main-top">
-				<a href="{$smarty.const._AM_SITE_URL}" style="font-size:12.5px;color:var(--t-muted);display:inline-flex;align-items:center;gap:6px">
+				<a href="{if $sb_url_customer != ''}{$sb_url_customer}{else}{$smarty.const._AM_SITE_URL}{/if}" style="font-size:12.5px;color:var(--t-muted);display:inline-flex;align-items:center;gap:6px">
 					<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
 					Retour au site
 				</a>
@@ -103,8 +103,6 @@
 					{/if}
 				{/if}
 			</div>
-
-			<div class="auth-main-bottom">{$smarty.const._AM_SITE_CUSTOMER_NAME} &middot; propulsé par SBUIADMIN</div>
 		</main>
 	</div>
 

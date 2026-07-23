@@ -214,9 +214,9 @@ switch($action) {
 		// --------------------------------
 		$sbform->addAnything('<p>&nbsp;</p>
 							 <p class="help-block">L\'usage du RECAPTCHA INVISIBLE ne requiert pas le bouton SUBMIT car il devient le bouton de soumission de votre formulaire.</p>
-							 <button class="btn btn-danger btn-xs" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[TEXT name=name/required=required]\')">NAME</button>
+							 <button class="btn btn--danger btn--sm" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[TEXT name=name/required=required]\')">NAME</button>
 							 &nbsp;&nbsp;
-							 <button class="btn btn-danger btn-xs" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[TEXT name=email/required=required]\')">EMAIL</button>
+							 <button class="btn btn--danger btn--sm" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[TEXT name=email/required=required]\')">EMAIL</button>
 							 &nbsp;&nbsp;
 							 <button class="btn btn-primary btn-xs" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[TEXT name=your-name/required=required]\')">TEXT</button>
 							 &nbsp;&nbsp;
@@ -224,9 +224,9 @@ switch($action) {
 							 &nbsp;&nbsp;
 							 <button class="btn btn-primary btn-xs" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[SELECT name=selection/options=choisissez un choix|choix1|choix2|choix3|choix4/value=0|10|20|30|40/required=required]\')">SELECT</button>
 							 &nbsp;&nbsp;
-							 <button class="btn btn-danger btn-xs" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[RECAPTCHA]\')">RECAPTCHA</button>
+							 <button class="btn btn--danger btn--sm" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[RECAPTCHA]\')">RECAPTCHA</button>
 							 &nbsp;&nbsp;
-							 <button class="btn btn-danger btn-xs" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[RECAPTCHA_INVISIBLE name=go/value=Envoyer]\')">RECAPTCHA_INVISIBLE</button>
+							 <button class="btn btn--danger btn--sm" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[RECAPTCHA_INVISIBLE name=go/value=Envoyer]\')">RECAPTCHA_INVISIBLE</button>
 							 &nbsp;&nbsp;
 							 <button class="btn btn-primary btn-xs" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[SUBMIT name=go/value=Envoyer]\')">SUBMIT</button>');
 		$sbform->addTextarea('', $contactform, array('id' => 'contactform', 'name' => 'contactform', 'style' => 'height: 400px !important; background: url(img/form-bg-textarea.png) repeat-y; font: normal 12px verdana; line-height: 25px; padding: 2px 10px; border: 2px solid #ddd; border-left: 0px; background-attachment: local;'), false, "Les boutons rouges ont caractère d'obligation. Si vous les omettez, le formulaire de contact ne fonctionnera pas correctement.");

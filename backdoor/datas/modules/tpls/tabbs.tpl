@@ -18,11 +18,11 @@
 					<div class="card-head">
 						<div class="card-title-wrap">
 							<h2 class="card-title">
-								<a data-toggle="collapse" data-parent="#accordion" href="#collapse" aria-expanded="false" class="collapsed" style="color:inherit"><i class="fa fa-arrow-circle-down"></i> &nbsp;&nbsp;Que fait TABBS ?</a>
+								<a href="#" onclick="document.getElementById('collapse').classList.toggle('is-open'); return false;" style="color:inherit"><i class="fa fa-arrow-circle-down"></i> &nbsp;&nbsp;Que fait TABBS ?</a>
 							</h2>
 						</div>
 					</div>
-					<div id="collapse" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+					<div id="collapse" class="tabbs-collapse">
 						<p style="font-size: 1.2em;">
 							TABBS permet :
 							<ol>

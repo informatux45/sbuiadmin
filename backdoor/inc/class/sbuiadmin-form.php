@@ -1165,11 +1165,16 @@ class form extends sanitize {
 	* @return Page Builder
 	*/
 	public function addPageBuilder ($label = '', $src = '', $arrArgs = array (), $isRequired = false, $toolbar = 'full', $helpDsc = '') {
-		// Load CSS
-		$chaineTemp .= '<link rel="stylesheet" href="inc/plugins/pagebuilder/css/pagebuilder.css">
+		// Page Builder keeps its own Bootstrap 3 chrome (navbar, grid, ~60 form-control
+		// fields) and drives it via jQuery's Bootstrap modal/collapse/buttons-radio
+		// plugins - loaded here rather than globally so the rest of the app no longer
+		// depends on Bootstrap (Phase 7 cleanup).
+		$chaineTemp .= '<link rel="stylesheet" href="assets/bower_components/bootstrap/dist/css/bootstrap.css">
+						<link rel="stylesheet" href="inc/plugins/pagebuilder/css/pagebuilder.css">
 						<link rel="stylesheet" href="inc/plugins/pagebuilder/css/colorselector.css">';
 		// Load JS
-		$chaineTemp .= '<script src="inc/plugins/pagebuilder/js/jquery.ui.touch-punch.min.js"></script>
+		$chaineTemp .= '<script src="assets/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+						<script src="inc/plugins/pagebuilder/js/jquery.ui.touch-punch.min.js"></script>
 						<script src="inc/plugins/pagebuilder/js/colorselector.js"></script>
 						<!--<script type="text/javascript">
 							var path = "";

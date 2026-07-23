@@ -129,7 +129,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button aria-hidden="true" data-dismiss="modal" class="close" type="button">&times;</button>
-						<h4 id="sbupgradecoreLabel" class="modal-title">Mise à niveau vers la version <span style="color: red;">{$sbuiadmin_upgrade_core}</span></h4><a onclick="javascript:sbUgrade('core','{$smarty.const._AM_SITE_URL}');" role="button" class="upgrade-now btn btn-danger" id="upgrade-core">upgrade now!</a>
+						<h4 id="sbupgradecoreLabel" class="modal-title">Mise à niveau vers la version <span style="color: red;">{$sbuiadmin_upgrade_core}</span></h4><a onclick="javascript:sbUgrade('core','{$smarty.const._AM_SITE_URL}');" role="button" class="upgrade-now btn btn--danger" id="upgrade-core">upgrade now!</a>
 					</div>
 					<div id="upgrade-ajax-content" class="modal-body">
 						<div class="sbupgrade-filelist">
@@ -142,7 +142,7 @@
 						</div>
 					</div>
 					<div class="modal-footer">
-						<button data-dismiss="modal" class="btn btn-default" type="button" onclick="javascript:location.href='{$smarty.const._AM_SITE_URL}'">Close</button>
+						<button data-dismiss="modal" class="btn btn--ghost" type="button" onclick="javascript:location.href='{$smarty.const._AM_SITE_URL}'">Close</button>
 					</div>
 				</div>
 			</div>
@@ -160,7 +160,7 @@
 						Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 					</div>
 					<div class="modal-footer">
-						<button data-dismiss="modal" class="btn btn-default" type="button">Close</button>
+						<button data-dismiss="modal" class="btn btn--ghost" type="button">Close</button>
 					</div>
 				</div>
 			</div>

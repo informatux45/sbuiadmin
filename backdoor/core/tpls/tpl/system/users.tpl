@@ -88,7 +88,7 @@
 																			{$user_json}
 																		</div> <!-- ./modal-body -->
 																		<div class="modal-footer">
-																			<button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+																			<button type="button" class="btn btn--ghost" data-dismiss="modal">Fermer</button>
 																		</div>
 																	</div>
 																</div>

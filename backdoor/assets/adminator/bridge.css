@@ -1,9 +1,10 @@
 /*
- * Compatibility bridge — maps legacy Bootstrap 3 classes onto Adminator's
- * design tokens so content pages not yet migrated to the new theme (Phases
- * 4-6) stay visually consistent (incl. dark mode) under the new chrome.
- * Loaded only on pages still using the legacy stack. Delete in Phase 7
- * once nothing references Bootstrap classes anymore.
+ * Adminator theme extension: gap-fills for the grid system, dark-mode
+ * skinning for third-party widgets the app still embeds as-is (CKEditor,
+ * jQuery UI), and small custom classes ported verbatim from the removed
+ * sb-admin-2.css/sb-admin-custom.css (Phase 7 cleanup) that are still
+ * emitted by inc/class/sbuiadmin-form.php and various module controllers.
+ * Loaded globally.
  */
 
 body {
@@ -32,168 +33,6 @@ main.content {
 	z-index: 9;
 }
 
-/* Panels / wells -> card look */
-.panel,
-.well {
-	background: var(--bg-card);
-	border: 1px solid var(--border);
-	border-radius: 14px;
-	box-shadow: var(--shadow-card);
-	color: var(--t-base);
-}
-.panel-heading {
-	background: var(--bg-muted);
-	border-bottom: 1px solid var(--border);
-	color: var(--t-base);
-	border-top-left-radius: 14px;
-	border-top-right-radius: 14px;
-}
-.panel-footer {
-	background: var(--bg-muted);
-	border-top: 1px solid var(--border);
-}
-.panel-default > .panel-heading {
-	background: var(--bg-muted);
-	color: var(--t-base);
-}
-
-/* Tables */
-.table {
-	color: var(--t-base);
-}
-.table > thead > tr > th,
-.table > tbody > tr > td,
-.table > tbody > tr > th {
-	border-color: var(--border);
-}
-.table-striped > tbody > tr:nth-of-type(odd) {
-	background: var(--bg-muted);
-}
-.table-hover > tbody > tr:hover {
-	background: var(--bg-hover);
-}
-.dataTables_wrapper,
-.dataTables_wrapper .dataTables_length,
-.dataTables_wrapper .dataTables_filter,
-.dataTables_wrapper .dataTables_info,
-.dataTables_wrapper .dataTables_paginate {
-	color: var(--t-muted);
-}
-
-/* Forms */
-.form-control {
-	background: var(--bg-card);
-	border: 1px solid var(--border);
-	color: var(--t-base);
-}
-.form-control:focus {
-	border-color: var(--primary);
-	box-shadow: 0 0 0 3px var(--primary-ring);
-}
-.input-group-addon {
-	background: var(--bg-muted);
-	border: 1px solid var(--border);
-	color: var(--t-muted);
-}
-label {
-	color: var(--t-base);
-}
-
-/* Buttons */
-.btn-default {
-	background: var(--bg-card);
-	border-color: var(--border);
-	color: var(--t-base);
-}
-.btn-primary {
-	background: var(--primary);
-	border-color: var(--primary);
-}
-.btn-danger {
-	background: var(--danger);
-	border-color: var(--danger);
-}
-.btn-success {
-	background: var(--success);
-	border-color: var(--success);
-}
-.btn-info {
-	background: var(--info);
-	border-color: var(--info);
-}
-.btn-warning {
-	background: var(--warning);
-	border-color: var(--warning);
-}
-
-/* Dropdowns, modals, tabs (Bootstrap JS still driving these until Phase 7) */
-.dropdown-menu {
-	background: var(--bg-card);
-	border: 1px solid var(--border);
-	box-shadow: var(--shadow-lg);
-	color: var(--t-base);
-}
-.dropdown-menu > li > a {
-	color: var(--t-base);
-}
-.dropdown-menu > li > a:hover,
-.dropdown-menu > li > a:focus {
-	background: var(--bg-hover);
-	color: var(--t-base);
-}
-.dropdown-menu .divider {
-	background: var(--border);
-}
-
-.modal-content {
-	background: var(--bg-card);
-	border: none;
-	border-radius: 14px;
-	box-shadow: var(--shadow-lg);
-	color: var(--t-base);
-}
-.modal-header,
-.modal-footer {
-	border-color: var(--border);
-}
-.modal-backdrop {
-	background: var(--overlay);
-}
-
-.nav-tabs {
-	border-bottom-color: var(--border);
-}
-.nav-tabs > li.active > a,
-.nav-tabs > li.active > a:hover,
-.nav-tabs > li.active > a:focus {
-	background: var(--bg-card);
-	border-color: var(--border);
-	color: var(--primary);
-}
-.nav-tabs > li > a {
-	color: var(--t-muted);
-}
-.tab-content {
-	background: var(--bg-card);
-	border: 1px solid var(--border);
-	border-top: none;
-	color: var(--t-base);
-}
-
-/* Labels / badges */
-.label-default { background: var(--bg-muted); color: var(--t-muted); }
-.label-primary { background: var(--primary); }
-.label-danger { background: var(--danger); }
-.label-success { background: var(--success); }
-.label-warning { background: var(--warning); }
-.label-info { background: var(--info); }
-
-/* Bootstrap alerts still emitted by some legacy code paths */
-.alert-success { background: var(--success-soft); border-color: var(--success); color: var(--t-base); }
-.alert-danger { background: var(--danger-soft); border-color: var(--danger); color: var(--t-base); }
-.alert-warning { background: var(--warning-soft); border-color: var(--warning); color: var(--t-base); }
-.alert-info { background: var(--info-soft); border-color: var(--info); color: var(--t-base); }
-
 a {
 	color: var(--primary);
 }
@@ -216,20 +55,6 @@ a {
 .cke_bottom {
 	background: var(--bg-muted) !important;
 	border-top-color: var(--border) !important;
-}
-
-/* system/theme.tpl: theme picker cards keep the legacy theme_block/theme_block_active
-   classes for JS-free active-state marking, but the old green gradient background
-   from sb-admin-custom.css clashes with .card's own background — override it with
-   a simple accent border instead. */
-.theme_block {
-	overflow: visible !important;
-	min-height: 0 !important;
-}
-.theme_block_active {
-	background: var(--bg-card) !important;
-	border-color: var(--success) !important;
-	box-shadow: 0 0 0 1px var(--success);
 }
 .cke_contents, .cke_contents iframe {
 	background: var(--bg-card) !important;
@@ -258,3 +83,181 @@ a {
 	border: 1px solid var(--border);
 	box-shadow: var(--shadow-lg);
 }
+
+/* system/theme.tpl: theme picker cards keep the legacy theme_block/theme_block_active
+   classes for JS-free active-state marking, but the old green gradient background
+   from sb-admin-custom.css clashes with .card's own background — override it with
+   a simple accent border instead. */
+.theme_block {
+	overflow: visible !important;
+	min-height: 0 !important;
+}
+.theme_block_active {
+	background: var(--bg-card) !important;
+	border-color: var(--success) !important;
+	box-shadow: 0 0 0 1px var(--success);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Ported verbatim from the removed sb-admin-2.css/sb-admin-custom.css     */
+/* (Phase 7 cleanup) — still emitted by real, non-Page-Builder code paths. */
+/* ---------------------------------------------------------------------- */
+
+/* Text-color utilities (server.php/cache.php warnings, medias.tpl status). */
+.red { color: var(--danger); }
+.green { color: var(--success); }
+
+/* navigation.tpl: upgrade-in-progress spinner container. */
+.center { text-align: center; }
+
+/* header.tpl: body class on the "transfert" page. */
+.margin10 { margin: 10px; }
+
+/* inc/class/sbuiadmin-form.php: helpDsc text under nearly every field type. */
+.help-block {
+	color: var(--t-muted);
+	font-size: 0.9em;
+	font-style: italic;
+	margin-top: -10px;
+}
+
+/* inc/class/sbuiadmin-form.php addBreak(): section divider used across forms. */
+.well.form-break-info {
+	background: none;
+	color: var(--t-base);
+	margin-top: 3em;
+	padding: 0;
+}
+.form-break-info h4 {
+	background: var(--bg-muted);
+	border-bottom: 2px solid var(--primary);
+	color: var(--primary);
+	font-size: 1.5em;
+	line-height: 1.4em;
+	margin: 0;
+	padding: 4px 4px 4px 15px;
+	text-align: left;
+	width: 100%;
+}
+
+/* inc/class/sbuiadmin-form.php addInput(): photo-preview widget for photo-type fields. */
+.icon-transfert { display: inline-block; }
+.transfert-media-img {
+	background-color: var(--bg-muted);
+	max-height: 170px;
+	max-width: 200px;
+}
+.transfert-media-img-remove { height: 170px; width: 170px; }
+.transfert-media-img-pictures {
+	background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjAiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgODAgODAiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDgwIDgwOyIgZmlsbD0iIzAwMDAwMCIgPjxnPgk8cmVjdCB4PSIyLjUiIHk9IjguNSIgc3R5bGU9ImZpbGw6I0ZGRkZGRjsiIHdpZHRoPSI3NSIgaGVpZ2h0PSI2MyI+PC9yZWN0Pgk8Zz4JCTxwYXRoIHN0eWxlPSJmaWxsOiM3ODhCOUM7IiBkPSJNNzcsOXY2MkgzVjlINzcgTTc4LDhIMnY2NGg3NlY4TDc4LDh6Ij48L3BhdGg+CTwvZz48L2c+PHJlY3QgeD0iMTIiIHk9IjE4IiBzdHlsZT0iZmlsbDojQjVERUZGOyIgd2lkdGg9IjU2IiBoZWlnaHQ9IjM1Ljc1Ij48L3JlY3Q+PHJlY3QgeD0iMTIiIHk9IjM4IiBzdHlsZT0iZmlsbDojRDlGNkZGOyIgd2lkdGg9IjU2IiBoZWlnaHQ9IjE2Ij48L3JlY3Q+PHJlY3QgeD0iMTIiIHk9IjU0IiBzdHlsZT0iZmlsbDojN0FBREYwOyIgd2lkdGg9IjU2IiBoZWlnaHQ9IjgiPjwvcmVjdD48ZWxsaXBzZSBzdHlsZT0iZmlsbDojRDlGNkZGOyIgY3g9IjI5LjUiIGN5PSIzNi4yODYiIHJ4PSI3IiByeT0iNi4yODYiPjwvZWxsaXBzZT48ZWxsaXBzZSBzdHlsZT0iZmlsbDojRDlGNkZGOyIgY3g9IjIyLjUiIGN5PSIzNi4yODYiIHJ4PSI1LjI1IiByeT0iNC43MTQiPjwvZWxsaXBzZT48ZWxsaXBzZSBzdHlsZT0iZmlsbDojRDlGNkZGOyIgY3g9IjQwIiBjeT0iMzkuNDI5IiByeD0iNyIgcnk9IjYuMjg2Ij48L2VsbGlwc2U+PGVsbGlwc2Ugc3R5bGU9ImZpbGw6I0Q5RjZGRjsiIGN4PSI1MC41IiBjeT0iMzYuMjg2IiByeD0iNyIgcnk9IjYuMjg2Ij48L2VsbGlwc2U+PGVsbGlwc2Ugc3R5bGU9ImZpbGw6I0Q5RjZGRjsiIGN4PSI2NC41IiBjeT0iMzYuMjg2IiByeD0iMy41IiByeT0iMy4xNDMiPjwvZWxsaXBzZT48ZWxsaXBzZSBzdHlsZT0iZmlsbDojRDlGNkZGOyIgY3g9IjE1LjUiIGN5PSIzNi4yODYiIHJ4PSIzLjUiIHJ5PSIzLjE0MyI+PC9lbGxpcHNlPjxlbGxpcHNlIHN0eWxlPSJmaWxsOiNEOUY2RkY7IiBjeD0iNTcuNSIgY3k9IjM2LjI4NiIgcng9IjUuMjUiIHJ5PSI0LjcxNCI+PC9lbGxpcHNlPjxlbGxpcHNlIHN0eWxlPSJmaWxsOiNEOUY2RkY7IiBjeD0iNjQuNSIgY3k9IjM2LjI4NiIgcng9IjMuNSIgcnk9IjMuMTQzIj48L2VsbGlwc2U+PHBvbHlnb24gc3R5bGU9ImZpbGw6IzRBNkQ5QzsiIHBvaW50cz0iMTIsNTQgNjgsNTQgNjgsNTAuNzY4IDUwLjUsNDAgIj48L3BvbHlnb24+PHBvbHlnb24gc3R5bGU9ImZpbGw6IzVEODRCODsiIHBvaW50cz0iNTQsNTQgMTIsNTQgMTIsNDYgMjkuNSwzOCAiPjwvcG9seWdvbj48L3N2Zz4=') 50% 0% no-repeat;
+	background-size: 90%;
+	height: 170px;
+	margin-top: -10px;
+	width: 200px;
+}
+.transfert-media-img-pictures-without {
+	margin-top: -10px;
+	max-height: 170px;
+	max-width: 200px;
+}
+
+/* inc/class/sbuiadmin-form.php addSortable(): drag-and-drop reorder widget,
+   used by menu/users/sandbox/blocs/news/slider/tabbs/table. */
+#sortable { list-style-type: none; margin: 0; padding: 0; width: 100%; }
+#sortable li {
+	box-shadow: 1px 1px 3px var(--border);
+	font-size: 1.2em;
+	font-weight: normal;
+	height: 2em;
+	margin: 0 0 5px;
+	padding: 4px 5px 5px 10px;
+}
+#sortable li:hover, #sortable-grid li:hover { cursor: move; }
+.sb-sort-i {
+	color: var(--t-muted);
+	display: block;
+	float: left;
+	font-size: 0.7em;
+	margin-top: 7px;
+	padding: 0 20px 0 5px;
+}
+#sortable-grid {
+	clear: both !important;
+	float: left;
+	list-style-type: none;
+	margin: 0 0 20px;
+	padding: 0;
+	width: 100%;
+}
+#sortable-grid li {
+	float: left;
+	height: auto !important;
+	margin: 3px 7px 3px 0;
+	padding: 4px 0;
+	text-align: center;
+	width: auto;
+}
+#sortable-grid li img {
+	margin: 0 -10px 0 -3px;
+	padding: 0;
+}
+#sortable-grid .ui-state-highlight {
+	padding-bottom: 58px !important;
+	width: 100px !important;
+}
+
+/* dashboard.php: "?" help link next to a field label. */
+.sb-question-icon:hover {
+	text-decoration: none;
+}
+
+/* system/medias.tpl: delete overlay button on each thumbnail. */
+.sbmedia_ext_allowed {
+	font-weight: bold;
+	text-transform: uppercase;
+}
+.sbmedia-delete {
+	align-items: center;
+	background: var(--info);
+	border-radius: 15px;
+	color: #fff;
+	display: flex;
+	height: 22px !important;
+	justify-content: center;
+	margin: -160px 0 0 53px;
+	position: absolute;
+	width: 22px !important;
+}
+.sbmedia-delete:hover {
+	background: var(--danger);
+}
+
+/* navigation.tpl: core/modules upgrade dialogs. */
+.sbupgrade-filelist { font-size: 0.8em; line-height: 1.1em; }
+.sbupgrade-filelist span { display: block; font-size: 1.3em; line-height: 0.4em; }
+.upgrade-now { position: absolute; right: 50px; top: 10px; }
+
+/* system/theme.tpl theme picker + preview thumbnails reused by
+   themeinfos.tpl and the page-template picker (datas/modules/tpls/pages.tpl). */
+.theme_img {
+	border: 1px solid var(--border);
+	border-radius: 7px;
+	float: left;
+	margin-right: 2em;
+}
+.theme_description { font-size: 0.9em; }
+.theme_activate { margin-top: 1em; }
+.theme_view {
+	border: 1px solid var(--border);
+	height: auto;
+	width: 100%;
+}
+.theme_view img#img_theme_view { width: 100%; }
+
+/* datas/modules/tpls/tabbs.tpl: "Que fait TABBS ?" accordion (single use, vanilla toggle). */
+.tabbs-collapse { display: none; }
+.tabbs-collapse.is-open { display: block; }
+
+/* Adminator overrides */
+.eyebrow { font-size: 20px; }
+.card-title-wrap .eyebrow { margin-bottom: 14px; }

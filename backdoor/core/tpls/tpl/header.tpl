@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="SBUIADMIN User Interface Administration {$smarty.const._AM_START_VERSION} | Powered by Smarty {$smarty.version} | Design by SBadmin 2 Bootstrap">
+    <meta name="description" content="SBUIADMIN User Interface Administration {$smarty.const._AM_START_VERSION} | Powered by Smarty {$smarty.version} | Design by Adminator">
     <meta name="author" content="INFORMATUX">
 
 	<link rel="apple-touch-icon" sizes="180x180" href="img/favicons/apple-touch-icon.png">
@@ -35,24 +35,12 @@
     <link href="assets/adminator/fonts/fonts.css" rel="stylesheet">
     <link href="assets/adminator/style.css" rel="stylesheet">
 
-    {if $page != 'login'}
-    <!-- Legacy stack: still required by content pages not yet migrated to Adminator (Phases 4-6) -->
-    <!-- Bootstrap Core CSS -->
-    <link href="assets/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
-    <link href="assets/dist/css/sb-admin-2.css" rel="stylesheet">
-
-    <!-- Font Awesome (self-hosted, no CDN) -->
+    <!-- Font Awesome (self-hosted, no CDN) — used for icons throughout the app -->
     <link rel="stylesheet" href="assets/bower_components/font-awesome/css/font-awesome.min.css">
 
-    <!-- Custom Admin CSS -->
-    <link href="assets/dist/css/sb-admin-custom.css" rel="stylesheet">
-
-    <!-- Compatibility bridge: maps legacy Bootstrap classes onto Adminator's design tokens so
-         not-yet-migrated content pages look consistent under the new chrome. Removed in Phase 7. -->
+    <!-- Adminator theme extension: grid gap-fills, third-party widget dark-mode skinning,
+         and small custom classes ported from the removed sb-admin-2/sb-admin-custom stack -->
     <link href="assets/adminator/bridge.css" rel="stylesheet">
-    {/if}
 
 	<!-- OutdatedBrowser -->
 	<link rel="stylesheet" href="inc/plugins/outdatedbrowser/outdatedbrowser.min.css">

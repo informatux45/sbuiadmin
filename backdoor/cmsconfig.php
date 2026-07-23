@@ -656,7 +656,7 @@ switch($action) {
 		// --------------------------------
 		// --- Code to insert
 		// --------------------------------
-		$sbform->addTextarea('Code GOOGLE FONTS', $fonts, array('id' => 'fonts', 'name' => 'fonts', 'style' => 'height: 200px !important;'), false, "Vous pouvez insérer le code à l'aide :<br>- du GOOGLE FONT SELECTOR<br>- ou bien depuis l'interface de <a href='https://fonts.google.com/' target='_blank'>Google Fonts</a><p><button type='button' class='btn btn-outline btn-warning btn-sm'>Plus vous insèrerez de Google Fonts et plus le chargement de vos pages sera ralenti !</button></p><br>");
+		$sbform->addTextarea('Code GOOGLE FONTS', $fonts, array('id' => 'fonts', 'name' => 'fonts', 'style' => 'height: 200px !important;'), false, "Vous pouvez insérer le code à l'aide :<br>- du GOOGLE FONT SELECTOR<br>- ou bien depuis l'interface de <a href='https://fonts.google.com/' target='_blank'>Google Fonts</a><p><button type='button' class='btn btn--warning btn--sm'>Plus vous insèrerez de Google Fonts et plus le chargement de vos pages sera ralenti !</button></p><br>");
 		// --------------------------------
 		// --- Hiddens / Buttons
 		// --------------------------------	

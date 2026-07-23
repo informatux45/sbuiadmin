@@ -93,6 +93,7 @@ defined('SBUIADMIN_CKEDITOR_BEHAVIOR') or define('SBUIADMIN_CKEDITOR_BEHAVIOR', 
 // --- Settings file init
 // ----------------------
 $sb_link_settings = file(_AM_SETTINGS_FILE);
+$sbsmarty->assign('sb_url_customer', trim($sb_link_settings[15]));
 
 // ----------------------
 // Identification / Authentification

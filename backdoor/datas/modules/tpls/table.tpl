@@ -159,7 +159,7 @@
 														<img src="{$smarty.const._AM_SITE_IMG_URL}modules/sb_table_full.png" alt="" style="max-width: 100%;" />
 													</div>
 													<div class="modal-footer">
-														<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+														<button type="button" class="btn btn--ghost" data-dismiss="modal">Close</button>
 													</div>
 												</div>
 												<!-- /.modal-content -->
@@ -182,7 +182,7 @@
 														<img src="{$smarty.const._AM_SITE_IMG_URL}modules/sb_table_option1.png" alt="" style="max-width: 100%;" />
 													</div>
 													<div class="modal-footer">
-														<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+														<button type="button" class="btn btn--ghost" data-dismiss="modal">Close</button>
 													</div>
 												</div>
 												<!-- /.modal-content -->
@@ -205,7 +205,7 @@
 														<img src="{$smarty.const._AM_SITE_IMG_URL}modules/sb_table_option2.png" alt="" style="max-width: 100%;" />
 													</div>
 													<div class="modal-footer">
-														<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+														<button type="button" class="btn btn--ghost" data-dismiss="modal">Close</button>
 													</div>
 												</div>
 												<!-- /.modal-content -->

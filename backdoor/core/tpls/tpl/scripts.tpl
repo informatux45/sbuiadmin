@@ -7,12 +7,7 @@
     <script defer src="assets/adminator/datatable.js"></script>
     <script defer src="assets/adminator/confirm.js"></script>
     <script defer src="assets/adminator/lightbox.js"></script>
-
-    {if $page != 'login'}
-    <!-- Bootstrap Core JavaScript: still required by content pages not yet migrated (data-toggle
-         dropdowns/tabs/modals). Removed once Phases 5-6 no longer depend on it. -->
-    <script src="assets/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-    {/if}
+    <script defer src="assets/adminator/modal.js"></script>
 
 	{if $page != 'login'}
     <!-- jscroll -->
@@ -49,12 +44,6 @@
 	
 	<script>
 	$(document).ready(function() {
-		// -----------------------------------------------------
-		// Enable tooltip
-		$('.tooltip').tooltip({
-			selector: "[data-toggle=tooltip]",
-			container: "body"
-		})
 		// -----------------------------------------------------
 		// Lightbox (rel="facebox") and delete confirmations are now handled globally by
 		// assets/adminator/lightbox.js and assets/adminator/confirm.js
