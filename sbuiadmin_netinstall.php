@@ -493,7 +493,7 @@ if ($do_install) {
             <div class="checkmark">✓</div>
             <h2><?php $language === 'FR' ? print('Installation réussie') : print('Installation complete'); ?></h2>
             <p><?php echo constant('SBUIADMIN_INSTALL_SUCCESSFULLY_' . $language); ?></p>
-            <a class="btn-admin" href="./administration/index.php">
+            <a class="btn-admin" href="./backdoor/index.php">
                 <?php echo constant('SBUIADMIN_GO_TO_ADMIN_' . $language); ?> →
             </a>
         </div>
