@@ -71,7 +71,7 @@
 	</script>
 	{/if}
 
-	{if isset($pagef) && $pagef == 'upload'}
+	{if isset($pagef) && $pagef == 'upload' && (!isset($sb_can_add_medias) || $sb_can_add_medias)}
 	{*<link href="inc/js/upload/fine-uploader.min.css" media="screen" rel="stylesheet" type="text/css" />*}
 	{*<link href="inc/js/upload/fine-uploader-new.min.css" media="screen" rel="stylesheet" type="text/css" />*}
 	<link href="inc/js/upload/fine-uploader-gallery.min.css" media="screen" rel="stylesheet" type="text/css" />

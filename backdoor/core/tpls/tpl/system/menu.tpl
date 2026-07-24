@@ -16,9 +16,32 @@
 					<h1 class="hero-title">Menu</h1>
 					<p class="hero-sub">Gérez la structure et l'ordre des menus affichés sur votre site.</p>
 				</div>
-			</section>
+				<div class="hero-actions">
+					<div class="dd-wrap">
+						<button class="btn btn--outline-primary" data-dropdown>
+							Menu
+							<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+						</button>
+						<div class="dd-menu" role="menu" style="min-width:220px">
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=menu">Tous les menus</a>
+							<div class="dd-divider"></div>
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=menu&a=add">+1 menu</a>
+						</div>
+					</div>
 
-			{include file='system/menu_bar.tpl'}
+					{if isset($smarty.get.id) && $smarty.get.a != 'sort'}
+					<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=menu&a=sort&id={$smarty.get.id}'">
+						Trier les pages du menu
+					</button>
+					{/if}
+
+					{if isset($smarty.get.a) && $smarty.get.a == 'sort'}
+					<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=menu&a=edit&id={$smarty.get.id}'">
+						Retour au menu
+					</button>
+					{/if}
+				</div>
+			</section>
 
             <div class="grid">
                 <section class="col-12 card">

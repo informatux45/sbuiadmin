@@ -9,7 +9,47 @@
  * @file UTF-8
  * ©INFORMATUX.COM
  */
- 
+
+// -----------------------------------------------------------------------
+// Ce script est appelé DIRECTEMENT par l'uploader JS (pas via index.php) -
+// il ne passait donc jamais par la vérification des droits du routeur
+// (sbHasRight), ni même par une simple vérification de connexion : hors
+// mode Adminer (voir/ajouter/supprimer), N'IMPORTE QUI pouvait uploader un
+// fichier ici sans être connecté. Bootstrap minimal (sans Smarty/tpl -
+// seulement DB + session + droits) pour fermer ça.
+// -----------------------------------------------------------------------
+defined('SBUIADMIN_PATH') or define('SBUIADMIN_PATH', dirname(__FILE__, 3));
+defined('SBUIADMIN_URL')  or define('SBUIADMIN_URL', $_SERVER['SERVER_NAME'] . (isset($_SERVER['SERVER_PORT']) ? ':' . $_SERVER['SERVER_PORT'] : '') . rtrim(dirname($_SERVER['SCRIPT_NAME'], 3), '/') . '/');
+
+session_start([
+	'cookie_lifetime' => 86400,
+]);
+
+require_once(SBUIADMIN_PATH . '/inc/sbuiadmin-config.php');
+require_once(SBUIADMIN_PATH . '/inc/sbuiadmin-rights.php');
+require_once(_AM_SMARTY_DIR . 'Smarty.class.php'); // la classe "sql" hérite de Smarty
+require_once(SBUIADMIN_PATH . '/inc/class/sbuiadmin-sql.php');
+require_once(SBUIADMIN_PATH . '/inc/class/sbuiadmin-sanitize.php');
+require_once(SBUIADMIN_PATH . '/inc/class/sbuiadmin-users.php');
+
+$sbsql      = new sql();
+$sbsanitize = new sanitize();
+$sbusers    = new user();
+
+function sbUploadDeny($message) {
+	http_response_code(403);
+	header('Content-Type: text/plain');
+	echo json_encode(array('success' => false, 'error' => $message));
+	exit;
+}
+
+if (!isset($_SESSION['sbuiadmin_user_name']) || trim($_SESSION['sbuiadmin_user_name']) == '') {
+	sbUploadDeny('Non authentifié.');
+}
+if (!sbHasRight('medias', 'add')) {
+	sbUploadDeny('Droit "ajouter" requis sur les médias.');
+}
+
 // Include the uploader class
 require_once '../../server/php/qqFileUploader.php';
 

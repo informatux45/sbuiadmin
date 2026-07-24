@@ -960,18 +960,6 @@ function sbGetMenuModule($param = '') {
 	}
 
 	if (!empty($modules_dir)) {
-		// --- Get User Authorizations
-		$id = $sbusers->getUserInfo($_SESSION['sbuiadmin_user_name'], 'id');
-	      	if (isset($id) && $id > 0) {
-		 	$table      = _AM_DB_PREFIX . "sb_users";
-		 	$query      = "SELECT menu FROM $table WHERE id = $id";
-		 	$request    = $sbsql->query($query);
-		 	$user_auth  = $sbsql->assoc($request);
-		 	$auth_array = explode("|", $user_auth['menu']);
-	      	} else {
-		 	$auth_array = [];
-	      	}
-		
 		for($i = 0; $i < count($modules_dir); $i++) {
 			// --- Get Module name
 			if (isset($modules_dir[$i])) $module_name = pathinfo($modules_dir[$i], PATHINFO_FILENAME);
@@ -984,14 +972,37 @@ function sbGetMenuModule($param = '') {
 					|| ($module_menu[$module_name]['group'] == 'user' && $sbuiadmin_user_type == 'admin')
 					|| ($module_menu[$module_name]['group'] == 'user' && $sbuiadmin_user_type == 'user')) {
 					
-					// --- Check if user is authorized to view menu (Personnalized)
-					if (!in_array($module_name, $auth_array)) {
+					// --- Check if user is authorized to view menu (droits granulaires,
+					// voir inc/sbuiadmin-rights.php - remplace l'ancienne liste
+					// pipe-délimitée sb_users.menu, devenue inutilisée).
+					// Un module avec sous-menu (li) peut regrouper des entrées pointant
+					// vers des modules différents (ex: "Configuration" -> session/cache/
+					// server/theme/..., "Pages" -> blocs) : se contenter de vérifier le
+					// droit du module PARENT masquerait tout le groupe même si certaines
+					// sous-entrées restent autorisées individuellement. Chaque lien est
+					// donc filtré pour lui-même (sbHasMenuLinkRight) ; le groupe entier
+					// n'est masqué que si plus aucun lien n'y survit. Pour un module sans
+					// sous-menu (lien unique), ça revient exactement à vérifier le module.
+					$module_menu[$module_name]['li'] = (isset($module_menu[$module_name]['li'])) ? $module_menu[$module_name]['li'] : [];
+					$ul_module_menu = count((array)$module_menu[$module_name]['li']);
+
+					if ($ul_module_menu > 0) {
+						$visible_li = array();
+						foreach ($module_menu[$module_name]['li'] as $li_item) {
+							$li_link  = isset($li_item['link']) ? $li_item['link'] : '';
+							$li_rights = isset($li_item['rights']) ? $li_item['rights'] : null;
+							if (sbHasMenuLinkRight($li_link, $li_rights)) $visible_li[] = $li_item;
+						}
+						$module_menu[$module_name]['li'] = $visible_li;
+						$ul_module_menu = count($visible_li);
+						$show_module = ($ul_module_menu > 0);
+					} else {
+						$show_module = sbHasRight($module_name, 'view');
+					}
+
+					if ($show_module) {
 						// Init Current URL
 						$request_url = 'http' . (($_SERVER['HTTPS'] == 'on') ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-
-						// Menu UL (Entries)
-                  $module_menu[$module_name]['li'] = (isset($module_menu[$module_name]['li'])) ? $module_menu[$module_name]['li'] : [];
-                  $ul_module_menu = count((array)$module_menu[$module_name]['li']);
 
 						// Check if active menu
 						if ($request_url == _AM_SITE_URL . "index.php?p=" . $module_name && $ul_module_menu == 0) {
@@ -1038,18 +1049,43 @@ function sbGetMenuModule($param = '') {
 							$ret_module_menu .= '</a>';
 							$ret_module_menu .= '<div class="nav-submenu">';
 
-							// Menu entries (choices) - matched on the link's own p= (and a=, when
-							// present) query params rather than exact full-URL string equality,
-							// which broke as soon as the real request URL carried anything the
-							// menu's own href didn't (trailing params, ordering...).
+							// Menu entries (choices) - matched by comparing query params against
+							// the current request rather than exact full-URL string equality
+							// (too fragile: broke on any incidental difference). Beyond p=, each
+							// submenu family uses its own extra param to tell entries apart -
+							// a= for users.php, op= for cmsconfig.php, none at all for settings.php
+							// (each entry there has a distinct p=) - so rather than hardcoding one
+							// param name (which missed op= and made every cmsconfig entry show
+							// active together, since they only differ by op=), collect whichever
+							// keys this module's own entries actually use to distinguish
+							// themselves, and require the current request to agree with the
+							// entry on all of them (present-and-equal, or both absent).
+							$li_discriminator_keys = array();
+							foreach ((array)$module_menu[$module_name]['li'] as $sib_li) {
+								if (empty($sib_li['link'])) continue;
+								parse_str((string)parse_url($sib_li['link'], PHP_URL_QUERY), $sib_params);
+								foreach ($sib_params as $sib_key => $sib_val) {
+									if ($sib_key != 'p') $li_discriminator_keys[$sib_key] = true;
+								}
+							}
+							$li_discriminator_keys = array_keys($li_discriminator_keys);
+
 							for($j = 0; $j < $ul_module_menu; $j++) {
 								$class_active = '';
 								if (!empty($module_menu[$module_name]['li'][$j]['link']) && isset($_GET['p'])) {
 									parse_str((string)parse_url($module_menu[$module_name]['li'][$j]['link'], PHP_URL_QUERY), $li_params);
-									$a_matches = isset($li_params['a'])
-										? (isset($_GET['a']) && $li_params['a'] == trim($_GET['a']))
-										: !isset($_GET['a']);
-									if (isset($li_params['p']) && $li_params['p'] == trim($_GET['p']) && $a_matches) {
+									$li_matches = isset($li_params['p']) && $li_params['p'] == trim($_GET['p']);
+									if ($li_matches) {
+										foreach ($li_discriminator_keys as $disc_key) {
+											$li_val  = isset($li_params[$disc_key]) ? $li_params[$disc_key] : null;
+											$get_val = isset($_GET[$disc_key]) ? trim($_GET[$disc_key]) : null;
+											if ($li_val !== $get_val) {
+												$li_matches = false;
+												break;
+											}
+										}
+									}
+									if ($li_matches) {
 										$class_active = ' is-active';
 									}
 								}

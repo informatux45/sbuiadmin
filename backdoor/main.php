@@ -44,6 +44,10 @@ $module_menu['settings']['li'][7]['link']  = "index.php?p=themeinfos";
 $module_menu['settings']['li'][8]['title'] = SBUIADMIN_MENU_CONFIGURATION_BOOTSTRAP;
 $module_menu['settings']['li'][8]['link']  = "assets/samples/";
 $module_menu['settings']['li'][8]['target'] = "_blank";
+// Lien statique (pas de p=) - la matrice de droits ne peut pas l'identifier
+// via l'URL comme les autres entrées, on le rattache donc explicitement à
+// sa propre ligne (voir sbGetRightsSubmodules()/sbHasMenuLinkRight()).
+$module_menu['settings']['li'][8]['rights'] = 'settings:samples';
 
 $module_menu['logaccess']['main']  = SBUIADMIN_MENU_LOG;
 $module_menu['logaccess']['icon']  = "list-alt";

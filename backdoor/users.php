@@ -121,32 +121,55 @@ switch($action) {
 
 			} elseif ($formType == 'edit' && $id > 0) {
 
-				// UPDATE DATAS
-				if ($password == '') { 
-					// Request without password
-					$query = "UPDATE $table SET username = '$username'
-																	,email = '$email'
-																	,active = '$active'
-																	WHERE id = '$id'";					
+				// Libre-service : sans "modifier" sur users, chacun peut quand
+				// même changer SON PROPRE mot de passe (voir sbClassifyAction()) -
+				// mais uniquement celui-ci, le reste de la fiche est ignoré même
+				// si le POST contenait d'autres valeurs (formulaire déjà réduit
+				// au mot de passe côté rendu, voir plus bas - ceci est le
+				// garde-fou côté serveur).
+				$self_password_only = ($id == sbGetCurrentUserId() && !sbHasRight('users', 'edit'));
+
+				if ($self_password_only) {
+					if ($password != '') {
+						$password = $sbusers->encrypt($password);
+						$query = "UPDATE $table SET password = '$password' WHERE id = '$id'";
+						$result_edit = $sbsql->query($query);
+						if ($result_edit) {
+							$sb_msg_valid = 'Mot de passe modifié avec succès';
+						} else {
+							$sb_msg_error = 'Error: Write Error (EDIT)!';
+						}
+					} else {
+						$sb_msg_error = 'Veuillez saisir un mot de passe';
+					}
 				} else {
-					// --- Encrypt password
-					$password = $sbusers->encrypt($password);
-					$query = "UPDATE $table SET username = '$username'
-																	,password = '$password'
-																	,email = '$email'
-																	,active = '$active'
-																	WHERE id = '$id'";
-				}
-											 
-				$result_edit = $sbsql->query($query);
-				if ($result_edit) {
-					// --- On ne vide pas les champs du formulaire
-					// -------------------------------------------
-					// --- Message SUCCES
-					$sb_msg_valid = $text . ' modifié avec succès';
-				} else {
-					// --- Message ERROR
-					$sb_msg_error = 'Error: Write Error (EDIT)!';
+					// UPDATE DATAS
+					if ($password == '') {
+						// Request without password
+						$query = "UPDATE $table SET username = '$username'
+																		,email = '$email'
+																		,active = '$active'
+																		WHERE id = '$id'";
+					} else {
+						// --- Encrypt password
+						$password = $sbusers->encrypt($password);
+						$query = "UPDATE $table SET username = '$username'
+																		,password = '$password'
+																		,email = '$email'
+																		,active = '$active'
+																		WHERE id = '$id'";
+					}
+
+					$result_edit = $sbsql->query($query);
+					if ($result_edit) {
+						// --- On ne vide pas les champs du formulaire
+						// -------------------------------------------
+						// --- Message SUCCES
+						$sb_msg_valid = $text . ' modifié avec succès';
+					} else {
+						// --- Message ERROR
+						$sb_msg_error = 'Error: Write Error (EDIT)!';
+					}
 				}
 
 			}
@@ -175,42 +198,54 @@ switch($action) {
 			// --- Debug SQL
 			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);
 		}
-		// --------------------------------		
+		// --------------------------------
 		// --- Define variables
 		$formAction = $module_url . "&a=" . $formType . "&id=" . $id;
+		// Libre-service : sans "modifier" sur users, on ne modifie QUE sa propre
+		// fiche - et seul le mot de passe est proposé (voir sbClassifyAction() +
+		// le garde-fou serveur équivalent plus haut dans ce case).
+		$self_password_only = ($formType == 'edit' && $id > 0 && $id == sbGetCurrentUserId() && !sbHasRight('users', 'edit'));
 		// --- Form construct
 		$sbform->openForm(array('action' => "$formAction", 'name' => "$formName", 'id' => "$formName", 'reloadpage' => "$formAction", 'submitpage' => "$formAction"));
 		// --- Add inputs and more
-		// ----------------------------
-		// --- Actif / Desactive
-		// ----------------------------
-		$active = ($active) ? '1' : '0';
-		$sbform->addRadioYN('Actif', true, array('id'=>'active', 'name'=>'active', 'checked'=>"$active"), 'activé', 'désactivé');
-		// ----------------------------
-		// --- Nom de l'utilisateur (login)
-		// ----------------------------
-		$sbform->addInput('text', 'Utilisateur', array ('name' => 'sbusername', 'value' => "$username"), true);
+		if ($self_password_only) {
+			$sbform->addAnything('<p>Vous ne pouvez modifier que votre mot de passe. Contactez un administrateur pour le reste de votre fiche.</p>');
+		} else {
+			// ----------------------------
+			// --- Actif / Desactive
+			// ----------------------------
+			$active = ($active) ? '1' : '0';
+			$sbform->addRadioYN('Actif', true, array('id'=>'active', 'name'=>'active', 'checked'=>"$active"), 'activé', 'désactivé');
+			// ----------------------------
+			// --- Nom de l'utilisateur (login)
+			// ----------------------------
+			$sbform->addInput('text', 'Utilisateur', array ('name' => 'sbusername', 'value' => "$username"), true);
+		}
 		// ----------------------------
 		// --- Mot de passe
 		// ----------------------------
 		if ($formType == 'edit')
-			$sbform->addInput('password', 'Mot de passe', array ('name' => 'sbpassword', 'value' => ''), false, false, "Si ce champs n'est pas rempli, il ne sera pas mis à jour.&nbsp;&nbsp;&nbsp;<span style='color: white; background-color: white;'>{$sbusers->decrypt($password)}</span>");
+			$sbform->addInput('password', 'Mot de passe', array ('name' => 'sbpassword', 'value' => ''), $self_password_only, false, "Si ce champs n'est pas rempli, il ne sera pas mis à jour.&nbsp;&nbsp;&nbsp;<span style='color: white; background-color: white;'>{$sbusers->decrypt($password)}</span>");
 		else
 			$sbform->addInput('password', 'Mot de passe', array ('name' => 'sbpassword', 'value' => ''), true);
 		// ----------------------------
 		// --- Email
 		// ----------------------------
-		$sbform->addInput('text', 'Email', array ('name' => 'email', 'value' => "$email"), true);
+		if (!$self_password_only) {
+			$sbform->addInput('text', 'Email', array ('name' => 'email', 'value' => "$email"), true);
+		}
 		// --- Hiddens / Buttons
 		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => "$formName"));
 		if ($formType == 'edit') {
 			$sbform->addInput('hidden', '', array('name' => 'id', 'value' => "$id"));
-			$sbform->addInput('hidden', '', array('name' => 'edit_user', 'value' => "edit"));			
+			$sbform->addInput('hidden', '', array('name' => 'edit_user', 'value' => "edit"));
 		}
-		$sbform->addInput('submit', '', array('value' => "$btn_add_edit"));
 		$sbform->addInput('reset', '', array('value' => "Reset"));
 		// --- Close Form
 		$sbform->closeForm ();
+		// --- Bouton "Actions" de la colonne droite (shared-panel-actions.tpl)
+		$sbsmarty->assign('sb_form_id', $formName);
+		$sbsmarty->assign('sb_form_submit_value', $btn_add_edit);
 	break;
 
 	case "menu":
@@ -220,33 +255,22 @@ switch($action) {
 		$formName        = "editmenu_form";
 		$formType        = "menu";
 		$btn_add_edit    = "Modifier";
-		$legend_add_edit = "Modifier les autorisations de menu de &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
-		$sbsmarty->assign('allmenu', true);
+		$legend_add_edit = "Droits d'accès de &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
 		if ($_POST['form_submit']) {
 
 			// Injection des données
-			$id   = intval($_POST['id']);
-			foreach($_POST['menu'] as $val) { $menu .= "$val|"; }
-			$menu = rtrim($menu, '|');
-			
-			// EDIT
+			$id = intval($_POST['id']);
+
+			// EDIT (droits granulaires par module, voir inc/sbuiadmin-rights.php)
 			if ($formType == 'menu' && $id > 0) {
 
-				// UPDATE DATAS
-				// --- Encrypt password
-				$password = $sbusers->encrypt($password);
-				$query = "UPDATE $table SET menu = '$menu'
-										    WHERE id = '$id'";
-											 
-				$result_edit = $sbsql->query($query);
+				$result_edit = sbSaveRightsMatrix($id, $_POST);
 				if ($result_edit) {
-					// --- On ne vide pas les champs du formulaire
-					// -------------------------------------------
 					// --- Message SUCCES
-					$sb_msg_valid = 'Autorisations de menu modifiées avec succès';
+					$sb_msg_valid = 'Droits d\'accès modifiés avec succès';
 				} else {
 					// --- Message ERROR
 					$sb_msg_error = 'Error: Write Error (EDIT)!';
@@ -261,8 +285,8 @@ switch($action) {
 			$username     = utf8_encode($assoc_name['username']);
 
 			// --- Debug SQL
-			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query . "\n" . 'Submit Form Type = '.$formType);
-			
+			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', 'sbSaveRightsMatrix(' . $id . ', $_POST)' . "\n" . 'Submit Form Type = '.$formType);
+
 		}
 		
 		// --------------------------------
@@ -272,7 +296,6 @@ switch($action) {
 			$query_1  = "SELECT * FROM $table WHERE id = $id";
 			$requestQ = $sbsql->query($query_1);
 			$assoc    = $sbsql->assoc($requestQ);
-			$menu     = $assoc['menu'];
 			$username = utf8_encode($assoc['username']);
 			$sbsmarty->assign('assoc', $query_1);
 
@@ -287,39 +310,42 @@ switch($action) {
 		$sbform->openForm(array('action' => "$formAction", 'name' => "$formName", 'id' => "$formName", 'reloadpage' => "$formAction", 'submitpage' => "$formAction"));
 		// --- Add inputs and more
 		// ----------------------------
-		// Menu
+		// Droits d'accès (voir/ajouter/modifier/supprimer par module),
+		// groupés comme le menu principal (Configuration / Modules)
 		// ----------------------------
-		// --- Tableau des modules
-		$array_menu = explode("|", $menu);
-		// --- Wrapper for floated .config_blocks (form is flex-column)
-		$sbform->addAnything('<div class="rights-toggle-grid" style="overflow:hidden">');
-		foreach($module_menu as $key => $val) {
-			// Create random variable
-			$_randstring = substr(str_shuffle(str_repeat("0123456789abcdefghijklmnopqrstuvwxyz", 5)), 0, 5);
-			// Initialize each array
-			$_mmodule[$_randstring] = [];
-			// Module Text
-			$main_text = '<i class="fa fa-'.$module_menu[$key]['icon'].' fa-fw"></i> ' . $module_menu[$key]['main'];
-			$module_subtitle = "<span class='help-block'>" . 'Module : '.$key.'</span>';
-			$_mmodule[$_randstring][0]['text']    = 'Désactivé';
-			$_mmodule[$_randstring][0]['name']    = 'menu[]';
-			$_mmodule[$_randstring][0]['value']   = $key;
-			$_mmodule[$_randstring][0]['checked'] = (in_array($key, $array_menu)) ? '1' : '0';
-			$config_blocks = ($_mmodule[$_randstring][0]['checked'] == '0') ? 'config_blocks_active' : 'config_blocks_desactived';
-			$sbform->addAnything("<div class='$config_blocks'>");
-			$sbform->addCheckbox((($module_menu[$key]['group'] == 'admin') ? '<span style="color: red;">'.$main_text.'</span>' : $main_text), $_mmodule[$_randstring], '', false, '<br />');
-			$sbform->addAnything($module_subtitle);
-			$sbform->addAnything("</div>");
+		$rights_matrix = sbGetRightsMatrix($id);
+		$rights_groups = sbGetRightsGroups();
+		foreach ($rights_groups as $section_title => $section_modules) {
+			if (empty($section_modules)) continue;
+			$sbform->addAnything('<h3 style="margin:20px 0 8px">' . $section_title . '</h3>');
+			$sbform->addAnything('<div style="overflow-x:auto"><table class="data-table"><thead><tr>');
+			$sbform->addAnything('<th>Module</th><th>Voir</th><th>Ajouter</th><th>Modifier</th><th>Supprimer</th>');
+			$sbform->addAnything('</tr></thead><tbody>');
+			foreach ($section_modules as $key => $label) {
+				$rights      = $rights_matrix[$key];
+				$view_checked = ($rights['can_view'] == 1);
+				$sbform->addAnything('<tr class="data-row" data-rights-row><td>' . $rights['label'] . '</td>');
+				foreach (array('view', 'add', 'edit', 'delete') as $right) {
+					$checked  = ($rights['can_' . $right] == 1) ? ' checked' : '';
+					// "Ajouter/Modifier/Supprimer" n'ont aucun effet sans "Voir" (sbCheckRightRow
+					// bloque tout dès que can_view=0) - grisées tant que "Voir" est décochée
+					// (toggle JS dans users.tpl, valeur préservée à la soumission).
+					$disabled = ($right != 'view' && !$view_checked) ? ' disabled' : '';
+					$sbform->addAnything('<td><label class="check"><input type="checkbox" name="rights[' . $key . '][' . $right . ']" value="1" data-right="' . $right . '"' . $checked . $disabled . '><span class="box"></span></label></td>');
+				}
+				$sbform->addAnything('</tr>');
+			}
+			$sbform->addAnything('</tbody></table></div>');
 		}
-		$sbform->addAnything('</div>');
-		$sbform->addAnything("<p style='clear: both'>Cochez les entrées du menu qui ne sont pas autorisées pour cet utilisateur.<br>Les entrées nommées en <span style='color: red;'>rouge</span> sont les modules accessibles uniquement par les administrateurs (Groupe Admin).</p>");
 		// --- Hiddens / Buttons
 		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => "$formName"));
 		$sbform->addInput('hidden', '', array('name' => 'id', 'value' => "$id"));
-		$sbform->addInput('submit', '', array('value' => "$btn_add_edit"));
 		$sbform->addInput('reset', '', array('value' => "Reset"));
 		// --- Close Form
 		$sbform->closeForm ();
+		// --- Bouton "Actions" de la colonne droite (shared-panel-actions.tpl)
+		$sbsmarty->assign('sb_form_id', $formName);
+		$sbsmarty->assign('sb_form_submit_value', $btn_add_edit);
 	break;
 
 	case "delblockedip":
@@ -412,7 +438,6 @@ switch($action) {
 		$sbform->addInput('text', "Délai minimum entre deux tentatives de connexion (secondes)", array('name' => 'flood_login_delay', 'value' => "$sb_config_flood_login_delay", 'placeholder' => "4"), true, false, "Une nouvelle tentative avant l'écoulement de ce délai déclenche le blocage de l'IP.");
 		// --- Hiddens / Buttons
 		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => "$formName"));
-		$sbform->addInput('submit', '', array('value' => "$btn_add_edit"));
 		$sbform->addInput('reset', '', array('value' => "Reset"));
 		// --- Close Form
 		$sbform->closeForm();

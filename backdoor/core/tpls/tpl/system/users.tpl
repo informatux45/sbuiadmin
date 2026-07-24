@@ -229,7 +229,7 @@
 																<span class="btn--icon" style="color:{if $user.active}var(--success){else}var(--danger){/if}" title="Statut {if $user.active}visible{else}non visible{/if}">
 																	<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
 																</span>
-																<a class="btn--icon" href="{$module_url}&a=menu&id={$user.id}" title="Autorisation menu">
+																<a class="btn--icon" href="{$module_url}&a=menu&id={$user.id}" title="Droits d'accès">
 																	<svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
 																</a>
 																<a class="btn--icon" href="{$module_url}&a=edit&id={$user.id}" title="Modifier">
@@ -260,7 +260,7 @@
 
 			{if !$all && $smarty.get.a != 'blockedip' && $smarty.get.a != 'delblockedip' && $smarty.get.a != 'blockedipsettings'}
 				<div class="grid">
-					<section class="{if $allmenu}col-12{else}col-8{/if} card">
+					<section class="col-8 card">
 						<div class="card-head">
 							<div class="card-title-wrap">
 								<h2 class="card-title">{$legend_add_edit|unescape:"htmlall"} - {$smarty.get.a}</h2>
@@ -270,16 +270,27 @@
 							{include_php file='form.php'}
 					</section>
 
-					{if !$allmenu}
 					<div class="col-4">
 						{* ------------------------------------ *}
 						{* --- Include Shared Panel Actions --- *}
 						{include file='shared/shared-panel-actions.tpl'}
 						{* ------------------------------------ *}
 						{* ------------------------------------ *}
+						{if $smarty.get.a == 'menu'}
+						<div class="card">
+							<div class="card-head">
+								<div class="card-title-wrap">
+									<h2 class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Aide</h2>
+								</div>
+							</div>
+							<p>Décochez une case pour retirer le droit correspondant à cet utilisateur.</p>
+							<p>« Voir » contrôle l'accès au module lui-même (même en tapant directement l'URL).</p>
+							<p>Les 3 autres contrôlent les actions à l'intérieur du module.</p>
+						</div>
+						<!-- /.card -->
+						{/if}
 					</div>
 					<!-- /.col-4 -->
-					{/if}
 				</div>
 				<!-- /.grid -->
 			{/if}
@@ -293,12 +304,27 @@
 				$( "#sortable" ).sortable({
 					axis: "y",
 					placeholder: "ui-state-highlight",
-					{*update: function() { 
-						var order = $('#sortable').sortable('serialize'); 
+					{*update: function() {
+						var order = $('#sortable').sortable('serialize');
 						$.post('sortable.php',order);
 					}*}
 				});
 				$( "#sortable" ).disableSelection();
+			{/if}
+
+			{if $smarty.get.a == 'menu'}
+				// Droits d'accès : "Ajouter/Modifier/Supprimer" n'ont aucun effet
+				// sans "Voir" - grisés/verrouillés tant que "Voir" est décochée.
+				$('[data-rights-row]').on('change', '[data-right="view"]', function() {
+					$(this).closest('[data-rights-row]')
+						.find('[data-right="add"], [data-right="edit"], [data-right="delete"]')
+						.prop('disabled', !this.checked);
+				});
+				// Un checkbox "disabled" n'est pas envoyé au submit : on les
+				// réactive juste avant l'envoi pour préserver leur valeur.
+				$(document).on('submit', 'form[id="editmenu_form"]', function() {
+					$(this).find('input:disabled').prop('disabled', false);
+				});
 			{/if}
 		});
 		</script>

@@ -107,6 +107,12 @@ $sbsmarty->assign('sbpagination', $sbpagination);
 $sbsmarty->assign('sbfiles_medias_exts_allowed', $sbfiles_medias_exts_allowed);
 $sbsmarty->assign('sbfiles_medias_dirs_allowed', $sbfiles_medias_dirs_allowed);
 
+// --- ASSIGN Droits (l'upload lui-même est aussi vérifié côté serveur dans
+// server/php/sbUploadServer.php, qui est hors routeur - ceci n'est que
+// l'affichage, pour éviter de proposer une zone d'upload inutilisable)
+$sbsmarty->assign('sb_can_add_medias', sbHasRight('medias', 'add'));
+$sbsmarty->assign('sb_can_delete_medias', sbHasRight('medias', 'delete'));
+
 // --- ASSIGN Infos ini_get
 $sbsmarty->assign('media_ini_get_post_max_size', sbIniGet('post_max_size'));
 $sbsmarty->assign('media_ini_get_upload_max_filesize', sbIniGet('upload_max_filesize'));

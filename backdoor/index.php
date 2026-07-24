@@ -359,8 +359,9 @@ if (trim($sb_link_settings[24]) == '1') {
 	$sb_url_customer = trim($sb_link_settings[15]);
 }
 $sbsmarty->assign('sb_url_customer', $sb_url_customer);
-// --- Sandbox Activation
-$sbsmarty->assign('sb_sandbox', trim($sb_link_settings[16]));
+// --- Sandbox Activation (option globale ET droit "voir" de l'utilisateur -
+// ce lien est codé en dur dans main_menu.tpl, hors boucle de sbGetMenuModule())
+$sbsmarty->assign('sb_sandbox', (trim($sb_link_settings[16]) == 1 && sbHasRight('sandbox', 'view')) ? 1 : 0);
 // --- CMS Activation
 $sbsmarty->assign('sb_cms', trim($sb_link_settings[17]));
 
@@ -407,6 +408,15 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 	// --- Control if PHP file exists
 	$controlIfPhpFileExists = $sb_path_file_sys_mod.$sb_get_page.".php";
 	if (file_exists($controlIfPhpFileExists) && $sb_get_page != 'index') {
+		// --- Droits granulaires (voir/ajouter/modifier/supprimer) : vérifié
+		// AVANT d'exécuter le contrôleur du module, pour bloquer l'accès
+		// direct par URL (connaître index.php?p=faq ne suffisait jusqu'ici
+		// qu'à contourner le masquage cosmétique du menu). Voir inc/sbuiadmin-rights.php.
+		if (!sbHasRight($sb_get_page)) {
+			$sbsmarty->display("403.tpl");
+			exit;
+		}
+
 		// Yes, so include
 		sb_global_include($controlIfPhpFileExists);
 
@@ -450,7 +460,7 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 				$sbsmarty->assign('sb_dashboard_status1_link', ( (isset($sb_dashboard[3])) ? trim($sb_dashboard[3]) : "" ));
 				$sbsmarty->assign('sb_dashboard_status1_icon', ( (isset($sb_dashboard[4])) ? trim($sb_dashboard[4]) : "" ));
 				$sbsmarty->assign('sb_dashboard_status1_tbcol', ( (isset($sb_dashboard[5])) ? trim($sb_dashboard[5]) : "" ));
-				if (isset($sb_dashboard[5]) && isset($sb_dashboard[1])) {
+				if (isset($sb_dashboard[5]) && trim($sb_dashboard[5]) != '' && isset($sb_dashboard[1]) && trim($sb_dashboard[1]) != '') {
 					$query_1  = "SELECT ".$sb_dashboard[5]." FROM ".$sb_dashboard[1]." ORDER BY ".$sb_dashboard[5]." DESC";
 					$request1 = $sbsql->query($query_1);
 					$result1  = $sbsql->toarray($request1);
@@ -466,7 +476,7 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 				$sbsmarty->assign('sb_dashboard_status2_link', ( (isset($sb_dashboard[8])) ? trim($sb_dashboard[8]) : "" ));
 				$sbsmarty->assign('sb_dashboard_status2_icon', ( (isset($sb_dashboard[9])) ? trim($sb_dashboard[9]) : "" ));
 				$sbsmarty->assign('sb_dashboard_status2_tbcol', ( (isset($sb_dashboard[10])) ? trim($sb_dashboard[10]) : "" ));
-				if (isset($sb_dashboard[10]) && isset($sb_dashboard[6])) {
+				if (isset($sb_dashboard[10]) && trim($sb_dashboard[10]) != '' && isset($sb_dashboard[6]) && trim($sb_dashboard[6]) != '') {
 					$query_2  = "SELECT ".$sb_dashboard[10]." FROM ".$sb_dashboard[6]." ORDER BY ".$sb_dashboard[10]." DESC";
 					$request2 = $sbsql->query($query_2);
 					$result2  = $sbsql->toarray($request2);
@@ -482,7 +492,7 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 				$sbsmarty->assign('sb_dashboard_status3_link', ( (isset($sb_dashboard[13])) ? trim($sb_dashboard[13]) : "" ));
 				$sbsmarty->assign('sb_dashboard_status3_icon', ( (isset($sb_dashboard[14])) ? trim($sb_dashboard[14]) : "" ));
 				$sbsmarty->assign('sb_dashboard_status3_tbcol', ( (isset($sb_dashboard[15])) ? trim($sb_dashboard[15]) : "" ));
-				if (isset($sb_dashboard[11]) && isset($sb_dashboard[15])) {
+				if (isset($sb_dashboard[11]) && trim($sb_dashboard[11]) != '' && isset($sb_dashboard[15]) && trim($sb_dashboard[15]) != '') {
 					$query_3  = "SELECT ".$sb_dashboard[15]." FROM ".$sb_dashboard[11]." ORDER BY ".$sb_dashboard[15]." DESC";
 					if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $sb_dashboard[15]);
 					$request3 = $sbsql->query($query_3);
@@ -499,7 +509,7 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 				$sbsmarty->assign('sb_dashboard_status4_link', ( (isset($sb_dashboard[18])) ? trim($sb_dashboard[18]) : "" ));
 				$sbsmarty->assign('sb_dashboard_status4_icon', ( (isset($sb_dashboard[19])) ? trim($sb_dashboard[19]) : "" ));
 				$sbsmarty->assign('sb_dashboard_status4_tbcol', ( (isset($sb_dashboard[20])) ? trim($sb_dashboard[20]) : "" ));
-				if (isset($sb_dashboard[16]) && isset($sb_dashboard[20])) {
+				if (isset($sb_dashboard[16]) && trim($sb_dashboard[16]) != '' && isset($sb_dashboard[20]) && trim($sb_dashboard[20]) != '') {
 					$query_4  = "SELECT ".$sb_dashboard[20]." FROM ".$sb_dashboard[16]." ORDER BY {$sb_dashboard[20]} DESC";
 					$request4 = $sbsql->query($query_4);
 					$result4  = $sbsql->toarray($request4);

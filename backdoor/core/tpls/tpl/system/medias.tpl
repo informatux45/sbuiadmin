@@ -31,6 +31,13 @@
 						</div>
                     </div>
 
+						{if !$sb_can_add_medias}
+							<div class="alert warning">
+								<span class="ico"><svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg></span>
+								<div class="body">Vous n'avez pas le droit d'ajouter des médias.</div>
+							</div>
+						{/if}
+
 							<!-- Fine Uploader Gallery template
 							====================================================================== -->
 							<script type="text/template" id="qq-template-gallery">
@@ -188,9 +195,11 @@
 								<span class="sbmedia-mime">{$sbmedia|@sbDisplayMediaMime}</span>
 								
 								{* Display Delete Button *}
+								{if $sb_can_delete_medias}
 								<a class="sbmedia-delete" data-confirm="Sûr de vouloir supprimer ceci ?" type="button" href="{$module_short_url}&del={$sbmedia}{if isset($smarty.get.page)}&page={$smarty.get.page}{/if}">
 									<i class="fa fa-times"></i>
 								</a>
+								{/if}
 								
 								</p>
 							{foreachelse}

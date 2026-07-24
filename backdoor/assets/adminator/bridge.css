@@ -63,6 +63,14 @@ main.content {
 	animation-fill-mode: backwards;
 }
 
+/* Le "gap" du thème (voir plus haut) n'espace que les items À L'INTÉRIEUR
+   d'une même .grid — quand une page empile plusieurs .grid séparées
+   (cmsconfig.tpl, toolbarck.tpl, users.tpl...), rien ne les espace entre
+   elles et les blocs se retrouvent collés. */
+.grid + .grid {
+	margin-top: 20px;
+}
+
 /* Adminator's .grid ships only .col-6/.col-12 — filling in the missing
    3/4/8-column spans used when porting pages to .grid/.card layouts. */
 .col-3 { grid-column: span 3; }
@@ -135,39 +143,6 @@ main.content {
 	background: linear-gradient(180deg, var(--success-soft), var(--bg-card) 65%) !important;
 	border-color: var(--success) !important;
 	box-shadow: 0 0 0 1px var(--success);
-}
-/* users.php menu-rights grid (.rights-toggle-grid wrapper): same live
-   feedback as the Plugins tab, but inverted - here "checked" means the
-   menu entry is restricted/disabled for this user, so checked = red,
-   unchecked = green. Both static classes are neutralised first so the
-   live checkbox state is always the single source of truth. */
-.rights-toggle-grid .config_blocks_active,
-.rights-toggle-grid .config_blocks_desactived {
-	border: 1px solid var(--border);
-	background: var(--bg-muted);
-}
-.rights-toggle-grid .config_blocks_active:has(input:checked),
-.rights-toggle-grid .config_blocks_desactived:has(input:checked) {
-	background: linear-gradient(180deg, var(--danger-soft), var(--bg-card) 65%) !important;
-	border-color: var(--danger) !important;
-	box-shadow: 0 0 0 1px var(--danger);
-}
-.rights-toggle-grid .config_blocks_active:not(:has(input:checked)),
-.rights-toggle-grid .config_blocks_desactived:not(:has(input:checked)) {
-	background: linear-gradient(180deg, var(--success-soft), var(--bg-card) 65%) !important;
-	border-color: var(--success) !important;
-	box-shadow: 0 0 0 1px var(--success);
-}
-/* "Module : key" caption - moved out of .field-label via addAnything()
-   (same fix as the Plugins howto button: .field-label is display:flex,
-   so the <br> that used to separate it from the module name never
-   actually broke the line, it just got shoved to the side or overflowed). */
-.rights-toggle-grid .help-block {
-	display: block;
-	margin-top: 4px;
-	font-size: 11px;
-	color: var(--t-muted);
-	font-style: italic;
 }
 /* .field-label is itself display:flex (theme default) - text-align:center
    on .config_blocks doesn't center a flex box's own content, it needs

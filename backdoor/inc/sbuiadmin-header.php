@@ -56,7 +56,7 @@ register_shutdown_function('__fatalHandler');
 // ----------------------
 // INCLUDES by array
 // ----------------------
-$sbuiadmin_files = array('config', 'functions');
+$sbuiadmin_files = array('config', 'functions', 'rights');
 foreach ($sbuiadmin_files as $sbuiadmin_file) {
     require_once(SBUIADMIN_PATH . '/inc/' . SBUIADMIN_ID . '-' . $sbuiadmin_file . '.php');
 }
