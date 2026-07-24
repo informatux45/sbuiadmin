@@ -10,13 +10,35 @@
 			{*       Write your own code after this line        *}
 			{* ------------------------------------------------ *}
 			
-			{include file='system/sandbox_bar.tpl'}
+			<section class="hero">
+				<div class="hero-text">
+					<span class="eyebrow">Sandbox</span>
+					<h1 class="hero-title">Sandbox</h1>
+					<p class="hero-sub">Page de démonstration des composants du constructeur de formulaires (developpeurs).</p>
+				</div>
+				<div class="hero-actions">
+					<div class="dd-wrap">
+						<button class="btn btn--outline-primary" data-dropdown>
+							Actions
+							<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+						</button>
+						<div class="dd-menu" role="menu">
+							<a class="dd-menu-item" href="index.php?p=sandbox"{if $all} style="color:var(--primary);font-weight:600"{/if}>Tous les enregistrements</a>
+							<a class="dd-menu-item" href="index.php?p=sandbox&a=add"{if $smarty.get.a == 'add'} style="color:var(--primary);font-weight:600"{/if}>Ajouter un enregistrement</a>
+							<a class="dd-menu-item" href="index.php?p=sandbox&a=sort"{if $sort} style="color:var(--primary);font-weight:600"{/if}>Trier les enregistrements</a>
+							<div class="dd-divider"></div>
+							<a class="dd-menu-item" href="index.php?p=sandbox">Autres liens</a>
+							<a class="dd-menu-item" href="index.php?p=sandbox">Autres liens 2</a>
+							<a class="dd-menu-item" href="index.php?p=sandbox">Autres liens 3</a>
+						</div>
+					</div>
+				</div>
+			</section>
 
             <div class="grid">
                 <section class="col-12 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<span class="eyebrow">Sandbox</span>
 							<h2 class="card-title">{if $all}Gestion de vos enregistrements{else}{$legend_add_edit}{/if}</h2>
 						</div>
                     </div>

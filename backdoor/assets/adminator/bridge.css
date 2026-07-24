@@ -7,7 +7,12 @@
  * Loaded globally.
  */
 
-body {
+/* "html body" (au lieu de "body" seul) : plus spécifique que le "body"
+   de Bootstrap 3 (fond blanc fixe), injecté par addPageBuilder() sur
+   sandbox.php et qui, chargé après coup dans la page, écrasait sinon
+   le fond du thème sur cette page précise (même famille de bug que les
+   collisions .input-group/.help-block/.well déjà rencontrées). */
+html body {
 	background: var(--bg-body);
 	color: var(--t-base);
 }
@@ -661,3 +666,40 @@ p.sbmedia > span.sbmedia-other {
 .field .input-group { display: flex; }
 .input-group .addon { flex: 0 0 auto; white-space: nowrap; }
 .input-group .input { flex: 1 1 0%; min-width: 0; }
+
+/* .btn : même collision Bootstrap 3 que .input-group/.help-block/.well
+   ci-dessus (sandbox.php, Page Builder) — Bootstrap définit aussi une
+   classe .btn (padding/border-radius/display différents), même
+   spécificité, chargée après coup. Classe doublée pour gagner quel que
+   soit l'ordre de chargement.
+   border-color volontairement absent d'ici (border-width/style seulement) :
+   les modifieurs (.btn--outline-primary, etc.) redéfinissent uniquement
+   border-color, à la même spécificité (0,1,0) que le .btn de Bootstrap —
+   si border-color avait été fixé ici (0,2,0), il aurait aussi pris le pas
+   sur ces modifieurs. Voir .btn--outline-primary.btn--outline-primary
+   plus bas pour le même correctif appliqué à leur propre spécificité. */
+.btn.btn {
+	align-items: center;
+	border-style: solid;
+	border-width: 1px;
+	border-radius: 8px;
+	display: inline-flex;
+	font-size: 13px;
+	font-weight: 600;
+	gap: 8px;
+	padding: 9px 14px;
+	white-space: nowrap;
+}
+.btn--outline-primary.btn--outline-primary {
+	background: transparent;
+	border-color: var(--primary);
+	color: var(--primary);
+}
+/* .btn--ghost a le même souci (border-color propre) que .btn--outline-primary
+   ci-dessus — corrigé par anticipation avant que ça se voie ailleurs sur
+   sandbox.php (boutons submit/reset du formulaire notamment). */
+.btn--ghost.btn--ghost {
+	background: var(--bg-card);
+	border-color: var(--border);
+	color: var(--t-base);
+}
