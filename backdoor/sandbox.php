@@ -355,7 +355,7 @@ switch($action) {
 		// ----------------------------
 		// --- Input TEXT with icon / icon2
 		// ----------------------------
-		$sbform->addInput('text', 'Nom (2 icônes)', array ('name' => 'montant', 'value' => "$montant", 'placeholder' => "Votre montant", 'icon' => 'euro', 'icon2' => '.00'), true);
+		$sbform->addInput('text', 'Nom (2 icônes)', array ('name' => 'montant', 'value' => "$montant", 'placeholder' => "Votre montant", 'icon' => 'euro', 'icon2' => '.00', 'style' => 'width: 200px;'), true);
 		// ----------------------------
 		// --- Input TEXT with text instead of icon
 		// ----------------------------

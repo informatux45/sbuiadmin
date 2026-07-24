@@ -278,10 +278,11 @@ class form extends sanitize {
 		if (!array_key_exists ('name', $arrArgs) && $elem !== 'submit' && $elem !== 'reset') {
 			$arrArgs['name'] = 'default'.time();
 		}
-		
+
 		$cpt = count ($this -> formElementArr);
 		$this -> formElementArr[$cpt][$elem] = array ();
 		$arrTemp = array_merge ($this -> eventArr, $this -> commonArr, $this -> inputArr[$elem]);
+		$labelInputGroupStyle = '';
 
 		foreach ($arrTemp as $clef => $val) {
 			if (array_key_exists ($clef, $arrArgs)) {
@@ -289,6 +290,8 @@ class form extends sanitize {
 					$labelFor = $arrArgs[$clef];
 				if ($clef == 'icon')
 					$labelInputGroup = $arrArgs[$clef];
+				if ($clef == 'style')
+					$labelInputGroupStyle = $arrArgs[$clef];
 				if ($clef == 'medias')
 					$onclickFunction = true;
 				if ($clef == 'addany')
@@ -345,13 +348,19 @@ class form extends sanitize {
 			if ($addany)
 				$chaineTemp .= '<div style="width: 200px; height: 200px; border: 1px solid red;">';
 
+			// Un texte à la place d'un icône (préfixe commençant par "0") a une largeur
+			// variable, contrairement à un glyphe FontAwesome — utilise le composant
+			// natif .input-group/.addon (texte à côté de l'input) plutôt que
+			// .input-icon/.ico (pensé pour une icône de taille fixe en position absolue).
+			$isTextPrefix = ($labelInputGroup != '' && substr($labelInputGroup, 0, 1) == '0');
+
 			// Show label (required fields)
-			$chaineTemp .= $this -> isRequired ($isRequired, $label, $labelFor, 'red', $labelInputGroup);
+			$chaineTemp .= $this -> isRequired ($isRequired, $label, $labelFor, 'red', $labelInputGroup, $labelInputGroupStyle, $isTextPrefix);
 
 			// Show the form element
 			if ($labelInputGroup != '') {
-				if (substr($labelInputGroup, 0 ,1) == '0')
-					$chaineTemp .= '<span class="ico">' . substr($labelInputGroup, 1) . '</span>';
+				if ($isTextPrefix)
+					$chaineTemp .= '<span class="addon">' . substr($labelInputGroup, 1) . '</span>';
 				else
 					$chaineTemp .= '<span class="ico"><i class="fa fa-' . $labelInputGroup . '"></i></span>';
 			}
@@ -397,14 +406,14 @@ class form extends sanitize {
 			
 			$chaineTemp .= '/>';
 
+			// Si deuxieme icon (icon2) : suffixe dans l'input (ex: "500 [ms]"), pas en dessous
+			if ($labelInputGroup2 != '')
+				$chaineTemp .= '<span class="ico-suffix">' . $labelInputGroup2 . '</span>';
+
 			// Close .input-icon, opened by isRequired() when $labelInputGroup is set
 			if ($labelInputGroup != '') {
 				$chaineTemp .= '</div>';
 			}
-
-			// Si deuxieme icon (icon2)
-			if ($labelInputGroup2 != '')
-				$chaineTemp .= '<span class="field-help">' . $labelInputGroup2 . '</span>';
 
 			// Close .field, opened by isRequired()
 			$chaineTemp .= '</div>';
@@ -881,7 +890,7 @@ class form extends sanitize {
 		$chaineRequired = ($isRequired == true) ? ' required="true" bname="' . $label . '" ' : '';
 		$chaineTemp    .= $chaineRequired;
 
-		$chaineTemp .= '/>&nbsp;';
+		$chaineTemp .= '/>';
 		$chaineTemp .= '<script type="text/javascript">';
 		// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 		// Possible options for the calendar date select -=
@@ -960,11 +969,11 @@ class form extends sanitize {
 		$chaineRequired = ($isRequired == true) ? ' required="true" bname="' . $label . '" ' : '';
 		$chaineTemp    .= $chaineRequired;
 
-		$chaineTemp .= '/>&nbsp;';
-		$chaineTemp .= '<link rel="stylesheet" href="'.SBUIADMIN_URL.'assets/dist/js/vendor/tagify/tagify.css">';
-		$chaineTemp .= '<script src="'.SBUIADMIN_URL.'assets/dist/js/vendor/tagify/tagify.min.js"></script>';
-		$chaineTemp .= '<link rel="stylesheet" href="'.SBUIADMIN_URL.'assets/dist/js/vendor/tagify/dragsort.css" media="print" onload="this.media=\'all\'">';
-		$chaineTemp .= '<script src="'.SBUIADMIN_URL.'assets/dist/js/vendor/tagify/dragsort.js"></script>';
+		$chaineTemp .= '/>';
+		$chaineTemp .= '<link rel="stylesheet" href="'._AM_SITE_URL.'assets/dist/js/vendor/tagify/tagify.css">';
+		$chaineTemp .= '<script src="'._AM_SITE_URL.'assets/dist/js/vendor/tagify/tagify.min.js"></script>';
+		$chaineTemp .= '<link rel="stylesheet" href="'._AM_SITE_URL.'assets/dist/js/vendor/tagify/dragsort.css" media="print" onload="this.media=\'all\'">';
+		$chaineTemp .= '<script src="'._AM_SITE_URL.'assets/dist/js/vendor/tagify/dragsort.js"></script>';
 		$chaineTemp .= '<style>';
 		if (_AM_SITE_DEBUG) {
 			$chaineTemp .= '.tagify+input, .tagify+textarea {
@@ -977,9 +986,16 @@ class form extends sanitize {
 								background: powderblue;
 							}';
 		}
+		// Tagify insère son widget (<tags class="tagify">) comme un nouveau frère
+		// de l'input d'origine (masqué) — le "style" (ex: largeur) passé pour ce
+		// champ n'est appliqué par défaut qu'à cet input caché, jamais au widget
+		// réellement visible. Sans largeur explicite ici, .field étant un flex
+		// column (align-items:stretch par défaut), le widget s'étire sur toute
+		// la largeur de la carte au lieu de rester compact.
+		$tagifyStyle = (isset($arrArgs['style']) && $arrArgs['style'] != '') ? $arrArgs['style'] : 'min-width: 400px;';
 		$chaineTemp .= '.tagify{
 							margin: .2em;
-							min-width: 400px;
+							' . $tagifyStyle . '
 						}
 						</style>';
 		$chaineTemp .= '<script type="text/javascript">';
@@ -1040,8 +1056,12 @@ class form extends sanitize {
 			$chaineTemp .= $this -> addOption ('Pas de pays disponible', array('value'=>''));	
 		}
 
-		$chaineTemp .= $this -> closeSelect();
-		$this -> formBuffer['elements'][$cpt] = $chaineTemp;
+		// openSelect()/addOption()/closeSelect() écrivent chacune directement
+		// dans formBuffer à leur propre position (aucune ne retourne de HTML),
+		// $chaineTemp ne sert donc à rien ici — pas d'assignation finale à
+		// faire (l'ancienne ligne écrivait dans une clé de tableau invalide,
+		// $cpt n'ayant jamais été déclaré dans cette méthode).
+		$this -> closeSelect($helpDsc);
 	}
 	
 	
@@ -2121,7 +2141,7 @@ EOT;
 	* add a * for form fields required
 	* @return html code (string)
 	*/
-	public function isRequired ($fieldRequired, $label, $labelFor = '', $colorRequired = 'red', $labelInputGroup = '') {
+	public function isRequired ($fieldRequired, $label, $labelFor = '', $colorRequired = 'red', $labelInputGroup = '', $labelInputGroupStyle = '', $isTextPrefix = false) {
 
 		$chaineTemp = '<div class="field">';
 
@@ -2136,7 +2156,15 @@ EOT;
 		$chaineTemp .= '</label>';
 
 		if ($labelInputGroup != '') {
-			$chaineTemp .= '<div class="input-icon">';
+			// $labelInputGroupStyle (ex: "width: 200px;") va sur ce wrapper, pas sur
+			// l'input lui-même — sinon l'icône/suffixe absolus (.ico/.ico-suffix),
+			// positionnés par rapport à ce div, ne suivent pas le rétrécissement de
+			// l'input et se retrouvent décalés à droite du champ au lieu d'y coller.
+			// Texte-préfixe (largeur variable) : composant .input-group/.addon
+			// (texte à côté de l'input, en flux normal), pas .input-icon/.ico
+			// (pensé pour un glyphe de taille fixe en position absolue).
+			$wrapClass = $isTextPrefix ? 'input-group' : 'input-icon';
+			$chaineTemp .= '<div class="' . $wrapClass . '"' . ($labelInputGroupStyle != '' ? ' style="' . $labelInputGroupStyle . '"' : '') . '>';
 		}
 
 		return $chaineTemp;

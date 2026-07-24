@@ -252,6 +252,40 @@ a {
 	border: 1px solid var(--border);
 	box-shadow: var(--shadow-lg);
 }
+/* addTagify() (sandbox.php "Tags") : tagify.css expose ses couleurs via ses
+   propres variables CSS — on les fait pointer vers les tokens du thème au
+   lieu de les laisser à leurs valeurs par défaut (fond blanc fixe, jamais
+   adapté au dark mode ni au style .input du reste des champs). */
+.tagify {
+	--tags-border-color: var(--border);
+	--tags-hover-border-color: var(--primary);
+	--tags-focus-border-color: var(--primary);
+	--tags-disabled-bg: var(--bg-muted);
+	--tag-bg: var(--bg-muted);
+	--tag-hover: var(--primary-soft);
+	--tag-text-color: var(--t-base);
+	--tag-text-color--edit: var(--t-base);
+	--tag-remove-btn-color: var(--t-muted);
+	--tag-remove-btn-bg--hover: var(--danger);
+	--input-color: var(--t-base);
+	--placeholder-color: var(--t-light);
+	--placeholder-color-focus: var(--t-light);
+	background: var(--bg-card);
+	border-radius: 8px;
+	font-family: inherit;
+	font-size: 13px;
+}
+.tagify__dropdown__wrapper {
+	background: var(--bg-card) !important;
+	border-color: var(--border) !important;
+}
+.tagify__dropdown__item {
+	color: var(--t-base);
+}
+.tagify__dropdown__item--active {
+	background: var(--primary) !important;
+	color: var(--t-inverse) !important;
+}
 
 /* system/theme.tpl: theme picker cards keep the legacy theme_block/theme_block_active
    classes for JS-free active-state marking. The original sb-admin-custom.css gradient
@@ -282,12 +316,28 @@ a {
 /* header.tpl: body class on the "transfert" page. */
 .margin10 { margin: 10px; }
 
-/* inc/class/sbuiadmin-form.php: helpDsc text under nearly every field type. */
-.help-block {
-	color: var(--t-muted);
+/* inc/class/sbuiadmin-form.php: helpDsc text under nearly every field type.
+   --t-light (au lieu de --t-muted) : même niveau de discrétion que les
+   placeholders de champ, tout en s'adaptant clair/sombre (contrairement à
+   une couleur fixe). Sélecteur ".help-block.help-block" (classe doublée,
+   au lieu de ".help-block" seul) : même spécificité utile que "form
+   .help-block" face au ".help-block" de Bootstrap 3 (injecté par
+   addPageBuilder() sur sandbox.php), mais sans dépendre de la hiérarchie
+   DOM — le contenu de démo du Page Builder contient des <form> imbriqués
+   (HTML invalide) qui referment le vrai formulaire prématurément, rendant
+   un sélecteur ancré sur "form" peu fiable à cet endroit précis. */
+.help-block.help-block {
+	color: var(--t-light);
 	font-size: 0.9em;
 	font-style: italic;
 	margin-top: -10px;
+}
+/* addTagify() : le widget <tags class="tagify"> a une géométrie différente
+   d'un .input classique (marges propres à la librairie) — le -10px déjà
+   calibré pour les autres champs fait légèrement remonter la 1re ligne
+   sous le widget dans ce cas précis. */
+.field:has(.tagify) + .help-block.help-block {
+	margin-top: 0;
 }
 
 /* inc/class/sbuiadmin-form.php addBreak(): section divider used across forms.
@@ -550,3 +600,56 @@ p.sbmedia > span.sbmedia-other {
 .eyebrow { font-size: 20px; }
 .card-title-wrap .eyebrow { margin-bottom: 14px; }
 .nav-label { font-size: 14px; padding: 15px 10px 0px; }
+
+/* .input-icon : la hauteur du conteneur (position:relative) dépend de son
+   contenu en flux normal. addDate() ajoute un "&nbsp;" et un <script> après
+   l'input à l'intérieur de ce conteneur (contrairement aux autres champs à
+   icône) — un flux de blocs standard peut alors mal recalculer cette
+   hauteur, faisant dériver le "top:50%" de l'icône (ci-dessous) et la
+   plaquant en haut du champ au lieu du centre. Un conteneur flex calcule
+   sa hauteur de façon plus robuste (à partir du plus grand item), donc
+   l'ancre de "top:50%" reste correcte quel que soit le contenu additionnel. */
+.input-icon {
+	align-items: center;
+	display: flex;
+}
+
+/* .input-icon .ico (icône de gauche des champs) : le span est bien centré
+   verticalement (position:absolute + top:50%), mais son contenu (le glyphe
+   FontAwesome <i>) ne l'est pas, et dépend donc de la hauteur de ligne de la
+   police — léger décalage vers le bas. Centrage explicite du contenu. */
+.input-icon .ico {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* sbuiadmin-form.php addInput(): champ avec un 2e icône/texte (ex: "500 [ms]"),
+   affiché comme un suffixe à droite DANS le champ, pas en dessous. */
+.input-icon .ico-suffix {
+	color: var(--t-muted);
+	font-size: 12px;
+	pointer-events: none;
+	position: absolute;
+	right: 11px;
+	top: 50%;
+	transform: translateY(-50%);
+}
+.input-icon:has(.ico-suffix) .input { padding-right: 34px; }
+
+/* sbuiadmin-form.php addInput(): préfixe texte (.input-group/.addon) à côté
+   d'un input dans une ligne flex. L'input a width:100% dans sa règle de base
+   (.input,.select,.textarea) — sans flex-basis explicite, ce width:100%
+   entrait en conflit avec le partage d'espace flex et le préfixe se
+   retrouvait rendu sur sa propre ligne pleine largeur au lieu d'être
+   accolé à l'input. flex-basis:0% neutralise le width:100% pour le calcul
+   flex ; min-width:0 autorise l'input à rétrécir sous son contenu.
+   Sélecteur ".field .input-group" (au lieu de ".input-group" seul) : plus
+   spécifique que le ".input-group{display:table}" de Bootstrap 3, injecté
+   par addPageBuilder() (sandbox.php) et qui, chargé après coup dans la
+   page, écrasait sinon notre "display:flex" (même spécificité, dernière
+   règle gagne) — cassant l'affichage uniquement sur les pages utilisant
+   le Page Builder. */
+.field .input-group { display: flex; }
+.input-group .addon { flex: 0 0 auto; white-space: nowrap; }
+.input-group .input { flex: 1 1 0%; min-width: 0; }
