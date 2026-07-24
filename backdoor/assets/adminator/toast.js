@@ -62,6 +62,6 @@
 		close.addEventListener('click', remove);
 
 		getStack().appendChild(toast);
-		setTimeout(remove, 7000);
+		setTimeout(remove, window.SB_TOAST_DURATION || 7000);
 	};
 })();

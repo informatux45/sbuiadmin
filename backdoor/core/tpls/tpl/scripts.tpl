@@ -9,6 +9,7 @@
     <script defer src="assets/adminator/lightbox.js"></script>
     <script defer src="assets/adminator/modal.js"></script>
     <script defer src="assets/adminator/peek.js"></script>
+    <script>window.SB_TOAST_DURATION = {if isset($sb_toast_duration) && $sb_toast_duration != ''}{$sb_toast_duration}{else}7{/if} * 1000;</script>
     <script defer src="assets/adminator/toast.js"></script>
 
 	{if $page != 'login'}

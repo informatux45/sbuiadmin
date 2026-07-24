@@ -314,6 +314,8 @@ if ($sbusers->getUserInfo('admin', 'username') == 'admin') {
 // ----------------------
 // --- Link CUSTOMER WEBSITE
 $sbsmarty->assign('sb_url_customer', trim($sb_link_settings[15]));
+// --- Durée d'affichage des toasts (secondes)
+$sbsmarty->assign('sb_toast_duration', (isset($sb_link_settings[35]) && trim($sb_link_settings[35]) != '') ? trim($sb_link_settings[35]) : 7);
 // --- Sandbox Activation
 $sbsmarty->assign('sb_sandbox', trim($sb_link_settings[16]));
 // --- CMS Activation
@@ -347,6 +349,14 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 	if (file_exists("{$sb_path_file_sys_mod}{$sb_get_page}.php") && $sb_get_page != 'index') {
 		// Yes, so include
 		sb_global_include("{$sb_path_file_sys_mod}{$sb_get_page}.php");
+
+		// $sb_link_settings (lu tout en haut du fichier, avant de savoir quel
+		// module va s'exécuter) est relu ici pour sb_toast_duration : si le
+		// module qui vient de s'exécuter (ex: settings.php) vient de modifier
+		// settings.txt, la page affichée dans CETTE MÊME réponse doit refléter
+		// la nouvelle valeur, pas l'ancienne lue avant l'écriture.
+		$sb_link_settings = file(_AM_SETTINGS_FILE);
+		$sbsmarty->assign('sb_toast_duration', (isset($sb_link_settings[35]) && trim($sb_link_settings[35]) != '') ? trim($sb_link_settings[35]) : 7);
 	} else {
 		// No, so show error message
 		if (_AM_SITE_DEBUG && $sb_get_page != 'index') echo "Fichier php '{$sb_path_file_sys_mod}{$sb_get_page}' inexistant !";

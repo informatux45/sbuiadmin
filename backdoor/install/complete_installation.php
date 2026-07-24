@@ -137,6 +137,7 @@
 								$output_file .= "0" . "\n";    // Anti-flood (login) activé - désactivé par défaut
 								$output_file .= "86400" . "\n"; // Anti-flood: durée de blocage (secondes, 1 jour)
 								$output_file .= "4" . "\n";    // Anti-flood: délai minimum entre 2 tentatives de connexion (secondes)
+								$output_file .= "7" . "\n";    // Durée d'affichage des toasts (secondes)
 
 								// Locker le fichier pour qu'une seule personne a la fois ecrive dedans
 								$result_edit = file_put_contents($settings_file, $output_file, FILE_USE_INCLUDE_PATH | LOCK_EX);

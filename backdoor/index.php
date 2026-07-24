@@ -94,6 +94,7 @@ defined('SBUIADMIN_CKEDITOR_BEHAVIOR') or define('SBUIADMIN_CKEDITOR_BEHAVIOR', 
 // ----------------------
 $sb_link_settings = file(_AM_SETTINGS_FILE);
 $sbsmarty->assign('sb_url_customer', trim($sb_link_settings[15]));
+$sbsmarty->assign('sb_toast_duration', (isset($sb_link_settings[35]) && trim($sb_link_settings[35]) != '') ? trim($sb_link_settings[35]) : 7);
 
 // ----------------------
 // Identification / Authentification
@@ -408,6 +409,14 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 	if (file_exists($controlIfPhpFileExists) && $sb_get_page != 'index') {
 		// Yes, so include
 		sb_global_include($controlIfPhpFileExists);
+
+		// $sb_link_settings (lu tout en haut du fichier, avant de savoir quel
+		// module va s'exécuter) est relu ici pour sb_toast_duration : si le
+		// module qui vient de s'exécuter (ex: settings.php) vient de modifier
+		// settings.txt, la page affichée dans CETTE MÊME réponse doit refléter
+		// la nouvelle valeur, pas l'ancienne lue avant l'écriture.
+		$sb_link_settings = file(_AM_SETTINGS_FILE);
+		$sbsmarty->assign('sb_toast_duration', (isset($sb_link_settings[35]) && trim($sb_link_settings[35]) != '') ? trim($sb_link_settings[35]) : 7);
 	} else {
 		// No, so show error message
 		if (_AM_SITE_DEBUG && $sb_get_page != 'index') echo "Fichier php '$controlIfPhpFileExists' inexistant !";

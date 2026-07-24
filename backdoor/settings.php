@@ -71,6 +71,10 @@ $sb_msg_valid = false;
  * 29 - Smarty Caching
  * 30 - Smarty Caching Lifetime
  * 31 - Médias par page (module Médias)
+ * 32 - Anti-flood (login) activé      \
+ * 33 - Anti-flood : durée de blocage   > gérées par users.php (action blockedipsettings), pas ce formulaire
+ * 34 - Anti-flood : délai min. entre 2 tentatives /
+ * 35 - Durée d'affichage des toasts (secondes)
  * ---------------------------- */
 $sb_settings_file = _AM_SETTINGS_FILE;
 
@@ -127,6 +131,15 @@ switch($action) {
 			$sb_output_file .= ($_POST['smarty_caching'] === "on") ? "1"."\n" : "0"."\n";
 			$sb_output_file .= $sbsanitize->displayText($_POST['smarty_caching_time'], 'UTF-8', 1, 0) . "\n";
 			$sb_output_file .= $sbsanitize->displayText($_POST['medias_per_page'], 'UTF-8', 1, 0) . "\n";
+
+			// Positions 32-34 (anti-flood) : gérées par users.php (action
+			// blockedipsettings), pas ce formulaire — préservées telles
+			// quelles pour ne pas les écraser à chaque sauvegarde ici.
+			$sb_settings_preserved = file($sb_settings_file);
+			$sb_output_file .= (isset($sb_settings_preserved[32]) ? trim($sb_settings_preserved[32]) : "0") . "\n";
+			$sb_output_file .= (isset($sb_settings_preserved[33]) ? trim($sb_settings_preserved[33]) : "86400") . "\n";
+			$sb_output_file .= (isset($sb_settings_preserved[34]) ? trim($sb_settings_preserved[34]) : "4") . "\n";
+			$sb_output_file .= $sbsanitize->displayText($_POST['toast_duration'], 'UTF-8', 1, 0) . "\n";
 
 			// Locker le fichier pour qu'une seule personne a la fois ecrive dedans
 			$result_edit = file_put_contents($sb_settings_file, $sb_output_file, FILE_USE_INCLUDE_PATH | LOCK_EX);
@@ -185,6 +198,7 @@ switch($action) {
 		$sb_config_smarty_caching      = $sb_settings[29];
 		$sb_config_smarty_caching_time = $sb_settings[30];
 		$sb_config_medias_per_page     = $sb_settings[31];
+		$sb_config_toast_duration      = (isset($sb_settings[35]) && trim($sb_settings[35]) != '') ? $sb_settings[35] : 7;
 
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) $sbsmarty->assign('file_content', $sb_settings);						
@@ -247,6 +261,7 @@ switch($action) {
 		$tab_check_7[1]['checked'] = ($sb_config_debug_smarty_front == 1) ? '1' : '0';
 		$sbform->addCheckbox('Activation des différents modes de DEBUG (FRONT)', $tab_check_7, '', false, '<br />', "Activation des modes DEBUG (FRONT) Inline, Smarty (core)");
 		$sbform->addBreak('Fonctionnalités');
+		$sbform->addInput('text', "Durée d'affichage des toasts (secondes)", array ('name' => 'toast_duration', 'value' => "$sb_config_toast_duration", 'placeholder' => "7"), true, false, "Notifications flottantes (haut droite) après une action réussie ou en erreur.");
 		// Checkbox du Sandbox
 		$tab_check_2 = array();
 		$tab_check_2[0]['text']    = 'Sandbox';
@@ -357,6 +372,7 @@ $sbsmarty->assign('sb_config_rewrite_url', trim($sb_config_rewrite_url));
 $sbsmarty->assign('sb_config_smarty_caching', trim($sb_config_smarty_caching));
 $sbsmarty->assign('sb_config_smarty_caching_time', trim($sb_config_smarty_caching_time));
 $sbsmarty->assign('sb_config_medias_per_page', trim($sb_config_medias_per_page));
+$sbsmarty->assign('sb_config_toast_duration', trim($sb_config_toast_duration));
 
 // ----------------------
 // ASSIGN Page TITLE
