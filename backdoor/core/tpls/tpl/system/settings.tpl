@@ -72,7 +72,7 @@
 											Database Host
 										</td>
 										<td>
-											{$sb_config_dbhost}
+											**************
 										</td>
 									</tr>
 									<tr class="data-row">
@@ -80,7 +80,7 @@
 											Database Name
 										</td>
 										<td>
-											{$sb_config_dbname}
+											**************
 										</td>
 									</tr>
 									<tr class="data-row">
@@ -88,7 +88,7 @@
 											Database User
 										</td>
 										<td>
-											{$sb_config_dbuser}
+											**************
 										</td>
 									</tr>
 									<tr class="data-row">
@@ -96,7 +96,7 @@
 											Database Password
 										</td>
 										<td>
-											{$sb_config_dbpwd}
+											**************
 										</td>
 									</tr>
 									<tr class="data-row">
@@ -104,7 +104,7 @@
 											Database Prefix Table
 										</td>
 										<td>
-											{$sb_config_dbprefix}
+											**************
 										</td>
 									</tr>
 									<tr class="data-row">
@@ -169,7 +169,7 @@
 											Google ReCaptcha Clé Publique
 										</td>
 										<td>
-											{$sb_config_recaptcha_public}
+											**************
 										</td>
 									</tr>
 									<tr class="data-row">
@@ -177,7 +177,7 @@
 											Google ReCaptcha Clé Secrète
 										</td>
 										<td>
-											{$sb_config_recaptcha_secret}
+											**************
 										</td>
 									</tr>
 									<tr class="data-row">

@@ -8,6 +8,7 @@
     <script defer src="assets/adminator/confirm.js"></script>
     <script defer src="assets/adminator/lightbox.js"></script>
     <script defer src="assets/adminator/modal.js"></script>
+    <script defer src="assets/adminator/peek.js"></script>
 
 	{if $page != 'login'}
     <!-- jscroll -->

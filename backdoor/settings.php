@@ -199,11 +199,11 @@ switch($action) {
 		$sbform->addBreak('Les administrateurs');
 		$sbform->addInput('text', 'Administrateurs', array ('name' => 'administrators', 'value' => "$sb_config_administrators", 'placeholder' => "Nom des administrateurs"), true, false, "Login des admins séparés par des virgules sans espace");
 		$sbform->addBreak('Base de données');
-		$sbform->addInput('text', 'DB Host', array ('name' => 'dbhost', 'value' => "$sb_config_dbhost", 'placeholder' => "Database Host"), true, false);
-		$sbform->addInput('text', 'DB Name', array ('name' => 'dbname', 'value' => "$sb_config_dbname", 'placeholder' => "Database Name"), true, false);
-		$sbform->addInput('text', 'DB User', array ('name' => 'dbuser', 'value' => "$sb_config_dbuser", 'placeholder' => "Database User"), true, false);
-		$sbform->addInput('text', 'DB Password', array ('name' => 'dbpwd', 'value' => "$sb_config_dbpwd", 'placeholder' => "Database Password"), true, false);
-		$sbform->addInput('text', 'DB Prefix', array ('name' => 'dbprefix', 'value' => "$sb_config_dbprefix", 'placeholder' => "Database Prefix table"), false, false);
+		$sbform->addInput('password', 'DB Host', array ('name' => 'dbhost', 'value' => "$sb_config_dbhost"), true, false);
+		$sbform->addInput('password', 'DB Name', array ('name' => 'dbname', 'value' => "$sb_config_dbname"), true, false);
+		$sbform->addInput('password', 'DB User', array ('name' => 'dbuser', 'value' => "$sb_config_dbuser"), true, false);
+		$sbform->addInput('password', 'DB Password', array ('name' => 'dbpwd', 'value' => "$sb_config_dbpwd"), true, false);
+		$sbform->addInput('password', 'DB Prefix', array ('name' => 'dbprefix', 'value' => "$sb_config_dbprefix"), false, false);
 		$sbform->addBreak('Configuration médias');
 		$sbform->addInput('text', 'Répertoire d\'upload', array ('name' => 'diruploads', 'value' => "$sb_config_diruploads", 'placeholder' => "Répertoire de l'upload"), true, false, "ex:  <strong>../votre_repertoire</strong>  -  s'il se trouve juste en dessous de l'arborescence du répertoire d'administration<br>Chemin relatif (obligatoirement), pas d'absolu !!! - Ne pas mettre le  <span style='color: red;'>/</span>  à la fin");
 		$sbform->addInput('text', 'URL d\'upload', array ('name' => 'urluploads', 'value' => "$sb_config_urluploads", 'placeholder' => "URL de l'upload (http://...)"), true, false, "Ne pas mettre le  <span style='color: red;'>/</span>  à la fin");
@@ -216,8 +216,8 @@ switch($action) {
 		$sbform->addBreak('Modules');
 		$sbform->addInput('text', 'Modules', array ('name' => 'modules', 'value' => "$sb_config_modules", 'placeholder' => "Nom de vos modules"), false, false, "Nom de vos modules autorisés dans votre administration séparés par des virgules sans espace");
 		$sbform->addBreak('Captcha (Google reCAPTCHA)');
-		$sbform->addInput('text', "Google Recaptcha (Clé publique)", array ('name' => 'recaptcha_public', 'value' => "$sb_config_recaptcha_public", 'placeholder' => "Clé publique"), false, false, "Clé du site dans le code HTML que vous proposez à vos utilisateurs");
-		$sbform->addInput('text', 'Google Recaptcha (Clé secrète)', array ('name' => 'recaptcha_secret', 'value' => "$sb_config_recaptcha_secret", 'placeholder' => "Clé secrète"), false, false, "Clé pour toute communication entre votre site et Google. Veillez à ne pas la divulguer, car il s'agit d'une clé secrète.");
+		$sbform->addInput('password', "Google Recaptcha (Clé publique)", array ('name' => 'recaptcha_public', 'value' => "$sb_config_recaptcha_public"), false, false, "Clé du site dans le code HTML que vous proposez à vos utilisateurs");
+		$sbform->addInput('password', 'Google Recaptcha (Clé secrète)', array ('name' => 'recaptcha_secret', 'value' => "$sb_config_recaptcha_secret"), false, false, "Clé pour toute communication entre votre site et Google. Veillez à ne pas la divulguer, car il s'agit d'une clé secrète.");
 		// Checkbox du mode CAPTCHA
 		$tab_check_4 = array();
 		$tab_check_4[0]['text']    = 'Activé';
