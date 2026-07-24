@@ -15,18 +15,13 @@
 
 				{if $sb_msg_valid}
 					{* --- Message status VALID --- *}
-					<div class="alert success">
-						<span class="ico"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
-						<div class="body">{$sb_msg_valid}</div>
-						<button type="button" class="close" aria-label="Fermer" onclick="this.closest('.alert').style.display='none'">&times;</button>
-					</div>
+					{* toast.js is loaded with "defer" further down the page, not
+					   executed yet at this point in the HTML parse — wait for
+					   DOMContentLoaded so window.sbToast is guaranteed to exist. *}
+					<script>document.addEventListener('DOMContentLoaded', function() { sbToast("{$sb_msg_valid|replace:'<br>':'\n'|escape:'javascript'}", 'success'); });</script>
 				{elseif $sb_msg_error}
 					{* --- Message status ERROR --- *}
-					<div class="alert danger">
-						<span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg></span>
-						<div class="body">{$sb_msg_error}</div>
-						<button type="button" class="close" aria-label="Fermer" onclick="this.closest('.alert').style.display='none'">&times;</button>
-					</div>
+					<script>document.addEventListener('DOMContentLoaded', function() { sbToast("{$sb_msg_error|replace:'<br>':'\n'|escape:'javascript'}", 'error'); });</script>
 				{/if}
 
 			{/if}

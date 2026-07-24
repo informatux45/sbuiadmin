@@ -327,12 +327,12 @@ It was popularised in the 1960s with the release of Letraset sheets containing L
 					data: {}
 				})
 				.fail(function() {
-					alert( "Erreur sitemap génération !!" );
+					sbToast("Erreur sitemap génération !!", 'error');
 				})
 				.always(function(data) {
 					$("#seo-sitemap-loader").css('visibility','hidden');
 					$("#seo-sitemap").html(data);
-					alert( "Génération sitemap.xml terminée\nVérifier la log (Résultat)" );
+					sbToast("Génération sitemap.xml terminée\nVérifier la log (Résultat)", 'success');
 				});
 			}
 		</script>

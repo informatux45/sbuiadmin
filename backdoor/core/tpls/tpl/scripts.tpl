@@ -9,6 +9,7 @@
     <script defer src="assets/adminator/lightbox.js"></script>
     <script defer src="assets/adminator/modal.js"></script>
     <script defer src="assets/adminator/peek.js"></script>
+    <script defer src="assets/adminator/toast.js"></script>
 
 	{if $page != 'login'}
     <!-- jscroll -->
@@ -103,7 +104,7 @@
             },
 			callbacks: {
 				onError: function(id, name, errorReason, xhrOrXdr) {
-					alert(qq.format("Erreur sur le fichier n.{} - {}.  Raison: {}", id, name, errorReason));
+					sbToast(qq.format("Erreur sur le fichier n.{} - {}.  Raison: {}", id, name, errorReason), 'error');
 				},
 				onAllComplete: function(succeeded, failed) {
 					// Reload once the whole batch is done (not per file) so newly

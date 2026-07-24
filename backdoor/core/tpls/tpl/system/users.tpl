@@ -132,9 +132,9 @@
 														<td>{$blockedip.reason}</td>
 														<td>
 															<div class="data-cell-actions">
-																<button class="btn--icon" aria-label="Débloquer" onclick="if(confirm('Vous souhaitez débloquer cette adresse IP ?')) window.location.href='{$module_url}&a=delblockedip&id={$blockedip.id}';">
+																<a class="btn--icon" aria-label="Débloquer" data-confirm="Vous souhaitez débloquer cette adresse IP ?" href="{$module_url}&a=delblockedip&id={$blockedip.id}">
 																	<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
-																</button>
+																</a>
 															</div>
 														</td>
 													</tr>
