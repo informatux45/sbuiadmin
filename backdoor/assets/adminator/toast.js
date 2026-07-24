@@ -2,6 +2,7 @@
  * Vanilla-JS replacement for the browser's native alert(), matching
  * Adminator's visual language (same spirit as confirm.js/modal.js).
  * Usage: sbToast("message") or sbToast("message", "success"|"error"|"info").
+ * Optional action link: sbToast("message", "error", "href", "label").
  * Self-contained: injects its own styles, no separate CSS file needed.
  */
 (function () {
@@ -11,6 +12,7 @@
 .sb-toast.success{border-left-color:var(--success)}\
 .sb-toast.error{border-left-color:var(--danger)}\
 .sb-toast-msg{flex:1}\
+.sb-toast-link{color:inherit;display:inline-block;font-weight:600;margin-top:4px;text-decoration:underline}\
 .sb-toast-close{background:none;border:0;color:var(--t-muted);cursor:pointer;flex-shrink:0;font-size:16px;line-height:1;padding:0}\
 .sb-toast-close:hover{color:var(--t-base)}\
 .sb-toast.is-leaving{animation:sb-toast-out .16s ease both}\
@@ -36,7 +38,7 @@
 		return stack;
 	}
 
-	window.sbToast = function (message, type) {
+	window.sbToast = function (message, type, actionHref, actionLabel) {
 		injectStyle();
 
 		var toast = document.createElement('div');
@@ -48,6 +50,15 @@
 		msg.textContent = message;
 		toast.appendChild(msg);
 
+		if (actionHref && actionLabel) {
+			msg.appendChild(document.createElement('br'));
+			var link = document.createElement('a');
+			link.className = 'sb-toast-link';
+			link.href = actionHref;
+			link.textContent = actionLabel;
+			msg.appendChild(link);
+		}
+
 		var close = document.createElement('button');
 		close.type = 'button';
 		close.className = 'sb-toast-close';
@@ -55,13 +66,31 @@
 		close.innerHTML = '&times;';
 		toast.appendChild(close);
 
+		var timer = null;
+
 		function remove() {
+			clearTimeout(timer);
 			toast.classList.add('is-leaving');
 			toast.addEventListener('animationend', function () { toast.remove(); }, { once: true });
 		}
 		close.addEventListener('click', remove);
 
+		// Survol = pause du décompte, sans le remettre à zéro à la sortie.
+		var duration  = window.SB_TOAST_DURATION || 7000;
+		var remaining = duration;
+		var startedAt = 0;
+
+		function start() {
+			startedAt = Date.now();
+			timer = setTimeout(remove, remaining);
+		}
+		toast.addEventListener('mouseenter', function () {
+			clearTimeout(timer);
+			remaining -= Date.now() - startedAt;
+		});
+		toast.addEventListener('mouseleave', start);
+
 		getStack().appendChild(toast);
-		setTimeout(remove, window.SB_TOAST_DURATION || 7000);
+		start();
 	};
 })();

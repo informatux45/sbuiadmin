@@ -15,43 +15,6 @@
 			</section>
 
 			{if $sbuiadmin_user_type == 'admin'}
-				{if isset($sb_warning_installer_lock) || isset($sb_warning_install_file) || isset($sb_warning_admin_user)}
-					<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
-					{if isset($sb_warning_installer_lock)}
-						<div class="alert danger">
-							<span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg></span>
-							<div class="body">
-								<div class="title">Le répertoire INSTALL existe toujours</div>
-								Supprimez-le au plus vite ! <a href="#">Vite</a> !!!
-							</div>
-							<button type="button" class="close" aria-label="Fermer" onclick="this.closest('.alert').style.display='none'"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-						</div>
-					{/if}
-
-					{if isset($sb_warning_install_file) && $sb_warning_install_file == true}
-						<div class="alert danger">
-							<span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg></span>
-							<div class="body">
-								<div class="title">Le fichier INSTALL.PHP existe toujours</div>
-								Supprimez-le au plus vite ! <a href="#">Vite</a> !!!
-							</div>
-							<button type="button" class="close" aria-label="Fermer" onclick="this.closest('.alert').style.display='none'"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-						</div>
-					{/if}
-
-					{if isset($sb_warning_admin_user) && $sb_warning_admin_user == true}
-						<div class="alert danger">
-							<span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg></span>
-							<div class="body">
-								<div class="title">L'utilisateur ADMIN existe toujours</div>
-								Créez d'autres utilisateurs et supprimez-le ! <a href="index.php?p=users">Vite</a> !!!
-							</div>
-							<button type="button" class="close" aria-label="Fermer" onclick="this.closest('.alert').style.display='none'"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-						</div>
-					{/if}
-					</div>
-				{/if}
-
 			<div class="kpi-grid" aria-label="Aperçu système">
 				<a href="index.php?p=users" class="kpi-card">
 					<div class="kpi-top">
@@ -238,8 +201,19 @@
 		<!-- ------------------------------------------------------------ -->
 		<script>
 		$(document).ready(function() {
-			// Your own code
-
+			// Avertissements sécurité admin : en toasts (empilables) plutôt qu'en
+			// alertes fixes sur le dashboard, pour ne pas surcharger l'affichage.
+			{if $sbuiadmin_user_type == 'admin'}
+				{if isset($sb_warning_installer_lock)}
+					sbToast('Le répertoire INSTALL existe toujours. Supprimez-le au plus vite !', 'error', '#', 'Vite');
+				{/if}
+				{if isset($sb_warning_install_file) && $sb_warning_install_file == true}
+					sbToast('Le fichier INSTALL.PHP existe toujours. Supprimez-le au plus vite !', 'error', '#', 'Vite');
+				{/if}
+				{if isset($sb_warning_admin_user) && $sb_warning_admin_user == true}
+					sbToast('L\'utilisateur ADMIN existe toujours. Créez d\'autres utilisateurs et supprimez-le !', 'error', 'index.php?p=users', 'Vite');
+				{/if}
+			{/if}
 		});
 		</script>
 
