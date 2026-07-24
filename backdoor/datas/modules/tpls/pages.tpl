@@ -137,13 +137,11 @@
 					</div>
 					<!-- /.card -->
 					{/if}
+					{if isset($show_headpage)}
+						{include file='shared/shared-slider-4col.tpl'}
+					{/if}
 				</div>
 				<!-- /.col-4 -->
-
-				{if isset($show_headpage)}
-					{include file='shared/shared-slider-4col.tpl'}
-				{/if}
-
 
 				{/if}
             </div>

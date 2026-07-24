@@ -53,9 +53,9 @@
 												<tr class="data-row"{if $log.logaccess_type == 'error'} style="background:var(--danger-soft)"{/if}>
 													<td>{$log.id}</td>
 													<td data-sort-value="{$log.logaccess_date}">{$log.logaccess_date|date_format:"%d.%m.%Y - %R"}</td>
-													<td>{$log.logaccess_user}</td>
+													<td>{$log.logaccess_user|unescape:"htmlall"}</td>
 													<td>{$log.logaccess_type}</td>
-													<td>{$log.logaccess_event}</td>
+													<td>{$log.logaccess_event|unescape:"htmlall"}</td>
 												</tr>
 											{/foreach}
 										{/if}

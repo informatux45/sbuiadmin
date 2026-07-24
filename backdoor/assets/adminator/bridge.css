@@ -342,10 +342,18 @@ a {
 
 /* inc/class/sbuiadmin-form.php addBreak(): section divider used across forms.
    Accent-bar label instead of the original heavy boxed callout (fond gris +
-   bordure bleue épaisse) or the too-faint all-muted-caps first pass. */
+   bordure bleue épaisse) or the too-faint all-muted-caps first pass.
+   border-right/bottom/left/border-radius/box-shadow explicitement remis à
+   zéro (pas seulement border-top) : sur sandbox.php, le Bootstrap 3 injecté
+   par le Page Builder définit aussi .well (4 côtés + arrondi + ombre) et,
+   ne concurrençant que border-top, ces autres propriétés restaient
+   héritées de Bootstrap faute d'être explicitement écrasées ici. */
 .well.form-break-info {
 	background: none;
+	border: 0;
 	border-top: 1px solid var(--border);
+	border-radius: 0;
+	box-shadow: none;
 	color: var(--t-base);
 	margin-top: 8px;
 	padding: 18px 0 0;

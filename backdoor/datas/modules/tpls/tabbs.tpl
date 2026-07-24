@@ -73,7 +73,7 @@
 					</div>
 				</section>
 
-				{if isset($all)}
+				{if isset($all) && (!isset($smarty.get.a) || $smarty.get.a == '' || $smarty.get.a == 'del')}
 
 					<section class="col-12 card">
 						<div class="card-head">
@@ -136,7 +136,7 @@
 					</section>
 				{/if}
 
-				{if isset($allt)}
+				{if isset($allt) && isset($smarty.get.a) && ($smarty.get.a == 'alltabs' || $smarty.get.a == 'deltab')}
                 <section class="col-12 card">
                     <div class="card-head">
 						<div class="card-title-wrap">

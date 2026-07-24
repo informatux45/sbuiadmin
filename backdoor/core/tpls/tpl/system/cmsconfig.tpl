@@ -82,7 +82,7 @@
                     <div class="card">
                         <div class="card-head">
 							<div class="card-title-wrap">
-								<h2 class="card-title">Aide</h2>
+								<h2 class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Aide</h2>
 							</div>
                         </div>
 							{if $action_edit == 'headerfooter'}
