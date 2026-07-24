@@ -162,5 +162,9 @@ $module_menu['table']['group'] = "user"; // user OR admin
 $module_menu['faq']['main']  = SBUIADMIN_MENU_FAQ;
 $module_menu['faq']['icon']  = "question-circle";
 $module_menu['faq']['group'] = "user"; // user OR admin
+$module_menu['faq']['li'][0]['title'] = SBUIADMIN_MENU_FAQ_ALL;
+$module_menu['faq']['li'][0]['link']  = "index.php?p=faq";
+$module_menu['faq']['li'][1]['title'] = SBUIADMIN_MENU_FAQ_CATEGORIES;
+$module_menu['faq']['li'][1]['link']  = "index.php?p=faq&a=category";
 
 ?>

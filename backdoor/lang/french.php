@@ -91,5 +91,7 @@ defined('SBUIADMIN_MENU_TABBS_ONGLETS') or define("SBUIADMIN_MENU_TABBS_ONGLETS"
 defined('SBUIADMIN_MENU_TABLES') or define("SBUIADMIN_MENU_TABLES", "Tableaux");
 // ** FAQ
 defined('SBUIADMIN_MENU_FAQ') or define("SBUIADMIN_MENU_FAQ", "FAQ");
+defined('SBUIADMIN_MENU_FAQ_ALL') or define("SBUIADMIN_MENU_FAQ_ALL", "Questions");
+defined('SBUIADMIN_MENU_FAQ_CATEGORIES') or define("SBUIADMIN_MENU_FAQ_CATEGORIES", "Catégories");
 
 ?>

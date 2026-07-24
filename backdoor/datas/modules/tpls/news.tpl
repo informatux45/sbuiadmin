@@ -384,7 +384,12 @@
 							<span style="font-weight: bold;">[CS name=sbnews_blocks_recent count=3 truncate=40]</span><br>
 							<span style="font-style: italic;">Affiche le bloc d'articles de toutes les catégories au nombre de 3 avec des titres tronquer à 40 caractères</span><br>
 							<span style="font-weight: bold;">[CS name=sbnews_blocks_recent count=3 truncate=40 id=1]</span><br>
-							<span style="font-style: italic;">Affiche le bloc d'articles de la catégorie à l'ID 1 au nombre de 3 avec des titres tronquer à 40 caractères</span>
+							<span style="font-style: italic;">Affiche le bloc d'articles de la catégorie à l'ID 1 au nombre de 3 avec des titres tronquer à 40 caractères</span><br><br>
+							<span style="font-weight: bold;">Insertion directe dans un tpl (module inc)</span><br>
+							<span style="font-style: italic;">Pour afficher les actualités directement dans le template d'un module, sans passer par un contenu éditable, insérer le shortcode via le modifier Smarty <code>sbGetShortcode</code> :</span><br>
+							<code>{ldelim}"[CS name=sbnews_blocks_recent count=3]"|sbGetShortcode{rdelim}</code><br><br>
+							<span style="font-style: italic;">Ou via la fonction Smarty <code>insert</code> <code>sbDoShortcode</code> (ex : navigation.tpl, index.tpl d'un thème) :</span><br>
+							<code>{ldelim}insert name="sbDoShortcode" code="[CS name=sbnews_blocks_recent count=3]"{rdelim}</code>
 							</div>
 						</div>
 						<div class="modal-footer">

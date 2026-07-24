@@ -39,7 +39,7 @@
 							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=faq&a=categoryadd">+1 catégorie</a>
 						</div>
 					</div>
-					{if isset($all)}
+					{if isset($all) && (!isset($smarty.get.a) || $smarty.get.a == '' || $smarty.get.a == 'del')}
 						<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=faq&a=sort'">
 							Trier les questions
 						</button>
@@ -52,7 +52,7 @@
 
             <div class="grid">
 
-				{if isset($all)}
+				{if isset($all) && (!isset($smarty.get.a) || $smarty.get.a == '' || $smarty.get.a == 'del')}
                 <section class="col-12 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
@@ -112,7 +112,7 @@
                 </section>
 				{/if}
 
-				{if isset($allcat)}
+				{if isset($allcat) && isset($smarty.get.a) && ($smarty.get.a == 'category' || $smarty.get.a == 'categorydel')}
 
                 <section class="col-12 card">
                     <div class="card-head">
@@ -210,7 +210,14 @@
 							<span style="font-weight: bold;">[CS name=sbfaq]</span><br>
 							<span style="font-style: italic;">Affiche toutes les questions actives, toutes catégories confondues</span><br><br>
 							<span style="font-weight: bold;">[CS name=sbfaq id=1]</span><br>
-							<span style="font-style: italic;">Affiche uniquement les questions actives de la catégorie à l'ID 1</span>
+							<span style="font-style: italic;">Affiche uniquement les questions actives de la catégorie à l'ID 1</span><br><br>
+							<span style="font-weight: bold;">Insertion directe dans un tpl (module inc)</span><br>
+							<span style="font-style: italic;">Pour afficher la FAQ directement dans le template d'un module, sans passer par un contenu éditable, insérer le shortcode via le modifier Smarty <code>sbGetShortcode</code> :</span><br>
+							<code>{ldelim}"[CS name=sbfaq]"|sbGetShortcode{rdelim}</code><br>
+							<code>{ldelim}"[CS name=sbfaq id=1]"|sbGetShortcode{rdelim}</code><br><br>
+							<span style="font-style: italic;">Ou via la fonction Smarty <code>insert</code> <code>sbDoShortcode</code> (ex : navigation.tpl, index.tpl d'un thème) :</span><br>
+							<code>{ldelim}insert name="sbDoShortcode" code="[CS name=sbfaq]"{rdelim}</code><br>
+							<code>{ldelim}insert name="sbDoShortcode" code="[CS name=sbfaq id=1]"{rdelim}</code>
 							</div>
 						</div>
 						<div class="modal-footer">
