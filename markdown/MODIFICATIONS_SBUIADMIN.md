@@ -149,3 +149,11 @@ Remplace l'ancien mécanisme de dashboard (fichier plat `inc/admin/dashboard.txt
 - **Look modernisé** : nouvelle feuille `assets/adminator/pagebuilder-bridge.css`, palette/rayons/ombres Adminator (clair + sombre) sur navbar/boutons/panneau latéral/canevas/modale, sans toucher au moteur Bootstrap 3/jQuery UI (drag & drop, modales) qui reste inchangé.
 - Testé et validé en conditions réelles par le client (construction, sauvegarde, rechargement, ré-édition, drag & drop, tous types de blocs).
 - Commit : `1dbcad7`
+
+### Suite — Sélecteur d'image branché sur le vrai média du CMS
+
+- Le bouton "Browse" du bloc "Image" ouvrait une fausse galerie AJAX pointant vers un fichier inexistant (`media-popup.php`, jamais relié à ce CMS) - branché sur le vrai sélecteur de médias partagé (`sbOpenPopup()`/`sbTransfert()`, `assets/dist/js/sb-custom.js`, le même mécanisme que les champs Photo/Pdf ailleurs dans l'admin). Bouton renommé "Choisir une image ...".
+- L'URL injectée dans le champ est désormais l'URL absolue complète du site (`_AM_MEDIAS_URL` + nom de fichier, exposée en JS via `window.sbMediasUrl`) plutôt qu'un chemin relatif à la popup de sélection (inutilisable une fois la page affichée hors de l'admin) ou le simple nom de fichier que range `sbTransfert()` par défaut (comportement partagé avec les autres champs médias, volontairement pas modifié).
+- **Bug corrigé au passage** : la première tentative de brancher `sbOpenPopup()` plantait en JS (`invalid escape sequence`) - le bloc concerné de `addPageBuilderTags()` est un HEREDOC PHP, où `\'` n'a aucune signification spéciale (contrairement à une chaîne à guillemets simples) et laissait une vraie barre oblique inverse dans le HTML généré.
+- **Régression en cours, pas encore diagnostiquée** : le double encodage HTML ("soupe de code" au rechargement, voir plus haut) est réapparu après une sauvegarde en modification, repéré en toute fin de session. Piste à vérifier en priorité à la reprise : lien éventuel avec le nouveau contenu d'URL d'image absolue (`https://...`), jamais testé dans le cycle encodage/décodage jusqu'ici. Détails dans la mémoire de session.
+- Commit : `b83eeb2`
