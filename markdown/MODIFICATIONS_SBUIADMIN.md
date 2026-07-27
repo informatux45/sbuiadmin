@@ -136,4 +136,4 @@ Remplace l'ancien mécanisme de dashboard (fichier plat `inc/admin/dashboard.txt
 - **UX** : le sélecteur "Type de widget" (9 choix) passe d'un `<select>` à une rangée de boutons cliquables avec icône (composant `.tabs.pills` du thème Adminator, jusque-là inutilisé nulle part), piloté par un input hidden en JS. Bouton "Retour aux widgets" ajouté dans le bandeau `.hero` des pages d'ajout/modification.
 - **Bugs corrigés en cours de route** : `addIconFA()` (classe `form`) n'émettait pas le `</div>` fermant `.field` avant le texte d'aide, le laissant imbriqué au lieu d'être un frère (espacement cassé) ; les groupes de champs conditionnels par type (`data-widget-type-fields`) faisaient perdre le `display:flex;gap:14px` du `<form>` aux champs qu'ils contiennent, l'aide `margin-top:-10px` (calibrée pour ce gap de 14px) chevauchait alors le champ juste au-dessus faute de gap à compenser - même `display:flex;gap:14px` appliqué à ces groupes.
 - Testé et validé en conditions réelles (4 nouveaux types, avatars, boutons de type, retour aux widgets).
-- Commit : `<HASH>`
+- Commit : `17f5db4`
