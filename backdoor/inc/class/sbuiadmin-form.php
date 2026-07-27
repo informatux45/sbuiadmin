@@ -963,7 +963,12 @@ class form extends sanitize {
 		foreach ($this -> formElementArr[$cpt][$elem] as $clef => $val) {
 			if ($clef === 'id')
 				$dateId = $val;
-			$chaineTemp .= $clef.'="'.$val.'" ';
+			// "value" porte le pré-chargement Tagify au format JSON
+			// (voir sandbox.php) - contient des guillemets qui casseraient
+			// l'attribut HTML sans échappement (jamais fait ici jusqu'à
+			// présent, jamais remarqué faute de valeur réelle à recharger).
+			$attrVal = ($clef === 'value') ? htmlspecialchars($val, ENT_QUOTES, 'UTF-8') : $val;
+			$chaineTemp .= $clef.'="'.$attrVal.'" ';
 		}
 
 		$chaineRequired = ($isRequired == true) ? ' required="true" bname="' . $label . '" ' : '';
@@ -999,22 +1004,34 @@ class form extends sanitize {
 						}
 						</style>';
 		$chaineTemp .= '<script type="text/javascript">';
+		// Tagify (v4.21.1) a un bug connu non protégé : son initialisation
+		// (loadOriginalValues -> addTags -> setRangeAtStartEnd) plante avec
+		// "can't access property focusNode, i is null" quand
+		// document.getSelection() renvoie null à ce moment précis (souvent
+		// un souci de timing avec une modale Bootstrap présente sur la
+		// page - https://github.com/yairEO/tagify/issues/1338, jamais
+		// corrigé en amont). Sans try/catch, cette erreur non interceptée
+		// interrompait toute la suite de la file $(document).ready() de la
+		// page (dont l\'initialisation d\'autres champs plus bas).
 		$chaineTemp .= '(() => {
-							var inputElm = document.querySelector(\'input[name='.$arrArgs['name'].']\')
-							
-							let tagify = new Tagify(inputElm)
-							
-							var dragsort = new DragSort(tagify.DOM.scope, {
-								selector:\'.\'+tagify.settings.classNames.tag,
-								callbacks: {
-									dragEnd: onDragEnd
+							try {
+								var inputElm = document.querySelector(\'input[name='.$arrArgs['name'].']\')
+
+								let tagify = new Tagify(inputElm)
+
+								var dragsort = new DragSort(tagify.DOM.scope, {
+									selector:\'.\'+tagify.settings.classNames.tag,
+									callbacks: {
+										dragEnd: onDragEnd
+									}
+								})
+
+								function onDragEnd(elm){
+									tagify.updateValueByDOMTags()
 								}
-							})
-							
-							function onDragEnd(elm){
-								tagify.updateValueByDOMTags()
+							} catch (e) {
+								console.warn(\'Tagify: échec d\\\'initialisation (bug connu de la librairie), le reste de la page continue normalement.\', e);
 							}
-							
 						})();';
 		$chaineTemp .= '</script>';
 		
@@ -1196,13 +1213,26 @@ class form extends sanitize {
 	* @return Page Builder
 	*/
 	public function addPageBuilder ($label = '', $src = '', $arrArgs = array (), $isRequired = false, $toolbar = 'full', $helpDsc = '') {
+		// $cpt était absent ici (même famille de bug que addCountry(), voir
+		// project_sbuiadmin_sandbox_pagebuilder_quirks) - la méthode
+		// n'enregistrait jamais sa place dans formElementArr, donc le champ
+		// suivant (form_submit, hidden) recalculait le même $cpt et
+		// écrasait purement et simplement le HTML du Page Builder dans
+		// formBuffer['elements'] avant l'affichage.
+		$cpt = count ($this -> formElementArr);
+		$this -> formElementArr[$cpt]['pagebuilder'] = array();
+
+		$fieldId   = (array_key_exists('id', $arrArgs) && $arrArgs['id'] != '') ? $arrArgs['id'] : 'PageBuilder' . $cpt . time();
+		$fieldName = (array_key_exists('name', $arrArgs) && $arrArgs['name'] != '') ? $arrArgs['name'] : $fieldId;
+
 		// Page Builder keeps its own Bootstrap 3 chrome (navbar, grid, ~60 form-control
 		// fields) and drives it via jQuery's Bootstrap modal/collapse/buttons-radio
 		// plugins - loaded here rather than globally so the rest of the app no longer
 		// depends on Bootstrap (Phase 7 cleanup).
 		$chaineTemp .= '<link rel="stylesheet" href="assets/bower_components/bootstrap/dist/css/bootstrap.css">
 						<link rel="stylesheet" href="inc/plugins/pagebuilder/css/pagebuilder.css">
-						<link rel="stylesheet" href="inc/plugins/pagebuilder/css/colorselector.css">';
+						<link rel="stylesheet" href="inc/plugins/pagebuilder/css/colorselector.css">
+						<link rel="stylesheet" href="assets/adminator/pagebuilder-bridge.css">';
 		// Load JS
 		$chaineTemp .= '<script src="assets/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 						<script src="inc/plugins/pagebuilder/js/jquery.ui.touch-punch.min.js"></script>
@@ -1214,23 +1244,24 @@ class form extends sanitize {
 				
 		// Show the label for the element
 		$chaineTemp .= $this -> isRequired ($isRequired, $label);
-		
-		// Navbar
-		$chaineTemp .= '<div class="navbar-page-builder navbar-inverse navbar-htmleditor">
+
+		// Champ réellement soumis avec le formulaire - absent jusqu'ici,
+		// seul ".htmlpage" (zone d'édition visuelle) existait, rien ne
+		// portait le contenu construit jusqu'au serveur. Rempli/synchronisé
+		// en JS (voir pagebuilder.js, data-pagebuilder-target) au clic sur
+		// "Save" et juste avant la soumission du formulaire.
+		$chaineTemp .= '<textarea id="' . $fieldId . '" name="' . $fieldName . '" style="display:none">' . htmlspecialchars($src, ENT_QUOTES, 'UTF-8') . '</textarea>';
+
+		// Navbar - pas de bouton "Edit"/"Save" propre au widget : l'unique
+		// sauvegarde possible est le bouton Ajouter/Modifier du formulaire
+		// (comme n'importe quel autre champ), le contenu est synchronisé
+		// automatiquement à la soumission (voir pagebuilder.js).
+		$chaineTemp .= '<div class="navbar-page-builder navbar-inverse navbar-htmleditor" data-pagebuilder-target="' . $fieldId . '">
 							<div class="navbar-header">
-								<button data-target="navbar-collapse" data-toggle="collapse" class="navbar-toggle" type="button"> <span class="glyphicon-bar"></span> <span class="glyphicon-bar"></span> <span class="glyphicon-bar"></span> </button> <a class="navbar-brand"><i class="fa fa-magic"></i>&nbsp;&nbsp;Page Builder</a> </div>
-							<div class="collapse navbar-collapse">
-								<ul class="nav" id="menu-htmleditor">
-									<li>
-										<div class="btn-group" data-toggle="buttons-radio">
-											<button type="button" id="edit" class="active btn btn-primary"><i class="glyphicon glyphicon-edit "></i> Edit</button>
-											<button type="button" id="save" class="btn btn-warning float-right"><i class="fa fa-save"></i>&nbsp;save</button>
-										</div>
-									</li>
-								</ul>
+								<a class="navbar-brand"><i class="fa fa-magic"></i>&nbsp;&nbsp;Page Builder</a>
 							</div>
 						</div>';
-		
+
 		// Page Builder NavBar (Column Elements)
 		$chaineTemp .= '<div class="container">
 							<div class="row">
@@ -1352,32 +1383,19 @@ class form extends sanitize {
 						</div>
 						</div>'; // Row
 						
-		// Page Builder Modal / JS
-		$chaineTemp .= '<div class="modal fade" id="download" tabindex="-1" role="dialog" aria-labelledby="download" aria-hidden="true">
-							<div class="modal-dialog" role="document">
-								<div class="modal-content">
-									<div class="modal-header">
-										<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-										<h4 class="modal-title"><i class="fa fa-save"></i>&nbsp;Save as </h4> </div>
-									<div class="modal-body" id="sourceCode">
-										<textarea id="src" rows="10"></textarea>
-										<textarea id="model" rows="10" class="form-control"></textarea>
-									</div>
-									<div class="modal-footer">
-										<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-close"></i>&nbsp;Close</button>
-										<button type="button" class="btn btn-success" id="srcSave" onclick="alert(\'OK\'); return false;"><i class="fa fa-save"></i>&nbsp;Save</button>
-									</div>
-								</div>
-							</div>
-						</div>';
+		// Page Builder Modal / JS - la modale "Save as" (id="download",
+		// bouton #srcSave) est retirée : la sauvegarde ne passe plus que par
+		// le bouton Ajouter/Modifier du formulaire (voir plus haut). Les 2
+		// <form> imbriqués que contenait cette modale (onglets Youtube/
+		// Carte) étaient la véritable cause du blocage de soumission -
+		// remplacés par de simples <div> juste au-dessus (aucun besoin
+		// d'un vrai <form>, ces champs ne sont jamais soumis indépendamment
+		// - leur contenu est lu/appliqué directement en JS par pagebuilder.js).
 		$chaineTemp .= '<div class="modal fade" id="preferences" tabindex="-1" role="dialog" aria-labelledby="preferences">
 							<div class="modal-dialog" role="document">
 								<div class="modal-content">';
 		$chaineTemp .= $this->addPageBuilderTags('modal-content', $toolbar);
 		$chaineTemp .= '		</div>
-							</div>';
-		$chaineTemp .= '	<div id="download-layout">
-								<div class="container"></div>
 							</div>
 						</div>';
 						
@@ -1639,7 +1657,7 @@ $htmlpagebuilder = <<<EOT
 						</div>
 						<div class="row">
 							<div class="col-md-12">
-								<form>
+								<div class="pb-settings-form">
 									<div class="form-group">
 										<label for="video-url">Video id :</label>
 										<input type="text" value="" id="video-url" class="form-control" /> </div>
@@ -1655,7 +1673,7 @@ $htmlpagebuilder = <<<EOT
 												<input type="text" value="" id="video-height" class="form-control" /> </div>
 										</div>
 									</div>
-								</form>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -1668,7 +1686,7 @@ $htmlpagebuilder = <<<EOT
 						</div>
 						<div class="row">
 							<div class="col-md-12">
-								<form>
+								<div class="pb-settings-form">
 									<div class="form-group">
 										<label for="address">Latitude :</label>
 										<input type="text" value="" id="latitude" class="form-control" /> </div>
@@ -1690,7 +1708,7 @@ $htmlpagebuilder = <<<EOT
 												<input type="text" value="" id="map-height" class="form-control" /> </div>
 										</div>
 									</div>
-								</form>
+								</div>
 							</div>
 						</div>
 					</div>

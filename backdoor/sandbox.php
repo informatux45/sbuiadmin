@@ -204,7 +204,7 @@ switch($action) {
 		}
 
 		// Initialisation
-		$sb_table_header = array('Nom', 'Telephone', 'Email', 'Entreprise', 'Pays', 'Actions');
+		$sb_table_header = array('Nom', 'Pays', 'Type', 'Actions');
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		
 		// Contents table
@@ -240,34 +240,71 @@ switch($action) {
 		// --------------------------------
 		if ($_POST['form_submit']) {
 
-			// Injection des données
-			$id            = intval($_POST['id']);
-			$horsename     = $sbsanitize->displayText($_POST['horsename'], 'UTF-8', 1, 0);
-			$tags          = sbGetTagifyDatas($_POST['tags']); // Tags
-			$sire_dam_info = $sbsanitize->displayText($_POST['sire_dam_info'], 'UTF-8', 1, 0);
-			$breeder       = $sbsanitize->displayText($_POST['breeder'], 'UTF-8', 1, 0);
-			$sale          = $sbsanitize->displayText($_POST['sale'], 'UTF-8', 1, 0);
-			$photo         = $sbsanitize->displayText($_POST['photo'], 'UTF-8', 1, 0);
-			$active        = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
-			$perf_1        = $sbsanitize->displayText($_POST['perf_1'], 'UTF-8', 1, 0);
-			$video_1       = $sbsanitize->displayText($_POST['video_1'], 'UTF-8', 1, 0);
-			$perf_2        = $sbsanitize->displayText($_POST['perf_2'], 'UTF-8', 1, 0);
-			$video_2       = $sbsanitize->displayText($_POST['video_2'], 'UTF-8', 1, 0);
-			$perf_3        = $sbsanitize->displayText($_POST['perf_3'], 'UTF-8', 1, 0);
-			$video_3       = $sbsanitize->displayText($_POST['video_3'], 'UTF-8', 1, 0);
-			$perf_4        = $sbsanitize->displayText($_POST['perf_4'], 'UTF-8', 1, 0);
-			$video_4       = $sbsanitize->displayText($_POST['video_4'], 'UTF-8', 1, 0);
-			$perf_5        = $sbsanitize->displayText($_POST['perf_5'], 'UTF-8', 1, 0);
-			$video_5       = $sbsanitize->displayText($_POST['video_5'], 'UTF-8', 1, 0);
-			
+			// Injection des données - un champ par type de widget démontré
+			// sur cette page (voir le formulaire plus bas), aligné sur les
+			// vraies colonnes de sb_sandbox (le bloc précédent lisait des
+			// clés POST - horsename/sire_dam_info/perf_1.../video_1... -
+			// qu'aucun champ du formulaire n'envoie jamais, et écrivait
+			// dans des colonnes qui n'existaient plus dans la table :
+			// toute soumission plantait avant d'atteindre la base).
+			$id              = intval($_POST['id']);
+			$active          = ($_POST['active'] == '1') ? '1' : '0';
+			$yourname        = $sbsanitize->displayText($_POST['yourname'], 'UTF-8', 1, 0);
+			$montant         = $sbsanitize->displayText($_POST['montant'], 'UTF-8', 1, 0);
+			$seo_url         = $sbsanitize->displayText($_POST['seo_url'], 'UTF-8', 1, 0);
+			$country         = $sbsanitize->displayText($_POST['country'], 'UTF-8', 1, 0);
+			$dob             = $sbsanitize->displayText($_POST['dob'], 'UTF-8', 1, 0);
+			$color           = $sbsanitize->displayText($_POST['color'], 'UTF-8', 1, 0);
+			$tags            = sbGetTagifyDatas($_POST['tags']); // Tags
+			$pdf             = $sbsanitize->displayText($_POST['pdf'], 'UTF-8', 1, 0);
+			$photo           = $sbsanitize->displayText($_POST['photo'], 'UTF-8', 1, 0);
+			$video           = $sbsanitize->displayText($_POST['video'], 'UTF-8', 1, 0);
+			$option_one      = isset($_POST['option_one']) ? '1' : '0';
+			$option_two      = isset($_POST['option_two']) ? '1' : '0';
+			$option_three    = isset($_POST['option_three']) ? '1' : '0';
+			$type            = in_array($_POST['type'], array('1', '2', '3')) ? $_POST['type'] : '';
+			$selection_table       = $sbsanitize->displayText($_POST['selection'], 'UTF-8', 1, 0);
+			$comment         = $sbsanitize->displayText($_POST['comment'], 'UTF-8', 1, 0);
+			$comment_ckeditor1 = $sbsanitize->displayText($_POST['comment_editor1'], 'UTF-8', 1, 0);
+			$comment_ckeditor2 = $sbsanitize->displayText($_POST['comment_editor2'], 'UTF-8', 1, 0);
+			$comment_ckeditor3 = $sbsanitize->displayText($_POST['comment_editor3'], 'UTF-8', 1, 0);
+			// Page Builder : voir addPageBuilder()/pagebuilder.js - le
+			// champ réel synchronisé à la soumission (data-pagebuilder-
+			// target), pas la version "démo" codée en dur.
+			$page_builder_content = $sbsanitize->displayText($_POST['page_builder_content'], 'UTF-8', 1, 0);
+
+			if (!$tags) $tags = '';
+
+			// Échappement SQL - absent jusqu'ici sur tout ce bloc (aucun
+			// escape_string() nulle part), risque d'injection et requête
+			// cassée dès qu'une valeur contient une apostrophe.
+			$yourname_esc          = $sbsql->escape_string($yourname);
+			$montant_esc           = $sbsql->escape_string($montant);
+			$seo_url_esc           = $sbsql->escape_string($seo_url);
+			$country_esc           = $sbsql->escape_string($country);
+			$dob_esc               = $sbsql->escape_string($dob);
+			$color_esc             = $sbsql->escape_string($color);
+			$tags_esc              = $sbsql->escape_string($tags);
+			$pdf_esc                = $sbsql->escape_string($pdf);
+			$photo_esc              = $sbsql->escape_string($photo);
+			$video_esc              = $sbsql->escape_string($video);
+			$type_esc               = $sbsql->escape_string($type);
+			$selection_table_esc    = $sbsql->escape_string($selection_table);
+			$comment_esc            = $sbsql->escape_string($comment);
+			$comment_ckeditor1_esc  = $sbsql->escape_string($comment_ckeditor1);
+			$comment_ckeditor2_esc  = $sbsql->escape_string($comment_ckeditor2);
+			$comment_ckeditor3_esc  = $sbsql->escape_string($comment_ckeditor3);
+			$page_builder_content_esc = $sbsql->escape_string($page_builder_content);
+
 			// ADD or EDIT
 			if ($formType == 'add') {
-				// INSERT DATAS
-				$query = "INSERT INTO $table VALUES ('','$horsename','$sire_dam_info','$photo','$perf_1','$video_1','$perf_2','$video_2','$perf_3','$video_3','$perf_4','$video_4','$perf_5','$video_5','$breeder','$sale','$active','0')";
+				$query = "INSERT INTO $table (active, yourname, montant, seo_url, country, dob, color, tags, pdf, photo, video, option_one, option_two, option_three, type, selection, comment, comment_editor1, comment_editor2, comment_editor3, page_builder_content, sort)
+						  VALUES ('$active','$yourname_esc','$montant_esc','$seo_url_esc','$country_esc','$dob_esc','$color_esc','$tags_esc','$pdf_esc','$photo_esc','$video_esc','$option_one','$option_two','$option_three','$type_esc','$selection_table_esc','$comment_esc','$comment_ckeditor1_esc','$comment_ckeditor2_esc','$comment_ckeditor3_esc','$page_builder_content_esc','0')";
 				$result_add = $sbsql->query($query);
 				if ($result_add) {
 					// --- Vider les champs du formulaire
-					$horsename = $sire_dam_info = $photo = $perf_1 = $video_1 = $perf_2 = $video_2 = $perf_3 = $video_3 = $perf_4 = $video_4 = $perf_5 = $video_5 = $breeder = $sale = $active = '';
+					$yourname = $montant = $seo_url = $country = $dob = $color = $tags = $pdf = $photo = $video = $selection_table = $comment = $comment_ckeditor1 = $comment_ckeditor2 = $comment_ckeditor3 = $page_builder_content = $type = '';
+					$active = $option_one = $option_two = $option_three = '0';
 					// --- Message SUCCESS
 					$sb_msg_valid = 'Enregistrement ajouté avec succès';
 				} else {
@@ -278,24 +315,29 @@ switch($action) {
 			} elseif ($formType == 'edit' && $id > 0) {
 
 				// UPDATE DATAS
-				$query = "UPDATE $table SET name = '$horsename'
-											 ,sire_dam_info = '$sire_dam_info'
-											 ,photo = '$photo'
-											 ,perf_1 = '$perf_1'
-											 ,video_1 = '$video_1'
-											 ,perf_2 = '$perf_2'
-											 ,video_2 = '$video_2'
-											 ,perf_3 = '$perf_3'
-											 ,video_3 = '$video_3'
-											 ,perf_4 = '$perf_4'
-											 ,video_4 = '$video_4'
-											 ,perf_5 = '$perf_5'
-											 ,video_5 = '$video_5'
-											 ,breeder = '$breeder'
-											 ,sale = '$sale'
-											 ,active = '$active'
+				$query = "UPDATE $table SET active = '$active'
+											 ,yourname = '$yourname_esc'
+											 ,montant = '$montant_esc'
+											 ,seo_url = '$seo_url_esc'
+											 ,country = '$country_esc'
+											 ,dob = '$dob_esc'
+											 ,color = '$color_esc'
+											 ,tags = '$tags_esc'
+											 ,pdf = '$pdf_esc'
+											 ,photo = '$photo_esc'
+											 ,video = '$video_esc'
+											 ,option_one = '$option_one'
+											 ,option_two = '$option_two'
+											 ,option_three = '$option_three'
+											 ,type = '$type_esc'
+											 ,selection = '$selection_table_esc'
+											 ,comment = '$comment_esc'
+											 ,comment_editor1 = '$comment_ckeditor1_esc'
+											 ,comment_editor2 = '$comment_ckeditor2_esc'
+											 ,comment_editor3 = '$comment_ckeditor3_esc'
+											 ,page_builder_content = '$page_builder_content_esc'
 											 WHERE id = '$id'";
-											 
+
 				$result_edit = $sbsql->query($query);
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
@@ -311,35 +353,72 @@ switch($action) {
 
 			// --- Debug SQL
 			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query . "\n" . 'Submit Form Type = '.$formType);
-			
+
 		} else {
 			// Si AJOUT (First time)
 			// --- Vider les champs du formulaire
-			$horsename = $sire_dam_info = $photo = $perf_1 = $video_1 = $perf_2 = $video_2 = $perf_3 = $video_3 = $perf_4 = $video_4 = $perf_5 = $video_5 = $breeder = $sale = $active = '';
+			$yourname = $montant = $seo_url = $country = $dob = $color = $tags = $pdf = $photo = $video = $selection_table = $comment = $comment_ckeditor1 = $comment_ckeditor2 = $comment_ckeditor3 = $page_builder_content = $type = '';
+			$active = $option_one = $option_two = $option_three = '0';
 		}
 		// --------------------------------
 		if ($formType == 'edit' && !$_POST['form_submit']) {
 			// --- Recuperation des donnees
-			$id            = intval($_GET['id']);
-			$query_1       = "SELECT * FROM $table WHERE id = $id";
-			$requestQ      = $sbsql->query($query_1);
-			$assoc         = $sbsql->assoc($requestQ);
-			$horsename     = utf8_encode($assoc['name']);
-			$sire_dam_info = utf8_encode($assoc['sire_dam_info']);
-			$breeder       = utf8_encode($assoc['breeder']);
-			$sale          = utf8_encode($assoc['sale']);
-			$tags          = $assoc['tags'];
-			$photo         = $assoc['photo'];
-			$active        = $assoc['active'];
+			$id                = intval($_GET['id']);
+			$query_1           = "SELECT * FROM $table WHERE id = $id";
+			$requestQ          = $sbsql->query($query_1);
+			$assoc             = $sbsql->assoc($requestQ);
+			$active            = $assoc['active'];
+			$yourname          = utf8_encode($assoc['yourname']);
+			$montant           = utf8_encode($assoc['montant']);
+			$seo_url           = utf8_encode($assoc['seo_url']);
+			$country           = utf8_encode($assoc['country']);
+			$dob               = utf8_encode($assoc['dob']);
+			$color             = utf8_encode($assoc['color']);
+			// Tagify attend son "value" initial au format JSON
+			// ([{"value":"demo"}, ...]) pour re-précharger les tags - une
+			// simple chaîne "demo,exemple" fait planter son initialisation
+			// (loadOriginalValues/addTags, erreur "focusNode" - i is null),
+			// ce qui bloquait au passage toute la file $(document).ready()
+			// suivante (dont la synchronisation du Page Builder).
+			$tags = '';
+			if ($assoc['tags'] != '') {
+				$tags_arr = array();
+				foreach (explode(',', $assoc['tags']) as $tags_item) {
+					$tags_item = trim($tags_item);
+					if ($tags_item !== '') $tags_arr[] = array('value' => $tags_item);
+				}
+				$tags = json_encode($tags_arr, JSON_UNESCAPED_UNICODE);
+			}
+			$pdf               = utf8_encode($assoc['pdf']);
+			$photo             = utf8_encode($assoc['photo']);
+			$video             = utf8_encode($assoc['video']);
+			$option_one        = $assoc['option_one'];
+			$option_two        = $assoc['option_two'];
+			$option_three      = $assoc['option_three'];
+			$type_checked      = $assoc['type'];
+			$selection_table   = $assoc['selection'];
+			$comment           = utf8_encode($assoc['comment']);
+			$comment_ckeditor1 = utf8_encode($assoc['comment_editor1']);
+			$comment_ckeditor2 = utf8_encode($assoc['comment_editor2']);
+			$comment_ckeditor3 = utf8_encode($assoc['comment_editor3']);
+			// Page Builder : contenu réel (pas la version "démo") - décodé
+			// pour être réinjecté tel quel dans ".htmlpage" par
+			// addPageBuilder() (voir sbuiadmin-form.php), pas affiché en
+			// texte échappé.
+			$page_builder_content = html_entity_decode(utf8_encode($assoc['page_builder_content']), ENT_QUOTES, 'UTF-8');
 
 			$sbsmarty->assign('assoc', $query_1);
 
 			// --- Debug SQL
 			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);						
 		}
-		// --------------------------------		
+		// --------------------------------
 		// --- Define variables
-		$formAction = $module_url . "&a=" . $formType;
+		// $id manquait ici (bug préexistant) - l'action du formulaire ne
+		// portait jamais l'id en édition, la cible réelle ne venait que du
+		// champ caché "id" en POST (fonctionnait par accident, mais l'URL
+		// affichée pendant l'édition était trompeuse).
+		$formAction = $module_url . "&a=" . $formType . ($formType == 'edit' ? "&id=" . $id : "");
 		// --- Form construct
 		$sbform->openForm(array('action' => "$formAction", 'name' => "$formName", 'id' => "$formName", 'reloadpage' => "$formAction", 'submitpage' => "$formAction"));
 		// --- Add inputs and more
@@ -371,15 +450,15 @@ switch($action) {
 		// ----------------------------
 		// --- Input DATE (calendar)
 		// ----------------------------
-		$sbform->addDate('Date de naissance (Calendar)', array('id'=>'dob', 'name'=>'dob', 'value'=>$birth), true);
+		$sbform->addDate('Date de naissance (Calendar)', array('id'=>'dob', 'name'=>'dob', 'value'=>$dob), true);
 		// ----------------------------
 		// --- Input COLOR PICKER
 		// ----------------------------		
-		$sbform->addColor ('Couleur (Color PICKER)', array('id' => 'color', 'name' => 'name'), false);
+		$sbform->addColor ('Couleur (Color PICKER)', array('id' => 'color', 'name' => 'color', 'value' => $color), false);
 		// -----------------------------------
 		// --- Caisses
 		// -----------------------------------
-		$sbform->addTagify ('Tags', array('name' => 'inputTags', 'value' => $tags, 'placeholder' => 'Indiquez le nom des caisses', 'style' => 'width: 500px;'), false, 'Ajouter des noms et valider par la touche Entrée de votre clavier.<br>Vous pouvez trier les noms en drag & drop.<br>Ne pas utilisez le caractère "<strong>,</strong>" (Virgule).');
+		$sbform->addTagify ('Tags', array('name' => 'tags', 'value' => $tags, 'placeholder' => 'Indiquez le nom des caisses', 'style' => 'width: 500px;'), false, 'Ajouter des noms et valider par la touche Entrée de votre clavier.<br>Vous pouvez trier les noms en drag & drop.<br>Ne pas utilisez le caractère "<strong>,</strong>" (Virgule).');
 		// ----------------------------
 		// --- Pdf only (width popup medias)
 		// You can add more exts separate by coma
@@ -402,7 +481,7 @@ switch($action) {
 		// ----------------------------
 		// -- Video (without popup media)
 		// ----------------------------
-		$sbform->addInput('text', 'Vidéo (URL) - (Without popup MEDIAS)', array ('id' => 'video', 'name' => 'video', 'value' => "$country", 'placeholder' => "URL de votre vidéo ( http:// )", 'icon' => 'video-camera'), true);
+		$sbform->addInput('text', 'Vidéo (URL) - (Without popup MEDIAS)', array ('id' => 'video', 'name' => 'video', 'value' => "$video", 'placeholder' => "URL de votre vidéo ( http:// )", 'icon' => 'video-camera'), true);
 		// ----------------------------
 		// -- Input CHECKBOX
 		// ----------------------------
@@ -519,7 +598,7 @@ switch($action) {
 		$sort_array    = $sbsql->toarray($requestQ);
 		foreach($sort_array as $sort) {
 			$sort_id          = $sort['id'];
-			$toSort[$sort_id] = utf8_encode($sort['nom']);
+			$toSort[$sort_id] = utf8_encode($sort['yourname']);
 		}
 
 		// --- Debug SQL

@@ -66,11 +66,9 @@
 										{if $allsandbox}
 											{foreach from=$allsandbox item=record}
 												<tr class="data-row">
-													<td>{$record.nom|unescape:"htmlall"}</td>
-													<td>{$record.telephone|unescape:"htmlall"}</td>
-													<td>{$record.email|unescape:"htmlall"}</td>
-													<td>{$record.company|unescape:"htmlall"}</td>
+													<td>{$record.yourname|unescape:"htmlall"}</td>
 													<td>{$record.country|unescape:"htmlall"}</td>
+													<td>{$record.type}</td>
 													<td>
 														<div class="data-cell-actions">
 															<span class="btn--icon" style="color:{if $record.active}var(--success){else}var(--danger){/if}" title="Statut {if $record.active}visible{else}non visible{/if}">

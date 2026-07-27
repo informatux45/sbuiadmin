@@ -1,0 +1,213 @@
+/* --------------------------------------------------------------------- */
+/* Page Builder (addPageBuilder(), inc/class/sbuiadmin-form.php) - reskin
+   visuel Adminator par-dessus le chrome Bootstrap 3 du plugin tiers
+   (inc/plugins/pagebuilder/). Le moteur d'interaction (drag & drop,
+   modales, jQuery UI) reste piloté par Bootstrap 3/jQuery - uniquement
+   une surcharge de couleurs/rayons/ombres ici, aucun changement de
+   structure. Chargée uniquement sur les pages qui utilisent ce champ
+   (voir addPageBuilder()), spécificité suffisante pour battre Bootstrap
+   sans dépendre de l'ordre de chargement (même précédent que
+   .help-block.help-block, voir bridge.css). */
+/* --------------------------------------------------------------------- */
+
+/* --- Navbar --- */
+.navbar-page-builder.navbar-inverse {
+	background: var(--primary);
+	border: 0;
+	border-radius: 8px;
+	box-shadow: var(--shadow-card);
+	margin-bottom: 18px;
+}
+.navbar-page-builder .navbar-header {
+	padding: 10px 16px;
+}
+.navbar-page-builder a.navbar-brand {
+	color: #fff;
+	float: none;
+	display: inline-flex;
+	align-items: center;
+	height: auto;
+	padding: 0;
+	font-weight: 600;
+}
+
+/* --- Boutons Bootstrap (remove/drag/clone/settings/modal) --- */
+.htmlpage .btn,
+#pagebuilder-sidebar-nav .btn,
+.modal .btn,
+.navbar-page-builder .btn {
+	border-radius: 6px;
+	border: 1px solid transparent;
+	box-shadow: none;
+	transition: filter 0.15s ease;
+}
+.htmlpage .btn:hover,
+#pagebuilder-sidebar-nav .btn:hover,
+.modal .btn:hover,
+.navbar-page-builder .btn:hover {
+	filter: brightness(0.92);
+}
+
+/* Chevauchement des icônes .btn-xs : plutôt que de forcer leur taille
+   (cassait le drag & drop de jQuery UI, voir plus haut), on élargit
+   l'espacement entre icônes pour accommoder leur taille réelle (gonflée
+   par le padding global d'Adminator sur .btn) - valeurs ajustées en
+   direct par le client dans l'inspecteur. */
+.htmlpage .column .box .configuration {
+	right: 96px;
+}
+.htmlpage .lyrow .clone {
+	right: 96px;
+}
+.htmlpage .lyrow .drag {
+	right: 50px;
+}
+#pagebuilder-sidebar-nav .preview input {
+	height: 33px;
+}
+#pagebuilder-sidebar-nav .lyrow.ui-draggable .drag {
+	padding: 9px 3px;
+}
+
+/* Bootstrap 3 ne centre pas verticalement ses modales par défaut (la
+   modale "Preferences" - réglages d'un bloc - reste collée en haut) -
+   technique classique de centrage vertical Bootstrap 3, scopée à
+   #preferences pour ne pas affecter d'autres modales de l'admin. */
+#preferences.modal {
+	text-align: center;
+	padding: 0 !important;
+}
+#preferences.modal:before {
+	content: '';
+	display: inline-block;
+	height: 100%;
+	vertical-align: middle;
+	margin-right: -4px;
+}
+#preferences .modal-dialog {
+	display: inline-block;
+	text-align: left;
+	vertical-align: middle;
+}
+.btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+.btn-success { background: var(--success); border-color: var(--success); color: #fff; }
+.btn-warning { background: var(--warning); border-color: var(--warning); color: #fff; }
+.btn-danger  { background: var(--danger);  border-color: var(--danger);  color: #fff; }
+.btn-info    { background: var(--info);    border-color: var(--info);    color: #fff; }
+.btn-default {
+	background: var(--bg-card);
+	border-color: var(--border);
+	color: var(--t-base);
+}
+
+/* --- Panneau latéral (blocs disponibles) --- */
+#pagebuilder-sidebar-nav {
+	background: var(--bg-muted);
+	border-radius: 8px;
+	border: 1px solid var(--border-soft);
+}
+#pagebuilder-sidebar-nav .nav-header {
+	color: var(--t-base);
+	text-shadow: none;
+}
+.sidebar-nav .box {
+	background: var(--bg-card);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	box-shadow: var(--shadow-sm);
+}
+#pagebuilder-sidebar-nav .preview {
+	color: var(--t-muted);
+}
+
+/* --- Canevas (.htmlpage) --- */
+.htmlpage {
+	background: var(--bg-card);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+}
+.htmlpage:after,
+.htmlpage .row:before,
+.column:after {
+	background: var(--bg-muted);
+	border-color: var(--border);
+	color: var(--t-light);
+	border-radius: 6px 0 6px 0;
+}
+.htmlpage .row {
+	background: var(--bg-muted);
+	border-color: var(--border-soft);
+	box-shadow: none;
+}
+.column {
+	background: var(--bg-card);
+	border-color: var(--border);
+}
+.htmlpage .box:hover,
+.htmlpage .active {
+	border-color: var(--primary);
+}
+.ui-sortable-placeholder {
+	outline-color: var(--primary-soft);
+	border-color: var(--primary);
+}
+
+/* --- Modale "Preferences" (réglages par bloc) --- */
+#preferences .modal-content {
+	background: var(--bg-card);
+	color: var(--t-base);
+	border-radius: 10px;
+	border: 1px solid var(--border);
+	box-shadow: var(--shadow-lg);
+}
+#preferences .modal-header {
+	border-bottom: 1px solid var(--border-soft);
+}
+#preferences .modal-footer {
+	border-top: 1px solid var(--border-soft);
+}
+#preferences .modal-title,
+#preferences label {
+	color: var(--t-base);
+}
+#preferences .nav-tabs {
+	border-bottom-color: var(--border-soft);
+}
+#preferences .nav-tabs > li > a {
+	color: var(--t-muted);
+	border-radius: 6px 6px 0 0;
+}
+#preferences .nav-tabs > li.active > a,
+#preferences .nav-tabs > li.active > a:hover,
+#preferences .nav-tabs > li.active > a:focus {
+	background: var(--bg-muted);
+	color: var(--t-base);
+	border-color: var(--border-soft);
+}
+#preferences .form-control,
+#preferences textarea,
+#preferences input[type="text"] {
+	background: var(--bg-body);
+	border: 1px solid var(--border);
+	color: var(--t-base);
+	border-radius: 6px;
+	box-shadow: none;
+}
+#preferences .form-control:focus {
+	border-color: var(--primary);
+	box-shadow: 0 0 0 3px var(--primary-ring);
+}
+#preferences .well {
+	background: var(--bg-muted);
+	border-color: var(--border-soft);
+}
+.modal-backdrop {
+	background: #0b1120;
+}
+
+/* --- Colorselector (sélecteur de couleur des lignes/colonnes) --- */
+.dropdown-colorselector > .dropdown-menu {
+	background: var(--bg-card);
+	border: 1px solid var(--border);
+	box-shadow: var(--shadow-lg);
+}

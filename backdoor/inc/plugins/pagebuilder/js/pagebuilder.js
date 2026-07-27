@@ -191,11 +191,6 @@ function _init() {
         // $('.active').removeClass('active');
     });
 
-    $("#save").click(function (e) {
-        downloadLayoutSrc();
-    });
-
-
     $("#clear").click(function (e) {
         e.preventDefault();
         clearDemo()
@@ -638,26 +633,32 @@ function cleanRow(row) {
     row.remove();
 }
 
-function downloadLayoutSrc() {
-    //  var e = "";
-    $("#download-layout").children().html($(".htmlpage").html());
+// Sauvegarde basée sur le comportement standard des formulaires SBUIADMIN
+// (bouton Ajouter/Modifier, comme n'importe quel autre champ) - pas de
+// bouton "Save"/modale propre au widget. Le contenu du builder est
+// synchronisé dans le vrai champ soumis (voir addPageBuilder()/
+// sbuiadmin-form.php, data-pagebuilder-target) juste avant l'envoi du
+// formulaire, comme CKEditor le fait déjà pour ses propres champs.
+// $(function(){...}) et pas une IIFE immédiate : ce <script> est chargé
+// par addPageBuilder() AVANT son propre HTML (CSS/JS d'abord, balisage
+// ensuite) - un binding immédiat ne trouve donc ni data-pagebuilder-
+// target ni .htmlpage (pas encore dans le DOM) et ne fait jamais rien,
+// silencieusement. _init() plus haut a exactement le même besoin
+// d'attendre le DOM, d'où le même $(function(){...}).
+$(function () {
+    var $target = $('[data-pagebuilder-target]');
+    var targetId = $target.attr('data-pagebuilder-target');
+    if (!targetId) return;
 
-    // var t = $("#download-layout").children();
-    $("#download-layout").children('.container').each(function (i) {
-        var container = $(this);
-        container.children('.lyrow').each(function (i) {
-            var row = $(this);
-            cleanRow(row);
-        });
+    $target.closest('form').on('submit', function () {
+        // PAS de cleanRow() ici (contrairement à l'ancien downloadLayoutSrc(),
+        // export à usage unique) : ce widget doit permettre de resauvegarder
+        // et rééditer indéfiniment le même contenu, il faut donc conserver
+        // tout le chrome d'édition (poignées drag/remove/clone/configuration)
+        // dans ce qui est stocké - un nettoyage à la sauvegarde produit un
+        // HTML propre mais définitivement plus éditable au rechargement.
+        $('#' + targetId).val($('.htmlpage').html());
     });
-    $('textarea#model').val($(".htmlpage").html());
-    $('textarea#src').val(style_html($("#download-layout").html()));
-    $('#download').modal('show');
-
-}
-
-$('#srcSave').click(function () {
-    //$.post(path + '/save.php', {html: style_html($("#download-layout").html())}, function (data) {       }, 'html');
 });
 
 
