@@ -1240,6 +1240,7 @@ class form extends sanitize {
 						<!--<script type="text/javascript">
 							var path = "";
 						</script>-->
+						<script>window.sbMediasUrl = ' . json_encode(_AM_MEDIAS_URL) . ';</script>
 						<script src="inc/plugins/pagebuilder/js/pagebuilder.js"></script>';
 				
 		// Show the label for the element
@@ -1621,7 +1622,7 @@ $htmlpagebuilder = <<<EOT
 					<div id="image" style="display:none">
 						<div class="row">
 							<div class="col-md-5">
-								<div id="imgContent"> </div> <a class="btn btn-default form-control" href="#" id="gallery"><i class="icon-upload-alt"></i>&nbsp;Browse ...</a> </div>
+								<div id="img-urlThumb" class="icon-transfert"> </div> <a class="btn btn-default form-control" href="#" onclick="sbOpenPopup('img-url', 'jpg,jpeg,jpe,png,gif,tif,tiff,bmp,ico,svg', '', ''); return false;"><i class="icon-upload-alt"></i>&nbsp;Choisir une image ...</a> </div>
 							<div class="col-md-7">
 								<div class="form-group">
 									<label for="img-url">Url :</label>

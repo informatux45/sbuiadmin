@@ -215,11 +215,6 @@ function _init() {
     });
 
 
-    $('#gallery').click(function(){
-        $('#thepref').slideUp();
-        $('#mediagallery').slideDown();
-    });
-
 
     $("#sourcepreview").click(function () {
         $('#pc').addClass('active');
@@ -403,7 +398,7 @@ function prepareEditor(part, row, column) {
         case 'image':
             var img = part.find('img');
 
-            $('#imgContent').html(img.clone().attr('width', '200'));
+            $('#img-urlThumb').html(img.clone().attr('width', '200'));
             $('#img-url').val(img.attr('src'));
             $('#img-width').val(img.innerWidth());
             $('#img-height').val(img.innerHeight());
@@ -659,6 +654,27 @@ $(function () {
         // HTML propre mais définitivement plus éditable au rechargement.
         $('#' + targetId).val($('.htmlpage').html());
     });
+});
+
+// Bloc "Image" : sbTransfert() (assets/dist/js/sb-custom.js, partagée par
+// tout le CMS - ne pas y toucher, ça casserait les autres champs médias)
+// range volontairement le nom de fichier seul dans #img-url (ex: "xxx.png"),
+// jamais un chemin utilisable une fois la page affichée hors de l'admin -
+// la miniature (#img-urlThumb) reçoit elle un chemin relatif à la popup de
+// sélection ("../upload/xxx.png"), tout aussi inutilisable ailleurs. On
+// reconstruit ici l'URL absolue du site (window.sbMediasUrl, voir
+// addPageBuilder()/sbuiadmin-form.php - même constante _AM_MEDIAS_URL
+// utilisée partout ailleurs dans le CMS) + le nom de fichier déjà correct.
+$(function () {
+    var thumb = document.getElementById('img-urlThumb');
+    if (!thumb || !window.MutationObserver || !window.sbMediasUrl) return;
+
+    new MutationObserver(function () {
+        var filename = $('#img-url').val();
+        if (filename) {
+            $('#img-url').val(window.sbMediasUrl + '/' + filename);
+        }
+    }).observe(thumb, { childList: true });
 });
 
 
