@@ -935,6 +935,232 @@ function sbGetUserAvatar($avatar, $email, $s = 80) {
 }
 
 /**
+ * Whitelist des tables/colonnes réellement présentes en base (widgets du
+ * dashboard, voir dashboard.php/index.php) - une valeur de table/colonne
+ * soumise par un formulaire ne doit jamais être interpolée dans du SQL
+ * sans avoir été confrontée à ce schéma au préalable. Le type de colonne
+ * (ex: 'int(11)', 'date', 'datetime') sert à distinguer une vraie colonne
+ * date/datetime/timestamp d'un entier de type "timestamp Unix" (ex:
+ * sb_users.logintime) pour construire la bonne comparaison SQL (voir
+ * index.php, calcul de tendance/graphique).
+ * @return array ['nom_table_sans_prefixe' => ['col1' => 'type', ...]]
+ */
+function sbGetDbSchema() {
+    global $sbsql;
+
+    $schema = array();
+    $prefix = _AM_DB_PREFIX;
+
+    // mysqli_report(MYSQLI_REPORT_STRICT) est actif (voir sql::connect()) :
+    // une requête en échec lève une exception au lieu de renvoyer false -
+    // cette fonction ne doit jamais casser toute la page pour un souci de
+    // schéma ponctuel (droits DB restreints, table verrouillée, etc.).
+    try {
+        $request_tables = $sbsql->query("SHOW TABLES LIKE '" . $sbsql->escape_string($prefix) . "%'");
+        $tables = $sbsql->toarray($request_tables);
+        if (!is_array($tables)) return $schema;
+    } catch (Exception $e) {
+        return $schema;
+    }
+
+    foreach ($tables as $t) {
+        $full_name  = $t[0];
+        $short_name = (strpos($full_name, $prefix) === 0) ? substr($full_name, strlen($prefix)) : $full_name;
+
+        try {
+            $request_cols = $sbsql->query("SHOW COLUMNS FROM `$full_name`");
+            $cols = $sbsql->toarray($request_cols);
+            if (!is_array($cols)) continue;
+        } catch (Exception $e) {
+            continue;
+        }
+
+        $schema[$short_name] = array();
+        foreach ($cols as $c) {
+            $schema[$short_name][$c[0]] = $c[1];
+        }
+    }
+
+    return $schema;
+}
+
+/**
+ * Widgets système du dashboard (Point 3) - une métrique par clé, sans lien
+ * avec une table SQL contrairement aux widgets "table" classiques.
+ * @param string $key voir dashboard.php pour la liste des clés proposées
+ * @return string valeur déjà formatée pour affichage
+ */
+function sbGetSystemWidgetValue($key) {
+    global $sbsql;
+
+    switch ($key) {
+        case 'users_count':
+            try {
+                $row = $sbsql->assoc($sbsql->query("SELECT COUNT(*) AS cpt FROM " . _AM_DB_PREFIX . "sb_users"));
+                return ($row) ? intval($row['cpt']) : 0;
+            } catch (Exception $e) {
+                return 0;
+            }
+
+        case 'php_version':
+            return _AM_SERVER_PHP_VERSION_ID;
+
+        case 'db_host':
+            return _AM_DB_HOST;
+
+        case 'upload_limit':
+            return _AM_MEDIAS_SIZE_LIMIT;
+
+        case 'disk_free':
+            $bytes = @disk_free_space(SBUIADMIN_PATH);
+            return ($bytes !== false) ? sbFormatByteSize($bytes) : 'N/A';
+
+        case 'media_size':
+            return sbFormatByteSize(sbGetDirectorySize(_AM_MEDIAS_DIR));
+
+        case 'active_sessions':
+            try {
+                $row = $sbsql->assoc($sbsql->query("SELECT COUNT(*) AS cpt FROM " . _AM_DB_PREFIX . "sb_sessions WHERE expiredate > NOW()"));
+                return ($row) ? intval($row['cpt']) : 0;
+            } catch (Exception $e) {
+                return 0;
+            }
+    }
+
+    return '';
+}
+
+/**
+ * Formatage "Go/Mo/Ko/bytes" d'un nombre d'octets déjà connu - mêmes
+ * seuils que sbDisplayMediaSize() (qui part elle d'un chemin de fichier).
+ */
+function sbFormatByteSize($bytes) {
+    if ($bytes >= 1073741824) return round($bytes / 1073741824 * 100) / 100 . ' Go';
+    if ($bytes >= 1048576)    return round($bytes / 1048576 * 100) / 100 . ' Mo';
+    if ($bytes >= 1024)       return round($bytes / 1024 * 100) / 100 . ' Ko';
+    return $bytes . ' bytes';
+}
+
+/**
+ * Taille totale (récursive) d'un dossier - utilisée par le widget système
+ * "Espace utilisé par les médias".
+ */
+function sbGetDirectorySize($dir) {
+    if (!is_dir($dir)) return 0;
+
+    $total    = 0;
+    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS));
+    foreach ($iterator as $file) {
+        if ($file->isFile()) $total += $file->getSize();
+    }
+    return $total;
+}
+
+/**
+ * Widget météo (Point 3) - prévisions Open-Meteo (gratuit, sans clé) pour
+ * les coordonnées résolues à l'enregistrement du widget (voir
+ * sbGeocodeCity(), appelée une seule fois depuis dashboard.php - pas à
+ * chaque affichage du dashboard). Timeout volontairement court : ce widget
+ * ne doit jamais ralentir longtemps le rendu du dashboard si l'API est
+ * lente/indisponible - repli explicite plutôt qu'une page cassée.
+ * @param string $location format "Ville|lat|lon" (voir dashboard.php)
+ * @return array|false ['city'=>.., 'temp'=>.., 'icon'=>.., 'label'=>..] ou false si indisponible
+ */
+function sbGetWeatherWidgetValue($location) {
+    $parts = explode('|', $location);
+    if (count($parts) < 3) return false;
+
+    list($city, $lat, $lon) = $parts;
+    $url = 'https://api.open-meteo.com/v1/forecast?latitude=' . urlencode($lat) . '&longitude=' . urlencode($lon) . '&current=temperature_2m,weather_code';
+
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl, CURLOPT_TIMEOUT, 4);
+    curl_setopt($curl, CURLOPT_USERAGENT, 'SBUIADMIN Dashboard Widget');
+    $response  = curl_exec($curl);
+    $curlError = curl_errno($curl);
+    curl_close($curl);
+
+    if ($curlError || !$response) return false;
+
+    $data = json_decode($response, true);
+    if (!isset($data['current']['temperature_2m'])) return false;
+
+    $code = isset($data['current']['weather_code']) ? intval($data['current']['weather_code']) : 0;
+
+    return array(
+        'city'  => $city,
+        'temp'  => round($data['current']['temperature_2m']),
+        'icon'  => sbGetWeatherIcon($code),
+        'label' => sbGetWeatherLabel($code),
+    );
+}
+
+/**
+ * Icône Font Awesome (bundle FA4 embarqué) selon le code météo WMO renvoyé
+ * par Open-Meteo - volontairement simplifié (quelques familles plutôt que
+ * les ~30 codes WMO un par un, FA4 n'a de toute façon pas d'icône dédiée
+ * à chacun).
+ */
+function sbGetWeatherIcon($code) {
+    if ($code == 0) return 'sun-o';
+    if ($code <= 48) return 'cloud';
+    if ($code <= 67) return 'umbrella';
+    if ($code <= 77) return 'asterisk';
+    if ($code <= 82) return 'umbrella';
+    if ($code <= 86) return 'asterisk';
+    if ($code >= 95) return 'bolt';
+    return 'cloud';
+}
+
+/**
+ * Libellé français selon le code météo WMO - voir sbGetWeatherIcon().
+ */
+function sbGetWeatherLabel($code) {
+    if ($code == 0) return 'Ciel dégagé';
+    if ($code <= 3) return 'Partiellement nuageux';
+    if ($code <= 48) return 'Brouillard';
+    if ($code <= 67) return 'Pluie';
+    if ($code <= 77) return 'Neige';
+    if ($code <= 82) return 'Averses';
+    if ($code <= 86) return 'Averses de neige';
+    if ($code >= 95) return 'Orage';
+    return 'Nuageux';
+}
+
+/**
+ * Géocodage d'un nom de ville (Open-Meteo, gratuit, sans clé) - appelé une
+ * seule fois à l'enregistrement d'un widget météo (voir dashboard.php),
+ * jamais à l'affichage du dashboard.
+ * @return array|false ['city'=>.., 'lat'=>.., 'lon'=>..] ou false si la ville est introuvable/API indisponible
+ */
+function sbGeocodeCity($city) {
+    $url = 'https://geocoding-api.open-meteo.com/v1/search?name=' . urlencode($city) . '&count=1&language=fr';
+
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl, CURLOPT_TIMEOUT, 8);
+    curl_setopt($curl, CURLOPT_USERAGENT, 'SBUIADMIN Dashboard Widget');
+    $response  = curl_exec($curl);
+    $curlError = curl_errno($curl);
+    curl_close($curl);
+
+    if ($curlError || !$response) return false;
+
+    $data = json_decode($response, true);
+    if (empty($data['results'][0])) return false;
+
+    $result = $data['results'][0];
+    return array(
+        'city' => $result['name'],
+        'lat'  => $result['latitude'],
+        'lon'  => $result['longitude'],
+    );
+}
+
+/**
  * Construct Module Menu (Out of System)
  * @param string $type main / admin
  * @return String menu Admin

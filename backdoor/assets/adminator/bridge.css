@@ -744,3 +744,83 @@ p.sbmedia > span.sbmedia-other {
 .sb-emoji-toggle.sb-emoji-toggle:hover {
 	background: var(--primary-soft);
 }
+
+/* Point 3 (dashboard) : conteneur du mini graphique SVG maison
+   (dashboard-chart.js) dans une carte "Récent" du dashboard. */
+.sb-dashboard-chart {
+	height: 90px;
+	margin-bottom: 10px;
+}
+
+/* addIconFA() (inc/class/sbuiadmin-form.php) + icon-picker.js : aperçu +
+   champ texte + bouton, et la grille filtrable du modal partagé. */
+.icon-picker-wrap {
+	align-items: center;
+	display: flex;
+	gap: 8px;
+}
+.icon-picker-wrap .input {
+	flex: 1;
+}
+.icon-picker-preview {
+	align-items: center;
+	background: var(--bg-muted);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	display: grid;
+	flex-shrink: 0;
+	height: 38px;
+	place-items: center;
+	width: 38px;
+}
+.icon-picker-preview i {
+	color: var(--t-base);
+	font-size: 16px;
+}
+.sb-icon-picker-grid {
+	display: grid;
+	gap: 6px;
+	grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+	max-height: 360px;
+	overflow-y: auto;
+}
+.sb-icon-picker-item {
+	align-items: center;
+	background: var(--bg-card);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	color: var(--t-muted);
+	cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	font-size: 9px;
+	overflow: hidden;
+	padding: 8px 2px;
+	transition: background .14s, color .14s;
+}
+.sb-icon-picker-item:hover {
+	background: var(--bg-hover);
+	color: var(--t-base);
+}
+.sb-icon-picker-item i {
+	color: var(--t-base);
+	font-size: 16px;
+}
+.sb-icon-picker-item span {
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* Point 3 (dashboard) : le thème ne définit que 4 variantes de la lueur de
+   fond .kpi-card (.c-primary/.c-success/.c-danger/.c-purple) - les widgets
+   proposent 6 couleurs (+info/+warning, cohérent avec .kpi-icon qui les a
+   toutes les 6), complète les 2 manquantes. */
+.kpi-card.c-info {
+	color: var(--info);
+}
+.kpi-card.c-warning {
+	color: var(--warning);
+}

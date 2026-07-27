@@ -182,6 +182,42 @@ INSERT INTO `<DB_PREFIX>sb_config` (`id`, `config`, `content`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `sb_dashboard_widgets`
+--
+
+DROP TABLE IF EXISTS `<DB_PREFIX>sb_dashboard_widgets`;
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_dashboard_widgets` (
+  `id` int(11) NOT NULL,
+  `type` varchar(20) NOT NULL DEFAULT 'table',
+  `position` int(11) NOT NULL DEFAULT 0,
+  `table_name` varchar(64) NOT NULL,
+  `value_column` varchar(64) NOT NULL,
+  `date_column` varchar(64) NOT NULL DEFAULT '',
+  `widget_key` varchar(50) NOT NULL DEFAULT '',
+  `location` varchar(255) NOT NULL DEFAULT '',
+  `content` longtext,
+  `title` varchar(100) NOT NULL,
+  `link` varchar(255) NOT NULL DEFAULT '',
+  `icon` varchar(50) NOT NULL DEFAULT '',
+  `color` varchar(20) NOT NULL DEFAULT 'primary',
+  `show_chart` tinyint(1) NOT NULL DEFAULT 0,
+  `active` tinyint(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `sb_dashboard_widgets`
+--
+
+INSERT INTO `<DB_PREFIX>sb_dashboard_widgets` (`id`, `type`, `position`, `table_name`, `value_column`, `date_column`, `widget_key`, `location`, `title`, `link`, `icon`, `color`, `show_chart`, `active`) VALUES
+(1, 'system', 0, '', '', '', 'users_count', '', 'Utilisateurs', 'index.php?p=users', 'users', 'primary', 0, 1),
+(2, 'system', 1, '', '', '', 'php_version', '', 'Version PHP', 'index.php?p=database', 'code', 'info', 0, 1),
+(3, 'system', 2, '', '', '', 'db_host', '', 'DB Host', 'index.php?p=settings', 'database', 'purple', 0, 1),
+(4, 'system', 3, '', '', '', 'upload_limit', '', 'Upload limit', 'index.php?p=settings', 'upload', 'warning', 0, 1),
+(5, 'table', 4, 'sb_sandbox', 'nom', '', '', '', 'Nom (Sandbox)', 'index.php?p=sandbox', 'ambulance', 'primary', 0, 1);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `sb_contact`
 --
 
@@ -1052,6 +1088,12 @@ ALTER TABLE `<DB_PREFIX>sb_config`
   ADD KEY `config_2` (`config`);
 
 --
+-- Indexes for table `sb_dashboard_widgets`
+--
+ALTER TABLE `<DB_PREFIX>sb_dashboard_widgets`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `sb_contact`
 --
 ALTER TABLE `<DB_PREFIX>sb_contact`
@@ -1221,6 +1263,11 @@ ALTER TABLE `<DB_PREFIX>sb_blocs_sort`
 --
 ALTER TABLE `<DB_PREFIX>sb_config`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+--
+-- AUTO_INCREMENT for table `sb_dashboard_widgets`
+--
+ALTER TABLE `<DB_PREFIX>sb_dashboard_widgets`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 --
 -- AUTO_INCREMENT for table `sb_contact`
 --

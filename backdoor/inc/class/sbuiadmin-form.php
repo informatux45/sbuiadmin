@@ -2120,8 +2120,70 @@ EOT;
 		$this -> formBuffer['elements'][$cpt] = $chaineTemp;
 	}
 
-	
-	
+
+	/**
+	* Construct form (body)
+	* add a form element (Font Awesome icon picker : aperçu + champ texte +
+	* bouton ouvrant une grille filtrable de toutes les icônes du bundle FA
+	* embarqué, via le composant vanilla JS assets/adminator/icon-picker.js,
+	* chargé globalement comme peek.js/modal.js). La valeur stockée/soumise
+	* reste le nom brut de l'icône (ex: "comments"), identique à ce
+	* qu'attendaient déjà tous les usages existants (<i class="fa fa-...">).
+	* @return html code
+	*/
+	public function addIconFA ($label = '', $arrArgs = array (), $isRequired = false, $helpDsc = '') {
+		$elem = 'text';
+		if (!array_key_exists ($elem, $this -> inputArr)) {
+			throw new Exception ($elem . ' n\'est pas un élément valide');
+		}
+
+		if (!array_key_exists ('name', $arrArgs) && $elem !== 'submit' && $elem !== 'reset') {
+			$arrArgs['name'] = 'default';
+		}
+
+		$cpt = count ($this -> formElementArr);
+		$this -> formElementArr[$cpt][$elem] = array ();
+		$arrTemp = array_merge ($this -> eventArr, $this -> commonArr, $this -> inputArr[$elem]);
+
+		foreach ($arrTemp as $clef => $val) {
+			if (array_key_exists ($clef, $arrArgs)) {
+				$this -> formElementArr[$cpt][$elem][$clef] = $arrArgs[$clef];
+			}
+		}
+
+		$fieldId    = (array_key_exists('id', $arrArgs) && $arrArgs['id'] != '') ? $arrArgs['id'] : 'iconFA' . $cpt . time();
+		$fieldValue = array_key_exists('value', $arrArgs) ? $arrArgs['value'] : '';
+
+		// Show the label for the element
+		$chaineTemp .= $this -> isRequired ($isRequired, $label);
+
+		// Show the form element
+		$chaineTemp .= '<div class="icon-picker-wrap">';
+		$chaineTemp .= '<span class="icon-picker-preview" id="' . $fieldId . 'Preview"><i class="fa fa-fw' . ($fieldValue != '' ? ' fa-' . $fieldValue : '') . '"></i></span>';
+		$chaineTemp .= '<input class="input" type="'.$elem.'" data-icon-picker id="' . $fieldId . '" ';
+
+		foreach ($this -> formElementArr[$cpt][$elem] as $clef => $val) {
+			if ($clef == 'id') continue; // déjà émis ci-dessus
+			$chaineTemp .= $clef.'="'.$val.'" ';
+		}
+
+		$chaineRequired = ($isRequired == true) ? ' required="true" bname="' . $label . '" ' : '';
+		$chaineTemp    .= $chaineRequired;
+
+		$chaineTemp .= '/>';
+		$chaineTemp .= '<button type="button" class="btn btn--ghost icon-picker-trigger" data-icon-picker-trigger="' . $fieldId . '">Choisir</button>';
+		$chaineTemp .= '</div>';
+
+		// If help
+		if ($helpDsc != '')
+			$chaineTemp .= '<p class="help-block">' . $helpDsc . '</p>';
+		else
+			$chaineTemp .= '<p></p>';
+
+		$this -> formBuffer['elements'][$cpt] = $chaineTemp;
+	}
+
+
 	/**
 	* Construct form (body)
 	* add a break to the form (line with title)

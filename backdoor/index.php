@@ -448,83 +448,182 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 				$sb_now       = time();
 				$sbsmarty->assign('sb_dashboard_date_fr', $sb_fr_days[date('w', $sb_now)] . ' ' . date('j', $sb_now) . ' ' . $sb_fr_months[(int)date('n', $sb_now)] . ' ' . date('Y', $sb_now));
 
-				// Traitement page DASHBOARD (INDEX ADMIN)
-				$sb_dashboard_file = _AM_DASHBOARD_FILE;
-				// --- Ouverture du fichier
-				$sb_dashboard = file($sb_dashboard_file);
-				// --- Initialisation
-				$sbsmarty->assign('sb_dashboard_table', trim($sb_dashboard[0]));
-				// --- Table 1
-				$sbsmarty->assign('sb_dashboard_status1_table', ( (isset($sb_dashboard[1])) ? trim($sb_dashboard[1]) : "" ));
-				$sbsmarty->assign('sb_dashboard_status1_title', ( (isset($sb_dashboard[2])) ? trim($sb_dashboard[2]) : "" ));
-				$sbsmarty->assign('sb_dashboard_status1_link', ( (isset($sb_dashboard[3])) ? trim($sb_dashboard[3]) : "" ));
-				$sbsmarty->assign('sb_dashboard_status1_icon', ( (isset($sb_dashboard[4])) ? trim($sb_dashboard[4]) : "" ));
-				$sbsmarty->assign('sb_dashboard_status1_tbcol', ( (isset($sb_dashboard[5])) ? trim($sb_dashboard[5]) : "" ));
-				if (isset($sb_dashboard[5]) && trim($sb_dashboard[5]) != '' && isset($sb_dashboard[1]) && trim($sb_dashboard[1]) != '') {
-					$query_1  = "SELECT ".$sb_dashboard[5]." FROM ".$sb_dashboard[1]." ORDER BY ".$sb_dashboard[5]." DESC";
-					$request1 = $sbsql->query($query_1);
-					$result1  = $sbsql->toarray($request1);
-					$sbsmarty->assign('sb_dashboard_status1_cpt', $sbsql->numrows());
-					$sbsmarty->assign('sb_dashboard_status1_all', $result1);
-				} else {
-					$sbsmarty->assign('sb_dashboard_status1_cpt', '');
-					$sbsmarty->assign('sb_dashboard_status1_all', '');
+				// --------------------------------
+				// --- Widgets du dashboard (table sb_dashboard_widgets) -
+				// remplace l'ancien mécanisme positionnel (fichier plat
+				// inc/admin/dashboard.txt, 4 emplacements fixes, SQL non
+				// échappé). Chaque ligne = une tuile KPI + une carte
+				// "éléments récents", avec tendance (7 derniers jours vs 7
+				// précédents) et graphique en option si une colonne date a
+				// été configurée pour ce widget (voir dashboard.php).
+				// --------------------------------
+				$sb_dashboard_widgets_query = $sbsql->query("SELECT * FROM " . _AM_DB_PREFIX . "sb_dashboard_widgets WHERE active = 1 ORDER BY position ASC");
+				$sb_dashboard_widgets_rows  = $sbsql->toarray($sb_dashboard_widgets_query);
+
+				$sb_dashboard_schema  = sbGetDbSchema();
+				$sb_dashboard_widgets = array();
+
+				foreach ($sb_dashboard_widgets_rows as $sb_widget) {
+					$sb_widget_type = isset($sb_widget['type']) ? $sb_widget['type'] : 'table';
+
+					// --- system / weather / html / text : pas de source SQL
+					// arbitraire, la tuile ne montre qu'une valeur calculée
+					// (ou du contenu figé) - aucune liste "Récent" associée.
+					if ($sb_widget_type == 'system') {
+						$sb_dashboard_widgets[] = array(
+							'id'    => $sb_widget['id'],
+							'type'  => 'system',
+							'title' => $sb_widget['title'],
+							'link'  => $sb_widget['link'],
+							'icon'  => $sb_widget['icon'],
+							'color' => $sb_widget['color'],
+							'value' => sbGetSystemWidgetValue($sb_widget['widget_key']),
+						);
+						continue;
+					}
+
+					if ($sb_widget_type == 'weather') {
+						$sb_weather = sbGetWeatherWidgetValue($sb_widget['location']);
+						$sb_dashboard_widgets[] = array(
+							'id'      => $sb_widget['id'],
+							'type'    => 'weather',
+							'title'   => $sb_widget['title'],
+							'link'    => $sb_widget['link'],
+							'color'   => $sb_widget['color'],
+							// Icône/valeur déduites de la météo du moment, pas
+							// du champ "icon" du formulaire (voir dashboard.php).
+							'icon'    => $sb_weather ? $sb_weather['icon'] : 'question-circle-o',
+							'value'   => $sb_weather ? $sb_weather['temp'] . '°C' : 'Météo indisponible',
+							'city'    => $sb_weather ? $sb_weather['city'] : explode('|', $sb_widget['location'])[0],
+							'label'   => $sb_weather ? $sb_weather['label'] : '',
+						);
+						continue;
+					}
+
+					if ($sb_widget_type == 'html' || $sb_widget_type == 'text') {
+						$sb_dashboard_widgets[] = array(
+							'id'      => $sb_widget['id'],
+							'type'    => $sb_widget_type,
+							'title'   => $sb_widget['title'],
+							'link'    => $sb_widget['link'],
+							'icon'    => $sb_widget['icon'],
+							'color'   => $sb_widget['color'],
+							'content' => $sb_widget['content'],
+						);
+						continue;
+					}
+
+					// --- type "table" (défaut/historique) : re-vérifié à la
+					// lecture (pas seulement à l'écriture), si la
+					// table/colonne a disparu depuis, on ignore
+					// silencieusement ce widget plutôt que d'exécuter du SQL
+					// sur un identifiant fantôme.
+					if (!isset($sb_dashboard_schema[$sb_widget['table_name']])
+						|| !array_key_exists($sb_widget['value_column'], $sb_dashboard_schema[$sb_widget['table_name']])) {
+						continue;
+					}
+
+					$sb_full_table = _AM_DB_PREFIX . $sb_widget['table_name'];
+					$sb_value_col  = $sb_widget['value_column'];
+					$sb_date_col   = $sb_widget['date_column'];
+					$sb_has_date   = ($sb_date_col != '' && array_key_exists($sb_date_col, $sb_dashboard_schema[$sb_widget['table_name']]));
+
+					$sb_item = array(
+						'id'    => $sb_widget['id'],
+						'type'  => 'table',
+						'title' => $sb_widget['title'],
+						'link'  => $sb_widget['link'],
+						'icon'  => $sb_widget['icon'],
+						'color' => $sb_widget['color'],
+						'cpt'   => 0,
+						'all'   => array(),
+						'trend' => null,
+						'chart' => null,
+					);
+
+					// --- Compteur total + 10 plus récents
+					$sb_order_col = $sb_has_date ? $sb_date_col : $sb_value_col;
+					$sb_count_row = $sbsql->assoc($sbsql->query("SELECT COUNT(*) AS cpt FROM `$sb_full_table`"));
+					$sb_item['cpt'] = ($sb_count_row) ? intval($sb_count_row['cpt']) : 0;
+
+					$sb_list_request = $sbsql->query("SELECT `$sb_value_col` AS val FROM `$sb_full_table` ORDER BY `$sb_order_col` DESC LIMIT 10");
+					$sb_item['all']  = $sbsql->toarray($sb_list_request);
+
+					// --- Tendance + graphique (seulement si colonne date valide)
+					if ($sb_has_date) {
+						$sb_col_type     = $sb_dashboard_schema[$sb_widget['table_name']][$sb_date_col];
+						$sb_is_real_date = (bool) preg_match('/^(date|datetime|timestamp)/i', $sb_col_type);
+						$sb_is_int_ts    = (bool) preg_match('/^(int|bigint|mediumint|smallint)/i', $sb_col_type);
+
+						if ($sb_is_real_date || $sb_is_int_ts) {
+							if ($sb_is_int_ts) {
+								$sb_bound_7    = 'UNIX_TIMESTAMP(NOW() - INTERVAL 7 DAY)';
+								$sb_bound_14   = 'UNIX_TIMESTAMP(NOW() - INTERVAL 14 DAY)';
+								$sb_group_expr = "FROM_UNIXTIME(`$sb_date_col`, '%Y-%m-%d')";
+							} else {
+								$sb_bound_7    = 'NOW() - INTERVAL 7 DAY';
+								$sb_bound_14   = 'NOW() - INTERVAL 14 DAY';
+								$sb_group_expr = "DATE(`$sb_date_col`)";
+							}
+
+							$sb_current_row  = $sbsql->assoc($sbsql->query("SELECT COUNT(*) AS cpt FROM `$sb_full_table` WHERE `$sb_date_col` >= $sb_bound_7"));
+							$sb_previous_row = $sbsql->assoc($sbsql->query("SELECT COUNT(*) AS cpt FROM `$sb_full_table` WHERE `$sb_date_col` >= $sb_bound_14 AND `$sb_date_col` < $sb_bound_7"));
+
+							$sb_current  = ($sb_current_row) ? intval($sb_current_row['cpt']) : 0;
+							$sb_previous = ($sb_previous_row) ? intval($sb_previous_row['cpt']) : 0;
+
+							if ($sb_current > $sb_previous) $sb_direction = 'up';
+							elseif ($sb_current < $sb_previous) $sb_direction = 'down';
+							else $sb_direction = 'flat';
+
+							$sb_percent = ($sb_previous > 0)
+								? round((($sb_current - $sb_previous) / $sb_previous) * 100)
+								: (($sb_current > 0) ? 100 : 0);
+
+							$sb_item['trend'] = array(
+								'direction' => $sb_direction,
+								'percent'   => abs($sb_percent),
+								'current'   => $sb_current,
+								'previous'  => $sb_previous,
+							);
+
+							// --- Graphique : répartition par jour sur les 14 derniers jours
+							if ($sb_widget['show_chart']) {
+								$sb_chart_request = $sbsql->query(
+									"SELECT $sb_group_expr AS jour, COUNT(*) AS cpt FROM `$sb_full_table`
+									 WHERE `$sb_date_col` >= $sb_bound_14
+									 GROUP BY jour ORDER BY jour ASC"
+								);
+								$sb_chart_rows   = $sbsql->toarray($sb_chart_request);
+								$sb_chart_by_day = array();
+								foreach ($sb_chart_rows as $sb_crow) {
+									$sb_chart_by_day[$sb_crow['jour']] = intval($sb_crow['cpt']);
+								}
+
+								$sb_chart_labels = array();
+								$sb_chart_values = array();
+								for ($sb_d = 13; $sb_d >= 0; $sb_d--) {
+									$sb_day_key         = date('Y-m-d', strtotime("-$sb_d days"));
+									$sb_chart_labels[]  = date('d/m', strtotime("-$sb_d days"));
+									$sb_chart_values[]  = isset($sb_chart_by_day[$sb_day_key]) ? $sb_chart_by_day[$sb_day_key] : 0;
+								}
+
+								$sb_item['chart'] = array('labels' => $sb_chart_labels, 'values' => $sb_chart_values);
+							}
+						}
+					}
+
+					$sb_dashboard_widgets[] = $sb_item;
 				}
-				// --- Table 2
-				$sbsmarty->assign('sb_dashboard_status2_table', ( (isset($sb_dashboard[6])) ? trim($sb_dashboard[6]) : "" ));
-				$sbsmarty->assign('sb_dashboard_status2_title', ( (isset($sb_dashboard[7])) ? trim($sb_dashboard[7]) : "" ));
-				$sbsmarty->assign('sb_dashboard_status2_link', ( (isset($sb_dashboard[8])) ? trim($sb_dashboard[8]) : "" ));
-				$sbsmarty->assign('sb_dashboard_status2_icon', ( (isset($sb_dashboard[9])) ? trim($sb_dashboard[9]) : "" ));
-				$sbsmarty->assign('sb_dashboard_status2_tbcol', ( (isset($sb_dashboard[10])) ? trim($sb_dashboard[10]) : "" ));
-				if (isset($sb_dashboard[10]) && trim($sb_dashboard[10]) != '' && isset($sb_dashboard[6]) && trim($sb_dashboard[6]) != '') {
-					$query_2  = "SELECT ".$sb_dashboard[10]." FROM ".$sb_dashboard[6]." ORDER BY ".$sb_dashboard[10]." DESC";
-					$request2 = $sbsql->query($query_2);
-					$result2  = $sbsql->toarray($request2);
-					$sbsmarty->assign('sb_dashboard_status2_cpt', $sbsql->numrows());
-					$sbsmarty->assign('sb_dashboard_status2_all', $result2);
-				} else {
-					$sbsmarty->assign('sb_dashboard_status2_cpt', '');
-					$sbsmarty->assign('sb_dashboard_status2_all', '');
-				}
-				// --- Table 3
-				$sbsmarty->assign('sb_dashboard_status3_table', ( (isset($sb_dashboard[11])) ? trim($sb_dashboard[11]) : "" ));
-				$sbsmarty->assign('sb_dashboard_status3_title', ( (isset($sb_dashboard[12])) ? trim($sb_dashboard[12]) : "" ));
-				$sbsmarty->assign('sb_dashboard_status3_link', ( (isset($sb_dashboard[13])) ? trim($sb_dashboard[13]) : "" ));
-				$sbsmarty->assign('sb_dashboard_status3_icon', ( (isset($sb_dashboard[14])) ? trim($sb_dashboard[14]) : "" ));
-				$sbsmarty->assign('sb_dashboard_status3_tbcol', ( (isset($sb_dashboard[15])) ? trim($sb_dashboard[15]) : "" ));
-				if (isset($sb_dashboard[11]) && trim($sb_dashboard[11]) != '' && isset($sb_dashboard[15]) && trim($sb_dashboard[15]) != '') {
-					$query_3  = "SELECT ".$sb_dashboard[15]." FROM ".$sb_dashboard[11]." ORDER BY ".$sb_dashboard[15]." DESC";
-					if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $sb_dashboard[15]);
-					$request3 = $sbsql->query($query_3);
-					$result3  = $sbsql->toarray($request3);
-					$sbsmarty->assign('sb_dashboard_status3_cpt', $sbsql->numrows());
-					$sbsmarty->assign('sb_dashboard_status3_all', $result3);
-				} else {
-					$sbsmarty->assign('sb_dashboard_status3_cpt', '');
-					$sbsmarty->assign('sb_dashboard_status3_all', '');
-				}
-				// --- Table 4
-				$sbsmarty->assign('sb_dashboard_status4_table', ( (isset($sb_dashboard[16])) ? trim($sb_dashboard[16]) : "" ));
-				$sbsmarty->assign('sb_dashboard_status4_title', ( (isset($sb_dashboard[17])) ? trim($sb_dashboard[17]) : "" ));
-				$sbsmarty->assign('sb_dashboard_status4_link', ( (isset($sb_dashboard[18])) ? trim($sb_dashboard[18]) : "" ));
-				$sbsmarty->assign('sb_dashboard_status4_icon', ( (isset($sb_dashboard[19])) ? trim($sb_dashboard[19]) : "" ));
-				$sbsmarty->assign('sb_dashboard_status4_tbcol', ( (isset($sb_dashboard[20])) ? trim($sb_dashboard[20]) : "" ));
-				if (isset($sb_dashboard[16]) && trim($sb_dashboard[16]) != '' && isset($sb_dashboard[20]) && trim($sb_dashboard[20]) != '') {
-					$query_4  = "SELECT ".$sb_dashboard[20]." FROM ".$sb_dashboard[16]." ORDER BY {$sb_dashboard[20]} DESC";
-					$request4 = $sbsql->query($query_4);
-					$result4  = $sbsql->toarray($request4);
-					$sbsmarty->assign('sb_dashboard_status4_cpt', $sbsql->numrows());
-					$sbsmarty->assign('sb_dashboard_status4_all', $result4);
-				} else {
-					$sbsmarty->assign('sb_dashboard_status4_cpt', '');
-					$sbsmarty->assign('sb_dashboard_status4_all', '');
-				}
-				// --- Users (cpt)
+
+				$sbsmarty->assign('sb_dashboard_widgets', $sb_dashboard_widgets);
+
+				// --- Users (cpt) - hors mécanisme widgets, ligne KPI admin fixe (index.tpl)
 				$query_5  = "SELECT id FROM " . _AM_DB_PREFIX . "sb_users";
 				$request5 = $sbsql->query($query_5);
 				$result5  = $sbsql->numrows($request5);
 				$sbsmarty->assign('sb_users_cpt', $result5);
-				
+
 			}
 			$sbsmarty->display("system/$sb_get_page.tpl");
 		} else {
