@@ -2173,6 +2173,7 @@ EOT;
 		$chaineTemp .= '/>';
 		$chaineTemp .= '<button type="button" class="btn btn--ghost icon-picker-trigger" data-icon-picker-trigger="' . $fieldId . '">Choisir</button>';
 		$chaineTemp .= '</div>';
+		$chaineTemp .= '</div>';
 
 		// If help
 		if ($helpDsc != '')

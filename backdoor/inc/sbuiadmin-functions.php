@@ -1161,6 +1161,133 @@ function sbGeocodeCity($city) {
 }
 
 /**
+ * Widget dashboard "rss" - lit un flux RSS 2.0 ou Atom et renvoie les
+ * $limit entrées les plus récentes. Aucun cache : lu à chaque affichage
+ * du dashboard, comme la météo (voir sbGetWeatherWidgetValue()) - même
+ * repli silencieux (false) en cas d'échec réseau/flux invalide.
+ * @return array|false [['title'=>.., 'link'=>.., 'date'=>..], ...] ou false
+ */
+function sbGetRssWidgetValue($url, $limit = 5) {
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl, CURLOPT_TIMEOUT, 5);
+    curl_setopt($curl, CURLOPT_USERAGENT, 'SBUIADMIN Dashboard Widget');
+    $response  = curl_exec($curl);
+    $curlError = curl_errno($curl);
+    curl_close($curl);
+
+    if ($curlError || !$response) return false;
+
+    libxml_use_internal_errors(true);
+    $xml = simplexml_load_string($response);
+    libxml_use_internal_errors(false);
+    if (!$xml) return false;
+
+    $items = array();
+
+    if (isset($xml->channel->item)) {
+        // --- RSS 2.0
+        foreach ($xml->channel->item as $item) {
+            $items[] = array(
+                'title' => (string) $item->title,
+                'link'  => (string) $item->link,
+                'date'  => isset($item->pubDate) ? date('d/m/Y', strtotime((string) $item->pubDate)) : '',
+            );
+            if (count($items) >= $limit) break;
+        }
+    } elseif (isset($xml->entry)) {
+        // --- Atom
+        foreach ($xml->entry as $entry) {
+            $link = '';
+            if (isset($entry->link)) {
+                foreach ($entry->link as $sb_atom_link) {
+                    if (!isset($sb_atom_link['rel']) || (string) $sb_atom_link['rel'] == 'alternate') {
+                        $link = (string) $sb_atom_link['href'];
+                        break;
+                    }
+                }
+            }
+            $items[] = array(
+                'title' => (string) $entry->title,
+                'link'  => $link,
+                'date'  => isset($entry->updated) ? date('d/m/Y', strtotime((string) $entry->updated)) : '',
+            );
+            if (count($items) >= $limit) break;
+        }
+    } else {
+        return false;
+    }
+
+    return $items;
+}
+
+/**
+ * Widget dashboard "logs" - dernières $lines lignes d'un fichier situé
+ * dans backdoor/logs/ (protégé par .htaccess, accès web direct interdit).
+ * $filename est réduit à son basename() avant toute utilisation : aucun
+ * chemin ni traversée de répertoire n'est jamais possible depuis le
+ * formulaire, quelle que soit la valeur saisie.
+ * @return array|false lignes (les plus anciennes en premier) ou false si le fichier n'existe pas/n'est pas lisible
+ */
+function sbTailLogFile($filename, $lines = 15) {
+    $safeName = basename($filename);
+    if ($safeName === '') return false;
+
+    $path = SBUIADMIN_PATH . '/logs/' . $safeName;
+    if (!is_file($path) || !is_readable($path)) return false;
+
+    $size   = filesize($path);
+    $handle = fopen($path, 'r');
+    if (!$handle) return false;
+
+    // 64 Ko lus depuis la fin suffisent très largement pour ~15-100 lignes
+    // de log usuelles - pas besoin de charger le fichier entier.
+    $chunkSize = min(65536, $size);
+    fseek($handle, -$chunkSize, SEEK_END);
+    $chunk = fread($handle, $chunkSize);
+    fclose($handle);
+
+    $rows = explode("\n", trim($chunk));
+    return array_slice($rows, -$lines);
+}
+
+/**
+ * Widget dashboard "logaccess" - les $limit dernières connexions réussies
+ * (module Journaux, table sb_logaccess). Ne remonte que logaccess_type =
+ * 'login' - les tentatives échouées ('error') ne sont volontairement pas
+ * mélangées, ce n'est pas ce que "dernières connexions" désigne.
+ * @return array [['user'=>.., 'date'=>..], ...] (vide si aucune ou en cas d'erreur)
+ */
+function sbGetLastLoginsWidgetValue($limit = 10) {
+    global $sbsql;
+
+    try {
+        // LEFT JOIN : un utilisateur supprimé depuis reste visible dans
+        // l'historique (avatar/email absents -> repli Gravatar générique
+        // via sbGetUserAvatar()).
+        $rows = $sbsql->toarray($sbsql->query(
+            "SELECT l.logaccess_user, l.logaccess_date, u.avatar, u.email
+			 FROM " . _AM_DB_PREFIX . "sb_logaccess l
+			 LEFT JOIN " . _AM_DB_PREFIX . "sb_users u ON u.username = l.logaccess_user
+			 WHERE l.logaccess_type = 'login' ORDER BY l.logaccess_date DESC LIMIT " . intval($limit)
+        ));
+    } catch (Exception $e) {
+        return array();
+    }
+
+    $items = array();
+    foreach ($rows as $sb_row) {
+        $items[] = array(
+            'user'   => $sb_row['logaccess_user'],
+            'date'   => date('d/m/Y H:i', intval($sb_row['logaccess_date'])),
+            'avatar' => sbGetUserAvatar($sb_row['avatar'] ?? '', $sb_row['email'] ?? '', 40),
+        );
+    }
+    return $items;
+}
+
+/**
  * Construct Module Menu (Out of System)
  * @param string $type main / admin
  * @return String menu Admin

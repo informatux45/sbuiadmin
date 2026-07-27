@@ -63,6 +63,24 @@ $sb_type_options = array(
 	'weather' => 'Météo',
 	'html'    => 'Code HTML personnalisé',
 	'text'    => 'Texte (éditeur enrichi)',
+	'rss'       => 'Flux RSS',
+	'iframe'    => 'Contenu externe (iframe)',
+	'logs'      => 'Journal (fichier log)',
+	'logaccess' => 'Dernières connexions',
+);
+
+// Icône du sélecteur de type (boutons cliquables du formulaire) - purement
+// cosmétique, sans rapport avec le champ "Icône" du widget lui-même.
+$sb_type_icons = array(
+	'table'     => 'table',
+	'system'    => 'hdd-o',
+	'weather'   => 'cloud',
+	'html'      => 'code',
+	'text'      => 'align-left',
+	'rss'       => 'rss',
+	'iframe'    => 'external-link',
+	'logs'      => 'file-text-o',
+	'logaccess' => 'sign-in',
 );
 
 $sb_system_options = array(
@@ -229,7 +247,7 @@ switch ($action) {
 
 			// Injection des données
 			$id           = intval($_POST['id']);
-			$type         = in_array($_POST['type'], array('table', 'system', 'weather', 'html', 'text')) ? $_POST['type'] : 'table';
+			$type         = in_array($_POST['type'], array('table', 'system', 'weather', 'html', 'text', 'rss', 'iframe', 'logs', 'logaccess')) ? $_POST['type'] : 'table';
 			$table_name   = $sbsanitize->displayText($_POST['table_name'], 'UTF-8', 1, 0);
 			$value_column = $sbsanitize->displayText($_POST['value_column'], 'UTF-8', 1, 0);
 			$date_column  = $sbsanitize->displayText($_POST['date_column'], 'UTF-8', 1, 0);
@@ -240,7 +258,17 @@ switch ($action) {
 			// le champ pertinent pour $type est non vide côté formulaire.
 			$content_html = $sbsanitize->displayText($_POST['content_html'], 'UTF-8', 1, 0);
 			$content_text = $sbsanitize->displayText($_POST['content_text'], 'UTF-8', 1, 0);
-			$widget_title = $sbsanitize->displayText($_POST['widget_title'], 'UTF-8', 1, 0);
+			// rss/iframe/logs réutilisent "location" (URL ou nom de fichier
+			// selon le type) et "value_column" (nombre d'éléments/lignes) -
+			// pas de nouvelle colonne, mêmes colonnes que "weather"/"table"
+			// mais avec un sens différent selon $type.
+			$rss_url      = $sbsanitize->displayText($_POST['rss_url'], 'UTF-8', 1, 0);
+			$rss_count    = $sbsanitize->displayText($_POST['rss_count'], 'UTF-8', 1, 0);
+			$iframe_url   = $sbsanitize->displayText($_POST['iframe_url'], 'UTF-8', 1, 0);
+			$log_filename    = $sbsanitize->displayText($_POST['log_filename'], 'UTF-8', 1, 0);
+			$log_lines       = $sbsanitize->displayText($_POST['log_lines'], 'UTF-8', 1, 0);
+			$logaccess_count = $sbsanitize->displayText($_POST['logaccess_count'], 'UTF-8', 1, 0);
+			$widget_title    = $sbsanitize->displayText($_POST['widget_title'], 'UTF-8', 1, 0);
 			$link         = $sbsanitize->displayText($_POST['link'], 'UTF-8', 1, 0);
 			$icon         = $sbsanitize->displayText($_POST['icon'], 'UTF-8', 1, 0);
 			$color        = $sbsanitize->displayText($_POST['color'], 'UTF-8', 1, 0);
@@ -305,6 +333,64 @@ switch ($action) {
 					$show_chart = '0';
 					break;
 
+				case 'rss':
+					$sb_valid = false;
+					$sb_url   = trim($rss_url);
+					if ($sb_url == '' || !filter_var($sb_url, FILTER_VALIDATE_URL) || !preg_match('#^https?://#i', $sb_url)) {
+						$sb_msg_error = 'URL de flux RSS invalide.';
+					} else {
+						$location = $sb_url;
+						$sb_valid = true;
+					}
+					// Nombre d'articles (1 à 20, 5 par défaut) - réutilise
+					// "value_column" (inutilisé pour ce type).
+					$value_column = (ctype_digit($rss_count) && $rss_count >= 1 && $rss_count <= 20) ? $rss_count : '5';
+					$table_name = $date_column = $widget_key = '';
+					$show_chart = '0';
+					break;
+
+				case 'iframe':
+					$sb_valid = false;
+					$sb_url   = trim($iframe_url);
+					if ($sb_url == '' || !filter_var($sb_url, FILTER_VALIDATE_URL) || !preg_match('#^https?://#i', $sb_url)) {
+						$sb_msg_error = 'URL invalide (http/https uniquement).';
+					} else {
+						$location = $sb_url;
+						$sb_valid = true;
+					}
+					$table_name = $value_column = $date_column = $widget_key = '';
+					$show_chart = '0';
+					break;
+
+				case 'logs':
+					// basename() retire tout séparateur/traversée de chemin -
+					// le fichier est toujours cherché dans backdoor/logs/
+					// (voir sbTailLogFile()), jamais ailleurs sur le disque.
+					$sb_safe_filename = basename(trim($log_filename));
+					$sb_valid = ($sb_safe_filename != '');
+					if (!$sb_valid) {
+						$sb_msg_error = 'Veuillez indiquer un nom de fichier.';
+					} else {
+						$location = $sb_safe_filename;
+					}
+					// Nombre de lignes (1 à 100, 15 par défaut) - réutilise
+					// "value_column" (inutilisé pour ce type).
+					$value_column = (ctype_digit($log_lines) && $log_lines >= 1 && $log_lines <= 100) ? $log_lines : '15';
+					$table_name = $date_column = $widget_key = '';
+					$show_chart = '0';
+					break;
+
+				case 'logaccess':
+					// Aucune saisie à valider - source fixe (sb_logaccess,
+					// connexions réussies uniquement, voir sbGetLastLoginsWidgetValue()).
+					$sb_valid = true;
+					// Nombre de connexions (1 à 50, 10 par défaut) - réutilise
+					// "value_column" (inutilisé pour ce type).
+					$value_column = (ctype_digit($logaccess_count) && $logaccess_count >= 1 && $logaccess_count <= 50) ? $logaccess_count : '10';
+					$table_name = $date_column = $widget_key = '';
+					$show_chart = '0';
+					break;
+
 				case 'table':
 				default:
 					// Validation contre le vrai schéma de la base.
@@ -341,7 +427,7 @@ switch ($action) {
 					$result_add = $sbsql->query($query);
 					if ($result_add) {
 						// --- Vider les champs du formulaire
-						$table_name = $value_column = $date_column = $widget_key = $city_input = $content_html = $content_text = $widget_title = $link = $icon = '';
+						$table_name = $value_column = $date_column = $widget_key = $city_input = $content_html = $content_text = $rss_url = $rss_count = $iframe_url = $log_filename = $log_lines = $logaccess_count = $widget_title = $link = $icon = '';
 						$type = 'table'; $color = 'primary'; $show_chart = '0'; $active = '1';
 						// --- Message SUCCESS
 						$sb_msg_valid = $text . ' ajouté avec succès';
@@ -384,7 +470,7 @@ switch ($action) {
 			// Si AJOUT (First time)
 			// --- Vider les champs du formulaire
 			$type = 'table';
-			$table_name = $value_column = $date_column = $widget_key = $city_input = $content_html = $content_text = $widget_title = $link = $icon = '';
+			$table_name = $value_column = $date_column = $widget_key = $city_input = $content_html = $content_text = $rss_url = $rss_count = $iframe_url = $log_filename = $log_lines = $logaccess_count = $widget_title = $link = $icon = '';
 			$color = 'primary'; $show_chart = '0'; $active = '1';
 		}
 		// --------------------------------
@@ -407,7 +493,15 @@ switch ($action) {
 			// groupes conditionnels du formulaire ci-dessous).
 			$content_html = ($assoc['type'] == 'html') ? utf8_encode($assoc['content']) : '';
 			$content_text = ($assoc['type'] == 'text') ? utf8_encode($assoc['content']) : '';
-			$widget_title = utf8_encode($assoc['title']);
+			// rss/iframe/logs réutilisent également location/value_column,
+			// chacun avec son propre sens (voir la validation ci-dessus).
+			$rss_url      = ($assoc['type'] == 'rss') ? utf8_encode($assoc['location']) : '';
+			$rss_count    = ($assoc['type'] == 'rss') ? $assoc['value_column'] : '';
+			$iframe_url   = ($assoc['type'] == 'iframe') ? utf8_encode($assoc['location']) : '';
+			$log_filename    = ($assoc['type'] == 'logs') ? utf8_encode($assoc['location']) : '';
+			$log_lines       = ($assoc['type'] == 'logs') ? $assoc['value_column'] : '';
+			$logaccess_count = ($assoc['type'] == 'logaccess') ? $assoc['value_column'] : '';
+			$widget_title    = utf8_encode($assoc['title']);
 			$link         = utf8_encode($assoc['link']);
 			$icon         = utf8_encode($assoc['icon']);
 			$color        = $assoc['color'];
@@ -431,13 +525,23 @@ switch ($action) {
 		// géré uniquement côté serveur pour ne pas bloquer la soumission
 		// à cause d'un champ caché resté "required").
 		// ----------------------------
-		$sbform->openSelect("Type de widget", array("id" => "type", "name" => "type"), true);
+		// Boutons cliquables (composant "pills" du thème Adminator, jusque
+		// là inutilisé) plutôt qu'un <select> - 9 choix, plus lisible et
+		// plus rapide à choisir en un clic. Le vrai champ soumis reste un
+		// input hidden #type, piloté par les boutons en JS (voir
+		// dashboard-widget-form.js) - aucune logique de validation ne
+		// change côté serveur.
+		$sb_type_buttons = '';
 		foreach ($sb_type_options as $sb_type_key => $sb_type_label) {
-			$sb_opt_args = array("value" => $sb_type_key);
-			if ($sb_type_key == $type) $sb_opt_args['selected'] = '';
-			$sbform->addOption($sb_type_label, $sb_opt_args);
+			$sb_type_active = ($sb_type_key == $type) ? ' is-active' : '';
+			$sb_type_icon   = isset($sb_type_icons[$sb_type_key]) ? $sb_type_icons[$sb_type_key] : 'circle-o';
+			$sb_type_buttons .= '<button type="button" class="tab' . $sb_type_active . '" data-type-value="' . $sb_type_key . '"><i class="fa fa-' . $sb_type_icon . '"></i> ' . $sb_type_label . '</button>';
 		}
-		$sbform->closeSelect();
+		$sbform->addAnything(
+			'<div class="field"><label class="field-label form_required">Type de widget <span class="req">*</span></label>'
+			. '<div class="tabs pills sb-type-picker" data-widget-type-picker>' . $sb_type_buttons . '</div>'
+			. '<input type="hidden" id="type" name="type" value="' . $type . '"></div><p></p>'
+		);
 
 		// ----------------------------
 		// --- Groupe "table" (visible par défaut, masqué en JS si un autre
@@ -508,6 +612,36 @@ switch ($action) {
 		$sbform->addAnything('</div><div data-widget-type-fields="text" style="display:none">');
 
 		$sbform->addTextareaHtml('Texte', "$content_text", array('id' => 'content_text', 'name' => 'content_text', 'style' => 'height:200px'), false);
+
+		// ----------------------------
+		// --- Groupe "rss" (masqué par défaut)
+		// ----------------------------
+		$sbform->addAnything('</div><div data-widget-type-fields="rss" style="display:none">');
+
+		$sbform->addInput('text', 'URL du flux RSS', array('id' => 'rss_url', 'name' => 'rss_url', 'value' => "$rss_url"), false, false, 'RSS 2.0 ou Atom - lu à chaque affichage du dashboard, sans mise en cache.');
+		$sbform->addInput('text', "Nombre d'articles", array('id' => 'rss_count', 'name' => 'rss_count', 'value' => "$rss_count"), false, false, 'Entre 1 et 20 - 5 par défaut si laissé vide.');
+
+		// ----------------------------
+		// --- Groupe "iframe" (masqué par défaut)
+		// ----------------------------
+		$sbform->addAnything('</div><div data-widget-type-fields="iframe" style="display:none">');
+
+		$sbform->addInput('text', 'URL à intégrer', array('id' => 'iframe_url', 'name' => 'iframe_url', 'value' => "$iframe_url"), false, false, 'http(s) uniquement - le site distant doit autoriser son intégration en iframe.');
+
+		// ----------------------------
+		// --- Groupe "logs" (masqué par défaut)
+		// ----------------------------
+		$sbform->addAnything('</div><div data-widget-type-fields="logs" style="display:none">');
+
+		$sbform->addInput('text', 'Nom du fichier', array('id' => 'log_filename', 'name' => 'log_filename', 'value' => "$log_filename"), false, false, 'Doit exister dans le dossier backdoor/logs/ (protégé, non accessible directement depuis le web).');
+		$sbform->addInput('text', 'Nombre de lignes', array('id' => 'log_lines', 'name' => 'log_lines', 'value' => "$log_lines"), false, false, 'Entre 1 et 100 - 15 par défaut si laissé vide.');
+
+		// ----------------------------
+		// --- Groupe "logaccess" (masqué par défaut)
+		// ----------------------------
+		$sbform->addAnything('</div><div data-widget-type-fields="logaccess" style="display:none">');
+
+		$sbform->addInput('text', 'Nombre de connexions', array('id' => 'logaccess_count', 'name' => 'logaccess_count', 'value' => "$logaccess_count"), false, false, 'Entre 1 et 50 - 10 par défaut si laissé vide. Ne montre que les connexions réussies (module Journaux).');
 
 		$sbform->addAnything('</div>');
 

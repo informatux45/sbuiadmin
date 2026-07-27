@@ -513,6 +513,63 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 						continue;
 					}
 
+					if ($sb_widget_type == 'rss') {
+						// "location"/"value_column" réutilisés (URL du flux /
+						// nombre d'articles) - voir dashboard.php.
+						$sb_dashboard_widgets[] = array(
+							'id'    => $sb_widget['id'],
+							'type'  => 'rss',
+							'title' => $sb_widget['title'],
+							'link'  => $sb_widget['link'],
+							'icon'  => $sb_widget['icon'],
+							'color' => $sb_widget['color'],
+							'items' => sbGetRssWidgetValue($sb_widget['location'], intval($sb_widget['value_column']) ?: 5),
+						);
+						continue;
+					}
+
+					if ($sb_widget_type == 'iframe') {
+						$sb_dashboard_widgets[] = array(
+							'id'    => $sb_widget['id'],
+							'type'  => 'iframe',
+							'title' => $sb_widget['title'],
+							'link'  => $sb_widget['link'],
+							'icon'  => $sb_widget['icon'],
+							'color' => $sb_widget['color'],
+							'src'   => $sb_widget['location'],
+						);
+						continue;
+					}
+
+					if ($sb_widget_type == 'logs') {
+						// "location"/"value_column" réutilisés (nom de fichier
+						// dans backdoor/logs/ / nombre de lignes) - voir
+						// dashboard.php et sbTailLogFile().
+						$sb_dashboard_widgets[] = array(
+							'id'    => $sb_widget['id'],
+							'type'  => 'logs',
+							'title' => $sb_widget['title'],
+							'link'  => $sb_widget['link'],
+							'icon'  => $sb_widget['icon'],
+							'color' => $sb_widget['color'],
+							'lines' => sbTailLogFile($sb_widget['location'], intval($sb_widget['value_column']) ?: 15),
+						);
+						continue;
+					}
+
+					if ($sb_widget_type == 'logaccess') {
+						$sb_dashboard_widgets[] = array(
+							'id'    => $sb_widget['id'],
+							'type'  => 'logaccess',
+							'title' => $sb_widget['title'],
+							'link'  => $sb_widget['link'],
+							'icon'  => $sb_widget['icon'],
+							'color' => $sb_widget['color'],
+							'items' => sbGetLastLoginsWidgetValue(intval($sb_widget['value_column']) ?: 10),
+						);
+						continue;
+					}
+
 					// --- type "table" (défaut/historique) : re-vérifié à la
 					// lecture (pas seulement à l'écriture), si la
 					// table/colonne a disparu depuis, on ignore

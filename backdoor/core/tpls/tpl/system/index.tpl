@@ -82,6 +82,75 @@
 					</div>
 					<div>{$widget.content|unescape:"htmlall"}</div>
 				</section>
+				{elseif $widget.type == 'rss'}
+				<section class="col-4 card">
+					<div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Flux RSS</span>
+							<h2 class="card-title">{if $widget.icon}<i class="fa fa-{$widget.icon} fa-fw" style="color:var(--{$widget.color})"></i> {/if}{$widget.title|@sbDisplayLang}</h2>
+						</div>
+						{if $widget.link}<a class="card-action" href="{$widget.link}">Voir tout <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>{/if}
+					</div>
+					<div>
+						{if $widget.items}
+							{foreach from=$widget.items item=sbrssitem}
+								<a href="{$sbrssitem.link}" target="_blank" rel="noopener" style="display:flex;flex-direction:column;gap:2px;padding:10px 0;border-bottom:1px solid var(--border-soft);color:var(--t-base);font-size:13px">
+									<span>{$sbrssitem.title|unescape:"htmlall"}</span>
+									{if $sbrssitem.date}<span style="color:var(--t-light);font-size:12px">{$sbrssitem.date}</span>{/if}
+								</a>
+							{/foreach}
+						{else}
+							<p style="color:var(--t-muted);font-size:13px;padding:10px 0">Flux indisponible pour l'instant.</p>
+						{/if}
+					</div>
+				</section>
+				{elseif $widget.type == 'iframe'}
+				<section class="col-4 card">
+					<div class="card-head">
+						<div class="card-title-wrap">
+							<h2 class="card-title">{if $widget.icon}<i class="fa fa-{$widget.icon} fa-fw" style="color:var(--{$widget.color})"></i> {/if}{$widget.title|@sbDisplayLang}</h2>
+						</div>
+						{if $widget.link}<a class="card-action" href="{$widget.link}">Voir tout <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>{/if}
+					</div>
+					<iframe src="{$widget.src|escape:'html'}" loading="lazy" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms" style="width:100%;height:300px;border:0;border-radius:8px"></iframe>
+				</section>
+				{elseif $widget.type == 'logs'}
+				<section class="col-4 card">
+					<div class="card-head">
+						<div class="card-title-wrap">
+							<h2 class="card-title">{if $widget.icon}<i class="fa fa-{$widget.icon} fa-fw" style="color:var(--{$widget.color})"></i> {/if}{$widget.title|@sbDisplayLang}</h2>
+						</div>
+					</div>
+					{if $widget.lines}
+						<pre style="font-size:12px;line-height:1.6;white-space:pre-wrap;word-break:break-all;max-height:260px;overflow-y:auto;margin:0;color:var(--t-base)">{foreach from=$widget.lines item=sblogline}{$sblogline|escape:"html"}
+{/foreach}</pre>
+					{else}
+						<p style="color:var(--t-muted);font-size:13px;padding:10px 0">Journal indisponible ou vide.</p>
+					{/if}
+				</section>
+				{elseif $widget.type == 'logaccess'}
+				<section class="col-4 card">
+					<div class="card-head">
+						<div class="card-title-wrap">
+							<span class="eyebrow">Journaux</span>
+							<h2 class="card-title">{if $widget.icon}<i class="fa fa-{$widget.icon} fa-fw" style="color:var(--{$widget.color})"></i> {/if}{$widget.title|@sbDisplayLang}</h2>
+						</div>
+						<a class="card-action" href="{if $widget.link}{$widget.link}{else}index.php?p=logaccess{/if}">Voir tout <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+					</div>
+					<div>
+						{foreach from=$widget.items item=sbloginitem}
+							<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-soft);color:var(--t-base);font-size:13px">
+								<span style="display:flex;align-items:center;gap:8px">
+									<img src="{$sbloginitem.avatar}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0">
+									{$sbloginitem.user|unescape:"htmlall"}
+								</span>
+								<span style="color:var(--t-light);font-size:12px">{$sbloginitem.date}</span>
+							</div>
+						{foreachelse}
+							<p style="color:var(--t-muted);font-size:13px;padding:10px 0">Aucune connexion enregistrée.</p>
+						{/foreach}
+					</div>
+				</section>
 				{/if}
 				{/foreach}
 			</div>

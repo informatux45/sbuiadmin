@@ -19,6 +19,8 @@
 				<div class="hero-actions">
 					{if $all && (!isset($smarty.get.a) || $smarty.get.a == '' || $smarty.get.a == 'del' || $smarty.get.a == 'up' || $smarty.get.a == 'down')}
 						<a class="btn btn--primary" href="{$module_url}&a=add">+1 widget</a>
+					{elseif !$all && isset($smarty.get.a) && $smarty.get.a != 'del' && $smarty.get.a != 'up' && $smarty.get.a != 'down'}
+						<a class="btn btn--ghost" href="{$module_url}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Retour aux widgets</a>
 					{/if}
 				</div>
 			</section>
@@ -55,6 +57,14 @@
 															{$widget.location}
 														{elseif $widget.type == 'html' || $widget.type == 'text'}
 															<span style="color:var(--t-light)">Contenu personnalisé</span>
+														{elseif $widget.type == 'rss'}
+															{$widget.location} ({$widget.value_column} art.)
+														{elseif $widget.type == 'iframe'}
+															{$widget.location}
+														{elseif $widget.type == 'logs'}
+															logs/{$widget.location} ({$widget.value_column} lignes)
+														{elseif $widget.type == 'logaccess'}
+															{$widget.value_column} dernières connexions
 														{elseif isset($sb_table_titles[$widget.table_name])}
 															{$sb_table_titles[$widget.table_name]}
 														{else}

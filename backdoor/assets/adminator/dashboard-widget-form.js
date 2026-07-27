@@ -32,9 +32,24 @@
 	}
 
 	document.addEventListener('DOMContentLoaded', function () {
+		// "type" est un input hidden piloté par les boutons .tab de
+		// [data-widget-type-picker] (voir dashboard.php) - plus friendly
+		// qu'un <select> pour 9 choix, l'ancien select() aurait pu rester
+		// en fallback mais le formulaire n'est de toute façon jamais
+		// utilisable sans JS (cascade Table -> Colonnes ci-dessous, etc.).
 		var typeSelect = document.getElementById('type');
+		var typePicker = document.querySelector('[data-widget-type-picker]');
 		if (typeSelect) {
-			typeSelect.addEventListener('change', function () { updateTypeFields(typeSelect); });
+			if (typePicker) {
+				typePicker.addEventListener('click', function (e) {
+					var btn = e.target.closest('[data-type-value]');
+					if (!btn) return;
+					typePicker.querySelectorAll('.tab').forEach(function (t) { t.classList.remove('is-active'); });
+					btn.classList.add('is-active');
+					typeSelect.value = btn.getAttribute('data-type-value');
+					updateTypeFields(typeSelect);
+				});
+			}
 			updateTypeFields(typeSelect);
 		}
 

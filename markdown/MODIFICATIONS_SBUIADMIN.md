@@ -125,3 +125,15 @@ Remplace l'ancien mécanisme de dashboard (fichier plat `inc/admin/dashboard.txt
 - **Bugs corrigés en cours de route** : icône "Actif" du tableau des widgets disproportionnée (mauvais contexte CSS) ; formulaire d'ajout/modification totalement vide (`{if isset($all)}` toujours vrai car `index.php` assigne `'all' => false` par défaut sur toute page — remplacé par `{if $all}`, cohérent avec `users.tpl`) ; erreur MySQL stricte `Incorrect integer value` sur `show_chart` quand la colonne est désactivée côté JS (radio jamais soumis) ; erreur `mysqli_real_escape_string(): Argument #1 must be of type mysqli, int given` sur `sql::escape_string()` en connexion paresseuse.
 - Testé et validé en conditions réelles (mécanisme de base, types système/météo/HTML/texte, tuiles en dur retirées).
 - Commit : `6c6329b`
+
+### Suite — 4 types de widgets supplémentaires + UX du formulaire
+
+- **Type `rss`** : URL de flux (RSS 2.0 ou Atom, parsé via SimpleXML) + nombre d'articles, liste des N plus récents en carte de contenu, aucune mise en cache (lu à chaque affichage, comme la météo).
+- **Type `iframe`** : URL http(s) à intégrer, rendu en `<iframe sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms">` (surface réduite au strict nécessaire).
+- **Type `logs`** : dernières lignes d'un fichier de log - **nouveau dossier** `backdoor/logs/` (protégé par `.htaccess deny from all`, aucun accès web direct), nom de fichier systématiquement réduit à `basename()` avant toute lecture (aucune traversée de chemin possible quelle que soit la saisie, vérifié par test).
+- **Type `logaccess`** ("Dernières connexions") : les N dernières connexions réussies (`sb_logaccess`, `logaccess_type = 'login'` uniquement - les tentatives échouées ne sont pas mélangées), avec l'avatar de chaque utilisateur (jointure sur `sb_users`, repli Gravatar générique si l'utilisateur a été supprimé depuis).
+- `rss`/`iframe`/`logs`/`logaccess` réutilisent les colonnes `location`/`value_column` existantes (URL/fichier + nombre d'éléments selon le type) - aucune migration SQL nécessaire pour ce lot.
+- **UX** : le sélecteur "Type de widget" (9 choix) passe d'un `<select>` à une rangée de boutons cliquables avec icône (composant `.tabs.pills` du thème Adminator, jusque-là inutilisé nulle part), piloté par un input hidden en JS. Bouton "Retour aux widgets" ajouté dans le bandeau `.hero` des pages d'ajout/modification.
+- **Bugs corrigés en cours de route** : `addIconFA()` (classe `form`) n'émettait pas le `</div>` fermant `.field` avant le texte d'aide, le laissant imbriqué au lieu d'être un frère (espacement cassé) ; les groupes de champs conditionnels par type (`data-widget-type-fields`) faisaient perdre le `display:flex;gap:14px` du `<form>` aux champs qu'ils contiennent, l'aide `margin-top:-10px` (calibrée pour ce gap de 14px) chevauchait alors le champ juste au-dessus faute de gap à compenser - même `display:flex;gap:14px` appliqué à ces groupes.
+- Testé et validé en conditions réelles (4 nouveaux types, avatars, boutons de type, retour aux widgets).
+- Commit : `<HASH>`

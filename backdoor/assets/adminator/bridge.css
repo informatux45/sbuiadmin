@@ -824,3 +824,33 @@ p.sbmedia > span.sbmedia-other {
 .kpi-card.c-warning {
 	color: var(--warning);
 }
+
+/* Sélecteur "Type de widget" (dashboard.php) : composant .tabs.pills du
+   thème (jusque là inutilisé nulle part), en display:inline-flex sans
+   retour à la ligne par défaut - 9 types ne tiennent pas sur une seule
+   ligne. */
+.sb-type-picker {
+	flex-wrap: wrap;
+}
+.sb-type-picker .tab {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	white-space: nowrap;
+}
+
+/* Groupes de champs conditionnels par type (dashboard.php, data-widget-
+   type-fields) : <form> a display:flex;flex-direction:column;gap:14px
+   entre TOUS ses enfants directs (.field + son <p class="help-block">
+   séparé, voir sbuiadmin-form.php) - un champ/aide qui se retrouve
+   imbriqué dans un simple <div> (au lieu d'être enfant direct du form)
+   perd ce gap et retombe sur les marges par défaut du navigateur, ce qui
+   fait remonter le texte d'aide (margin-top:-10px, calibré pour un gap de
+   14px) par-dessus le champ juste au-dessus. Même display:flex ici que
+   sur <form> pour que les champs à l'intérieur se comportent exactement
+   comme des champs de premier niveau. */
+[data-widget-type-fields] {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
