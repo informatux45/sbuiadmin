@@ -219,7 +219,7 @@
 											{if $alluser}
 												{foreach from=$alluser item=user}
 													<tr class="data-row">
-														<td><img src="{$user.email|@sbGetGravatar}" style="width:28px;height:28px;border-radius:50%;" /></td>
+														<td><img src="{$user.avatar|@sbGetUserAvatar:$user.email}" style="width:28px;height:28px;border-radius:50%;object-fit:cover" /></td>
 														<td>{$user.username|@sbGetUserGroup|upper}</td>
 														<td>{$user.username}</td>
 														<td>{$user.email}</td>

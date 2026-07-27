@@ -156,6 +156,12 @@ defined('_AM_SITE_URL') OR define('_AM_SITE_URL', _AM_SITE_PROTOCOL . SBUIADMIN_
 defined('_AM_SITE_IMG_DIR') OR define('_AM_SITE_IMG_DIR', SBUIADMIN_PATH . '/img/');
 // --- Site UPLOAD URL
 defined('_AM_SITE_IMG_URL') OR define('_AM_SITE_IMG_URL',_AM_SITE_PROTOCOL . SBUIADMIN_URL . 'img/');
+// --- Avatars utilisateurs : sous-dossier "avatars" de la Médiathèque
+// existante (_AM_MEDIAS_DIR = "../upload", voir settings.txt position 6),
+// choisi via l'input photo standard (addInput('text', ..., icon=>'photo',
+// medias=>'', subdir=>'avatars')) plutôt qu'un upload maison.
+defined('_AM_AVATARS_DIR') OR define('_AM_AVATARS_DIR', SBUIADMIN_PATH . '/../upload/avatars/');
+defined('_AM_AVATARS_URL') OR define('_AM_AVATARS_URL', '../upload/avatars');
 // --- Site LANG / DIR / URL
 defined('_AM_SITE_LANG') OR define('_AM_SITE_LANG', 'french');
 defined('_AM_SITE_LANG_DIR') OR define('_AM_SITE_LANG_DIR', SBUIADMIN_PATH . '/lang/');

@@ -58,7 +58,7 @@ switch($action) {
 		}
 
 		// Initialisation
-		$sb_table_header =  array('Gravatar', 'Groupe', 'Nom', 'Email', 'Dernière connexion', 'action');
+		$sb_table_header =  array('Avatar', 'Groupe', 'Nom', 'Email', 'Dernière connexion', 'action');
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		
 		// Contents table
@@ -100,18 +100,43 @@ switch($action) {
 			$password = $sbsanitize->displayText($_POST['sbpassword'], 'UTF-8', 1, 0);
 			$email    = $sbsanitize->displayText($_POST['email'], 'UTF-8', 1, 0);
 			$active   = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
-			
+
+			// Libre-service : sans "modifier" sur users, chacun peut quand même
+			// changer SON PROPRE mot de passe (voir sbClassifyAction()) - mais
+			// uniquement celui-ci, le reste de la fiche (y compris les nouveaux
+			// champs profil ci-dessous) est ignoré même si le POST contenait
+			// d'autres valeurs (formulaire déjà réduit au mot de passe côté
+			// rendu, voir plus bas - ceci est le garde-fou côté serveur).
+			$self_password_only = ($formType == 'edit' && $id == sbGetCurrentUserId() && !sbHasRight('users', 'edit'));
+
+			// Champs profil (Point 12) - non lus/utilisés en libre-service mot
+			// de passe seul. Avatar : même mécanisme "photo" que Slider/News/
+			// Pages (picker de la Médiathèque, sous-dossier avatars) - $avatar
+			// n'est qu'un nom de fichier choisi/déjà présent dans ce dossier,
+			// pas un upload natif géré ici.
+			if (!$self_password_only) {
+				$prenom                = $sbsql->escape_string($sbsanitize->displayText($_POST['prenom'], 'UTF-8', 1, 0));
+				$nom                   = $sbsql->escape_string($sbsanitize->displayText($_POST['nom'], 'UTF-8', 1, 0));
+				$telephone             = $sbsql->escape_string($sbsanitize->displayText($_POST['telephone'], 'UTF-8', 1, 0));
+				$fonction              = $sbsql->escape_string($sbsanitize->displayText($_POST['fonction'], 'UTF-8', 1, 0));
+				$profession            = $sbsql->escape_string($sbsanitize->displayText($_POST['profession'], 'UTF-8', 1, 0));
+				$centres_interet       = $sbsql->escape_string($sbsanitize->displayText($_POST['centres_interet'], 'UTF-8', 1, 0));
+				$infos_complementaires = $sbsql->escape_string($sbsanitize->displayText($_POST['infos_complementaires'], 'UTF-8', 1, 0));
+				$avatar                = $sbsql->escape_string($sbsanitize->displayText($_POST['avatar'], 'UTF-8', 1, 0));
+			}
+
 			// ADD or EDIT
 			if ($formType == 'add') {
 				// INSERT DATAS
 				// --- Encrypt password
 				$password = $sbusers->encrypt($password);
-				$query = "INSERT INTO $table (`username`, `password`, `email`, `active`, `logintime`, `lastlogin`, `menu`, `groupe`)
-						  VALUES ('$username','$password','$email','$active','0','0',' ','admin')";
+				$query = "INSERT INTO $table (`username`, `password`, `email`, `active`, `logintime`, `lastlogin`, `menu`, `groupe`, `prenom`, `nom`, `telephone`, `fonction`, `profession`, `centres_interet`, `infos_complementaires`, `avatar`)
+						  VALUES ('$username','$password','$email','$active','0','0',' ','admin','$prenom','$nom','$telephone','$fonction','$profession','$centres_interet','$infos_complementaires','$avatar')";
 				$result_add = $sbsql->query($query);
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$username = $password = $email = $active = '';
+					$prenom = $nom = $telephone = $fonction = $profession = $centres_interet = $infos_complementaires = $avatar = '';
 					// --- Message SUCCESS
 					$sb_msg_valid = $text . ' ajouté avec succès';
 				} else {
@@ -120,14 +145,6 @@ switch($action) {
 				}
 
 			} elseif ($formType == 'edit' && $id > 0) {
-
-				// Libre-service : sans "modifier" sur users, chacun peut quand
-				// même changer SON PROPRE mot de passe (voir sbClassifyAction()) -
-				// mais uniquement celui-ci, le reste de la fiche est ignoré même
-				// si le POST contenait d'autres valeurs (formulaire déjà réduit
-				// au mot de passe côté rendu, voir plus bas - ceci est le
-				// garde-fou côté serveur).
-				$self_password_only = ($id == sbGetCurrentUserId() && !sbHasRight('users', 'edit'));
 
 				if ($self_password_only) {
 					if ($password != '') {
@@ -149,6 +166,14 @@ switch($action) {
 						$query = "UPDATE $table SET username = '$username'
 																		,email = '$email'
 																		,active = '$active'
+																		,prenom = '$prenom'
+																		,nom = '$nom'
+																		,telephone = '$telephone'
+																		,fonction = '$fonction'
+																		,profession = '$profession'
+																		,centres_interet = '$centres_interet'
+																		,infos_complementaires = '$infos_complementaires'
+																		,avatar = '$avatar'
 																		WHERE id = '$id'";
 					} else {
 						// --- Encrypt password
@@ -157,6 +182,14 @@ switch($action) {
 																		,password = '$password'
 																		,email = '$email'
 																		,active = '$active'
+																		,prenom = '$prenom'
+																		,nom = '$nom'
+																		,telephone = '$telephone'
+																		,fonction = '$fonction'
+																		,profession = '$profession'
+																		,centres_interet = '$centres_interet'
+																		,infos_complementaires = '$infos_complementaires'
+																		,avatar = '$avatar'
 																		WHERE id = '$id'";
 					}
 
@@ -176,11 +209,12 @@ switch($action) {
 
 			// --- Debug SQL
 			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query . "\n" . 'Submit Form Type = '.$formType);
-			
+
 		} else {
 			// Si AJOUT (First time)
 			// --- Vider les champs du formulaire
 			$username = $password = $email = $active = '';
+			$prenom = $nom = $telephone = $fonction = $profession = $centres_interet = $infos_complementaires = $avatar = '';
 		}
 		// --------------------------------
 		if ($formType == 'edit' && !$_POST['form_submit']) {
@@ -189,10 +223,18 @@ switch($action) {
 			$query_1  = "SELECT * FROM $table WHERE id = $id";
 			$requestQ = $sbsql->query($query_1);
 			$assoc    = $sbsql->assoc($requestQ);
-			$username = utf8_encode($assoc['username']);
-			$password = utf8_encode($assoc['password']);
-			$email    = utf8_encode($assoc['email']);
-			$active   = $assoc['active'];
+			$username               = utf8_encode($assoc['username']);
+			$password               = utf8_encode($assoc['password']);
+			$email                  = utf8_encode($assoc['email']);
+			$active                 = $assoc['active'];
+			$prenom                 = utf8_encode($assoc['prenom']);
+			$nom                    = utf8_encode($assoc['nom']);
+			$telephone              = utf8_encode($assoc['telephone']);
+			$fonction               = utf8_encode($assoc['fonction']);
+			$profession             = utf8_encode($assoc['profession']);
+			$centres_interet        = utf8_encode($assoc['centres_interet']);
+			$infos_complementaires  = utf8_encode($assoc['infos_complementaires']);
+			$avatar                 = $assoc['avatar'];
 			$sbsmarty->assign('assoc', $query_1);
 
 			// --- Debug SQL
@@ -234,12 +276,32 @@ switch($action) {
 		if (!$self_password_only) {
 			$sbform->addInput('text', 'Email', array ('name' => 'email', 'value' => "$email"), true);
 		}
+		// ----------------------------
+		// --- Champs profil (Point 12)
+		// ----------------------------
+		if (!$self_password_only) {
+			$sbform->addInput('text', 'Prénom', array('name' => 'prenom', 'value' => "$prenom"));
+			$sbform->addInput('text', 'Nom', array('name' => 'nom', 'value' => "$nom"));
+			$sbform->addInput('text', 'Téléphone', array('name' => 'telephone', 'value' => "$telephone"));
+			$sbform->addInput('text', 'Fonction / poste', array('name' => 'fonction', 'value' => "$fonction"));
+			$sbform->addInput('text', 'Profession', array('name' => 'profession', 'value' => "$profession"));
+			$sbform->addTextarea('Centres d\'intérêt', $centres_interet, array('id' => 'centres_interet', 'name' => 'centres_interet', 'style' => 'height: 90px !important;'));
+			$sbform->addTextarea('Infos complémentaires', $infos_complementaires, array('id' => 'infos_complementaires', 'name' => 'infos_complementaires', 'style' => 'height: 90px !important;'));
+			// --- Avatar : même picker "photo" que Slider/News/Pages (Médiathèque,
+			// sous-dossier "avatars") - repli sur Gravatar si vide, voir sbGetUserAvatar()
+			$sbform->addInput('text', 'Photo de profil', array('id' => 'inputAvatar', 'name' => 'avatar', 'value' => "$avatar", 'placeholder' => 'Photo de profil', 'medias' => '', 'icon' => 'photo', 'dir' => _AM_AVATARS_URL, 'subdir' => 'avatars', 'style' => 'width: 100% !important'), false, false, 'Gravatar (associé à l\'email) utilisé par défaut si aucune photo n\'est choisie.');
+		}
 		// --- Hiddens / Buttons
 		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => "$formName"));
 		if ($formType == 'edit') {
 			$sbform->addInput('hidden', '', array('name' => 'id', 'value' => "$id"));
 			$sbform->addInput('hidden', '', array('name' => 'edit_user', 'value' => "edit"));
 		}
+		// Le formulaire est maintenant assez long pour que le bouton du
+		// panneau "Actions" (fixe, en haut à droite) sorte du champ de
+		// vision une fois qu'on a défilé jusqu'en bas - un vrai bouton de
+		// soumission à côté de "Reset" évite d'avoir à remonter.
+		$sbform->addInput('submit', '', array('value' => "$btn_add_edit"));
 		$sbform->addInput('reset', '', array('value' => "Reset"));
 		// --- Close Form
 		$sbform->closeForm ();

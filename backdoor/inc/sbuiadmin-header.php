@@ -139,6 +139,20 @@ $sbsmarty->assign('sb_can_view_messages', $sb_can_view_messages);
 // ------------------
 
 // ------------------
+// --- Avatar de l'utilisateur connecté (Point 12) - utilisé par
+// navigation.tpl (sidebar + topbar) via sbGetUserAvatar(), qui retombe
+// sur Gravatar si aucune photo n'a été uploadée.
+// ------------------
+$sbuiadmin_user_avatar = '';
+if ($sb_current_user_id > 0) {
+	$sb_avatar_result      = $sbsql->query("SELECT avatar FROM " . _AM_DB_PREFIX . "sb_users WHERE id = " . $sb_current_user_id);
+	$sb_avatar_row         = $sbsql->assoc($sb_avatar_result);
+	$sbuiadmin_user_avatar = ($sb_avatar_row) ? $sb_avatar_row['avatar'] : '';
+}
+$sbsmarty->assign('sbuiadmin_user_avatar', $sbuiadmin_user_avatar);
+// ------------------
+
+// ------------------
 // --- Messages non lus (badge topbar) - assigné sur CHAQUE page pour que
 // le badge soit correct dès le premier rendu, avant tout polling JS.
 // ------------------

@@ -19,7 +19,7 @@
 
 		<div class="sidebar-footer">
 			<div class="workspace">
-				<img src="{$sbuiadmin_user_email|@sbGetGravatar}" alt="" style="width:36px;height:36px;border-radius:50%;flex-shrink:0;">
+				<img src="{$sbuiadmin_user_avatar|@sbGetUserAvatar:$sbuiadmin_user_email}" alt="" style="width:36px;height:36px;border-radius:50%;flex-shrink:0;">
 				<div class="workspace-text">
 					<div class="workspace-name">{$sbuiadmin_user_name}</div>
 					<div class="workspace-role">{$smarty.const.SBUIADMIN_GLOBAL_LAST_LOGIN} {$sbuiadmin_user_last_login}</div>
@@ -135,7 +135,7 @@
 				<button id="themeToggle" class="icon-btn" aria-label="Changer de thème" data-tip="Changer de thème"></button>
 
 				<div class="dd-wrap">
-					<img src="{$sbuiadmin_user_email|@sbGetGravatar}" alt="" class="avatar" data-dropdown tabindex="0" role="button" aria-label="Menu utilisateur" style="object-fit:cover">
+					<img src="{$sbuiadmin_user_avatar|@sbGetUserAvatar:$sbuiadmin_user_email}" alt="" class="avatar" data-dropdown tabindex="0" role="button" aria-label="Menu utilisateur" style="object-fit:cover">
 					<div class="dd-menu dd-profile" role="menu">
 						<div class="dd-profile-head">
 							<div class="dd-profile-name">{$sbuiadmin_user_name}</div>

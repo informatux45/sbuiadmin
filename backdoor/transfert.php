@@ -38,8 +38,12 @@ $sb_msg_valid = false;
 // -----------------------
 // Global MEDIAS
 // -----------------------
-if (isset($_GET['subdir']) && $_GET['subdir'] != '') $sbfiles_medias_dirs_allowed = rtrim($sbfiles_medias_dirs_allowed . DIRECTORY_SEPARATOR . $_GET['subdir'], "/");
 global $sbfiles_medias_dirs_allowed, $sbfiles_medias_exts_allowed;
+// Le "global" doit précéder la lecture/modification qui suit - avant ce
+// correctif, la ligne ci-dessous s'exécutait avant l'import global et ne
+// modifiait donc qu'une variable locale jamais relue par scan() plus bas
+// (bug resté latent : "subdir" n'avait jamais servi ailleurs dans le code).
+if (isset($_GET['subdir']) && $_GET['subdir'] != '') $sbfiles_medias_dirs_allowed = rtrim($sbfiles_medias_dirs_allowed . DIRECTORY_SEPARATOR . $_GET['subdir'], "/");
 
 // ---------------------------------------------------
 // ---------------------------------------------------
@@ -86,6 +90,11 @@ foreach($sbfiles_new as $key => $val) {
 }
 
 $sbsmarty->assign('medias_all', $sbfiles);
+// Jamais transmis à Smarty auparavant - transfert.tpl retombait donc
+// toujours sur son fallback "(jpg,jpeg,png,gif,pdf,xml,mp4)" (une seule
+// chaîne, pas un tableau), qui ne matche jamais aucune extension côté
+// Fine Uploader et rejette systématiquement tout upload.
+$sbsmarty->assign('sbfiles_medias_exts_allowed', $sbfiles_medias_exts_allowed);
 
 
 // ---------------------------------------------------

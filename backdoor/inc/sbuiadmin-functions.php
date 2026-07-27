@@ -918,6 +918,23 @@ function sbGetGravatar( $email, $s = 80, $d = 'mm', $r = 'g', $img = false, $att
 }
 
 /**
+ * Avatar utilisateur : photo choisie via le picker "photo" standard
+ * (Médiathèque, sous-dossier avatars - voir users.php et
+ * _AM_AVATARS_DIR/_AM_AVATARS_URL dans inc/sbuiadmin-config.php) si
+ * présente, sinon repli sur Gravatar.
+ * @param string $avatar Nom de fichier stocké dans sb_users.avatar (vide = pas de photo locale)
+ * @param string $email
+ * @param int $s Taille, transmise à Gravatar uniquement (l'avatar local est affiché tel quel)
+ * @return string URL (relative pour l'avatar local, absolue pour Gravatar)
+ */
+function sbGetUserAvatar($avatar, $email, $s = 80) {
+    if (!empty($avatar) && is_file(_AM_AVATARS_DIR . $avatar)) {
+        return _AM_AVATARS_URL . '/' . $avatar;
+    }
+    return sbGetGravatar($email, $s);
+}
+
+/**
  * Construct Module Menu (Out of System)
  * @param string $type main / admin
  * @return String menu Admin

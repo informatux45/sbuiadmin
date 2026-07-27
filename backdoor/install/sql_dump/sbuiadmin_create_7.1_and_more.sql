@@ -982,15 +982,23 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_users` (
   `activekey` varchar(15) NOT NULL DEFAULT '0',
   `resetkey` varchar(15) NOT NULL DEFAULT '0',
   `menu` text NOT NULL COMMENT 'Liste du menu inaccessible ( separe par des | )',
-  `groupe` varchar(50) NOT NULL
+  `groupe` varchar(50) NOT NULL,
+  `prenom` varchar(50) NOT NULL DEFAULT '',
+  `nom` varchar(50) NOT NULL DEFAULT '',
+  `telephone` varchar(30) NOT NULL DEFAULT '',
+  `fonction` varchar(100) NOT NULL DEFAULT '',
+  `profession` varchar(100) NOT NULL DEFAULT '',
+  `centres_interet` text NOT NULL,
+  `infos_complementaires` text NOT NULL,
+  `avatar` varchar(255) NOT NULL DEFAULT '' COMMENT 'Nom de fichier dans upload/avatars/ (racine du site) - vide = repli sur Gravatar'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Table Users';
 
 --
 -- Dumping data for table `sb_users`
 --
 
-INSERT INTO `<DB_PREFIX>sb_users` (`id`, `username`, `password`, `email`, `logintime`, `lastlogin`, `active`, `activekey`, `resetkey`, `menu`, `groupe`) VALUES
-(1, 'admin', 'OUovZTFHdGNmaThNL1RZU0tyVXNmZz09Ojrdt++k07oZd9AcRrsXNqow', 'admin-reply@votresite.com', 0, 0, 1, '0', '0', '', '');
+INSERT INTO `<DB_PREFIX>sb_users` (`id`, `username`, `password`, `email`, `logintime`, `lastlogin`, `active`, `activekey`, `resetkey`, `menu`, `groupe`, `prenom`, `nom`, `telephone`, `fonction`, `profession`, `centres_interet`, `infos_complementaires`, `avatar`) VALUES
+(1, 'admin', 'OUovZTFHdGNmaThNL1RZU0tyVXNmZz09Ojrdt++k07oZd9AcRrsXNqow', 'admin-reply@votresite.com', 0, 0, 1, '0', '0', '', '', '', '', '', '', '', '', '', '');
 
 --
 -- Table structure for table `sb_users_rights`
