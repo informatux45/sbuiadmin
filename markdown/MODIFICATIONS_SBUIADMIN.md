@@ -124,4 +124,4 @@ Remplace l'ancien mécanisme de dashboard (fichier plat `inc/admin/dashboard.txt
 - `index.tpl` : grille de tuiles KPI et cartes "Récent" entièrement pilotées par `$sb_dashboard_widgets` (`index.php`, dispatch par type) — plus aucune tuile ni logique codée en dur.
 - **Bugs corrigés en cours de route** : icône "Actif" du tableau des widgets disproportionnée (mauvais contexte CSS) ; formulaire d'ajout/modification totalement vide (`{if isset($all)}` toujours vrai car `index.php` assigne `'all' => false` par défaut sur toute page — remplacé par `{if $all}`, cohérent avec `users.tpl`) ; erreur MySQL stricte `Incorrect integer value` sur `show_chart` quand la colonne est désactivée côté JS (radio jamais soumis) ; erreur `mysqli_real_escape_string(): Argument #1 must be of type mysqli, int given` sur `sql::escape_string()` en connexion paresseuse.
 - Testé et validé en conditions réelles (mécanisme de base, types système/météo/HTML/texte, tuiles en dur retirées).
-- Commit : `<HASH>`
+- Commit : `6c6329b`
