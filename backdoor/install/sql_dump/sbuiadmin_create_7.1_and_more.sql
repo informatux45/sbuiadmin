@@ -538,6 +538,22 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_faq_category` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `sb_messages`
+--
+
+DROP TABLE IF EXISTS `<DB_PREFIX>sb_messages`;
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_messages` (
+  `id` int(11) NOT NULL,
+  `sender_id` int(11) NOT NULL,
+  `recipient_id` int(11) NOT NULL,
+  `message` text NOT NULL,
+  `created_at` int(11) NOT NULL,
+  `read_at` int(11) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `sb_news`
 --
 
@@ -1070,6 +1086,14 @@ ALTER TABLE `<DB_PREFIX>sb_faq_category`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `sb_messages`
+--
+ALTER TABLE `<DB_PREFIX>sb_messages`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `sender_id` (`sender_id`),
+  ADD KEY `recipient_id` (`recipient_id`,`read_at`);
+
+--
 -- Indexes for table `sb_news`
 --
 ALTER TABLE `<DB_PREFIX>sb_news`
@@ -1213,6 +1237,11 @@ ALTER TABLE `<DB_PREFIX>sb_faq`
 -- AUTO_INCREMENT for table `sb_faq_category`
 --
 ALTER TABLE `<DB_PREFIX>sb_faq_category`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `sb_messages`
+--
+ALTER TABLE `<DB_PREFIX>sb_messages`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `sb_news`

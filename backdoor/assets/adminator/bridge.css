@@ -678,3 +678,69 @@ p.sbmedia > span.sbmedia-other {
 	border-color: var(--border);
 	color: var(--t-base);
 }
+
+/* Point 13 (messagerie) : .chat-conv-badge est en position:absolute
+   (top-right du item), au même niveau vertical que .chat-conv-top (nom +
+   heure). Le thème démo n'affiche que des heures très courtes ("now",
+   "10:18") qui laissent la place libre ; nos horodatages "JJ/MM HH:MM"
+   sont plus longs et passent sous le badge. On réserve la place à droite
+   de la ligne nom/heure plutôt que de repositionner le badge. */
+.chat-conv-top {
+	padding-right: 34px;
+}
+
+/* Point 13 (messagerie) : sélecteur d'émoticônes du composer, réutilise
+   le composant .dd-wrap/.dd-menu du thème (open/close déjà géré par
+   2026.js) - juste un modificateur pour ouvrir vers le HAUT, le bouton
+   étant tout en bas de la page (composer), et une petite grille perso. */
+.dd-menu.dd-menu-up {
+	bottom: calc(100% + 10px);
+	top: auto;
+}
+/* Le thème dimensionne .dd-menu pour des listes de notifications
+   (min-width:340px) - beaucoup trop large pour une grille de 8 colonnes
+   d'émoticônes. Largeur resserrée au contenu + ancrage explicite à
+   gauche du bouton (le bouton étant maintenant tout à gauche du champ
+   de saisie, le panneau s'étend vers la DROITE, au-dessus du composer -
+   pas vers la gauche où il sortirait du panneau de conversation). */
+.dd-menu.dd-menu-left {
+	left: 0;
+	min-width: 0;
+	right: auto;
+	width: 248px;
+}
+.sb-emoji-grid {
+	display: grid;
+	gap: 2px;
+	grid-template-columns: repeat(8, 1fr);
+	padding: 10px;
+}
+.sb-emoji-item {
+	background: none;
+	border: 0;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 18px;
+	line-height: 1;
+	padding: 6px 0;
+	transition: background 0.15s ease;
+}
+.sb-emoji-item:hover {
+	background: var(--bg-hover);
+}
+/* Bouton d'ouverture : même gabarit que .chat-composer-send (32x32,
+   coins arrondis) - classe partagée avec lui dans le markup - mais style
+   "outline primary" (mêmes teintes que .btn--outline-primary) pour rester
+   discret et ne pas se confondre avec le bouton d'envoi (plein), et icône
+   "plus fun" (emoji brut plutôt qu'un sprite SVG au trait comme les
+   autres icônes du thème). */
+.sb-emoji-toggle.sb-emoji-toggle {
+	background: transparent;
+	border: 1px solid var(--primary);
+	color: var(--primary);
+	font-size: 16px;
+	line-height: 1;
+}
+.sb-emoji-toggle.sb-emoji-toggle:hover {
+	background: var(--primary-soft);
+}

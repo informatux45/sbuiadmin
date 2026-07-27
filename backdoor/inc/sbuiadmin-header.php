@@ -129,6 +129,90 @@ $sbsmarty->assign('sbuiadmin_upgrade_modules', false);
 // ------------------
 
 // ------------------
+// --- Visibilité du module Messages (droits granulaires) - conditionne
+// l'icône topbar (navigation.tpl) et l'entrée "Communications" du menu
+// principal (main_menu.tpl), en plus du gate déjà fait par le routeur.
+// ------------------
+$sb_current_user_id   = sbGetCurrentUserId();
+$sb_can_view_messages = sbHasRight('messages', 'view');
+$sbsmarty->assign('sb_can_view_messages', $sb_can_view_messages);
+// ------------------
+
+// ------------------
+// --- Messages non lus (badge topbar) - assigné sur CHAQUE page pour que
+// le badge soit correct dès le premier rendu, avant tout polling JS.
+// ------------------
+$sb_unread_messages = 0;
+if ($sb_can_view_messages) {
+	$sb_unread_result = $sbsql->query("SELECT COUNT(*) AS cpt FROM " . _AM_DB_PREFIX . "sb_messages WHERE recipient_id = " . $sb_current_user_id . " AND read_at = 0");
+	$sb_unread_row    = $sbsql->assoc($sb_unread_result);
+	$sb_unread_messages = ($sb_unread_row) ? intval($sb_unread_row['cpt']) : 0;
+}
+$sbsmarty->assign('sb_unread_messages', $sb_unread_messages);
+// ------------------
+
+// ------------------
+// --- Aperçu des messages non lus (dropdown topbar) - jusqu'à 5
+// conversations les plus récentes ayant au moins un message non lu.
+// ------------------
+$sb_messages_preview = array();
+if ($sb_can_view_messages) {
+	$sb_msg_table_prev = _AM_DB_PREFIX . "sb_messages";
+
+	$sb_preview_result = $sbsql->query("SELECT * FROM $sb_msg_table_prev WHERE sender_id = $sb_current_user_id OR recipient_id = $sb_current_user_id ORDER BY created_at DESC LIMIT 300");
+	$sb_preview_rows   = $sbsql->toarray($sb_preview_result);
+
+	$sb_preview_conv = array();
+	foreach ($sb_preview_rows as $sb_prow) {
+		$sb_other_id = ($sb_prow['sender_id'] == $sb_current_user_id) ? $sb_prow['recipient_id'] : $sb_prow['sender_id'];
+		if (!isset($sb_preview_conv[$sb_other_id])) {
+			$sb_preview_conv[$sb_other_id] = array(
+				'other_id'     => $sb_other_id,
+				'last_message' => $sb_prow['message'],
+				'last_time'    => intval($sb_prow['created_at']),
+				'unread'       => 0,
+			);
+		}
+		if ($sb_prow['recipient_id'] == $sb_current_user_id && $sb_prow['read_at'] == 0) {
+			$sb_preview_conv[$sb_other_id]['unread']++;
+		}
+	}
+
+	// Ne garder que les conversations avec des non-lus, 5 plus récentes
+	$sb_preview_conv = array_slice(array_values(array_filter($sb_preview_conv, function ($c) {
+		return $c['unread'] > 0;
+	})), 0, 5);
+
+	if (!empty($sb_preview_conv)) {
+		$sb_other_ids_list = implode(',', array_map('intval', array_column($sb_preview_conv, 'other_id')));
+		$sb_preview_users_result = $sbsql->query("SELECT id, username FROM " . _AM_DB_PREFIX . "sb_users WHERE id IN ($sb_other_ids_list)");
+		$sb_preview_users_by_id  = array();
+		foreach ($sbsql->toarray($sb_preview_users_result) as $sb_pu) {
+			$sb_preview_users_by_id[$sb_pu['id']] = $sb_pu['username'];
+		}
+
+		$sb_pi = 0;
+		foreach ($sb_preview_conv as &$sb_pc) {
+			$sb_pc['username']     = isset($sb_preview_users_by_id[$sb_pc['other_id']]) ? $sb_preview_users_by_id[$sb_pc['other_id']] : '(supprimé)';
+			$sb_pc['initials']     = strtoupper(substr($sb_pc['username'], 0, 2));
+			$sb_pc['message']      = $sbsanitize->displayText($sb_pc['last_message'], 'UTF-8', 0, 1);
+			$sb_pc['avatar_class'] = 'a' . (($sb_pi % 3) + 1);
+			$sb_pi++;
+
+			$sb_pdiff = time() - $sb_pc['last_time'];
+			if ($sb_pdiff < 3600)       $sb_pc['time_label'] = max(1, intdiv($sb_pdiff, 60)) . ' MIN';
+			elseif ($sb_pdiff < 86400)  $sb_pc['time_label'] = intdiv($sb_pdiff, 3600) . ' H';
+			else                        $sb_pc['time_label'] = intdiv($sb_pdiff, 86400) . ' J';
+		}
+		unset($sb_pc);
+	}
+
+	$sb_messages_preview = $sb_preview_conv;
+}
+$sbsmarty->assign('sb_messages_preview', $sb_messages_preview);
+// ------------------
+
+// ------------------
 $sbsmarty->setTemplateDir(array('sys' => _AM_SMARTY_DIR . 'tpls/tpl/'
 							   ,'mod' => SBUIADMIN_PATH . '/datas/modules/tpls/'
 						  ));

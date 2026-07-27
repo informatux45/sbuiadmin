@@ -50,6 +50,10 @@ class sql extends Smarty {
             //$this->dump(mysqli_connect_error() . ' (' . mysqli_errno($this->connect_id) . ')', 'Connect MYSQLI DB (Error)');
             return false;
         } else {
+            // utf8mb4 sur la connexion (pas seulement sur les tables) : nécessaire
+            // pour que les caractères 4 octets (emojis) passent sans corruption -
+            // sans danger pour les tables encore en utf8 (sous-ensemble strict).
+            mysqli_set_charset($this->connect_id, 'utf8mb4');
             //$this->dump(mysqli_get_host_info($this->connect_id), 'Connect SQL DB (success) : ');
             return $this->connect_id;
         }
@@ -127,6 +131,7 @@ class sql extends Smarty {
         //return mysqli_free_result($this->connect_id);
     }
     function escape_string($escapestr) {
+        if (!$this->connect_id) $this->connect();
         return mysqli_real_escape_string($this->connect_id, $escapestr);
     }
     function optimize($tbl_name) {

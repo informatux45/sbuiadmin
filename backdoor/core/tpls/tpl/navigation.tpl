@@ -91,6 +91,32 @@
 					</div>
 				</div>
 
+				{if $sb_can_view_messages}
+				<div class="dd-wrap">
+					<button class="icon-btn" data-dropdown aria-label="Messages" data-tip="Messages">
+						<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+						<span class="count info sb-messages-badge" style="{if $sb_unread_messages <= 0}display:none{/if}">{$sb_unread_messages}</span>
+					</button>
+					<div class="dd-menu" role="menu">
+						<div class="dd-head"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg> Messages</div>
+						<div class="dd-list">
+							{foreach from=$sb_messages_preview item=conv}
+								<a class="dd-item" href="{$smarty.const._AM_SITE_URL}index.php?p=messages&with={$conv.other_id}">
+									<div class="dd-avatar {$conv.avatar_class}">{$conv.initials}</div>
+									<div class="dd-body">
+										<div class="dd-row-head"><strong>{$conv.username}</strong><span class="dd-time">{$conv.time_label}</span></div>
+										<div class="dd-preview">{$conv.message|truncate:70|escape:'html'}</div>
+									</div>
+								</a>
+							{foreachelse}
+								<div class="dd-item"><div class="dd-body"><div class="dd-text">Aucun nouveau message.</div></div></div>
+							{/foreach}
+						</div>
+						<a class="dd-footer" href="{$smarty.const._AM_SITE_URL}index.php?p=messages">Voir tous les messages →</a>
+					</div>
+				</div>
+				{/if}
+
 				<div class="dd-wrap">
 					<button class="icon-btn" data-dropdown aria-label="Informations" data-tip="Credits SBUIADMIN">
 						<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
@@ -125,10 +151,12 @@
 							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
 							Profil
 						</div>
-						<div class="dd-menu-item" style="cursor:default;opacity:.5" title="Bientôt disponible">
+						{if $sb_can_view_messages}
+						<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=messages">
 							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
 							Messages
-						</div>
+						</a>
+						{/if}
 						<div class="dd-divider"></div>
 						<a class="dd-menu-item danger" href="{$smarty.const._AM_SITE_URL}?ac=logout" title="{$smarty.const.SBUIADMIN_GLOBAL_LOGOUT}">
 							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
