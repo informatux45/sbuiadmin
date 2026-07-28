@@ -231,3 +231,12 @@ Remplace l'ancien mécanisme de dashboard (fichier plat `inc/admin/dashboard.txt
 
 - Tabbs, FAQ et Blocs testés en navigateur avec succès (round-trip complet, front + back) — dernier volet restant après les vérifications déjà faites sur Pages et Actualités.
 - **Point 15 (Page Builder) entièrement clos.**
+
+### Fuite CSS de bootstrap.css sur les pages Page Builder
+
+- **Fichier** : `backdoor/assets/adminator/pagebuilder-bridge.css`
+- **Problème** : sur toute page utilisant le Page Builder, le menu/chrome admin perdait son comportement habituel - les liens se soulignaient au survol, et la police du body passait d'Inter à Helvetica Neue/Arial (graisse visuellement différente).
+- **Cause** : `addPageBuilder()` charge le vrai `bootstrap.css` de Bower pour son propre canevas, sans le scoper à son propre widget. Ses règles `a:hover, a:focus { text-decoration: underline; }` et `body { font-family: "Helvetica Neue"... }` ont la même spécificité que les règles équivalentes du thème Adminator - c'est donc la dernière chargée (bootstrap.css) qui l'emportait.
+- **Correctif** : restauration du comportement Adminator (pas de soulignement au survol, police Inter/graisse 400/taille/interlignage identiques) dans `pagebuilder-bridge.css`, déjà chargé en dernier sur ces pages. N'affecte que l'admin, pas le rendu front (feuille séparée).
+- Testé et validé en navigateur.
+- Commit : `98ed232`
