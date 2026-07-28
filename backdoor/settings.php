@@ -75,6 +75,8 @@ $sb_msg_valid = false;
  * 33 - Anti-flood : durée de blocage   > gérées par users.php (action blockedipsettings), pas ce formulaire
  * 34 - Anti-flood : délai min. entre 2 tentatives /
  * 35 - Durée d'affichage des toasts (secondes)
+ * 36 - Modules utilisant le Page Builder (liste séparée par virgules de
+ *      clés "module.champ", voir sbModuleUsesPageBuilder())
  * ---------------------------- */
 $sb_settings_file = _AM_SETTINGS_FILE;
 
@@ -140,6 +142,21 @@ switch($action) {
 			$sb_output_file .= (isset($sb_settings_preserved[33]) ? trim($sb_settings_preserved[33]) : "86400") . "\n";
 			$sb_output_file .= (isset($sb_settings_preserved[34]) ? trim($sb_settings_preserved[34]) : "4") . "\n";
 			$sb_output_file .= $sbsanitize->displayText($_POST['toast_duration'], 'UTF-8', 1, 0) . "\n";
+			// Le champ est desactivé (disabled) si le multilangue est actif
+			// (voir plus bas, formulaire) - un champ disabled n'est jamais
+			// soumis par le navigateur, $_POST['pagebuilder_modules'] serait
+			// donc absent : on préserve alors la valeur déjà enregistrée
+			// plutôt que d'écraser silencieusement la sélection à chaque
+			// sauvegarde de ce formulaire tant que le multilangue est actif.
+			if (sbGetConfig('multilang')) {
+				$sb_output_file .= (isset($sb_settings_preserved[36]) ? trim($sb_settings_preserved[36]) : '') . "\n";
+			} else {
+				// sbGetTagifyDatas() retourne false si vide - jamais écrire
+				// "false"/rien de vide dans le fichier positionnel, sinon la
+				// ligne 36 se décale/disparaît à la prochaine lecture.
+				$sb_pagebuilder_modules = sbGetTagifyDatas($_POST['pagebuilder_modules']);
+				$sb_output_file .= ($sb_pagebuilder_modules !== false ? $sb_pagebuilder_modules : '') . "\n";
+			}
 
 			// Locker le fichier pour qu'une seule personne a la fois ecrive dedans
 			$result_edit = file_put_contents($sb_settings_file, $sb_output_file, FILE_USE_INCLUDE_PATH | LOCK_EX);
@@ -199,6 +216,7 @@ switch($action) {
 		$sb_config_smarty_caching_time = $sb_settings[30];
 		$sb_config_medias_per_page     = $sb_settings[31];
 		$sb_config_toast_duration      = (isset($sb_settings[35]) && trim($sb_settings[35]) != '') ? $sb_settings[35] : 7;
+		$sb_config_pagebuilder_modules = isset($sb_settings[36]) ? trim($sb_settings[36]) : '';
 
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) $sbsmarty->assign('file_content', $sb_settings);						
@@ -229,6 +247,29 @@ switch($action) {
 		$sbform->addInput('text', 'Médias par page', array ('name' => 'medias_per_page', 'value' => "$sb_config_medias_per_page", 'placeholder' => "Nombre de médias par page"), true, false, "Nombre d'images affichées par page dans le module Médias");
 		$sbform->addBreak('Modules');
 		$sbform->addInput('text', 'Modules', array ('name' => 'modules', 'value' => "$sb_config_modules", 'placeholder' => "Nom de vos modules"), false, false, "Nom de vos modules autorisés dans votre administration séparés par des virgules sans espace");
+		$sbform->addBreak('Page Builder');
+		$sb_pagebuilder_whitelist = sbGetPageBuilderModulesList();
+		$sb_pagebuilder_selected  = array();
+		foreach (explode(',', $sb_config_pagebuilder_modules) as $sb_pb_key) {
+			$sb_pb_key = trim($sb_pb_key);
+			if ($sb_pb_key !== '' && array_key_exists($sb_pb_key, $sb_pagebuilder_whitelist)) {
+				$sb_pagebuilder_selected[] = array('value' => $sb_pb_key);
+			}
+		}
+		// Incompatible avec le multilangue pour l'instant : seul le champ FR
+		// bascule sur le Page Builder (EN reste toujours CKEditor, décision
+		// pour éviter le chantier de support multi-instance du Page
+		// Builder dans une même page - voir feedback_pagebuilder_debugging_lessons).
+		// Champ désactivé + valeur préservée telle quelle côté sauvegarde
+		// (voir plus haut) tant que le multilangue reste actif.
+		$sb_multilang_enabled = sbGetConfig('multilang');
+		$sb_pagebuilder_help  = "Le(s) module(s) sélectionné(s) utiliseront le Page Builder à la place de CKEditor pour leur champ de contenu principal.";
+		$sb_pagebuilder_args  = array('name' => 'pagebuilder_modules', 'value' => json_encode($sb_pagebuilder_selected, JSON_UNESCAPED_UNICODE));
+		if ($sb_multilang_enabled) {
+			$sb_pagebuilder_args['disabled'] = 'disabled';
+			$sb_pagebuilder_help .= " <strong style='color: red;'>Cette fonctionnalité ne peut pas être utilisée tant que le multilangue est activé.</strong>";
+		}
+		$sbform->addTagifyWhitelist('Modules utilisant le Page Builder', $sb_pagebuilder_whitelist, $sb_pagebuilder_args, false, $sb_pagebuilder_help);
 		$sbform->addBreak('Captcha (Google reCAPTCHA)');
 		$sbform->addInput('password', "Google Recaptcha (Clé publique)", array ('name' => 'recaptcha_public', 'value' => "$sb_config_recaptcha_public"), false, false, "Clé du site dans le code HTML que vous proposez à vos utilisateurs");
 		$sbform->addInput('password', 'Google Recaptcha (Clé secrète)', array ('name' => 'recaptcha_secret', 'value' => "$sb_config_recaptcha_secret"), false, false, "Clé pour toute communication entre votre site et Google. Veillez à ne pas la divulguer, car il s'agit d'une clé secrète.");

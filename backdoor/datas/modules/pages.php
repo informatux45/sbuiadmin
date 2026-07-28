@@ -129,7 +129,7 @@ switch($action) {
 			$content         = "[fr]".$content_fr."[/fr]";
 			if ($getMultilang) {
 				$content_en = $sbsanitize->displayText($_POST['content_en'], 'UTF-8', 1, 0);
-				$content   .= "[en]".$content_en."[/en]";				
+				$content   .= "[en]".$content_en."[/en]";
 			}
 			$seo_url         = $sbsanitize->displayText($_POST['seo_url'], 'UTF-8', 1, 0);
 			if (trim($seo_url) != '') {
@@ -196,6 +196,16 @@ switch($action) {
 					$sb_msg_error = 'Error: Write Error (EDIT)!';
 				}
 
+			}
+
+			// Réaffichage du formulaire dans la même requête après soumission
+			// (pas de redirection HTTP) : fait ICI, une fois la requête SQL
+			// déjà exécutée avec la version encodée en entités ($content
+			// n'a pas de escape_string() ici, décoder avant la requête
+			// aurait injecté du HTML brut - donc des apostrophes
+			// potentielles - directement dans le SQL).
+			if (sbModuleUsesPageBuilder('pages.content_fr')) {
+				$content_fr = html_entity_decode($content_fr, ENT_QUOTES, 'UTF-8');
 			}
 
 			// --- Debug SQL
@@ -341,7 +351,11 @@ switch($action) {
 		// --- Editeur Contenu FR / EN
 		// ----------------------------
 		$content_fr_title = ($getMultilang) ? 'Contenu (FR)' : 'Contenu' ;
-		$sbform->addTextareaHTML("$content_fr_title", $content_fr, array('id' => 'content_fr', 'name' => 'content_fr'), true);
+		if (sbModuleUsesPageBuilder('pages.content_fr')) {
+			$sbform->addPageBuilder("$content_fr_title", $content_fr, array('id' => 'content_fr', 'name' => 'content_fr'), true, 'full', '');
+		} else {
+			$sbform->addTextareaHTML("$content_fr_title", $content_fr, array('id' => 'content_fr', 'name' => 'content_fr'), true);
+		}
 		if ($getMultilang)
 			$sbform->addTextareaHTML('Contenu (EN)', $content_en, array('id' => 'content_en', 'name' => 'content_en'), false);
 		//$sbform->addPageBuilder('', $src = '', $model = '', $arrArgs = array (), $isRequired = false, $toolbar = 'simple', $helpDsc = '');

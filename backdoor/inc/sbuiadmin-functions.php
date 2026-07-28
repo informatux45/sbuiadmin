@@ -218,6 +218,36 @@ if (!function_exists("sbGetTagifyDatas")) {
    }
 }
 
+if (!function_exists("sbGetPageBuilderModulesList")) {
+   // Référentiel unique des couples "module.champ" éligibles au Page
+   // Builder (Point 15, phase 2) - un seul champ par module, celui qui
+   // porte le contenu principal (pas les champs secondaires type "Intro").
+   // Utilisé à la fois par le réglage (settings.php, whitelist Tagify) et
+   // par sbModuleUsesPageBuilder() (vérification côté chaque module).
+   function sbGetPageBuilderModulesList() {
+      return array(
+          'pages.content_fr'  => 'Pages – Contenu'
+         ,'news.desc_full_fr' => 'Actualités – Article'
+         ,'tabbs.content_fr'  => 'Tabbs – Contenu'
+         ,'faq.response'      => 'FAQ – Réponse'
+         ,'blocs.content_fr'  => 'Blocs – Contenu'
+      );
+   }
+}
+
+if (!function_exists("sbModuleUsesPageBuilder")) {
+   // $sb_link_settings est chargé une fois par index.php avant le
+   // dispatch vers le module - disponible tel quel (même portée
+   // d'inclusion) dans pages.php/news.php/etc, mais une fonction a besoin
+   // de "global" pour y accéder.
+   function sbModuleUsesPageBuilder($key) {
+      global $sb_link_settings;
+      if (empty($sb_link_settings) || !isset($sb_link_settings[36])) return false;
+      $selected = array_map('trim', explode(',', trim($sb_link_settings[36])));
+      return in_array($key, $selected, true);
+   }
+}
+
 function sbRewriteTags($string) {
 	$noValidString     = trim($string);
 	$noValidCharacters = array("$","+","/","=","[","]","&","~","`","'",",","%",'"',"-","_","£","<",">",":",".","´","*","#","{","}","(",")","|","@",";","!");

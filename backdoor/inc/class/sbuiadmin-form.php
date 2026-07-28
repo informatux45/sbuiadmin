@@ -20,6 +20,14 @@ defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
 class form extends sanitize {
 
+	// Point 15 (phase 2) : plusieurs addPageBuilder() peuvent désormais
+	// coexister sur une même page (ex: champ FR + champ EN d'un module
+	// bilingue) - les assets (bootstrap.css/pagebuilder.js/...) ne doivent
+	// être injectés qu'une seule fois, sinon pagebuilder.js s'exécute 2 fois
+	// (double init de $(".htmlpage").sortable()/.draggable() sur les mêmes
+	// éléments côté sidebar, partagée entre toutes les instances).
+	private static $pageBuilderAssetsLoaded = false;
+
 	/**
 	* Class form's attributes
 	* private properties
@@ -1045,8 +1053,103 @@ class form extends sanitize {
 
 		$this -> formBuffer['elements'][$cpt] = $chaineTemp;
 	}
-	
-	
+
+
+	/**
+	* Construct form (body)
+	* add a form element (Tagify restreint à une liste de choix prédéfinis,
+	* avec dropdown de suggestions - contrairement à addTagify() qui permet
+	* la saisie libre. $whitelist : array('cle_stable' => 'Libellé affiché', ...)
+	* Valeur pré-remplie/soumise au même format JSON que addTagify()
+	* (tableau d'objets {value: "cle_stable"}), lisible par
+	* sbGetTagifyDatas() côté serveur sans changement.
+	* @return html code
+	*/
+	public function addTagifyWhitelist($label = '', $whitelist = array (), $arrArgs = array (), $isRequired = false, $helpDsc = '') {
+		$elem = 'text';
+		if (!array_key_exists ($elem, $this -> inputArr)) {
+			throw new Exception ($elem . ' n\'est pas un élément valide');
+		}
+
+		if (!array_key_exists ('name', $arrArgs) && $elem !== 'submit' && $elem !== 'reset') {
+			$arrArgs['name'] = 'default';
+		}
+
+		$cpt = count ($this -> formElementArr);
+		$this -> formElementArr[$cpt][$elem] = array ();
+		$arrTemp = array_merge ($this -> eventArr, $this -> commonArr, $this -> inputArr[$elem]);
+
+		foreach ($arrTemp as $clef => $val) {
+			if (array_key_exists ($clef, $arrArgs)) {
+				$this -> formElementArr[$cpt][$elem][$clef] = $arrArgs[$clef];
+			}
+		}
+
+		// Show the label for the element
+		$chaineTemp .= $this -> isRequired ($isRequired, $label, '', 'red');
+
+		// Show the form element
+		$chaineTemp .= '<input ';
+
+		foreach ($this -> formElementArr[$cpt][$elem] as $clef => $val) {
+			$attrVal = ($clef === 'value') ? htmlspecialchars($val, ENT_QUOTES, 'UTF-8') : $val;
+			$chaineTemp .= $clef.'="'.$attrVal.'" ';
+		}
+
+		$chaineRequired = ($isRequired == true) ? ' required="true" bname="' . $label . '" ' : '';
+		$chaineTemp    .= $chaineRequired;
+
+		$chaineTemp .= '/>';
+		$chaineTemp .= '<link rel="stylesheet" href="'._AM_SITE_URL.'assets/dist/js/vendor/tagify/tagify.css">';
+		$chaineTemp .= '<script src="'._AM_SITE_URL.'assets/dist/js/vendor/tagify/tagify.min.js"></script>';
+		$tagifyStyle = (isset($arrArgs['style']) && $arrArgs['style'] != '') ? $arrArgs['style'] : 'min-width: 400px;';
+		$chaineTemp .= '<style>.tagify{ margin: .2em; ' . $tagifyStyle . ' }</style>';
+
+		$whitelistJs = array ();
+		foreach ($whitelist as $key => $labelText) {
+			$whitelistJs[] = array ('value' => (string) $key, 'label' => (string) $labelText);
+		}
+
+		$chaineTemp .= '<script type="text/javascript">';
+		// Même protection contre le bug connu de Tagify (voir addTagify())
+		// - enforceWhitelist + dropdown.enabled:0 pour afficher toutes les
+		// suggestions dès le focus (pas seulement après un mot tapé) et
+		// empêcher toute saisie hors liste ; tagTextProp/mapValueTo pour
+		// afficher le libellé humain plutôt que la clé technique stockée.
+		$chaineTemp .= '(() => {
+							try {
+								var inputElm = document.querySelector(\'input[name='.$arrArgs['name'].']\')
+
+								var tagify = new Tagify(inputElm, {
+									whitelist: ' . json_encode($whitelistJs, JSON_UNESCAPED_UNICODE) . ',
+									tagTextProp: "label",
+									enforceWhitelist: true,
+									skipInvalid: true,
+									dropdown: {
+										mapValueTo: "label",
+										enabled: 0,
+										maxItems: 50,
+										closeOnSelect: false
+									}
+								})
+							} catch (e) {
+								console.warn(\'Tagify: échec d\\\'initialisation (bug connu de la librairie), le reste de la page continue normalement.\', e);
+							}
+						})();';
+		$chaineTemp .= '</script>';
+
+		$chaineTemp .= '</div>';
+
+		// If help
+		if ($helpDsc != '')
+			$chaineTemp .= '<p class="help-block">' . $helpDsc . '</p>';
+		else
+			$chaineTemp .= '<p></p>';
+
+		$this -> formBuffer['elements'][$cpt] = $chaineTemp;
+	}
+
+
 	/**
 	* Construct form (body)
 	* add a form element (country select)
@@ -1235,22 +1338,26 @@ class form extends sanitize {
 		// navigateur ne suffit pas toujours à contourner si l'hébergement
 		// passe par un proxy/CDN intermédiaire (même principe que
 		// bridge_css_version, voir inc/sbuiadmin-header.php).
-		$pbBridgeVersion = @filemtime(SBUIADMIN_PATH . '/assets/adminator/pagebuilder-bridge.css');
-		$pbJsVersion      = @filemtime(SBUIADMIN_PATH . '/inc/plugins/pagebuilder/js/pagebuilder.js');
+		if (!self::$pageBuilderAssetsLoaded) {
+			self::$pageBuilderAssetsLoaded = true;
 
-		$chaineTemp .= '<link rel="stylesheet" href="assets/bower_components/bootstrap/dist/css/bootstrap.css">
-						<link rel="stylesheet" href="inc/plugins/pagebuilder/css/pagebuilder.css">
-						<link rel="stylesheet" href="inc/plugins/pagebuilder/css/colorselector.css">
-						<link rel="stylesheet" href="assets/adminator/pagebuilder-bridge.css?v=' . $pbBridgeVersion . '">';
-		// Load JS
-		$chaineTemp .= '<script src="assets/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-						<script src="inc/plugins/pagebuilder/js/jquery.ui.touch-punch.min.js"></script>
-						<script src="inc/plugins/pagebuilder/js/colorselector.js"></script>
-						<!--<script type="text/javascript">
-							var path = "";
-						</script>-->
-						<script>window.sbMediasUrl = ' . json_encode(_AM_MEDIAS_URL) . ';</script>
-						<script src="inc/plugins/pagebuilder/js/pagebuilder.js?v=' . $pbJsVersion . '"></script>';
+			$pbBridgeVersion = @filemtime(SBUIADMIN_PATH . '/assets/adminator/pagebuilder-bridge.css');
+			$pbJsVersion      = @filemtime(SBUIADMIN_PATH . '/inc/plugins/pagebuilder/js/pagebuilder.js');
+
+			$chaineTemp .= '<link rel="stylesheet" href="assets/bower_components/bootstrap/dist/css/bootstrap.css">
+							<link rel="stylesheet" href="inc/plugins/pagebuilder/css/pagebuilder.css">
+							<link rel="stylesheet" href="inc/plugins/pagebuilder/css/colorselector.css">
+							<link rel="stylesheet" href="assets/adminator/pagebuilder-bridge.css?v=' . $pbBridgeVersion . '">';
+			// Load JS
+			$chaineTemp .= '<script src="assets/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+							<script src="inc/plugins/pagebuilder/js/jquery.ui.touch-punch.min.js"></script>
+							<script src="inc/plugins/pagebuilder/js/colorselector.js"></script>
+							<!--<script type="text/javascript">
+								var path = "";
+							</script>-->
+							<script>window.sbMediasUrl = ' . json_encode(_AM_MEDIAS_URL) . ';</script>
+							<script src="inc/plugins/pagebuilder/js/pagebuilder.js?v=' . $pbJsVersion . '"></script>';
+		}
 				
 		// Show the label for the element
 		$chaineTemp .= $this -> isRequired ($isRequired, $label);

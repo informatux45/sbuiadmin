@@ -145,6 +145,17 @@ switch($action) {
 
 			}
 
+			// Réaffichage dans la même requête après soumission (pas de
+			// redirection HTTP) : re-décodage si le Page Builder est actif
+			// sur ce champ - fait ICI, une fois la requête SQL déjà
+			// exécutée avec la version encodée en entités ($response n'a
+			// pas de escape_string() ici contrairement aux autres modules,
+			// décoder avant la requête aurait injecté du HTML brut - donc
+			// des apostrophes potentielles - directement dans le SQL).
+			if (sbModuleUsesPageBuilder('faq.response')) {
+				$response = html_entity_decode($response, ENT_QUOTES, 'UTF-8');
+			}
+
 			// --- Debug SQL
 			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query . "\n" . 'Submit Form Type = '.$formType);
 
@@ -202,7 +213,11 @@ switch($action) {
 		// ----------------------------
 		// --- Reponse
 		// ----------------------------
-		$sbform->addTextareaHtml("Réponse", $response, array('id' => 'response', 'name' => 'response'), true);
+		if (sbModuleUsesPageBuilder('faq.response')) {
+			$sbform->addPageBuilder("Réponse", $response, array('id' => 'response', 'name' => 'response'), true, 'full', '');
+		} else {
+			$sbform->addTextareaHtml("Réponse", $response, array('id' => 'response', 'name' => 'response'), true);
+		}
 		// --------------------------------
 		// --- Hiddens / Buttons
 		// --------------------------------

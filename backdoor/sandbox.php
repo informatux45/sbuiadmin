@@ -475,6 +475,12 @@ switch($action) {
 		// --- Caisses
 		// -----------------------------------
 		$sbform->addTagify ('Tags', array('name' => 'tags', 'value' => $tags, 'placeholder' => 'Indiquez le nom des caisses', 'style' => 'width: 500px;'), false, 'Ajouter des noms et valider par la touche Entrée de votre clavier.<br>Vous pouvez trier les noms en drag & drop.<br>Ne pas utilisez le caractère "<strong>,</strong>" (Virgule).');
+		// -----------------------------------
+		// --- Tagify à choix restreints (démo) - voir sbGetPageBuilderModulesList()
+		// pour l'usage réel (réglage Page Builder de Configuration générale).
+		// Non persisté en base (champ de démonstration uniquement).
+		// -----------------------------------
+		$sbform->addTagifyWhitelist('Tagify à choix restreints', array('demo1' => 'Choix numéro 1', 'demo2' => 'Choix numéro 2', 'demo3' => 'Choix numéro 3'), array('name' => 'tagify_whitelist_demo', 'value' => '', 'placeholder' => 'Choisissez parmi les propositions', 'style' => 'width: 500px;'), false, 'Contrairement au champ "Tags" ci-dessus, la saisie est ici restreinte aux choix proposés dans le menu déroulant.');
 		// ----------------------------
 		// --- Pdf only (width popup medias)
 		// You can add more exts separate by coma

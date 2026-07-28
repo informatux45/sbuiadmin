@@ -141,7 +141,7 @@ switch($action) {
 			$content    = "[fr]".$content_fr."[/fr]";
 			if ($getMultilang) {
 				$content_en = $sbsanitize->displayText($_POST['content_en'], 'UTF-8', 1, 0);
-				$content   .= "[en]".$content_en."[/en]";				
+				$content   .= "[en]".$content_en."[/en]";
 			}
 			// ---------
 			$various_view = $sbsanitize->displayText($_POST['various_view'], 'UTF-8', 1, 0);
@@ -224,6 +224,16 @@ switch($action) {
 					$sb_msg_error = 'Error: Write Error (EDIT)!';
 				}
 
+			}
+
+			// Réaffichage dans la même requête après soumission (pas de
+			// redirection HTTP) : fait ICI, une fois la requête SQL déjà
+			// exécutée avec la version encodée en entités ($content n'a pas
+			// de escape_string() ici, décoder avant la requête aurait
+			// injecté du HTML brut - donc des apostrophes potentielles -
+			// directement dans le SQL).
+			if (sbModuleUsesPageBuilder('blocs.content_fr')) {
+				$content_fr = html_entity_decode($content_fr, ENT_QUOTES, 'UTF-8');
 			}
 
 			// --- Debug SQL
@@ -359,7 +369,11 @@ switch($action) {
 		// --- Contenu du bloc
 		// -----------------------------------
 		$contenu_fr_title = ($getMultilang) ? 'Contenu (FR)' : 'Contenu';
-		$sbform->addTextareaHTML("$contenu_fr_title", $content_fr, array('id' => 'content_fr', 'name' => 'content_fr'), true);
+		if (sbModuleUsesPageBuilder('blocs.content_fr')) {
+			$sbform->addPageBuilder("$contenu_fr_title", $content_fr, array('id' => 'content_fr', 'name' => 'content_fr'), true, 'full', '');
+		} else {
+			$sbform->addTextareaHTML("$contenu_fr_title", $content_fr, array('id' => 'content_fr', 'name' => 'content_fr'), true);
+		}
 		if ($getMultilang)
 			$sbform->addTextareaHTML('Contenu (EN)', $content_en, array('id' => 'content_en', 'name' => 'content_en'), true);
 		// --------------------------------			

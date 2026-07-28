@@ -205,7 +205,7 @@ switch($action) {
 			$desc_full         = "[fr]".$desc_full_fr."[/fr]";
 			if ($getMultilang) {
 				$desc_full_en  = $sbsanitize->displayText($_POST['desc_full_en'], 'UTF-8', 1, 0);
-				$desc_full    .= "[en]".$desc_full_en."[/en]";				
+				$desc_full    .= "[en]".$desc_full_en."[/en]";
 			}
 			list($day, $month, $year) = explode("/", trim($_POST['date']));
 			$date              = $sbsanitize->displayText($year.'-'.$month.'-'.$day, 'UTF-8', 1, 0);
@@ -252,6 +252,16 @@ switch($action) {
 					$sb_msg_error = 'Error: Write Error (EDIT)!';
 				}
 
+			}
+
+			// Réaffichage dans la même requête après soumission (pas de
+			// redirection HTTP) : fait ICI, une fois la requête SQL déjà
+			// exécutée avec la version encodée en entités ($desc_full n'a
+			// pas de escape_string() ici, décoder avant la requête aurait
+			// injecté du HTML brut - donc des apostrophes potentielles -
+			// directement dans le SQL). "Article" uniquement, jamais "Intro".
+			if (sbModuleUsesPageBuilder('news.desc_full_fr')) {
+				$desc_full_fr = html_entity_decode($desc_full_fr, ENT_QUOTES, 'UTF-8');
 			}
 
 			// --- Debug SQL
@@ -352,7 +362,11 @@ switch($action) {
 		// --- Description FULL
 		// ----------------------------
 		$desc_full_fr_title = ($getMultilang) ? 'Article (FR)' : 'Article' ;
-		$sbform->addTextareaHTML("$desc_full_fr_title", $desc_full_fr, array('id' => 'desc_full_fr', 'name' => 'desc_full_fr'), true);
+		if (sbModuleUsesPageBuilder('news.desc_full_fr')) {
+			$sbform->addPageBuilder("$desc_full_fr_title", $desc_full_fr, array('id' => 'desc_full_fr', 'name' => 'desc_full_fr'), true, 'full', '');
+		} else {
+			$sbform->addTextareaHTML("$desc_full_fr_title", $desc_full_fr, array('id' => 'desc_full_fr', 'name' => 'desc_full_fr'), true);
+		}
 		if ($getMultilang)
 			$sbform->addTextareaHTML('Article (EN)', $desc_full_en, array('id' => 'desc_full_en', 'name' => 'desc_full_en'), false);
 		// --------------------------------			

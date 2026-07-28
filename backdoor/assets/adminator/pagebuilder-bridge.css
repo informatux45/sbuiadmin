@@ -10,6 +10,20 @@
    .help-block.help-block, voir bridge.css). */
 /* --------------------------------------------------------------------- */
 
+/* Bootstrap 3 .container a une largeur FIXE selon le viewport (750/970/
+   1170px par media queries), sans jamais tenir compte de la largeur réelle
+   de son parent. Quand addPageBuilder() est utilisé dans une colonne plus
+   étroite qu'une grille CSS de la page (ex: pages.tpl : .col-8 à côté d'un
+   .col-4 "Choix du template"), le widget déborde de sa colonne et se fait
+   recouvrir visuellement par la colonne voisine (peinte après lui dans le
+   DOM) - donnant l'impression que les blocs glissés-déposés "passent en
+   dessous" du conteneur. Fluide (100% du parent réel) plutôt que fixe,
+   quel que soit le contexte où le champ est utilisé. */
+.navbar-page-builder + .container {
+	width: 100%;
+	max-width: 100%;
+}
+
 /* --- Navbar --- */
 .navbar-page-builder.navbar-inverse {
 	background: var(--primary);

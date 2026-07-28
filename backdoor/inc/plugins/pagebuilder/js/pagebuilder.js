@@ -109,7 +109,13 @@ function _init() {
     $(".htmlpage").css("min-height", $(window).height() - 160);
     // $(".htmlpage").sortable({connectWith: ".lyrow", opacity: .35, handle: ".drag"});
     $(".htmlpage, .htmlpage .column").sortable({connectWith: ".column", opacity: .35, handle: ".drag"});
-    $(".sidebar-nav .lyrow").draggable({connectToSortable: ".htmlpage", helper: "clone", handle: ".drag", drag: function (e, t) {
+    // zIndex explicite : sans lui, le clone glissé (helper) hérite de
+    // l'ordre d'empilement de son parent d'origine (la sidebar, ajoutée
+    // via appendTo:"parent" par défaut) - sur une page où un panneau
+    // voisin opaque chevauche visuellement le canevas (ex: pages.tpl,
+    // colonne "Choix du template" à côté du Page Builder), le clone
+    // passait dessous pendant le drag, invisible et raté au dépôt.
+    $(".sidebar-nav .lyrow").draggable({connectToSortable: ".htmlpage", helper: "clone", handle: ".drag", zIndex: 9999, drag: function (e, t) {
             t.helper.width(400)
         }, stop: function (e, t) {
             // connectToSortable réutilise le helper de drag comme élément
@@ -121,14 +127,67 @@ function _init() {
             // permanence après un simple glisser-déposer.
             t.helper.css({position: '', top: '', left: '', inset: '', opacity: '', zIndex: '', width: '', height: ''});
             $(".htmlpage .column").sortable({opacity: .35, connectWith: ".column"})
+
+            // Repli manuel : sur certaines pages, connectToSortable de
+            // jQuery UI ne détecte jamais le survol de .htmlpage (cause
+            // précise non élucidée après investigation poussée - même
+            // version jQuery UI 1.11.4, mêmes options, reproductible
+            // uniquement sur certaines pages avec un canevas vide - voir
+            // feedback_pagebuilder_debugging_lessons). cancelHelperRemoval
+            // reste alors à true et le helper n'est jamais absorbé par le
+            // sortable. Si le point de relâchement de la souris est bien
+            // dans .htmlpage, on l'y ajoute nous-mêmes.
+            var $canvas = $(".htmlpage");
+            var canvasContainsHelper = $canvas.length && ($canvas[0] === t.helper[0] || $.contains($canvas[0], t.helper[0]));
+            var offset = $canvas.offset();
+            if ($canvas.length && !canvasContainsHelper) {
+                if (offset && e.pageX >= offset.left && e.pageX <= offset.left + $canvas.outerWidth()
+                    && e.pageY >= offset.top && e.pageY <= offset.top + $canvas.outerHeight()) {
+                    // jQuery UI Draggable supprime lui-même son helper juste
+                    // après avoir déclenché "stop" quand aucun sortable ne
+                    // l'a formellement accepté (le helper porte encore
+                    // .ui-draggable-dragging à ce stade) - on insère donc un
+                    // CLONE indépendant plutôt que le helper original, que
+                    // jQuery UI va faire disparaître juste après.
+                    var $clone = t.helper.clone();
+                    $clone.removeClass('ui-draggable ui-draggable-dragging ui-draggable-handle')
+                        .css({position: '', top: '', left: '', inset: '', opacity: '', zIndex: '', width: '', height: ''});
+                    $canvas.append($clone);
+                    $(".htmlpage .column").sortable({opacity: .35, connectWith: ".column"});
+                }
+            }
         }});
 
-    $(".sidebar-nav .box").draggable({connectToSortable: ".column", helper: "clone", handle: ".preview", drag: function (e, t) {
+    $(".sidebar-nav .box").draggable({connectToSortable: ".column", helper: "clone", handle: ".preview", zIndex: 9999, drag: function (e, t) {
             t.helper.width(400)
         }, stop: function (e, t) {
             // Même nettoyage que ci-dessus, pour les widgets (image/texte/...)
             // déposés directement dans une colonne existante.
             t.helper.css({position: '', top: '', left: '', inset: '', opacity: '', zIndex: '', width: '', height: ''});
+
+            // Même repli manuel que pour les lignes ci-dessus, ici pour un
+            // widget déposé dans une colonne existante.
+            var alreadyPlaced = false;
+            $(".column").each(function () {
+                if (this === t.helper[0] || $.contains(this, t.helper[0])) alreadyPlaced = true;
+            });
+            if (!alreadyPlaced) {
+                $(".column").each(function () {
+                    var $col = $(this);
+                    var offset = $col.offset();
+                    if (offset && e.pageX >= offset.left && e.pageX <= offset.left + $col.outerWidth()
+                        && e.pageY >= offset.top && e.pageY <= offset.top + $col.outerHeight()) {
+                        // Clone indépendant - voir le commentaire équivalent
+                        // dans le repli des lignes ci-dessus (jQuery UI
+                        // supprime son propre helper après "stop").
+                        var $clone = t.helper.clone();
+                        $clone.removeClass('ui-draggable ui-draggable-dragging ui-draggable-handle')
+                            .css({position: '', top: '', left: '', inset: '', opacity: '', zIndex: '', width: '', height: ''});
+                        $col.append($clone);
+                        return false;
+                    }
+                });
+            }
             /* if ( t.helper.data('type')==="map"|| t.helper.data('type')==="youtube" ) {
              var iframe = t.helper.find('div.view > iframe');
 
