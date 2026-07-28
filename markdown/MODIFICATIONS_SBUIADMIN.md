@@ -203,3 +203,26 @@ Remplace l'ancien mécanisme de dashboard (fichier plat `inc/admin/dashboard.txt
 - Testé et validé en conditions réelles sur le module Pages (round-trip complet, dépôt d'une ligne et dépôt d'un widget dans une colonne).
 - **Reste à tester** : Tabbs, Actualités, FAQ, Blocs (même mécanisme, pas encore vérifiés en navigateur).
 - Commit : `8d58f1e`
+
+## 2026-07-28 (suite) — Point 15 (suite) : rendu front du Page Builder + bloc Carte en Leaflet
+
+### Nettoyage HTML côté front
+
+- **Nouveau** (`inc/functions.php`, front) : portage PHP (`DOMDocument`/`DOMXPath`) de `cleanRow()`/`sbRenameClasses()` (JS, bouton "Code généré") - `sbCleanPageBuilderContent()` retire tout le chrome d'édition (poignées, boutons remove/clone/réglages, marqueurs de largeur) et renomme les classes Bootstrap survivantes en `.sb*`, exactement comme l'aperçu "Code généré" côté admin.
+- Branché sur les 5 modules concernés : Pages (`pages.php`), Tabbs (`tabbs/inc/functions.php`), Actualités (`news_display_article.tpl`), FAQ (`faq/inc/functions.php`), et les Blocs (5 gabarits d'affichage : Pages/Contact/Utilisateur/Actualités/Recherche) - sans ce nettoyage, le HTML brut d'édition (icônes, boutons, inputs de taille) s'affichait tel quel sur le site public.
+- **Nouvelle feuille** `assets/pagebuilder-front.css` (racine front, déplacée de `backdoor/assets/adminator/`) et **nouveaux fichiers vendorisés** `assets/leaflet/` (Leaflet 1.9.4) - injectés dynamiquement via `insert_sbGetHeaders()` (déjà appelé par les 5 thèmes front) plutôt que par le champ "CSS" de Configuration générale, qui enveloppe systématiquement son contenu dans `<style>` et ne peut donc pas porter une balise `<link>`. URL absolues (`SB_URL`/`SB_PATH`, jamais `SB_ADMIN_URL`/`SB_ADMIN_DIR`) : une page publique ne doit jamais référencer un chemin qui renseigne sur l'emplacement/le nom du répertoire d'administration.
+- **Bug corrigé au passage** : `box-sizing: border-box` manquant sur `.sbcol-md-*`, ce qui faisait passer deux colonnes de 6 à la ligne au lieu de les afficher côte à côte (le padding s'ajoutait à la largeur au lieu d'être inclus dedans).
+
+### Bloc "Carte" remplacé par Leaflet (abandon de Google Maps)
+
+- L'ancien bloc (iframe Google Maps) ne fonctionnait pas du tout côté admin (glisser-déposer impossible à relâcher) et n'avait aucun rendu défini côté front. Remplacé par **Leaflet + tuiles OpenStreetMap** (demande explicite du client, plus léger et plus libre) - fichiers vendorisés en local (`assets/leaflet/` côté front, `backdoor/inc/plugins/pagebuilder/js/leaflet/` côté admin), pas de CDN.
+- Réglages inchangés (latitude/longitude/zoom), avec en plus un **aperçu interactif** dans la modale (marqueur déplaçable à la souris, carte qui suit les champs) et un nouveau champ **texte/HTML pour le marqueur** (popup), stocké en attribut `data-popup` sur le conteneur (et non en enfant caché, qui serait détruit par l'initialisation de Leaflet).
+- **Bug de sauvegarde corrigé** : le champ générique "Class CSS" (`#class`, commun à tous les types de blocs) écrasait la classe `sb-pagebuilder-map` elle-même à la confirmation des réglages - la 1ère confirmation "réussissait" silencieusement, mais la réglage suivant sur ce même bloc ne le retrouvait plus (`part.find()` vide) et plantait au clic sur "Confirmer". Corrigé en masquant ce champ (sans objet pour une Carte) au lieu de le laisser écraser la classe.
+- Testé et validé des deux côtés (admin + front), y compris double confirmation successive avec/sans description.
+
+### Autres correctifs trouvés en testant le module Actualités
+
+- **Row/Cell** : `loadRowSettings()`/`loadColumnSettings()` lisaient la valeur CSS *calculée* (`.css('X')`, toujours non-vide) au lieu du style inline réel de l'élément - ouvrir les réglages de n'importe quel bloc (même juste pour configurer une image) figeait silencieusement un fond/padding/marge par défaut qui n'avait jamais été choisi. Corrigé en lisant `.style.X` (vide si non défini).
+- **Champ "Css class"** (Row/Cell) : se remplissait avec les classes structurelles (`row clearfix`, `col-md-X column`) et, si l'utilisateur les retirait, cassait l'affichage dans le Page Builder lui-même. Corrigé en traitant ce champ comme des classes *en plus* uniquement - les classes structurelles sont désormais toujours réappliquées par le code, quel que soit le contenu du champ.
+- **Bloc "Code"** : un script `ace.edit('code')` mort dans `news.tpl` (jamais réellement relié à un champ Actualités) entrait en collision avec le panneau de réglages du Page Builder (même id `#code`), empêchant la sauvegarde de ce bloc spécifiquement sur Actualités (fonctionnait sur `sandbox.php`, qui n'a pas ce script). Retiré.
+- Commit : `a83c6e1`
