@@ -296,6 +296,22 @@ switch($action) {
 			$comment_ckeditor3_esc  = $sbsql->escape_string($comment_ckeditor3);
 			$page_builder_content_esc = $sbsql->escape_string($page_builder_content);
 
+			// Réaffichage du formulaire dans la même requête après soumission
+			// (pas de redirection HTTP : "add" échoué et "edit" ne vident
+			// jamais les champs, voir plus bas) : $page_builder_content
+			// ci-dessus est encore la version encodée en entités pour le
+			// stockage (displayText()), déjà capturée dans
+			// $page_builder_content_esc pour la requête SQL - on peut donc
+			// la re-décoder sans risque pour redonner à addPageBuilder() du
+			// HTML brut, exactement comme le fait le bloc GET plus bas
+			// (html_entity_decode(utf8_encode(...))). Sans ce re-décodage,
+			// addPageBuilder() recevait la version entités et affichait la
+			// "soupe de code" immédiatement après Ajouter/Modifier, sans
+			// même attendre un rechargement (pas d'utf8_encode() ici :
+			// contrairement au bloc GET, cette chaîne ne vient pas de la
+			// base, elle est déjà de l'UTF-8 valide dans cette même requête).
+			$page_builder_content = html_entity_decode($page_builder_content, ENT_QUOTES, 'UTF-8');
+
 			// ADD or EDIT
 			if ($formType == 'add') {
 				$query = "INSERT INTO $table (active, yourname, montant, seo_url, country, dob, color, tags, pdf, photo, video, option_one, option_two, option_three, type, selection, comment, comment_editor1, comment_editor2, comment_editor3, page_builder_content, sort)

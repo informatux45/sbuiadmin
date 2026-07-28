@@ -1229,10 +1229,19 @@ class form extends sanitize {
 		// fields) and drives it via jQuery's Bootstrap modal/collapse/buttons-radio
 		// plugins - loaded here rather than globally so the rest of the app no longer
 		// depends on Bootstrap (Phase 7 cleanup).
+		// Cache-busting (?v=filemtime) sur les 2 fichiers qu'on modifie
+		// régulièrement dans ce chantier - le .htaccess racine impose
+		// Cache-Control: proxy-revalidate, max-age=3600, qu'un hard-refresh
+		// navigateur ne suffit pas toujours à contourner si l'hébergement
+		// passe par un proxy/CDN intermédiaire (même principe que
+		// bridge_css_version, voir inc/sbuiadmin-header.php).
+		$pbBridgeVersion = @filemtime(SBUIADMIN_PATH . '/assets/adminator/pagebuilder-bridge.css');
+		$pbJsVersion      = @filemtime(SBUIADMIN_PATH . '/inc/plugins/pagebuilder/js/pagebuilder.js');
+
 		$chaineTemp .= '<link rel="stylesheet" href="assets/bower_components/bootstrap/dist/css/bootstrap.css">
 						<link rel="stylesheet" href="inc/plugins/pagebuilder/css/pagebuilder.css">
 						<link rel="stylesheet" href="inc/plugins/pagebuilder/css/colorselector.css">
-						<link rel="stylesheet" href="assets/adminator/pagebuilder-bridge.css">';
+						<link rel="stylesheet" href="assets/adminator/pagebuilder-bridge.css?v=' . $pbBridgeVersion . '">';
 		// Load JS
 		$chaineTemp .= '<script src="assets/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 						<script src="inc/plugins/pagebuilder/js/jquery.ui.touch-punch.min.js"></script>
@@ -1241,7 +1250,7 @@ class form extends sanitize {
 							var path = "";
 						</script>-->
 						<script>window.sbMediasUrl = ' . json_encode(_AM_MEDIAS_URL) . ';</script>
-						<script src="inc/plugins/pagebuilder/js/pagebuilder.js"></script>';
+						<script src="inc/plugins/pagebuilder/js/pagebuilder.js?v=' . $pbJsVersion . '"></script>';
 				
 		// Show the label for the element
 		$chaineTemp .= $this -> isRequired ($isRequired, $label);
@@ -1260,6 +1269,9 @@ class form extends sanitize {
 		$chaineTemp .= '<div class="navbar-page-builder navbar-inverse navbar-htmleditor" data-pagebuilder-target="' . $fieldId . '">
 							<div class="navbar-header">
 								<a class="navbar-brand"><i class="fa fa-magic"></i>&nbsp;&nbsp;Page Builder</a>
+								<a href="#" class="btn btn-default btn-xs" id="pbShowCode" data-pagebuilder-code-target="' . $fieldId . '">
+									<i class="fa fa-code"></i>&nbsp;Code généré
+								</a>
 							</div>
 						</div>';
 
@@ -1397,6 +1409,31 @@ class form extends sanitize {
 								<div class="modal-content">';
 		$chaineTemp .= $this->addPageBuilderTags('modal-content', $toolbar);
 		$chaineTemp .= '		</div>
+							</div>
+						</div>';
+
+		// Modale "Code généré" : aperçu en lecture seule du HTML qui serait
+		// réellement inséré sur la page front (chrome d'édition retiré via
+		// cleanRow(), classes grille/boutons/média renommées en .sb* - voir
+		// pagebuilder.js generatePageBuilderCode()/SB_CLASS_RENAME_MAP -
+		// pour ne jamais entrer en conflit avec le Bootstrap (ou son
+		// absence) du thème front. N'affecte jamais le contenu réellement
+		// stocké/édité, uniquement cet aperçu.
+		$chaineTemp .= '<div class="modal fade" id="pbCodeModal" tabindex="-1" role="dialog" aria-labelledby="pbCodeModal">
+							<div class="modal-dialog modal-lg" role="document">
+								<div class="modal-content">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+										<h4 class="modal-title">Code généré</h4>
+									</div>
+									<div class="modal-body">
+										<p class="help-block">Code HTML qui sera injecté dans la page.</p>
+										<pre style="max-height: 60vh; overflow: auto;"><code id="pbCodeOutput"></code></pre>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+									</div>
+								</div>
 							</div>
 						</div>';
 						

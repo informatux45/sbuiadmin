@@ -20,6 +20,28 @@
 }
 .navbar-page-builder .navbar-header {
 	padding: 10px 16px;
+	/* float:left par défaut (Bootstrap 3) sinon, ce qui réduit la largeur
+	   du header au contenu et empêche tout enfant .pull-right d'atteindre
+	   le bord droit réel de la barre - voir bouton #pbShowCode. width/
+	   box-sizing explicites pour ne dépendre d'aucun comportement implicite
+	   de largeur du bloc parent. */
+	float: none;
+	width: 100%;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+/* Le clearfix Bootstrap (.navbar-header:before/:after { content:" " }, une
+   technique anti-float) devient, une fois le parent passé en display:flex,
+   2 items flex bien réels aux 2 extrémités - avec justify-content:
+   space-between, l'espace se répartit alors entre 4 éléments (::before,
+   navbar-brand, #pbShowCode, ::after) au lieu de 2, ce qui pousse le titre
+   et le bouton vers le centre. Le clearfix ne sert à rien en flex, on le
+   retire ici. */
+.navbar-page-builder .navbar-header:before,
+.navbar-page-builder .navbar-header:after {
+	content: none;
 }
 .navbar-page-builder a.navbar-brand {
 	color: #fff;
@@ -72,19 +94,22 @@
 /* Bootstrap 3 ne centre pas verticalement ses modales par défaut (la
    modale "Preferences" - réglages d'un bloc - reste collée en haut) -
    technique classique de centrage vertical Bootstrap 3, scopée à
-   #preferences pour ne pas affecter d'autres modales de l'admin. */
-#preferences.modal {
+   #preferences et #pbCodeModal (pas les autres modales de l'admin). */
+#preferences.modal,
+#pbCodeModal.modal {
 	text-align: center;
 	padding: 0 !important;
 }
-#preferences.modal:before {
+#preferences.modal:before,
+#pbCodeModal.modal:before {
 	content: '';
 	display: inline-block;
 	height: 100%;
 	vertical-align: middle;
 	margin-right: -4px;
 }
-#preferences .modal-dialog {
+#preferences .modal-dialog,
+#pbCodeModal .modal-dialog {
 	display: inline-block;
 	text-align: left;
 	vertical-align: middle;
@@ -203,6 +228,22 @@
 }
 .modal-backdrop {
 	background: #0b1120;
+}
+
+/* Titre centré sur toute la largeur du header : le bouton close (float:
+   right par défaut) mange sinon une partie de la largeur du <h4>, un
+   simple text-align:center dessus ne recentre alors le texte que sur
+   l'espace restant, pas sur la largeur réelle de la modale - on sort donc
+   le bouton du flux (position:absolute) pour libérer toute la largeur. */
+#pbCodeModal .modal-header {
+	position: relative;
+	text-align: center;
+}
+#pbCodeModal .modal-header .close {
+	position: absolute;
+	top: 15px;
+	right: 15px;
+	float: none;
 }
 
 /* --- Colorselector (sélecteur de couleur des lignes/colonnes) --- */

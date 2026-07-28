@@ -112,12 +112,23 @@ function _init() {
     $(".sidebar-nav .lyrow").draggable({connectToSortable: ".htmlpage", helper: "clone", handle: ".drag", drag: function (e, t) {
             t.helper.width(400)
         }, stop: function (e, t) {
+            // connectToSortable réutilise le helper de drag comme élément
+            // sortable réel une fois déposé (pas un clone jetable) - le
+            // style inline appliqué pendant le drag (opacity/position/
+            // inset/z-index/width forcé à 400 par le "drag" ci-dessus)
+            // reste donc figé sur le bloc pour de bon si on ne le retire
+            // pas ici : le bloc apparaissait visuellement "opacifié" en
+            // permanence après un simple glisser-déposer.
+            t.helper.css({position: '', top: '', left: '', inset: '', opacity: '', zIndex: '', width: '', height: ''});
             $(".htmlpage .column").sortable({opacity: .35, connectWith: ".column"})
         }});
 
     $(".sidebar-nav .box").draggable({connectToSortable: ".column", helper: "clone", handle: ".preview", drag: function (e, t) {
             t.helper.width(400)
         }, stop: function (e, t) {
+            // Même nettoyage que ci-dessus, pour les widgets (image/texte/...)
+            // déposés directement dans une colonne existante.
+            t.helper.css({position: '', top: '', left: '', inset: '', opacity: '', zIndex: '', width: '', height: ''});
             /* if ( t.helper.data('type')==="map"|| t.helper.data('type')==="youtube" ) {
              var iframe = t.helper.find('div.view > iframe');
 
@@ -627,6 +638,55 @@ function cleanRow(row) {
     row.parent().append(row.children('.view').html());
     row.remove();
 }
+
+// Renommage des classes Bootstrap qui survivent dans le HTML exporté
+// (grille .row/.col-md-X/.clearfix, boutons .btn/.btn-*, média
+// .img-responsive - tout le reste, poignées drag/remove/configuration
+// et modale de réglages, est du chrome d'édition retiré par cleanRow()
+// avant même d'arriver ici) en équivalents préfixés .sb*, pour que ce
+// HTML n'entre jamais en conflit avec le Bootstrap (même version, autre
+// version, ou absence de Bootstrap) du thème front qui l'affichera.
+// Feuille de style correspondante : assets/adminator/pagebuilder-front.css.
+var SB_CLASS_RENAME_MAP = [
+    [/\brow\b/g, 'sbrow'],
+    [/\bcol-md-(\d+)\b/g, 'sbcol-md-$1'],
+    [/\bclearfix\b/g, 'sbclearfix'],
+    [/\bimg-responsive\b/g, 'sbimg-responsive'],
+    [/\bbtn-([a-z]+)\b/g, 'sbbtn-$1'],
+    [/\bbtn\b/g, 'sbbtn']
+];
+
+function sbRenameClasses(html) {
+    // N'agit que sur le contenu des attributs class="..." - jamais sur le
+    // texte/contenu (un bouton libellé "Ma row info" ne doit pas devenir
+    // "Ma sbrow info").
+    return html.replace(/class="([^"]*)"/g, function (match, classes) {
+        SB_CLASS_RENAME_MAP.forEach(function (pair) {
+            classes = classes.replace(pair[0], pair[1]);
+        });
+        return 'class="' + classes + '"';
+    });
+}
+
+// Code final (chrome d'édition retiré + classes renommées + indenté),
+// calculé à partir d'une COPIE hors-DOM de .htmlpage - cleanRow() retire
+// des éléments du DOM, on ne l'appelle donc jamais sur le vrai canevas
+// d'édition (voir bouton #pbShowCode plus bas).
+function generatePageBuilderCode() {
+    var copy = $('<div>').html($('.htmlpage').html());
+    copy.children('.lyrow').each(function () {
+        cleanRow($(this));
+    });
+    return style_html(sbRenameClasses(copy.html()));
+}
+
+$(function () {
+    $(document).on('click', '#pbShowCode', function (e) {
+        e.preventDefault();
+        $('#pbCodeOutput').text(generatePageBuilderCode());
+        $('#pbCodeModal').modal('show');
+    });
+});
 
 // Sauvegarde basée sur le comportement standard des formulaires SBUIADMIN
 // (bouton Ajouter/Modifier, comme n'importe quel autre champ) - pas de

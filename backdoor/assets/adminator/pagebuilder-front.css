@@ -1,0 +1,129 @@
+/*
+ * Feuille de style pour le HTML généré par le Page Builder (voir
+ * addPageBuilder()/pagebuilder.js, bouton "Code généré").
+ *
+ * Le contenu exporté (chrome d'édition retiré par cleanRow()) ne conserve
+ * que 3 familles de classes issues de Bootstrap : la grille, les boutons
+ * et .img-responsive. Elles sont ici renommées avec le préfixe "sb" pour
+ * ne jamais entrer en conflit avec le Bootstrap (même version, autre
+ * version, ou absence de Bootstrap) déjà chargé par le thème front.
+ *
+ * A charger UNIQUEMENT sur les pages front qui affichent du contenu
+ * Page Builder - jamais dans l'admin (qui a son propre Bootstrap 3
+ * vendorisé et isolé pour le widget lui-même, voir addPageBuilder()).
+ *
+ * Valeurs reprises de assets/bower_components/bootstrap/dist/css/bootstrap.css
+ * (grille/boutons Bootstrap 3, couleurs déjà celles du thème Adminator).
+ */
+
+/* --- Grille --- */
+.sbrow {
+	margin-left: -15px;
+	margin-right: -15px;
+}
+.sbrow:before,
+.sbrow:after {
+	content: " ";
+	display: table;
+}
+.sbrow:after {
+	clear: both;
+}
+
+[class^="sbcol-md-"],
+[class*=" sbcol-md-"] {
+	position: relative;
+	min-height: 1px;
+	padding-left: 15px;
+	padding-right: 15px;
+}
+
+@media (min-width: 992px) {
+	.sbcol-md-1, .sbcol-md-2, .sbcol-md-3, .sbcol-md-4, .sbcol-md-5, .sbcol-md-6,
+	.sbcol-md-7, .sbcol-md-8, .sbcol-md-9, .sbcol-md-10, .sbcol-md-11, .sbcol-md-12 {
+		float: left;
+	}
+	.sbcol-md-1  { width: 8.33333333%; }
+	.sbcol-md-2  { width: 16.66666667%; }
+	.sbcol-md-3  { width: 25%; }
+	.sbcol-md-4  { width: 33.33333333%; }
+	.sbcol-md-5  { width: 41.66666667%; }
+	.sbcol-md-6  { width: 50%; }
+	.sbcol-md-7  { width: 58.33333333%; }
+	.sbcol-md-8  { width: 66.66666667%; }
+	.sbcol-md-9  { width: 75%; }
+	.sbcol-md-10 { width: 83.33333333%; }
+	.sbcol-md-11 { width: 91.66666667%; }
+	.sbcol-md-12 { width: 100%; }
+}
+
+.sbclearfix:before,
+.sbclearfix:after {
+	content: " ";
+	display: table;
+}
+.sbclearfix:after {
+	clear: both;
+}
+
+/* --- Media --- */
+.sbimg-responsive {
+	display: block;
+	max-width: 100%;
+	height: auto;
+}
+
+/* --- Boutons (bloc "Button" du Page Builder) --- */
+.sbbtn {
+	display: inline-block;
+	padding: 6px 12px;
+	margin-bottom: 0;
+	font-size: 14px;
+	font-weight: normal;
+	line-height: 1.42857143;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	cursor: pointer;
+	user-select: none;
+	background-image: none;
+	border: 1px solid transparent;
+	border-radius: 4px;
+	text-decoration: none;
+}
+.sbbtn:hover,
+.sbbtn:focus {
+	text-decoration: none;
+}
+
+.sbbtn-default { color: #333; background-color: #fff; border-color: #ccc; }
+.sbbtn-default:hover { color: #333; background-color: #e6e6e6; border-color: #adadad; }
+
+.sbbtn-primary { color: #fff; background-color: #4e73df; border-color: #4e73df; }
+.sbbtn-primary:hover { color: #fff; background-color: #2e59d9; border-color: #2653d4; }
+
+.sbbtn-success { color: #fff; background-color: #1cc88a; border-color: #1cc88a; }
+.sbbtn-success:hover { color: #fff; background-color: #17a673; border-color: #169b6b; }
+
+.sbbtn-info { color: #fff; background-color: #36b9cc; border-color: #36b9cc; }
+.sbbtn-info:hover { color: #fff; background-color: #2c9faf; border-color: #2a96a5; }
+
+.sbbtn-warning { color: #fff; background-color: #f6c23e; border-color: #f6c23e; }
+.sbbtn-warning:hover { color: #fff; background-color: #f4b619; border-color: #f4b30d; }
+
+.sbbtn-danger { color: #fff; background-color: #e74a3b; border-color: #e74a3b; }
+.sbbtn-danger:hover { color: #fff; background-color: #e02d1b; border-color: #e02d1b; }
+
+.sbbtn-link {
+	font-weight: normal;
+	color: #4e73df;
+	border-radius: 0;
+	background-color: transparent;
+	box-shadow: none;
+	border-color: transparent;
+}
+.sbbtn-link:hover { color: #2e59d9; text-decoration: underline; background-color: transparent; }
+
+.sbbtn-lg { padding: 10px 16px; font-size: 18px; line-height: 1.3333333; border-radius: 6px; }
+.sbbtn-sm { padding: 5px 10px; font-size: 12px; line-height: 1.5; border-radius: 3px; }
+.sbbtn-xs { padding: 1px 5px; font-size: 12px; line-height: 1.5; border-radius: 3px; }
