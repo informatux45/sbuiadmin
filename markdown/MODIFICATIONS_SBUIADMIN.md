@@ -157,3 +157,26 @@ Remplace l'ancien mécanisme de dashboard (fichier plat `inc/admin/dashboard.txt
 - **Bug corrigé au passage** : la première tentative de brancher `sbOpenPopup()` plantait en JS (`invalid escape sequence`) - le bloc concerné de `addPageBuilderTags()` est un HEREDOC PHP, où `\'` n'a aucune signification spéciale (contrairement à une chaîne à guillemets simples) et laissait une vraie barre oblique inverse dans le HTML généré.
 - **Régression en cours, pas encore diagnostiquée** : le double encodage HTML ("soupe de code" au rechargement, voir plus haut) est réapparu après une sauvegarde en modification, repéré en toute fin de session. Piste à vérifier en priorité à la reprise : lien éventuel avec le nouveau contenu d'URL d'image absolue (`https://...`), jamais testé dans le cycle encodage/décodage jusqu'ici. Détails dans la mémoire de session.
 - Commit : `b83eeb2`
+
+## 2026-07-28 — Point 15 (suite) : régression corrigée, bouton "Code généré", classes `.sb*` pour le front
+
+### Régression "soupe de code" diagnostiquée et corrigée
+
+- **Cause réelle** : `sandbox.php` n'a aucune redirection HTTP après un Ajouter/Modifier (réussi ou en échec) - le formulaire se réaffiche dans la même requête. Le bloc qui décode le contenu (`html_entity_decode(utf8_encode(...))`) n'est exécuté que côté GET (`!$_POST['form_submit']`), donc jamais sur ce réaffichage : `addPageBuilder()` recevait encore la version encodée en entités destinée au stockage. Rien à voir avec l'URL d'image (fausse piste de timing) - le bug touchait aussi bien Ajouter en échec que Modifier, avec ou sans image.
+- **Correctif** : re-décodage de `$page_builder_content` juste après l'échappement SQL (qui a déjà capturé la version entités pour la requête), avant que le formulaire soit reconstruit.
+- Testé et validé en conditions réelles (sauvegarde puis observation sans rechargement, puis rechargement).
+
+### Bug annexe : blocs glissés-déposés visuellement "opacifiés"
+
+- jQuery UI (`connectToSortable` + `helper: 'clone'`) laissait un style inline résiduel (`opacity`, `position`, `z-index`, largeur forcée à 400px pendant le drag) sur le bloc une fois déposé, jamais nettoyé - visible en permanence, pas seulement pendant le drag.
+- **Correctif** : nettoyage explicite (`.css({...})`) dans les gestionnaires `stop` des 2 `draggable()` concernés (`pagebuilder.js`). Les blocs déjà enregistrés avant ce correctif restent opacifiés en base tant qu'ils ne sont pas re-glissés/resauvegardés.
+
+### Nouveau bouton "Code généré" + classes `.sb*` pour le front
+
+- Bouton dans la navbar du Page Builder (`sbuiadmin-form.php`) ouvrant une modale en lecture seule avec le HTML qui serait réellement inséré sur la page front.
+- `generatePageBuilderCode()` (`pagebuilder.js`) : travaille sur une copie hors-DOM de `.htmlpage` (jamais le canevas d'édition réel) - `cleanRow()` retire tout le chrome d'édition, puis les classes Bootstrap qui survivent dans le contenu exporté (grille `.row`/`.col-md-X`/`.clearfix`, boutons `.btn`/`.btn-*`, `.img-responsive`) sont renommées en équivalents préfixés `.sb*`, pour ne jamais entrer en conflit avec le Bootstrap (même version, autre version, ou absence de Bootstrap) du thème front qui affichera ce contenu. Résultat indenté (`style_html()`, déjà présent mais inutilisé).
+- **Nouvelle feuille** `assets/adminator/pagebuilder-front.css` : équivalents `.sb*` de la grille/boutons/média Bootstrap 3 (valeurs reprises du Bootstrap vendorisé, couleurs déjà celles du thème Adminator) - à charger uniquement sur les pages front qui afficheront du contenu Page Builder (Phase 2, pas encore commencée).
+- Cache-busting (`?v=filemtime()`) ajouté sur `pagebuilder-bridge.css` et `pagebuilder.js`, modifiés régulièrement sur ce chantier - le `.htaccess` racine impose `Cache-Control: proxy-revalidate, max-age=3600`, qu'un hard-refresh navigateur ne suffit pas toujours à contourner selon l'hébergement.
+- **Bug de layout trouvé et corrigé au passage** (alignement du bouton dans la navbar) : le clearfix Bootstrap (`.navbar-header:before/:after { content:" " }`) devient 2 items flex à part entière une fois le conteneur passé en `display:flex` - `justify-content:space-between` répartissait alors l'espace entre 4 éléments au lieu de 2, poussant titre et bouton vers le centre. Neutralisé (`content:none`). Modale "Code généré" centrée verticalement (même technique que la modale `#preferences`) et titre recentré (bouton close sorti du flux en `position:absolute`).
+- Testé et validé en conditions réelles par le client.
+- Commit : `d19843f`
