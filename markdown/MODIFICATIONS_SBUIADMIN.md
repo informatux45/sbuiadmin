@@ -226,3 +226,8 @@ Remplace l'ancien mécanisme de dashboard (fichier plat `inc/admin/dashboard.txt
 - **Champ "Css class"** (Row/Cell) : se remplissait avec les classes structurelles (`row clearfix`, `col-md-X column`) et, si l'utilisateur les retirait, cassait l'affichage dans le Page Builder lui-même. Corrigé en traitant ce champ comme des classes *en plus* uniquement - les classes structurelles sont désormais toujours réappliquées par le code, quel que soit le contenu du champ.
 - **Bloc "Code"** : un script `ace.edit('code')` mort dans `news.tpl` (jamais réellement relié à un champ Actualités) entrait en collision avec le panneau de réglages du Page Builder (même id `#code`), empêchant la sauvegarde de ce bloc spécifiquement sur Actualités (fonctionnait sur `sandbox.php`, qui n'a pas ce script). Retiré.
 - Commit : `a83c6e1`
+
+### Clôture du point 15
+
+- Tabbs, FAQ et Blocs testés en navigateur avec succès (round-trip complet, front + back) — dernier volet restant après les vérifications déjà faites sur Pages et Actualités.
+- **Point 15 (Page Builder) entièrement clos.**
