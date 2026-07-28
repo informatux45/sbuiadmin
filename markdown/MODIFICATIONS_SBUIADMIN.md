@@ -180,3 +180,26 @@ Remplace l'ancien mécanisme de dashboard (fichier plat `inc/admin/dashboard.txt
 - **Bug de layout trouvé et corrigé au passage** (alignement du bouton dans la navbar) : le clearfix Bootstrap (`.navbar-header:before/:after { content:" " }`) devient 2 items flex à part entière une fois le conteneur passé en `display:flex` - `justify-content:space-between` répartissait alors l'espace entre 4 éléments au lieu de 2, poussant titre et bouton vers le centre. Neutralisé (`content:none`). Modale "Code généré" centrée verticalement (même technique que la modale `#preferences`) et titre recentré (bouton close sorti du flux en `position:absolute`).
 - Testé et validé en conditions réelles par le client.
 - Commit : `d19843f`
+
+## 2026-07-28 — Point 15 (Phase 2) : intégration Page Builder dans les modules de contenu
+
+### Nouveau réglage "Modules utilisant le Page Builder"
+
+- **Configuration générale** : champ Tagify à choix restreints (dropdown de suggestions, saisie libre bloquée via `enforceWhitelist`) listant les champs éligibles - un seul champ par module, celui qui porte le contenu principal : Pages (Contenu), Actualités (Article - pas Intro), Tabbs (Contenu), FAQ (Réponse), Blocs (Contenu). Sauvegardé position 36 de `settings.txt`.
+- **Nouvelle méthode** `addTagifyWhitelist()` (`sbuiadmin-form.php`), sans toucher à `addTagify()` existante (doit rester en saisie libre pour les champs qui en ont besoin, ex: mots-clés SEO).
+- **Incompatible avec le multilangue** (décision actée) : le Page Builder ne remplace que le champ FR/principal, jamais l'EN - éviter le chantier de support multi-instance du Page Builder sur une même page (la modale de réglages d'un bloc a une quinzaine d'ID fixes non scopés par instance, chantier bien plus gros que prévu). Le réglage est désactivé et grisé (texte d'aide en rouge) si le multilangue est actif, et sa sélection existante est préservée à la sauvegarde plutôt qu'effacée (un champ HTML `disabled` n'est jamais soumis par le navigateur - sans cette précaution, activer le multilangue aurait silencieusement vidé le réglage à la prochaine sauvegarde de la configuration).
+- Démo de `addTagifyWhitelist()` ajoutée dans `sandbox.php` (non persistée).
+
+### 5 modules câblés (Pages, Tabbs, Actualités, FAQ, Blocs)
+
+- Bascule conditionnelle CKEditor ↔ Page Builder sur le champ éligible de chaque module, pilotée par le nouveau réglage (`sbModuleUsesPageBuilder()`, `sbuiadmin-functions.php`).
+- **Bug trouvé et corrigé en cours de route** : ces 5 modules n'ont aucun `escape_string()` sur ce champ (lacune préexistante). Le re-décodage du contenu (nécessaire pour réafficher du HTML brut au Page Builder après une sauvegarde sans redirection, voir Point 15 précédent) doit donc se faire *après* l'exécution de la requête SQL, jamais avant - décoder avant y aurait injecté du HTML brut, donc des apostrophes potentielles, directement dans la requête.
+- `addPageBuilder()` ne charge plus ses assets (Bootstrap/jQuery UI touch-punch/pagebuilder.js) qu'une seule fois par page (protection statique, défensif - devenu superflu vu la décision multilangue ci-dessus, mais sans risque à garder).
+
+### Bugs de drag & drop trouvés en testant le module Pages
+
+- **jQuery UI ne liait jamais le glisser-déposer sur cette page précise** : `connectToSortable` (jQuery UI 1.11.4) ne déclenchait aucun événement `sortover`/`sortreceive` en glissant depuis la barre du haut vers le canevas, sans aucune erreur console, alors que le même mécanisme fonctionnait parfaitement sur `sandbox.php`. Cause exacte non élucidée malgré investigation poussée (écarté : conflit de version jQuery UI, débordement de conteneur, canevas vide vs rempli - détails dans la mémoire de session). **Corrigé** par un filet de sécurité manuel dans le `stop` du glisser-déposer : si les coordonnées réelles de la souris au relâchement sont dans la zone de dépôt mais que jQuery UI n'a rien absorbé, on insère le contenu nous-mêmes.
+- **Ce filet de sécurité échouait lui-même silencieusement** : jQuery UI supprime son propre élément de glisser-déposer juste après avoir déclenché l'événement "stop" quand aucune zone de tri ne l'a formellement accepté - ce qui effaçait ce qu'on venait d'insérer manuellement, sans erreur visible. Corrigé en insérant un clone indépendant de l'élément plutôt que l'élément original.
+- Testé et validé en conditions réelles sur le module Pages (round-trip complet, dépôt d'une ligne et dépôt d'un widget dans une colonne).
+- **Reste à tester** : Tabbs, Actualités, FAQ, Blocs (même mécanisme, pas encore vérifiés en navigateur).
+- Commit : `8d58f1e`
