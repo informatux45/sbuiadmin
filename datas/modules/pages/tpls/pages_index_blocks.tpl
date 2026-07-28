@@ -10,7 +10,7 @@
 			<h5 class="title-bg">{$block.title|unescape:"htmlall"|sbDisplayLang:"`$smarty.session.lang`"}</h5>
 		{/if}
 
-		{$block.content|unescape:"htmlall"|sbDisplayLang:"`$smarty.session.lang`"|sbGetShortcode}
+		{$block.content|unescape:"htmlall"|sbDisplayLang:"`$smarty.session.lang`"|sbCleanPageBuilderContent|sbGetShortcode}
 		
 		{if $block.various_view != ""}
 			{include file="{$smarty.const.SB_VARIOUS_DIR}{$block.various_view}"}

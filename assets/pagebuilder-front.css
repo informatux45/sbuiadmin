@@ -36,6 +36,14 @@
 	min-height: 1px;
 	padding-left: 15px;
 	padding-right: 15px;
+	/* Bootstrap s'appuie sur un reset global *{box-sizing:border-box}
+	   qu'on ne peut pas imposer ici (feuille scopée aux seules classes
+	   .sb*, pas un reset site-wide) - sans lui, un padding ajouté via les
+	   réglages "Cell" du Page Builder s'ajoute PAR-DESSUS le width:50%
+	   (au lieu d'être inclus dedans), et 2 colonnes de 50% + padding
+	   dépassent la largeur totale de la ligne : la seconde retombe à la
+	   ligne suivante au lieu de rester à côté de la première. */
+	box-sizing: border-box;
 }
 
 @media (min-width: 992px) {

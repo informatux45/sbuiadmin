@@ -61,7 +61,7 @@ function shortcode_sbtabbs($param = '') {
 			$item_html .= '</h2>';
 			// Contenu
 			$item_html .= '<div>';
-			$item_html .= sbGetShortcode($sbsanitize->displayText($sbsanitize->displayLang($row['content'], $_SESSION['lang']), 'UTF-8'));
+			$item_html .= sbGetShortcode(sbCleanPageBuilderContent($sbsanitize->displayText($sbsanitize->displayLang($row['content'], $_SESSION['lang']), 'UTF-8')));
 			$item_html .= '</div>'; // END Div
 		}
 

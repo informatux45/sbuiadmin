@@ -45,6 +45,49 @@ $(function () {
  * All HTMLeditor functions are implemented below.
  */
 
+// Instance Leaflet de l'aperçu affiché dans la modale de réglages du bloc
+// "Carte" (#map-content) - une seule à la fois, voir case 'map' ci-dessous.
+var sbLeafletPreviewMap = null;
+
+// Initialise (ou réinitialise) les cartes Leaflet du bloc "Carte" -
+// remplace l'ancien iframe Google Maps (statique, en HTTP, qui gênait le
+// suivi de la souris pendant le drag & drop). Scopé à .htmlpage (jamais
+// .sidebar-nav, dont le gabarit de la carte reste caché/non dimensionné -
+// initialiser Leaflet sur un conteneur caché produit une carte grise
+// vide tant qu'on ne force pas invalidateSize()).
+// Idempotent (marqueur data-leaflet-init) : peut être rappelée sans
+// risque après chaque glisser-déposer, seules les cartes réellement
+// nouvelles sont initialisées.
+function sbInitPageBuilderMaps() {
+    if (typeof L === 'undefined') return;
+    $('.htmlpage .sb-pagebuilder-map').each(function () {
+        var el = this;
+        if (el.getAttribute('data-leaflet-init')) return;
+        el.setAttribute('data-leaflet-init', '1');
+
+        var lat  = parseFloat(el.getAttribute('data-lat'))  || 48.8566;
+        var lng  = parseFloat(el.getAttribute('data-lng'))  || 2.3522;
+        var zoom = parseInt(el.getAttribute('data-zoom'), 10) || 13;
+
+        // Le texte/HTML du marqueur vit dans l'attribut data-popup du
+        // conteneur (pas un enfant : L.map(el) vide le conteneur pour y
+        // placer ses propres panneaux de tuiles, un enfant caché n'y
+        // survivrait pas - un attribut sur l'élément lui-même si).
+        var popupHtml = el.getAttribute('data-popup') || '';
+
+        var map = L.map(el).setView([lat, lng], zoom);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            maxZoom: 19
+        }).addTo(map);
+        var marker = L.marker([lat, lng]).addTo(map);
+        if (popupHtml.trim() !== '') marker.bindPopup(popupHtml);
+
+        el._sbLeafletMap = map;
+        el._sbLeafletMarker = marker;
+    });
+}
+
 function _init() {
 
     $(window).resize(function () {
@@ -156,6 +199,7 @@ function _init() {
                     $(".htmlpage .column").sortable({opacity: .35, connectWith: ".column"});
                 }
             }
+            sbInitPageBuilderMaps();
         }});
 
     $(".sidebar-nav .box").draggable({connectToSortable: ".column", helper: "clone", handle: ".preview", zIndex: 9999, drag: function (e, t) {
@@ -188,14 +232,10 @@ function _init() {
                     }
                 });
             }
-            /* if ( t.helper.data('type')==="map"|| t.helper.data('type')==="youtube" ) {
-             var iframe = t.helper.find('div.view > iframe');
-
-             var iframeId = iframe.assignId();
-             $('#'+iframeId).attr('src',iframe.data('url'));
-             }
-             */
-
+            // Initialise Leaflet sur une éventuelle carte fraîchement
+            // déposée (voir sbInitPageBuilderMaps() - sans effet sur les
+            // dépôts d'autres types de blocs).
+            sbInitPageBuilderMaps();
         }});
 
     $(document).on('click', 'a.clone', function (e) {
@@ -329,26 +369,39 @@ function _init() {
     removeElm();
     gridSystemGenerator();
 
+    // Cartes déjà présentes au chargement (contenu existant en édition).
+    sbInitPageBuilderMaps();
 }
 
 function loadRowSettings(row) {
-    //RowSettings
+    // RowSettings - lire le style INLINE (row[0].style.x), jamais .css()
+    // (qui renvoie la valeur CALCULÉE par le navigateur, donc toujours
+    // quelque chose même sans réglage explicite). Sinon, appliquer les
+    // réglages d'un bloc quelconque (même juste une image) figeait ces
+    // valeurs par défaut en style inline via saveRowSettings() ci-dessous,
+    // y compris une couleur de fond que personne n'avait choisie.
+    var s = row[0].style;
     // paddings
-    $('#tabRow input[data-ref="padding-top"]').val(row.css('padding-top'));
-    $('#tabRow input[data-ref="padding-left"]').val(row.css('padding-left'));
-    $('#tabRow input[data-ref="padding-right"]').val(row.css('padding-right'));
-    $('#tabRow input[data-ref="padding-bottom"]').val(row.css('padding-bottom'));
+    $('#tabRow input[data-ref="padding-top"]').val(s.paddingTop);
+    $('#tabRow input[data-ref="padding-left"]').val(s.paddingLeft);
+    $('#tabRow input[data-ref="padding-right"]').val(s.paddingRight);
+    $('#tabRow input[data-ref="padding-bottom"]').val(s.paddingBottom);
     // margin
-    $('#tabRow input[data-ref="margin-top"]').val(row.css('margin-top'));
-    $('#tabRow input[data-ref="margin-left"]').val(row.css('margin-left'));
-    $('#tabRow input[data-ref="margin-right"]').val(row.css('margin-right'));
-    $('#tabRow input[data-ref="margin-bottom"]').val(row.css('margin-bottom'));
+    $('#tabRow input[data-ref="margin-top"]').val(s.marginTop);
+    $('#tabRow input[data-ref="margin-left"]').val(s.marginLeft);
+    $('#tabRow input[data-ref="margin-right"]').val(s.marginRight);
+    $('#tabRow input[data-ref="margin-bottom"]').val(s.marginBottom);
     // backgroundColor
-    $('#rowbg').val(row.css('background-color'));
+    $('#rowbg').val(s.backgroundColor);
     // image
-    $('#rowbgimage').val(row.css('background-image').replace(/^url\(['"]?/,'').replace(/['"]?\)$/,''));
-    // css class
-    $('#rowcss').val(row.attr('class'));
+    $('#rowbgimage').val((s.backgroundImage || '').replace(/^url\(['"]?/,'').replace(/['"]?\)$/,''));
+    // Css class : ne montrer que les classes personnalisées AJOUTÉES par
+    // l'utilisateur - jamais "row"/"clearfix" (structurelles, requises
+    // pour que la grille fonctionne, toujours réappliquées telles quelles
+    // par saveRowSettings() quel que soit le contenu de ce champ).
+    $('#rowcss').val(row.attr('class').split(/\s+/).filter(function (c) {
+        return c !== 'row' && c !== 'clearfix';
+    }).join(' '));
 }
 
 function saveRowSettings(row) {
@@ -368,27 +421,35 @@ function saveRowSettings(row) {
     // image
     if($("#rowbgimage").val()!="none")
     row.css('background-image',  'url("'+$("#rowbgimage").val()+'")');
-    // css class
-    row.removeClass();
-    row.addClass($('#rowcss').val());
-    //row.attr('css', $('#rowcss').val());
+    // Css class : "row"/"clearfix" toujours préservées (voir
+    // loadRowSettings()), le champ n'ajoute que des classes en plus.
+    row.attr('class', ('row clearfix ' + $('#rowcss').val()).trim());
 }
 
 function loadColumnSettings(column) {
+    // Même principe que loadRowSettings() ci-dessus : style inline
+    // uniquement, jamais la valeur calculée.
+    var s = column[0].style;
     // paddings
-    $('#tabCol input[data-ref="padding-top"]').val(column.css('padding-top'));
-    $('#tabCol input[data-ref="padding-left"]').val(column.css('padding-left'));
-    $('#tabCol input[data-ref="padding-right"]').val(column.css('padding-right'));
-    $('#tabCol input[data-ref="padding-bottom"]').val(column.css('padding-bottom'));
+    $('#tabCol input[data-ref="padding-top"]').val(s.paddingTop);
+    $('#tabCol input[data-ref="padding-left"]').val(s.paddingLeft);
+    $('#tabCol input[data-ref="padding-right"]').val(s.paddingRight);
+    $('#tabCol input[data-ref="padding-bottom"]').val(s.paddingBottom);
     // margin
-    $('#tabCol input[data-ref="margin-top"]').val(column.css('margin-top'));
-    $('#tabCol input[data-ref="margin-left"]').val(column.css('margin-left'));
-    $('#tabCol input[data-ref="margin-right"]').val(column.css('margin-right'));
-    $('#tabCol input[data-ref="margin-bottom"]').val(column.css('margin-bottom'));
+    $('#tabCol input[data-ref="margin-top"]').val(s.marginTop);
+    $('#tabCol input[data-ref="margin-left"]').val(s.marginLeft);
+    $('#tabCol input[data-ref="margin-right"]').val(s.marginRight);
+    $('#tabCol input[data-ref="margin-bottom"]').val(s.marginBottom);
     // backgroundColor
-    $('#colbg').val(column.css('background-color'));
-    // css class
-    $('#colcss').val(column.attr('class'));
+    $('#colbg').val(s.backgroundColor);
+    // Css class : ne montrer que les classes personnalisées AJOUTÉES par
+    // l'utilisateur - jamais "column" (marqueur admin, retiré de toute
+    // façon au nettoyage front) ni "col-md-X" (largeur de la colonne :
+    // la perdre casserait complètement la mise en page), toujours
+    // réappliquées telles quelles par saveColumnSettings().
+    $('#colcss').val(column.attr('class').split(/\s+/).filter(function (c) {
+        return c !== 'column' && !/^col-md-\d+$/.test(c);
+    }).join(' '));
 }
 function saveColumnSettings(column) {
     //CellSettings
@@ -404,8 +465,11 @@ function saveColumnSettings(column) {
     column.css('margin-bottom', $('#tabCol input[data-ref="margin-bottom"]').val());
     // backgroundColor
     column.css('background-color', $('#colbg').val());
-    // css class
-    column.attr('class', $('#colcss').val());
+    // Css class : "column" + la classe de largeur col-md-X en cours
+    // toujours préservées (voir loadColumnSettings()), le champ n'ajoute
+    // que des classes en plus.
+    var widthClass = (column.attr('class').match(/\bcol-md-\d+\b/) || ['col-md-12'])[0];
+    column.attr('class', (widthClass + ' column ' + $('#colcss').val()).trim());
 }
 
 function prepareEditor(part, row, column) {
@@ -520,35 +584,94 @@ function prepareEditor(part, row, column) {
         break;
     
         case 'map':
-            var iframe = part.find('iframe');
-            var c = iframe.clone();
-            $('#map-content').html(c.attr('width', '100%'));
-            $('#address');
+            // #id/#class sont génériques à tous les blocs, mais pour la
+            // Carte l'écriture de #class sur o (= mapDiv) écraserait la
+            // classe sb-pagebuilder-map elle-même : la 1ère confirmation
+            // "réussit" silencieusement, puis la réouverture suivante des
+            // réglages ne retrouve plus l'élément (part.find() vide) et
+            // plante sur mapDiv[0] au clic Confirmer suivant.
+            $('#class').parent().hide();
+            $('#id').parent().hide();
+
+            var mapDiv = part.find('.sb-pagebuilder-map');
+            var mLat  = parseFloat(mapDiv.attr('data-lat'))  || 48.8566;
+            var mLng  = parseFloat(mapDiv.attr('data-lng'))  || 2.3522;
+            var mZoom = parseInt(mapDiv.attr('data-zoom'), 10) || 13;
+            var mPopup = mapDiv.attr('data-popup') || '';
+
             $('#map').show();
-            $('#map-width').val(iframe.innerWidth());
-            $('#map-height').val(iframe.innerHeight());
-            var url = iframe.attr('src');
-            var latlon = gup('q', url).split(',');
-            var z = gup('z', url);
+            $('#map-width').val(mapDiv.width());
+            $('#map-height').val(mapDiv.height());
+            $('#latitude').val(mLat);
+            $('#longitude').val(mLng);
+            $('#zoom').val(mZoom);
+            $('#map-popup').val(mPopup);
 
-            $('#latitude').val(latlon[0]);
-            $('#longitude').val(latlon[1]);
-            $('#zoom').val(z);
+            // Un même #map-content ne peut pas être réinitialisé par
+            // Leaflet une 2e fois sans nettoyer l'instance précédente
+            // (sbLeafletPreviewMap, module-level) - sinon "Map container
+            // is already initialized" à la prochaine ouverture de ce
+            // panneau, y compris après un Annuler/fermeture sans Confirmer.
+            if (sbLeafletPreviewMap) {
+                sbLeafletPreviewMap.remove();
+                sbLeafletPreviewMap = null;
+            }
+            sbLeafletPreviewMap = L.map('map-content').setView([mLat, mLng], mZoom);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                maxZoom: 19
+            }).addTo(sbLeafletPreviewMap);
+            var previewMarker = L.marker([mLat, mLng], {draggable: true}).addTo(sbLeafletPreviewMap);
+            if (mPopup.trim() !== '') previewMarker.bindPopup(mPopup);
+            previewMarker.on('dragend', function () {
+                var pos = previewMarker.getLatLng();
+                $('#latitude').val(pos.lat.toFixed(6));
+                $('#longitude').val(pos.lng.toFixed(6));
+            });
+            // La modale (display:none avant ouverture) donne une taille
+            // nulle au conteneur au moment de l'init - sans ce recalcul
+            // après affichage, Leaflet ne charge qu'une partie des tuiles.
+            setTimeout(function () { sbLeafletPreviewMap.invalidateSize(); }, 200);
 
-            //http://maps.google.com/maps?q=12.927923,77.627108&z=15&output=embed
-            $('#latitude, #longitude, #zoom').change(function () {
-                c.attr('src', 'http://maps.google.com/maps?q=' + $('#latitude').val() + ',' + $('#longitude').val() + '&z=' + $('#zoom').val() + '&output=embed');
+            $('#latitude, #longitude, #zoom').off('change.sbmap').on('change.sbmap', function () {
+                var newLat  = parseFloat($('#latitude').val()) || mLat;
+                var newLng  = parseFloat($('#longitude').val()) || mLng;
+                var newZoom = parseInt($('#zoom').val(), 10) || mZoom;
+                sbLeafletPreviewMap.setView([newLat, newLng], newZoom);
+                previewMarker.setLatLng([newLat, newLng]);
+            });
+            $('#map-popup').off('change.sbmap').on('change.sbmap', function () {
+                var txt = $('#map-popup').val();
+                if (txt.trim() !== '') { previewMarker.bindPopup(txt).openPopup(); }
             });
 
             confirm.bind('click', function (e) {
                 e.preventDefault();
                 saveRowSettings(row);
                 saveColumnSettings(column);
-                iframe.css('width', $('#map-width').val());
-                iframe.css('height', $('#map-height').val());
-                iframe.attr('src', 'http://maps.google.com/maps?q=' + $('#latitude').val() + ',' + $('#longitude').val() + '&z=' + $('#zoom').val() + '&output=embed');
-                o.attr('id', $('#id').val());
-                o.attr('class', $('#class').val());
+                var finalLat  = parseFloat($('#latitude').val()) || mLat;
+                var finalLng  = parseFloat($('#longitude').val()) || mLng;
+                var finalZoom = parseInt($('#zoom').val(), 10) || mZoom;
+                var finalPopup = $('#map-popup').val();
+                mapDiv.attr('data-lat', finalLat);
+                mapDiv.attr('data-lng', finalLng);
+                mapDiv.attr('data-zoom', finalZoom);
+                mapDiv.attr('data-popup', finalPopup);
+                mapDiv.css({width: $('#map-width').val() || '100%', height: $('#map-height').val() || '300px'});
+                // Répercute sur la carte déjà affichée dans le canevas
+                // (sans la détruire/recréer) si elle est déjà initialisée.
+                if (mapDiv[0]._sbLeafletMap) {
+                    mapDiv[0]._sbLeafletMap.setView([finalLat, finalLng], finalZoom);
+                    mapDiv[0]._sbLeafletMap.invalidateSize();
+                    if (mapDiv[0]._sbLeafletMarker) {
+                        mapDiv[0]._sbLeafletMarker.setLatLng([finalLat, finalLng]);
+                        if (finalPopup.trim() !== '') mapDiv[0]._sbLeafletMarker.bindPopup(finalPopup);
+                    }
+                }
+                if (sbLeafletPreviewMap) {
+                    sbLeafletPreviewMap.remove();
+                    sbLeafletPreviewMap = null;
+                }
                 $('#preferences').modal('hide');
             });
 
@@ -744,6 +867,31 @@ $(function () {
         e.preventDefault();
         $('#pbCodeOutput').text(generatePageBuilderCode());
         $('#pbCodeModal').modal('show');
+    });
+
+    $(document).on('click', '#pbCodeCopy', function (e) {
+        e.preventDefault();
+        var code = $('#pbCodeOutput').text();
+        var $btn = $(this);
+        var restoreLabel = function () {
+            setTimeout(function () { $btn.text('Copier'); }, 1500);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(code).then(function () {
+                $btn.text('Copié !');
+                restoreLabel();
+            });
+        } else {
+            // Repli pour les contextes sans Clipboard API (HTTP non
+            // sécurisé, navigateurs anciens) : textarea temporaire +
+            // execCommand, seule méthode de copie encore disponible là.
+            var $tmp = $('<textarea>').val(code).css({position: 'fixed', left: '-9999px'}).appendTo('body');
+            $tmp.select();
+            document.execCommand('copy');
+            $tmp.remove();
+            $btn.text('Copié !');
+            restoreLabel();
+        }
     });
 });
 

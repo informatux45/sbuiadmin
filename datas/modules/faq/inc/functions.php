@@ -42,7 +42,7 @@ function shortcode_sbfaq($param = '') {
 		$item_html .= '<div class="sbfaq">';
 		foreach($faqs as $row) {
 			$question = $sbsanitize->displayText($sbsanitize->displayLang($row['question'], $_SESSION['lang']), 'UTF-8');
-			$response = $sbsanitize->displayText($sbsanitize->displayLang($row['response'], $_SESSION['lang']), 'UTF-8');
+			$response = sbCleanPageBuilderContent($sbsanitize->displayText($sbsanitize->displayLang($row['response'], $_SESSION['lang']), 'UTF-8'));
 			$item_html .= '<details class="sbfaq-item">';
 			$item_html .= '<summary class="sbfaq-question">' . $question . '</summary>';
 			$item_html .= '<div class="sbfaq-response">' . sbGetShortcode($response) . '</div>';

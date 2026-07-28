@@ -1347,11 +1347,13 @@ class form extends sanitize {
 			$chaineTemp .= '<link rel="stylesheet" href="assets/bower_components/bootstrap/dist/css/bootstrap.css">
 							<link rel="stylesheet" href="inc/plugins/pagebuilder/css/pagebuilder.css">
 							<link rel="stylesheet" href="inc/plugins/pagebuilder/css/colorselector.css">
+							<link rel="stylesheet" href="inc/plugins/pagebuilder/js/leaflet/leaflet.css">
 							<link rel="stylesheet" href="assets/adminator/pagebuilder-bridge.css?v=' . $pbBridgeVersion . '">';
 			// Load JS
 			$chaineTemp .= '<script src="assets/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 							<script src="inc/plugins/pagebuilder/js/jquery.ui.touch-punch.min.js"></script>
 							<script src="inc/plugins/pagebuilder/js/colorselector.js"></script>
+							<script src="inc/plugins/pagebuilder/js/leaflet/leaflet.js"></script>
 							<!--<script type="text/javascript">
 								var path = "";
 							</script>-->
@@ -1482,7 +1484,7 @@ class form extends sanitize {
 										<div class="element-desc">Carte</div>
 									</div>
 									<div class="view">
-										<iframe class="img-responsive" src="http://maps.google.com/maps?q=12.927923,77.627108&z=15&output=embed" frameborder="0" allowfullscreen data-url=""></iframe>
+										<div class="sb-pagebuilder-map" data-lat="48.8566" data-lng="2.3522" data-zoom="13" data-popup="" style="width: 100%; height: 300px;"></div>
 									</div>
 								</div>
 								<div class="box box-element" data-type="code"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#" ><i class="fa fa-gear"></i></a> </span>
@@ -1538,6 +1540,7 @@ class form extends sanitize {
 										<pre style="max-height: 60vh; overflow: auto;"><code id="pbCodeOutput"></code></pre>
 									</div>
 									<div class="modal-footer">
+										<button type="button" class="btn btn-default" id="pbCodeCopy">Copier</button>
 										<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
 									</div>
 								</div>
@@ -1826,7 +1829,7 @@ $htmlpagebuilder = <<<EOT
 					<div id="map" style="display:none">
 						<div class="row">
 							<div class="col-md-12">
-								<div id="map-content"> </div>
+								<div id="map-content" style="height: 250px;"> </div>
 							</div>
 						</div>
 						<div class="row">
@@ -1841,6 +1844,9 @@ $htmlpagebuilder = <<<EOT
 									<div class="form-group">
 										<label for="address">Zoom :</label>
 										<input type="text" value="" id="zoom" class="form-control" /> </div>
+									<div class="form-group">
+										<label for="map-popup">Texte du marqueur (HTML autorisé) :</label>
+										<textarea id="map-popup" class="form-control" rows="3"></textarea> </div>
 									<div class="row">
 										<div class="col-md-6">
 											<div class="form-group">

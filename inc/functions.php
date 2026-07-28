@@ -290,6 +290,162 @@ if (!function_exists("sbGetShortcode")) {
 }
 
 /**
+* Nettoie le HTML issu du Page Builder (chrome d'édition admin - poignées
+* remove/drag/clone/configuration, indicateurs de largeur de colonne,
+* icônes de la bibliothèque de blocs) avant affichage front, et renomme les
+* classes Bootstrap qui survivent (grille/boutons/média) en équivalents
+* préfixés .sb* pour ne jamais entrer en conflit avec le Bootstrap du thème
+* front. Portage PHP (DOMDocument) de cleanRow()/sbRenameClasses()
+* (inc/plugins/pagebuilder/js/pagebuilder.js, bouton "Code généré").
+*
+* Sans effet si le champ n'a jamais été édité via le Page Builder (contenu
+* CKEditor classique) : aucun ".lyrow" à nettoyer, la chaîne ressort
+* inchangée. Peut donc être appliqué systématiquement aux 5 champs
+* éligibles (Point 15), qu'ils utilisent CKEditor ou le Page Builder.
+*
+* @param	string	$html	Contenu brut tel que stocké en base (déjà décodé
+*                           via displayLang()/html_entity_decode())
+* @return	string	Contenu prêt pour le front
+*/
+if (!function_exists("sbDomHasClass")) {
+	function sbDomHasClass($node, $class) {
+		if (!($node instanceof DOMElement) || !$node->hasAttribute('class')) return false;
+		$classes = preg_split('/\s+/', trim($node->getAttribute('class')));
+		return in_array($class, $classes, true);
+	}
+}
+
+if (!function_exists("sbDomChildrenWithClass")) {
+	// Équivalent de jQuery .children('.class') : enfants DIRECTS uniquement.
+	function sbDomChildrenWithClass($node, $class) {
+		$result = array();
+		foreach ($node->childNodes as $child) {
+			if (sbDomHasClass($child, $class)) $result[] = $child;
+		}
+		return $result;
+	}
+}
+
+if (!function_exists("sbDomRemoveClass")) {
+	function sbDomRemoveClass($node, $class) {
+		if (!($node instanceof DOMElement)) return;
+		$classes  = preg_split('/\s+/', trim($node->getAttribute('class')));
+		$filtered = array_diff($classes, array($class));
+		$node->setAttribute('class', trim(implode(' ', $filtered)));
+	}
+}
+
+if (!function_exists("sbDomUnwrap")) {
+	// Remplace $node, dans son parent, par les enfants de $replacement
+	// (ou de $node lui-même si $replacement est omis).
+	function sbDomUnwrap($node, $replacement = null) {
+		$source = $replacement ? $replacement : $node;
+		$parent = $node->parentNode;
+		if (!$parent) return;
+		foreach (iterator_to_array($source->childNodes) as $child) {
+			$parent->insertBefore($child->cloneNode(true), $node);
+		}
+		$parent->removeChild($node);
+	}
+}
+
+if (!function_exists("sbCleanPageBuilderLyrow")) {
+	// Portage direct de cleanRow() (pagebuilder.js) : ne garde que le
+	// contenu de .view (la grille + les blocs déposés), retire tout le
+	// chrome d'édition (poignées, boutons, marqueurs de largeur).
+	function sbCleanPageBuilderLyrow($lyrow) {
+		foreach (array('remove', 'drag', 'preview') as $cls) {
+			foreach (sbDomChildrenWithClass($lyrow, $cls) as $el) {
+				if ($el->parentNode) $el->parentNode->removeChild($el);
+			}
+		}
+		$views = sbDomChildrenWithClass($lyrow, 'view');
+		if (empty($views)) {
+			sbDomUnwrap($lyrow);
+			return;
+		}
+		$view = $views[0];
+		foreach (sbDomChildrenWithClass($view, 'row') as $row) {
+			foreach (sbDomChildrenWithClass($row, 'column') as $column) {
+				sbDomRemoveClass($column, 'column');
+
+				foreach (sbDomChildrenWithClass($column, 'lyrow') as $nestedLyrow) {
+					sbCleanPageBuilderLyrow($nestedLyrow);
+				}
+
+				foreach (sbDomChildrenWithClass($column, 'box-element') as $box) {
+					foreach (array('remove', 'drag', 'configuration', 'preview') as $cls) {
+						foreach (sbDomChildrenWithClass($box, $cls) as $el) {
+							if ($el->parentNode) $el->parentNode->removeChild($el);
+						}
+					}
+					$boxViews = sbDomChildrenWithClass($box, 'view');
+					if (!empty($boxViews)) {
+						sbDomUnwrap($box, $boxViews[0]);
+					} else {
+						sbDomUnwrap($box);
+					}
+				}
+			}
+		}
+		sbDomUnwrap($lyrow, $view);
+	}
+}
+
+if (!function_exists("sbCleanPageBuilderContent")) {
+	function sbCleanPageBuilderContent($html) {
+		if (trim((string) $html) === '' || strpos($html, 'lyrow') === false) {
+			return $html;
+		}
+
+		$prevErrors = libxml_use_internal_errors(true);
+		$dom = new DOMDocument();
+		// Astuce classique pour forcer l'interprétation UTF-8 de
+		// loadHTML() sans passer par mb_convert_encoding (qui abîme les
+		// caractères déjà correctement encodés).
+		$dom->loadHTML('<?xml encoding="UTF-8"><div id="sb-pb-root">' . $html . '</div>');
+		libxml_clear_errors();
+		libxml_use_internal_errors($prevErrors);
+
+		$root = $dom->getElementById('sb-pb-root');
+		if (!$root) return $html;
+
+		foreach (sbDomChildrenWithClass($root, 'lyrow') as $lyrow) {
+			sbCleanPageBuilderLyrow($lyrow);
+		}
+
+		$cleaned = '';
+		foreach ($root->childNodes as $child) {
+			$cleaned .= $dom->saveHTML($child);
+		}
+
+		// Résidu jQuery UI (classe d'exécution, jamais de style associé
+		// utile côté front) - même nettoyage que cleanRow().
+		$cleaned = str_replace(array(' ui-sortable', 'ui-sortable '), '', $cleaned);
+
+		return sbRenamePageBuilderClasses($cleaned);
+	}
+}
+
+if (!function_exists("sbRenamePageBuilderClasses")) {
+	// Portage direct de sbRenameClasses() (pagebuilder.js) - mêmes
+	// correspondances, même limitation volontaire aux seules classes qui
+	// survivent réellement dans le contenu exporté (grille/boutons/média).
+	function sbRenamePageBuilderClasses($html) {
+		return preg_replace_callback('/class="([^"]*)"/', function ($matches) {
+			$classes = $matches[1];
+			$classes = preg_replace('/\brow\b/', 'sbrow', $classes);
+			$classes = preg_replace('/\bcol-md-(\d+)\b/', 'sbcol-md-$1', $classes);
+			$classes = preg_replace('/\bclearfix\b/', 'sbclearfix', $classes);
+			$classes = preg_replace('/\bimg-responsive\b/', 'sbimg-responsive', $classes);
+			$classes = preg_replace('/\bbtn-([a-z]+)\b/', 'sbbtn-$1', $classes);
+			$classes = preg_replace('/\bbtn\b/', 'sbbtn', $classes);
+			return 'class="' . $classes . '"';
+		}, $html);
+	}
+}
+
+/**
 * Get SEO Meta Keywords / Description
 * @return html
 */
@@ -534,7 +690,53 @@ if (!function_exists("insert_sbGetHeaders")) {
 		global $sbsql, $sbsanitize;
 		$cms_headers  = '';
 		$table_config = _AM_DB_PREFIX . 'sb_config';
-	
+
+		// Feuille de style du Page Builder (Point 15) - classes .sb* du
+		// HTML nettoyé par sbCleanPageBuilderContent(). Injectée ici
+		// (plutôt que via le champ "CSS" de Configuration générale, qui
+		// enveloppe systématiquement son contenu dans <style>...</style>
+		// et ne peut donc pas porter une vraie balise <link>) pour être
+		// présente sur les 5 thèmes front sans dépendre d'une action admin.
+		// Fichier côté racine front (assets/), pas dans backdoor/ : une
+		// page publique ne doit jamais référencer un chemin qui renseigne
+		// sur l'emplacement/le nom du répertoire d'administration.
+		// URL absolue obligatoire (SB_URL) : une page front peut être
+		// servie à n'importe quelle profondeur d'URL réécrite (ex:
+		// /news/category/5/titre), un chemin relatif ne pointerait alors
+		// plus vers le bon dossier.
+		$pbFrontCssPath = SB_PATH . 'assets' . DIRECTORY_SEPARATOR . 'pagebuilder-front.css';
+		$pbFrontVersion = @filemtime($pbFrontCssPath);
+		$cms_headers .= '<link rel="stylesheet" href="' . SB_URL . 'assets/pagebuilder-front.css?v=' . $pbFrontVersion . '">';
+
+		// Bloc "Carte" (Point 15) - Leaflet + tuiles OpenStreetMap, remplace
+		// l'ancien iframe Google Maps. Fichiers vendorisés en assets/leaflet/
+		// (copie de backdoor/inc/plugins/pagebuilder/js/leaflet/, jamais
+		// référencée depuis le front - même raison que pagebuilder-front.css
+		// ci-dessus). Script d'init en JS pur (pas de dépendance jQuery,
+		// un thème front peut très bien ne pas la charger).
+		$leafletJsPath  = SB_PATH . 'assets' . DIRECTORY_SEPARATOR . 'leaflet' . DIRECTORY_SEPARATOR . 'leaflet.js';
+		$leafletVersion = @filemtime($leafletJsPath);
+		$cms_headers .= '<link rel="stylesheet" href="' . SB_URL . 'assets/leaflet/leaflet.css?v=' . $leafletVersion . '">';
+		$cms_headers .= '<script src="' . SB_URL . 'assets/leaflet/leaflet.js?v=' . $leafletVersion . '"></script>';
+		$cms_headers .= '<script>
+			document.addEventListener("DOMContentLoaded", function () {
+				if (typeof L === "undefined") return;
+				document.querySelectorAll(".sb-pagebuilder-map").forEach(function (el) {
+					var lat   = parseFloat(el.getAttribute("data-lat"))  || 48.8566;
+					var lng   = parseFloat(el.getAttribute("data-lng"))  || 2.3522;
+					var zoom  = parseInt(el.getAttribute("data-zoom"), 10) || 13;
+					var popup = el.getAttribute("data-popup") || "";
+					var map = L.map(el).setView([lat, lng], zoom);
+					L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+						attribution: \'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>\',
+						maxZoom: 19
+					}).addTo(map);
+					var marker = L.marker([lat, lng]).addTo(map);
+					if (popup.trim() !== "") marker.bindPopup(popup);
+				});
+			});
+			</script>';
+
 		// --- Get CMS headers CODE (CSS / JAVASCRIPT)
 		// --- Key sort by Alphabetical order => css (0), javascript (1)
 		$query   = "SELECT config, content FROM $table_config

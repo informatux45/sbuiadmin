@@ -58,7 +58,10 @@ if ($sb_pages_active) {
 	// --------------------------
 	$sbsmarty->assign('sb_title', $sb_pages_title); // Title of Module PAGES
 	$sbsmarty->assign('sb_pages_title', $sb_pages_title);
-	$sbsmarty->assign('sb_pages_content', sbGetShortcode($sb_pages_content));
+	// Nettoyage Page Builder avant les shortcodes : évite de refaire
+	// passer la sortie HTML d'un shortcode (potentiellement non
+	// structurée comme du HTML de bloc) dans le parseur DOM.
+	$sbsmarty->assign('sb_pages_content', sbGetShortcode(sbCleanPageBuilderContent($sb_pages_content)));
 	$sbsmarty->assign('sb_pages_various', $additional_html_content);
 	
 	// --------------------------
