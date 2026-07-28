@@ -24,6 +24,35 @@
 	max-width: 100%;
 }
 
+/* bootstrap.css (chargé par addPageBuilder() pour le canevas du plugin)
+   définit `a:hover, a:focus { text-decoration: underline; }` en global,
+   non scopé à son propre widget. Un pseudo-classe (:hover) a une
+   spécificité plus élevée qu'un simple `a` (voir le reset `a
+   {text-decoration:none}` de style.css) et gagne donc quel que soit
+   l'ordre de chargement - ce qui fait apparaître un soulignement au
+   survol sur tout le reste du menu/chrome admin, uniquement sur les
+   pages utilisant le Page Builder. Adminator ne souligne jamais ses
+   liens au survol : restauré globalement ici plutôt que de lister
+   chaque sélecteur du menu un par un. */
+a:hover,
+a:focus {
+	text-decoration: none;
+}
+
+/* Même souci que ci-dessus, sur `body` : bootstrap.css impose Helvetica
+   Neue/Arial 14px/1.42857143 par-dessus la police Inter/graisse 400 du
+   thème Adminator - même spécificité (sélecteur `body` des deux côtés),
+   c'est le dernier chargé (bootstrap.css) qui gagne. Restauré ici, qui
+   se charge après. */
+body {
+	font-family: Inter, system-ui, "Segoe UI", Ubuntu, Cantarell, "Noto Sans", -apple-system, Roboto, sans-serif;
+	font-size: 14px;
+	font-weight: 400;
+	letter-spacing: -.003em;
+	line-height: 1.55;
+	color: var(--t-base);
+}
+
 /* --- Navbar --- */
 .navbar-page-builder.navbar-inverse {
 	background: var(--primary);
