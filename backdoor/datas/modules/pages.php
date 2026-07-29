@@ -223,17 +223,17 @@ switch($action) {
 			$query_1         = "SELECT * FROM $table WHERE id = $id";
 			$requestQ        = $sbsql->query($query_1);
 			$assoc           = $sbsql->assoc($requestQ);
-			$menu_fr         = $sbsanitize->displayLang(utf8_encode($assoc['menu']));
-			$title_fr        = $sbsanitize->displayLang(utf8_encode($assoc['title']));
-			$content_fr      = $sbsanitize->displayLang(utf8_encode($assoc['content']));
+			$menu_fr         = $sbsanitize->displayLang(sb_utf8_encode($assoc['menu']));
+			$title_fr        = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']));
+			$content_fr      = $sbsanitize->displayLang(sb_utf8_encode($assoc['content']));
 			// ---------------------------
-			$menu_en         = $sbsanitize->displayLang(utf8_encode($assoc['menu']), 'en');
-			$title_en        = $sbsanitize->displayLang(utf8_encode($assoc['title']), 'en');
-			$content_en      = $sbsanitize->displayLang(utf8_encode($assoc['content']), 'en');
+			$menu_en         = $sbsanitize->displayLang(sb_utf8_encode($assoc['menu']), 'en');
+			$title_en        = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), 'en');
+			$content_en      = $sbsanitize->displayLang(sb_utf8_encode($assoc['content']), 'en');
 			// ---------------------------
-			$seo_url         = utf8_encode($assoc['seo_url']);
-			$seo_keywords    = utf8_encode($assoc['seo_keywords']);
-			$seo_description = utf8_encode($assoc['seo_description']);
+			$seo_url         = sb_utf8_encode($assoc['seo_url']);
+			$seo_keywords    = sb_utf8_encode($assoc['seo_keywords']);
+			$seo_description = sb_utf8_encode($assoc['seo_description']);
 			$theme_view      = $assoc['theme_view'];
 			$module_view     = $assoc['module_view'];
 			$various_view    = $assoc['various_view'];
@@ -454,11 +454,11 @@ switch($action) {
 			$query_1         = "SELECT * FROM $table WHERE id = $id";
 			$requestQ        = $sbsql->query($query_1);
 			$assoc           = $sbsql->assoc($requestQ);
-			$menu_fr         = $sbsanitize->displayLang(utf8_encode($assoc['menu']));
+			$menu_fr         = $sbsanitize->displayLang(sb_utf8_encode($assoc['menu']));
 			// ---------------------------
-			$menu_en         = $sbsanitize->displayLang(utf8_encode($assoc['menu']), 'en');
+			$menu_en         = $sbsanitize->displayLang(sb_utf8_encode($assoc['menu']), 'en');
 			// ---------------------------
-			$url_custom      = utf8_encode($assoc['url_custom']);
+			$url_custom      = sb_utf8_encode($assoc['url_custom']);
 			$active          = $assoc['active'];
 
 			$sbsmarty->assign('assoc', $query_1);

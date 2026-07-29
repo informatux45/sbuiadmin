@@ -61,7 +61,7 @@ $request = $sbsql->query($query);
 $assoc   = $sbsql->toarray($request);
 // --------------------------------
 foreach($assoc as $row) {
-	$cs[$row['config']] = utf8_encode($row['content']);
+	$cs[$row['config']] = sb_utf8_encode($row['content']);
 }
 // --------------------------------
 
@@ -83,7 +83,7 @@ $coming_soon_type = (isset($cs['coming-soon-type']) && $cs['coming-soon-type'] !
 
 <meta name="description" content="">
 <meta name="author" content="">
-<title><?php echo utf8_encode($cs['coming-soon-title']) ?></title>
+<title><?php echo sb_utf8_encode($cs['coming-soon-title']) ?></title>
 <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
 
 <!-- style -->
@@ -173,7 +173,7 @@ $coming_soon_video = ($cs['coming-soon-video'] == '') ? 'PF0L3gvSVcg' : $cs['com
 	  <section id="home" class="tab-pane fade in active">
 		<article role="countdown" class="countdown-pan">
 		  <!--<div id="countdown" class="text-center"></div>-->
-		  <p><?php echo html_entity_decode( utf8_encode($cs['coming-soon-title2']) ) ?></p>
+		  <p><?php echo html_entity_decode( sb_utf8_encode($cs['coming-soon-title2']) ) ?></p>
 		</article>
 	  </section>
 	  
@@ -238,7 +238,7 @@ $coming_soon_video = ($cs['coming-soon-video'] == '') ? 'PF0L3gvSVcg' : $cs['com
 	  
 	  <!-- logo -->
 	  
-	  <h1> <a href="#" title="<?php echo utf8_encode($cs['coming-soon-title']) ?>"><?php echo utf8_encode($cs['coming-soon-title']) ?></a> </h1>
+	  <h1> <a href="#" title="<?php echo sb_utf8_encode($cs['coming-soon-title']) ?>"><?php echo sb_utf8_encode($cs['coming-soon-title']) ?></a> </h1>
 	  
 	  <!-- logog --> 
 	  
@@ -289,14 +289,14 @@ $coming_soon_video = ($cs['coming-soon-video'] == '') ? 'PF0L3gvSVcg' : $cs['com
 	  
 	</hgroup>
 	<footer class="desk">
-	  <p>&copy; <?php echo utf8_encode($cs['coming-soon-title']) ?> <?php echo date('Y'); ?>. Tous droits r&eacute;serv&eacute;s.</p>
+	  <p>&copy; <?php echo sb_utf8_encode($cs['coming-soon-title']) ?> <?php echo date('Y'); ?>. Tous droits r&eacute;serv&eacute;s.</p>
 	</footer>
   </header>
   
   <!-- header -->
   
   <footer class="mobile">
-	<p>&copy; <?php echo utf8_encode($cs['coming-soon-title']) ?> <?php echo date('Y'); ?>. Tous droits r&eacute;serv&eacute;s.</p>
+	<p>&copy; <?php echo sb_utf8_encode($cs['coming-soon-title']) ?> <?php echo date('Y'); ?>. Tous droits r&eacute;serv&eacute;s.</p>
   </footer>
 </div>
 </main>

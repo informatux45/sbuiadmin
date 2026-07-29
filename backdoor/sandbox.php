@@ -304,10 +304,10 @@ switch($action) {
 			// $page_builder_content_esc pour la requête SQL - on peut donc
 			// la re-décoder sans risque pour redonner à addPageBuilder() du
 			// HTML brut, exactement comme le fait le bloc GET plus bas
-			// (html_entity_decode(utf8_encode(...))). Sans ce re-décodage,
+			// (html_entity_decode(sb_utf8_encode(...))). Sans ce re-décodage,
 			// addPageBuilder() recevait la version entités et affichait la
 			// "soupe de code" immédiatement après Ajouter/Modifier, sans
-			// même attendre un rechargement (pas d'utf8_encode() ici :
+			// même attendre un rechargement (pas d'sb_utf8_encode() ici :
 			// contrairement au bloc GET, cette chaîne ne vient pas de la
 			// base, elle est déjà de l'UTF-8 valide dans cette même requête).
 			$page_builder_content = html_entity_decode($page_builder_content, ENT_QUOTES, 'UTF-8');
@@ -384,12 +384,12 @@ switch($action) {
 			$requestQ          = $sbsql->query($query_1);
 			$assoc             = $sbsql->assoc($requestQ);
 			$active            = $assoc['active'];
-			$yourname          = utf8_encode($assoc['yourname']);
-			$montant           = utf8_encode($assoc['montant']);
-			$seo_url           = utf8_encode($assoc['seo_url']);
-			$country           = utf8_encode($assoc['country']);
-			$dob               = utf8_encode($assoc['dob']);
-			$color             = utf8_encode($assoc['color']);
+			$yourname          = sb_utf8_encode($assoc['yourname']);
+			$montant           = sb_utf8_encode($assoc['montant']);
+			$seo_url           = sb_utf8_encode($assoc['seo_url']);
+			$country           = sb_utf8_encode($assoc['country']);
+			$dob               = sb_utf8_encode($assoc['dob']);
+			$color             = sb_utf8_encode($assoc['color']);
 			// Tagify attend son "value" initial au format JSON
 			// ([{"value":"demo"}, ...]) pour re-précharger les tags - une
 			// simple chaîne "demo,exemple" fait planter son initialisation
@@ -405,23 +405,23 @@ switch($action) {
 				}
 				$tags = json_encode($tags_arr, JSON_UNESCAPED_UNICODE);
 			}
-			$pdf               = utf8_encode($assoc['pdf']);
-			$photo             = utf8_encode($assoc['photo']);
-			$video             = utf8_encode($assoc['video']);
+			$pdf               = sb_utf8_encode($assoc['pdf']);
+			$photo             = sb_utf8_encode($assoc['photo']);
+			$video             = sb_utf8_encode($assoc['video']);
 			$option_one        = $assoc['option_one'];
 			$option_two        = $assoc['option_two'];
 			$option_three      = $assoc['option_three'];
 			$type_checked      = $assoc['type'];
 			$selection_table   = $assoc['selection'];
-			$comment           = utf8_encode($assoc['comment']);
-			$comment_ckeditor1 = utf8_encode($assoc['comment_editor1']);
-			$comment_ckeditor2 = utf8_encode($assoc['comment_editor2']);
-			$comment_ckeditor3 = utf8_encode($assoc['comment_editor3']);
+			$comment           = sb_utf8_encode($assoc['comment']);
+			$comment_ckeditor1 = sb_utf8_encode($assoc['comment_editor1']);
+			$comment_ckeditor2 = sb_utf8_encode($assoc['comment_editor2']);
+			$comment_ckeditor3 = sb_utf8_encode($assoc['comment_editor3']);
 			// Page Builder : contenu réel (pas la version "démo") - décodé
 			// pour être réinjecté tel quel dans ".htmlpage" par
 			// addPageBuilder() (voir sbuiadmin-form.php), pas affiché en
 			// texte échappé.
-			$page_builder_content = html_entity_decode(utf8_encode($assoc['page_builder_content']), ENT_QUOTES, 'UTF-8');
+			$page_builder_content = html_entity_decode(sb_utf8_encode($assoc['page_builder_content']), ENT_QUOTES, 'UTF-8');
 
 			$sbsmarty->assign('assoc', $query_1);
 
@@ -620,7 +620,7 @@ switch($action) {
 		$sort_array    = $sbsql->toarray($requestQ);
 		foreach($sort_array as $sort) {
 			$sort_id          = $sort['id'];
-			$toSort[$sort_id] = utf8_encode($sort['yourname']);
+			$toSort[$sort_id] = sb_utf8_encode($sort['yourname']);
 		}
 
 		// --- Debug SQL

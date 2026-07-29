@@ -501,14 +501,14 @@ switch($action) {
 			$requestQ = $sbsql->query($query_1);
 			$assoc    = $sbsql->assoc($requestQ);
 			$sid      = $assoc['sid'];
-			$title    = $sbsanitize->displayLang(utf8_encode($assoc['title']), 'UTF-8', 1, 0);
-			$type     = $sbsanitize->displayLang(utf8_encode($assoc['type']), 'UTF-8', 1, 0);
+			$title    = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), 'UTF-8', 1, 0);
+			$type     = $sbsanitize->displayLang(sb_utf8_encode($assoc['type']), 'UTF-8', 1, 0);
 			if ($type == 'video') {
 				$photo = '';
-				$video = $sbsanitize->displayLang(utf8_encode($assoc['photo']), 'UTF-8', 1, 0);
+				$video = $sbsanitize->displayLang(sb_utf8_encode($assoc['photo']), 'UTF-8', 1, 0);
 			} else {
 				$video = '';
-				$photo = $sbsanitize->displayLang(utf8_encode($assoc['photo']), 'UTF-8', 1, 0);				
+				$photo = $sbsanitize->displayLang(sb_utf8_encode($assoc['photo']), 'UTF-8', 1, 0);				
 			}
 			$active   = $assoc['active'];
 
@@ -536,9 +536,9 @@ switch($action) {
 		$sbform->addOption('Choisissez un slider', array ("value"=>"", "selected"=>""));
 		foreach($sliders as $row) {
 			if ($row['id'] == $sid)
-				$sbform->addOption($sbsanitize->displayLang(utf8_encode($row['title'])), array ("value"=>$row['id'], "selected"=>""));
+				$sbform->addOption($sbsanitize->displayLang(sb_utf8_encode($row['title'])), array ("value"=>$row['id'], "selected"=>""));
 			else
-				$sbform->addOption($sbsanitize->displayLang(utf8_encode($row['title'])), array ("value"=>$row['id']));
+				$sbform->addOption($sbsanitize->displayLang(sb_utf8_encode($row['title'])), array ("value"=>$row['id']));
 		}
 		// --- Close Select
 		$sbform->closeSelect();

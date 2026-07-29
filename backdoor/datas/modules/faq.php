@@ -172,8 +172,8 @@ switch($action) {
 			$requestQ    = $sbsql->query($query_1);
 			$assoc       = $sbsql->assoc($requestQ);
 			$category    = $assoc['category'];
-			$question    = $sbsanitize->displayLang(utf8_encode($assoc['question']));
-			$response    = $sbsanitize->displayLang(utf8_encode($assoc['response']));
+			$question    = $sbsanitize->displayLang(sb_utf8_encode($assoc['question']));
+			$response    = $sbsanitize->displayLang(sb_utf8_encode($assoc['response']));
 			$active      = $assoc['active'];
 
 			$sbsmarty->assign('assoc', $query_1);
@@ -274,7 +274,7 @@ switch($action) {
 		$requestQ      = $sbsql->query($query_3);
 		$sort_array    = $sbsql->toarray($requestQ);
 		foreach($sort_array as $sort) {
-			$active = ($sort['active']) ? $sbsanitize->displayLang(utf8_encode($sort['question'])) : "<span style='color: red;'>".$sbsanitize->displayLang(utf8_encode($sort['question']))."</span>";
+			$active = ($sort['active']) ? $sbsanitize->displayLang(sb_utf8_encode($sort['question'])) : "<span style='color: red;'>".$sbsanitize->displayLang(sb_utf8_encode($sort['question']))."</span>";
 			$sort_id          = $sort['id'];
 			$toSort[$sort_id] = $active;
 		}
@@ -412,7 +412,7 @@ switch($action) {
 			$query_1  = "SELECT * FROM $table_cat WHERE id = $id";
 			$requestQ = $sbsql->query($query_1);
 			$assoc    = $sbsql->assoc($requestQ);
-			$name     = $sbsanitize->displayLang(utf8_encode($assoc['name']));
+			$name     = $sbsanitize->displayLang(sb_utf8_encode($assoc['name']));
 			$active   = $assoc['active'];
 
 			$sbsmarty->assign('assoc', $query_1);

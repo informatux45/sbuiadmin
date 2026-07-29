@@ -1347,4 +1347,23 @@ if (!function_exists("insert_sbGetInfoBlockedIP")) {
 	}
 }
 
+/** UTF8_ENCODE / UTF8_DECODE Deprecated for PHP8.2 (Point 9, compat PHP 8.4)
+ * Même implémentation que backdoor/inc/sbuiadmin-functions.php (côté
+ * admin) - cette version-là existait déjà (précédent effort de
+ * compatibilité PHP 8.2), reprise ici à l'identique pour le front, qui ne
+ * l'avait pas encore.
+============================================== */
+if (!function_exists("sb_utf8_encode")) {
+   function sb_utf8_encode($string, $from_encoding = 'ISO-8859-1', $to_encoding = 'UTF-8') {
+      return iconv($from_encoding, $to_encoding, $string);
+   }
+}
+
+if (!function_exists("sb_utf8_decode")) {
+   function sb_utf8_decode($string, $from_encoding = 'UTF-8', $to_encoding = 'ISO-8859-1') {
+      return iconv($from_encoding, $to_encoding, $string);
+   }
+}
+/* =========================================== */
+
 ?>

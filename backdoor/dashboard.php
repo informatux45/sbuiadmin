@@ -491,19 +491,19 @@ switch ($action) {
 			// "content" alimente indifféremment le champ html ou texte selon
 			// $type - un seul des deux est réellement affiché (voir les
 			// groupes conditionnels du formulaire ci-dessous).
-			$content_html = ($assoc['type'] == 'html') ? utf8_encode($assoc['content']) : '';
-			$content_text = ($assoc['type'] == 'text') ? utf8_encode($assoc['content']) : '';
+			$content_html = ($assoc['type'] == 'html') ? sb_utf8_encode($assoc['content']) : '';
+			$content_text = ($assoc['type'] == 'text') ? sb_utf8_encode($assoc['content']) : '';
 			// rss/iframe/logs réutilisent également location/value_column,
 			// chacun avec son propre sens (voir la validation ci-dessus).
-			$rss_url      = ($assoc['type'] == 'rss') ? utf8_encode($assoc['location']) : '';
+			$rss_url      = ($assoc['type'] == 'rss') ? sb_utf8_encode($assoc['location']) : '';
 			$rss_count    = ($assoc['type'] == 'rss') ? $assoc['value_column'] : '';
-			$iframe_url   = ($assoc['type'] == 'iframe') ? utf8_encode($assoc['location']) : '';
-			$log_filename    = ($assoc['type'] == 'logs') ? utf8_encode($assoc['location']) : '';
+			$iframe_url   = ($assoc['type'] == 'iframe') ? sb_utf8_encode($assoc['location']) : '';
+			$log_filename    = ($assoc['type'] == 'logs') ? sb_utf8_encode($assoc['location']) : '';
 			$log_lines       = ($assoc['type'] == 'logs') ? $assoc['value_column'] : '';
 			$logaccess_count = ($assoc['type'] == 'logaccess') ? $assoc['value_column'] : '';
-			$widget_title    = utf8_encode($assoc['title']);
-			$link         = utf8_encode($assoc['link']);
-			$icon         = utf8_encode($assoc['icon']);
+			$widget_title    = sb_utf8_encode($assoc['title']);
+			$link         = sb_utf8_encode($assoc['link']);
+			$icon         = sb_utf8_encode($assoc['icon']);
 			$color        = $assoc['color'];
 			$show_chart   = $assoc['show_chart'];
 			$active       = $assoc['active'];

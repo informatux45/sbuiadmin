@@ -253,13 +253,13 @@ switch($action) {
 			$assoc        = $sbsql->assoc($requestQ);
 			$pages        = $assoc['pages_id'];
 			$modules      = $assoc['modules_id'];
-			$name         = $sbsanitize->displayLang(utf8_encode($assoc['name']));
+			$name         = $sbsanitize->displayLang(sb_utf8_encode($assoc['name']));
 			// ----------------------------
-			$title_fr     = $sbsanitize->displayLang(utf8_encode($assoc['title']));
-			$title_en     = $sbsanitize->displayLang(utf8_encode($assoc['title']), 'en');
+			$title_fr     = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']));
+			$title_en     = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), 'en');
 			// ----------------------------
-			$content_fr   = $sbsanitize->displayLang(utf8_encode($assoc['content']));
-			$content_en   = $sbsanitize->displayLang(utf8_encode($assoc['content']), 'en');
+			$content_fr   = $sbsanitize->displayLang(sb_utf8_encode($assoc['content']));
+			$content_en   = $sbsanitize->displayLang(sb_utf8_encode($assoc['content']), 'en');
 			// ----------------------------
 			$various_view = $assoc['various_view'];
 			$position     = $assoc['position'];
@@ -309,7 +309,7 @@ switch($action) {
 		$array_pages = explode("|", $pages);
 		$i = 0;
 		foreach($allpages as $row) {
-			$tab_pages[$i]['text']    = $sbsanitize->displayLang(utf8_encode($row['title']));
+			$tab_pages[$i]['text']    = $sbsanitize->displayLang(sb_utf8_encode($row['title']));
 			$tab_pages[$i]['name']    = 'pages[]';
 			$tab_pages[$i]['value']   = $row['id'];
 			$tab_pages[$i]['checked'] = (in_array($row['id'], $array_pages)) ? '1' : '0';
@@ -439,7 +439,7 @@ switch($action) {
 		$sort_array    = $sbsql->toarray($requestQ);
 		foreach($sort_array as $sort) {
 			$sort_id          = $sort['id'];
-			$toSort[$sort_id] = utf8_encode($sort['blocname']);
+			$toSort[$sort_id] = sb_utf8_encode($sort['blocname']);
 		}
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_3 . "\n" . 'Form Type = '.$formType);
@@ -510,7 +510,7 @@ switch($action) {
 		$sort_array    = $sbsql->toarray($requestQ);
 		foreach($sort_array as $sort) {
 			$sort_id          = $sort['id'];
-			$toSort[$sort_id] = utf8_encode($sort['blocname']);
+			$toSort[$sort_id] = sb_utf8_encode($sort['blocname']);
 		}
 
 		// --- Debug SQL

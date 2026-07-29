@@ -154,7 +154,7 @@ switch($action) {
 			$query_1 = "SELECT * FROM $table WHERE id = $id";
 			$requestQ = $sbsql->query($query_1);
 			$assoc    = $sbsql->assoc($requestQ);
-			$name     = $sbsanitize->displayLang(utf8_encode($assoc['name']));
+			$name     = $sbsanitize->displayLang(sb_utf8_encode($assoc['name']));
 			$tag      = $assoc['tag'];
 			$pages    = $assoc['pages'];
 			$active   = $assoc['active'];
@@ -193,7 +193,7 @@ switch($action) {
 		$array_pages = explode("|", $pages);
 		$i = 0;
 		foreach($allpages as $row) {
-			$tab_pages[$i]['text']    = $sbsanitize->displayLang(utf8_encode($row['title']));
+			$tab_pages[$i]['text']    = $sbsanitize->displayLang(sb_utf8_encode($row['title']));
 			$tab_pages[$i]['name']    = 'pages[]';
 			$tab_pages[$i]['value']   = $row['id'];
 			$tab_pages[$i]['checked'] = (in_array($row['id'], $array_pages)) ? '1' : '0';

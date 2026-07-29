@@ -80,7 +80,7 @@ $request = $sbsql->query($query);
 $assoc   = $sbsql->toarray($request);
 // --------------------------------
 foreach($assoc as $row) {
-	$cs[$row['config']] = utf8_encode($row['content']);
+	$cs[$row['config']] = sb_utf8_encode($row['content']);
 }
 
 // --------------------------------

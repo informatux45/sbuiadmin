@@ -166,8 +166,8 @@ switch($action) {
 			$query_1  = "SELECT * FROM $table WHERE id = $id";
 			$requestQ = $sbsql->query($query_1);
 			$assoc    = $sbsql->assoc($requestQ);
-			$name     = utf8_encode($assoc['name']);
-			$type     = utf8_encode($assoc['type']);
+			$name     = sb_utf8_encode($assoc['name']);
+			$type     = sb_utf8_encode($assoc['type']);
 			$active   = $assoc['active'];
 
 			$sbsmarty->assign('assoc', $query_1);
@@ -305,9 +305,9 @@ switch($action) {
 			$requestQ     = $sbsql->query($query_1);
 			$assoc        = $sbsql->assoc($requestQ);
 			$tid          = intval($assoc['tid']);
-			$title        = $sbsanitize->displayLang(utf8_encode($assoc['title']));
-			$field_type   = utf8_encode($assoc['field_type']);
-			$field_target = utf8_encode($assoc['field_target']);
+			$title        = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']));
+			$field_type   = sb_utf8_encode($assoc['field_type']);
+			$field_target = sb_utf8_encode($assoc['field_target']);
 			$active       = $assoc['active'];
 
 			$sbsmarty->assign('assoc', $query_1);
@@ -498,12 +498,12 @@ switch($action) {
 			$requestQ     = $sbsql->query($query_1);
 			$assoc        = $sbsql->assoc($requestQ);
 			$tid          = intval($assoc['tid']);
-			$title_fr     = $sbsanitize->displayLang(utf8_encode($assoc['title']));
+			$title_fr     = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']));
 			// ----------------------------
-			$title_en     = $sbsanitize->displayLang(utf8_encode($assoc['title']), 'en');
+			$title_en     = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), 'en');
 			// ----------------------------
-			$field_type   = utf8_encode($assoc['field_type']);
-			$field_target = utf8_encode($assoc['field_target']);
+			$field_type   = sb_utf8_encode($assoc['field_type']);
+			$field_target = sb_utf8_encode($assoc['field_target']);
 			$active       = $assoc['active'];
 
 			$sbsmarty->assign('assoc', $query_1);
@@ -511,7 +511,7 @@ switch($action) {
 			// --- Debug SQL
 			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);						
 		} else {
-			if (isset($_POST['title_fr'])) $name = $sbsanitize->displayLang(utf8_encode($_POST['title_fr'])); // Legende
+			if (isset($_POST['title_fr'])) $name = $sbsanitize->displayLang(sb_utf8_encode($_POST['title_fr'])); // Legende
 		}
 		
 		// --------------------------------		
@@ -658,7 +658,7 @@ switch($action) {
 		$requestQ   = $sbsql->query($query_3);
 		$sort_array = $sbsql->toarray($requestQ);
 		foreach($sort_array as $sort) {
-			$active = ($sort['active']) ? $sbsanitize->displayLang(utf8_encode($sort['title'])) : "<span style='color: red;'>".$sbsanitize->displayLang(utf8_encode($sort['title']))."</span>";
+			$active = ($sort['active']) ? $sbsanitize->displayLang(sb_utf8_encode($sort['title'])) : "<span style='color: red;'>".$sbsanitize->displayLang(sb_utf8_encode($sort['title']))."</span>";
 			$sort_id          = $sort['id'];
 			$toSort[$sort_id] = $active;
 		}

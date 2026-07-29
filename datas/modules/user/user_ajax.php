@@ -47,9 +47,9 @@ $modpage['tables']['user'] = _AM_DB_PREFIX . "sb_users";
 //$assoc   = $sbsql->assoc($request);
 //// --- Assign
 //$sb_pages_ajax    = '';
-//$sb_pages_title   = $sbsanitize->displayLang(utf8_encode($assoc['title']), $_SESSION['lang']);
-//$sb_pages_title2  = $sbsanitize->displayLang(utf8_encode($assoc['seo_keywords']), $_SESSION['lang']);
-//$sb_pages_content = $sbsanitize->displayLang(utf8_encode($assoc['content']), $_SESSION['lang']);
+//$sb_pages_title   = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']);
+//$sb_pages_title2  = $sbsanitize->displayLang(sb_utf8_encode($assoc['seo_keywords']), $_SESSION['lang']);
+//$sb_pages_content = $sbsanitize->displayLang(sb_utf8_encode($assoc['content']), $_SESSION['lang']);
 //$sb_pages_active  = $assoc['active'];
 //
 //if ($sb_pages_active) {

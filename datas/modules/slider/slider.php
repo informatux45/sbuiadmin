@@ -34,8 +34,8 @@ $query   = "SELECT * FROM {$modpage['tables']['slider']} WHERE id = '$id'";
 $request = $sbsql->query($query);
 $assoc   = $sbsql->assoc($request);
 // --- Assign Array
-$sb_slider_title   = $sbsanitize->displayLang(utf8_encode($assoc['title']), $_SESSION['lang']);
-$sb_slider_content = $sbsanitize->displayLang(utf8_encode($assoc['content']), $_SESSION['lang']);
+$sb_slider_title   = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']);
+$sb_slider_content = $sbsanitize->displayLang(sb_utf8_encode($assoc['content']), $_SESSION['lang']);
 $sb_slider_active  = $assoc['active'];
 $sbsmarty->assign('sb_pages_content', $sb_pages_content);
 

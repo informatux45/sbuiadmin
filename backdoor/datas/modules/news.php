@@ -280,17 +280,17 @@ switch($action) {
 			$requestQ      = $sbsql->query($query_1);
 			$assoc         = $sbsql->assoc($requestQ);
 			$catid         = $assoc['catid'];
-			$title_fr      = $sbsanitize->displayLang(utf8_encode($assoc['title']));
-			$subtitle_fr   = $sbsanitize->displayLang(utf8_encode($assoc['subtitle']));
-			$desc_short_fr = $sbsanitize->displayLang(utf8_encode($assoc['desc_short']));
-			$desc_full_fr  = $sbsanitize->displayLang(utf8_encode($assoc['desc_full']));
+			$title_fr      = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']));
+			$subtitle_fr   = $sbsanitize->displayLang(sb_utf8_encode($assoc['subtitle']));
+			$desc_short_fr = $sbsanitize->displayLang(sb_utf8_encode($assoc['desc_short']));
+			$desc_full_fr  = $sbsanitize->displayLang(sb_utf8_encode($assoc['desc_full']));
 			// ----------------------------
-			$title_en      = $sbsanitize->displayLang(utf8_encode($assoc['title']), 'en');
-			$subtitle_en   = $sbsanitize->displayLang(utf8_encode($assoc['subtitle']), 'en');
-			$desc_short_en = $sbsanitize->displayLang(utf8_encode($assoc['desc_short']), 'en');
-			$desc_full_en  = $sbsanitize->displayLang(utf8_encode($assoc['desc_full']), 'en');
+			$title_en      = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), 'en');
+			$subtitle_en   = $sbsanitize->displayLang(sb_utf8_encode($assoc['subtitle']), 'en');
+			$desc_short_en = $sbsanitize->displayLang(sb_utf8_encode($assoc['desc_short']), 'en');
+			$desc_full_en  = $sbsanitize->displayLang(sb_utf8_encode($assoc['desc_full']), 'en');
 			$date          = $assoc['date'];
-			$photo         = utf8_encode($assoc['image']);
+			$photo         = sb_utf8_encode($assoc['image']);
 			$active        = $assoc['active'];			
 
 			$sbsmarty->assign('assoc', $query_1);
@@ -326,7 +326,7 @@ switch($action) {
 		$array_category = explode("|", $catid);
 		$i = 0;
 		foreach($categories as $row) {
-			$tab_category[$i]['text']    = $sbsanitize->displayLang(utf8_encode($row['title']));
+			$tab_category[$i]['text']    = $sbsanitize->displayLang(sb_utf8_encode($row['title']));
 			$tab_category[$i]['name']    = 'catid[]';
 			$tab_category[$i]['value']   = $row['id'];
 			$tab_category[$i]['checked'] = (in_array($row['id'], $array_category)) ? '1' : '0';
@@ -468,13 +468,13 @@ switch($action) {
 			$query_1     = "SELECT * FROM $table_category WHERE id = $id";
 			$requestQ    = $sbsql->query($query_1);
 			$assoc       = $sbsql->assoc($requestQ);
-			$title_fr    = $sbsanitize->displayLang(utf8_encode($assoc['title']));
-			$subtitle_fr = $sbsanitize->displayLang(utf8_encode($assoc['subtitle']));
+			$title_fr    = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']));
+			$subtitle_fr = $sbsanitize->displayLang(sb_utf8_encode($assoc['subtitle']));
 			// ----------------------------
-			$title_en    = $sbsanitize->displayLang(utf8_encode($assoc['title']), 'en');
-			$subtitle_en = $sbsanitize->displayLang(utf8_encode($assoc['subtitle']), 'en');
+			$title_en    = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), 'en');
+			$subtitle_en = $sbsanitize->displayLang(sb_utf8_encode($assoc['subtitle']), 'en');
 			// ----------------------------
-			$photo       = utf8_encode($assoc['photo']);
+			$photo       = sb_utf8_encode($assoc['photo']);
 			$active      = $assoc['active'];
 
 			$sbsmarty->assign('assoc', $query_1);
@@ -566,7 +566,7 @@ switch($action) {
 		$requestQ      = $sbsql->query($query_3);
 		$sort_array    = $sbsql->toarray($requestQ);
 		foreach($sort_array as $sort) {
-			$active = ($sort['active']) ? $sbsanitize->displayLang(utf8_encode($sort['title'])) : "<span style='color: red;'>".$sbsanitize->displayLang(utf8_encode($sort['title']))."</span>";
+			$active = ($sort['active']) ? $sbsanitize->displayLang(sb_utf8_encode($sort['title'])) : "<span style='color: red;'>".$sbsanitize->displayLang(sb_utf8_encode($sort['title']))."</span>";
 			$sort_id          = $sort['id'];
 			$toSort[$sort_id] = $active;
 		}
@@ -777,11 +777,11 @@ switch($action) {
 			$theme_view_single    = $assoc['theme_view_single'];
 			$other_news           = $assoc['other_news'];
 			$other_news_per_page  = $assoc['other_news_per_page'];
-			$other_news_title     = utf8_encode($assoc['other_news_title']);
-			$other_news_type      = utf8_encode($assoc['other_news_type']);
-			$news_next_prev       = utf8_encode($assoc['news_next_prev']);
-			$comments             = utf8_encode($assoc['comments']);
-			$comments_user        = utf8_encode($assoc['comments_user']);
+			$other_news_title     = sb_utf8_encode($assoc['other_news_title']);
+			$other_news_type      = sb_utf8_encode($assoc['other_news_type']);
+			$news_next_prev       = sb_utf8_encode($assoc['news_next_prev']);
+			$comments             = sb_utf8_encode($assoc['comments']);
+			$comments_user        = sb_utf8_encode($assoc['comments_user']);
 			
 			$sbsmarty->assign('assoc', $query_1);
 
@@ -1025,7 +1025,7 @@ switch($action) {
 			$query_1             = "SELECT * FROM $table_category WHERE id = $id";
 			$requestQ            = $sbsql->query($query_1);
 			$assoc               = $sbsql->assoc($requestQ);
-			$module_show         = utf8_encode($assoc['module_show']);
+			$module_show         = sb_utf8_encode($assoc['module_show']);
 			$module_show_masonry = $assoc['module_show_masonry'];
 			$title_fr            = $sbsanitize->displayLang($assoc['title']);
 			$sbsmarty->assign('assoc', $query_1);

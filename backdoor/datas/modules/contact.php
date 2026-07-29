@@ -172,13 +172,13 @@ switch($action) {
 			$query_1     = "SELECT * FROM $table WHERE id = $id";
 			$requestQ    = $sbsql->query($query_1);
 			$assoc       = $sbsql->assoc($requestQ);
-			$title       = $sbsanitize->displayLang(utf8_encode($assoc['title']));
+			$title       = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']));
 			$recipients  = $assoc['recipients'];
 			$contactform = $assoc['form'];
 			$active      = $assoc['active'];
-			$subject_fr  = $sbsanitize->displayLang(utf8_encode($assoc['subject']));
+			$subject_fr  = $sbsanitize->displayLang(sb_utf8_encode($assoc['subject']));
 			// ---------------------------
-			$subject_en  = $sbsanitize->displayLang(utf8_encode($assoc['subject']), 'en');
+			$subject_en  = $sbsanitize->displayLang(sb_utf8_encode($assoc['subject']), 'en');
 
 			$sbsmarty->assign('assoc', $query_1);
 
@@ -355,9 +355,9 @@ switch($action) {
 		// Sujet (Général)
 		// --------------------------------
 		$email_subject_title = ($getMultilang) ? 'Sujet (FR)' : 'Sujet' ;
-		$sbform->addInput('text', "$email_subject_title", array ('name' => 'email_subject_fr', 'value' => $sbsanitize->displayLang(utf8_encode($assocA['content'])), 'placeholder' => "Email(s)", 'icon' => 'pencil'), false, false, "Sujet principal de vos formulaires (si un formulaire possède un sujet, celui-ci sera utilisé en priorité)");
+		$sbform->addInput('text', "$email_subject_title", array ('name' => 'email_subject_fr', 'value' => $sbsanitize->displayLang(sb_utf8_encode($assocA['content'])), 'placeholder' => "Email(s)", 'icon' => 'pencil'), false, false, "Sujet principal de vos formulaires (si un formulaire possède un sujet, celui-ci sera utilisé en priorité)");
 		if ($getMultilang) {
-			$sbform->addInput('text', 'Sujet (EN)', array ('name' => 'email_subject_en', 'value' => $sbsanitize->displayLang(utf8_encode($assocA['content']), 'en'), 'placeholder' => "Email(s)", 'icon' => 'pencil'), false, false, "Sujet (EN) principal de vos formulaires (si un formulaire possède un sujet, celui-ci sera utilisé en priorité)");
+			$sbform->addInput('text', 'Sujet (EN)', array ('name' => 'email_subject_en', 'value' => $sbsanitize->displayLang(sb_utf8_encode($assocA['content']), 'en'), 'placeholder' => "Email(s)", 'icon' => 'pencil'), false, false, "Sujet (EN) principal de vos formulaires (si un formulaire possède un sujet, celui-ci sera utilisé en priorité)");
 		}
 		// --------------------------------
 		// Google RECAPTCHA Keys

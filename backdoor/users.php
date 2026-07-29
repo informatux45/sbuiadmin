@@ -228,17 +228,17 @@ switch($action) {
 			$query_1  = "SELECT * FROM $table WHERE id = $id";
 			$requestQ = $sbsql->query($query_1);
 			$assoc    = $sbsql->assoc($requestQ);
-			$username               = utf8_encode($assoc['username']);
-			$password               = utf8_encode($assoc['password']);
-			$email                  = utf8_encode($assoc['email']);
+			$username               = sb_utf8_encode($assoc['username']);
+			$password               = sb_utf8_encode($assoc['password']);
+			$email                  = sb_utf8_encode($assoc['email']);
 			$active                 = $assoc['active'];
-			$prenom                 = utf8_encode($assoc['prenom']);
-			$nom                    = utf8_encode($assoc['nom']);
-			$telephone              = utf8_encode($assoc['telephone']);
-			$fonction               = utf8_encode($assoc['fonction']);
-			$profession             = utf8_encode($assoc['profession']);
-			$centres_interet        = utf8_encode($assoc['centres_interet']);
-			$infos_complementaires  = utf8_encode($assoc['infos_complementaires']);
+			$prenom                 = sb_utf8_encode($assoc['prenom']);
+			$nom                    = sb_utf8_encode($assoc['nom']);
+			$telephone              = sb_utf8_encode($assoc['telephone']);
+			$fonction               = sb_utf8_encode($assoc['fonction']);
+			$profession             = sb_utf8_encode($assoc['profession']);
+			$centres_interet        = sb_utf8_encode($assoc['centres_interet']);
+			$infos_complementaires  = sb_utf8_encode($assoc['infos_complementaires']);
 			$avatar                 = $assoc['avatar'];
 			$sbsmarty->assign('assoc', $query_1);
 
@@ -349,7 +349,7 @@ switch($action) {
 			$query_name   = "SELECT username FROM $table WHERE id = $id";
 			$request_name = $sbsql->query($query_name);
 			$assoc_name   = $sbsql->assoc($request_name);
-			$username     = utf8_encode($assoc_name['username']);
+			$username     = sb_utf8_encode($assoc_name['username']);
 
 			// --- Debug SQL
 			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', 'sbSaveRightsMatrix(' . $id . ', $_POST)' . "\n" . 'Submit Form Type = '.$formType);
@@ -363,7 +363,7 @@ switch($action) {
 			$query_1  = "SELECT * FROM $table WHERE id = $id";
 			$requestQ = $sbsql->query($query_1);
 			$assoc    = $sbsql->assoc($requestQ);
-			$username = utf8_encode($assoc['username']);
+			$username = sb_utf8_encode($assoc['username']);
 			$sbsmarty->assign('assoc', $query_1);
 
 			// --- Debug SQL

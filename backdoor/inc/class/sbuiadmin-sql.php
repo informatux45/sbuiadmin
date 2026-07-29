@@ -30,7 +30,16 @@ class sql extends Smarty {
     var $query      = "";
 
     private function connect() {
-        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+        // Point 9 (compat PHP 8.4) : MYSQLI_REPORT_ERROR|STRICT fait lever
+        // des mysqli_sql_exception non attrapées sur toute erreur SQL
+        // (comportement par défaut depuis PHP 8.1, ici explicitement forcé
+        // en plus) - déjà provoqué un plantage avec trace technique
+        // visible (chemins serveur, nom de la base) pendant les tests du
+        // Point 1, le temps qu'une table manquante soit créée. Tout ce
+        // codebase (des centaines de "if ($result) {...} else {erreur
+        // gérée}") est écrit pour le comportement pré-8.1 : mysqli_query()
+        // renvoie simplement false sur erreur, jamais d'exception.
+        mysqli_report(MYSQLI_REPORT_OFF);
         if ($this->socket === false) {
             try {
                 $this->connect_id = mysqli_connect($this->host, $this->user, $this->pass, $this->base);

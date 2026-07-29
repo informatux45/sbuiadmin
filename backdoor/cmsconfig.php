@@ -96,7 +96,7 @@ switch($action) {
 			$requestQ  = $sbsql->query($query_1);
 			$assoc     = $sbsql->assoc($requestQ);
 			$id        = intval($assoc['id']);
-			$content   = utf8_encode($assoc['content']);
+			$content   = sb_utf8_encode($assoc['content']);
 
 			$sbsmarty->assign('assoc', $query_1);
 
@@ -179,7 +179,7 @@ switch($action) {
 		$requestF = $sbsql->query($queryF);
 		$assocH   = $sbsql->assoc($requestH);
 		$assocF   = $sbsql->assoc($requestF);
-		$contentH = utf8_encode($assocH['content']);
+		$contentH = sb_utf8_encode($assocH['content']);
 
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $queryH . "\n" . $queryF . "\n" . 'Form Type = '.$formType);						
@@ -193,17 +193,17 @@ switch($action) {
 		// Editeur HEADER code
 		// --------------------------------
 		$header_fr_title = ($getMultilang) ? 'Header CODE (FR)' : 'Header CODE' ;
-		$sbform->addTextareaHtml("$header_fr_title", $sbsanitize->displayLang(utf8_encode($assocH['content'])), array('id' => 'header_fr', 'name' => 'header_fr', 'style' => 'height: 250px !important;'), false);
+		$sbform->addTextareaHtml("$header_fr_title", $sbsanitize->displayLang(sb_utf8_encode($assocH['content'])), array('id' => 'header_fr', 'name' => 'header_fr', 'style' => 'height: 250px !important;'), false);
 		if ($getMultilang) {
-			$sbform->addTextareaHtml('Header CODE (EN)', $sbsanitize->displayLang(utf8_encode($assocH['content']), 'en'), array('id' => 'header_en', 'name' => 'header_en', 'style' => 'height: 250px !important;'), false);			
+			$sbform->addTextareaHtml('Header CODE (EN)', $sbsanitize->displayLang(sb_utf8_encode($assocH['content']), 'en'), array('id' => 'header_en', 'name' => 'header_en', 'style' => 'height: 250px !important;'), false);			
 		}
 		// --------------------------------
 		// Editeur FOOTER code
 		// --------------------------------
 		$footer_fr_title = ($getMultilang) ? 'Footer CODE (FR)' : 'Footer CODE' ;
-		$sbform->addTextareaHtml("$footer_fr_title", $sbsanitize->displayLang(utf8_encode($assocF['content'])), array('id' => 'footer_fr', 'name' => 'footer_fr', 'style' => 'height: 250px !important;'), false);
+		$sbform->addTextareaHtml("$footer_fr_title", $sbsanitize->displayLang(sb_utf8_encode($assocF['content'])), array('id' => 'footer_fr', 'name' => 'footer_fr', 'style' => 'height: 250px !important;'), false);
 		if ($getMultilang) {
-			$sbform->addTextareaHtml('Footer CODE (EN)', $sbsanitize->displayLang(utf8_encode($assocF['content']), 'en'), array('id' => 'footer_en', 'name' => 'footer_en', 'style' => 'height: 250px !important;'), false);			
+			$sbform->addTextareaHtml('Footer CODE (EN)', $sbsanitize->displayLang(sb_utf8_encode($assocF['content']), 'en'), array('id' => 'footer_en', 'name' => 'footer_en', 'style' => 'height: 250px !important;'), false);			
 		}
 		// --------------------------------			
 		// --- Hiddens / Buttons
@@ -313,7 +313,7 @@ switch($action) {
 		$assoc   = $sbsql->toarray($request);
 		// --------------------------------
 		foreach($assoc as $row) {
-			$cs[$row['config']] = utf8_encode($row['content']);
+			$cs[$row['config']] = sb_utf8_encode($row['content']);
 		}
 		
 		// --------------------------------
@@ -647,7 +647,7 @@ switch($action) {
 		$query   = "SELECT content FROM $table WHERE config = 'fonts'";
 		$request = $sbsql->query($query);
 		$assoc   = $sbsql->assoc($request);
-		$fonts   = utf8_encode($assoc['content']);
+		$fonts   = sb_utf8_encode($assoc['content']);
 		// --------------------------------
 
 		// --- Debug SQL
@@ -739,7 +739,7 @@ switch($action) {
 		$assoc   = $sbsql->toarray($request);
 		// --------------------------------
 		foreach($assoc as $row) {
-			$cs[$row['config']] = utf8_encode($row['content']);
+			$cs[$row['config']] = sb_utf8_encode($row['content']);
 		}
 		
 		// --- Debug SQL
