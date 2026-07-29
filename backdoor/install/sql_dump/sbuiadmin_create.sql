@@ -958,6 +958,26 @@ INSERT INTO `<DB_PREFIX>sb_users` (`id`, `username`, `password`, `email`, `login
 (1, 'admin', '99pxlOJyAWx1UswLgblCziBfdWeREDCTYlWP2RWWkAc=', 'admin-reply@votresite.com', 0, 0, 1, '0', '0', '', '', '', '', '', '', '', '', '', '');
 
 --
+-- Table structure for table `sb_users_remember_tokens`
+-- (Point 1, audit sécurité 2026-07-29) : jetons "Se souvenir de moi"
+-- (sélecteur/validateur) - remplace le stockage du mot de passe chiffré
+-- directement dans le cookie. `validator_hash` est un sha256 du validateur
+-- aléatoire (pas du mot de passe - haute entropie, un hash rapide suffit
+-- ici, contrairement à `sb_users`.`password`).
+--
+
+DROP TABLE IF EXISTS `<DB_PREFIX>sb_users_remember_tokens`;
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_users_remember_tokens` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `selector` varchar(24) NOT NULL,
+  `validator_hash` varchar(64) NOT NULL,
+  `expires` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `sb_users_rights`
 --
 
@@ -1149,6 +1169,14 @@ ALTER TABLE `<DB_PREFIX>sb_users`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `sb_users_remember_tokens`
+--
+ALTER TABLE `<DB_PREFIX>sb_users_remember_tokens`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `selector` (`selector`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indexes for table `sb_users_rights`
 --
 ALTER TABLE `<DB_PREFIX>sb_users_rights`
@@ -1289,6 +1317,12 @@ ALTER TABLE `<DB_PREFIX>sb_table_structure`
 --
 ALTER TABLE `<DB_PREFIX>sb_users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+--
+-- AUTO_INCREMENT for table `sb_users_remember_tokens`
+--
+ALTER TABLE `<DB_PREFIX>sb_users_remember_tokens`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `sb_users_rights`
 --

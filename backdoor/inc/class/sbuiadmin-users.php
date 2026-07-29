@@ -21,26 +21,135 @@ defined('SBUIADMIN_PATH') or die('Are you crazy!');
 class user extends sql {
 	
     function login($username, $password) {
-		// Initialisation
-		$query  = "SELECT username, password FROM " . _AM_DB_PREFIX . "sb_users WHERE username = '$username'";
+		// Point 1 (audit sécurité, 2026-07-29) : $username venait de
+		// stopXSS() (ne protège pas l'apostrophe) - injection SQL possible
+		// depuis le formulaire de connexion lui-même, accessible sans
+		// authentification.
+		$username_esc = $this->escape_string($username);
+		$query  = "SELECT id, username, password FROM " . _AM_DB_PREFIX . "sb_users WHERE username = '$username_esc'";
         $result = $this->query($query);
 		$infos  = $this->assoc($result);
-		// Check if user exists
-		if ($result) {
-			// Passwords
-			$password_db    = $this->decrypt($infos['password']);
-			$password_login = $this->decrypt($password);
-			// Check passwords
-			if ($password_db !== $password_login)
-				return false;
-			else
-				return true;
-
-		} else {
-			// User unknown
+		// $result (retour mysqli_query) est vrai même pour 0 ligne trouvée -
+		// vérifier $infos, pas $result, pour un "utilisateur inconnu" correct.
+		if (!$infos || !isset($infos['password']) || $infos['password'] === '') {
 			return false;
 		}
+
+		$stored = $infos['password'];
+
+		// Format actuel : mots de passe hachés (password_hash(), à sens
+		// unique - ne remplace PAS decrypt()/encrypt() ci-dessous tant que
+		// tous les comptes n'ont pas été confirmés migrés, voir leur docblock).
+		if (password_verify($password, $stored)) {
+			if (password_needs_rehash($stored, PASSWORD_DEFAULT)) {
+				$this->rehashPassword($infos['id'], $password);
+			}
+			return true;
+		}
+
+		// Ancien format (chiffrement réversible, pré-migration) - filet de
+		// compatibilité UNIQUEMENT : si ça matche, on bascule silencieusement
+		// ce compte vers password_hash() (aucune action requise de
+		// l'utilisateur). $stored qui n'est pas un ancien format valide
+		// (ex: déjà un hash password_hash() qui vient d'échouer ci-dessus)
+		// fait tomber ici sans risque - decrypt() renvoie alors une valeur
+		// qui ne matchera jamais $password. @ : decrypt() émet un warning
+		// PHP sur un $stored qui n'a pas la forme attendue (explode('::', ...)
+		// sur une valeur qui n'en contient pas), sans gravité ici.
+		$legacy_plain = @$this->decrypt($stored);
+		if ($legacy_plain !== false && $legacy_plain !== '' && hash_equals($legacy_plain, $password)) {
+			$this->rehashPassword($infos['id'], $password);
+			return true;
+		}
+
+		return false;
     }
+
+
+	/**
+	 * Bascule un compte vers password_hash() (Point 1) - appelé UNIQUEMENT
+	 * juste après une vérification de mot de passe déjà réussie ci-dessus,
+	 * jamais avant.
+	 */
+	function rehashPassword($user_id, $plain_password) {
+		$user_id  = intval($user_id);
+		$new_hash = $this->escape_string(password_hash($plain_password, PASSWORD_DEFAULT));
+		$this->query("UPDATE " . _AM_DB_PREFIX . "sb_users SET password = '$new_hash' WHERE id = $user_id");
+	}
+
+
+	/**
+	 * "Se souvenir de moi" (Point 1) - jeton sélecteur/validateur au lieu
+	 * du mot de passe chiffré stocké en cookie. Le sélecteur sert de clé
+	 * de recherche rapide (indexée, non secrète) ; seul le hash du
+	 * validateur (haute entropie, sha256 suffit - pas un mot de passe) est
+	 * stocké, jamais le validateur lui-même. Retourne "selector:validator"
+	 * (valeur brute du cookie) ou false en cas d'échec.
+	 * @return string|false
+	 */
+	function createRememberToken($user_id, $lifetime) {
+		$user_id   = intval($user_id);
+		$selector  = bin2hex(random_bytes(9));
+		$validator = bin2hex(random_bytes(33));
+		$hash      = hash('sha256', $validator);
+		$expires   = time() + intval($lifetime);
+
+		$query = "INSERT INTO " . _AM_DB_PREFIX . "sb_users_remember_tokens (user_id, selector, validator_hash, expires) VALUES ($user_id, '$selector', '$hash', $expires)";
+		if (!$this->query($query)) return false;
+
+		return $selector . ':' . $validator;
+	}
+
+	/**
+	 * Vérifie un cookie "selector:validator" et retourne les infos du
+	 * compte correspondant si valide (et pas expiré), false sinon. Le
+	 * jeton est TOUJOURS supprimé ici (à usage unique, qu'il soit valide
+	 * ou non) - c'est à l'appelant d'émettre un jeton de remplacement
+	 * (createRememberToken()) une fois les vérifications additionnelles
+	 * passées (ex: compte toujours actif) - pas fait automatiquement ici
+	 * pour ne jamais réémettre un jeton à un compte qui va être rejeté.
+	 * @return array{user_id:int,username:string}|false
+	 */
+	function verifyRememberToken($cookie_value) {
+		if (strpos((string)$cookie_value, ':') === false) return false;
+		list($selector, $validator) = explode(':', $cookie_value, 2);
+		$selector_esc = $this->escape_string($selector);
+
+		$query = "SELECT t.id, t.user_id, t.validator_hash, t.expires, u.username
+					FROM " . _AM_DB_PREFIX . "sb_users_remember_tokens t
+					INNER JOIN " . _AM_DB_PREFIX . "sb_users u ON u.id = t.user_id
+					WHERE t.selector = '$selector_esc'";
+		$result = $this->query($query);
+		$row    = $this->assoc($result);
+
+		if (!$row) return false;
+		$this->deleteRememberTokenById($row['id']);
+
+		if (intval($row['expires']) < time()) return false;
+		if (!hash_equals($row['validator_hash'], hash('sha256', $validator))) {
+			// Sélecteur valide mais mauvais validateur : signe possible de
+			// vol de cookie. Le jeton est déjà supprimé ci-dessus.
+			return false;
+		}
+
+		return array('user_id' => intval($row['user_id']), 'username' => $row['username']);
+	}
+
+	/**
+	 * Supprime un jeton "Se souvenir de moi" à partir de la valeur brute du
+	 * cookie (ex: à la déconnexion).
+	 */
+	function deleteRememberTokenBySelector($cookie_value) {
+		if (strpos((string)$cookie_value, ':') === false) return;
+		list($selector) = explode(':', $cookie_value, 2);
+		$selector_esc = $this->escape_string($selector);
+		$this->query("DELETE FROM " . _AM_DB_PREFIX . "sb_users_remember_tokens WHERE selector = '$selector_esc'");
+	}
+
+	function deleteRememberTokenById($id) {
+		$id = intval($id);
+		$this->query("DELETE FROM " . _AM_DB_PREFIX . "sb_users_remember_tokens WHERE id = $id");
+	}
 	
 	
     function checkUser($password, $captcha) {
@@ -60,7 +169,8 @@ class user extends sql {
 	
 	
     function checkUserIsActive($username) {
-        $query_user = "SELECT active FROM " . _AM_DB_PREFIX . "sb_users WHERE username = '$username'";
+        $username_esc = $this->escape_string($username);
+        $query_user = "SELECT active FROM " . _AM_DB_PREFIX . "sb_users WHERE username = '$username_esc'";
         $result_user = $this->query($query_user);
         $user_infos = $this->assoc($result_user);
         if ($user_infos['active'] == '0') {
@@ -103,15 +213,16 @@ class user extends sql {
 	*/
 	function updateAccessUserLogin($sbuiadmin_user, $lastlogin = false, $time = false) {
 		// --- Update the Access User logintime
+		$sbuiadmin_user_esc = $this->escape_string($sbuiadmin_user);
 		if ($sbuiadmin_user != '' && $lastlogin == false) {
-			$sql = "UPDATE " . _AM_DB_PREFIX . "sb_users SET logintime = '$time' WHERE username = '$sbuiadmin_user'";
+			$sql = "UPDATE " . _AM_DB_PREFIX . "sb_users SET logintime = '$time' WHERE username = '$sbuiadmin_user_esc'";
 			$result = $this->query($sql);
 			if (!$result)
 				return false;
 			else
 				return true;
 		} elseif ($sbuiadmin_user != '' && $lastlogin) {
-			$sql = "UPDATE " . _AM_DB_PREFIX . "sb_users SET lastlogin = logintime WHERE username = '$sbuiadmin_user'";
+			$sql = "UPDATE " . _AM_DB_PREFIX . "sb_users SET lastlogin = logintime WHERE username = '$sbuiadmin_user_esc'";
 			$result = $this->query($sql);
 			if (!$result)
 				return false;
@@ -130,9 +241,9 @@ class user extends sql {
 		global $sbsanitize;
 		// --- Initialization
 		$field        = $sbsanitize->stopXSS($field);
-		$sbuiadmin_user = $sbsanitize->stopXSS($sbuiadmin_user);
-		
-        $sql       = "SELECT $field FROM " . _AM_DB_PREFIX . "sb_users WHERE username = '$sbuiadmin_user'";
+		$sbuiadmin_user_esc = $this->escape_string($sbsanitize->stopXSS($sbuiadmin_user));
+
+        $sql       = "SELECT $field FROM " . _AM_DB_PREFIX . "sb_users WHERE username = '$sbuiadmin_user_esc'";
         $result    = $this->query($sql);
         $user_info = $this->assoc($result);
         if (isset($user_info[$field])) {

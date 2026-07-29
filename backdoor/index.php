@@ -17,9 +17,32 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date dans le passé
 // Session Initialization
 // This sends a persistent cookie that lasts a day
 // ----------------------
+// Point 1 (audit sécurité) : cookie_secure calculé (pas codé en dur à 1) -
+// sbconfig.php n'est pas encore chargé ici, même détection locale que sur
+// index.php racine.
+$sb_is_https = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
 session_start([
     'cookie_lifetime' => 86400,
+    'cookie_secure'   => $sb_is_https,
+    'cookie_httponly' => true,
+    'cookie_samesite' => 'Lax',
 ]);
+
+// Point 1 (audit sécurité) : les cookies "Se souvenir de moi" utilisaient
+// l'ancienne syntaxe setcookie(nom, valeur, expiration, chemin) - aucun
+// des flags secure/httponly/samesite (portée uniquement par la syntaxe
+// tableau, indépendante de ceux passés à session_start() ci-dessus) n'y
+// était donc appliqué. Repris ici avec les mêmes flags que la session.
+function sbSetAuthCookie($name, $value, $expire) {
+    global $sb_is_https;
+    setcookie($name, $value, [
+        'expires'  => $expire,
+        'path'     => '/',
+        'secure'   => $sb_is_https,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+}
  
 // ----------------------
 // Global defined
@@ -124,9 +147,7 @@ $sbsmarty->assign('sb_random_bg_video', $sb_background[$rand_video[1]]);
 // ----------------------
 // --- Initialisation
 // ----------------------
-$cookie_username = 'sbuiadmin_user_name';
-$cookie_pwdname  = 'sbuiadmin_user_password';
-$cookie_method   = 'sbuiadmin_user_method';
+$cookie_remember = 'sbuiadmin_remember';
 $cookie_lifetime = intval(sbGetConfig("cookie-lifetime"));
 $rememberme      = (isset($_POST['remember']) && $_POST['remember'] == 'longtime') ? 'yes' : 'no';
 $sbsmarty->assign('sbuiadmin_access_code', false);
@@ -137,17 +158,25 @@ $sbsmarty->assign('sbuiadmin_access_code', false);
 // pour une duree determinee
 // ✓ Remember me
 // ----------------------
+// Point 1 (audit sécurité, 2026-07-29) : jeton sélecteur/validateur
+// (sbusers->verifyRememberToken(), sb_users_remember_tokens) au lieu du
+// mot de passe chiffré stocké tel quel dans le cookie - un seul cookie
+// désormais (sbuiadmin_user_name/_password/_method fusionnés).
 global $_COOKIE;
 // --- Automatic Login ---
-if ( (!isset($_SESSION['sbuiadmin_user_name']) || $_SESSION['sbuiadmin_user_name'] == NULL) && isset($_COOKIE['sbuiadmin_user_password'])) {
+if ( (!isset($_SESSION['sbuiadmin_user_name']) || $_SESSION['sbuiadmin_user_name'] == NULL) && isset($_COOKIE[$cookie_remember]) && $_COOKIE[$cookie_remember] != '') {
 	// ------------------
 	// --- COOKIE Auth (Remember me)
 	// ------------------
-	$sbuiadmin_user_name     = trim($sbsanitize->stopXSS($_COOKIE['sbuiadmin_user_name']));
-	$sbuiadmin_user_password = $_COOKIE['sbuiadmin_user_password'];
-	$sbuiadmin_user_method   = $_COOKIE['sbuiadmin_user_method'];
-	// --- Check User
-	if ($sbusers->login($sbuiadmin_user_name, $sbuiadmin_user_password)) {
+	$sb_remember_result = $sbusers->verifyRememberToken($_COOKIE[$cookie_remember]);
+	if ($sb_remember_result === false) {
+		// Jeton invalide/expiré/déjà utilisé : nettoyage silencieux, on
+		// retombe sur le formulaire de connexion normal - un cookie
+		// expiré n'est pas une tentative de connexion ratée, pas de log
+		// d'échec ici.
+		sbSetAuthCookie($cookie_remember, '', time() - 3600);
+	} else {
+		$sbuiadmin_user_name = trim($sbsanitize->stopXSS($sb_remember_result['username']));
 		// --- Check if User is active
 		if (!$sbusers->checkUserIsActive($sbuiadmin_user_name)) {
 			// --- User is no more active
@@ -155,45 +184,57 @@ if ( (!isset($_SESSION['sbuiadmin_user_name']) || $_SESSION['sbuiadmin_user_name
 			$sbuiadmin_type = 'error';
 			$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_USER_ERROR, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
 			$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
-			// --- Destroy COOKIE
-		    setcookie('sbuiadmin_user_name', '', time() - 3600, "/");
-		    setcookie('sbuiadmin_user_password', '', time() - 3600, "/");
-		    setcookie('sbuiadmin_user_method', '', time() - 3600, "/");
+			// --- Destroy COOKIE (le jeton lui-même est déjà supprimé par
+			// verifyRememberToken(), à usage unique)
+		    sbSetAuthCookie($cookie_remember, '', time() - 3600);
 		    // --- Set sessions to NULL
 			$_SESSION = array();
-		    $_SESSION['sbuiadmin_user_name']     = NULL;
-		    $_SESSION['sbuiadmin_user_password'] = NULL;
-		    $_SESSION['sbuiadmin_user_method']   = NULL;
+		    $_SESSION['sbuiadmin_user_name'] = NULL;
 			// --- Smarty display
 			$sbsmarty->display('system/login.tpl');
 			exit;
 		} else {
-			$_SESSION['sbuiadmin_user_name']     = trim($sbsanitize->stopXSS($_COOKIE['sbuiadmin_user_name']));
-			$_SESSION['sbuiadmin_user_password'] = $_COOKIE['sbuiadmin_user_password'];
-			$_SESSION['sbuiadmin_user_method']   = $_COOKIE['sbuiadmin_user_method'];
+			// Point 1 (audit sécurité) : même régénération que pour la
+			// connexion par formulaire - la ré-authentification via le
+			// cookie "Se souvenir de moi" établit tout autant une session
+			// authentifiée fraîche.
+			session_regenerate_id(true);
+			$_SESSION['sbuiadmin_user_name'] = $sbuiadmin_user_name;
+			// Jeton précédent déjà supprimé (usage unique) - on en émet un
+			// nouveau pour que "Se souvenir de moi" reste valide tant que
+			// l'utilisateur revient avant expiration.
+			$sb_new_cookie = $sbusers->createRememberToken($sb_remember_result['user_id'], $cookie_lifetime);
+			if ($sb_new_cookie !== false) {
+				sbSetAuthCookie($cookie_remember, $sb_new_cookie, time() + $cookie_lifetime);
+			}
 		}
 	}
 }
 
-if (isset($_SESSION['sbuiadmin_user_name']) && isset($_SESSION['sbuiadmin_user_password'])) {
+if (isset($_SESSION['sbuiadmin_user_name']) && $_SESSION['sbuiadmin_user_name'] != NULL) {
 	// ------------------
 	// --- SESSION Auth
 	// ------------------
-	// --- Check Session
-	$sbuiadmin_user_name     = trim($sbsanitize->stopXSS($_SESSION['sbuiadmin_user_name']));
-	$sbuiadmin_user_password = $_SESSION['sbuiadmin_user_password'];
-	// --- Check User
-	if ($sbusers->login($sbuiadmin_user_name, $sbuiadmin_user_password)) {
-		// --- Check if User is active
-		if (!$sbusers->checkUserIsActive($sbuiadmin_user_name)) {
-			// --- User is no more active
-			$sbsmarty->assign('sbuiadmin_access_code', 'E4');
-			$sbuiadmin_type = 'error';
-			$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_USER_ERROR, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
-			$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
-			$sbsmarty->display('system/login.tpl');
-			exit;
-		}
+	// Point 1 (audit sécurité, 2026-07-29) : ne revérifie plus le mot de
+	// passe à chaque requête (l'ancien code déchiffrait et comparait le
+	// mot de passe stocké en session sur CHAQUE page admin - coûteux, et
+	// de toute façon sans effet réel : un échec ici ne bloquait rien,
+	// $sbuiadmin_user_type et le reste de la page continuaient quand même
+	// avec la session existante). Une session PHP valide (cookie
+	// httponly/secure/samesite, ID régénéré à la connexion) est la
+	// preuve d'authentification suffisante - pratique standard. Seul le
+	// statut "actif" est encore réévalué à chaque requête : un compte
+	// désactivé doit être éjecté immédiatement, pas seulement à sa
+	// prochaine connexion.
+	$sbuiadmin_user_name = trim($sbsanitize->stopXSS($_SESSION['sbuiadmin_user_name']));
+	if (!$sbusers->checkUserIsActive($sbuiadmin_user_name)) {
+		// --- User is no more active
+		$sbsmarty->assign('sbuiadmin_access_code', 'E4');
+		$sbuiadmin_type = 'error';
+		$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_USER_ERROR, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
+		$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
+		$sbsmarty->display('system/login.tpl');
+		exit;
 	}
 }
 if ((isset($_POST['username']) && $_POST['username']) && (isset($_POST['password']) && $_POST['password'])) {
@@ -209,8 +250,12 @@ if ((isset($_POST['username']) && $_POST['username']) && (isset($_POST['password
 	// ------------------
 	// --- Form auth
 	// ------------------
+	// Point 1 (audit sécurité, 2026-07-29) : mot de passe transmis en clair
+	// à login() (password_verify() ne fonctionne pas sur un chiffré) -
+	// jamais stocké nulle part sous cette forme, ni en session ni en
+	// cookie (voir le jeton "Se souvenir de moi" plus bas).
 	$sbuiadmin_user_name     = trim($sbsanitize->stopXSS($_POST['username']));
-	$sbuiadmin_user_password = trim($sbusers->encrypt($_POST['password']));
+	$sbuiadmin_user_password = $_POST['password'];
 	// --- Check User
 	if ($sbusers->login($sbuiadmin_user_name, $sbuiadmin_user_password)) {
 		// --- Check if User is active
@@ -273,14 +318,24 @@ if ((isset($_POST['username']) && $_POST['username']) && (isset($_POST['password
 			$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
 			// Update LoginTime
 			$sbusers->updateAccessUserLogin($sbuiadmin_user_name, false, time());
-			// Assign SESSION
-			$_SESSION['sbuiadmin_user_name']     = $sbuiadmin_user_name;
-			$_SESSION['sbuiadmin_user_password'] = $sbuiadmin_user_password;
-			// Cookie is Remember me Checked
+			// Point 1 (audit sécurité) : régénère l'ID de session à chaque
+			// authentification réussie (jamais fait avant - uniquement au
+			// logout) pour empêcher la fixation de session (un ID connu/
+			// imposé avant connexion ne doit plus être valide après).
+			session_regenerate_id(true);
+			// Assign SESSION - Point 1 (audit sécurité) : le mot de passe
+			// (en clair ou sous quelque forme que ce soit) n'est plus
+			// jamais stocké en session - la revérifier à chaque requête
+			// n'est plus nécessaire (voir le bloc "SESSION Auth" plus haut).
+			$_SESSION['sbuiadmin_user_name'] = $sbuiadmin_user_name;
+			// Cookie is Remember me Checked - jeton sélecteur/validateur
+			// (Point 1) au lieu du mot de passe stocké dans le cookie.
 			if ($rememberme == 'yes') {
-				setcookie('sbuiadmin_user_name', $_SESSION['sbuiadmin_user_name'], time() + $cookie_lifetime, "/");
-				setcookie('sbuiadmin_user_password', $_SESSION['sbuiadmin_user_password'], time() + $cookie_lifetime, "/");
-				setcookie('sbuiadmin_user_method', $cookie_method, time() + $cookie_lifetime, "/");
+				$sb_user_id = intval($sbusers->getUserInfo($sbuiadmin_user_name, 'id'));
+				$sb_new_cookie = $sbusers->createRememberToken($sb_user_id, $cookie_lifetime);
+				if ($sb_new_cookie !== false) {
+					sbSetAuthCookie($cookie_remember, $sb_new_cookie, time() + $cookie_lifetime);
+				}
 			}
 			
 		}
@@ -296,7 +351,7 @@ if ((isset($_POST['username']) && $_POST['username']) && (isset($_POST['password
 		exit;
 	}
 }
-if (!isset($_SESSION['sbuiadmin_user_name']) && !isset($_SESSION['sbuiadmin_user_password'])) {
+if (!isset($_SESSION['sbuiadmin_user_name']) || $_SESSION['sbuiadmin_user_name'] == NULL) {
 	// ------------------
 	// --- SESSION Auth
 	// ------------------
@@ -316,16 +371,20 @@ if (isset($_GET['ac']) && $_GET['ac'] == 'logout') {
 	$sbusers->updateAccessUserLogin($sbuiadmin_user_name, true);
 	// Start SESSION
 	session_start();
-	// --- Destroy COOKIE
-	setcookie('sbuiadmin_user_name', '', time() - 3600, "/");
-	setcookie('sbuiadmin_user_password', '', time() - 3600, "/");
-	setcookie('sbuiadmin_user_method', '', time() - 3600, "/");
+	// --- Destroy COOKIE + jeton "Se souvenir de moi" en base (Point 1) -
+	// une déconnexion explicite doit aussi invalider ce jeton, sinon il
+	// reste utilisable pour se reconnecter automatiquement malgré la
+	// déconnexion volontaire.
+	if (isset($_COOKIE[$cookie_remember]) && $_COOKIE[$cookie_remember] != '') {
+		$sbusers->deleteRememberTokenBySelector($_COOKIE[$cookie_remember]);
+	}
+	sbSetAuthCookie($cookie_remember, '', time() - 3600);
 	// --- Set sessions to NULL
 	$_SESSION = array();
 	session_unset();
 	session_destroy();
 	session_write_close();
-	setcookie(session_name(),'',0,'/');
+	sbSetAuthCookie(session_name(), '', 0);
 	session_regenerate_id(true);
 	header("Location: " . trim($sb_link_settings[15]));
 	exit();

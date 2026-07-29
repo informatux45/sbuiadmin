@@ -13,9 +13,19 @@
 // ----------------------
 ini_set("session.gc_maxlifetime", 24*3600); // 1 day (24 hours)
 // Options disponibles depuis PHP 7.0
+// Point 1 (audit sécurité) : cookie_secure calculé (pas codé en dur à 1) -
+// sbconfig.php n'est pas encore chargé à ce stade, donc pas d'accès à
+// $_sb_https ; même détection reprise ici en local pour ne jamais envoyer
+// le cookie de session en clair sur HTTPS, sans casser les accès HTTP
+// (dev local, etc.) en forçant un cookie_secure qui ne serait alors jamais
+// renvoyé par le navigateur.
+$sb_is_https = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
 session_start([
     'cookie_lifetime' => 86400,
     'gc_maxlifetime'  => 86400,
+    'cookie_secure'   => $sb_is_https,
+    'cookie_httponly' => true,
+    'cookie_samesite' => 'Lax',
 ]);
 ob_start();
 

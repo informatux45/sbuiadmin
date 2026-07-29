@@ -128,8 +128,13 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'add') {
 				// INSERT DATAS
-				// --- Encrypt password
-				$password = $sbusers->encrypt($password);
+				// --- Hache le mot de passe (Point 1, audit sécurité) -
+				// password_hash() remplace l'ancien chiffrement réversible
+				// (encrypt(), clé codée en dur) pour tout NOUVEAU mot de
+				// passe. encrypt()/decrypt() restent dans sbuiadmin-users.php
+				// uniquement pour la compatibilité des comptes pas encore
+				// migrés (login() bascule automatiquement au 1er login réussi).
+				$password = $sbsql->escape_string(password_hash($password, PASSWORD_DEFAULT));
 				$query = "INSERT INTO $table (`username`, `password`, `email`, `active`, `logintime`, `lastlogin`, `menu`, `groupe`, `prenom`, `nom`, `telephone`, `fonction`, `profession`, `centres_interet`, `infos_complementaires`, `avatar`)
 						  VALUES ('$username','$password','$email','$active','0','0',' ','admin','$prenom','$nom','$telephone','$fonction','$profession','$centres_interet','$infos_complementaires','$avatar')";
 				$result_add = $sbsql->query($query);
@@ -148,7 +153,7 @@ switch($action) {
 
 				if ($self_password_only) {
 					if ($password != '') {
-						$password = $sbusers->encrypt($password);
+						$password = $sbsql->escape_string(password_hash($password, PASSWORD_DEFAULT));
 						$query = "UPDATE $table SET password = '$password' WHERE id = '$id'";
 						$result_edit = $sbsql->query($query);
 						if ($result_edit) {
@@ -176,8 +181,8 @@ switch($action) {
 																		,avatar = '$avatar'
 																		WHERE id = '$id'";
 					} else {
-						// --- Encrypt password
-						$password = $sbusers->encrypt($password);
+						// --- Hache le mot de passe (Point 1)
+						$password = $sbsql->escape_string(password_hash($password, PASSWORD_DEFAULT));
 						$query = "UPDATE $table SET username = '$username'
 																		,password = '$password'
 																		,email = '$email'
