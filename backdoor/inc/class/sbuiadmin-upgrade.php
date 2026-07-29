@@ -35,7 +35,7 @@ class upgrade extends sanitize {
 	 * @return update
 	 */
 
-	function upgrade($server_address, $current_version){
+	private function upgrade($server_address, $current_version){
 		$this->server_address  = $server_address;
 		$this->current_version = $current_version;
 		$this->get_server_variables();
@@ -46,7 +46,7 @@ class upgrade extends sanitize {
 	 *
 	 */
 
-	function check_for_updates() {
+	public function check_for_updates() {
 		if ($this->current_version < $this->server_version)
 			return true;
 		else
@@ -76,7 +76,7 @@ class upgrade extends sanitize {
 	 *
 	 * @return string
 	 */
-	function print_updated_files_list() {
+	public function print_updated_files_list() {
 		$filelist = "";
 		foreach ($this->updated_files_list as $filename) {
 			$filelist .= $filename."<br>";
@@ -122,7 +122,7 @@ class upgrade extends sanitize {
 	 * @return true
 	 */
 
-	function check_if_are_writable() {
+	public function check_if_are_writable() {
 		$err="";
 		foreach ($this->updated_files_list as $filename) {
 			if($this->is__writable($filename)===true) {
@@ -137,7 +137,7 @@ class upgrade extends sanitize {
 		return $err==1?false:true;
 	}
 
-	function get_total_charlen() {
+	private function get_total_charlen() {
 		foreach($this->charlen_file as $len) {
 			$total_len+=$len;
 		}
@@ -151,7 +151,7 @@ class upgrade extends sanitize {
 	 * @return error string for error or true
 	 */
 
-	function update_files() {
+	public function update_files() {
 		$err="";
 		if($this->check_if_are_writable()===true) {
 			$i=0;

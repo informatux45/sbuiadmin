@@ -60,7 +60,7 @@ class panier extends sql {
 	   ,'4' => _CMS_SHOP_DISCOUNT_TYPE_4 // Livraison gratuite
 	];
 
-	function __construct() {
+	public function __construct() {
 		// --- Initialize
 		$this->total_quantity  = 0;
 		$this->total_price_ht  = 0;
@@ -80,7 +80,7 @@ class panier extends sql {
 	 *
 	 * @return void
 	 */
-	function add($ref, $qty, $ekado = '0') {
+	public function add($ref, $qty, $ekado = '0') {
 		global $sbsanitize;
 		// Check if quantity
 		if ( !empty($qty) ) {
@@ -136,7 +136,7 @@ class panier extends sql {
 	 *
 	 * @return void
 	 */
-	function update() {
+	public function update() {
 		global $_POST;
 		// Check if products
 		if ($_POST) {
@@ -157,7 +157,7 @@ class panier extends sql {
 	 *
 	 * @return void
 	 */
-	function remove($reference) {
+	public function remove($reference) {
 		if (!empty($_SESSION["cart"])) {
 			foreach($_SESSION["cart"] as $k => $v) {
 					if ($reference == $k) unset($_SESSION["cart"][$k]);				
@@ -173,7 +173,7 @@ class panier extends sql {
 	 *
 	 * @return void
 	 */
-	function check($reference) {
+	public function check($reference) {
 		global $sbsanitize;
 		// Check if quantity
 		if (!empty($_SESSION["cart"])) {
@@ -192,7 +192,7 @@ class panier extends sql {
 	 *
 	 * @return void
 	 */
-	function promo($code) {
+	public function promo($code) {
 		global $sbsanitize, $sbsmarty;
 		// -----------------------------
 		// Check if SESSION cart_promo is already active
@@ -291,7 +291,7 @@ class panier extends sql {
 	 *
 	 * @return void
 	 */
-	function transport($id) {
+	public function transport($id) {
 		global $sbsanitize, $sbsmarty;
 		// -----------------------------
 		if (!$id) return false;
@@ -342,7 +342,7 @@ class panier extends sql {
 	 *
 	 * @return bool
 	 */
-	function checkEkadoCart() {
+	public function checkEkadoCart() {
 		$ekado = false;
 		if (!empty($_SESSION["cart"])) {
 			foreach($_SESSION["cart"] as $k => $v) {
@@ -357,7 +357,7 @@ class panier extends sql {
 	 *
 	 * @return string | false
 	 */
-	function getProductEkado($reference) {
+	public function getProductEkado($reference) {
 		global $sbsanitize;
 		// Check if Cart SESSION is not empty
 		if (!empty($_SESSION["cart"])) {
@@ -376,7 +376,7 @@ class panier extends sql {
 	 *
 	 * @return string | false
 	 */
-	function getCartNbProducts() {
+	public function getCartNbProducts() {
 		global $sbsanitize;
 		$nb_products = 0;
 		// Check if Cart SESSION is not empty
@@ -395,7 +395,7 @@ class panier extends sql {
 	 *
 	 * @return array (object)
 	 */
-	function getPromo() {
+	public function getPromo() {
 		return (object) [
 			 'code'         => $_SESSION['cart_promo']['code']
 			,'code_name'    => $_SESSION['cart_promo']['code_name']
@@ -413,7 +413,7 @@ class panier extends sql {
 	 *
 	 * @return array (object)
 	 */
-	function getTransport() {
+	public function getTransport() {
 		return (object) [
 			 'title'               => $_SESSION['cart_transport']['title']
 			,'description'         => $_SESSION['cart_transport']['description']
@@ -436,7 +436,7 @@ class panier extends sql {
 	 *
 	 * @return array
 	 */
-	function getPayment($id, $field = '') {
+	public function getPayment($id, $field = '') {
 		global $sbsanitize;
 		// --- Initialization
 		$field = ($field != '') ? $sbsanitize->stopXSS($field) : "*";
@@ -479,7 +479,7 @@ class panier extends sql {
 	 *
 	 * @return float / float with currency
 	 */
-	function calculatePromo($total_price_ttc, $float = false, $total = false) {
+	public function calculatePromo($total_price_ttc, $float = false, $total = false) {
 		// Switch Calculation with TYPE of Discount (code)
 		switch( $this->getPromo()->code ) {
 			case "1": // Remise sur un produit
@@ -506,7 +506,7 @@ class panier extends sql {
 	 *
 	 * @return void
 	 */
-	function cartEmpty() {
+	public function cartEmpty() {
 		unset($_SESSION["cart"]);               // Panier
 		unset($_SESSION["cart_promo"]);         // Codes promo
 		unset($_SESSION["cart_transport"]);     // Transport ID
@@ -519,7 +519,7 @@ class panier extends sql {
 	 *
 	 * @return array
 	 */
-	function getProducts() {
+	public function getProducts() {
 		// --- Initialize
 		$cart_item = [];
 		// --- Check if products in cart
@@ -553,7 +553,7 @@ class panier extends sql {
 	 *
 	 * @return object
 	 */
-	function getCartTotal($tva = false, $shipping = false) {
+	public function getCartTotal($tva = false, $shipping = false) {
 		// --- Check if products in cart
 		if (isset($_SESSION["cart"])) {
 			$this->total_quantity = 0;
@@ -597,7 +597,7 @@ class panier extends sql {
 	 *
 	 * @return object
 	 */
-	function getTotalCartWithTransportLessDiscount() {
+	private function getTotalCartWithTransportLessDiscount() {
 		// --------------------
 		// Transport
 		// --------------------
@@ -645,7 +645,7 @@ class panier extends sql {
 	 * 
 	 * @return object
 	 */
-	function getCartTVA($total_price) {
+	private function getCartTVA($total_price) {
 		// TVA Calcul
 		switch($this->config->is_tva) {
 			default:
@@ -675,7 +675,7 @@ class panier extends sql {
 	 * 
 	 * @return object
 	 */
-	function getProductCartTVA($price) {
+	private function getProductCartTVA($price) {
 		// 3: TVA activée (à inclure dans le prix du produit - prix en TTC sur la fiche produit)
 		$_product_tva       = $price * ($this->TVA / 100);
 		$_product_width_tva = $price + $_product_tva;
@@ -690,7 +690,7 @@ class panier extends sql {
 	 * 
 	 * @return object
 	 */
-	function getOrder($oid) {
+	public function getOrder($oid) {
 		$oid = intval($oid);
         // --- Free SQL
         $this->free();
@@ -713,7 +713,7 @@ class panier extends sql {
 	 * 
 	 * @return object
 	 */
-	function getOrderDetail($oid) {
+	public function getOrderDetail($oid) {
 		$oid           = intval($oid);
         // --- Free SQL
         $this->free();
@@ -736,7 +736,7 @@ class panier extends sql {
 	 *
 	 * @return string (Shipping Adress)
 	 */
-	function getClientShipping($user_info) {
+	public function getClientShipping($user_info) {
 		$client_shipping = "";
 		$transport       = $this->getTransport();
 		
@@ -791,7 +791,7 @@ class panier extends sql {
 	 *
 	 * @return string	Order detail TABLE
 	 */
-	function getOrderEmail($oid) {
+	public function getOrderEmail($oid) {
 		global $sbsql, $sbsanitize, $sbsmarty;
 		// -------------------------------
 		// --- Initialize
@@ -986,7 +986,7 @@ class panier extends sql {
 	 * 
 	 * @return string (Country Name)
 	 */
-	function getCountryName($code) {
+	public function getCountryName($code) {
 		global $sbsql, $sbsanitize, $sbsmarty;
 		$table = _AM_DB_PREFIX . 'sb_shop_currency_country';
 		$code  = $sbsanitize->stopXSS($code);
@@ -1013,7 +1013,7 @@ class panier extends sql {
 	 *
 	 * @return float
 	 */
-	function decimalsFloat($n, $n_decimals) {
+	private function decimalsFloat($n, $n_decimals) {
 		return ( (floor($n) == round($n, $n_decimals)) ? number_format($n) : number_format($n, $n_decimals) );
 	}
 	
@@ -1024,7 +1024,7 @@ class panier extends sql {
 	 *
 	 * @return string
 	 */
-	function addCurrency($price) {
+	private function addCurrency($price) {
 		// --------------------------------
 		// --- Show currency
 		// --------------------------------
@@ -1042,7 +1042,7 @@ class panier extends sql {
 	 *
 	 * @return object
 	 */
-	function getConfShop() {
+	public function getConfShop() {
         // --- Free SQL
         $this->free();
 		$query_conf   = "SELECT * FROM " . $this->tblshopconfig . " WHERE id = '1'";
@@ -1075,7 +1075,7 @@ class panier extends sql {
 	 *
 	 * @return string
 	 */
-	function getProductInfo($pid, $field = '') {
+	public function getProductInfo($pid, $field = '') {
 		global $sbsanitize;
 		// --- Initialization
 		$field = ($field != '') ? $sbsanitize->stopXSS($field) : "*";
@@ -1115,7 +1115,7 @@ class panier extends sql {
 	 *
 	 * @return string
 	 */
-	function getProductPrice($pid) {
+	public function getProductPrice($pid) {
         // Get product infos
         $product       = $this->getProductInfo($pid);
 		$is_discount   = $this->isDiscount($product['type']);
@@ -1146,7 +1146,7 @@ class panier extends sql {
 	 *
 	 * @return bool
 	 */
-	function isDiscount($type) {
+	public function isDiscount($type) {
 		global $sbsanitize;
 		// Product type
 		$type     = $sbsanitize->sTrim( $type );
@@ -1172,7 +1172,7 @@ class panier extends sql {
 	 *
 	 * @return float
 	 */
-	function calculPriceDiscount($price, $type) {
+	private function calculPriceDiscount($price, $type) {
 		global $sbsanitize;
 		// Discount type
 		$type = $sbsanitize->sTrim( $type ); // Ex: cheque, box, vegetable, chair, shoes, ...

@@ -11,6 +11,7 @@
 ################################################################################
 
 	session_start();
+	require_once('../inc-auth-guard.php');
 
 	$handler_ajax = true;
     require_once('../include/settings.inc.php');

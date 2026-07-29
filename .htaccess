@@ -2,7 +2,17 @@
  <FilesMatch "\.(jpg|png|css|js)$">
  Header set Cache-Control "proxy-revalidate, max-age=3600"
  </FilesMatch>
- 
+
+## Point 1 (audit sécurité, 2026-07-29) : en-têtes HTTP de sécurité de base.
+## Pas de Content-Security-Policy/Strict-Transport-Security ici - ces 2-là
+## peuvent casser des choses (CDN externes, mode HTTP local...) sans un
+## réglage plus fin au cas par cas, volontairement laissés de côté.
+<IfModule mod_headers.c>
+Header always set X-Content-Type-Options "nosniff"
+Header always set X-Frame-Options "SAMEORIGIN"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
  ## Error Document
  ErrorDocument 404 index.php?p=pages&id=404
 

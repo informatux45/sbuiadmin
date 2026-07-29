@@ -265,6 +265,11 @@ class form extends sanitize {
 				$this -> formBuffer['open'] .= $clef.'="'.$val.'" ';
 		}
 		$this -> formBuffer['open'] .= '>' . "\n";
+		// Point 1 (audit sécurité) : jeton CSRF injecté automatiquement
+		// dans TOUS les formulaires passant par cette classe - vérifié
+		// côté serveur au point d'entrée unique de index.php
+		// (sbCheckCsrfToken()).
+		$this -> formBuffer['open'] .= '<input type="hidden" name="sbuiadmin_csrf_token" value="' . htmlspecialchars(sbCsrfToken(), ENT_QUOTES, 'UTF-8') . '">' . "\n";
 	}
 	
 	// fermer le formulaire

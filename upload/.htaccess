@@ -1,0 +1,11 @@
+## Point 1 (audit sécurité, 2026-07-29) : défense en profondeur - empêche
+## l'exécution de scripts dans ce dossier même si une validation
+## d'extension côté upload venait à être contournée (uploads utilisateurs
+## uniquement, aucun script n'a besoin d'y tourner).
+<FilesMatch "\.(php|php3|php4|php5|php7|phtml|pl|py|cgi|sh|asp|aspx)$">
+order allow,deny
+deny from all
+</FilesMatch>
+
+## Prevent directory listings
+Options All -Indexes

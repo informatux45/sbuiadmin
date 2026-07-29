@@ -478,6 +478,18 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 			exit;
 		}
 
+		// Point 1 (audit sécurité, 2026-07-29) : protection CSRF, vérifiée
+		// ici au même point d'étranglement que les droits pour couvrir
+		// tous les contrôleurs d'un coup plutôt que module par module.
+		// Uniquement les vraies soumissions de formulaire
+		// ($_POST['form_submit'], convention universelle de
+		// sbuiadmin-form.php::openForm(), qui injecte le jeton) - pas les
+		// endpoints AJAX qui ne passent pas par cette classe (ex: messages).
+		if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_submit']) && $_POST['form_submit'] != '' && !sbCheckCsrfToken()) {
+			$sbsmarty->display("403.tpl");
+			exit;
+		}
+
 		// Yes, so include
 		sb_global_include($controlIfPhpFileExists);
 

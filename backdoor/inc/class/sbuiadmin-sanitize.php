@@ -25,7 +25,7 @@ class sanitize extends sql {
 	* @param  string  $text
 	* @return string
 	**/
-	function makeClickable(&$text) {
+	private function makeClickable(&$text) {
 		$patterns = array("/(^|[^]_a-z0-9-=\"'\/])([a-z]+?):\/\/([^, \r\n\"\(\)'<>]+)/i", "/(^|[^]_a-z0-9-=\"'\/])www\.([a-z0-9\-]+)\.([^, \r\n\"\(\)'<>]+)/i", "/(^|[^]_a-z0-9-=\"'\/])ftp\.([a-z0-9\-]+)\.([^, \r\n\"\(\)'<>]+)/i", "/(^|[^]_a-z0-9-=\"'\/:\.])([a-z0-9\-_\.]+?)@([^, \r\n\"\(\)'<>\[\]]+)/i");
 		$replacements = array("\\1<a href=\"\\2://\\3\" target=\"_blank\">\\2://\\3</a>", "\\1<a href=\"http://www.\\2.\\3\" target=\"_blank\">www.\\2.\\3</a>", "\\1<a href=\"ftp://ftp.\\2.\\3\" target=\"_blank\">ftp.\\2.\\3</a>", "\\1<a href=\"mailto:\\2@\\3\">\\2@\\3</a>");
 		return preg_replace($patterns, $replacements, $text);
@@ -37,7 +37,7 @@ class sanitize extends sql {
 	* @param  string  $text
 	* @return string
 	*/
-	function nl2Br($text) {
+	public function nl2Br($text) {
 		return preg_replace("/(\015\012)|(\015)|(\012)/","<br />",$text);
 	}
 
@@ -47,7 +47,7 @@ class sanitize extends sql {
 	* @param  string  $text
 	* @return string
 	*/
-	function undoNl2Br($text) {
+	private function undoNl2Br($text) {
 		return preg_replace("/(\015\012)|(\015)|(\012)/","\n",$text);
 	}
 
@@ -57,7 +57,7 @@ class sanitize extends sql {
 	* @param  string  $text
 	* @return string
 	**/
-	function addSlashes($text) {
+	public function addSlashes($text) {
 		if (!function_exists("get_magic_quotes_gpc")) {
 			$text = addslashes($text);
 		}
@@ -70,7 +70,7 @@ class sanitize extends sql {
 	* @param  string  $text
 	* @return string
 	*/
-	function stripSlashesGPC($text) {
+	private function stripSlashesGPC($text) {
 		if (function_exists("get_magic_quotes_gpc") && get_magic_quotes_gpc()) {
 			$text = stripslashes($text);
 		}
@@ -83,7 +83,7 @@ class sanitize extends sql {
 	* @param  array  $value
 	* @return array
 	*/
-	function stripslashes_deep($value) {
+	private function stripslashes_deep($value) {
 		$value = is_array($value) ?
 					array_map('stripslashes_deep', $value) :
 					$this->stripSlashesGPC($value);
@@ -97,7 +97,7 @@ class sanitize extends sql {
 	* @param  string  $text
 	* @return string
 	*/
-	function stripTags($text) {
+	public function stripTags($text) {
 		return strip_tags($text);
 	}
 
@@ -125,7 +125,7 @@ class sanitize extends sql {
 	* EUC-JP 	EUCJP				Japanese
 	* ------------------------------------------------------------------------------
 	*/
-	function htmlEntities($text, $encode = 'UTF-8') {
+	public function htmlEntities($text, $encode = 'UTF-8') {
 		return htmlentities($text, ENT_QUOTES, $encode);
 	}
 
@@ -153,7 +153,7 @@ class sanitize extends sql {
 	* EUC-JP 	EUCJP				Japanese
 	* ------------------------------------------------------------------------------
 	*/
-	function htmlEntitiesDecode($text, $encode = 'UTF-8') {
+	public function htmlEntitiesDecode($text, $encode = 'UTF-8') {
 		return html_entity_decode($text, ENT_QUOTES, $encode);
 	}
 
@@ -166,7 +166,7 @@ class sanitize extends sql {
 	* @param   bool    $double_encode
 	* @return    string
 	*/
-	function htmlSpecialChars($text, $charset = "UTF-8", $double_encode = true) {
+	public function htmlSpecialChars($text, $charset = "UTF-8", $double_encode = true) {
 		if ( version_compare( phpversion(), "5.2.3", ">=" ) ) {
 			$text = htmlspecialchars( $text, ENT_QUOTES, $charset, $double_encode );
 		} else {
@@ -183,7 +183,7 @@ class sanitize extends sql {
 	* @param  string  $text
 	* @return string
 	**/
-	function undoHtmlSpecialChars($text) {
+	private function undoHtmlSpecialChars($text) {
 		return preg_replace(array("/&gt;/i", "/&lt;/i", "/&quot;/i", "/&#039;/i", '/&amp;nbsp;/i'), array(">", "<", "\"", "'", "&nbsp;"), $text);
 	}
 
@@ -204,7 +204,7 @@ class sanitize extends sql {
     * "\x0B" (ASCII 11 (0x0B)), a vertical tab.
 	*------------------------------------------------------------------------------
 	**/
-	function sTrim($text, $character_mask = '') {
+	public function sTrim($text, $character_mask = '') {
 		if ($character_mask != '')
 			return trim($text, $character_mask);
 		else
@@ -216,7 +216,7 @@ class sanitize extends sql {
 	* @param  string  $url
 	* @return string url website
 	*/
-	function validateWebsite($url) {
+	private function validateWebsite($url) {
 		if ($url === 'http://') {
 			return '';
 		} else if (!preg_match('#^[a-z0-9]+://#i', $url) && strlen($url) > 0) {
@@ -230,7 +230,7 @@ class sanitize extends sql {
 	* @param  string  $string
 	* @return string string
 	*/	
-	function rewriteString($string, $lowupp = false) {
+	public function rewriteString($string, $lowupp = false) {
 		$noValidString = trim($this->displayText($string));
 		$noValidString = preg_replace('`\s+`', '-', trim($noValidString));
 		$noValidString = str_replace("'", "-", $noValidString);
@@ -256,7 +256,7 @@ class sanitize extends sql {
 	* A quick solution for filtering XSS scripts
 	* @TODO: To be improved
 	*/
-	function filterXss($text) {
+	private function filterXss($text) {
 		$patterns = array();
 		$replacements = array();
 
@@ -280,7 +280,7 @@ class sanitize extends sql {
 	* @param string $text String to purify
 	* @return string $text The purified text
 	*/
-	function stopXSS($text) {
+	public function stopXSS($text) {
 		if (!is_array($text)) {
 			$text = preg_replace("/\(\)/si", "", $text);
 			$text = strip_tags($text);
@@ -310,7 +310,7 @@ class sanitize extends sql {
 	* @param   bool    $xss    allow filtering XSS scripts?
 	* @return  string
 	**/
-	function displayText($text, $encode = 'UTF-8', $entities = 0, $decode_entities = 1, $html = 0, $br = 0, $clickable = 0, $xss = 1) {
+	public function displayText($text, $encode = 'UTF-8', $entities = 0, $decode_entities = 1, $html = 0, $br = 0, $clickable = 0, $xss = 1) {
 
 		// Trim text
 		$text = $this->sTrim($text);
@@ -372,7 +372,7 @@ class sanitize extends sql {
 	* EUC-JP 	EUCJP				Japanese
 	* ------------------------------------------------------------------------------
 	**/
-	function displayLang($string, $lang = "fr", $encode = "UTF-8") {
+	public function displayLang($string, $lang = "fr", $encode = "UTF-8") {
 		// Show the language session (fr OR en OR ...)
 		$string = $this->htmlEntitiesDecode($string, $encode);
 		$string = $this->stripSlashesGPC($string);

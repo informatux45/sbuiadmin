@@ -85,7 +85,7 @@ class account extends sql {
 	 *
 	 * @return bool
 	 */
-    function login($email, $password) {
+    public function login($email, $password) {
 		// Initialisation
 		$query  = "SELECT email, password FROM " . $this->tblaccount . " WHERE email = '$email'";
         $result = $this->query($query);
@@ -115,7 +115,7 @@ class account extends sql {
 	 *
 	 * @return bool
 	 */
-    function checkUser($password, $captcha) {
+    public function checkUser($password, $captcha) {
         if (isset($_SESSION['sbaccount_user_email']) || $_SESSION['sbaccount_user_email'] != '') {
             if (!$this->login($_SESSION['sbaccount_user_email'], $password, $crypt)) {
                 return false;
@@ -135,7 +135,7 @@ class account extends sql {
 	 *
 	 * @return string (url)
 	 */
-	function getUrlHomepage() {
+	public function getUrlHomepage() {
 		// --- Link CUSTOMER WEBSITE HOME
 		$sb_link_settings = file( SB_ADMIN_DIR . 'inc/admin/settings.txt' );
 		if (trim($sb_link_settings[24]) == '1') {
@@ -157,7 +157,7 @@ class account extends sql {
 	 *
 	 * @return void
 	 */
-	function userLogout() {
+	public function userLogout() {
 		// Update LastLogin
 		$this->updateAccessUserLogin($_SESSION['sbaccount_user_email']);
 		// --- Link CUSTOMER WEBSITE HOME
@@ -180,7 +180,7 @@ class account extends sql {
 	 *
 	 * @return void
 	 */
-	function redirect($redirect_url) {
+	public function redirect($redirect_url) {
 		header("Location: " . $redirect_url);
 		exit();
 	}
@@ -192,7 +192,7 @@ class account extends sql {
 	 *
 	 * @return bool
 	 */
-    function checkUserIsActive($email) {
+    public function checkUserIsActive($email) {
         $query_user  = "SELECT active FROM " . $this->tblaccount . " WHERE email = '$email'";
         $result_user = $this->query($query_user);
         $user_infos  = $this->assoc($result_user);
@@ -208,7 +208,7 @@ class account extends sql {
 	 *
 	 * @return array
 	 */
-	function getGroups() {
+	public function getGroups() {
         $query_group  = "SELECT gid, title FROM " . $this->tblgroup . " WHERE active = '1' ORDER BY sort ASC";
         $result_group = $this->query($query_group);
         $group_infos  = $this->toarray($result_group);
@@ -224,7 +224,7 @@ class account extends sql {
 	 *
 	 * @return array / string
 	 */
-	function getGroupInfo($gid, $field = '') {
+	public function getGroupInfo($gid, $field = '') {
 		global $sbsanitize;
 		// --- Initialization
 		$field = ($field != '') ? $sbsanitize->stopXSS($field) : "*";
@@ -255,7 +255,7 @@ class account extends sql {
 	/**
 	 * TODO: group SQL TBL to construct
 	 */
-    function checkGroup() {
+    public function checkGroup() {
         if (isset($_SESSION['sbaccount_user_email']) || $_SESSION['sbaccount_user_email'] != '') return true;
         else return false;
     }
@@ -267,7 +267,7 @@ class account extends sql {
 	* 
 	* @return bool
 	*/
-	function checkEmailExist($email) {
+	public function checkEmailExist($email) {
 		global $sbsanitize;
 		// check if email already exist
 		// Escape strings
@@ -293,7 +293,7 @@ class account extends sql {
 	* 
 	* @return bool / array
 	*/
-	function isUserSocialExist($identifier, $provider) {
+	public function isUserSocialExist($identifier, $provider) {
 		// --- Initialize
 		$identifier = trim($identifier);
 		$provider   = strtolower(trim($provider));
@@ -319,7 +319,7 @@ class account extends sql {
 	* 
 	* @return HTML
 	*/
-	function socialGetErrorSession($session, $type, $success = false) {
+	public function socialGetErrorSession($session, $type, $success = false) {
 		// Initialization
 		$html_return = "";
 		$html_style  = ($success) ? 'success' : 'error';
@@ -360,7 +360,7 @@ class account extends sql {
 	* 
 	* @return bool
 	*/
-	function updateUserSession($email, $password) {
+	public function updateUserSession($email, $password) {
 		$_SESSION['sbaccount_user_email']    = $email;
 		$_SESSION['sbaccount_user_password'] = $password;
 	}	
@@ -374,7 +374,7 @@ class account extends sql {
 	* 
 	* @return bool
 	*/
-	function updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user = 'client') {
+	public function updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user = 'client') {
 		// --- Update the Access Log file if exist
 		$sql = "INSERT INTO " . $this->tblaccess . " (`logaccess_type`, `logaccess_date`, `logaccess_user`, `logaccess_event`)
 				VALUES ('$sbuiadmin_type', UNIX_TIMESTAMP(), '$sbuiadmin_user', '$sbuiadmin_event')";
@@ -394,7 +394,7 @@ class account extends sql {
 	* 
 	* @return bool
 	*/
-	function updateAccessUserLogin($email, $lastlogin = false, $time = false) {
+	public function updateAccessUserLogin($email, $lastlogin = false, $time = false) {
 		// --- Update the Access User logintime
 		if ($email != '' && $lastlogin == false) {
 			$sql = "UPDATE " . $this->tblaccount . " SET logintime = NOW() WHERE email = '$email'";
@@ -424,7 +424,7 @@ class account extends sql {
 	 *
 	 * @return array / string
 	 */
-	function getUserInfo($email, $field = '') {
+	public function getUserInfo($email, $field = '') {
 		global $sbsanitize;
 		// --- Initialization
 		$field = ($field != '') ? $sbsanitize->stopXSS($field) : "*";
@@ -460,7 +460,7 @@ class account extends sql {
 	 * 
 	 * @return array
 	 */
-	function sbGetOrders($client_uid = '', $field = '') {
+	public function sbGetOrders($client_uid = '', $field = '') {
 		global $sbsanitize;
 		// --- Initialization
 		$field = ($field != '') ? $sbsanitize->stopXSS($field) : "*";
@@ -486,7 +486,7 @@ class account extends sql {
 	 * 
 	 * @return array
 	 */
-	function getOrderInfo($order_id, $field = '') {
+	public function getOrderInfo($order_id, $field = '') {
 		global $sbsanitize;
 		// --- Initialization
 		$field = ($field != '') ? $sbsanitize->stopXSS($field) : "*";
@@ -509,7 +509,7 @@ class account extends sql {
 	 * 
 	 * @return string Status Name
 	 */
-	function sbGetOrderStatus($status_id = '') {		
+	public function sbGetOrderStatus($status_id = '') {		
 		switch($status_id) {
 			case "6": // 3: Déposé - BURO Club
 				return "Déposé - BURO Club";
@@ -543,7 +543,7 @@ class account extends sql {
 	 *
 	 * @return array
 	 */
-	function getCountry() {
+	public function getCountry() {
 		$this->free();
 		$query_currency    = "SELECT * FROM " . $this->tblcurrency . " ORDER BY country ASC";
 		$request_currency  = $this->query($query_currency);
@@ -559,7 +559,7 @@ class account extends sql {
 	 *
 	 * @return string
 	 */
-	function getCountryName($code) {
+	public function getCountryName($code) {
 		$this->free();
 		$query_currency   = "SELECT country FROM " . $this->tblcurrency . " WHERE country_code = '$code'";
 		$request_currency = $this->query($query_currency);
@@ -575,7 +575,7 @@ class account extends sql {
 	 *
 	 * @return	string
 	 */
-	function getCurlData($url) {
+	private function getCurlData($url) {
 		$curl = curl_init();
 		curl_setopt($curl, CURLOPT_URL, $url);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -590,7 +590,7 @@ class account extends sql {
 	* Get Google Recaptcha Response
 	* @return bool
 	*/
-	function checkRecaptcha($privatekey) {
+	public function checkRecaptcha($privatekey) {
 		global $_POST;
 		if ($privatekey) {
 			// --- Check Google Recaptcha
@@ -623,7 +623,7 @@ class account extends sql {
 	 *
 	 * return string 
 	 */
-	function generatePassword($length = 64) {
+	public function generatePassword($length = 64) {
 		$salt = '';
 		$base = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 		$microtime = function_exists('microtime') ? microtime() : time();
@@ -640,7 +640,7 @@ class account extends sql {
 	* 
 	* @return bool
 	*/
-	function sendEmail($emailname, $datas = '') {
+	public function sendEmail($emailname, $datas = '') {
 		// -----------------------
 		// Get email name infos
 		// -----------------------
@@ -717,7 +717,7 @@ class account extends sql {
 	* Send Email by PHPMailer
 	* @return bool
 	*/
-	function sendMailer($address_to, $address_name, $subject, $htmlcontent, $sender_name, $sender_email, $attachment = false) {
+	private function sendMailer($address_to, $address_name, $subject, $htmlcontent, $sender_name, $sender_email, $attachment = false) {
 		global $sbsanitize;
 		
 		$PHPMailer = new PHPMailer;
@@ -773,7 +773,7 @@ class account extends sql {
 	* $datas : Array for replace in body email
 	* @return Formatted email
 	*/
-	function formatEmail($return_text, $datas) {
+	private function formatEmail($return_text, $datas) {
 		# Url confirm email
 		$confirmemail = SB_URL . 'account/activation/' . $datas['key_activation'] . '/confirmation';
 		# Format email
@@ -835,7 +835,7 @@ class account extends sql {
 	 *
 	 * @return string
 	 */	
-	function encrypt($text, $key = '(D$9=h!S2info$rS3+huY!NX', $iv = "fYAjHeXm", $bit_check = 32, $tag = "informatux") {
+	public function encrypt($text, $key = '(D$9=h!S2info$rS3+huY!NX', $iv = "fYAjHeXm", $bit_check = 32, $tag = "informatux") {
 		// Check if php version smaller than 7.1.0
 		if (version_compare(phpversion(), '7.1.0', '<')) {
 			// All method
@@ -886,7 +886,7 @@ class account extends sql {
 	 *
 	 * @return string
 	 */	
-	function decrypt($encrypted_text, $key = '(D$9=h!S2info$rS3+huY!NX', $iv = "fYAjHeXm", $bit_check = 32, $tag = "informatux") {
+	public function decrypt($encrypted_text, $key = '(D$9=h!S2info$rS3+huY!NX', $iv = "fYAjHeXm", $bit_check = 32, $tag = "informatux") {
 		// Check if php version smaller than 7.1.0
 		if (version_compare(phpversion(), '7.1.0', '<')) {
 			$cipher = mcrypt_module_open(MCRYPT_TRIPLEDES,'','cbc','');

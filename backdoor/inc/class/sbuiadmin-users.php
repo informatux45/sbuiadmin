@@ -20,7 +20,7 @@ defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
 class user extends sql {
 	
-    function login($username, $password) {
+    public function login($username, $password) {
 		// Point 1 (audit sécurité, 2026-07-29) : $username venait de
 		// stopXSS() (ne protège pas l'apostrophe) - injection SQL possible
 		// depuis le formulaire de connexion lui-même, accessible sans
@@ -71,7 +71,7 @@ class user extends sql {
 	 * juste après une vérification de mot de passe déjà réussie ci-dessus,
 	 * jamais avant.
 	 */
-	function rehashPassword($user_id, $plain_password) {
+	private function rehashPassword($user_id, $plain_password) {
 		$user_id  = intval($user_id);
 		$new_hash = $this->escape_string(password_hash($plain_password, PASSWORD_DEFAULT));
 		$this->query("UPDATE " . _AM_DB_PREFIX . "sb_users SET password = '$new_hash' WHERE id = $user_id");
@@ -87,7 +87,7 @@ class user extends sql {
 	 * (valeur brute du cookie) ou false en cas d'échec.
 	 * @return string|false
 	 */
-	function createRememberToken($user_id, $lifetime) {
+	public function createRememberToken($user_id, $lifetime) {
 		$user_id   = intval($user_id);
 		$selector  = bin2hex(random_bytes(9));
 		$validator = bin2hex(random_bytes(33));
@@ -110,7 +110,7 @@ class user extends sql {
 	 * pour ne jamais réémettre un jeton à un compte qui va être rejeté.
 	 * @return array{user_id:int,username:string}|false
 	 */
-	function verifyRememberToken($cookie_value) {
+	public function verifyRememberToken($cookie_value) {
 		if (strpos((string)$cookie_value, ':') === false) return false;
 		list($selector, $validator) = explode(':', $cookie_value, 2);
 		$selector_esc = $this->escape_string($selector);
@@ -139,20 +139,20 @@ class user extends sql {
 	 * Supprime un jeton "Se souvenir de moi" à partir de la valeur brute du
 	 * cookie (ex: à la déconnexion).
 	 */
-	function deleteRememberTokenBySelector($cookie_value) {
+	public function deleteRememberTokenBySelector($cookie_value) {
 		if (strpos((string)$cookie_value, ':') === false) return;
 		list($selector) = explode(':', $cookie_value, 2);
 		$selector_esc = $this->escape_string($selector);
 		$this->query("DELETE FROM " . _AM_DB_PREFIX . "sb_users_remember_tokens WHERE selector = '$selector_esc'");
 	}
 
-	function deleteRememberTokenById($id) {
+	private function deleteRememberTokenById($id) {
 		$id = intval($id);
 		$this->query("DELETE FROM " . _AM_DB_PREFIX . "sb_users_remember_tokens WHERE id = $id");
 	}
 	
 	
-    function checkUser($password, $captcha) {
+    private function checkUser($password, $captcha) {
         if (isset($_SESSION['sbuiadmin_user_name']) || $_SESSION['sbuiadmin_user_name'] != '') {
             if (!$this->login($_SESSION['sbuiadmin_user_name'], $password, $crypt)) {
                 return false;
@@ -168,7 +168,7 @@ class user extends sql {
     }
 	
 	
-    function checkUserIsActive($username) {
+    public function checkUserIsActive($username) {
         $username_esc = $this->escape_string($username);
         $query_user = "SELECT active FROM " . _AM_DB_PREFIX . "sb_users WHERE username = '$username_esc'";
         $result_user = $this->query($query_user);
@@ -181,7 +181,7 @@ class user extends sql {
     }
 	
 	
-    function checkIsAdmin() {
+    private function checkIsAdmin() {
         if (isset($_SESSION['sbuiadmin_user_name']) || $_SESSION['sbuiadmin_user_name'] != '') return true;
         else return false;
     }
@@ -191,7 +191,7 @@ class user extends sql {
 	* Update Access Log
 	* @return bool
 	*/
-	function updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user = 'admin') {
+	public function updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user = 'admin') {
 		// --- Update the Access Log file if exist
 		global $sbsanitize;
 	        $_sbuiadmin_event = $sbsanitize->displayText($sbuiadmin_event, 'UTF-8', $entities = 1, $decode_entities = 0, $html = 0, $br = 0, $clickable = 0, $xss = 1);
@@ -211,7 +211,7 @@ class user extends sql {
 	* Update Acces Login / Last login Time User
 	* @return bool
 	*/
-	function updateAccessUserLogin($sbuiadmin_user, $lastlogin = false, $time = false) {
+	public function updateAccessUserLogin($sbuiadmin_user, $lastlogin = false, $time = false) {
 		// --- Update the Access User logintime
 		$sbuiadmin_user_esc = $this->escape_string($sbuiadmin_user);
 		if ($sbuiadmin_user != '' && $lastlogin == false) {
@@ -237,7 +237,7 @@ class user extends sql {
 	/**
 	 * Get User Infos
 	 */
-	function getUserInfo($sbuiadmin_user, $field = '') {
+	public function getUserInfo($sbuiadmin_user, $field = '') {
 		global $sbsanitize;
 		// --- Initialization
 		$field        = $sbsanitize->stopXSS($field);
@@ -257,7 +257,7 @@ class user extends sql {
 	/**
 	 * Returns an encrypted & utf8-encoded
 	 */
-	function encrypt($text, $key = '(D$9=h!S2olla$rS3+huY!NX', $iv = "fYAhHeXm", $bit_check = 32, $tag = "informatux") {
+	public function encrypt($text, $key = '(D$9=h!S2olla$rS3+huY!NX', $iv = "fYAhHeXm", $bit_check = 32, $tag = "informatux") {
 		// Check if php version smaller than 7.1.0
 		if (version_compare(phpversion(), '7.1.0', '<')) {
 			// All method
@@ -301,7 +301,7 @@ class user extends sql {
 	/**
 	 * Returns decrypted original string
 	 */	
-	function decrypt($encrypted_text, $key = '(D$9=h!S2olla$rS3+huY!NX', $iv = "fYAhHeXm", $bit_check = 32, $tag = "informatux") {
+	public function decrypt($encrypted_text, $key = '(D$9=h!S2olla$rS3+huY!NX', $iv = "fYAhHeXm", $bit_check = 32, $tag = "informatux") {
 		// Check if php version smaller than 7.1.0
 		if (version_compare(phpversion(), '7.1.0', '<')) {
 			$cipher = mcrypt_module_open(MCRYPT_TRIPLEDES,'','cbc','');

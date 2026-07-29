@@ -29,7 +29,7 @@ class sql extends Smarty {
     var $result_id  = false;
     var $query      = "";
 
-    function connect() {
+    private function connect() {
         mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
         if ($this->socket === false) {
             try {
@@ -59,7 +59,7 @@ class sql extends Smarty {
         }
     }
     
-    function query($query) {
+    public function query($query) {
         // Check if DB connect ID
         if (!$this->connect_id) $this->connect();
         // Check Request SQL
@@ -77,10 +77,10 @@ class sql extends Smarty {
         /* Fermeture de la connexion */
         mysqli_close($this->connect_id);
     }
-    function lastinsertid() {
+    public function lastinsertid() {
         return mysqli_insert_id($this->connect_id);
     }
-    function numrows() {
+    public function numrows() {
         if (isset($this->result_id)) {
             if (preg_match('`^select`i', $this->query)) return mysqli_num_rows($this->result_id);
             if (preg_match('`^(insert|update|delete)`i', $this->query)) return mysqli_affected_rows($this->result_id);
@@ -88,10 +88,10 @@ class sql extends Smarty {
             return count($this->records);
         }
     }
-    function object($query) {
+    public function object($query) {
         return mysqli_fetch_object($query);
     }
-    function getArray($query, $mode = 'ASSOC') {
+    private function getArray($query, $mode = 'ASSOC') {
         switch ($mode) {
             case 'NUM':
                 return mysqli_fetch_array($query, MYSQLI_NUM);
@@ -106,11 +106,11 @@ class sql extends Smarty {
                 return mysqli_fetch_assoc($query);
         }
     }
-    function assoc($query) {
+    public function assoc($query) {
         if (!$query) return false;
         return mysqli_fetch_assoc($query);
     }
-    function toarray($result) {
+    public function toarray($result) {
         if (!$result) return false;
         $res_array = array();
         for ($count = 0; $row = mysqli_fetch_array($result); $count++) {
@@ -118,23 +118,23 @@ class sql extends Smarty {
         }
         return $res_array;
     }
-    function error() {
+    private function error() {
         if (!$this->connect_id) $this->connect();
         return mysqli_error($this->connect_id);
     }
-    function close() {
+    public function close() {
         if (!$this->connect_id) $this->connect();
         return mysqli_close($this->connect_id);
     }
-    function free() {
+    public function free() {
         //if (!$this->connect_id) $this->connect();
         //return mysqli_free_result($this->connect_id);
     }
-    function escape_string($escapestr) {
+    public function escape_string($escapestr) {
         if (!$this->connect_id) $this->connect();
         return mysqli_real_escape_string($this->connect_id, $escapestr);
     }
-    function optimize($tbl_name) {
+    private function optimize($tbl_name) {
         if (!$this->connect_id) $this->connect();
         $query = "OPTIMIZE TABLE $tbl_name";
         if ($this->result_id = mysqli_query($this->connect_id, $query)) {
@@ -146,7 +146,7 @@ class sql extends Smarty {
             return false;
         }
     }
-    function truncate($tbl_name) {
+    private function truncate($tbl_name) {
         //if (!$this->connect_id) $this->connect();
         $query = "TRUNCATE TABLE $tbl_name";
         if ($this->result_id = mysqli_query($this->connect_id, $query)) {
@@ -158,13 +158,13 @@ class sql extends Smarty {
             return false;
         }
     }
-    function blob($file) {
+    private function blob($file) {
         $blob = file_get_contents($file);
         $blob = addslashes($blob);
         $blob = addcslashes($blob, "");
         return $blob;
     }
-    function showUpdateResult($result, $msg_success = '', $msg_error = '') {
+    private function showUpdateResult($result, $msg_success = '', $msg_error = '') {
         $result_error = ($msg_error != '') ? $msg_error : _AM_SYS_MSG_ERROR_NOUPDATE;
         $result_success = ($msg_success != '') ? '1:' . $msg_success : '1';
         if ($result) {
@@ -174,7 +174,7 @@ class sql extends Smarty {
             echo $result_error . '<br />' . $error;
         }
     }
-    function redirect_error($code) {
+    private function redirect_error($code) {
         $error_msg = addslashes($this->error());
         header("Location:redirect.php?errorid=$code&msg=$error_msg");
         exit;

@@ -13,7 +13,8 @@
 ##                                                                             #
 ################################################################################
    
-    session_start();   
+    session_start();
+    require_once('inc-auth-guard.php');
 
 	require_once('include/shared.inc.php');    
     require_once('include/settings.inc.php');

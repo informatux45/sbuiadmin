@@ -507,4 +507,36 @@ function sbSaveRightsMatrix($user_id, $postData) {
 	return $ok;
 }
 
+/**
+ * Jeton CSRF (Point 1, audit sécurité, 2026-07-29) - un seul par session,
+ * généré à la première demande et réutilisé pour tous les formulaires de
+ * cette session (pas un jeton par formulaire - inutile pour ce CMS, un
+ * jeton par session suffit contre le CSRF classique). Injecté
+ * automatiquement dans tous les formulaires par
+ * sbuiadmin-form.php::openForm().
+ * @return string
+ */
+function sbCsrfToken() {
+	if (empty($_SESSION['sbuiadmin_csrf_token'])) {
+		$_SESSION['sbuiadmin_csrf_token'] = bin2hex(random_bytes(32));
+	}
+	return $_SESSION['sbuiadmin_csrf_token'];
+}
+
+/**
+ * Vérifie le jeton CSRF d'une requête POST (comparaison à temps
+ * constant). Appelé une seule fois, au point d'étranglement de
+ * index.php, pour toute requête POST qui soumet un vrai formulaire
+ * (présence de $_POST['form_submit'], convention universelle de
+ * sbuiadmin-form.php - n'englobe pas les endpoints AJAX qui ne passent
+ * pas par cette classe, ex: messages).
+ * @return bool
+ */
+function sbCheckCsrfToken() {
+	if (empty($_SESSION['sbuiadmin_csrf_token']) || empty($_POST['sbuiadmin_csrf_token'])) {
+		return false;
+	}
+	return hash_equals($_SESSION['sbuiadmin_csrf_token'], $_POST['sbuiadmin_csrf_token']);
+}
+
 ?>

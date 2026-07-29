@@ -41,7 +41,7 @@ class flood extends sql {
         "LOGIN"   => 0.1
     ];
 
-    function __construct() {
+    public function __construct() {
         // --- Pull the configurable bits from Paramètres > Utilisateurs > IP(s)
         // bloquée(s) > Paramètres IP bloquées, when defined, without breaking
         // callers that don't rely on sbuiadmin-config.php having run.
@@ -65,11 +65,11 @@ class flood extends sql {
         }
     }
 
-    function addUserlimit($key, $time) {
+    private function addUserlimit($key, $time) {
         $this->timeLimitUser [$key] = $time;
     }
 
-    function addProcesslimit($key, $time) {
+    private function addProcesslimit($key, $time) {
         $this->timeLimitProcess [$key] = $time;
     }
 

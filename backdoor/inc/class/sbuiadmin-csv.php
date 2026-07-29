@@ -42,7 +42,7 @@ class csv extends sanitize {
     private $length;
 	var $mappings = array(); 
     //--------------------------------------------------------------------
-    function file($file_name, $parse_header = false, $delimiter = "\t", $length = 8000) {
+    public function file($file_name, $parse_header = false, $delimiter = "\t", $length = 8000) {
 		$this->file         = $file_name;
         $this->fp           = (file_exists($file_name)) ? fopen($file_name, "r") : false;
         $this->parse_header = $parse_header;
@@ -61,12 +61,12 @@ class csv extends sanitize {
 
     }
     //--------------------------------------------------------------------
-    function __destruct() {
+    public function __destruct() {
         if ($this->fp) {
             fclose($this->fp);
         }
     }
-	function count($add = 0) {
+	public function count($add = 0) {
 		if ($this->fp !== false) {
 			// Create new file reference
 			$file = new SplFileObject($this->file, 'r');
@@ -84,7 +84,7 @@ class csv extends sanitize {
 		}
 	}
 	// -------------------------------------------------------------------
-    function get($max_lines = 0) {
+    public function get($max_lines = 0) {
 
 		if ($this->fp !== false) {
 
@@ -117,7 +117,7 @@ class csv extends sanitize {
 		}
     }
 	//--------------------------------------------------------------------
-	function parse_file($convert_from = false, $convert_to = false, $convert_key = false) {
+	public function parse_file($convert_from = false, $convert_to = false, $convert_key = false) {
 		
 		if ($this->fp !== false) {
 			
@@ -153,7 +153,7 @@ class csv extends sanitize {
 	}
     //--------------------------------------------------------------------
 	// --- Multisort array by key
-	function sort(array $array, $on, $order = SORT_ASC) {
+	public function sort(array $array, $on, $order = SORT_ASC) {
 		$new_array = array();
 		$sortable_array = array();
 	
@@ -210,7 +210,7 @@ class csv extends sanitize {
 	 *
 	 * @return array|null Returns a multidimensional array or `null` if `$key` is invalid.
 	 */
-	function group_by(array $array, $key) {
+	public function group_by(array $array, $key) {
 		
 		if ($this->fp !== false) {
 		
@@ -323,7 +323,7 @@ class csv extends sanitize {
 	 *     [read_kb] => 10
 	 * )
 	 */
-	function analyse($file, $capture_limit_in_kb = 10) {
+	public function analyse($file, $capture_limit_in_kb = 10) {
 		
 		$output = array();
 		
