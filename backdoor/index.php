@@ -339,6 +339,8 @@ $sbsmarty->assign('sbuiadmin_user_name', $_SESSION['sbuiadmin_user_name']);
 $sbsmarty->assign('sbuiadmin_user_type', $sbuiadmin_user_type);
 $sbsmarty->assign('sbuiadmin_user_email', $sbusers->getUserInfo($_SESSION['sbuiadmin_user_name'], 'email'));
 $sbsmarty->assign('sbuiadmin_user_last_login', date("d/m/Y H:i", $sbusers->getUserInfo($_SESSION['sbuiadmin_user_name'], 'lastlogin')));
+// --- Lien "Profil" du dropdown compte (navigation.tpl, Points 11/19)
+$sbsmarty->assign('sbuiadmin_user_id', sbGetCurrentUserId());
 
 // ----------------------
 // Check if user ADMIN is always in DB

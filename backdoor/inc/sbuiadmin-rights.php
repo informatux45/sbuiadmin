@@ -102,7 +102,10 @@ function sbGetRightsGroups() {
 	$groups     = array('Configuration' => array(), 'Modules' => array());
 
 	foreach ((array)$sb_safe_pages as $page) {
-		if ($page == 'index') continue;
+		// "profile" (Point 19) : page personnelle de libre-service, jamais
+		// restreignable via la matrice - sinon un admin pourrait décocher
+		// "voir" par erreur et bloquer un utilisateur sur SA PROPRE fiche.
+		if ($page == 'index' || $page == 'profile') continue;
 
 		$is_root = file_exists(_AM_SITE_DIR . $page . '.php');
 		$path    = $is_root ? _AM_SITE_DIR . $page . '.php' : _AM_SITE_DIR . 'datas/modules/' . $page . '.php';
@@ -217,10 +220,16 @@ function sbClassifyAction($module) {
 		return (isset($_GET['th']) && $_GET['th'] != '') ? 'edit' : 'view';
 	}
 
-	// Cas particulier : themeinfos.php/session.php/dashboard.php n'ont aucun
-	// paramètre d'action du tout - formulaire unique qui se soumet en POST
-	// sur lui-même (pas de a=/op= pour distinguer affichage et modification).
-	if ($module == 'themeinfos' || $module == 'session' || $module == 'dashboard') {
+	// Cas particulier : themeinfos.php/session.php/dashboard.php/profile.php
+	// n'ont aucun paramètre d'action du tout - formulaire unique qui se
+	// soumet en POST sur lui-même (pas de a=/op= pour distinguer affichage
+	// et modification). "profile" (Point 19) n'a de toute façon pas de
+	// ligne dans la matrice des droits (page personnelle, pas un module
+	// listé pour être restreint) - accès par défaut déjà garanti - mais ce
+	// classement le rend cohérent avec les autres pages de ce type et
+	// évite un verrouillage accidentel si un admin l'ajoutait un jour à la
+	// matrice.
+	if ($module == 'themeinfos' || $module == 'session' || $module == 'dashboard' || $module == 'profile') {
 		return ($_SERVER['REQUEST_METHOD'] === 'POST') ? 'edit' : 'view';
 	}
 

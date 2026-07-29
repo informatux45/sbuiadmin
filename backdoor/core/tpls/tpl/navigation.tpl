@@ -147,10 +147,10 @@
 							Réglages
 						</a>
 						{/if}
-						<div class="dd-menu-item" style="cursor:default;opacity:.5" title="Bientôt disponible">
+						<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=profile">
 							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
 							Profil
-						</div>
+						</a>
 						{if $sb_can_view_messages}
 						<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=messages">
 							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
