@@ -341,7 +341,7 @@ switch($action) {
 		$tab_check_9[0]['checked'] = ($sb_config_smarty_force_tpls == 1) ? '1' : '0';
 		$sbform->addCheckbox('Activation de la compilation des templates Smarty', $tab_check_9, '', false, '<br />', "Désactiver ce mode quand le site est en production !");
 		// Smarty cache
-		$tab_check_10[0]['text']    = 'Smarty Cache Templates';
+		$tab_check_10[0]['text']    = 'Smarty Cache Templates (FRONT)';
 		$tab_check_10[0]['name']    = 'smarty_caching';
 		$tab_check_10[0]['checked'] = ($sb_config_smarty_caching == 1) ? '1' : '0';
 		$sbform->addCheckbox('Activation du cache des templates Smarty', $tab_check_10, '', false, '<br />', "Si le cache est activé, choisir la durée du cache des templates");
@@ -356,7 +356,7 @@ switch($action) {
 							   ,'259200' => '3 jours'
 							   ,'604800' => '1 semaine'
 								];
-		$sbform->openSelect("Durée du cache Smarty", array("id"=>"smarty_caching_time", "name"=>"smarty_caching_time"));
+		$sbform->openSelect("Durée du cache Smarty (FRONT)", array("id"=>"smarty_caching_time", "name"=>"smarty_caching_time"));
 		$sbform->addOption('Choisissez une durée de cache', array ("value"=>"", "selected"=>""));
 		foreach($sb_options_lifetime as $key => $value) {
 			if ($key == $sb_config_smarty_caching_time)

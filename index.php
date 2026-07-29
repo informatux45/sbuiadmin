@@ -152,6 +152,13 @@ if (SBREWRITEURL) {
 // ----------------------
 
 // --------------------------------
+// --- Smarty cache_id : une entrée de cache distincte par URL, sinon le
+// --- cache Smarty (settings.txt) renvoie la même page (celle mise en
+// --- cache en premier) pour toutes les URLs du site une fois activé.
+// --------------------------------
+$sb_smarty_cache_id = md5($sb_get_page . '|' . ($_SERVER['REQUEST_URI'] ?? ''));
+
+// --------------------------------
 // --- Search for safe page
 // --------------------------------
 if (in_array($sb_get_page, $sb_safe_pages_cms) || in_array($sb_get_page, $sb_safe_modules_cms)) {
@@ -270,8 +277,8 @@ if (in_array($sb_get_page, $sb_safe_pages_cms) || in_array($sb_get_page, $sb_saf
 		// ---------------------------------------
 		// Assign Index TPL Theme
 		// ---------------------------------------		
-		$sbsmarty->display("index.tpl");
-		
+		$sbsmarty->display("index.tpl", $sb_smarty_cache_id);
+
 	} elseif (isset($module['template_main']) && $module['template_main'] != '') { // MODULE STANDALONE
 		// ---------------------------------------
 		// Assign Module View TPL (Main)
@@ -317,10 +324,10 @@ if (in_array($sb_get_page, $sb_safe_pages_cms) || in_array($sb_get_page, $sb_saf
 		// ---------------------------------------
 		// Assign Index TPL Theme
 		// ---------------------------------------		
-		$sbsmarty->display("index.tpl");
-		
+		$sbsmarty->display("index.tpl", $sb_smarty_cache_id);
+
 	} else {
-		// ---------------------------------------		
+		// ---------------------------------------
 		// --- Get Statistics
 		// ---------------------------------------
 		//sbGetStats('NOT FOUND');

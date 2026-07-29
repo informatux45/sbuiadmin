@@ -127,9 +127,9 @@ defined('SBMAINTENANCE') OR define('SBMAINTENANCE', _sbcfgbool($sb_settings_conf
 
 # Define Subdirectory Site
 # if is visible in your url
-# Default: false
-# Ex: http://site.com/dir/
-defined('SBSITESUBDIRECTORY') OR define('SBSITESUBDIRECTORY', '');
+# Default: auto-détecté depuis l'URL du site (settings.txt, position CFG_SITE_URL)
+# Ex: http://site.com/dir/ => 'dir'
+defined('SBSITESUBDIRECTORY') OR define('SBSITESUBDIRECTORY', trim((string) parse_url(_sbcfg($sb_settings_config, CFG_SITE_URL), PHP_URL_PATH), '/'));
 
 # Defined Safe Modules created by you (developer)
 //$sb_safe_modules_cms = ['your_new_module','your_new_module2'];

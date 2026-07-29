@@ -678,18 +678,29 @@ if (!function_exists("insert_sbGetMenuCms")) {
 if (!function_exists("insert_sbGetContentCms")) {
 	function insert_sbGetContentCms($param) {
 		global $sbsmarty;
-		
+
+		// Rendu imbriqué (display() dans display()) : ce sous-rendu hérite
+		// sinon de $sbsmarty->caching, et passe alors lui aussi par le
+		// cache de sortie Smarty avec un cache_id vide (partagé par erreur
+		// entre pages différentes utilisant le même template) - contenu
+		// perdu ou figé selon la page. Désactivé le temps de l'appel :
+		// ce contenu (page/module/blocs) doit toujours être rendu à neuf.
+		$sb_caching_state    = $sbsmarty->caching;
+		$sbsmarty->caching   = false;
+
 		if (isset($param['o1']) && $param['o1'] != '' && sbCheckTplExist($param['o1']))
 			$sbsmarty->display($param['o1']);
-	
+
 		if (isset($param['o2']) && $param['o2'] != '' && sbCheckTplExist($param['o2']))
 		$sbsmarty->display($param['o2']);
-	
+
 		if (isset($param['o3']) && $param['o3'] != '' && sbCheckTplExist($param['o3']))
-			$sbsmarty->display($param['o3']);	
-	
+			$sbsmarty->display($param['o3']);
+
 		if (isset($param['o4']) && $param['o4'] != '' && sbCheckTplExist($param['o4']))
 			$sbsmarty->display($param['o4']);
+
+		$sbsmarty->caching = $sb_caching_state;
 	}
 }
 

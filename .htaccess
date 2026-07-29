@@ -33,15 +33,14 @@ Options +FollowSymlinks
 ## Activation du mod rewrite d'Apache
 RewriteEngine On
 ## Réécriture de index.html vers index.php
-RewriteRule ^index\.html$ /index.php
+RewriteRule ^index\.html$ index.php
 
 <IfModule mod_rewrite.c>
 	RewriteEngine On
-	RewriteBase /
 	RewriteRule ^index\.php$ - [L]
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteCond %{REQUEST_FILENAME} !-d
-	RewriteRule . /index.php [L]
+	RewriteRule . index.php [L]
 </IfModule>
 
 ## Block bad bots
