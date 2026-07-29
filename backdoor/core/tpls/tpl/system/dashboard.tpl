@@ -80,19 +80,19 @@
 													</td>
 													<td>
 														<div class="data-cell-actions">
-															<span class="btn--icon" style="color:{if $widget.active}var(--success){else}var(--danger){/if}" title="Statut {if $widget.active}actif{else}inactif{/if}">
+															<span class="btn--icon" style="color:{if $widget.active}var(--success){else}var(--danger){/if}" data-tooltip="Statut {if $widget.active}actif{else}inactif{/if}">
 																<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
 															</span>
-															<a class="btn--icon" href="{$module_url}&a=up&id={$widget.id}" title="Monter">
+															<a class="btn--icon" href="{$module_url}&a=up&id={$widget.id}" data-tooltip="Monter">
 																<svg viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"/></svg>
 															</a>
-															<a class="btn--icon" href="{$module_url}&a=down&id={$widget.id}" title="Descendre">
+															<a class="btn--icon" href="{$module_url}&a=down&id={$widget.id}" data-tooltip="Descendre">
 																<svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
 															</a>
-															<a class="btn--icon" href="{$module_url}&a=edit&id={$widget.id}" title="Modifier">
+															<a class="btn--icon" href="{$module_url}&a=edit&id={$widget.id}" data-tooltip="Modifier">
 																<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"/></svg>
 															</a>
-															<a class="btn--icon" data-confirm="Sûr de vouloir supprimer ce widget ?" href="{$module_url}&a=del&id={$widget.id}" title="Supprimer">
+															<a class="btn--icon" data-confirm="Sûr de vouloir supprimer ce widget ?" href="{$module_url}&a=del&id={$widget.id}" data-tooltip="Supprimer">
 																<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
 															</a>
 														</div>

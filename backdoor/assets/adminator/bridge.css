@@ -854,3 +854,50 @@ p.sbmedia > span.sbmedia-other {
 	flex-direction: column;
 	gap: 14px;
 }
+
+/* Tooltips (Point 20) : remplace les title="..." natifs du navigateur
+   (lents à apparaître, style non maîtrisé, incohérents avec le reste du
+   thème) sur les icônes des tableaux (colonne Actions, icônes de statut).
+   CSS pur, pas de JS - positionné au-dessus et centré sur l'élément plutôt
+   que d'essayer d'éviter les débordements gauche/droite en bord de
+   tableau (plus simple et fiable qu'une détection de collision en JS). */
+[data-tooltip] {
+	position: relative;
+}
+[data-tooltip]:before,
+[data-tooltip]:after {
+	opacity: 0;
+	pointer-events: none;
+	position: absolute;
+	bottom: 100%;
+	left: 50%;
+	transform: translate(-50%, 4px);
+	transition: opacity .12s, transform .12s;
+	z-index: 60;
+}
+[data-tooltip]:before {
+	content: attr(data-tooltip);
+	background: var(--t-base);
+	color: var(--bg-card);
+	white-space: nowrap;
+	font-size: 12px;
+	font-weight: 500;
+	line-height: 1;
+	padding: 6px 9px;
+	border-radius: 6px;
+	box-shadow: var(--shadow-lg);
+	margin-bottom: 6px;
+}
+[data-tooltip]:after {
+	content: "";
+	border: 5px solid transparent;
+	border-top-color: var(--t-base);
+	margin-bottom: 1px;
+}
+[data-tooltip]:hover:before,
+[data-tooltip]:hover:after,
+[data-tooltip]:focus-visible:before,
+[data-tooltip]:focus-visible:after {
+	opacity: 1;
+	transform: translate(-50%, 0);
+}

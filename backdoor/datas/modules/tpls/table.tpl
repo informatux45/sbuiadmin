@@ -91,19 +91,19 @@
 													<td>{$table.type}</td>
 													<td>
 														<div class="data-cell-actions">
-															<span class="btn--icon" style="color:{if $table.active}var(--success){else}var(--danger){/if}" title="Statut {if $table.active}visible{else}non visible{/if}">
+															<span class="btn--icon" style="color:{if $table.active}var(--success){else}var(--danger){/if}" data-tooltip="Statut {if $table.active}visible{else}non visible{/if}">
 																<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
 															</span>
-															<a class="btn--icon" href="{$module_url}&a=edit&id={$table.id}" title="Modifier">
+															<a class="btn--icon" href="{$module_url}&a=edit&id={$table.id}" data-tooltip="Modifier">
 																<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"/></svg>
 															</a>
-															<a class="btn--icon" href="{$module_url}&a=editfield&tid={$table.id}" title="Modifier la structure">
+															<a class="btn--icon" href="{$module_url}&a=editfield&tid={$table.id}" data-tooltip="Modifier la structure">
 																<svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
 															</a>
-															<a class="btn--icon" href="{$module_url}&a=editdatas&tid={$table.id}" title="Modifier les données">
+															<a class="btn--icon" href="{$module_url}&a=editdatas&tid={$table.id}" data-tooltip="Modifier les données">
 																<svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
 															</a>
-															<a class="btn--icon" data-confirm="Sûr de vouloir supprimer ceci ?" href="{$module_url}&a=del&id={$table.id}" title="Supprimer">
+															<a class="btn--icon" data-confirm="Sûr de vouloir supprimer ceci ?" href="{$module_url}&a=del&id={$table.id}" data-tooltip="Supprimer">
 																<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
 															</a>
 														</div>
@@ -292,13 +292,13 @@
 													<td>{$column.field_target}</td>
 													<td>
 														<div class="data-cell-actions">
-															<span class="btn--icon" style="color:{if $column.active}var(--success){else}var(--danger){/if}" title="Statut {if $column.active}visible{else}non visible{/if}">
+															<span class="btn--icon" style="color:{if $column.active}var(--success){else}var(--danger){/if}" data-tooltip="Statut {if $column.active}visible{else}non visible{/if}">
 																<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
 															</span>
-															<a class="btn--icon" href="{$module_url}&a=editfield&tid={$column.tid}&id={$column.id}" title="Modifier">
+															<a class="btn--icon" href="{$module_url}&a=editfield&tid={$column.tid}&id={$column.id}" data-tooltip="Modifier">
 																<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"/></svg>
 															</a>
-															<a class="btn--icon" data-confirm="Sûr de vouloir supprimer ceci ?" href="{$module_url}&a=delfield&tid={$column.tid}&id={$column.id}" title="Supprimer">
+															<a class="btn--icon" data-confirm="Sûr de vouloir supprimer ceci ?" href="{$module_url}&a=delfield&tid={$column.tid}&id={$column.id}" data-tooltip="Supprimer">
 																<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
 															</a>
 														</div>
@@ -359,10 +359,10 @@
 													{insert name=jsondata datas="`$datas.content`"}
 													<td>
 														<div class="data-cell-actions">
-															<a class="btn--icon" href="{$module_url}&a=editdatas&tid={$datas.tid}&id={$datas.id}" title="Modifier">
+															<a class="btn--icon" href="{$module_url}&a=editdatas&tid={$datas.tid}&id={$datas.id}" data-tooltip="Modifier">
 																<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"/></svg>
 															</a>
-															<a class="btn--icon" data-confirm="Sûr de vouloir supprimer ceci ?" href="{$module_url}&a=deldatas&tid={$datas.tid}&id={$datas.id}" title="Supprimer">
+															<a class="btn--icon" data-confirm="Sûr de vouloir supprimer ceci ?" href="{$module_url}&a=deldatas&tid={$datas.tid}&id={$datas.id}" data-tooltip="Supprimer">
 																<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
 															</a>
 														</div>
