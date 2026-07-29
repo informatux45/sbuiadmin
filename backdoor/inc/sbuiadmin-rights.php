@@ -41,6 +41,10 @@ function sbGetRightsSubmodules() {
 		'faq'       => array(
 			'category' => 'Catégories', 'categorydel' => 'Catégories', 'categoryadd' => 'Catégories', 'categoryedit' => 'Catégories',
 		),
+		'boutique'  => array(
+			'category' => 'Catégories', 'categorydel' => 'Catégories', 'categoryadd' => 'Catégories', 'categoryedit' => 'Catégories',
+			'settings' => 'Paramètres',
+		),
 		'news'      => array(
 			'category' => 'Catégories', 'categorydel' => 'Catégories', 'categoryadd' => 'Catégories', 'categoryedit' => 'Catégories',
 			'settings' => 'Paramètres', 'settingscategory' => 'Paramètres',
@@ -268,6 +272,7 @@ function sbClassifyAction($module) {
 		'contact'   => array('settings' => 'edit'),
 		'news'      => array('settings' => 'edit', 'settingscategory' => 'edit', 'tpl_list' => 'edit', 'tpl_single' => 'edit', 'sort' => 'edit'),
 		'faq'       => array('sort' => 'edit', 'category' => 'view'),
+		'boutique'  => array('sort' => 'edit', 'category' => 'view', 'settings' => 'edit'),
 		'slider'    => array('sort' => 'edit', 'photo' => 'view'),
 		'tabbs'     => array('sort' => 'edit', 'alltabs' => 'view'),
 		'table'     => array('sortstructure' => 'edit', 'sortdatas' => 'edit'),

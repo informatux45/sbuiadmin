@@ -171,4 +171,17 @@ $module_menu['faq']['li'][0]['link']  = "index.php?p=faq";
 $module_menu['faq']['li'][1]['title'] = SBUIADMIN_MENU_FAQ_CATEGORIES;
 $module_menu['faq']['li'][1]['link']  = "index.php?p=faq&a=category";
 
+// -----------------------
+// Menu Boutique
+// -----------------------
+$module_menu['boutique']['main']  = SBUIADMIN_MENU_BOUTIQUE;
+$module_menu['boutique']['icon']  = "shopping-cart";
+$module_menu['boutique']['group'] = "user"; // user OR admin
+$module_menu['boutique']['li'][0]['title'] = SBUIADMIN_MENU_BOUTIQUE_PRODUCTS;
+$module_menu['boutique']['li'][0]['link']  = "index.php?p=boutique";
+$module_menu['boutique']['li'][1]['title'] = SBUIADMIN_MENU_BOUTIQUE_CATEGORIES;
+$module_menu['boutique']['li'][1]['link']  = "index.php?p=boutique&a=category";
+$module_menu['boutique']['li'][2]['title'] = SBUIADMIN_MENU_BOUTIQUE_SETTINGS;
+$module_menu['boutique']['li'][2]['link']  = "index.php?p=boutique&a=settings";
+
 ?>
