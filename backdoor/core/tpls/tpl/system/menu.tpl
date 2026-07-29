@@ -47,10 +47,10 @@
                 <section class="col-12 card">
                     <div class="card-head">
 						<div class="card-title-wrap">
-							<h2 class="card-title">{if isset($all)}Gestion de vos menus{else}{$legend_add_edit}{/if}</h2>
+							<h2 class="card-title">{if $all}Gestion de vos menus{else}{$legend_add_edit}{/if}</h2>
 						</div>
                     </div>
-							{if isset($all)}
+							{if $all}
 							<div class="data-toolbar">
 								<div class="data-toolbar-left">
 									<div class="input-icon" style="flex:1;max-width:320px">
