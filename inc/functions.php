@@ -431,16 +431,28 @@ if (!function_exists("sbRenamePageBuilderClasses")) {
 	// Portage direct de sbRenameClasses() (pagebuilder.js) - mêmes
 	// correspondances, même limitation volontaire aux seules classes qui
 	// survivent réellement dans le contenu exporté (grille/boutons/média).
+	// Comparaison par TOKEN entier (split sur les espaces), pas par
+	// sous-chaîne \b...\b - un tiret compte comme limite de mot en PCRE,
+	// donc \bbtn\b matchait aussi le "btn" caché dans un token composé
+	// comme "sb-tabs-btn" (bloc Onglets) et le corrompait en
+	// "sb-tabs-sbbtn", cassant silencieusement son CSS/JS sur le front.
 	function sbRenamePageBuilderClasses($html) {
-		return preg_replace_callback('/class="([^"]*)"/', function ($matches) {
-			$classes = $matches[1];
-			$classes = preg_replace('/\brow\b/', 'sbrow', $classes);
-			$classes = preg_replace('/\bcol-md-(\d+)\b/', 'sbcol-md-$1', $classes);
-			$classes = preg_replace('/\bclearfix\b/', 'sbclearfix', $classes);
-			$classes = preg_replace('/\bimg-responsive\b/', 'sbimg-responsive', $classes);
-			$classes = preg_replace('/\bbtn-([a-z]+)\b/', 'sbbtn-$1', $classes);
-			$classes = preg_replace('/\bbtn\b/', 'sbbtn', $classes);
-			return 'class="' . $classes . '"';
+		$map = array(
+			'row'            => 'sbrow',
+			'clearfix'       => 'sbclearfix',
+			'img-responsive' => 'sbimg-responsive',
+			'btn'            => 'sbbtn'
+		);
+		return preg_replace_callback('/class="([^"]*)"/', function ($matches) use ($map) {
+			$tokens = preg_split('/\s+/', trim($matches[1]));
+			$renamed = array_map(function ($cls) use ($map) {
+				if ($cls === '') return $cls;
+				if (isset($map[$cls])) return $map[$cls];
+				if (preg_match('/^col-md-(\d+)$/', $cls, $m)) return 'sbcol-md-' . $m[1];
+				if (preg_match('/^btn-([a-z]+)$/', $cls, $m)) return 'sbbtn-' . $m[1];
+				return $cls;
+			}, $tokens);
+			return 'class="' . implode(' ', $renamed) . '"';
 		}, $html);
 	}
 }
@@ -707,6 +719,31 @@ if (!function_exists("insert_sbGetHeaders")) {
 		$pbFrontCssPath = SB_PATH . 'assets' . DIRECTORY_SEPARATOR . 'pagebuilder-front.css';
 		$pbFrontVersion = @filemtime($pbFrontCssPath);
 		$cms_headers .= '<link rel="stylesheet" href="' . SB_URL . 'assets/pagebuilder-front.css?v=' . $pbFrontVersion . '">';
+
+		$pbFrontJsPath = SB_PATH . 'assets' . DIRECTORY_SEPARATOR . 'pagebuilder-front.js';
+		$pbFrontJsVersion = @filemtime($pbFrontJsPath);
+		$cms_headers .= '<script src="' . SB_URL . 'assets/pagebuilder-front.js?v=' . $pbFrontJsVersion . '"></script>';
+
+		// Bloc "Image" avec case "Ouvrir en lightbox" + bloc "Galerie"
+		// (Page Builder) - même raisonnement que Leaflet ci-dessous : chargé
+		// systématiquement plutôt que via le plugin "lightbox" de
+		// Configuration > Plugins (insert_sbGetPlugins()), qui n'est pas
+		// forcément activé sur un site utilisant le Page Builder.
+		// "-plus-jquery" et pas le lightbox.min.js utilisé par le plugin
+		// Configuration > Plugins ci-dessous : ce dernier attend un jQuery
+		// DÉJÀ chargé sur la page - pas garanti sur tous les thèmes.
+		// `defer` est ESSENTIEL ici : sbGetHeaders() est injecté dans le
+		// <head>, donc AVANT que <body> existe dans le DOM. La librairie
+		// lie ses clics en délégation dès son exécution ($('body').on(
+		// 'click', 'a[data-lightbox]', ...)) - sans defer, ce script
+		// s'exécute immédiatement pendant l'analyse du <head>, où
+		// $('body') est encore un ensemble VIDE : jQuery ne lève aucune
+		// erreur, mais ne lie rien non plus, silencieusement. Symptôme
+		// observé : le clic sur une image navigue directement au lieu
+		// d'ouvrir la visionneuse. `defer` reporte l'exécution après
+		// l'analyse complète du HTML (donc une fois <body> réellement là).
+		$cms_headers .= '<link href="' . SB_URL . 'plugins/lightbox/css/lightbox.min.css" rel="stylesheet">';
+		$cms_headers .= '<script defer src="' . SB_URL . 'plugins/lightbox/js/lightbox-plus-jquery.min.js"></script>';
 
 		// Bloc "Carte" (Point 15) - Leaflet + tuiles OpenStreetMap, remplace
 		// l'ancien iframe Google Maps. Fichiers vendorisés en assets/leaflet/

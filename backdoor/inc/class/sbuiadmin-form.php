@@ -1493,6 +1493,79 @@ class form extends sanitize {
 									</div>
 									<div class="view"> Put your html code here </div>
 								</div>
+								<div class="box box-element" data-type="separator"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#" ><i class="fa fa-gear"></i></a> </span>
+									<div class="preview"> <i class="fa fa-minus fa-2x"></i>
+										<div class="element-desc">Séparateur</div>
+									</div>
+									<div class="view"> <hr class="sb-separator" style="border-top-style:solid;margin-top:20px;margin-bottom:20px;"> </div>
+								</div>
+								<div class="box box-element" data-type="icon"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#" ><i class="fa fa-gear"></i></a> </span>
+									<div class="preview"> <i class="fa fa-star fa-2x"></i>
+										<div class="element-desc">Icône</div>
+									</div>
+									<div class="view"> <i class="sb-icon fa fa-star" style="font-size:32px;color:#333333;"></i> </div>
+								</div>
+								<div class="box box-element" data-type="quote"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#" ><i class="fa fa-gear"></i></a> </span>
+									<div class="preview"> <i class="fa fa-quote-right fa-2x"></i>
+										<div class="element-desc">Citation</div>
+									</div>
+									<div class="view">
+										<blockquote class="sb-quote">
+											<p class="sb-quote-text">Votre citation ici.</p>
+											<cite class="sb-quote-author">Auteur</cite>
+										</blockquote>
+									</div>
+								</div>
+								<div class="box box-element" data-type="accordion"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#" ><i class="fa fa-gear"></i></a> </span>
+									<div class="preview"> <i class="fa fa-caret-square-o-down fa-2x"></i>
+										<div class="element-desc">Accordéon</div>
+									</div>
+									<div class="view">
+										<div class="sb-accordion">
+											<details class="sb-accordion-item" open>
+												<summary class="sb-accordion-q">Question 1 ?</summary>
+												<div class="sb-accordion-a">Réponse à la question 1.</div>
+											</details>
+											<details class="sb-accordion-item">
+												<summary class="sb-accordion-q">Question 2 ?</summary>
+												<div class="sb-accordion-a">Réponse à la question 2.</div>
+											</details>
+											<details class="sb-accordion-item">
+												<summary class="sb-accordion-q">Question 3 ?</summary>
+												<div class="sb-accordion-a">Réponse à la question 3.</div>
+											</details>
+										</div>
+									</div>
+								</div>
+								<div class="box box-element" data-type="tabs"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#" ><i class="fa fa-gear"></i></a> </span>
+									<div class="preview"> <i class="fa fa-folder-o fa-2x"></i>
+										<div class="element-desc">Onglets</div>
+									</div>
+									<div class="view">
+										<div class="sb-tabs">
+											<div class="sb-tabs-nav">
+												<button type="button" class="sb-tabs-btn is-active" data-tab="tab1">Onglet 1</button>
+												<button type="button" class="sb-tabs-btn" data-tab="tab2">Onglet 2</button>
+												<button type="button" class="sb-tabs-btn" data-tab="tab3">Onglet 3</button>
+											</div>
+											<div class="sb-tabs-panel is-active" data-tab="tab1">Contenu de l\'onglet 1.</div>
+											<div class="sb-tabs-panel" data-tab="tab2">Contenu de l\'onglet 2.</div>
+											<div class="sb-tabs-panel" data-tab="tab3">Contenu de l\'onglet 3.</div>
+										</div>
+									</div>
+								</div>
+								<div class="box box-element" data-type="gallery"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#" ><i class="fa fa-gear"></i></a> </span>
+									<div class="preview"> <i class="fa fa-th fa-2x"></i>
+										<div class="element-desc">Galerie</div>
+									</div>
+									<div class="view">
+										<div class="sb-gallery" data-lightbox-group="pbgal-default">
+											<a class="sb-gallery-item-link" data-lightbox="pbgal-default" href="img/add-image.svg">
+												<img class="sb-gallery-img" src="img/add-image.svg" alt="">
+											</a>
+										</div>
+									</div>
+								</div>
 							</li>
 						</ul>
 						</div>';
@@ -1793,6 +1866,9 @@ $htmlpagebuilder = <<<EOT
 								<div class="form-group">
 									<label for="img-rel">Rel :</label>
 									<input type="text" value="" id="img-rel" class="form-control" /> </div>
+								<div class="checkbox">
+									<label><input type="checkbox" id="img-lightbox"> Ouvrir en lightbox au clic (galerie : juxtaposez plusieurs blocs Image dans une mise en page en colonnes)</label>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -1971,6 +2047,144 @@ $htmlpagebuilder = <<<EOT
 					<!-- fine bottone-->
 					<div id="code" style="display:none"> </div>
 					<!-- fine code -->
+					<div id="separator" style="display:none">
+						<div class="form-group">
+							<label for="sep-style">Style :</label>
+							<select id="sep-style" class="form-control">
+								<option value="solid">Trait plein</option>
+								<option value="dashed">Tirets</option>
+								<option value="dotted">Pointillés</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="sep-margin">Marge haut/bas (px) :</label>
+							<input type="text" value="" id="sep-margin" class="form-control" />
+						</div>
+					</div>
+					<!-- fine separator -->
+					<div id="icon" style="display:none">
+						<div class="form-group">
+							<label for="icon-class">Icône :</label>
+							<!-- Réutilise le sélecteur d'icônes global de addIconFA()
+							     (icon-picker.js, chargé par scripts.tpl) - même
+							     convention de valeur stockée (nom brut sans préfixe
+							     "fa-", ex: "star"). -->
+							<div class="icon-picker-wrap">
+								<span class="icon-picker-preview" id="icon-classPreview"><i class="fa fa-fw fa-star"></i></span>
+								<input class="input" type="text" id="icon-class" readonly />
+								<button type="button" class="btn btn--ghost icon-picker-trigger" data-icon-popover-trigger="icon-class">Choisir</button>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="icon-size">Taille (px) :</label>
+							<input type="text" value="" id="icon-size" class="form-control" />
+						</div>
+						<div class="form-group">
+							<label>Couleur :</label>
+							<input type="text" class="form-control" id="icon-color" />
+							<select id="colorselector-icon">
+								<option value="1" data-value="1" data-color="#A0522D">sienna</option>
+								<option value="2" data-value="2" data-color="#CD5C5C">indianred</option>
+								<option value="3" data-value="3" data-color="#FF4500">orangered</option>
+								<option value="4" data-value="4" data-color="#008B8B">darkcyan</option>
+								<option value="5" data-value="5" data-color="#B8860B">darkgoldenrod</option>
+								<option value="6" data-value="6" data-color="#32CD32">limegreen</option>
+								<option value="7" data-value="7" data-color="#FFD700">gold</option>
+								<option value="8" data-value="8" data-color="#48D1CC">mediumturquoise</option>
+								<option value="9" data-value="9" data-color="#87CEEB">skyblue</option>
+								<option value="10" data-value="10" data-color="#FF69B4">hotpink</option>
+								<option value="11" data-value="11" data-color="#87CEFA">lightskyblue</option>
+								<option value="12" data-value="12" data-color="#6495ED">cornflowerblue</option>
+								<option value="13" data-value="13" data-color="#DC143C">crimson</option>
+								<option value="14" data-value="14" data-color="#FF8C00">darkorange</option>
+								<option value="15" data-value="15" data-color="#C71585">mediumvioletred</option>
+								<option value="16" data-value="16" data-color="#000000">black</option>
+								<option value="17" data-value="17" data-color="#575757">grigio scuro</option>
+								<option value="18" data-value="18" data-color="#f2f2f2">grigio chiaro</option>
+								<option value="19" data-value="19" data-color="#efefef">marroncino</option>
+								<option value="20" data-value="20" data-color="#e7e0d8">marrone</option>
+								<option value="21" data-value="21" data-color="#d7d0c6">marrone scuro</option>
+								<option value="22" data-value="22" data-color="#263459">blu scuro</option>
+								<option value="23" data-value="23" data-color="#ffffff">bianco</option>
+							</select>
+							<script type="text/javascript">
+								$('#colorselector-icon').colorselector({
+									callback: function(value, color, title) {
+										$("#icon-color").val(color);
+									}
+								});
+							</script>
+						</div>
+					</div>
+					<!-- fine icon -->
+					<div id="quote" style="display:none">
+						<div class="form-group">
+							<label for="quote-text">Citation :</label>
+							<textarea id="quote-text" class="form-control" rows="3"></textarea>
+						</div>
+						<div class="form-group">
+							<label for="quote-author">Auteur :</label>
+							<input type="text" value="" id="quote-author" class="form-control" />
+						</div>
+						<div class="form-group">
+							<label>Couleur d'accent (bordure) :</label>
+							<input type="text" class="form-control" id="quote-color" />
+							<select id="colorselector-quote">
+								<option value="1" data-value="1" data-color="#A0522D">sienna</option>
+								<option value="2" data-value="2" data-color="#CD5C5C">indianred</option>
+								<option value="3" data-value="3" data-color="#FF4500">orangered</option>
+								<option value="4" data-value="4" data-color="#008B8B">darkcyan</option>
+								<option value="5" data-value="5" data-color="#B8860B">darkgoldenrod</option>
+								<option value="6" data-value="6" data-color="#32CD32">limegreen</option>
+								<option value="7" data-value="7" data-color="#FFD700">gold</option>
+								<option value="8" data-value="8" data-color="#48D1CC">mediumturquoise</option>
+								<option value="9" data-value="9" data-color="#87CEEB">skyblue</option>
+								<option value="10" data-value="10" data-color="#FF69B4">hotpink</option>
+								<option value="11" data-value="11" data-color="#87CEFA">lightskyblue</option>
+								<option value="12" data-value="12" data-color="#6495ED">cornflowerblue</option>
+								<option value="13" data-value="13" data-color="#DC143C">crimson</option>
+								<option value="14" data-value="14" data-color="#FF8C00">darkorange</option>
+								<option value="15" data-value="15" data-color="#C71585">mediumvioletred</option>
+								<option value="16" data-value="16" data-color="#000000">black</option>
+								<option value="17" data-value="17" data-color="#575757">grigio scuro</option>
+								<option value="18" data-value="18" data-color="#f2f2f2">grigio chiaro</option>
+								<option value="19" data-value="19" data-color="#efefef">marroncino</option>
+								<option value="20" data-value="20" data-color="#e7e0d8">marrone</option>
+								<option value="21" data-value="21" data-color="#d7d0c6">marrone scuro</option>
+								<option value="22" data-value="22" data-color="#263459">blu scuro</option>
+								<option value="23" data-value="23" data-color="#ffffff">bianco</option>
+							</select>
+							<script type="text/javascript">
+								$('#colorselector-quote').colorselector({
+									callback: function(value, color, title) {
+										$("#quote-color").val(color);
+									}
+								});
+							</script>
+						</div>
+					</div>
+					<!-- fine quote -->
+					<div id="accordion" style="display:none">
+						<div id="accordion-items"></div>
+						<button type="button" id="accordion-add" class="btn btn--ghost" style="margin-top:8px;">
+							<i class="fa fa-plus"></i>&nbsp;Ajouter une question
+						</button>
+					</div>
+					<!-- fine accordion -->
+					<div id="tabs" style="display:none">
+						<div id="tabs-items"></div>
+						<button type="button" id="tabs-add" class="btn btn--ghost" style="margin-top:8px;">
+							<i class="fa fa-plus"></i>&nbsp;Ajouter un onglet
+						</button>
+					</div>
+					<!-- fine tabs -->
+					<div id="gallery" style="display:none">
+						<div id="gallery-items"></div>
+						<button type="button" id="gallery-add" class="btn btn--ghost" style="margin-top:8px;">
+							<i class="fa fa-plus"></i>&nbsp;Ajouter une image
+						</button>
+					</div>
+					<!-- fine gallery -->
 					<div class="row">
 						<div class="col-md-6">
 							<div class="form-group">

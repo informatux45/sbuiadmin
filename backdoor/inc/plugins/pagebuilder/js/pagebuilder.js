@@ -472,10 +472,333 @@ function saveColumnSettings(column) {
     column.attr('class', (widthClass + ' column ' + $('#colcss').val()).trim());
 }
 
+// Popover d'icônes contigu au bouton "Choisir" du bloc "Icône" - reprend la
+// liste d'icônes du sélecteur global (assets/adminator/icon-picker.js,
+// window.SB_FA_ICON_LIST) mais PAS son modal : ce modal (système Adminator,
+// .modal.is-open) s'ouvrait derrière la modale Bootstrap 3 #preferences du
+// Page Builder (2 systèmes de modale distincts, piles de z-index
+// différentes, empilement non fiable) - un popover ancré au bouton évite le
+// problème plutôt que de le contourner.
+var sbIconPopover = null;
+function sbCloseIconPopover() {
+    if (sbIconPopover) { sbIconPopover.remove(); sbIconPopover = null; }
+    $(document).off('click.sbIconPopover');
+}
+function sbOpenIconPopover(anchorBtn, onPick) {
+    sbCloseIconPopover();
+    var icons = window.SB_FA_ICON_LIST || [];
+    var pop = $(
+        '<div class="sb-icon-popover">' +
+            '<input type="search" class="sb-icon-popover-search" placeholder="Rechercher...">' +
+            '<div class="sb-icon-popover-grid"></div>' +
+        '</div>'
+    );
+    $('body').append(pop);
+
+    var offset = anchorBtn.offset();
+    pop.css({
+        top: offset.top + anchorBtn.outerHeight() + 4,
+        left: offset.left
+    });
+
+    var grid = pop.find('.sb-icon-popover-grid');
+    function render(filter) {
+        grid.empty();
+        icons.forEach(function (name) {
+            if (filter && name.indexOf(filter) === -1) return;
+            $('<button type="button" class="sb-icon-popover-item" title="' + name + '"><i class="fa fa-' + name + '"></i></button>')
+                .on('click', function () {
+                    onPick(name);
+                    sbCloseIconPopover();
+                })
+                .appendTo(grid);
+        });
+    }
+    render('');
+
+    pop.find('.sb-icon-popover-search').on('input', function () {
+        render($(this).val().trim().toLowerCase());
+    }).focus();
+
+    sbIconPopover = pop;
+    // setTimeout : sans lui, le même clic sur anchorBtn qui vient d'ouvrir
+    // le popover serait aussi capté par ce handler document (délégation) et
+    // le refermerait aussitôt.
+    setTimeout(function () {
+        $(document).on('click.sbIconPopover', function (e) {
+            if (!$(e.target).closest('.sb-icon-popover, [data-icon-popover-trigger]').length) {
+                sbCloseIconPopover();
+            }
+        });
+    }, 0);
+}
+$(document).on('click', '[data-icon-popover-trigger]', function (e) {
+    e.preventDefault();
+    var targetId = $(this).attr('data-icon-popover-trigger');
+    var input = $('#' + targetId);
+    var preview = $('#' + targetId + 'Preview');
+    sbOpenIconPopover($(this), function (name) {
+        input.val(name).trigger('change');
+        preview.html('<i class="fa fa-fw fa-' + name + '"></i>');
+    });
+});
+
+// Éditeur "liste de titre+contenu" partagé par les blocs Accordéon (une
+// question/réponse par ligne) et Onglets (un titre d'onglet/contenu par
+// ligne) - remplace l'édition en HTML brut (peu user-friendly, retour
+// utilisateur du 2026-07-29) par un vrai formulaire répétable. Pas de
+// glisser-déposer pour réordonner (boutons Monter/Descendre à la place) -
+// ce widget a déjà eu des soucis de drag-and-drop capricieux ailleurs dans
+// ce même fichier (connectToSortable, voir feedback_pagebuilder_debugging_lessons).
+// Monter/Descendre/Supprimer : logique commune aux 2 éditeurs répétables
+// (texte pour Accordéon/Onglets, image pour Galerie) - même conteneur DOM
+// fixe (issu du template PHP) réutilisé à chaque ouverture du panneau,
+// namespacé + off() avant on() pour ne pas empiler les handlers à chaque
+// ouverture (même principe que confirm.unbind('click') dans prepareEditor()).
+function sbWireRepeaterReorder(container) {
+    container.off('click.sbRepeater').on('click.sbRepeater', '.sb-repeater-remove', function (e) {
+        e.preventDefault();
+        if (container.children('.sb-repeater-item').length <= 1) return;
+        var thisRow = $(this).closest('.sb-repeater-item');
+        // confirm.js (assets/adminator/confirm.js, chargé globalement) -
+        // repli sur la suppression directe si jamais indisponible plutôt
+        // que de bloquer l'action.
+        if (window.sbShowConfirm) {
+            window.sbShowConfirm('Supprimer cet élément ?', 'Supprimer', 'Annuler').then(function (ok) {
+                if (ok) thisRow.remove();
+            });
+        } else {
+            thisRow.remove();
+        }
+    });
+    container.on('click.sbRepeater', '.sb-repeater-up', function () {
+        var thisRow = $(this).closest('.sb-repeater-item');
+        var prev = thisRow.prev();
+        if (prev.length) thisRow.insertBefore(prev);
+    });
+    container.on('click.sbRepeater', '.sb-repeater-down', function () {
+        var thisRow = $(this).closest('.sb-repeater-item');
+        var next = thisRow.next();
+        if (next.length) thisRow.insertAfter(next);
+    });
+}
+
+function sbBuildRepeaterEditor(container, items, opts) {
+    container.empty();
+    items.forEach(function (item) {
+        addRow(item.title, item.content);
+    });
+
+    function addRow(title, content) {
+        var row = $(
+            '<div class="sb-repeater-item">' +
+                '<div class="sb-repeater-item-head">' +
+                    '<input type="text" class="form-control sb-repeater-title" placeholder="' + opts.titlePlaceholder + '">' +
+                    '<button type="button" class="btn btn-default btn-xs sb-repeater-up" title="Monter"><i class="fa fa-arrow-up"></i></button>' +
+                    '<button type="button" class="btn btn-default btn-xs sb-repeater-down" title="Descendre"><i class="fa fa-arrow-down"></i></button>' +
+                    '<button type="button" class="btn btn-danger btn-xs sb-repeater-remove" title="Supprimer"><i class="fa fa-trash"></i></button>' +
+                '</div>' +
+                '<textarea class="form-control sb-repeater-content" rows="2" placeholder="' + opts.contentPlaceholder + '"></textarea>' +
+            '</div>'
+        );
+        row.find('.sb-repeater-title').val(title || '');
+        row.find('.sb-repeater-content').val(content || '');
+        container.append(row);
+    }
+
+    sbWireRepeaterReorder(container);
+
+    return {
+        addRow: addRow,
+        getItems: function () {
+            return container.children('.sb-repeater-item').map(function () {
+                return {
+                    title: $(this).find('.sb-repeater-title').val(),
+                    content: $(this).find('.sb-repeater-content').val()
+                };
+            }).get();
+        }
+    };
+}
+
+var sbGalleryImgCounter = 0;
+
+// Éditeur répétable spécifique à la Galerie : chaque ligne pointe vers le
+// vrai sélecteur média du CMS (sbOpenPopup(), assets/dist/js/sb-custom.js,
+// déjà utilisé par le bloc Image) plutôt qu'un champ texte d'URL - la
+// popup de sélection écrit sa réponse en DOM brut
+// (document.getElementById(id).value = ...) sur un id précis, donc chaque
+// ligne a besoin d'un id STABLE et UNIQUE (compteur global jamais réutilisé,
+// pas un index de position qui se décale au Monter/Descendre/Supprimer).
+function sbBuildGalleryRepeaterEditor(container, items) {
+    container.empty();
+    items.forEach(function (item) {
+        addRow(item.url, item.caption);
+    });
+
+    function addRow(url, caption) {
+        var imgId = 'gallery-img-' + (sbGalleryImgCounter++);
+        // sbTransfert() (sb-custom.js) écrase le "className" (pas juste le
+        // contenu) de l'élément id+"Thumb" - le vrai id doit donc être sur
+        // un <div> INTERNE dédié (comme #img-urlThumb du bloc Image, dont
+        // le seul rôle est justement d'être ce receveur), jamais sur la
+        // case de taille fixe elle-même (.sb-gallery-thumb), sous peine de
+        // perdre son style de mise en page à la 1ère sélection d'image.
+        var row = $(
+            '<div class="sb-repeater-item">' +
+                '<div class="sb-repeater-item-head">' +
+                    '<div class="sb-gallery-thumb"><div id="' + imgId + 'Thumb" class="icon-transfert"><i class="fa fa-picture-o"></i></div></div>' +
+                    '<input type="hidden" id="' + imgId + '" class="sb-gallery-url">' +
+                    '<input type="text" class="form-control sb-gallery-caption" placeholder="Légende (optionnel)">' +
+                    '<button type="button" class="btn btn-default btn-xs sb-gallery-browse">Parcourir</button>' +
+                    '<button type="button" class="btn btn-default btn-xs sb-repeater-up" title="Monter"><i class="fa fa-arrow-up"></i></button>' +
+                    '<button type="button" class="btn btn-default btn-xs sb-repeater-down" title="Descendre"><i class="fa fa-arrow-down"></i></button>' +
+                    '<button type="button" class="btn btn-danger btn-xs sb-repeater-remove" title="Supprimer"><i class="fa fa-trash"></i></button>' +
+                '</div>' +
+            '</div>'
+        );
+        row.find('#' + imgId).val(url || '');
+        row.find('.sb-gallery-caption').val(caption || '');
+        if (url) {
+            row.find('#' + imgId + 'Thumb').html('<img src="' + url + '">');
+        }
+        row.find('.sb-gallery-browse').on('click', function () {
+            sbOpenPopup(imgId, 'jpg,jpeg,jpe,png,gif,tif,tiff,bmp,ico,svg', '', '');
+        });
+        container.append(row);
+    }
+
+    sbWireRepeaterReorder(container);
+
+    return {
+        addRow: addRow,
+        getItems: function () {
+            return container.children('.sb-repeater-item').map(function () {
+                return {
+                    url: $(this).find('.sb-gallery-url').val(),
+                    caption: $(this).find('.sb-gallery-caption').val()
+                };
+            }).get();
+        }
+    };
+}
+
+// Ne garde que les items non vides (titre ET contenu vides = ligne laissée
+// de côté par l'utilisateur) ; si tout est vide, garde un item minimal
+// plutôt qu'un bloc totalement vide/cassé une fois enregistré.
+function sbFilterEmptyItems(items, fallbackTitle) {
+    var kept = items.filter(function (it) {
+        return (it.title || '').trim() !== '' || (it.content || '').trim() !== '';
+    });
+    return kept.length ? kept : [{ title: fallbackTitle + ' 1', content: '' }];
+}
+
+function sbParseAccordionItems(part) {
+    var items = [];
+    part.find('.sb-accordion-item').each(function () {
+        items.push({
+            title: $(this).find('.sb-accordion-q').text(),
+            content: $(this).find('.sb-accordion-a').text()
+        });
+    });
+    return items.length ? items : [{ title: '', content: '' }];
+}
+
+function sbParseTabsItems(part) {
+    var items = [];
+    part.find('.sb-tabs-nav .sb-tabs-btn').each(function () {
+        var tabId = $(this).attr('data-tab');
+        items.push({
+            title: $(this).text(),
+            // .html() et non .text() : le contenu d'un onglet est interprété
+            // comme du HTML (voir sbBuildTabsHtml()) - relire le HTML brut
+            // permet de le ré-éditer tel quel plutôt que de le voir aplati
+            // en texte brut (et perdre le balisage) à la prochaine ouverture.
+            content: part.find('.sb-tabs-panel[data-tab="' + tabId + '"]').html() || ''
+        });
+    });
+    return items.length ? items : [{ title: '', content: '' }];
+}
+
+function sbBuildAccordionHtml(items) {
+    var wrap = $('<div class="sb-accordion"></div>');
+    items.forEach(function (item, i) {
+        var details = $('<details class="sb-accordion-item"></details>');
+        if (i === 0) details.attr('open', 'open');
+        $('<summary class="sb-accordion-q"></summary>').text(item.title || ('Question ' + (i + 1))).appendTo(details);
+        $('<div class="sb-accordion-a"></div>').text(item.content).appendTo(details);
+        wrap.append(details);
+    });
+    return wrap;
+}
+
+function sbBuildTabsHtml(items) {
+    var wrap = $('<div class="sb-tabs"></div>');
+    var nav = $('<div class="sb-tabs-nav"></div>');
+    var panels = [];
+    items.forEach(function (item, i) {
+        var tabId = 'tab' + (i + 1);
+        var btn = $('<button type="button" class="sb-tabs-btn"></button>').attr('data-tab', tabId).text(item.title || ('Onglet ' + (i + 1)));
+        // .html() et non .text() : le client veut pouvoir saisir du HTML
+        // (gras, liens, listes...) dans le contenu d'un onglet, interprété
+        // tel quel sur le front plutôt qu'échappé en texte brut.
+        var panel = $('<div class="sb-tabs-panel"></div>').attr('data-tab', tabId).html(item.content);
+        if (i === 0) { btn.addClass('is-active'); panel.addClass('is-active'); }
+        nav.append(btn);
+        panels.push(panel);
+    });
+    wrap.append(nav);
+    panels.forEach(function (panel) { wrap.append(panel); });
+    return wrap;
+}
+
+function sbParseGalleryItems(part) {
+    var items = [];
+    part.find('.sb-gallery-item-link').each(function () {
+        items.push({
+            url: $(this).attr('href') || '',
+            caption: $(this).attr('data-title') || ''
+        });
+    });
+    return items.length ? items : [{ url: '', caption: '' }];
+}
+
+function sbFilterEmptyGalleryItems(items) {
+    return items.filter(function (it) { return (it.url || '').trim() !== ''; });
+}
+
+function sbBuildGalleryHtml(items, groupId) {
+    var wrap = $('<div class="sb-gallery"></div>').attr('data-lightbox-group', groupId);
+    items.forEach(function (item) {
+        var a = $('<a class="sb-gallery-item-link"></a>')
+            .attr('data-lightbox', groupId)
+            .attr('href', item.url);
+        if (item.caption) a.attr('data-title', item.caption);
+        $('<img class="sb-gallery-img">').attr('src', item.url).attr('alt', item.caption || '').appendTo(a);
+        wrap.append(a);
+    });
+    return wrap;
+}
+
+var SB_PB_TYPE_LABELS = {
+    paragraph: 'Texte',
+    image: 'Image',
+    button: 'Bouton',
+    youtube: 'Vidéo',
+    map: 'Carte',
+    code: 'Code',
+    separator: 'Séparateur',
+    icon: 'Icône',
+    quote: 'Citation',
+    accordion: 'Accordéon',
+    tabs: 'Onglets',
+    gallery: 'Galerie'
+};
+
 function prepareEditor(part, row, column) {
     var clone = part.clone();
     var confirm = $('#applyChanges');
-    $('#preferencesTitle').html(part.data('type'));
+    $('#preferencesTitle').html(SB_PB_TYPE_LABELS[part.data('type')] || part.data('type'));
 
     $('.column .box').removeClass('active');
     part.addClass('active');
@@ -541,6 +864,7 @@ function prepareEditor(part, row, column) {
             $('#img-rel').val(img.attr('rel'));
             $('#img-title').val(img.attr('title'));
             // $('#img-clickurl').val(img.attr('onClick'));
+            $('#img-lightbox').prop('checked', img.parent('a.sb-lightbox-link').length > 0);
             $('#image').show();
 
             confirm.bind('click', function (e) {
@@ -557,6 +881,16 @@ function prepareEditor(part, row, column) {
                 o.attr('id', $('#id').val());
                 o.removeClass();
                 o.addClass($('#class').val());
+                // Lightbox : dé-wrap puis re-wrap systématiquement plutôt que
+                // de tester l'état courant, pour que le href reste toujours
+                // synchronisé avec l'URL d'image éventuellement modifiée
+                // au-dessus (sinon un ancien wrapper garderait un href périmé).
+                if (img.parent('a.sb-lightbox-link').length) {
+                    img.unwrap();
+                }
+                if ($('#img-lightbox').is(':checked')) {
+                    img.wrap('<a class="sb-lightbox-link" data-lightbox="pb-gallery" href="' + img.attr('src') + '"></a>');
+                }
                 $('#preferences').modal('hide');
             });
 
@@ -695,7 +1029,84 @@ function prepareEditor(part, row, column) {
                 $('#preferences').modal('hide');
             });
         break;
-    
+
+        case 'accordion':
+            $('#class').parent().hide();
+            $('#id').parent().hide();
+
+            var accordionItems = sbParseAccordionItems(part);
+            var accordionRepeater = sbBuildRepeaterEditor($('#accordion-items'), accordionItems, {
+                titlePlaceholder: 'Question',
+                contentPlaceholder: 'Réponse'
+            });
+            $('#accordion-add').off('click').on('click', function () {
+                accordionRepeater.addRow('', '');
+            });
+            $('#accordion').show();
+
+            confirm.bind('click', function (e) {
+                e.preventDefault();
+                saveRowSettings(row);
+                saveColumnSettings(column);
+                var items = sbFilterEmptyItems(accordionRepeater.getItems(), 'Question');
+                part.find('div.view').empty().append(sbBuildAccordionHtml(items));
+                $('#preferences').modal('hide');
+            });
+        break;
+
+        case 'tabs':
+            $('#class').parent().hide();
+            $('#id').parent().hide();
+
+            var tabsItems = sbParseTabsItems(part);
+            var tabsRepeater = sbBuildRepeaterEditor($('#tabs-items'), tabsItems, {
+                titlePlaceholder: 'Titre de l\'onglet',
+                contentPlaceholder: 'Contenu (HTML autorisé)'
+            });
+            $('#tabs-add').off('click').on('click', function () {
+                tabsRepeater.addRow('', '');
+            });
+            $('#tabs').show();
+
+            confirm.bind('click', function (e) {
+                e.preventDefault();
+                saveRowSettings(row);
+                saveColumnSettings(column);
+                var items = sbFilterEmptyItems(tabsRepeater.getItems(), 'Onglet');
+                part.find('div.view').empty().append(sbBuildTabsHtml(items));
+                $('#preferences').modal('hide');
+            });
+        break;
+
+        case 'gallery':
+            $('#class').parent().hide();
+            $('#id').parent().hide();
+
+            // Groupe lightbox stable : conservé tel quel s'il existe déjà
+            // (relecture depuis le bloc en cours d'édition), sinon généré
+            // une seule fois - pour que ce ne soit jamais régénéré à
+            // chaque ouverture des réglages (romprait le regroupement des
+            // images dans la visionneuse) et que 2 blocs Galerie
+            // différents sur la même page ne mélangent jamais leurs
+            // images dans la même visionneuse.
+            var galleryGroupId = part.find('.sb-gallery').attr('data-lightbox-group') || ('pbgal-' + s4() + s4());
+            var galleryItems = sbParseGalleryItems(part);
+            var galleryRepeater = sbBuildGalleryRepeaterEditor($('#gallery-items'), galleryItems);
+            $('#gallery-add').off('click').on('click', function () {
+                galleryRepeater.addRow('', '');
+            });
+            $('#gallery').show();
+
+            confirm.bind('click', function (e) {
+                e.preventDefault();
+                saveRowSettings(row);
+                saveColumnSettings(column);
+                var items = sbFilterEmptyGalleryItems(galleryRepeater.getItems());
+                part.find('div.view').empty().append(sbBuildGalleryHtml(items, galleryGroupId));
+                $('#preferences').modal('hide');
+            });
+        break;
+
         case 'button':
             var btn = part.find('.view > a.btn');
             var btn_id = btn.assignId();
@@ -722,6 +1133,78 @@ function prepareEditor(part, row, column) {
                 o.attr('id', $('#id').val());
                 btn.attr('class', $('#buttonContainer > a.btn').attr('class'));
                 o.attr('class', $('#class').val());
+                $('#preferences').modal('hide');
+            });
+        break;
+
+        case 'separator':
+            $('#id').parent().hide();
+            $('#class').parent().hide();
+
+            var hr = part.find('hr.sb-separator');
+            $('#sep-style').val(hr.css('border-top-style') || 'solid');
+            $('#sep-margin').val(parseInt(hr.css('margin-top'), 10) || 20);
+            $('#separator').show();
+
+            confirm.bind('click', function (e) {
+                e.preventDefault();
+                saveRowSettings(row);
+                saveColumnSettings(column);
+                var margin = $('#sep-margin').val() || 20;
+                hr.css('border-top-style', $('#sep-style').val());
+                hr.css('margin-top', margin + 'px');
+                hr.css('margin-bottom', margin + 'px');
+                $('#preferences').modal('hide');
+            });
+        break;
+
+        case 'icon':
+            var iconEl = part.find('.sb-icon');
+            // Convention alignée sur addIconFA()/icon-picker.js : nom brut
+            // sans préfixe "fa-" (ex: "star") - le picker écrit/lit cette
+            // valeur telle quelle dans #icon-class.
+            var currentIconName = (iconEl.attr('class') || '').split(/\s+/).filter(function (c) {
+                return c.indexOf('fa-') === 0 && c !== 'fa-2x';
+            })[0];
+            currentIconName = currentIconName ? currentIconName.replace(/^fa-/, '') : 'star';
+            $('#icon-class').val(currentIconName);
+            $('#icon-classPreview').html('<i class="fa fa-fw fa-' + currentIconName + '"></i>');
+            $('#icon-size').val(parseInt(iconEl.css('font-size'), 10) || 32);
+            $('#icon-color').val(iconEl.css('color'));
+            $('#icon').show();
+
+            confirm.bind('click', function (e) {
+                e.preventDefault();
+                saveRowSettings(row);
+                saveColumnSettings(column);
+                var newName = ($('#icon-class').val() || 'star').trim().replace(/^fa-/, '');
+                iconEl.attr('class', 'sb-icon fa fa-' + newName);
+                iconEl.css('font-size', ($('#icon-size').val() || 32) + 'px');
+                iconEl.css('color', $('#icon-color').val());
+                $('#preferences').modal('hide');
+            });
+        break;
+
+        case 'quote':
+            $('#id').parent().hide();
+            $('#class').parent().hide();
+
+            var quoteBlock = part.find('.sb-quote');
+            var quoteText = part.find('.sb-quote-text');
+            var quoteAuthor = part.find('.sb-quote-author');
+            $('#quote-text').val(quoteText.text());
+            $('#quote-author').val(quoteAuthor.text());
+            $('#quote-color').val(quoteBlock.css('border-left-color'));
+            $('#quote').show();
+
+            confirm.bind('click', function (e) {
+                e.preventDefault();
+                saveRowSettings(row);
+                saveColumnSettings(column);
+                quoteText.text($('#quote-text').val());
+                quoteAuthor.text($('#quote-author').val());
+                var accent = $('#quote-color').val();
+                if (accent) quoteBlock.css('border-left-color', accent);
                 $('#preferences').modal('hide');
             });
         break;
@@ -829,24 +1312,33 @@ function cleanRow(row) {
 // HTML n'entre jamais en conflit avec le Bootstrap (même version, autre
 // version, ou absence de Bootstrap) du thème front qui l'affichera.
 // Feuille de style correspondante : assets/adminator/pagebuilder-front.css.
-var SB_CLASS_RENAME_MAP = [
-    [/\brow\b/g, 'sbrow'],
-    [/\bcol-md-(\d+)\b/g, 'sbcol-md-$1'],
-    [/\bclearfix\b/g, 'sbclearfix'],
-    [/\bimg-responsive\b/g, 'sbimg-responsive'],
-    [/\bbtn-([a-z]+)\b/g, 'sbbtn-$1'],
-    [/\bbtn\b/g, 'sbbtn']
-];
+// Portage identique côté PHP : inc/functions.php, sbRenamePageBuilderClasses().
+var SB_CLASS_RENAME_MAP = {
+    'row': 'sbrow',
+    'clearfix': 'sbclearfix',
+    'img-responsive': 'sbimg-responsive',
+    'btn': 'sbbtn'
+};
 
 function sbRenameClasses(html) {
     // N'agit que sur le contenu des attributs class="..." - jamais sur le
     // texte/contenu (un bouton libellé "Ma row info" ne doit pas devenir
-    // "Ma sbrow info").
+    // "Ma sbrow info"). Comparaison par TOKEN entier (split sur les
+    // espaces), pas par sous-chaîne \b...\b - un tiret compte comme limite
+    // de mot en JS aussi, donc \bbtn\b matchait aussi le "btn" caché dans
+    // un token composé comme "sb-tabs-btn" (bloc Onglets) et le corrompait
+    // en "sb-tabs-sbbtn".
     return html.replace(/class="([^"]*)"/g, function (match, classes) {
-        SB_CLASS_RENAME_MAP.forEach(function (pair) {
-            classes = classes.replace(pair[0], pair[1]);
+        var renamed = classes.split(/\s+/).map(function (cls) {
+            if (cls === '') return cls;
+            if (SB_CLASS_RENAME_MAP.hasOwnProperty(cls)) return SB_CLASS_RENAME_MAP[cls];
+            var colMatch = cls.match(/^col-md-(\d+)$/);
+            if (colMatch) return 'sbcol-md-' + colMatch[1];
+            var btnMatch = cls.match(/^btn-([a-z]+)$/);
+            if (btnMatch) return 'sbbtn-' + btnMatch[1];
+            return cls;
         });
-        return 'class="' + classes + '"';
+        return 'class="' + renamed.join(' ') + '"';
     });
 }
 
@@ -923,25 +1415,41 @@ $(function () {
     });
 });
 
-// Bloc "Image" : sbTransfert() (assets/dist/js/sb-custom.js, partagée par
-// tout le CMS - ne pas y toucher, ça casserait les autres champs médias)
-// range volontairement le nom de fichier seul dans #img-url (ex: "xxx.png"),
-// jamais un chemin utilisable une fois la page affichée hors de l'admin -
-// la miniature (#img-urlThumb) reçoit elle un chemin relatif à la popup de
+// sbTransfert() (assets/dist/js/sb-custom.js, partagée par tout le CMS - ne
+// pas y toucher, ça casserait les autres champs médias) range volontairement
+// le nom de fichier seul dans le champ ciblé (ex: "xxx.png"), jamais un
+// chemin utilisable une fois la page affichée hors de l'admin - la
+// miniature (id+"Thumb") reçoit elle un chemin relatif à la popup de
 // sélection ("../upload/xxx.png"), tout aussi inutilisable ailleurs. On
 // reconstruit ici l'URL absolue du site (window.sbMediasUrl, voir
 // addPageBuilder()/sbuiadmin-form.php - même constante _AM_MEDIAS_URL
 // utilisée partout ailleurs dans le CMS) + le nom de fichier déjà correct.
+//
+// Généralisé à N'IMPORTE QUEL champ id+"Thumb"/id (pas seulement le
+// img-url/img-urlThumb fixe du bloc Image) : les lignes de la Galerie
+// (gallery-img-0, gallery-img-1...) sont créées/détruites dynamiquement,
+// impossible d'observer un élément précis qui n'existe pas encore au
+// chargement de la page - un seul observer délégué sur le document couvre
+// tous les champs présents ET futurs.
 $(function () {
-    var thumb = document.getElementById('img-urlThumb');
-    if (!thumb || !window.MutationObserver || !window.sbMediasUrl) return;
+    if (!window.MutationObserver || !window.sbMediasUrl) return;
 
-    new MutationObserver(function () {
-        var filename = $('#img-url').val();
-        if (filename) {
-            $('#img-url').val(window.sbMediasUrl + '/' + filename);
-        }
-    }).observe(thumb, { childList: true });
+    new MutationObserver(function (mutations) {
+        mutations.forEach(function (m) {
+            var thumb = m.target;
+            if (!thumb.id || thumb.id.slice(-5) !== 'Thumb') return;
+            var target = document.getElementById(thumb.id.slice(0, -5));
+            if (!target) return;
+            var filename = target.value;
+            // Ne préfixe que si c'est encore un nom de fichier nu - évite
+            // de re-préfixer une valeur déjà complète (relecture d'un item
+            // existant à l'ouverture des réglages, ou mutation non liée à
+            // une sélection média).
+            if (filename && filename.indexOf('://') === -1 && filename.indexOf(window.sbMediasUrl) === -1) {
+                target.value = window.sbMediasUrl + '/' + filename;
+            }
+        });
+    }).observe(document.body, { childList: true, subtree: true });
 });
 
 

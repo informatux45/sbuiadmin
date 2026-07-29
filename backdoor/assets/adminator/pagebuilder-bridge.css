@@ -296,3 +296,204 @@ body {
 	border: 1px solid var(--border);
 	box-shadow: var(--shadow-lg);
 }
+
+/* --- Aperçu canevas (.htmlpage) des 5 nouveaux blocs (Séparateur/Icône/
+   Citation/Accordéon/Onglets) - mêmes règles que assets/pagebuilder-front.css
+   (chargée uniquement côté front, jamais dans l'admin), adaptées aux
+   variables CSS Adminator pour rester lisibles en mode sombre. Sans ça, ces
+   blocs s'affichaient sans aucun style pendant l'édition (contrairement au
+   rendu front une fois enregistrés). */
+.htmlpage .sb-separator {
+	border: none;
+	border-top: 1px solid var(--border);
+}
+.htmlpage .sb-icon {
+	display: inline-block;
+}
+.htmlpage .sb-quote {
+	margin: 20px 0;
+	padding: 10px 20px;
+	border-left: 4px solid var(--primary);
+}
+.htmlpage .sb-quote-text {
+	margin: 0 0 8px 0;
+	font-size: 18px;
+	font-style: italic;
+	color: var(--t-base);
+	white-space: pre-line;
+}
+.htmlpage .sb-quote-author {
+	font-style: normal;
+	font-weight: bold;
+	color: var(--t-muted);
+}
+.htmlpage .sb-quote-author:before {
+	content: "— ";
+}
+.htmlpage .sb-accordion-item {
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	margin-bottom: 8px;
+	padding: 10px 15px;
+}
+.htmlpage .sb-accordion-q {
+	cursor: pointer;
+	font-weight: bold;
+	list-style: none;
+	color: var(--t-base);
+}
+.htmlpage .sb-accordion-q::-webkit-details-marker {
+	display: none;
+}
+.htmlpage .sb-accordion-q:before {
+	content: "+ ";
+}
+.htmlpage .sb-accordion-item[open] .sb-accordion-q:before {
+	content: "− ";
+}
+.htmlpage .sb-accordion-a {
+	margin-top: 10px;
+	color: var(--t-base);
+	white-space: pre-line;
+}
+.htmlpage .sb-tabs-nav {
+	display: flex;
+	flex-wrap: wrap;
+	border-bottom: 1px solid var(--border);
+	margin-bottom: 15px;
+}
+.htmlpage .sb-tabs-btn {
+	background: none;
+	border: none;
+	border-bottom: 2px solid transparent;
+	padding: 10px 16px;
+	font-size: 14px;
+	color: var(--t-muted);
+}
+.htmlpage .sb-tabs-btn.is-active {
+	color: var(--primary);
+	border-bottom-color: var(--primary);
+	font-weight: bold;
+}
+/* pagebuilder-front.js (toggle des panneaux au clic) n'est pas chargé dans
+   l'admin - tous les panneaux d'onglets restent visibles à la suite plutôt
+   que cachés, pour que chacun reste éditable sans dépendre d'un clic sur
+   un bouton dont l'interactivité n'existe pas ici. */
+.htmlpage .sb-tabs-panel {
+	border: 1px dashed var(--border-soft);
+	padding: 10px;
+	margin-bottom: 8px;
+	white-space: pre-line;
+	color: var(--t-base);
+}
+
+/* --- Popover d'icônes du bloc "Icône" (pagebuilder.js, sbOpenIconPopover)
+   ancré au bouton "Choisir" - z-index très au-dessus de la modale Bootstrap
+   3 #preferences (1050) pour ne jamais se retrouver dessous. --- */
+.sb-icon-popover {
+	background: var(--bg-card);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	box-shadow: var(--shadow-lg);
+	padding: 10px;
+	position: absolute;
+	width: 280px;
+	z-index: 100000;
+}
+.sb-icon-popover-search {
+	background: var(--bg-body);
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	color: var(--t-base);
+	margin-bottom: 8px;
+	padding: 6px 10px;
+	width: 100%;
+}
+.sb-icon-popover-grid {
+	display: grid;
+	gap: 4px;
+	grid-template-columns: repeat(6, 1fr);
+	max-height: 220px;
+	overflow-y: auto;
+}
+.sb-icon-popover-item {
+	align-items: center;
+	background: var(--bg-body);
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	color: var(--t-base);
+	cursor: pointer;
+	display: flex;
+	height: 32px;
+	justify-content: center;
+}
+.sb-icon-popover-item:hover {
+	background: var(--bg-hover);
+	border-color: var(--primary);
+}
+
+/* --- Éditeur répétable (Accordéon/Onglets, pagebuilder.js
+   sbBuildRepeaterEditor) --- */
+.sb-repeater-item {
+	background: var(--bg-body);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	margin-bottom: 8px;
+	padding: 8px;
+}
+.sb-repeater-item-head {
+	align-items: center;
+	display: flex;
+	gap: 6px;
+	margin-bottom: 6px;
+}
+.sb-repeater-item-head .sb-repeater-title {
+	flex: 1;
+}
+.sb-repeater-item-head .sb-gallery-caption {
+	flex: 1;
+}
+
+/* --- Aperçu canevas de la Galerie + éditeur d'images répétable --- */
+.htmlpage .sb-gallery {
+	display: grid;
+	gap: 10px;
+	grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+}
+.htmlpage .sb-gallery-img {
+	display: block;
+	width: 100%;
+	height: 120px;
+	object-fit: cover;
+	border-radius: 6px;
+}
+.sb-gallery-thumb {
+	align-items: center;
+	background: var(--bg-muted);
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	display: flex;
+	flex-shrink: 0;
+	height: 38px;
+	justify-content: center;
+	overflow: hidden;
+	width: 38px;
+}
+.sb-gallery-thumb i {
+	color: var(--t-muted);
+}
+/* .icon-transfert : receveur direct de sbTransfert() (className écrasé à
+   la sélection), imbriqué dans .sb-gallery-thumb pour que cette dernière
+   garde sa taille/son style fixes quel que soit ce que sbTransfert() y met. */
+.sb-gallery-thumb .icon-transfert {
+	align-items: center;
+	display: flex;
+	height: 100%;
+	justify-content: center;
+	width: 100%;
+}
+.sb-gallery-thumb img {
+	height: 100%;
+	object-fit: cover;
+	width: 100%;
+}

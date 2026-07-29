@@ -81,14 +81,18 @@ textarea.mce-textbox {
   border: 1px solid #bbb;
   border-radius: 4px;
   display: inline-block;
-  height: 50px;
+  height: 58px;
   margin-top: 2px;
   padding: 3px;
   text-align: center;
-  width: 50px;
+  width: 58px;
   cursor: move;
 }
-#pagebuilder-sidebar-nav .preview .element-desc { margin: 0px; padding: 1px; text-align: center; line-height: 8px;font-size: 9px; cursor: move  }
+/* Case élargie en 58x58px (était 50x50px, carrée conservée) + line-height
+   augmenté pour absorber les libellés de module sur 2 lignes (ex:
+   "Séparateur", "Accordéon") sans dépendre de la longueur exacte du texte -
+   s'applique uniformément à tous les blocs, anciens et à venir. */
+#pagebuilder-sidebar-nav .preview .element-desc { margin: 0px; padding: 1px; text-align: center; line-height: 10px; font-size: 9px; overflow-wrap: break-word; cursor: move }
 
 #pagebuilder-sidebar-nav .preview { display: block; color:#666; font-size:13px; line-height:30px;}
 #pagebuilder-sidebar-nav .preview input { width: 60px; padding:0 10px; background:#bbb; font-size:10px; color:#999; line-height:20px; height:20px; position:relative; top:-1px; }

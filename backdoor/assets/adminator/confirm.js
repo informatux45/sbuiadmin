@@ -7,7 +7,7 @@
  */
 (function () {
 	var STYLE = '\
-.sb-confirm-backdrop{align-items:center;background:var(--overlay);display:flex;inset:0;justify-content:center;position:fixed;z-index:1000}\
+.sb-confirm-backdrop{align-items:center;background:var(--overlay);display:flex;inset:0;justify-content:center;position:fixed;z-index:100000}\
 .sb-confirm-box{animation:sb-confirm-in .16s ease both;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-lg);max-width:360px;padding:22px;width:90%}\
 .sb-confirm-message{color:var(--t-base);font-size:14px;line-height:1.5;margin-bottom:18px}\
 .sb-confirm-actions{display:flex;gap:10px;justify-content:flex-end}\
@@ -23,6 +23,8 @@
 	}
 
 	function showConfirm(message, okLabel, cancelLabel) {
+		okLabel = okLabel || 'OK';
+		cancelLabel = cancelLabel || 'Annuler';
 		injectStyle();
 		return new Promise(function (resolve) {
 			var backdrop = document.createElement('div');
@@ -61,6 +63,11 @@
 			okBtn.addEventListener('click', function () { cleanup(true); });
 		});
 	}
+
+	// Exposée pour un appel programmatique depuis d'autres scripts admin
+	// (ex: suppression d'une ligne dans un éditeur répétable, pagebuilder.js)
+	// qui n'ont pas de <a href> à intercepter en déclaratif via data-confirm.
+	window.sbShowConfirm = showConfirm;
 
 	document.addEventListener('click', function (e) {
 		var el = e.target.closest('[data-confirm]');
