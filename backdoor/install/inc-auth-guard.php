@@ -18,9 +18,25 @@
  */
 
 $sb_install_settings_file = __DIR__ . '/../inc/admin/settings.txt';
+$sb_install_lock_file     = __DIR__ . '/installer/installer.lock';
 
 $sb_install_authorized = false;
-if (isset($_SESSION['sbuiadmin_user_name']) && trim((string)$_SESSION['sbuiadmin_user_name']) != '' && is_readable($sb_install_settings_file)) {
+
+/*
+ * Cas de la PREMIÈRE installation : tant que l'installeur n'a jamais été
+ * mené à son terme (installer.lock absent - ce fichier n'est écrit qu'à
+ * la toute fin, par complete_installation.php), il n'existe évidemment
+ * aucun compte administrateur avec lequel se connecter au préalable.
+ * Exiger une session admin dès cet instant rendrait le CMS purement et
+ * simplement ininstallable après téléchargement. L'assistant reste donc
+ * ouvert pendant cette fenêtre, et se referme définitivement dès que
+ * l'installation est terminée.
+ */
+if (!file_exists($sb_install_lock_file)) {
+	$sb_install_authorized = true;
+}
+
+if (!$sb_install_authorized && isset($_SESSION['sbuiadmin_user_name']) && trim((string)$_SESSION['sbuiadmin_user_name']) != '' && is_readable($sb_install_settings_file)) {
 	$sb_install_settings_lines = file($sb_install_settings_file);
 	// Ligne 2 (index 1) = liste des administrateurs, séparés par des
 	// virgules - même convention que $sbadministrators dans

@@ -7,3 +7,26 @@ backdoor/datas/cache/tpls_c/
 datas/cache/core/
 datas/cache/medias/
 datas/cache/tpls_c/
+
+# Marqueur de fin d'installation, propre à chaque installation. NE JAMAIS
+# le committer : présent dans une archive téléchargée, il refermerait
+# l'assistant d'installation (voir backdoor/install/inc-auth-guard.php)
+# avant même la première installation.
+backdoor/install/installer/installer.lock
+
+# Généré à l'exécution
+sitemap.xml
+
+# Fichiers déposés depuis l'admin. Le contenu de démo livré avec le CMS
+# (informatux.png, news-*.jpg, slider-*.jpg, .htaccess) reste suivi.
+upload/*
+!upload/.htaccess
+!upload/informatux.png
+!upload/news-*.jpg
+!upload/slider-*.jpg
+!upload/avatars/
+upload/avatars/*
+!upload/avatars/.gitkeep
+
+# Librairie mise de côté (désactivée en renommant le fichier)
+backdoor/assets/dist/js/vendor/tagify/_tagify.min.js_

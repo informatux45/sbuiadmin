@@ -158,8 +158,16 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'add') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table (catid,reference,title,description,description_short,price,priceht,tva_assujetti,tva,photo,poids,allow_physical,allow_dematerialise,active)
-						  VALUES ('$catid','$reference','$title','$description','$description_short','$price','$priceht','$tva_assujetti','$tva','$photo','$poids','$allow_physical','$allow_dematerialise','$active')";
+				// --- custom / photos / phys_visuals ne sont pas encore
+				// alimentées par ce formulaire (galerie et visuels de la
+				// version physique : phases suivantes), mais elles sont
+				// déclarées TEXT NOT NULL dans le schéma - or une colonne TEXT
+				// ne peut pas porter de DEFAULT en MySQL. En mode strict (par
+				// défaut depuis MySQL 5.7), les omettre fait échouer tout
+				// l'INSERT (erreur 1364). On les initialise donc explicitement
+				// à vide.
+				$query = "INSERT INTO $table (catid,reference,title,description,description_short,custom,price,priceht,tva_assujetti,tva,photo,photos,phys_visuals,poids,allow_physical,allow_dematerialise,active)
+						  VALUES ('$catid','$reference','$title','$description','$description_short','','$price','$priceht','$tva_assujetti','$tva','$photo','','','$poids','$allow_physical','$allow_dematerialise','$active')";
 				$result_add = $sbsql->query($query);
 				if ($result_add) {
 					// --- Vider les champs du formulaire
