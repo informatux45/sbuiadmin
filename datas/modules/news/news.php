@@ -93,15 +93,22 @@ switch($op) {
 		// --- Initialization
 		$news_page = (isset($_GET['l'])) ? intval($_GET['l']) : 0;
 		// --- Construct WHERE
+		// --- catid peut contenir plusieurs rubriques separees par des barres
+		// --- ("10|4") : un simple LIKE '%2%' capterait aussi 12, 20, 21...
+		// --- On encadre donc la valeur de barres pour ne matcher qu'un
+		// --- identifiant entier.
 		$where_categories = "";
-		$all_categories   = explode("|", $news_options['catid']);
+		$all_categories   = array_filter(explode("|", $news_options['catid']), 'strlen');
 		if ($all_categories) {
-			for($i = 0; $i < count($all_categories); ++$i) {
-				$category_id = $all_categories[$i];
-				$where_categories .= " (t1.catid LIKE '%$category_id%' AND t1.active = '1')";
-				if (($i + 1) < count($all_categories)) $where_categories .= " OR";
+			$where_parts = array();
+			foreach ($all_categories as $category_id) {
+				$category_id   = intval($category_id);
+				$where_parts[] = " (CONCAT('|', t1.catid, '|') LIKE '%|$category_id|%' AND t1.active = '1')";
 			}
+			$where_categories = implode(" OR", $where_parts);
 		}
+		// --- Aucune rubrique configuree : on affiche tous les articles actifs
+		if ($where_categories === "") $where_categories = " t1.active = '1'";
 		// --- SQL Request
 		$initQ = "SELECT t1.*, t2.title AS catname FROM {$module['tables']['news']} AS t1
 		          LEFT JOIN {$module['tables']['newscat']} AS t2 ON (t1.catid = t2.id)
@@ -152,7 +159,10 @@ switch($op) {
 		// --- Initialization
 		$news_page     = (isset($_GET['l'])) ? intval($_GET['l']) : 0;
 		// --- SQL Request
-		$initQ = "SELECT * FROM {$module['tables']['news']} WHERE catid LIKE '%$id%' AND active = '1' ORDER BY date DESC ";
+		// --- catid multi-rubriques ("10|4") : voir le commentaire du case
+		// --- "categories" ci-dessus, LIKE '%$id%' capte les identifiants
+		// --- dont $id n'est qu'un morceau (2 capte 12, 20...).
+		$initQ = "SELECT * FROM {$module['tables']['news']} WHERE CONCAT('|', catid, '|') LIKE '%|$id|%' AND active = '1' ORDER BY date DESC ";
 		// --- Total NEWS
 		$queryT = $sbsql->query($initQ);
 		$totalT = $sbsql->numrows();

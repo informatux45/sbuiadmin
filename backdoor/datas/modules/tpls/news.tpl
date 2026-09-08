@@ -402,6 +402,34 @@
 			</div>
 	
 		<!-- ------------------------------------------------------------ -->
+		<!-- Editeur ACE : uniquement sur les ecrans tpl_list / tpl_single -->
+		<!-- ATTENTION : ne pas se contenter d'un test $('#code').length,  -->
+		<!-- le Page Builder (addPageBuilder) pose lui aussi un            -->
+		<!-- <div id="code"> masque sur les ecrans add / edit.             -->
+		<!-- ------------------------------------------------------------ -->
+		{if isset($smarty.get.a) && ($smarty.get.a == 'tpl_list' OR $smarty.get.a == 'tpl_single')}
+		<script src="inc/plugins/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+		<script>
+		$(document).ready(function() {
+			var $editor = $('#code');
+			if ($editor.length > 0) {
+				var editor = ace.edit('code');
+				editor.setTheme("ace/theme/textmate");
+				editor.session.setMode("ace/mode/html");
+				editor.getSession().setTabSize(4);
+				editor.getSession().setUseWrapMode(true);
+				editor.setShowPrintMargin(true);
+				editor.setHighlightActiveLine(true);
+				$editor.closest('form').submit(function() {
+					$('input[name="code_hidden"]').val(editor.getValue());
+					$('input[name="code_ready"]').val('1');
+				});
+			}
+		});
+		</script>
+		{/if}
+
+		<!-- ------------------------------------------------------------ -->
 		<!-- Page-Level Scripts - Use this space this write your own code -->
 		<!-- ------------------------------------------------------------ -->
 		<script>

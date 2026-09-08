@@ -608,23 +608,57 @@ switch($action) {
 
 			// Injection des données
 			$id      = intval($_POST['id']);
-			$content = $sbsanitize->htmlEntitiesDecode($_POST['code_hidden'], 'UTF-8', 1, 0);
+			// --- Pas de decodage d'entites ici : code_hidden porte deja la
+			// --- valeur exacte de l'editeur ACE (le navigateur a decode les
+			// --- entites du div#code au rendu). Un htmlEntitiesDecode de plus
+			// --- transformait tout "&amp;" du gabarit en "&" et tout "&nbsp;"
+			// --- en espace insecable, a chaque enregistrement.
+			$content = isset($_POST['code_hidden']) ? $_POST['code_hidden'] : '';
 			
 			// --- EDIT
 			if ($id > 0) {
 
-				// UPDATE DATAS
-				$query = "UPDATE $table_category SET $action = '$content' WHERE id = '$id'";
-											 
-				$result_edit = $sbsql->query($query);
-				if ($result_edit) {
-					// --- On ne vide pas les champs du formulaire
-					// -------------------------------------------
-					// --- Message SUCCES
-					$sb_msg_valid = 'Template ('.$action.') modifié avec succès';
+				// --------------------------------------------------------
+				// GARDE-FOU : le contenu de l'éditeur ACE est recopié dans
+				// code_hidden par JavaScript au moment du submit. Si ce JS
+				// n'a pas tourné (ACE non chargé, erreur de script...), le
+				// champ arrive vide et l'UPDATE viderait le gabarit sans
+				// aucun avertissement.
+				// Le même JS pose code_ready=1 : sa présence distingue un
+				// champ vide VOULU (l'utilisateur a effacé l'éditeur, qu'on
+				// doit pouvoir enregistrer) d'un champ vide SUBI (le JS n'a
+				// pas tourné), seul cas qu'on refuse.
+				// --------------------------------------------------------
+				$editor_ran = (isset($_POST['code_ready']) && $_POST['code_ready'] === '1');
+
+				if (!$editor_ran && $sbsanitize->sTrim($content) === '') {
+
+					// --- Relecture pour réafficher l'existant plutôt qu'un éditeur vide
+					$query_current  = "SELECT $action FROM $table_category WHERE id = '$id'";
+					$requestCurrent = $sbsql->query($query_current);
+					$assocCurrent   = $sbsql->assoc($requestCurrent);
+					// --- Message ERROR (aucune écriture)
+					$sb_msg_error = "L'éditeur de code n'a pas répondu : le template (".$action.") n'a pas été modifié. Rechargez la page et réessayez.";
+					$content      = isset($assocCurrent[$action]) ? $assocCurrent[$action] : '';
+					$query        = $query_current;
+
 				} else {
-					// --- Message ERROR
-					$sb_msg_error = 'Error: Write Error (EDIT)!';
+
+					// UPDATE DATAS
+					$content_sql = $sbsql->escape_string($content);
+					$query = "UPDATE $table_category SET $action = '$content_sql' WHERE id = '$id'";
+
+					$result_edit = $sbsql->query($query);
+					if ($result_edit) {
+						// --- On ne vide pas les champs du formulaire
+						// -------------------------------------------
+						// --- Message SUCCES
+						$sb_msg_valid = 'Template ('.$action.') modifié avec succès';
+					} else {
+						// --- Message ERROR
+						$sb_msg_error = 'Error: Write Error (EDIT)!';
+					}
+
 				}
 
 			}
@@ -668,12 +702,19 @@ switch($action) {
 		// --------------------------------
 		// Editor ACE (LIST OU SINGLE)
 		// --------------------------------
-		$sbform->addAnything('<div id="code" style="height: 500px; width: 100%;">' . $sbsanitize->htmlSpecialChars($content) . '</div><p></p>');
+		// --- htmlspecialchars() natif, PAS $sbsanitize->htmlSpecialChars() :
+		// --- cette derniere repasse "&amp;" en "&" (preg_replace final), ce
+		// --- qui detruisait les entites du gabarit des l'affichage.
+		$sbform->addAnything('<div id="code" style="height: 500px; width: 100%;">' . htmlspecialchars($content, ENT_QUOTES, 'UTF-8') . '</div><p></p>');
 		// --------------------------------			
 		// --- Hiddens / Buttons
 		// --------------------------------	
 		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => "$formName"));
 		$sbform->addInput('hidden', '', array('name' => 'code_hidden', 'value' => ""));
+		// --- Marqueur posé par le JS de l'éditeur ACE (voir news.tpl) : permet
+		// --- de distinguer un gabarit vidé volontairement d'un JS qui n'a pas
+		// --- tourné. Voir le garde-fou de la branche de soumission ci-dessus.
+		$sbform->addInput('hidden', '', array('name' => 'code_ready', 'value' => ""));
 		$sbform->addInput('hidden', '', array('name' => 'id', 'value' => "$id"));
 		$sbform->addInput('submit', '', array('value' => "$btn_add_edit"));
 		// --------------------------------	

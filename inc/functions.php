@@ -167,10 +167,22 @@ if (!function_exists("sbRewriteUrl")) {
 	function sbRewriteUrl($subdirectory) {
 		// --- Initialization
 		global $sbsanitize;
+		// --- Keep only the PATH of the url : une url réécrite peut très bien
+		// --- porter une chaîne de requête (/search?s=terme, /news?l=10...).
+		// --- Sans ce parse_url, "?..." reste collé au premier segment et
+		// --- l'élément de routage est perdu (toute url avec un paramètre GET
+		// --- retombait alors sur la page d'accueil).
+		$path = (string) parse_url((isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : ''), PHP_URL_PATH);
 		// --- Remove subdirectory from url
-		$path = str_replace(DIRECTORY_SEPARATOR . $subdirectory . DIRECTORY_SEPARATOR, "", $_SERVER['REQUEST_URI']);
+		$path = str_replace(DIRECTORY_SEPARATOR . $subdirectory . DIRECTORY_SEPARATOR, "", $path);
 		// --- Trim leading slash(es)
 		$path = trim($path, DIRECTORY_SEPARATOR);
+		// --- Appel direct du contrôleur frontal (ErrorDocument du .htaccess,
+		// --- anciens liens index.php?p=...) : le chemin ne porte alors aucune
+		// --- information de routage, c'est "p" qui la porte.
+		if ($path === '' || $path === 'index.php') {
+			return (isset($_GET['p'])) ? $sbsanitize->stopXSS($_GET['p']) : false;
+		}
 		// --- Split path on slashes
 		$elements = explode('/', $path);
 		// --- No path elements means home
@@ -182,9 +194,6 @@ if (!function_exists("sbRewriteUrl")) {
 			$type = false;
 			// --- Switch value
 			$switch_element = $elements[0];
-			// --- Check if key id OR args for modules/pages
-			$pos = strpos($switch_element, '?');
-			$switch_element = ($pos !== false) ? "" : $switch_element;
 			// --- Get / Check modules List
 			$dir = SB_MODULES_DIR;
 			$result_modules_dir = array();	 
@@ -206,9 +215,11 @@ if (!function_exists("sbRewriteUrl")) {
 						return ($switch_element) ? 'pages' : 'index';
 					} else {
 						// === MODULES ===
-						// --- Check if key id OR args
-						$pos = strpos($elements[1], '?');
-						$count_elements = ($pos !== false) ? count($elements) - 1 : count($elements);
+						// --- Le chemin est déjà nettoyé de sa chaîne de requête
+						// --- (voir parse_url plus haut) : un simple comptage des
+						// --- segments suffit, et on ne lit plus $elements[1] à
+						// --- l'aveugle (notice PHP 8 sur un chemin à 1 segment).
+						$count_elements = count($elements);
 						if ($count_elements > 3) {
 							// Array for MODULE
 							// Schema:
