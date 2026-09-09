@@ -14,6 +14,12 @@ datas/cache/tpls_c/
 # avant même la première installation.
 backdoor/install/installer/installer.lock
 
+# Nom de la session PHP, tiré au sort à l'installation. Propre à chaque
+# installation : le committer ferait partager le même nom de cookie à tous
+# les sites issus de cette archive, ce qui est exactement le problème que ce
+# mécanisme corrige (voir inc/sbsession.php).
+inc/sbsession.txt
+
 # Généré à l'exécution
 sitemap.xml
 

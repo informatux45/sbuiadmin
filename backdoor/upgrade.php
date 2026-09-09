@@ -16,6 +16,10 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date dans le passé
 // ----------------------
 // Session Initialization
 // ----------------------
+// --- Nom de la session : DOIT etre pose avant session_start(), sinon ce
+// --- point d'entree repose sa propre session sous PHPSESSID et perd tout
+// --- ce que les autres y ont mis. Voir inc/sbsession.php.
+require_once(__DIR__ . '/../inc/sbsession.php');
 session_start();
  
 // ----------------------

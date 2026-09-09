@@ -22,6 +22,14 @@ order allow,deny
 deny from all
 </Files>
 
+## Nom de la session de cette installation (voir inc/sbsession.php).
+## Ce n'est pas un secret - un nom de cookie voyage en clair dans chaque
+## en-tete Set-Cookie - mais rien ne justifie de le servir comme un fichier.
+<Files sbsession.txt>
+order allow,deny
+deny from all
+</Files>
+
 ## Prevent directory listings
 Options All -Indexes
 

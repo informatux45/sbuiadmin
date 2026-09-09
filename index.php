@@ -20,6 +20,10 @@ ini_set("session.gc_maxlifetime", 24*3600); // 1 day (24 hours)
 // (dev local, etc.) en forçant un cookie_secure qui ne serait alors jamais
 // renvoyé par le navigateur.
 $sb_is_https = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+// --- Nom de la session : DOIT etre pose avant session_start(), sinon ce
+// --- point d'entree repose sa propre session sous PHPSESSID et perd tout
+// --- ce que les autres y ont mis. Voir inc/sbsession.php.
+require_once(__DIR__ . '/inc/sbsession.php');
 session_start([
     'cookie_lifetime' => 86400,
     'gc_maxlifetime'  => 86400,

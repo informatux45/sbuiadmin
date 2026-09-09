@@ -171,6 +171,18 @@
 								if (!$delete_install_start_file)
 									$error_mg[] = "<b>Erreur :</b> Fichier install.php non supprimé (Vérifier les droits d'écriture sur le fichier) !"; 
 
+								# Nom de la session PHP : tire au sort pour CETTE installation.
+								# Sans lui, toutes les installations issues de la meme archive
+								# partageraient le cookie PHPSESSID par defaut et, servies par un
+								# meme domaine, ecraseraient mutuellement l'identite de
+								# l'administrateur connecte (voir inc/sbsession.php).
+								# On supprime d'abord un eventuel fichier herite d'une
+								# installation precedente : une nouvelle installation doit
+								# repartir sur un nom neuf.
+								$session_name_file = dirname(__DIR__, 2) . '/inc/sbsession.txt';
+								@unlink($session_name_file);
+								require_once(dirname(__DIR__, 2) . '/inc/sbsession.php');
+
 								# Lock the installer
 								@file_put_contents($installer_lock, "installer lock file");
 

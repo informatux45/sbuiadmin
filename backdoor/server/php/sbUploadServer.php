@@ -21,6 +21,10 @@
 defined('SBUIADMIN_PATH') or define('SBUIADMIN_PATH', dirname(__FILE__, 3));
 defined('SBUIADMIN_URL')  or define('SBUIADMIN_URL', $_SERVER['SERVER_NAME'] . (isset($_SERVER['SERVER_PORT']) ? ':' . $_SERVER['SERVER_PORT'] : '') . rtrim(dirname($_SERVER['SCRIPT_NAME'], 3), '/') . '/');
 
+// --- Nom de la session : DOIT etre pose avant session_start(), sinon ce
+// --- point d'entree repose sa propre session sous PHPSESSID et perd tout
+// --- ce que les autres y ont mis. Voir inc/sbsession.php.
+require_once(__DIR__ . '/../../../inc/sbsession.php');
 session_start([
 	'cookie_lifetime' => 86400,
 ]);
