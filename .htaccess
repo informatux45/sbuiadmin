@@ -30,6 +30,17 @@ order allow,deny
 deny from all
 </Files>
 
+## Fichiers cachés : .gitignore, .user.ini, .env, et tout ce qui commence par
+## un point. Ne bloque QUE des fichiers, jamais un répertoire : la validation
+## Let's Encrypt (.well-known/acme-challenge/<jeton>) continue de fonctionner,
+## le nom du fichier servi n'y commence pas par un point.
+## Attention en élargissant cette règle : ne jamais bloquer .txt en bloc,
+## robots.txt et les fichiers de vérification des moteurs doivent rester servis.
+<FilesMatch "^\.">
+order allow,deny
+deny from all
+</FilesMatch>
+
 ## Prevent directory listings
 Options All -Indexes
 
@@ -40,6 +51,18 @@ Options All -Indexes
 Options +FollowSymlinks
 ## Activation du mod rewrite d'Apache
 RewriteEngine On
+
+## Répertoires cachés d'outils : dépôt git (présent dans la racine web dès
+## qu'on déploie par "git pull" plutôt que par transfert de fichiers), et les
+## dossiers de configuration d'éditeurs ou d'assistants.
+## Un <FilesMatch "^\."> ne suffit PAS ici : il faut interdire tout ce qui est
+## SOUS ces répertoires (.git/config, .git/HEAD, refs, objects...), et ces
+## fichiers-là ne commencent pas par un point. La règle générique plus bas ne
+## les protège pas davantage : elle ne redirige vers index.php que ce qui
+## n'existe PAS sur le disque - or .git/config existe bel et bien, donc Apache
+## le servait tel quel.
+RewriteRule (^|/)\.(git|svn|hg|bzr|claude|idea|vscode)(/|$) - [F,L]
+
 ## Réécriture de index.html vers index.php
 RewriteRule ^index\.html$ index.php
 
