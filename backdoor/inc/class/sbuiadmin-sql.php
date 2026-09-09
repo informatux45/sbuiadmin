@@ -90,12 +90,24 @@ class sql extends Smarty {
         return mysqli_insert_id($this->connect_id);
     }
     public function numrows() {
-        if (isset($this->result_id)) {
-            if (preg_match('`^select`i', $this->query)) return mysqli_num_rows($this->result_id);
-            if (preg_match('`^(insert|update|delete)`i', $this->query)) return mysqli_affected_rows($this->result_id);
-        } else {
-            return count($this->records);
+        if (!isset($this->result_id)) return count($this->records);
+
+        // --- Une requete en echec laisse result_id a FALSE (mysqli_report() est
+        // --- en MYSQLI_REPORT_OFF depuis le Point 9 : plus d'exception, juste un
+        // --- false) et laisse $this->query sur la requete PRECEDENTE, qui a
+        // --- reussi. Sans ce garde, mysqli_num_rows(false) leve une TypeError
+        // --- fatale sous PHP 8 - erreur 500 au lieu d'un simple resultat vide.
+        if ($this->result_id === false) return 0;
+
+        if (preg_match('`^select`i', $this->query)) {
+            return ($this->result_id instanceof mysqli_result) ? mysqli_num_rows($this->result_id) : 0;
         }
+        // --- mysqli_affected_rows() attend la CONNEXION, pas le resultat : sur
+        // --- un INSERT/UPDATE/DELETE, result_id vaut TRUE (booleen) et l'ancien
+        // --- appel levait lui aussi une TypeError sous PHP 8.
+        if (preg_match('`^(insert|update|delete)`i', $this->query)) return mysqli_affected_rows($this->connect_id);
+
+        return 0;
     }
     public function object($query) {
         return mysqli_fetch_object($query);

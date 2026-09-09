@@ -599,13 +599,18 @@ switch($action) {
 			// --------------------------------
 			// --- Control form submit --------
 			// --------------------------------
-			$sb_toSort = $_POST['drag'];
+			// --- (array) : count() sur une valeur non-tableau (drag=foo) leve une
+			// --- TypeError fatale sous PHP 8.
+			$sb_toSort = (array)$_POST['drag'];
 			
 			// reorganizes the order of elements
 			$sql_error = 0;
 			for ($i = 0; $i < count($sb_toSort); $i++) {
 				$tri = $i + 1;
-				$query_sort  = "UPDATE $table_photo SET sort = $tri WHERE id = " . $sb_toSort[$i];
+				// --- intval() : $_POST['drag'] est fourni par le navigateur, il partait
+				// --- brut dans le WHERE (les actions de tri ne passent pas par le jeton
+				// --- CSRF de openForm(), voir index.php).
+				$query_sort  = "UPDATE $table_photo SET sort = $tri WHERE id = " . intval($sb_toSort[$i]);
 				$result_sort = $sbsql->query($query_sort);
 				if (!$result_sort) {
 					// --- Error Database

@@ -227,12 +227,18 @@ switch($action) {
 			// --------------------------------
 			// --- Control form submit --------
 			// --------------------------------
-			$sb_toSort = $_POST['drag'];
+			// --- (array) : count() sur une valeur non-tableau (drag=foo) leve une
+			// --- TypeError fatale sous PHP 8.
+			$sb_toSort = (array)$_POST['drag'];
 			$id        = intval($_GET['id']);
 
 			// reorganizes the order of elements
+			// --- intval() : ces valeurs sont des id de pages fournis par le
+			// --- navigateur, elles finissent dans pages = '...' (les actions de
+			// --- tri ne passent pas par le jeton CSRF de openForm()).
+			$sb_pages_sorted = '';
 			for($i = 0; $i < count($sb_toSort); $i++) {
-				$sb_pages_sorted .= $sb_toSort[$i] . "|";
+				$sb_pages_sorted .= intval($sb_toSort[$i]) . "|";
 			}
 			$sb_pages_sorted = substr($sb_pages_sorted, 0, -1);
 
