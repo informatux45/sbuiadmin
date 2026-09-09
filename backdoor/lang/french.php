@@ -93,6 +93,12 @@ defined('SBUIADMIN_MENU_TABLES') or define("SBUIADMIN_MENU_TABLES", "Tableaux");
 defined('SBUIADMIN_MENU_FAQ') or define("SBUIADMIN_MENU_FAQ", "FAQ");
 defined('SBUIADMIN_MENU_FAQ_ALL') or define("SBUIADMIN_MENU_FAQ_ALL", "Questions");
 defined('SBUIADMIN_MENU_FAQ_CATEGORIES') or define("SBUIADMIN_MENU_FAQ_CATEGORIES", "Catégories");
+// ** Telechargements
+defined('SBUIADMIN_MENU_DOWNLOAD') or define("SBUIADMIN_MENU_DOWNLOAD", "Téléchargements");
+// ** Galeries
+defined('SBUIADMIN_MENU_GALLERY') or define("SBUIADMIN_MENU_GALLERY", "Galeries");
+defined('SBUIADMIN_MENU_GALLERY_ALL') or define("SBUIADMIN_MENU_GALLERY_ALL", "Toutes les galeries");
+defined('SBUIADMIN_MENU_GALLERY_PHOTOS') or define("SBUIADMIN_MENU_GALLERY_PHOTOS", "Photos / vidéos");
 // ** Boutique
 defined('SBUIADMIN_MENU_BOUTIQUE') or define("SBUIADMIN_MENU_BOUTIQUE", "Boutique");
 defined('SBUIADMIN_MENU_BOUTIQUE_PRODUCTS') or define("SBUIADMIN_MENU_BOUTIQUE_PRODUCTS", "Produits");

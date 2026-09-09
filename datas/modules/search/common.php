@@ -2,7 +2,7 @@
 /**
  * Plugin Name: SBUIADMIN SEARCH
  * Description: Module de recherche
- * Version: 0.1.1
+ * Version: 0.2.0
  * Author: BooBoo
  * Author URI: //www.informatux.com/
  * File: common.php
@@ -24,15 +24,23 @@ $module['author']      = "BooBoo";
 // -------------------------------------------------
 // --- Tables SQL
 // -------------------------------------------------
-$module['tables']['bien'] = "biens";
-$module['tables']['dpe']  = "dpe";
-$module['tables']['dept'] = "departement";
-$module['tables']['regi'] = "region";
-$module['tables']['type'] = "type";
-$module['tables']['page'] = "sb_pages";
-$module['tables']['phot'] = "photo";
-$module['tables']['flag'] = "flag";
-$module['tables']['sele'] = "selection";
+// --- Ce module ne possede aucune table : il interroge celles des autres
+// --- modules. Les tables declarees ici sont donc celles des 7 sources de
+// --- contenu couvertes par la recherche (demande du client), plus sb_blocs
+// --- qui sert uniquement a retrouver le contenu HOTE d'un shortcode.
+// -------------------------------------------------
+$module['tables']['pages']         = _AM_DB_PREFIX . "sb_pages";
+$module['tables']['news']          = _AM_DB_PREFIX . "sb_news";
+$module['tables']['contact']       = _AM_DB_PREFIX . "sb_contact";
+$module['tables']['table']         = _AM_DB_PREFIX . "sb_table";
+$module['tables']['tabledatas']    = _AM_DB_PREFIX . "sb_table_datas";
+$module['tables']['tablestruct']   = _AM_DB_PREFIX . "sb_table_structure";
+$module['tables']['tabbs']         = _AM_DB_PREFIX . "sb_tabbs";
+$module['tables']['tabbstab']      = _AM_DB_PREFIX . "sb_tabbs_tab";
+$module['tables']['download']      = _AM_DB_PREFIX . "sb_download";
+$module['tables']['gallery']       = _AM_DB_PREFIX . "sb_gallery";
+$module['tables']['galleryphotos'] = _AM_DB_PREFIX . "sb_gallery_photos";
+$module['tables']['blocs']         = _AM_DB_PREFIX . "sb_blocs";
 // -------------------------------------------------
 
 ?>

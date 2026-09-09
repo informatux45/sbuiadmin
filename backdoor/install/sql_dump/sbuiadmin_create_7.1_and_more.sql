@@ -574,6 +574,57 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_faq_category` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `sb_download`
+--
+
+DROP TABLE IF EXISTS `<DB_PREFIX>sb_download`;
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_download` (
+  `id` int(11) NOT NULL,
+  `title` text NOT NULL,
+  `description` text DEFAULT NULL,
+  `filename` varchar(255) NOT NULL DEFAULT '' COMMENT 'Nom du fichier',
+  `size` varchar(32) DEFAULT NULL,
+  `downloaded` int(11) NOT NULL DEFAULT 0 COMMENT 'Nombre de telechargements',
+  `randkey` varchar(80) NOT NULL DEFAULT '' COMMENT 'sbGenerateRandKey() renvoie 65 caracteres',
+  `active` tinyint(4) NOT NULL DEFAULT 1 COMMENT '0: inactive, 1: active'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `sb_gallery`
+--
+
+DROP TABLE IF EXISTS `<DB_PREFIX>sb_gallery`;
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_gallery` (
+  `id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `css` text DEFAULT NULL,
+  `javascript` text DEFAULT NULL,
+  `template` text DEFAULT NULL,
+  `active` tinyint(4) NOT NULL DEFAULT 1 COMMENT '0: inactive, 1: active'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `sb_gallery_photos`
+--
+
+DROP TABLE IF EXISTS `<DB_PREFIX>sb_gallery_photos`;
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_gallery_photos` (
+  `id` int(11) NOT NULL,
+  `gid` int(11) NOT NULL DEFAULT 0 COMMENT 'Gallery id',
+  `title` varchar(255) NOT NULL COMMENT 'Nom de la photo',
+  `photo` varchar(255) NOT NULL DEFAULT '' COMMENT 'Nom de l''image physique, ou URL de la video',
+  `type` varchar(16) NOT NULL DEFAULT 'photo' COMMENT 'video, photo',
+  `active` tinyint(4) NOT NULL DEFAULT 1 COMMENT '0: inactive, 1: active',
+  `sort` int(11) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `sb_messages`
 --
 
@@ -597,13 +648,13 @@ DROP TABLE IF EXISTS `<DB_PREFIX>sb_news`;
 CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_news` (
   `id` bigint(20) NOT NULL,
   `catid` varchar(50) NOT NULL COMMENT 'Categories',
-  `viewed` bigint(20) NOT NULL,
   `title` text NOT NULL,
   `subtitle` text NOT NULL,
   `desc_short` text NOT NULL,
   `desc_full` text NOT NULL,
   `image` varchar(200) DEFAULT NULL,
   `date` varchar(10) NOT NULL,
+  `viewed` int(11) NOT NULL DEFAULT 0 COMMENT 'Compteur de lectures',
   `active` tinyint(4) NOT NULL COMMENT '0: inactive, 1: active'
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
@@ -1321,6 +1372,26 @@ ALTER TABLE `<DB_PREFIX>sb_faq_category`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `sb_download`
+--
+ALTER TABLE `<DB_PREFIX>sb_download`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `randkey` (`randkey`);
+
+--
+-- Indexes for table `sb_gallery`
+--
+ALTER TABLE `<DB_PREFIX>sb_gallery`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `sb_gallery_photos`
+--
+ALTER TABLE `<DB_PREFIX>sb_gallery_photos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `gid` (`gid`,`sort`);
+
+--
 -- Indexes for table `sb_messages`
 --
 ALTER TABLE `<DB_PREFIX>sb_messages`
@@ -1572,6 +1643,21 @@ ALTER TABLE `<DB_PREFIX>sb_faq`
 -- AUTO_INCREMENT for table `sb_faq_category`
 --
 ALTER TABLE `<DB_PREFIX>sb_faq_category`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `sb_download`
+--
+ALTER TABLE `<DB_PREFIX>sb_download`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `sb_gallery`
+--
+ALTER TABLE `<DB_PREFIX>sb_gallery`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `sb_gallery_photos`
+--
+ALTER TABLE `<DB_PREFIX>sb_gallery_photos`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `sb_messages`

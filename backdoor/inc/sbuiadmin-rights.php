@@ -66,6 +66,12 @@ function sbGetRightsSubmodules() {
 		'tabbs'     => array(
 			'deltab' => 'Onglets', 'alltabs' => 'Onglets', 'tabadd' => 'Onglets', 'tabedit' => 'Onglets',
 		),
+		'gallery'   => array(
+			// "photo" en premier : c'est la clé canonique de la ligne (voir
+			// sbGetEffectiveModuleKey). "sort" trie les photos d'une galerie,
+			// pas les galeries elles-memes - il appartient donc a cette section.
+			'photo' => 'Photos / vidéos', 'photoadd' => 'Photos / vidéos', 'photoedit' => 'Photos / vidéos', 'delphoto' => 'Photos / vidéos', 'sort' => 'Photos / vidéos',
+		),
 		'cmsconfig' => array(
 			'headerfooter' => 'En-tête/Pied de page',
 			'css'          => 'CSS',
@@ -274,6 +280,7 @@ function sbClassifyAction($module) {
 		'faq'       => array('sort' => 'edit', 'category' => 'view'),
 		'boutique'  => array('sort' => 'edit', 'category' => 'view', 'settings' => 'edit'),
 		'slider'    => array('sort' => 'edit', 'photo' => 'view'),
+		'gallery'   => array('sort' => 'edit', 'photo' => 'view'),
 		'tabbs'     => array('sort' => 'edit', 'alltabs' => 'view'),
 		'table'     => array('sortstructure' => 'edit', 'sortdatas' => 'edit'),
 		'menu'      => array('sort' => 'edit'),

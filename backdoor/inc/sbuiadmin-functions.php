@@ -894,7 +894,12 @@ function sbGetModulesPage() {
 	$result_modules_dir = array();	 
 	$modules_dir = scandir($dir);
 	foreach ($modules_dir as $key => $value) {
-	   if (!in_array($value, array(".","..","pages","slider","tabbs","table"))) {
+	   // --- "download" et "gallery" sont exclus : ces deux modules n'ont pas
+	   // --- de front (ils ne servent qu'a poser des shortcodes dans un
+	   // --- contenu). Les proposer ici laissait choisir un module de page qui
+	   // --- n'affiche rien - gallery n'a meme plus de controleur front, la
+	   // --- page retombait donc sur le 404 du theme.
+	   if (!in_array($value, array(".","..","pages","slider","tabbs","table","download","gallery"))) {
 		  if (is_dir($dir . DIRECTORY_SEPARATOR . $value)) {
 			 $result_modules_dir[] = $value;
 		  }

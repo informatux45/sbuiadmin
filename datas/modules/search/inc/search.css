@@ -1,0 +1,138 @@
+/* ==========================================================
+   Module SEARCH - feuille de style du front
+   ----------------------------------------------------------
+   Volontairement autonome et sans dependance au theme : le
+   module doit rester lisible sur n'importe quel gabarit.
+   Aucune couleur de marque codee en dur, uniquement des gris
+   et la couleur de lien heritee du theme.
+   ========================================================== */
+
+.sbsearch {
+	margin: 0 0 30px 0;
+}
+
+/* --- Formulaire ---------------------------------------- */
+.sbsearch-head {
+	margin-bottom: 25px;
+}
+.sbsearch-form {
+	display: block;
+	margin: 0;
+}
+.sbsearch-form .sbsearch-input {
+	width: 60%;
+	max-width: 420px;
+	padding: 7px 10px;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	vertical-align: middle;
+	box-sizing: border-box;
+}
+.sbsearch-form .sbsearch-submit {
+	padding: 7px 16px;
+	margin-left: 5px;
+	border: 1px solid #bbb;
+	border-radius: 3px;
+	background: #f4f4f4;
+	cursor: pointer;
+	vertical-align: middle;
+}
+.sbsearch-form .sbsearch-submit:hover {
+	background: #e9e9e9;
+}
+
+/* --- Messages et compteur ------------------------------- */
+.sbsearch-msg,
+.sbsearch-count {
+	margin: 0 0 20px 0;
+	color: #666;
+}
+
+/* --- Liste des resultats -------------------------------- */
+.sbsearch-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.sbsearch-item {
+	padding: 15px 0;
+	border-top: 1px solid #eee;
+}
+.sbsearch-item:first-child {
+	border-top: 0;
+}
+
+/* --- Etiquette de source (Page, Actualite, Galerie...) --- */
+.sbsearch-type {
+	display: inline-block;
+	padding: 2px 8px;
+	margin-bottom: 6px;
+	font-size: 11px;
+	line-height: 16px;
+	text-transform: uppercase;
+	letter-spacing: .04em;
+	color: #666;
+	background: #f0f0f0;
+	border-radius: 2px;
+}
+
+.sbsearch-title {
+	margin: 0 0 6px 0;
+	font-size: 18px;
+	line-height: 1.3;
+}
+
+/* --- Contenu trouve mais pose nulle part sur le site ----- */
+.sbsearch-nolink {
+	margin-left: 8px;
+	font-size: 12px;
+	font-weight: normal;
+	font-style: italic;
+	color: #999;
+}
+
+.sbsearch-excerpt {
+	margin: 0 0 4px 0;
+	color: #444;
+}
+
+/* --- Termes trouves : <mark> pose par sbSearchHighlight() */
+.sbsearch-excerpt mark {
+	padding: 0 2px;
+	background: #fff2a8;
+	color: inherit;
+}
+
+/* --- "Vu dans : <page hote>" ---------------------------- */
+.sbsearch-host {
+	margin: 0;
+	font-size: 12px;
+	color: #888;
+}
+
+/* --- Pagination ----------------------------------------- */
+.sbsearch-pagination {
+	margin-top: 25px;
+	padding-top: 15px;
+	border-top: 1px solid #eee;
+}
+.sbsearch-pagination .sbsearch-next {
+	float: right;
+}
+.sbsearch-pagination:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+/* --- Petits ecrans -------------------------------------- */
+@media (max-width: 600px) {
+	.sbsearch-form .sbsearch-input {
+		width: 100%;
+		max-width: none;
+		margin-bottom: 8px;
+	}
+	.sbsearch-form .sbsearch-submit {
+		margin-left: 0;
+	}
+}

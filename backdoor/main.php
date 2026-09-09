@@ -172,6 +172,24 @@ $module_menu['faq']['li'][1]['title'] = SBUIADMIN_MENU_FAQ_CATEGORIES;
 $module_menu['faq']['li'][1]['link']  = "index.php?p=faq&a=category";
 
 // -----------------------
+// Menu TELECHARGEMENTS
+// -----------------------
+$module_menu['download']['main']  = SBUIADMIN_MENU_DOWNLOAD;
+$module_menu['download']['icon']  = "download";
+$module_menu['download']['group'] = "user"; // user OR admin
+
+// -----------------------
+// Menu GALERIES
+// -----------------------
+$module_menu['gallery']['main']  = SBUIADMIN_MENU_GALLERY;
+$module_menu['gallery']['icon']  = "picture-o";
+$module_menu['gallery']['group'] = "user"; // user OR admin
+$module_menu['gallery']['li'][0]['title'] = SBUIADMIN_MENU_GALLERY_ALL;
+$module_menu['gallery']['li'][0]['link']  = "index.php?p=gallery";
+$module_menu['gallery']['li'][1]['title'] = SBUIADMIN_MENU_GALLERY_PHOTOS;
+$module_menu['gallery']['li'][1]['link']  = "index.php?p=gallery&a=photo";
+
+// -----------------------
 // Menu Boutique
 // -----------------------
 $module_menu['boutique']['main']  = SBUIADMIN_MENU_BOUTIQUE;
