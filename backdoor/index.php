@@ -203,7 +203,8 @@ if ( (!isset($_SESSION['sbuiadmin_user_name']) || $_SESSION['sbuiadmin_user_name
 			// cookie "Se souvenir de moi" établit tout autant une session
 			// authentifiée fraîche.
 			session_regenerate_id(true);
-			$_SESSION['sbuiadmin_user_name'] = $sbuiadmin_user_name;
+			$_SESSION['sbuiadmin_user_name']     = $sbuiadmin_user_name;
+			$_SESSION['sbuiadmin_user_password'] = $sbusers->getPasswordHash($sbuiadmin_user_name); // hash courant, voir checkSessionHash()
 			// Jeton précédent déjà supprimé (usage unique) - on en émet un
 			// nouveau pour que "Se souvenir de moi" reste valide tant que
 			// l'utilisateur revient avant expiration.
@@ -219,18 +220,19 @@ if (isset($_SESSION['sbuiadmin_user_name']) && $_SESSION['sbuiadmin_user_name'] 
 	// ------------------
 	// --- SESSION Auth
 	// ------------------
-	// Point 1 (audit sécurité, 2026-07-29) : ne revérifie plus le mot de
-	// passe à chaque requête (l'ancien code déchiffrait et comparait le
-	// mot de passe stocké en session sur CHAQUE page admin - coûteux, et
-	// de toute façon sans effet réel : un échec ici ne bloquait rien,
-	// $sbuiadmin_user_type et le reste de la page continuaient quand même
-	// avec la session existante). Une session PHP valide (cookie
-	// httponly/secure/samesite, ID régénéré à la connexion) est la
-	// preuve d'authentification suffisante - pratique standard. Seul le
-	// statut "actif" est encore réévalué à chaque requête : un compte
-	// désactivé doit être éjecté immédiatement, pas seulement à sa
-	// prochaine connexion.
+	// À chaque requête : le hash en session doit être celui en base (pas
+	// de vérification du mot de passe lui-même), puis le compte doit être
+	// toujours actif - un compte désactivé est éjecté immédiatement.
 	$sbuiadmin_user_name = trim($sbsanitize->stopXSS($_SESSION['sbuiadmin_user_name']));
+	// Le hash du mot de passe gardé en session doit être celui en base :
+	// un mot de passe changé (ici ou ailleurs) ferme toutes les sessions
+	// ouvertes sur ce compte.
+	if (!$sbusers->checkSessionHash($sbuiadmin_user_name, isset($_SESSION['sbuiadmin_user_password']) ? $_SESSION['sbuiadmin_user_password'] : '')) {
+		$_SESSION = array();
+		session_regenerate_id(true);
+		$sbsmarty->display('system/login.tpl');
+		exit;
+	}
 	if (!$sbusers->checkUserIsActive($sbuiadmin_user_name)) {
 		// --- User is no more active
 		$sbsmarty->assign('sbuiadmin_access_code', 'E4');
@@ -327,11 +329,11 @@ if ((isset($_POST['username']) && $_POST['username']) && (isset($_POST['password
 			// logout) pour empêcher la fixation de session (un ID connu/
 			// imposé avant connexion ne doit plus être valide après).
 			session_regenerate_id(true);
-			// Assign SESSION - Point 1 (audit sécurité) : le mot de passe
-			// (en clair ou sous quelque forme que ce soit) n'est plus
-			// jamais stocké en session - la revérifier à chaque requête
-			// n'est plus nécessaire (voir le bloc "SESSION Auth" plus haut).
-			$_SESSION['sbuiadmin_user_name'] = $sbuiadmin_user_name;
+			// Assign SESSION : jamais le mot de passe, seulement son HASH en
+			// base - si le mot de passe change, toutes les sessions ouvertes
+			// sur ce compte tombent (bloc "SESSION Auth" plus haut).
+			$_SESSION['sbuiadmin_user_name']     = $sbuiadmin_user_name;
+			$_SESSION['sbuiadmin_user_password'] = $sbusers->getPasswordHash($sbuiadmin_user_name);
 			// Cookie is Remember me Checked - jeton sélecteur/validateur
 			// (Point 1) au lieu du mot de passe stocké dans le cookie.
 			if ($rememberme == 'yes') {
@@ -511,8 +513,10 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 	
 	// Display template page
 	// Check if non admin and authorized page
-	if (in_array($sb_get_page, $sb_admin_pages) && $sbuiadmin_user_type != 'admin')
+	if (in_array($sb_get_page, $sb_admin_pages) && $sbuiadmin_user_type != 'admin') {
+		http_response_code(404);
 		$sbsmarty->display("404.tpl");
+	}
 	else {
 		if ($sb_path_file_sys_mod == '') {
 			// System
@@ -767,6 +771,7 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 	}
 } else {
 	// --- Unsafe page
+	http_response_code(404);
 	$sbsmarty->display("404.tpl");
 }
 // --------------------------------

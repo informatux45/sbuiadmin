@@ -48,10 +48,29 @@ global $sbdebug, $sbsmarty, $sbsanitize, $sbusers, $sbform, $sbpage, $sbmedias;
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
+// -----------------------------------------------------------------------
+// Ce script est appelé DIRECTEMENT en AJAX (pas via index.php) : le
+// "defined(SBUIADMIN_PATH) or die" ci-dessus ne protège rien, la constante
+// est définie plus haut dans ce même fichier. N'importe qui pouvait donc
+// déclencher une mise à jour qui télécharge du code (en HTTP clair) et
+// écrase les fichiers du back-office. On exige une session admin active
+// + le droit "modifier" sur la configuration, en POST uniquement.
+// -----------------------------------------------------------------------
+$sb_upgrade_user = isset($_SESSION['sbuiadmin_user_name']) ? trim($_SESSION['sbuiadmin_user_name']) : '';
+if ($_SERVER['REQUEST_METHOD'] !== 'POST'
+	|| !_AM_UPGRADE_MODE
+	|| $sb_upgrade_user === ''
+	|| !$sbusers->checkUserIsActive($sb_upgrade_user)
+	|| !sbHasRight('settings', 'edit')) {
+	http_response_code(403);
+	echo '0|Accès refusé.';
+	exit;
+}
+
 // ----------------------
 // Initialization
 // ----------------------
-$mode     = $_POST['m'];
+$mode     = isset($_POST['m']) ? $_POST['m'] : 'core';
 $return   = '';
 $filelist = '';
 // ---------------------------------------------------

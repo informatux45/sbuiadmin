@@ -97,7 +97,10 @@ switch($action) {
 			// Injection des données
 			$id       = intval($_POST['id']);
 			$username = $sbsanitize->displayText($_POST['sbusername'], 'UTF-8', 1, 0);
-			$password = $sbsanitize->displayText($_POST['sbpassword'], 'UTF-8', 1, 0);
+			// Valeur BRUTE : seul son hash est stocké. displayText() (entités
+			// HTML) donnait un hash de "&amp;" quand login() vérifie "&" -
+			// tout mot de passe avec & < > ' " ou accent ne marchait jamais.
+			$password = isset($_POST['sbpassword']) ? (string)$_POST['sbpassword'] : '';
 			$email    = $sbsanitize->displayText($_POST['email'], 'UTF-8', 1, 0);
 			$active   = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
 
@@ -128,13 +131,8 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'add') {
 				// INSERT DATAS
-				// --- Hache le mot de passe (Point 1, audit sécurité) -
-				// password_hash() remplace l'ancien chiffrement réversible
-				// (encrypt(), clé codée en dur) pour tout NOUVEAU mot de
-				// passe. encrypt()/decrypt() restent dans sbuiadmin-users.php
-				// uniquement pour la compatibilité des comptes pas encore
-				// migrés (login() bascule automatiquement au 1er login réussi).
-				$password = $sbsql->escape_string(password_hash($password, PASSWORD_DEFAULT));
+				// --- Mot de passe haché (password_hash()), jamais chiffré
+				$password = $sbsql->escape_string($sbusers->hashPassword($password));
 				$query = "INSERT INTO $table (`username`, `password`, `email`, `active`, `logintime`, `lastlogin`, `menu`, `groupe`, `prenom`, `nom`, `telephone`, `fonction`, `profession`, `centres_interet`, `infos_complementaires`, `avatar`)
 						  VALUES ('$username','$password','$email','$active','0','0',' ','admin','$prenom','$nom','$telephone','$fonction','$profession','$centres_interet','$infos_complementaires','$avatar')";
 				$result_add = $sbsql->query($query);
@@ -151,12 +149,23 @@ switch($action) {
 
 			} elseif ($formType == 'edit' && $id > 0) {
 
+				// Calculé AVANT l'UPDATE : après, le hash en session ne
+				// correspond plus et sbGetCurrentUserId() renverrait 0.
+				$sb_editing_self = ($id == sbGetCurrentUserId());
+				$sb_new_hash     = ($password != '') ? $sbusers->hashPassword($password) : '';
+
 				if ($self_password_only) {
 					if ($password != '') {
-						$password = $sbsql->escape_string(password_hash($password, PASSWORD_DEFAULT));
+						$password = $sbsql->escape_string($sb_new_hash);
 						$query = "UPDATE $table SET password = '$password' WHERE id = '$id'";
 						$result_edit = $sbsql->query($query);
 						if ($result_edit) {
+							// Mot de passe changé : jetons "Se souvenir de moi"
+							// révoqués, et toutes les AUTRES sessions de ce compte
+							// tombent (leur hash ne correspond plus) - seule celle-ci
+							// reçoit le nouveau hash.
+							$sbusers->revokeRememberTokens($id);
+							$_SESSION['sbuiadmin_user_password'] = $sb_new_hash;
 							$sb_msg_valid = 'Mot de passe modifié avec succès';
 						} else {
 							$sb_msg_error = 'Error: Write Error (EDIT)!';
@@ -181,8 +190,8 @@ switch($action) {
 																		,avatar = '$avatar'
 																		WHERE id = '$id'";
 					} else {
-						// --- Hache le mot de passe (Point 1)
-						$password = $sbsql->escape_string(password_hash($password, PASSWORD_DEFAULT));
+						// --- Mot de passe haché (password_hash())
+						$password = $sbsql->escape_string($sb_new_hash);
 						$query = "UPDATE $table SET username = '$username'
 																		,password = '$password'
 																		,email = '$email'
@@ -199,6 +208,14 @@ switch($action) {
 					}
 
 					$result_edit = $sbsql->query($query);
+					if ($result_edit && $sb_new_hash != '') {
+						// Mot de passe changé : jetons "Se souvenir de moi"
+						// révoqués, et toutes les sessions de ce compte tombent
+						// (leur hash ne correspond plus) - sauf la mienne si je
+						// modifie mon propre compte.
+						$sbusers->revokeRememberTokens($id);
+						if ($sb_editing_self) $_SESSION['sbuiadmin_user_password'] = $sb_new_hash;
+					}
 					if ($result_edit) {
 						// --- On ne vide pas les champs du formulaire
 						// -------------------------------------------
@@ -272,7 +289,7 @@ switch($action) {
 		// --- Mot de passe
 		// ----------------------------
 		if ($formType == 'edit')
-			$sbform->addInput('password', 'Mot de passe', array ('name' => 'sbpassword', 'value' => ''), $self_password_only, false, "Si ce champs n'est pas rempli, il ne sera pas mis à jour.&nbsp;&nbsp;&nbsp;<span style='color: white; background-color: white;'>{$sbusers->decrypt($password)}</span>");
+			$sbform->addInput('password', 'Mot de passe', array ('name' => 'sbpassword', 'value' => ''), $self_password_only, false, "Si ce champs n'est pas rempli, il ne sera pas mis à jour.");
 		else
 			$sbform->addInput('password', 'Mot de passe', array ('name' => 'sbpassword', 'value' => ''), true);
 		// ----------------------------

@@ -1250,7 +1250,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_users` (
 --
 
 INSERT INTO `<DB_PREFIX>sb_users` (`id`, `username`, `password`, `email`, `logintime`, `lastlogin`, `active`, `activekey`, `resetkey`, `menu`, `groupe`, `prenom`, `nom`, `telephone`, `fonction`, `profession`, `centres_interet`, `infos_complementaires`, `avatar`) VALUES
-(1, 'admin', 'OUovZTFHdGNmaThNL1RZU0tyVXNmZz09Ojrdt++k07oZd9AcRrsXNqow', 'admin-reply@votresite.com', 0, 0, 1, '0', '0', '', '', '', '', '', '', '', '', '', '');
+(1, 'admin', '', 'admin-reply@votresite.com', 0, 0, 1, '0', '0', '', '', '', '', '', '', '', '', '', '');
 
 --
 -- Table structure for table `sb_users_remember_tokens`

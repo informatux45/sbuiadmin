@@ -66,6 +66,19 @@
 		if(empty($database_username)) $error_mg[] = lang_key('alert_db_username_empty'); 	
 		if (empty($database_password)) $error_mg[] = lang_key('alert_db_password_empty');
 
+		// --- Premier compte admin : identifiant + HASH posés à l'étape 4.
+		// --- Vérifié AVANT de créer les tables, pour ne jamais laisser une
+		// --- installation avec un compte admin sans mot de passe choisi.
+		$admin_username      = isset($_SESSION['admin_username']) ? (string)$_SESSION['admin_username'] : '';
+		$admin_password_hash = isset($_SESSION['admin_password_hash']) ? (string)$_SESSION['admin_password_hash'] : '';
+		$sb_set_admin        = (EI_USE_ADMIN_ACCOUNT && $install_type != 'update' && $install_type != 'un-install');
+		if ($sb_set_admin) {
+			$admin_hash_info = password_get_info($admin_password_hash);
+			if (!preg_match('/^[A-Za-z0-9_.@-]{3,50}$/', $admin_username) || empty($admin_hash_info['algo']) || !preg_match('/^[A-Za-z0-9_]*$/', $database_prefix)) {
+				$error_mg[] = lang_key('alert_admin_password_missing');
+			}
+		}
+
 		if(empty($error_mg)){		
 			if(EI_MODE == 'demo'){
 				if($database_host == 'localhost' && $database_name == 'db_name' && $database_username == 'test' && $database_password == 'test'){
@@ -92,6 +105,23 @@
 								if(EI_MODE != 'debug') $error_mg[] = lang_key('error_sql_executing');								
 							}else{
 								// write additional operations here, like setting up system preferences etc.
+
+								// --- Compte admin n°1 : identifiant et mot de passe choisis à
+								// --- l'étape 4 (le dump ne contient plus de mot de passe).
+								// --- Valeurs sûres en SQL : identifiant filtré par regex, hash
+								// --- password_hash() limité à [./$A-Za-z0-9,=+-].
+								$sb_admin_failed = false;
+								if ($sb_set_admin) {
+									$sb_admin_sql = "UPDATE `" . $database_prefix . "sb_users` SET `username` = '" . $admin_username . "', `password` = '" . str_replace("'", '', $admin_password_hash) . "' WHERE `id` = 1";
+									if (!$db->Query($sb_admin_sql)) {
+										$error_mg[] = lang_key('alert_admin_password_missing') . (EI_MODE == 'debug' ? ' ' . $db->Error() : '');
+										$sb_admin_failed = true;
+									}
+								}
+								// Sans compte admin utilisable, on ne finalise PAS (fichiers de
+								// réglages, suppression de install.php) : l'installation reste
+								// relançable au lieu d'aboutir à un back-office sans admin.
+								if (!$sb_admin_failed) {
 								
 								# One level up
 								$settings_file  = EI_CONFIG_FILE_PATH;
@@ -213,6 +243,8 @@
 								//if($install_type == 'un-install') unlink(EI_CONFIG_FILE_PATH);
 								///@chmod('../'.EI_CONFIG_FILE_DIRECTORY, 0644);
 								
+								} // fin if (!$sb_admin_failed)
+
 								$set_errors = array_keys( $error_mg, true );
 								if (!$set_errors) {
 									$completed = true;

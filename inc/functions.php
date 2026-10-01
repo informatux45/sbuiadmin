@@ -515,23 +515,18 @@ if (!function_exists("shortcode_sbyear")) {
  */
 if (!function_exists("sbGetUserIP")) {
 	function sbGetUserIP() {
-		// Initialize
-		$ip = "";
-		// Get real visitor IP behind CloudFlare network
-		if ( isset($_SERVER["HTTP_CF_CONNECTING_IP"]) ) {
-			$_SERVER['REMOTE_ADDR']    = $_SERVER["HTTP_CF_CONNECTING_IP"];
-			$_SERVER['HTTP_CLIENT_IP'] = $_SERVER["HTTP_CF_CONNECTING_IP"];
+		// Ordre inchangé (CloudFlare, Client-IP, X-Forwarded-For, REMOTE_ADDR),
+		// mais ces en-têtes sont choisis par le visiteur : seule la première IP
+		// VALIDE de chacun est retenue. Ne réécrit plus $_SERVER['REMOTE_ADDR'] :
+		// c'était la seule source fiable, et la fonction la rendait falsifiable
+		// pour tout le reste du code (logs, reCAPTCHA...).
+		foreach (array('HTTP_CF_CONNECTING_IP', 'HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR') as $header) {
+			if (!empty($_SERVER[$header])) {
+				$ip = trim(explode(',', $_SERVER[$header])[0]);
+				if (filter_var($ip, FILTER_VALIDATE_IP)) return $ip;
+			}
 		}
-		if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-			// ip from share internet
-			$ip = $_SERVER['HTTP_CLIENT_IP'];
-		} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-			// ip pass from proxy
-			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		} else {
-			$ip = $_SERVER['REMOTE_ADDR'];
-		}
-		return $ip;
+		return $_SERVER['REMOTE_ADDR'];
 	}
 }
 if (!function_exists("insert_sbGetUserIP")) {
@@ -557,7 +552,10 @@ if (!function_exists("sbIsBlockedIP")) {
 			$last_request = 2;  // Derniere requete en secondes
 		}
 		$table   = _AM_DB_PREFIX . 'sb_blocked_ip';
-		$user_ip = trim( $sbsanitize->stopXSS( (empty($ip)) ? sbGetUserIP() : $ip ) );
+		// L'IP vient de Client-IP / X-Forwarded-For quand ils sont présents :
+		// valeur choisie par le visiteur, et stopXSS() laisse passer l'apostrophe.
+		// Appelé sur CHAQUE page du front (header.php) : injection SQL sans session.
+		$user_ip = $sbsql->escape_string(trim( $sbsanitize->stopXSS( (empty($ip)) ? sbGetUserIP() : $ip ) ));
 		
 		// Supprimer tout ceux dont le temps a expiré
 		$sbsql->query("DELETE FROM $table WHERE expirationtime + $time_flood < " . time());
@@ -583,7 +581,10 @@ if (!function_exists("sbGetInfoBlockedIP")) {
 	function sbGetInfoBlockedIP( $ip = '') {
 		global $sbsql, $sbsanitize;
 		$table   = _AM_DB_PREFIX . 'sb_blocked_ip';
-		$user_ip = trim( $sbsanitize->stopXSS( (empty($ip)) ? sbGetUserIP() : $ip ) );
+		// L'IP vient de Client-IP / X-Forwarded-For quand ils sont présents :
+		// valeur choisie par le visiteur, et stopXSS() laisse passer l'apostrophe.
+		// Appelé sur CHAQUE page du front (header.php) : injection SQL sans session.
+		$user_ip = $sbsql->escape_string(trim( $sbsanitize->stopXSS( (empty($ip)) ? sbGetUserIP() : $ip ) ));
 
 		$query   = "SELECT * FROM $table WHERE ip = '$user_ip'";
 		$request = $sbsql->query($query);

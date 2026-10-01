@@ -114,6 +114,11 @@ if (SBMAINTENANCE) {
 // ----------------------
 // Get Global Infos
 // ----------------------
+// Session admin dont le mot de passe a changé depuis (hash différent) :
+// on retire seulement les clés admin, le reste de la session front reste.
+if (!empty($_SESSION['sbuiadmin_user_name']) && !$sbusers->checkSessionHash($_SESSION['sbuiadmin_user_name'], isset($_SESSION['sbuiadmin_user_password']) ? $_SESSION['sbuiadmin_user_password'] : '')) {
+	unset($_SESSION['sbuiadmin_user_name'], $_SESSION['sbuiadmin_user_password']);
+}
 if (!empty($_SESSION['sbuiadmin_user_name'])) {
 	$sbadministrators = explode(",", trim($sb_settings_config[1]));
 	$sbuiadmin_user_type = (in_array(trim($_SESSION['sbuiadmin_user_name']), $sbadministrators)) ? 'admin' : 'user';
@@ -193,6 +198,7 @@ if (in_array($sb_get_page, $sb_safe_pages_cms) || in_array($sb_get_page, $sb_saf
 		// --- Get Statistics
 		//sbGetStats('NOT FOUND');
 		// --- Unsafe Pages / Modules
+		http_response_code(404); // page inexistante : un 200 ici fait indexer la 404 par Google
 		$sbsmarty->display("404.tpl");
 		exit;
 	}
@@ -338,6 +344,7 @@ if (in_array($sb_get_page, $sb_safe_pages_cms) || in_array($sb_get_page, $sb_saf
 		// -----------------------------------
 		// --- Page doesn't exist
 		// -----------------------------------
+		http_response_code(404); // page inexistante : un 200 ici fait indexer la 404 par Google
 		$sbsmarty->display("404.tpl");			
 	}
 	
@@ -345,6 +352,7 @@ if (in_array($sb_get_page, $sb_safe_pages_cms) || in_array($sb_get_page, $sb_saf
 	// --- Get Statistics
 	//sbGetStats('NOT FOUND');
 	// --- Unsafe Pages / Modules
+	http_response_code(404); // page inexistante : un 200 ici fait indexer la 404 par Google
 	$sbsmarty->display("404.tpl");
 }
 // --------------------------------

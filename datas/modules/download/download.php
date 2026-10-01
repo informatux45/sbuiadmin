@@ -82,6 +82,7 @@ if ($key !== '' && preg_match('/^[A-Za-z0-9]+$/', $key)) {
 // --- Clé absente, invalide, inactive, ou fichier manquant sur le disque :
 // --- on rend la page 404 du thème plutôt qu'une page blanche.
 // --------------------------
+http_response_code(404); // page inexistante : un 200 ici fait indexer la 404 par Google
 $sbsmarty->display("404.tpl");
 exit();
 

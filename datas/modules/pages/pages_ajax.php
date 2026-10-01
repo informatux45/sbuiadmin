@@ -45,8 +45,9 @@ $modpage['tables']['pages'] = _AM_DB_PREFIX . "sb_pages";
 // --------------------------
 // --- Switch with Op GET
 // --------------------------
-$id      = $_POST['id'];
-$query   = "SELECT * FROM {$modpage['tables']['pages']} WHERE seo_url = '$id'";
+// $_POST['id'] brut, script appelable sans session : injection SQL.
+$id      = isset($_POST['id']) ? (string)$_POST['id'] : '';
+$query   = "SELECT * FROM {$modpage['tables']['pages']} WHERE seo_url = '" . $sbsql->escape_string($id) . "'";
 $request = $sbsql->query($query);
 $assoc   = $sbsql->assoc($request);
 // --- Assign

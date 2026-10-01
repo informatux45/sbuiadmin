@@ -60,6 +60,15 @@
 		
 		$password_encryption = isset($_POST['password_encryption']) ? prepare_input($_POST['password_encryption']) : EI_PASSWORD_ENCRYPTION_TYPE;
 
+		// --- Premier compte admin (2026-10-01). Le dump SQL créait jusqu'ici
+		// --- un compte "admin" au mot de passe "admin", identique sur TOUTES
+		// --- les installations, et cette étape ne le remplaçait jamais.
+		// --- Mot de passe pris BRUT (c'est ce que login() vérifie) et gardé
+		// --- en session uniquement sous forme de hash.
+		$admin_username         = isset($_POST['admin_username']) ? trim((string)$_POST['admin_username']) : '';
+		$admin_password         = isset($_POST['admin_password']) ? (string)$_POST['admin_password'] : '';
+		$admin_password_confirm = isset($_POST['admin_password_confirm']) ? (string)$_POST['admin_password_confirm'] : '';
+
 		// validation here
 		// -------------------------------------------------
 		if($settings_customer_name == ''){
@@ -74,6 +83,18 @@
 		}else if($settings_path_upload == ''){
 			$focus_field = 'settings_path_upload';
 			$error_msg = lang_key('alert_settings_path_upload_wrong');	
+		}else if(!preg_match('/^[A-Za-z0-9_.@-]{3,50}$/', $admin_username)){
+			$focus_field = 'admin_username';
+			$error_msg = lang_key('alert_admin_username_wrong');
+		}else if(strlen($admin_password) < 10){
+			$focus_field = 'admin_password';
+			$error_msg = lang_key('alert_admin_password_short');
+		}else if(strtolower($admin_password) == strtolower($admin_username)){
+			$focus_field = 'admin_password';
+			$error_msg = lang_key('alert_admin_password_weak');
+		}else if(!hash_equals($admin_password, $admin_password_confirm)){
+			$focus_field = 'admin_password_confirm';
+			$error_msg = lang_key('alert_admin_password_mismatch');
 		//}else if($settings_recaptcha_public == ''){
 		//	$focus_field = 'settings_recaptcha_public';
 		//	$error_msg = lang_key('alert_settings_recaptcha_public_wrong');	
@@ -96,6 +117,8 @@
 				$_SESSION['settings_recaptcha_public']  = $settings_recaptcha_public;
 				$_SESSION['settings_recaptcha_private'] = $settings_recaptcha_private;
 				$_SESSION['password_encryption'] = $password_encryption;				
+				$_SESSION['admin_username']      = $admin_username;
+				$_SESSION['admin_password_hash'] = password_hash($admin_password, PASSWORD_DEFAULT);
 
 				$_SESSION['passed_step'] = 4;
 				header('location: ready_to_install.php');
@@ -119,6 +142,7 @@
 		$settings_recaptcha_private = isset($_SESSION['settings_recaptcha_private']) ? $_SESSION['settings_recaptcha_private'] : '';
 		
 		$password_encryption = isset($_SESSION['password_encryption']) ? $_SESSION['password_encryption'] : EI_PASSWORD_ENCRYPTION_TYPE;
+		$admin_username = isset($_SESSION['admin_username']) ? $_SESSION['admin_username'] : 'admin';
 		$install_type = isset($_SESSION['install_type']) ? $_SESSION['install_type'] : '';
 		
 		// skip administrator settings
@@ -164,7 +188,7 @@
 			<tr>
 				<td width="250px">&nbsp;<?php echo lang_key('settings_customer_name'); ?>&nbsp;<span class="star">*</span></td>
 				<td><input name="settings_customer_name" id="settings_customer_name" class="form_text" size="28" value="<?php echo $settings_customer_name; ?>" onfocus="textboxOnFocus('notes_settings_customer_name')" onblur="textboxOnBlur('notes_settings_customer_name')" <?php if(EI_MODE != 'debug') echo 'autocomplete="off"'; ?> placeholder="<?php if(EI_MODE == 'demo') echo 'demo: test'; ?>" required="" /></td>
-				<td rowspan="6" valign="top">					
+				<td rowspan="10" valign="top">					
 					<div id="notes_settings_url_upload" class="notes_container">
 						<h4><?php echo lang_key('settings_url_upload'); ?></h4>
 						<p><?php echo lang_key('settings_url_upload_info'); ?></p>
@@ -184,6 +208,14 @@
 					<div id="notes_settings_recaptcha_public" class="notes_container">
 						<h4><?php echo lang_key('settings_recaptcha_public'); ?></h4>
 						<p><?php echo lang_key('settings_recaptcha_public_info'); ?></p>
+					</div>
+					<div id="notes_admin_username" class="notes_container">
+						<h4><?php echo lang_key('admin_login'); ?></h4>
+						<p><?php echo lang_key('admin_login_info'); ?></p>
+					</div>
+					<div id="notes_admin_password" class="notes_container">
+						<h4><?php echo lang_key('admin_password'); ?></h4>
+						<p><?php echo lang_key('admin_password_info'); ?></p>
 					</div>
 					<div id="notes_settings_recaptcha_private" class="notes_container">
 						<h4><?php echo lang_key('settings_recaptcha_private'); ?></h4>
@@ -212,6 +244,19 @@
 			<tr>
 				<td>&nbsp;<?php echo lang_key('settings_recaptcha_private'); ?></td>
 				<td><input name="settings_recaptcha_private" id="settings_recaptcha_private" class="form_text" size="28" value="<?php echo $settings_recaptcha_private; ?>" onfocus="textboxOnFocus('notes_settings_recaptcha_private')" onblur="textboxOnBlur('notes_settings_recaptcha_private')" <?php if(EI_MODE != 'debug') echo 'autocomplete="off"'; ?> /></td>
+			</tr>
+			<tr><td nowrap height="10px" colspan="3"></td></tr>
+			<tr>
+				<td>&nbsp;<?php echo lang_key('admin_login'); ?>&nbsp;<span class="star">*</span></td>
+				<td><input name="admin_username" id="admin_username" class="form_text" size="28" maxlength="50" value="<?php echo htmlspecialchars($admin_username, ENT_QUOTES, 'UTF-8'); ?>" onfocus="textboxOnFocus('notes_admin_username')" onblur="textboxOnBlur('notes_admin_username')" autocomplete="off" pattern="[A-Za-z0-9_.@\-]{3,50}" required="" /></td>
+			</tr>
+			<tr>
+				<td>&nbsp;<?php echo lang_key('admin_password'); ?>&nbsp;<span class="star">*</span></td>
+				<td><input name="admin_password" id="admin_password" class="form_text" type="password" size="28" value="" onfocus="textboxOnFocus('notes_admin_password')" onblur="textboxOnBlur('notes_admin_password')" autocomplete="new-password" minlength="10" required="" /></td>
+			</tr>
+			<tr>
+				<td>&nbsp;<?php echo lang_key('admin_password_confirm'); ?>&nbsp;<span class="star">*</span></td>
+				<td><input name="admin_password_confirm" id="admin_password_confirm" class="form_text" type="password" size="28" value="" onfocus="textboxOnFocus('notes_admin_password')" onblur="textboxOnBlur('notes_admin_password')" autocomplete="new-password" minlength="10" required="" /></td>
 			</tr>
 				<?php if(EI_USE_PASSWORD_ENCRYPTION){ ?>
 				<tr>

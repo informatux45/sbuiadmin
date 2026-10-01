@@ -62,7 +62,10 @@ switch($op) {
 			// --- Form auth
 			// ------------------
 			$sbuiadmin_user_name     = trim($sbsanitize->stopXSS($_POST['username']));
-			$sbuiadmin_user_password = trim($sbusers->encrypt($_POST['password']));
+			// Mot de passe en clair pour login() : depuis la migration vers
+			// password_hash() (Point 1), un chiffré ne matche plus jamais et
+			// cette connexion échouait toujours. Jamais stocké en session.
+			$sbuiadmin_user_password = $_POST['password'];
 			if ($sbusers->login($sbuiadmin_user_name, $sbuiadmin_user_password)) {
 				if (!$sbusers->checkUserIsActive($sbuiadmin_user_name)) {
 					// --- User is no more active
@@ -110,8 +113,9 @@ switch($op) {
 								// Update LoginTime
 								$sbusers->updateAccessUserLogin($sbuiadmin_user_name, false, time());
 								// Assign SESSION
+								session_regenerate_id(true);
 								$_SESSION['sbuiadmin_user_name']     = $sbuiadmin_user_name;
-								$_SESSION['sbuiadmin_user_password'] = $sbuiadmin_user_password;
+								$_SESSION['sbuiadmin_user_password'] = $sbusers->getPasswordHash($sbuiadmin_user_name); // hash, jamais le mot de passe
 							}
 							
 						} else {
@@ -132,8 +136,9 @@ switch($op) {
 						// Update LoginTime
 						$sbusers->updateAccessUserLogin($sbuiadmin_user_name, false, time());
 						// Assign SESSION
+						session_regenerate_id(true);
 						$_SESSION['sbuiadmin_user_name']     = $sbuiadmin_user_name;
-						$_SESSION['sbuiadmin_user_password'] = $sbuiadmin_user_password;
+						$_SESSION['sbuiadmin_user_password'] = $sbusers->getPasswordHash($sbuiadmin_user_name); // hash, jamais le mot de passe
 					}
 				}
 			} else {

@@ -60,8 +60,42 @@ require_once '../../server/php/qqFileUploader.php';
 // Get Settings
 $sb_upload_config = file('../../inc/admin/settings.txt');
 
+// -----------------------------------------------------------------------
+// Être connecté ne suffit pas : allowedExtensions est vide (tout type
+// accepté, .php compris) et subdir / qqfilename / qquuid arrivaient tels
+// quels jusqu'au chemin d'écriture ("../" = écriture n'importe où sous
+// la racine web).
+// -----------------------------------------------------------------------
+foreach (array('subdir', 'qqfilename', 'qquuid') as $sb_upload_param) {
+	if (isset($_REQUEST[$sb_upload_param]) && strpos($_REQUEST[$sb_upload_param], "\0") !== false) {
+		sbUploadDeny('Chemin invalide.');
+	}
+}
+// ".." refusé dans subdir seulement : pour le nom, basename() plus bas
+// suffit, et "Programme..pdf" doit rester accepté.
+if (isset($_REQUEST['subdir']) && strpos($_REQUEST['subdir'], '..') !== false) {
+	sbUploadDeny('Chemin invalide.');
+}
+if (isset($_REQUEST['qquuid']) && !preg_match('/^[A-Za-z0-9-]{1,64}$/', $_REQUEST['qquuid'])) {
+	sbUploadDeny('Identifiant invalide.');
+}
+$sb_upload_name = isset($_REQUEST['qqfilename']) ? $_REQUEST['qqfilename'] : (isset($_FILES['qqfile']['name']) ? $_FILES['qqfile']['name'] : '');
+$sb_upload_name = basename(str_replace('\\', '/', $sb_upload_name));
+// Chaque segment après un point est testé, pas seulement le dernier :
+// "shell.php.jpg" passe sur un Apache avec AddHandler mal réglé.
+$sb_upload_parts = explode('.', strtolower($sb_upload_name));
+array_shift($sb_upload_parts);
+foreach ($sb_upload_parts as $sb_upload_ext) {
+	if (preg_match('/^(php\d*|phtml|phar|pht|phps|cgi|pl|py|sh|shtml|asp|aspx|jsp)$/', $sb_upload_ext)) {
+		sbUploadDeny('Type de fichier interdit.');
+	}
+}
+if (in_array(strtolower($sb_upload_name), array('.htaccess', '.user.ini', 'web.config')) || $sb_upload_name === '' || $sb_upload_name[0] === '.') {
+	sbUploadDeny('Nom de fichier interdit.');
+}
+
 // File path
-$sbfiles_medias_subdir = (isset($_REQUEST['subdir']) && $_REQUEST['subdir'] != '') ? '/' . rtrim($_REQUEST['subdir'], "/") : '';
+$sbfiles_medias_subdir = (isset($_REQUEST['subdir']) && $_REQUEST['subdir'] != '') ? '/' . trim($_REQUEST['subdir'], "/") : '';
 $sbfiles_medias_dir = '../../' . trim($sb_upload_config[6]) . $sbfiles_medias_subdir;
 
 $uploader = new qqFileUploader();
@@ -79,7 +113,9 @@ $uploader->inputName = 'qqfile';
 $uploader->chunksFolder = 'chunks';
 
 // Call handleUpload() with the name of the folder, relative to PHP's getcwd()
-$result = $uploader->handleUpload($sbfiles_medias_dir);
+// Nom déjà assaini ci-dessus (basename) : ne pas laisser handleUpload()
+// relire qqfilename brut.
+$result = $uploader->handleUpload($sbfiles_medias_dir, $sb_upload_name);
 // To save the upload with a specified name, set the second parameter.
 //$result = $uploader->handleUpload($sbfiles_medias_dir, sbRewriteString($uploader->getUploadName()));
 

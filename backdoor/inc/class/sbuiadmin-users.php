@@ -37,27 +37,23 @@ class user extends sql {
 
 		$stored = $infos['password'];
 
-		// Format actuel : mots de passe hachés (password_hash(), à sens
-		// unique - ne remplace PAS decrypt()/encrypt() ci-dessous tant que
-		// tous les comptes n'ont pas été confirmés migrés, voir leur docblock).
-		if (password_verify($password, $stored)) {
+		// Mots de passe hachés uniquement (password_hash()). L'ancien
+		// chiffrement réversible (encrypt()/decrypt(), clé codée en dur) a
+		// été supprimé le 2026-10-01 : les comptes encore à l'ancien format
+		// passent par backdoor/migrate-passwords.php.
+		if ((string)$password === '') return false;
+		if (password_verify((string)$password, $stored)) {
 			if (password_needs_rehash($stored, PASSWORD_DEFAULT)) {
 				$this->rehashPassword($infos['id'], $password);
 			}
 			return true;
 		}
 
-		// Ancien format (chiffrement réversible, pré-migration) - filet de
-		// compatibilité UNIQUEMENT : si ça matche, on bascule silencieusement
-		// ce compte vers password_hash() (aucune action requise de
-		// l'utilisateur). $stored qui n'est pas un ancien format valide
-		// (ex: déjà un hash password_hash() qui vient d'échouer ci-dessus)
-		// fait tomber ici sans risque - decrypt() renvoie alors une valeur
-		// qui ne matchera jamais $password. @ : decrypt() émet un warning
-		// PHP sur un $stored qui n'a pas la forme attendue (explode('::', ...)
-		// sur une valeur qui n'en contient pas), sans gravité ici.
-		$legacy_plain = @$this->decrypt($stored);
-		if ($legacy_plain !== false && $legacy_plain !== '' && hash_equals($legacy_plain, $password)) {
+		// Filet : jusqu'au 2026-10-01, users.php hachait displayText() du
+		// mot de passe (entités HTML) au lieu de la saisie brute. Si c'est
+		// cette forme qui matche, on rehache la saisie brute.
+		$password_entities = htmlentities((string)$password, ENT_QUOTES, 'UTF-8');
+		if ($password_entities !== $password && password_verify($password_entities, $stored)) {
 			$this->rehashPassword($infos['id'], $password);
 			return true;
 		}
@@ -73,8 +69,39 @@ class user extends sql {
 	 */
 	private function rehashPassword($user_id, $plain_password) {
 		$user_id  = intval($user_id);
-		$new_hash = $this->escape_string(password_hash($plain_password, PASSWORD_DEFAULT));
+		$new_hash = $this->escape_string($this->hashPassword($plain_password));
 		$this->query("UPDATE " . _AM_DB_PREFIX . "sb_users SET password = '$new_hash' WHERE id = $user_id");
+	}
+
+
+	/**
+	 * Hash à stocker en base pour un mot de passe saisi EN CLAIR (valeur
+	 * brute, sans displayText()/stopXSS() : c'est ce que login() vérifie).
+	 */
+	public function hashPassword($plain_password) {
+		return password_hash((string)$plain_password, PASSWORD_DEFAULT);
+	}
+
+
+	/**
+	 * Hash stocké en base pour ce compte, false si le compte est inconnu.
+	 */
+	public function getPasswordHash($username) {
+		$username_esc = $this->escape_string($username);
+		$infos = $this->assoc($this->query("SELECT password FROM " . _AM_DB_PREFIX . "sb_users WHERE username = '$username_esc'"));
+		return ($infos && isset($infos['password'])) ? (string)$infos['password'] : false;
+	}
+
+
+	/**
+	 * La session garde le hash en vigueur à la connexion
+	 * ($_SESSION['sbuiadmin_user_password']). Si le mot de passe change en
+	 * base, le hash change aussi et TOUTES les sessions ouvertes sur ce
+	 * compte tombent à leur requête suivante.
+	 */
+	public function checkSessionHash($username, $session_hash) {
+		$hash = $this->getPasswordHash($username);
+		return ($hash !== false && $hash !== '' && (string)$session_hash !== '' && hash_equals($hash, (string)$session_hash));
 	}
 
 
@@ -146,6 +173,15 @@ class user extends sql {
 		$this->query("DELETE FROM " . _AM_DB_PREFIX . "sb_users_remember_tokens WHERE selector = '$selector_esc'");
 	}
 
+	/**
+	 * Révoque tous les jetons "Se souvenir de moi" d'un compte - à appeler
+	 * à chaque changement de mot de passe.
+	 */
+	public function revokeRememberTokens($user_id) {
+		$user_id = intval($user_id);
+		$this->query("DELETE FROM " . _AM_DB_PREFIX . "sb_users_remember_tokens WHERE user_id = $user_id");
+	}
+
 	private function deleteRememberTokenById($id) {
 		$id = intval($id);
 		$this->query("DELETE FROM " . _AM_DB_PREFIX . "sb_users_remember_tokens WHERE id = $id");
@@ -154,7 +190,7 @@ class user extends sql {
 	
     private function checkUser($password, $captcha) {
         if (isset($_SESSION['sbuiadmin_user_name']) || $_SESSION['sbuiadmin_user_name'] != '') {
-            if (!$this->login($_SESSION['sbuiadmin_user_name'], $password, $crypt)) {
+            if (!$this->login($_SESSION['sbuiadmin_user_name'], $password)) {
                 return false;
             } elseif (_AM_CAPTCHA_MODE == 0) {
                 return true;
@@ -194,11 +230,14 @@ class user extends sql {
 	public function updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user = 'admin') {
 		// --- Update the Access Log file if exist
 		global $sbsanitize;
+		// htmlentities(ENT_QUOTES) neutralise l'apostrophe mais pas
+		// l'antislash final ("admin\" casse la requête) : échapper aussi
+		// pour le SQL. Le nom vient du formulaire de login, sans session.
 	        $_sbuiadmin_event = $sbsanitize->displayText($sbuiadmin_event, 'UTF-8', $entities = 1, $decode_entities = 0, $html = 0, $br = 0, $clickable = 0, $xss = 1);
 	        $_sbuiadmin_user  = $sbsanitize->displayText($sbuiadmin_user, 'UTF-8', $entities = 1, $decode_entities = 0, $html = 0, $br = 0, $clickable = 0, $xss = 1);
 		$sql = "INSERT INTO " . _AM_DB_PREFIX . "sb_logaccess
 				(`logaccess_type`, `logaccess_date`, `logaccess_user`, `logaccess_event`)
-				VALUES ('$sbuiadmin_type', UNIX_TIMESTAMP(), '$_sbuiadmin_user', '$_sbuiadmin_event')";
+				VALUES ('" . $this->escape_string($sbuiadmin_type) . "', UNIX_TIMESTAMP(), '" . $this->escape_string($_sbuiadmin_user) . "', '" . $this->escape_string($_sbuiadmin_event) . "')";
 		$result = $this->query($sql);
 		if (!$result)
 			return false;
@@ -252,89 +291,7 @@ class user extends sql {
             return false;
         }
 	}
-	
-		
-	/**
-	 * Returns an encrypted & utf8-encoded
-	 */
-	public function encrypt($text, $key = '(D$9=h!S2olla$rS3+huY!NX', $iv = "fYAhHeXm", $bit_check = 32, $tag = "informatux") {
-		// Check if php version smaller than 7.1.0
-		if (version_compare(phpversion(), '7.1.0', '<')) {
-			// All method
-			$text_num = str_split($text, $bit_check);
-			$text_num = $bit_check-strlen($text_num[count($text_num)-1]);
-			
-			for ($i=0; $i<$text_num; $i++) {
-				$text = $text . chr($text_num);
-			}
-			
-			$cipher = mcrypt_module_open(MCRYPT_TRIPLEDES,'','cbc','');
-			mcrypt_generic_init($cipher, $key, $iv);
-			
-			$decrypted = mcrypt_generic($cipher, $text);
-			mcrypt_generic_deinit($cipher);
-			
-			return base64_encode($decrypted);
-		} else {
-			/* New method for php version 7.1 minimum
-			 * $cipher     = "aes-128-gcm";
-			 * $ivlen      = openssl_cipher_iv_length($cipher);
-			 * $iv2        = openssl_random_pseudo_bytes($ivlen);
-			 * $ciphertext = openssl_encrypt($text, $cipher, $key, $options=0, $iv2, $tag);
-			 */
-			// --- Remove the base64 encoding from our key
-			$encryption_key = base64_decode($key);
-			// --- Generate an initialization vector
-			$iv2 = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
-			// --- Encrypt the data using AES 256 encryption in CBC mode using our encryption key and initialization vector.
-			$encrypted = openssl_encrypt($text, 'aes-256-cbc', $encryption_key, 0, $iv2);
-			// --- The $iv is just as important as the key for decrypting, so save it with our encrypted data using a unique separator (::)
-			$encrypted_text = base64_encode($encrypted . '::' . $iv2);
 
-			return $encrypted_text;		
-		}
-
-
-	}
-	
-
-	/**
-	 * Returns decrypted original string
-	 */	
-	public function decrypt($encrypted_text, $key = '(D$9=h!S2olla$rS3+huY!NX', $iv = "fYAhHeXm", $bit_check = 32, $tag = "informatux") {
-		// Check if php version smaller than 7.1.0
-		if (version_compare(phpversion(), '7.1.0', '<')) {
-			$cipher = mcrypt_module_open(MCRYPT_TRIPLEDES,'','cbc','');
-			mcrypt_generic_init($cipher, $key, $iv);
-	
-			$decrypted = mdecrypt_generic($cipher,base64_decode($encrypted_text));
-			mcrypt_generic_deinit($cipher);
-	
-			$last_char = substr($decrypted,-1);
-	
-			for($i=0; $i<$bit_check-1; $i++) {
-				if(chr($i) == $last_char) {
-					$decrypted = substr($decrypted, 0, strlen($decrypted)-$i);
-					break;
-				}
-			}
-			return $decrypted;
-		} else {
-			// New method for php version 7.2 minimum
-			//$cipher     = "aes-128-gcm"; // Or "AES-256-CFB"
-			//$ivlen      = openssl_cipher_iv_length($cipher);
-			//$iv2        = openssl_random_pseudo_bytes($ivlen);
-			////store $cipher, $iv, and $tag for decryption later
-			//$decrypted = openssl_decrypt ($encrypted_text, $cipher, $key, $options=0, $iv2, $tag);
-			// Remove the base64 encoding from our key
-			$encryption_key = base64_decode($key);
-			// To decrypt, split the encrypted data from our IV - our unique separator used was "::"
-			list($encrypted_data, $iv2) = explode('::', base64_decode($encrypted_text), 2);
-			$decrypted = @openssl_decrypt($encrypted_data, 'aes-256-cbc', $encryption_key, 0, $iv2);
-			return $decrypted;
-		}
-	}
-	
 }
 
 ?>

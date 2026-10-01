@@ -382,11 +382,21 @@ function sbHasRight($module, $action = null) {
  */
 function sbGetCurrentUserId() {
 	global $sbusers;
+	static $cache = array();
 
 	$username = isset($_SESSION['sbuiadmin_user_name']) ? trim($_SESSION['sbuiadmin_user_name']) : '';
 	if ($username == '') return 0;
 
-	return intval($sbusers->getUserInfo($username, 'id'));
+	// La session doit porter le hash en vigueur du mot de passe : s'il a
+	// changé (mot de passe modifié ailleurs), la session ne vaut plus rien.
+	// Tous les contrôles de droits passent par ici, y compris ceux des
+	// scripts appelés directement (upload, upgrade) : c'est le point unique.
+	$session_hash = isset($_SESSION['sbuiadmin_user_password']) ? (string)$_SESSION['sbuiadmin_user_password'] : '';
+	$cache_key    = $username . '|' . $session_hash;
+	if (!isset($cache[$cache_key])) {
+		$cache[$cache_key] = $sbusers->checkSessionHash($username, $session_hash) ? intval($sbusers->getUserInfo($username, 'id')) : 0;
+	}
+	return $cache[$cache_key];
 }
 
 /**

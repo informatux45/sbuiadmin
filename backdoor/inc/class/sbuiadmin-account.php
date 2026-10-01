@@ -86,26 +86,32 @@ class account extends sql {
 	 * @return bool
 	 */
     public function login($email, $password) {
-		// Initialisation
-		$query  = "SELECT email, password FROM " . $this->tblaccount . " WHERE email = '$email'";
-        $result = $this->query($query);
-		$infos  = $this->assoc($result);
-		// Check if user exists
-		if ($result) {
-			// Passwords
-			$password_db    = $this->decrypt($infos['password']);
-			$password_login = $this->decrypt($password);
-			// Check passwords
-			if ($password_db !== $password_login)
-				return false;
-			else
-				return true;
-
-		} else {
-			// User unknown
-			return false;
+		// Mot de passe EN CLAIR, vérifié par password_verify(). L'ancien
+		// chiffrement réversible (encrypt()/decrypt(), clé codée en dur) a
+		// été supprimé le 2026-10-01, voir backdoor/migrate-passwords.php.
+		$hash = $this->getPasswordHash($email);
+		if ($hash === false || $hash === '' || (string)$password === '') return false;
+		if (!password_verify((string)$password, $hash)) return false;
+		if (password_needs_rehash($hash, PASSWORD_DEFAULT)) {
+			$this->query("UPDATE " . $this->tblaccount . " SET password = '" . $this->escape_string($this->hashPassword($password)) . "' WHERE email = '" . $this->escape_string($email) . "'");
 		}
+		return true;
     }
+
+	/**
+	 * Hash à stocker en base pour un mot de passe saisi en clair
+	 */
+	public function hashPassword($password) {
+		return password_hash((string)$password, PASSWORD_DEFAULT);
+	}
+
+	/**
+	 * Hash stocké en base pour ce client, false si inconnu
+	 */
+	public function getPasswordHash($email) {
+		$infos = $this->assoc($this->query("SELECT password FROM " . $this->tblaccount . " WHERE email = '" . $this->escape_string($email) . "'"));
+		return ($infos && isset($infos['password'])) ? (string)$infos['password'] : false;
+	}
 	
 	/**
 	 * Check if user captcha is correct if is activated
@@ -117,7 +123,7 @@ class account extends sql {
 	 */
     public function checkUser($password, $captcha) {
         if (isset($_SESSION['sbaccount_user_email']) || $_SESSION['sbaccount_user_email'] != '') {
-            if (!$this->login($_SESSION['sbaccount_user_email'], $password, $crypt)) {
+            if (!$this->login($_SESSION['sbaccount_user_email'], $password)) {
                 return false;
             } elseif (_AM_CAPTCHA_MODE == 0) {
                 return true;
@@ -823,104 +829,7 @@ class account extends sql {
 		# Return Formatted Email
 		return $return_text;
 	}
-	
-	/**
-	 * Returns an encrypted & utf8-encoded
-	 *
-	 * @param	string	$text		encrypted string
-	 * @param	string	$key 		decrypt key
-	 * @param	string	$iv 		IV
-	 * @param	integer	$bit_check	Bit
-	 * @param	string	$tag		Salt key (DEPRECATED)
-	 *
-	 * @return string
-	 */	
-	public function encrypt($text, $key = '(D$9=h!S2info$rS3+huY!NX', $iv = "fYAjHeXm", $bit_check = 32, $tag = "informatux") {
-		// Check if php version smaller than 7.1.0
-		if (version_compare(phpversion(), '7.1.0', '<')) {
-			// All method
-			$text_num = str_split($text, $bit_check);
-			$text_num = $bit_check-strlen($text_num[count($text_num)-1]);
-			
-			for ($i=0; $i<$text_num; $i++) {
-				$text = $text . chr($text_num);
-			}
-			
-			$cipher = mcrypt_module_open(MCRYPT_TRIPLEDES,'','cbc','');
-			mcrypt_generic_init($cipher, $key, $iv);
-			
-			$decrypted = mcrypt_generic($cipher, $text);
-			mcrypt_generic_deinit($cipher);
-			
-			return base64_encode($decrypted);
-		} else {
-			/* New method for php version 7.1 minimum
-			 * $cipher     = "aes-128-gcm";
-			 * $ivlen      = openssl_cipher_iv_length($cipher);
-			 * $iv2        = openssl_random_pseudo_bytes($ivlen);
-			 * $ciphertext = openssl_encrypt($text, $cipher, $key, $options=0, $iv2, $tag);
-			 */
-			// --- Remove the base64 encoding from our key
-			$encryption_key = base64_decode($key);
-			// --- Generate an initialization vector
-			$iv2 = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
-			// --- Encrypt the data using AES 256 encryption in CBC mode using our encryption key and initialization vector.
-			$encrypted = openssl_encrypt($text, 'aes-256-cbc', $encryption_key, 0, $iv2);
-			// --- The $iv is just as important as the key for decrypting, so save it with our encrypted data using a unique separator (::)
-			$encrypted_text = base64_encode($encrypted . '::' . $iv2);
 
-			return $encrypted_text;		
-		}
-
-
-	}
-	
-	/**
-	 * Returns decrypted original string
-	 *
-	 * @param	string	$encrypted_text		encrypted string
-	 * @param	string	$key 				decrypt key
-	 * @param	string	$iv 				IV
-	 * @param	integer	$bit_check			Bit
-	 * @param	string	$tag				Salt key (DEPRECATED)
-	 *
-	 * @return string
-	 */	
-	public function decrypt($encrypted_text, $key = '(D$9=h!S2info$rS3+huY!NX', $iv = "fYAjHeXm", $bit_check = 32, $tag = "informatux") {
-		// Check if php version smaller than 7.1.0
-		if (version_compare(phpversion(), '7.1.0', '<')) {
-			$cipher = mcrypt_module_open(MCRYPT_TRIPLEDES,'','cbc','');
-			mcrypt_generic_init($cipher, $key, $iv);
-	
-			$decrypted = mdecrypt_generic($cipher,base64_decode($encrypted_text));
-			mcrypt_generic_deinit($cipher);
-	
-			$last_char = substr($decrypted,-1);
-	
-			for($i=0; $i<$bit_check-1; $i++) {
-				if(chr($i) == $last_char) {
-					$decrypted = substr($decrypted, 0, strlen($decrypted)-$i);
-					break;
-				}
-			}
-			return $decrypted;
-		} else {
-			/* New method for php version 7.2 minimum
-			 * $cipher    = "aes-128-gcm"; // Or "AES-256-CFB"
-			 * $ivlen     = openssl_cipher_iv_length($cipher);
-			 * $iv2       = openssl_random_pseudo_bytes($ivlen);
-			 * Store $cipher, $iv, and $tag for decryption later
-			 * $decrypted = openssl_decrypt ($encrypted_text, $cipher, $key, $options=0, $iv2, $tag);
-			 */
-			// --- Remove the base64 encoding from our key
-			$encryption_key = base64_decode($key);
-			// --- To decrypt, split the encrypted data from our IV - our unique separator used was "::"
-			list($encrypted_data, $iv2) = explode('::', base64_decode($encrypted_text), 2);
-			$decrypted = openssl_decrypt($encrypted_data, 'aes-256-cbc', $encryption_key, 0, $iv2);
-			return $decrypted;
-		}
-	}
-	
 }
 
 ?>
