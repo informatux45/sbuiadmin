@@ -44,6 +44,12 @@
 								{$smarty.const.SBUIADMIN_MSG_ERROR_E3}
 							{elseif $sbuiadmin_access_code == 'E4'}
 								{$smarty.const.SBUIADMIN_MSG_ERROR_E4}
+							{elseif $sbuiadmin_access_code == 'E5'}
+								{$smarty.const.SBUIADMIN_MSG_ERROR_E5}
+							{elseif $sbuiadmin_access_code == 'E6'}
+								{$smarty.const.SBUIADMIN_MSG_ERROR_E6}
+							{elseif $sbuiadmin_access_code == 'E7'}
+								{$smarty.const.SBUIADMIN_MSG_ERROR_E7}
 							{/if}
 						</div>
 					</div>

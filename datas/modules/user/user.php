@@ -116,6 +116,7 @@ switch($op) {
 								session_regenerate_id(true);
 								$_SESSION['sbuiadmin_user_name']     = $sbuiadmin_user_name;
 								$_SESSION['sbuiadmin_user_password'] = $sbusers->getPasswordHash($sbuiadmin_user_name); // hash, jamais le mot de passe
+								unset($_SESSION['sb2fa_ok'], $_SESSION['sb2fa']); // le back-office redemandera le code 2FA
 							}
 							
 						} else {
@@ -139,6 +140,7 @@ switch($op) {
 						session_regenerate_id(true);
 						$_SESSION['sbuiadmin_user_name']     = $sbuiadmin_user_name;
 						$_SESSION['sbuiadmin_user_password'] = $sbusers->getPasswordHash($sbuiadmin_user_name); // hash, jamais le mot de passe
+						unset($_SESSION['sb2fa_ok'], $_SESSION['sb2fa']); // le back-office redemandera le code 2FA
 					}
 				}
 			} else {

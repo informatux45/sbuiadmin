@@ -48,8 +48,35 @@
 	// Include HEADERS
 	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-	$include = include '../../../../sbconfig.php';
-	$websiteurl = rtrim(SB_URL, DIRECTORY_SEPARATOR);
+	// Appelé DIRECTEMENT en AJAX (Configuration CMS > SEO), hors routeur : il
+	// n'avait aucune vérification - n'importe qui pouvait lancer un crawl
+	// complet du site (une requête = des centaines de pages) et réécrire le
+	// sitemap. Amorçage minimal du back-office + droit "modifier" sur la
+	// configuration CMS (2026-10-01). sbconfig.php (configuration du front)
+	// n'est plus inclus : il ne servait qu'à SB_URL, relu ici dans
+	// settings.txt (même ligne, CFG_SITE_URL = 15), ainsi que
+	// SBADMIN et SB_PATH, recalculés.
+	defined('SBUIADMIN_PATH') or define('SBUIADMIN_PATH', dirname(__FILE__, 4));
+	defined('SBUIADMIN_URL')  or define('SBUIADMIN_URL', $_SERVER['SERVER_NAME'] . rtrim(dirname($_SERVER['SCRIPT_NAME'], 4), '/') . '/');
+	require_once(__DIR__ . '/../../../../inc/sbsession.php');
+	session_start();
+	require_once(SBUIADMIN_PATH . '/inc/sbuiadmin-config.php');
+	require_once(SBUIADMIN_PATH . '/inc/sbuiadmin-rights.php');
+	require_once(_AM_SMARTY_DIR . 'Smarty.class.php'); // la classe "sql" hérite de Smarty
+	require_once(SBUIADMIN_PATH . '/inc/class/sbuiadmin-sql.php');
+	require_once(SBUIADMIN_PATH . '/inc/class/sbuiadmin-sanitize.php');
+	require_once(SBUIADMIN_PATH . '/inc/class/sbuiadmin-users.php');
+	$sbsql      = new sql();
+	$sbsanitize = new sanitize();
+	$sbusers    = new user();
+	session_write_close();
+	if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !sbHasRight('cmsconfig', 'edit')) {
+		http_response_code(403);
+		die('Accès refusé.');
+	}
+	$websiteurl = rtrim(trim($sb_settings_config[15]), '/');
+	defined('SBADMIN') or define('SBADMIN', basename(SBUIADMIN_PATH));
+	defined('SB_PATH') or define('SB_PATH', dirname(SBUIADMIN_PATH) . DIRECTORY_SEPARATOR);
 	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=	
 	

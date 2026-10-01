@@ -205,6 +205,7 @@ if ( (!isset($_SESSION['sbuiadmin_user_name']) || $_SESSION['sbuiadmin_user_name
 			session_regenerate_id(true);
 			$_SESSION['sbuiadmin_user_name']     = $sbuiadmin_user_name;
 			$_SESSION['sbuiadmin_user_password'] = $sbusers->getPasswordHash($sbuiadmin_user_name); // hash courant, voir checkSessionHash()
+			unset($_SESSION['sb2fa_ok'], $_SESSION['sb2fa']); // nouvelle connexion : nouveau code 2FA
 			// Jeton précédent déjà supprimé (usage unique) - on en émet un
 			// nouveau pour que "Se souvenir de moi" reste valide tant que
 			// l'utilisateur revient avant expiration.
@@ -334,6 +335,7 @@ if ((isset($_POST['username']) && $_POST['username']) && (isset($_POST['password
 			// sur ce compte tombent (bloc "SESSION Auth" plus haut).
 			$_SESSION['sbuiadmin_user_name']     = $sbuiadmin_user_name;
 			$_SESSION['sbuiadmin_user_password'] = $sbusers->getPasswordHash($sbuiadmin_user_name);
+			unset($_SESSION['sb2fa_ok'], $_SESSION['sb2fa']); // nouvelle connexion : nouveau code 2FA
 			// Cookie is Remember me Checked - jeton sélecteur/validateur
 			// (Point 1) au lieu du mot de passe stocké dans le cookie.
 			if ($rememberme == 'yes') {
@@ -394,6 +396,16 @@ if (isset($_GET['ac']) && $_GET['ac'] == 'logout') {
 	session_regenerate_id(true);
 	header("Location: " . trim($sb_link_settings[15]));
 	exit();
+}
+// ----------------------
+// Double authentification : code à 8 chiffres envoyé par e-mail. Tant qu'il
+// n'est pas validé, aucune page du back-office
+// n'est accessible - et sbGetCurrentUserId() refuse tout droit, ce qui couvre
+// aussi les scripts appelés directement (upload, upgrade, migration).
+// ----------------------
+require_once SBUIADMIN_PATH . '/inc/' . SBUIADMIN_ID . '-2fa.php';
+if (!sb2faIsVerified()) {
+	sb2faGate(); // affiche la saisie du code et s'arrête, ou valide et redirige
 }
 // ----------------------
 // Get Global Infos

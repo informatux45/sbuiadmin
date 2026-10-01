@@ -119,7 +119,12 @@ if (SBMAINTENANCE) {
 if (!empty($_SESSION['sbuiadmin_user_name']) && !$sbusers->checkSessionHash($_SESSION['sbuiadmin_user_name'], isset($_SESSION['sbuiadmin_user_password']) ? $_SESSION['sbuiadmin_user_password'] : '')) {
 	unset($_SESSION['sbuiadmin_user_name'], $_SESSION['sbuiadmin_user_password']);
 }
-if (!empty($_SESSION['sbuiadmin_user_name'])) {
+// Session admin pas encore passée par la double authentification (code
+// e-mail, backdoor/inc/sbuiadmin-2fa.php) : pas traitée comme connectée ici.
+// Fichier de secours backdoor/inc/admin/2fa-disabled : 2FA désactivée.
+$sb_admin_2fa_ok = file_exists(SB_ADMIN_DIR . 'inc' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . '2fa-disabled')
+	|| (!empty($_SESSION['sb2fa_ok']) && !empty($_SESSION['sbuiadmin_user_name']) && hash_equals((string)$_SESSION['sb2fa_ok'], (string)$_SESSION['sbuiadmin_user_name']));
+if (!empty($_SESSION['sbuiadmin_user_name']) && $sb_admin_2fa_ok) {
 	$sbadministrators = explode(",", trim($sb_settings_config[1]));
 	$sbuiadmin_user_type = (in_array(trim($_SESSION['sbuiadmin_user_name']), $sbadministrators)) ? 'admin' : 'user';
 	$sbsmarty->assign('sbuiadmin_user_name', $_SESSION['sbuiadmin_user_name']);

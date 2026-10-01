@@ -1,11 +1,23 @@
-## Point 1 (audit sécurité, 2026-07-29) : défense en profondeur - empêche
-## l'exécution de scripts dans ce dossier même si une validation
-## d'extension côté upload venait à être contournée (uploads utilisateurs
-## uniquement, aucun script n'a besoin d'y tourner).
-<FilesMatch "\.(php|php3|php4|php5|php7|phtml|pl|py|cgi|sh|asp|aspx)$">
-order allow,deny
-deny from all
+## Aucun script ne doit s'exécuter dans ce dossier d'écriture (uploads,
+## caches) : même si un fichier .php y était déposé malgré les contrôles de
+## l'upload, Apache refuse de le servir. Les templates compilés par Smarty
+## restent utilisables : PHP les inclut depuis le disque, pas par HTTP.
+<FilesMatch "(?i)\.(php\d*|phtml|phar|pht|phps|cgi|pl|py|sh|shtml|asp|aspx|jsp)$">
+	<IfModule mod_authz_core.c>
+		Require all denied
+	</IfModule>
+	<IfModule !mod_authz_core.c>
+		Order allow,deny
+		Deny from all
+	</IfModule>
 </FilesMatch>
-
-## Prevent directory listings
-Options All -Indexes
+<FilesMatch "^\.(htaccess|user\.ini)$">
+	<IfModule mod_authz_core.c>
+		Require all denied
+	</IfModule>
+	<IfModule !mod_authz_core.c>
+		Order allow,deny
+		Deny from all
+	</IfModule>
+</FilesMatch>
+Options -ExecCGI -Indexes

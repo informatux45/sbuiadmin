@@ -36,3 +36,6 @@ upload/avatars/*
 
 # Librairie mise de côté (désactivée en renommant le fichier)
 backdoor/assets/dist/js/vendor/tagify/_tagify.min.js_
+# Interrupteur de secours de la double authentification (voir
+# backdoor/inc/sbuiadmin-2fa.php) : propre à un serveur, jamais versionné.
+backdoor/inc/admin/2fa-disabled

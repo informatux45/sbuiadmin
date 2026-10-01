@@ -23,6 +23,9 @@ defined('SBUIADMIN_MSG_ERROR_E1') OR define("SBUIADMIN_MSG_ERROR_E1", "Captcha i
 defined('SBUIADMIN_MSG_ERROR_E2') OR define("SBUIADMIN_MSG_ERROR_E2", "Login incorrect");
 defined('SBUIADMIN_MSG_ERROR_E3') OR define("SBUIADMIN_MSG_ERROR_E3", "Login manquant");
 defined('SBUIADMIN_MSG_ERROR_E4') OR define("SBUIADMIN_MSG_ERROR_E4", "Compte d&eacute;sactiv&eacute;");
+defined('SBUIADMIN_MSG_ERROR_E5') OR define("SBUIADMIN_MSG_ERROR_E5", "Double authentification impossible : aucune adresse e-mail valide sur ce compte. Contactez l&#39;administrateur.");
+defined('SBUIADMIN_MSG_ERROR_E6') OR define("SBUIADMIN_MSG_ERROR_E6", "Double authentification impossible : l&#39;envoi du code par e-mail a &eacute;chou&eacute;. R&eacute;essayez ou contactez l&#39;administrateur.");
+defined('SBUIADMIN_MSG_ERROR_E7') OR define("SBUIADMIN_MSG_ERROR_E7", "Trop d&#39;essais de code : reconnectez-vous.");
 
 // ** User Interface
 defined('SBUIADMIN_GLOBAL_LAST_LOGIN') OR define("SBUIADMIN_GLOBAL_LAST_LOGIN", "Derni&egrave;re connexion");

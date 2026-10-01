@@ -3,14 +3,21 @@
  Header set Cache-Control "proxy-revalidate, max-age=3600"
  </FilesMatch>
 
-## Point 1 (audit sécurité, 2026-07-29) : en-têtes HTTP de sécurité de base.
-## Pas de Content-Security-Policy/Strict-Transport-Security ici - ces 2-là
-## peuvent casser des choses (CDN externes, mode HTTP local...) sans un
-## réglage plus fin au cas par cas, volontairement laissés de côté.
+## En-têtes HTTP de sécurité.
+## - HSTS : seulement sur une requête HTTPS (env=HTTPS), pour ne pas gêner une
+##   installation locale en HTTP. Volontairement SANS includeSubDomains ni
+##   preload : un sous-domaine encore en HTTP deviendrait inaccessible.
+## - Permissions-Policy : le CMS n'utilise ni caméra, ni micro, ni
+##   géolocalisation, ni paiement navigateur. Un site qui en a besoin (PWA qui
+##   scanne des QR codes, carte « autour de moi »...) doit mettre (self).
+## - Toujours pas de Content-Security-Policy : elle casserait les CDN et les
+##   scripts en ligne des thèmes sans réglage au cas par cas.
 <IfModule mod_headers.c>
 Header always set X-Content-Type-Options "nosniff"
 Header always set X-Frame-Options "SAMEORIGIN"
 Header always set Referrer-Policy "strict-origin-when-cross-origin"
+Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+Header always set Strict-Transport-Security "max-age=31536000" env=HTTPS
 </IfModule>
 
  ## Error Document

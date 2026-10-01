@@ -1,1 +1,23 @@
-
+## Aucun script ne doit s'exécuter dans ce dossier d'écriture (uploads,
+## caches) : même si un fichier .php y était déposé malgré les contrôles de
+## l'upload, Apache refuse de le servir. Les templates compilés par Smarty
+## restent utilisables : PHP les inclut depuis le disque, pas par HTTP.
+<FilesMatch "(?i)\.(php\d*|phtml|phar|pht|phps|cgi|pl|py|sh|shtml|asp|aspx|jsp)$">
+	<IfModule mod_authz_core.c>
+		Require all denied
+	</IfModule>
+	<IfModule !mod_authz_core.c>
+		Order allow,deny
+		Deny from all
+	</IfModule>
+</FilesMatch>
+<FilesMatch "^\.(htaccess|user\.ini)$">
+	<IfModule mod_authz_core.c>
+		Require all denied
+	</IfModule>
+	<IfModule !mod_authz_core.c>
+		Order allow,deny
+		Deny from all
+	</IfModule>
+</FilesMatch>
+Options -ExecCGI -Indexes

@@ -376,6 +376,28 @@ function sbHasRight($module, $action = null) {
 }
 
 /**
+ * Double authentification désactivée sur ce serveur ? Fichier de secours
+ * backdoor/inc/admin/2fa-disabled (à créer si l'envoi d'e-mails ne
+ * fonctionne pas : il faut déjà un accès aux fichiers pour le faire).
+ * @return bool
+ */
+function sb2faDisabled() {
+	return file_exists(__DIR__ . '/admin/2fa-disabled');
+}
+
+/**
+ * La session courante a-t-elle validé la double authentification
+ * (code reçu par e-mail, voir sbuiadmin-2fa.php) ?
+ * @return bool
+ */
+function sb2faIsVerified() {
+	if (sb2faDisabled()) return true;
+	return !empty($_SESSION['sbuiadmin_user_name'])
+		&& !empty($_SESSION['sb2fa_ok'])
+		&& hash_equals((string)$_SESSION['sb2fa_ok'], (string)$_SESSION['sbuiadmin_user_name']);
+}
+
+/**
  * Résout l'id numérique de l'utilisateur connecté à partir de la session
  * (seul $_SESSION['sbuiadmin_user_name'] existe, pas d'id en session).
  * @return int 0 si aucun utilisateur résolu
@@ -386,6 +408,9 @@ function sbGetCurrentUserId() {
 
 	$username = isset($_SESSION['sbuiadmin_user_name']) ? trim($_SESSION['sbuiadmin_user_name']) : '';
 	if ($username == '') return 0;
+
+	// Double authentification pas encore validée : aucun droit.
+	if (!sb2faIsVerified()) return 0;
 
 	// La session doit porter le hash en vigueur du mot de passe : s'il a
 	// changé (mot de passe modifié ailleurs), la session ne vaut plus rien.
