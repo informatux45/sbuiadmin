@@ -383,7 +383,7 @@ switch($action) {
 		// --- SMTP Username
 		$sbform->addInput('text', "SMTP Username", array ('name' => 'email_smtp_username', 'value' => $assocEmail['email_smtp_username']['content'], 'placeholder' => "SMTP Username", 'style' => 'width: 250px;'), false);
 		// --- SMTP Password
-		$sbform->addInput('text', "SMTP Mot de passe", array('name' => 'email_smtp_password', 'value' => $assocEmail['email_smtp_password']['content'], 'placeholder' => "SMTP Mot de passe", 'style' => 'width: 250px;'), false);
+		$sbform->addInput('password', "SMTP Mot de passe", array('name' => 'email_smtp_password', 'value' => $assocEmail['email_smtp_password']['content'], 'autocomplete' => 'new-password', 'style' => 'width: 250px;'), false);
 		// --- SMTP Protocole
 		// Valeurs attendues par PHPMailer : 'tls' (STARTTLS) ou 'ssl'.
 		// L'ancienne valeur 'starttls' est lue comme 'tls' (voir sbMailer()).

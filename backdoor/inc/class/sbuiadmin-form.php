@@ -125,6 +125,7 @@ class form extends sanitize {
 												   ,'valid' => ''
 												   ,'bname' => ''
 												   ,'mask' => ''
+												   ,'autocomplete' => ''
 												   ),
 							   'submit' => array ('name' => ''
 												 ,'value' => 'Valider'
