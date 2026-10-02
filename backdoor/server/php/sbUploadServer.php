@@ -101,7 +101,10 @@ $sbfiles_medias_dir = '../../' . trim($sb_upload_config[6]) . $sbfiles_medias_su
 $uploader = new qqFileUploader();
 
 // Specify the list of valid extensions, ex. array("jpeg", "xml", "bmp")
-$uploader->allowedExtensions = array();
+// --- Liste blanche : la liste noire ci-dessus arrête les scripts serveur,
+// --- mais laissait passer .html / .svg / .xml, servis depuis le domaine du
+// --- site avec leur JavaScript. Seuls les types utilisés par la médiathèque.
+$uploader->allowedExtensions = array('jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'mp4');
 
 // Specify max file size in bytes.
 //$uploader->sizeLimit = 10 * 1024 * 1024;

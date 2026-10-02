@@ -196,7 +196,7 @@
 								
 								{* Display Delete Button *}
 								{if $sb_can_delete_medias}
-								<a class="sbmedia-delete" data-confirm="Sûr de vouloir supprimer ceci ?" type="button" href="{$module_short_url}&del={$sbmedia}{if isset($smarty.get.page)}&page={$smarty.get.page}{/if}">
+								<a class="sbmedia-delete" data-confirm="Sûr de vouloir supprimer ceci ?" type="button" href="{$module_short_url}&del={$sbmedia|escape:'url'}&t={$sb_csrf_token}{if $sb_medias_page > 1}&page={$sb_medias_page}{/if}">
 									<i class="fa fa-times"></i>
 								</a>
 								{/if}

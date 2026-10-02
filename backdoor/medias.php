@@ -47,13 +47,22 @@ $sbid = intval($_GET['id']);
 // -----------------------
 // Remove a media from the list
 // -----------------------
+// --- Jeton CSRF de session obligatoire, et le chemin réel doit être un
+// --- fichier ordinaire DANS le dossier des médias (ni dossier, ni fichier
+// --- caché comme .htaccess).
 if (isset($_GET['del']) && $_GET['del'] != '') {
-	$media_name = $_GET['del'];
-	if (!file_exists($media_name)) {
+	$media_name  = $_GET['del'];
+	$media_real  = realpath($media_name);
+	$medias_root = realpath(_AM_MEDIAS_DIR);
+	if (!isset($_GET['t']) || !is_string($_GET['t']) || !hash_equals(sbCsrfToken(), $_GET['t'])) {
+		$sb_msg_error = 'Erreur : jeton de sécurité invalide, rechargez la page (DEL) !';
+	} elseif (!file_exists($media_name)) {
 		// File does not exist
 		$sb_msg_error = "Erreur : Le fichier n'existe pas (DEL) !";
+	} elseif ($media_real === false || $medias_root === false || strpos($media_real, $medias_root . DIRECTORY_SEPARATOR) !== 0 || !is_file($media_real) || substr(basename($media_real), 0, 1) === '.') {
+		$sb_msg_error = "Erreur : fichier hors de la médiathèque (DEL) !";
 	} else {
-		$remove_file = @unlink($media_name);
+		$remove_file = @unlink($media_real);
 		if ($remove_file)
 			$sb_msg_valid = 'Fichier supprimé avec succès';
 		else
@@ -101,6 +110,8 @@ if ($sbpagination->getNumPages() > 0 && $sb_medias_page > $sbpagination->getNumP
 $sbfiles_page        = array_slice($sbfiles, ($sb_medias_page - 1) * $sb_medias_per_page, $sb_medias_per_page);
 
 $sbsmarty->assign('medias_all', $sbfiles_page);
+$sbsmarty->assign('sb_medias_page', $sb_medias_page);
+$sbsmarty->assign('sb_csrf_token', sbCsrfToken());
 $sbsmarty->assign('sbpagination', $sbpagination);
 
 // --- ASSIGN sbfile medias infos

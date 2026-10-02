@@ -20,4 +20,14 @@
 		Deny from all
 	</IfModule>
 </FilesMatch>
+## Documents qui peuvent porter du JavaScript (html, svg, xml, js) : jamais
+## affichés comme une page du site. Servis en téléchargement, dans un bac à
+## sable sans script. Nécessite mod_headers (sans lui, ce bloc est ignoré :
+## la liste blanche de l'upload reste la protection principale).
+<FilesMatch "(?i)\.(html?|xhtml|xht|svgz?|xml|xsl|xslt|js|mjs)$">
+	<IfModule mod_headers.c>
+		Header always set Content-Security-Policy "sandbox"
+		Header always set Content-Disposition "attachment"
+	</IfModule>
+</FilesMatch>
 Options -ExecCGI -Indexes
