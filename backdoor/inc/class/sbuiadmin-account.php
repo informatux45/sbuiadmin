@@ -675,11 +675,6 @@ class account extends sql {
 			$email_tpls   = SB_PATH . 'datas/modules/account/tpls/emails/';
 			
 			// -----------------------
-			// Include PHPMAILER
-			// -----------------------
-			if (!class_exists("PHPMailer")) require SB_PATH . 'vendor/phpmailer/PHPMailerAutoload.php'; // sbconfig.php
-			
-			// -----------------------
 			// DATAS
 			// -----------------------
 			$address_to   = $datas['email'];
@@ -726,31 +721,18 @@ class account extends sql {
 	private function sendMailer($address_to, $address_name, $subject, $htmlcontent, $sender_name, $sender_email, $attachment = false) {
 		global $sbsanitize;
 		
-		$PHPMailer = new PHPMailer;
+		$PHPMailer = sbMailer(); // UTF-8 + SMTP
+		if (!$PHPMailer) return false;
 		
-		@$PHPMailer->SetFrom($sender_email, "$admin_name");
+		@$PHPMailer->SetFrom($sender_email, "$sender_name");
 		@$PHPMailer->ClearAllRecipients();
 		@$PHPMailer->AddAddress($address_to, "$address_name");
-		@$PHPMailer->Subject  = $sbsanitize->displayText($subject, 'ISO-8859-15');
+		@$PHPMailer->Subject  = $sbsanitize->displayText($subject, 'UTF-8');
 		@$PHPMailer->AltBody  = "To view the message, please use an HTML compatible email viewer!"; // optional, comment out and test
-		@$PHPMailer->MsgHTML($sbsanitize->displayText($htmlcontent, 'ISO-8859-15'));
+		@$PHPMailer->MsgHTML($sbsanitize->displayText($htmlcontent, 'UTF-8'));
 		//@$PHPMailer->MsgHTML  = $htmlcontent;
 		//@$PHPMailer->WordWrap = 80;
 		@$PHPMailer->IsHTML(true);
-        
-        // -----------------------------------
-        // -------------- SMTP ---------------
-        // -----------------------------------
-        if (sbGetConfig('email_smtp') == '1') {
-            @$PHPMailer->isSMTP();
-            @$PHPMailer->Host = sbGetConfig('email_smtp_host');
-            @$PHPMailer->SMTPAuth = (sbGetConfig('email_smtp_auth') == '1') ? true : false;
-            if (sbGetConfig('email_smtp_port') != '') @$PHPMailer->Port = sbGetConfig('email_smtp_port');
-            @$PHPMailer->Username = sbGetConfig('email_smtp_username');
-            @$PHPMailer->Password = sbGetConfig('email_smtp_password');
-            if (sbGetConfig('email_smtp_secure') != '') @$PHPMailer->SMTPSecure = sbGetConfig('email_smtp_secure') > 0; // optionnal (tls | starttls)
-            if (sbGetConfig('email_smtp_debug') == '1') @$PHPMailer->SMTPDebug = SMTP::DEBUG_SERVER;
-        }
 	
 		if ($attachment) {
 			@$PHPMailer->AddAttachment($attachment);

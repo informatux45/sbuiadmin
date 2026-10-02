@@ -70,6 +70,10 @@ RewriteEngine On
 ## le servait tel quel.
 RewriteRule (^|/)\.(git|svn|hg|bzr|claude|idea|vscode)(/|$) - [F,L]
 
+## Dépendances Composer (PHPMailer) : chargées par PHP uniquement, jamais
+## servies au navigateur. composer.json/composer.lock donnent les versions.
+RewriteRule ^(vendor/|composer\.(json|lock)$) - [F,L]
+
 ## Réécriture de index.html vers index.php
 RewriteRule ^index\.html$ index.php
 

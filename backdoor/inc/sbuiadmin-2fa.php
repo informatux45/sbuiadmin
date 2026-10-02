@@ -77,35 +77,21 @@ function sb2faSender() {
 
 /**
  * Envoi de l'e-mail du code. PHPMailer (avec la config SMTP de
- * Configuration > Contact) s'il est installé dans vendor/, sinon mail().
+ * Configuration > Contact), livré dans vendor/. mail() seulement en
+ * secours, si vendor/ manque sur le serveur.
  *
  * @return bool
  */
 function sb2faMail($to, $to_name, $subject, $html) {
 	$sender    = sb2faSender();
 	$site      = defined('_AM_SITE_TITLE') ? _AM_SITE_TITLE : 'Administration';
-	$vendor    = dirname(SBUIADMIN_PATH) . '/vendor/';
-	// PHPMailer 6 (Composer, avec namespace) ou PHPMailer 5 (PHPMailerAutoload)
-	if (!class_exists('\\PHPMailer\\PHPMailer\\PHPMailer') && is_readable($vendor . 'autoload.php')) require_once $vendor . 'autoload.php';
-	if (!class_exists('\\PHPMailer\\PHPMailer\\PHPMailer') && !class_exists('PHPMailer') && is_readable($vendor . 'phpmailer/PHPMailerAutoload.php')) require_once $vendor . 'phpmailer/PHPMailerAutoload.php';
-	$mailer_class = class_exists('\\PHPMailer\\PHPMailer\\PHPMailer') ? '\\PHPMailer\\PHPMailer\\PHPMailer' : (class_exists('PHPMailer') ? 'PHPMailer' : '');
+	$mail      = sbMailer(); // PHPMailer (vendor/) + SMTP de Configuration > Contact
 
-	if ($mailer_class !== '') {
-		$mail = new $mailer_class();
-		$mail->CharSet = 'UTF-8';
+	if ($mail) {
 		$mail->setFrom($sender, $site);
 		$mail->addAddress($to, $to_name);
 		$mail->Subject = $subject;
 		$mail->msgHTML($html);
-		if (sbGetConfig('email_smtp') == '1') {
-			$mail->isSMTP();
-			$mail->Host     = sbGetConfig('email_smtp_host');
-			$mail->SMTPAuth = (sbGetConfig('email_smtp_auth') == '1');
-			if (sbGetConfig('email_smtp_port') != '') $mail->Port = sbGetConfig('email_smtp_port');
-			$mail->Username = sbGetConfig('email_smtp_username');
-			$mail->Password = sbGetConfig('email_smtp_password');
-			if (sbGetConfig('email_smtp_secure') != '') $mail->SMTPSecure = sbGetConfig('email_smtp_secure');
-		}
 		return (bool)$mail->send();
 	}
 

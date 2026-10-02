@@ -1,0 +1,11 @@
+## Dépendances Composer : chargées par PHP uniquement. Rien ici ne doit être
+## servi ni exécuté par le web (PHPMailer livre get_oauth_token.php, qui
+## s'exécute s'il est atteignable). Doublon volontaire de la règle du
+## .htaccess racine, au cas où celui-ci serait remplacé.
+<IfModule mod_authz_core.c>
+	Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+	Order allow,deny
+	Deny from all
+</IfModule>

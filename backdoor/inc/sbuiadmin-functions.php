@@ -886,6 +886,38 @@ function sbGetConfig($config, $langdefault = 'fr') {
 }
 
 /**
+ * PHPMailer prêt à l'emploi : UTF-8 + SMTP de Configuration > Contact.
+ * PHPMailer est livré dans vendor/ (Composer). Les modules chargeaient
+ * vendor/phpmailer/PHPMailerAutoload.php, qui n'existait pas : erreur
+ * fatale à chaque envoi.
+ * @return \PHPMailer\PHPMailer\PHPMailer|null null si vendor/ est absent
+ */
+function sbMailer() {
+	$autoload = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+	if (!class_exists('\\PHPMailer\\PHPMailer\\PHPMailer') && is_readable($autoload)) require_once $autoload;
+	if (!class_exists('\\PHPMailer\\PHPMailer\\PHPMailer')) return null;
+
+	$mail = new \PHPMailer\PHPMailer\PHPMailer();
+	$mail->CharSet = \PHPMailer\PHPMailer\PHPMailer::CHARSET_UTF8;
+
+	if (sbGetConfig('email_smtp') == '1') {
+		$mail->isSMTP();
+		$mail->Host     = sbGetConfig('email_smtp_host');
+		$mail->SMTPAuth = (sbGetConfig('email_smtp_auth') == '1');
+		if (sbGetConfig('email_smtp_port') != '') $mail->Port = (int)sbGetConfig('email_smtp_port');
+		$mail->Username = sbGetConfig('email_smtp_username');
+		$mail->Password = sbGetConfig('email_smtp_password');
+		// PHPMailer attend 'tls' (STARTTLS) ou 'ssl'. Les modules y mettaient
+		// un booléen, et l'ancien sélecteur proposait 'starttls' (= 'tls').
+		$secure = strtolower(sbGetConfig('email_smtp_secure'));
+		if ($secure == 'starttls') $secure = 'tls';
+		if ($secure == 'tls' || $secure == 'ssl') $mail->SMTPSecure = $secure;
+		if (sbGetConfig('email_smtp_debug') == '1') $mail->SMTPDebug = \PHPMailer\PHPMailer\SMTP::DEBUG_SERVER;
+	}
+	return $mail;
+}
+
+/**
  * Get List Module useable for the module PAGES
  * @return array module list
  */

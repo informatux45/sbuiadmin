@@ -127,9 +127,8 @@ switch($op) {
 				$response   = json_decode($response); // Don't add TRUE setting in json_decode
 				
 				if ($response->success === true) {
-					// --- PHPMailer
-					require SB_PATH . 'vendor/phpmailer/PHPMailerAutoload.php';
-					$PHPMailer = new PHPMailer();
+					// --- PHPMailer (UTF-8 + SMTP, voir sbMailer())
+					$PHPMailer = sbMailer();
 					// --- Initialization
 					$htmlContent = '<h1>Contact site ' . _AM_SITE_TITLE . '</h1>';
 					// --- Get Contact form submission $_POST
@@ -143,24 +142,10 @@ switch($op) {
 					@$PHPMailer->setFrom($email, "$name");
 					@$PHPMailer->ClearAllRecipients();
 					@$PHPMailer->AddAddress($email_to, "$email_to");
-					@$PHPMailer->Subject  = $sbsanitize->displayText($subject, 'ISO-8859-15');
+					@$PHPMailer->Subject  = $sbsanitize->displayText($subject, 'UTF-8');
 					@$PHPMailer->AltBody  = "To view the message, please use an HTML compatible email viewer!"; // optional, comment out and test
-					@$PHPMailer->MsgHTML($sbsanitize->displayText($htmlContent, 'ISO-8859-15'));
+					@$PHPMailer->MsgHTML($sbsanitize->displayText($htmlContent, 'UTF-8'));
 					@$PHPMailer->IsHTML(true);
-					
-					// -----------------------------------
-					// -------------- SMTP ---------------
-					// -----------------------------------
-					if (sbGetConfig('email_smtp') == '1') {
-						@$PHPMailer->isSMTP();
-						@$PHPMailer->Host = sbGetConfig('email_smtp_host');
-						@$PHPMailer->SMTPAuth = (sbGetConfig('email_smtp_auth') == '1') ? true : false;
-						if (sbGetConfig('email_smtp_port') != '') @$PHPMailer->Port = sbGetConfig('email_smtp_port');
-						@$PHPMailer->Username = sbGetConfig('email_smtp_username');
-						@$PHPMailer->Password = sbGetConfig('email_smtp_password');
-						if (sbGetConfig('email_smtp_secure') != '') @$PHPMailer->SMTPSecure = sbGetConfig('email_smtp_secure') > 0; // optionnal (tls | starttls)
-						if (sbGetConfig('email_smtp_debug') == '1') @$PHPMailer->SMTPDebug = SMTP::DEBUG_SERVER;
-					}
 					
 					// --- Send email
 					$status = $PHPMailer->Send();

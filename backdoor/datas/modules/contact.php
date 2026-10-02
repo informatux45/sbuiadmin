@@ -385,14 +385,17 @@ switch($action) {
 		// --- SMTP Password
 		$sbform->addInput('text', "SMTP Mot de passe", array('name' => 'email_smtp_password', 'value' => $assocEmail['email_smtp_password']['content'], 'placeholder' => "SMTP Mot de passe", 'style' => 'width: 250px;'), false);
 		// --- SMTP Protocole
-		$sb_protocol = array('tls','starttls');
+		// Valeurs attendues par PHPMailer : 'tls' (STARTTLS) ou 'ssl'.
+		// L'ancienne valeur 'starttls' est lue comme 'tls' (voir sbMailer()).
+		$sb_protocol = array('tls' => 'STARTTLS (port 587)', 'ssl' => 'SSL / TLS (port 465)');
+		$sb_protocol_current = ($assocEmail['email_smtp_secure']['content'] == 'starttls') ? 'tls' : $assocEmail['email_smtp_secure']['content'];
 		$sbform->openSelect("SMTP Protocole", array("id"=>"email_smtp_secure", "name"=>"email_smtp_secure", "style" => "width: 200px;"));
 		$sbform->addOption('Choisissez un protocole', array ("value"=>"", "selected"=>""));
-		for($i = 0; $i < count($sb_protocol); $i++) {
-			if ($sb_protocol[$i] == $assocEmail['email_smtp_secure']['content'])
-				$sbform->addOption($sb_protocol[$i], array ("value"=>$sb_protocol[$i], "selected"=>""));
-		else
-				$sbform->addOption($sb_protocol[$i], array ("value"=>$sb_protocol[$i]));
+		foreach ($sb_protocol as $protocol_value => $protocol_label) {
+			if ($protocol_value == $sb_protocol_current)
+				$sbform->addOption($protocol_label, array ("value"=>$protocol_value, "selected"=>""));
+			else
+				$sbform->addOption($protocol_label, array ("value"=>$protocol_value));
 		}
 		// --- Close Select
 		$sbform->closeSelect();
