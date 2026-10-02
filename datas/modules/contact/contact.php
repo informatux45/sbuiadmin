@@ -108,7 +108,10 @@ switch($op) {
 						if ($k != 'g-recaptcha-response' && $k != 'submit') $htmlContent .= '<p><b>'.str_replace("-", " ", $k).' :</b> '.$sbsanitize->nl2Br($v).'</p>';
 					}
 					// --- Email Construct
-					@$PHPMailer->setFrom($email, "$name");
+					// --- Expéditeur = le site (le SMTP n'accepte que son domaine vérifié),
+					// --- réponse = le visiteur
+					@$PHPMailer->setFrom(SBFROMEMAIL, "$name");
+					@$PHPMailer->addReplyTo($email, "$name");
 					@$PHPMailer->ClearAllRecipients();
 					@$PHPMailer->AddAddress($email_to, "$email_to");
 					@$PHPMailer->Subject  = $sbsanitize->displayText($subject, 'UTF-8');
@@ -118,6 +121,7 @@ switch($op) {
 
 					// --- Send email
 					$status = $PHPMailer->Send();
+					if (!$status) error_log('Contact : envoi en échec : ' . $PHPMailer->ErrorInfo);
 					@$PHPMailer->ClearAddresses();
 					@$PHPMailer->ClearAttachments();
 					
