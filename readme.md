@@ -1,7 +1,7 @@
 # [SBUIADMIN](https://github.com/informatux45/sbuiadmin/)
 - CMS SBootstrap Admin Responsive
 - Contributeurs : [informatux45](https://github.com/informatux45)
-- Version stable : 4.10
+- Version stable : 4.11
 - License: [GPLv3](http://www.gnu.org/licenses/gpl-3.0.fr.html "Licence publique générale GNU v3")
 
 ---
@@ -45,6 +45,12 @@ Ready | Fonctionnalités
 ---
 
 ### Changelog
+
+**4.11**
+- Réglages en base de données (table sb_settings), migration automatique de settings.txt
+- Accès base dans sbdbconfig.php, cherché hors de la racine web (private/, dossier parent), variables d'environnement possibles
+- Secrets (reCAPTCHA, SMTP) chiffrés en base et jamais renvoyés au navigateur
+- Installeur : écriture directe des réglages, suppression de install/ en un clic, état des lieux des prérequis serveur
 
 **4.10**
 - Refonte complète de la charte graphique de l'administration (thème Adminator, mode sombre inclus)
