@@ -119,6 +119,21 @@ if (isset($path['scheme'])) {
     }
 }
 
+// src= borné aux dossiers upload/ et theme/ du site : sinon n'importe qui
+// testait l'existence de tout fichier lisible et lisait toute image.
+$sb_thumb_site = realpath(__DIR__);
+$sb_thumb_real = ($src !== false && !isset($path['scheme'])) ? realpath($src) : false;
+$sb_thumb_ok   = false;
+if ($sb_thumb_site && $sb_thumb_real && is_file($sb_thumb_real)) {
+    foreach (array('upload', 'theme') as $sb_thumb_dir) {
+        $sb_thumb_dir = realpath($sb_thumb_site . '/' . $sb_thumb_dir);
+        if ($sb_thumb_dir && strpos($sb_thumb_real, $sb_thumb_dir . DIRECTORY_SEPARATOR) === 0) { $sb_thumb_ok = true; break; }
+    }
+}
+if (!$sb_thumb_ok) {
+    die('File cannot be found');
+}
+
 if (!extension_loaded('gd')) {
     die('GD extension is not installed');
 }

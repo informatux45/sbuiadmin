@@ -78,6 +78,19 @@ Twitter:    @jamiebicknell
  *
  * */
 
+// Appelé directement (vignettes des vues medias, transfert et theme), hors
+// routeur : réservé à une session admin ayant validé la double authentification.
+defined('SBUIADMIN_PATH') or define('SBUIADMIN_PATH', __DIR__);
+require_once(__DIR__ . '/../inc/sbsession.php');
+session_start();
+require_once(SBUIADMIN_PATH . '/inc/sbuiadmin-rights.php');
+$sb_thumb_auth = sb2faIsVerified();
+session_write_close();
+if (!$sb_thumb_auth) {
+    http_response_code(403);
+    exit;
+}
+
 define('THUMB_CACHE',           './datas/cache/medias/');    // Path to cache directory (must be writeable)
 define('THUMB_CACHE_AGE',       86400);         // Duration of cached files in seconds
 define('THUMB_BROWSER_CACHE',   true);          // Browser cache true or false
@@ -117,6 +130,21 @@ if (isset($path['scheme'])) {
         }
         $src = implode('/', $temp);
     }
+}
+
+// src= borné aux dossiers upload/ et theme/ du site : sinon n'importe qui
+// testait l'existence de tout fichier lisible et lisait toute image.
+$sb_thumb_site = realpath(__DIR__ . '/..');
+$sb_thumb_real = ($src !== false && !isset($path['scheme'])) ? realpath($src) : false;
+$sb_thumb_ok   = false;
+if ($sb_thumb_site && $sb_thumb_real && is_file($sb_thumb_real)) {
+    foreach (array('upload', 'theme') as $sb_thumb_dir) {
+        $sb_thumb_dir = realpath($sb_thumb_site . '/' . $sb_thumb_dir);
+        if ($sb_thumb_dir && strpos($sb_thumb_real, $sb_thumb_dir . DIRECTORY_SEPARATOR) === 0) { $sb_thumb_ok = true; break; }
+    }
+}
+if (!$sb_thumb_ok) {
+    die('File cannot be found');
 }
 
 if (!extension_loaded('gd')) {
