@@ -113,6 +113,8 @@ $sbsmarty->assign('medias_all', $sbfiles);
 $sbsmarty->assign('sbfiles_medias_exts_allowed', $sbfiles_medias_exts_allowed);
 $sbsmarty->assign('sb_transfert_subdir', $sb_transfert_subdir);
 $sbsmarty->assign('sb_transfert_id', $sb_transfert_id);
+// L'URL des médias de la Configuration finit souvent par "/" (sinon upload//fichier pour CKEditor)
+$sbsmarty->assign('sb_transfert_medias_url', rtrim(_AM_MEDIAS_URL, '/'));
 
 
 // ---------------------------------------------------

@@ -92,7 +92,7 @@
 	{foreach $medias_all as $sbmedia}
 		
 		{if isset($smarty.get.editor) && $smarty.get.editor == 'ck'}
-			<p class="sbmedia" target="_parent" onclick="sbTransfertCkeditor('{$smarty.const._AM_MEDIAS_URL}/{$sbmedia|@sbFileRealname}')">
+			<p class="sbmedia" target="_parent" onclick="sbTransfertCkeditor('{$sb_transfert_medias_url}/{$sbmedia|@sbFileRealname}')">
 		{elseif isset($smarty.get.editor) && $smarty.get.editor == 'tiny'}
 			<p class="sbmedia" target="_parent" onclick='sbTransfertTiny("{$sbmedia}","{$sb_transfert_id}","{$smarty.const._AM_MEDIAS_URL}")'>
 		{else}
