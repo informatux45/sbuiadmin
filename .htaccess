@@ -1,7 +1,9 @@
 ## Caching schema
+<IfModule mod_headers.c>
  <FilesMatch "\.(jpg|png|css|js)$">
  Header set Cache-Control "proxy-revalidate, max-age=3600"
  </FilesMatch>
+</IfModule>
 
 ## En-têtes HTTP de sécurité.
 ## - HSTS : seulement sur une requête HTTPS (env=HTTPS), pour ne pas gêner une
@@ -25,17 +27,40 @@ Header always set Strict-Transport-Security "max-age=31536000" env=HTTPS
 
 ## Prevent viewing of .htaccess file
 <Files .htaccess>
-order allow,deny
-deny from all
+<IfModule mod_authz_core.c>
+	Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+	Order allow,deny
+	Deny from all
+</IfModule>
 </Files>
 
 ## Nom de la session de cette installation (voir inc/sbsession.php).
 ## Ce n'est pas un secret - un nom de cookie voyage en clair dans chaque
 ## en-tete Set-Cookie - mais rien ne justifie de le servir comme un fichier.
 <Files sbsession.txt>
-order allow,deny
-deny from all
+<IfModule mod_authz_core.c>
+	Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+	Order allow,deny
+	Deny from all
+</IfModule>
 </Files>
+
+## Accès à la base et copies de l'ancien settings.txt (voir
+## backdoor/inc/sbuiadmin-settings.php). Fichiers PHP qui ne renvoient rien
+## s'ils sont appelés directement : refusés quand même, par précaution.
+<FilesMatch "^(sbdbconfig|sbsettings-backup-.*)\.php$">
+<IfModule mod_authz_core.c>
+	Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+	Order allow,deny
+	Deny from all
+</IfModule>
+</FilesMatch>
 
 ## Fichiers cachés : .gitignore, .user.ini, .env, et tout ce qui commence par
 ## un point. Ne bloque QUE des fichiers, jamais un répertoire : la validation
@@ -44,8 +69,13 @@ deny from all
 ## Attention en élargissant cette règle : ne jamais bloquer .txt en bloc,
 ## robots.txt et les fichiers de vérification des moteurs doivent rester servis.
 <FilesMatch "^\.">
-order allow,deny
-deny from all
+<IfModule mod_authz_core.c>
+	Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+	Order allow,deny
+	Deny from all
+</IfModule>
 </FilesMatch>
 
 ## Prevent directory listings
