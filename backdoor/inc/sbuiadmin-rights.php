@@ -391,9 +391,11 @@ function sb2faDisabled() {
  * @return bool
  */
 function sb2faIsVerified() {
+	// Session d'abord : sinon, interrupteur posé, les gardes des scripts
+	// directs (upload, status, thumb...) laissaient passer sans connexion.
+	if (empty($_SESSION['sbuiadmin_user_name'])) return false;
 	if (sb2faDisabled()) return true;
-	return !empty($_SESSION['sbuiadmin_user_name'])
-		&& !empty($_SESSION['sb2fa_ok'])
+	return !empty($_SESSION['sb2fa_ok'])
 		&& hash_equals((string)$_SESSION['sb2fa_ok'], (string)$_SESSION['sbuiadmin_user_name']);
 }
 
