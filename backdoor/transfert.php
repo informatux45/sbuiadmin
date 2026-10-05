@@ -45,7 +45,7 @@ global $sbfiles_medias_dirs_allowed, $sbfiles_medias_exts_allowed;
 // (bug resté latent : "subdir" n'avait jamais servi ailleurs dans le code).
 // subdir= : segments [A-Za-z0-9_-] seulement, et le dossier doit rester sous
 // celui des médias ("../../" listait toute la racine web). Un sous-dossier
-// bien formé mais absent donne une liste vide (créé au premier upload).
+// bien formé mais absent donne une liste vide (l'upload y sera refusé).
 $sb_transfert_subdir = '';
 $sb_transfert_empty  = false;
 if (isset($_GET['subdir']) && is_string($_GET['subdir']) && preg_match('#^[A-Za-z0-9_-]+(/[A-Za-z0-9_-]+)*$#', trim($_GET['subdir'], '/'))) {

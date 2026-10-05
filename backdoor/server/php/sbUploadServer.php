@@ -95,8 +95,24 @@ if (in_array(strtolower($sb_upload_name), array('.htaccess', '.user.ini', 'web.c
 }
 
 // File path
-$sbfiles_medias_subdir = (isset($_REQUEST['subdir']) && $_REQUEST['subdir'] != '') ? '/' . trim($_REQUEST['subdir'], "/") : '';
+// subdir= : segments [A-Za-z0-9_-], et le dossier réel (liens symboliques
+// résolus) doit exister sous celui des médias.
+$sbfiles_medias_subdir = '';
+if (isset($_REQUEST['subdir'])) {
+	if (!is_string($_REQUEST['subdir'])) sbUploadDeny('Chemin invalide.');
+	$sb_upload_subdir = trim($_REQUEST['subdir'], '/');
+	if ($sb_upload_subdir !== '') {
+		if (!preg_match('#^[A-Za-z0-9_-]+(/[A-Za-z0-9_-]+)*$#', $sb_upload_subdir)) sbUploadDeny('Chemin invalide.');
+		$sbfiles_medias_subdir = '/' . $sb_upload_subdir;
+	}
+}
 $sbfiles_medias_dir = '../../' . trim($sb_upload_config[6]) . $sbfiles_medias_subdir;
+$sb_upload_root = realpath('../../' . trim($sb_upload_config[6]));
+$sb_upload_real = realpath($sbfiles_medias_dir);
+if (!$sb_upload_root || !$sb_upload_real || !is_dir($sb_upload_real)
+	|| ($sb_upload_real !== $sb_upload_root && strpos($sb_upload_real . DIRECTORY_SEPARATOR, $sb_upload_root . DIRECTORY_SEPARATOR) !== 0)) {
+	sbUploadDeny('Dossier de destination invalide.');
+}
 
 $uploader = new qqFileUploader();
 
