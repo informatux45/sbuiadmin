@@ -169,7 +169,8 @@ class Database
      */
     public function Create()
     {
-		$this->dbh = new PDO($this->db_driver.':host='.$this->host, $this->user, $this->password);
+		// Port compris (hôte saisi "hôte:port"), sinon on joint le serveur du port par défaut
+		$this->dbh = new PDO($this->db_driver.':host='.$this->host.(!empty($this->port) ? ';port='.$this->port : ''), $this->user, $this->password);
 		$this->dbh->exec('CREATE DATABASE IF NOT EXISTS `'.$this->database.'`;');
 		if($this->dbh->errorCode() != '00000'){
 			$err = $this->dbh->errorInfo();
@@ -519,13 +520,8 @@ class Database
 	//==========================================================================
 	public static function GetInstance($database_host = '', $database_name = '', $database_username = '', $database_password = '', $db_driver = '', $force_encoding = false, $is_installation = false)
 	{
-		$database_port = '';
-		
-		$host_parts = explode(':', $database_host);		
-		if(isset($host_parts[1]) && is_numeric($host_parts[1])){
-			$database_host = $host_parts[0];	
-			$database_port = $host_parts[1];	
-		}
+		// "hôte:port" est transmis tel quel : le constructeur le découpe
+		// (le découper ici perdait le port).
 		
 		if($database_host == ''){
 			$config = new Config();	

@@ -103,17 +103,13 @@
 		'server_api'   => array(false, lang_key('server_api'), isset($phpinfo['phpinfo']['Server API']), (isset($phpinfo['phpinfo']['Server API']) ? $phpinfo['phpinfo']['Server API'] : ''), lang_key('unknown')),
 		
 		'divider_php_settings' => array('title'=>lang_key('required_php_settings')),
-		'pdo_support'  => array(false, lang_key('pdo_support'), (isset($phpinfo['PDO']['PDO support']) && $phpinfo['PDO']['PDO support'] == 'enabled'), lang_key('enabled'), lang_key('disabled'), lang_key('error_pdo_support')),
-		'database_extension' => array(false, lang_key('database_extension').' (pdo_'.EI_DATABASE_TYPE.')', extension_loaded('pdo_'.EI_DATABASE_TYPE), lang_key('enabled'), lang_key('disabled')),
 		// --- MySQLi
-		'mysqli_support'  => array(true, lang_key('mysqli_support'), (isset($phpinfo['mysqli']['MysqlI Support']) && $phpinfo['mysqli']['MysqlI Support'] == 'enabled'), lang_key('enabled'), lang_key('disabled'), lang_key('error_mysqli_support')),
-		'mysqlnd_support'  => array(false, lang_key('mysqlnd_support'), (isset($phpinfo['mysqlnd']['mysqlnd']) && $phpinfo['mysqlnd']['mysqlnd'] == 'enabled'), lang_key('enabled'), lang_key('disabled'), lang_key('error_mysqlnd_support')),
 		// ----------
 		//'vd_support'   => array(false, lang_key('virtual_directory_support'), (isset($phpinfo['phpinfo']['Virtual Directory Support']) && $phpinfo['phpinfo']['Virtual Directory Support'] == 'enabled'), lang_key('enabled'), lang_key('disabled'), lang_key('error_vd_support')),
 		//'asp_tags'     => array(false, lang_key('asp_tags'), (isset($phpinfo[$php_core_index]) && $phpinfo[$php_core_index]['asp_tags'][0] == 'On'), lang_key('on'), lang_key('off'), lang_key('error_asp_tags')),
 		//'safe_mode'    => array(false, lang_key('safe_mode'), (isset($phpinfo[$php_core_index]) && $phpinfo[$php_core_index]['safe_mode'][0] == 'On'), lang_key('on'), lang_key('off')),
-		'short_open_tag'  => array(false, lang_key('short_open_tag'), (isset($phpinfo[$php_core_index]) && $phpinfo[$php_core_index]['short_open_tag'][0] == 'On'), lang_key('on'), lang_key('off')),
-		'session_support' => array(true, lang_key('session_support'), (isset($phpinfo['session']['Session Support']) && $phpinfo['session']['Session Support'] == 'enabled'), lang_key('enabled'), lang_key('disabled')),
+		// Off attendu (les gabarits ne s'en servent pas ; On peut casser du XML)
+		'short_open_tag'  => array(false, lang_key('short_open_tag'), !(isset($phpinfo[$php_core_index]) && $phpinfo[$php_core_index]['short_open_tag'][0] == 'On'), lang_key('off'), lang_key('on')),
 	);
 	/// $database_system_version = isset($phpinfo['mysql']) ? $phpinfo['mysql']['Client API version'] : "unknown";
 
@@ -136,34 +132,123 @@
 		$validations['sendmail_path'] = array(false, lang_key('sendmail_path'), ini_get('sendmail_path'), ini_get('sendmail_path'), lang_key('unknown'));
 	}
 	
+	// -------------------------------------------------------------------
+	// Prérequis SBUIADMIN (état des lieux 2026-10, CMS 4.11).
+	// [0] requis (bloque l'installation) / false = recommandé
+	// [2] true = OK, false = absent, null = non vérifiable (n'empêche rien)
+	// -------------------------------------------------------------------
+	$sb_ext = function ($name) { return extension_loaded($name); };
+	$sb_bytes = function ($v) {
+		$v = trim((string) $v); if ($v === '' || $v === '-1') return -1;
+		$n = (float) $v; $u = strtolower(substr($v, -1));
+		return (int) ($u === 'g' ? $n * 1073741824 : ($u === 'm' ? $n * 1048576 : ($u === 'k' ? $n * 1024 : $n)));
+	};
+
 	if(EI_CHECK_EXTENSIONS){
-		$validations['divider_extensions'] = array('title'=>lang_key('extensions'), 'description'=>'');
-		$loaded_extensions = get_loaded_extensions();
-		$validations['php_curl'] = array(true, 'PHP Curl', in_array('curl', $loaded_extensions), lang_key('installed'), lang_key('not_installed'));
-		$validations['php_gd2'] = array(false, 'PHP Gd2', in_array('gd2', $loaded_extensions), lang_key('installed'), lang_key('not_installed'));
-		if (version_compare(phpversion(), '7.1.0', '<')) {
-			$validations['php_mcrypt'] = array(true, 'PHP mcrypt', in_array('mcrypt', $loaded_extensions), lang_key('installed'), lang_key('not_installed'));
-		} else {
-			$validations['openssl_encrypt'] = array(true, 'OpenSSL encrypt', function_exists('openssl_encrypt'), lang_key('installed'), lang_key('not_installed'));
+		$validations['php_recommended'] = array(false, 'Version PHP recommandée (8.4, version testée)', version_compare(PHP_VERSION, '8.4.0', '>='), PHP_VERSION, PHP_VERSION . ' (fonctionne, 8.4 conseillé)');
+
+		$validations['divider_extensions'] = array('title' => 'Extensions PHP requises', 'description' => '');
+		foreach (array(
+			'mysqli'   => 'MySQLi (base de données du CMS)',
+			'pdo_mysql'=> 'PDO MySQL (assistant d\'installation)',
+			'session'  => 'Session',
+			'json'     => 'JSON',
+			'mbstring' => 'mbstring (texte UTF-8)',
+			'sodium'   => 'sodium (chiffrement des secrets en base)',
+			'openssl'  => 'OpenSSL (e-mails SMTP chiffrés, HTTPS sortant)',
+			'curl'     => 'cURL (reCAPTCHA, mises à jour, sitemap)',
+			'gd'       => 'GD (vignettes et redimensionnement des images)',
+			'fileinfo' => 'fileinfo (type réel des fichiers envoyés)',
+			'filter'   => 'filter',
+			'hash'     => 'hash',
+		) as $sb_name => $sb_label) {
+			$validations['ext_' . $sb_name] = array(true, $sb_label, $sb_ext($sb_name), lang_key('installed'), lang_key('not_installed'));
 		}
+
+		$validations['divider_extensions_reco'] = array('title' => 'Extensions PHP recommandées', 'description' => 'Facultatives : seule la fonction indiquée est privée si elles manquent.');
+		foreach (array(
+			'mysqlnd'  => 'mysqlnd (pilote MySQL natif)',
+			'exif'     => 'EXIF (orientation des photos)',
+			'zip'      => 'Zip (mise à jour automatique)',
+			'intl'     => 'intl (dates et tri localisés)',
+			'iconv'    => 'iconv (conversions de jeux de caractères)',
+			'dom'      => 'DOM (sitemap, Page Builder)',
+			'simplexml'=> 'SimpleXML',
+		) as $sb_name => $sb_label) {
+			$validations['ext_' . $sb_name] = array(false, $sb_label, $sb_ext($sb_name), lang_key('installed'), lang_key('not_installed'));
+		}
+		$validations['ext_memcache'] = array(false, 'Memcache ou Memcached (anti-flood de la connexion)', $sb_ext('memcache') || $sb_ext('memcached'), lang_key('installed'), lang_key('not_installed') . ' (anti-flood indisponible)');
+
+		$validations['divider_php_ini'] = array('title' => 'Réglages PHP', 'description' => '');
+		$sb_upload = $sb_bytes(ini_get('upload_max_filesize'));
+		$sb_post   = $sb_bytes(ini_get('post_max_size'));
+		$sb_mem    = $sb_bytes(ini_get('memory_limit'));
+		$validations['ini_file_uploads'] = array(true, 'file_uploads (envoi de fichiers)', (bool) ini_get('file_uploads'), lang_key('on'), lang_key('off'));
+		$validations['ini_upload_max']   = array(false, 'upload_max_filesize (8 Mo ou plus conseillé)', $sb_upload < 0 || $sb_upload >= 8388608, ini_get('upload_max_filesize'), ini_get('upload_max_filesize'));
+		$validations['ini_post_max']     = array(false, 'post_max_size (au moins upload_max_filesize)', $sb_post < 0 || ($sb_upload >= 0 && $sb_post >= $sb_upload), ini_get('post_max_size'), ini_get('post_max_size'));
+		$validations['ini_memory']       = array(false, 'memory_limit (128 Mo ou plus conseillé, traitement des images)', $sb_mem < 0 || $sb_mem >= 134217728, ini_get('memory_limit'), ini_get('memory_limit'));
+		$validations['ini_display']      = array(false, 'display_errors désactivé (production)', !in_array(strtolower((string) ini_get('display_errors')), array('1', 'on', 'stdout'), true), lang_key('off'), lang_key('on'));
 	}
-	
+
 	if(EI_CHECK_MODES){
-		$validations['divider_modes'] = array('title'=>lang_key('modes'), 'description'=>'');
-		if (function_exists('apache_get_modules')) {
-			$modules           = apache_get_modules();
-			$loaded_extensions = (in_array('mod_rewrite', $modules)) ? ['mod_rewrite'] : [];
-		} else {
-			$loaded_extensions = (getenv('HTTP_MOD_REWRITE') == 'On') ? ['mod_rewrite'] : [];
-		}
-		$validations['mod_rewrite'] = array(false, lang_key('mode').' Rewrite', in_array('mod_rewrite', $loaded_extensions), lang_key('installed'), lang_key('not_installed'));
-		//$validations['mod_ldap'] = array(false, lang_key('mode').' LDAP', in_array('ldap', $loaded_extensions), lang_key('installed'), lang_key('not_installed'));
+		// Les modules Apache ne sont listables qu'avec mod_php : sinon on
+		// vérifie leur effet en interrogeant le site lui-même (en reprenant
+		// l'éventuelle authentification HTTP de la requête en cours).
+		$validations['divider_modes'] = array('title' => 'Serveur web', 'description' => 'Requis par les .htaccess du site : mod_rewrite (sans lui, Apache répond par une erreur 500) et mod_headers (en-têtes de sécurité). Apache 2.4 conseillé, mod_access_compat inutile.');
+		$sb_software = isset($_SERVER['SERVER_SOFTWARE']) ? (string) $_SERVER['SERVER_SOFTWARE'] : '';
+		$sb_is_apache = stripos($sb_software, 'apache') !== false || function_exists('apache_get_modules');
+		$validations['web_server'] = array(false, 'Apache (.htaccess)', $sb_is_apache ? true : ($sb_software === '' ? null : false), $sb_software !== '' ? htmlspecialchars($sb_software) : 'Apache', ($sb_software !== '' ? htmlspecialchars($sb_software) : lang_key('unknown')) . ' : protections .htaccess à reproduire');
+
+		$sb_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+		$sb_site_url = $sb_https . '://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost') . rtrim(str_replace('\\', '/', dirname(dirname(dirname($_SERVER['SCRIPT_NAME'])))), '/') . '/';
+		$sb_admin_dir = basename(dirname(__DIR__));
+		$sb_probe = function ($path) use ($sb_site_url) {
+			if (!function_exists('curl_init')) return null;
+			$ch = curl_init($sb_site_url . $path);
+			curl_setopt_array($ch, array(CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true, CURLOPT_NOBODY => false, CURLOPT_TIMEOUT => 5, CURLOPT_FOLLOWLOCATION => false, CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => 0));
+			if (isset($_SERVER['PHP_AUTH_USER'])) {
+				curl_setopt($ch, CURLOPT_USERPWD, $_SERVER['PHP_AUTH_USER'] . ':' . (isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : ''));
+			} elseif (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
+				curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: ' . $_SERVER['HTTP_AUTHORIZATION']));
+			}
+			$raw = curl_exec($ch);
+			$code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			$hsize = (int) curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+			curl_close($ch);
+			if ($raw === false || $code === 0 || $code === 401) return null;
+			return array('code' => $code, 'headers' => strtolower(substr($raw, 0, $hsize)));
+		};
+		$sb_modules = function_exists('apache_get_modules') ? apache_get_modules() : null;
+
+		// .htaccess pris en compte (AllowOverride) : un fichier interdit doit répondre 403
+		$sb_r = $sb_probe($sb_admin_dir . '/inc/admin/theme.txt');
+		$validations['web_htaccess'] = array(true, '.htaccess pris en compte (AllowOverride All)', $sb_r === null ? null : ($sb_r['code'] === 403), lang_key('enabled'), $sb_r === null ? 'non vérifiable (accès HTTP impossible depuis le serveur)' : 'ignoré : fichiers protégés lisibles (code ' . $sb_r['code'] . ')');
+
+		// mod_rewrite : la règle [F] sur .git répond 403 même si le dossier n'existe pas
+		$sb_rw = $sb_modules !== null ? in_array('mod_rewrite', $sb_modules) : null;
+		if ($sb_rw === null) { $sb_r = $sb_probe('.git/sbuiadmin-test'); $sb_rw = $sb_r === null ? null : ($sb_r['code'] === 403); }
+		$validations['mod_rewrite'] = array(true, 'mod_rewrite', $sb_rw, lang_key('installed'), $sb_rw === null ? 'non vérifiable' : lang_key('not_installed'));
+
+		// mod_headers : en-têtes de sécurité posés par le .htaccess racine
+		$sb_hd = $sb_modules !== null ? in_array('mod_headers', $sb_modules) : null;
+		if ($sb_hd === null) { $sb_r = $sb_probe(''); $sb_hd = $sb_r === null ? null : (strpos($sb_r['headers'], 'x-content-type-options') !== false); }
+		$validations['mod_headers'] = array(true, 'mod_headers (en-têtes de sécurité)', $sb_hd, lang_key('installed'), $sb_hd === null ? 'non vérifiable' : lang_key('not_installed'));
+
+		$validations['db_version_note'] = array(false, 'MySQL 5.7+ ou MariaDB 10.3+ (vérifié à l\'étape suivante)', null, '', 'vérifié à l\'étape « Paramètres database »');
 	}
-	
+
 	if(EI_CHECK_DIRECTORIES_AND_FILES){
 		$validations['divider_dirs_and_files'] = array('title'=>lang_key('directories_and_files'), 'description'=>'');
 		//$validations['config_file_dir_1'] = array(true, EI_CONFIG_FILE_DIRECTORY, is_writable(EI_CONFIG_FILE_DIRECTORY), lang_key('writable'), lang_key('no_writable'));	
-		$validations['config_file_dir_2'] = array(true, '../inc/admin/settings.txt', is_writable('../inc/admin/settings.txt'), lang_key('writable'), lang_key('no_writable'));
+		// sbdbconfig.php (accès base) : premier emplacement inscriptible, dans
+		// l'ordre exact de l'installation (fonctions du chargeur, sans migration)
+		defined('SBUIADMIN_SETTINGS_NO_AUTOLOAD') or define('SBUIADMIN_SETTINGS_NO_AUTOLOAD', true);
+		require_once(dirname(__DIR__) . '/inc/sbuiadmin-settings.php');
+		$sb_req_where = false;
+		foreach (sbDbConfigDirs() as $sb_req_dir) {
+			if ($sb_req_dir[2] && @is_dir($sb_req_dir[0]) && @is_writable($sb_req_dir[0])) { $sb_req_where = $sb_req_dir[0]; break; }
+		}
+		$validations['config_file_dir_2'] = array(true, 'sbdbconfig.php (' . ($sb_req_where ? htmlspecialchars($sb_req_where) . (strpos($sb_req_where . '/', sbDbConfigSiteId() . '/') === 0 ? ', dans le site' : ', hors du site') : 'aucun dossier inscriptible') . ')', $sb_req_where !== false, lang_key('writable'), lang_key('no_writable'));
 		$validations['config_file_dir_3'] = array(true, '../inc/admin/dashboard.txt', is_writable('../inc/admin/dashboard.txt'), lang_key('writable'), lang_key('no_writable'));
 		$validations['config_file_dir_4'] = array(true, '../inc/admin/theme.txt', is_writable('../inc/admin/theme.txt'), lang_key('writable'), lang_key('no_writable'));
 		$validations['config_file_dir_5'] = array(true, '../install.php', is_writable('../install.php'), lang_key('writable'), lang_key('no_writable'));
@@ -209,10 +294,16 @@
 							}
 						}else{
 							$content .= '<td>&#8226; '.$val[1].': <i>'.(($val[2]) ? '<span class="found">'.$val[3].'</span>' : '<span class="disabled">'.$val[4].'</span>').'</i></td>';
-							if($val[0] == true && !$val[2]){
+							if($val[2] === null){
+								// Non vérifiable : signalé, sans bloquer
+								$content .= '<td><span style="color: #c67605;">à vérifier</span></td>';
+							}elseif($val[0] == true && !$val[2]){
 								$is_error = true;
 								$error_mg[$key] = isset($val[5]) ? $val[5] : str_ireplace('_SETTINGS_NAME_', '<b>'.$key.'</b>', lang_key('error_server_requirements'));
 								$content .= '<td><span class="failed">'.lang_key('failed').'!</span></td>';
+							}elseif(!$val[2]){
+								// Recommandé mais absent
+								$content .= '<td><span style="color: #c67605;">recommandé</span></td>';
 							}else{
 								$content .= '<td><span class="passed">'.lang_key('passed').'</span></td>';	
 							}

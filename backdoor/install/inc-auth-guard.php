@@ -17,7 +17,6 @@
  * l'installeur tiers.
  */
 
-$sb_install_settings_file = __DIR__ . '/../inc/admin/settings.txt';
 $sb_install_lock_file     = __DIR__ . '/installer/installer.lock';
 
 $sb_install_authorized = false;
@@ -36,19 +35,16 @@ if (!file_exists($sb_install_lock_file)) {
 	$sb_install_authorized = true;
 }
 
-if (!$sb_install_authorized && isset($_SESSION['sbuiadmin_user_name']) && trim((string)$_SESSION['sbuiadmin_user_name']) != '' && is_readable($sb_install_settings_file)) {
-	$sb_install_settings_lines = file($sb_install_settings_file);
-	// Ligne 2 (index 1) = liste des administrateurs, séparés par des
-	// virgules - même convention que $sbadministrators dans
-	// inc/sbuiadmin-config.php.
-	$sb_install_admins = isset($sb_install_settings_lines[1]) ? explode(',', trim($sb_install_settings_lines[1])) : array();
-	$sb_install_admins = array_map('trim', $sb_install_admins);
-
+if (!$sb_install_authorized && isset($_SESSION['sbuiadmin_user_name']) && trim((string)$_SESSION['sbuiadmin_user_name']) != '') {
+	// Liste des administrateurs : réglage "administrators" (en base depuis
+	// la migration de settings.txt, voir inc/sbuiadmin-settings.php) - même
+	// convention que $sbadministrators dans inc/sbuiadmin-config.php.
+	require_once(__DIR__ . '/../inc/sbuiadmin-settings.php');
+	$sb_install_admins = array_map('trim', explode(',', sbSetting('administrators')));
 	if (in_array(trim($_SESSION['sbuiadmin_user_name']), $sb_install_admins, true)) {
 		$sb_install_authorized = true;
 	}
 }
-
 if (!$sb_install_authorized) {
 	http_response_code(403);
 	die('Accès refusé. Connectez-vous d\'abord à l\'administration en tant qu\'administrateur avant d\'accéder à cette page.');

@@ -11,6 +11,50 @@
 ################################################################################
 
 	session_start();
+
+	// -------------------------------------------------------------------
+	// Bouton « Supprimer le répertoire install/ » de la dernière étape.
+	// Traité AVANT inc-auth-guard.php : une fois installer.lock posé, le
+	// garde exige une session admin, que l'installateur n'a pas encore. Le
+	// droit vient d'un jeton à usage unique (30 min) créé à la fin d'une
+	// installation réussie ; seule son empreinte est stockée, dans
+	// installer/ (refusé au web).
+	// -------------------------------------------------------------------
+	if (isset($_POST['task']) && $_POST['task'] === 'sb_remove_install') {
+		$sb_token_file = __DIR__ . '/installer/remove.token';
+		$sb_stored     = @file($sb_token_file, FILE_IGNORE_NEW_LINES);
+		$sb_given      = isset($_POST['sb_remove_token']) ? (string) $_POST['sb_remove_token'] : '';
+		$sb_dir        = realpath(__DIR__);
+		$sb_allowed    = $sb_stored && count($sb_stored) >= 2 && $sb_given !== ''
+			&& hash_equals($sb_stored[0], hash('sha256', $sb_given))
+			&& (time() - (int) $sb_stored[1]) < 1800
+			&& file_exists(__DIR__ . '/installer/installer.lock')
+			&& $sb_dir && basename($sb_dir) === 'install'
+			&& is_file(dirname($sb_dir) . '/inc/sbuiadmin-settings.php');
+		$sb_removed = false;
+		if ($sb_allowed) {
+			@unlink($sb_token_file);
+			$sb_items = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($sb_dir, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
+			foreach ($sb_items as $sb_item) {
+				// Liens symboliques supprimés eux-mêmes, jamais suivis
+				($sb_item->isDir() && !$sb_item->isLink()) ? @rmdir($sb_item->getPathname()) : @unlink($sb_item->getPathname());
+			}
+			$sb_removed = @rmdir($sb_dir);
+		}
+		// Réponse JSON (bouton AJAX de la dernière étape)
+		header('Content-Type: application/json; charset=utf-8');
+		if ($sb_removed) {
+			$sb_answer = array('ok' => true, 'message' => "Le répertoire install/ a été supprimé.");
+		} elseif ($sb_allowed) {
+			$sb_answer = array('ok' => false, 'message' => "Suppression incomplète : certains fichiers de install/ n'ont pu être supprimés (droits d'écriture). Supprimez le répertoire à la main.");
+		} else {
+			http_response_code(403);
+			$sb_answer = array('ok' => false, 'message' => "Suppression refusée (lien expiré ou invalide) : supprimez le répertoire install/ à la main.");
+		}
+		echo json_encode($sb_answer);
+		exit;
+	}
+
 	require_once('inc-auth-guard.php');
 	
 	require_once('include/shared.inc.php');    
@@ -132,47 +176,77 @@
 								//$install_file   = getcwd() . '/' . EI_CONFIG_FILE_INSTALL_START;
 								$installer_lock = EI_CONFIG_FILE_INSTALLER_LOCK;
 								
-								// Injection des données (Settings File)
-								$output_file  = $_SESSION['settings_customer_name'] . "\n";
-								$output_file .= "admin" . "\n"; // Administrateurs
-								$output_file .= $_SESSION['database_host'] . "\n";
-								$output_file .= $_SESSION['database_name'] . "\n";
-								$output_file .= $_SESSION['database_username'] . "\n";
-								$output_file .= $_SESSION['database_password'] . "\n";
-								$output_file .= $_SESSION['settings_path_upload'] . "\n";
-								$output_file .= "2MB" . "\n";  // Upload max
-								$output_file .= " " . "\n";    // Modules autorises
-								$output_file .= "0" . "\n";    // Debug General
-								$output_file .= "0" . "\n";    // Debug Formulaire
-								$output_file .= "0" . "\n";    // Debug Smarty
-								$output_file .= "jpg,jpeg,png,gif,pdf,xml,mp4" . "\n";
-								$output_file .= $_SESSION['settings_url_upload'] . "\n";
-								$output_file .= "20" . "\n";   // Uploads simultanes (limit)
-								$output_file .= $_SESSION['settings_customer_url'] . "\n";
-								$output_file .= "1" . "\n";    // Sandbox
-								$output_file .= "1" . "\n";    // Cms
-								$output_file .= "1024" . "\n"; // Image Scaling Max Size (Medias upload)
-								$output_file .= $_SESSION['settings_recaptcha_public'] . "\n";
-								$output_file .= $_SESSION['settings_recaptcha_private'] . "\n";
-								$output_file .= $_SESSION['database_prefix'] . "\n";
-								$output_file .= "0" . "\n"; // Captcha
-								$output_file .= "0" . "\n"; // Upgrade
-								$output_file .= "1" . "\n"; // Coming soon (maintenance)
-								$output_file .= "0" . "\n"; // Debug General Front
-								$output_file .= "0" . "\n"; // Debug Smarty Front
-								$output_file .= "1" . "\n"; // Smarty Force Compile
-								$output_file .= "0" . "\n"; // Rewrite Url
-								$output_file .= "0" . "\n"; // Smarty Caching
-								$output_file .= "3600" . "\n"; // Smarty Caching Lifetime
-								$output_file .= "24" . "\n";   // Médias par page
-								$output_file .= "0" . "\n";    // Anti-flood (login) activé - désactivé par défaut
-								$output_file .= "86400" . "\n"; // Anti-flood: durée de blocage (secondes, 1 jour)
-								$output_file .= "4" . "\n";    // Anti-flood: délai minimum entre 2 tentatives de connexion (secondes)
-								$output_file .= "7" . "\n";    // Durée d'affichage des toasts (secondes)
+								// Réglages : accès base + clé de chiffrement dans sbdbconfig.php
+								// (au-dessus du site si possible, sinon à sa racine), le reste
+								// dans la table sb_settings. Plus rien dans settings.txt.
+								// Voir inc/sbuiadmin-settings.php.
+								require_once(dirname(__DIR__) . '/inc/sbuiadmin-settings.php');
+								$sb_install_ok = true;
+								if ($install_type != 'un-install') {
+									$sb_db_existing = sbDbConfig(true);
+									$sb_db_new = array(
+										'host'     => (string) $_SESSION['database_host'],
+										'name'     => (string) $_SESSION['database_name'],
+										'user'     => (string) $_SESSION['database_username'],
+										'password' => (string) $_SESSION['database_password'],
+										'prefix'   => (string) $_SESSION['database_prefix'],
+										// Mise à jour : même clé, sinon les secrets déjà chiffrés
+										// en base deviendraient illisibles
+										'key'      => ($install_type == 'update' && $sb_db_existing['source'] !== 'legacy') ? $sb_db_existing['key'] : '',
+									);
+									$sb_dbconfig_file = sbDbConfigWrite($sb_db_new);
+									if (!$sb_dbconfig_file) {
+										$sb_install_ok = false;
+										$error_mg[] = "<b>Erreur :</b> impossible d'écrire sbdbconfig.php. Rendez inscriptible le dossier <code>" . htmlspecialchars(dirname(dirname(__DIR__, 2))) . "</code> (recommandé, hors du site) ou <code>" . htmlspecialchars(dirname(__DIR__, 2)) . "</code>, puis relancez l'installation.";
+									} else {
+										sbDbConfig(true);
+										sbSettingsDb(true);
+										$sb_install_settings = array(
+											'customer_name'         => $_SESSION['settings_customer_name'],
+											'administrators'        => ($sb_set_admin && $admin_username !== '') ? $admin_username : 'admin',
+											'medias_dir'            => $_SESSION['settings_path_upload'],
+											'upload_size_limit'     => '2MB',
+											'modules'               => '',
+											'debug_admin'           => '0',
+											'debug_form'            => '0',
+											'debug_smarty_admin'    => '0',
+											'upload_exts'           => 'jpg,jpeg,png,gif,webp,pdf,mp4',
+											'medias_url'            => $_SESSION['settings_url_upload'],
+											'upload_item_limit'     => '20',
+											'site_url'              => $_SESSION['settings_customer_url'],
+											'sandbox'               => '1',
+											'cms'                   => '1',
+											'scaling_maxsize'       => '1024',
+											'recaptcha_public'      => $_SESSION['settings_recaptcha_public'],
+											'recaptcha_secret'      => $_SESSION['settings_recaptcha_private'],
+											'captcha_mode'          => '0',
+											'upgrade_mode'          => '0',
+											'maintenance'           => '1',
+											'debug_front'           => '0',
+											'debug_smarty_front'    => '0',
+											'smarty_force_compile'  => '1',
+											'rewrite_url'           => '0',
+											'smarty_caching'        => '0',
+											'smarty_cache_lifetime' => '3600',
+											'medias_per_page'       => '24',
+											'flood_enabled'         => '0',
+											'flood_expiration'      => '86400',
+											'flood_login_delay'     => '4',
+											'toast_duration'        => '7',
+											'pagebuilder_modules'   => '',
+										);
+										// Mise à jour : ne complète que les réglages absents
+										if (!sbSettingsSave($sb_install_settings, $install_type == 'update')) {
+											$sb_install_ok = false;
+											$error_mg[] = "<b>Erreur :</b> impossible d'enregistrer les réglages dans la table " . htmlspecialchars(sbSettingsTable()) . ".";
+										} else {
+											// Un ancien settings.txt rempli serait re-migré par-dessus
+											// au premier chargement : on le vide.
+											@file_put_contents($settings_file, '', LOCK_EX);
+										}
+									}
+								}
 
-								// Locker le fichier pour qu'une seule personne a la fois ecrive dedans
-								$result_edit = file_put_contents($settings_file, $output_file, FILE_USE_INCLUDE_PATH | LOCK_EX);
-								
 								// Injection des données (Dashboard File)
 								$output_file_2  = $_SESSION['database_prefix'] . "sb_sandbox" . "\n";
 								$output_file_2 .= $_SESSION['database_prefix'] . "sb_sandbox" . "\n";
@@ -213,8 +287,9 @@
 								@unlink($session_name_file);
 								require_once(dirname(__DIR__, 2) . '/inc/sbsession.php');
 
-								# Lock the installer
-								@file_put_contents($installer_lock, "installer lock file");
+								# Lock the installer (pas si les réglages n'ont pu être écrits :
+								# l'installation doit rester relançable)
+								if ($sb_install_ok) @file_put_contents($installer_lock, "installer lock file");
 
 								//// now try to create file and write information
 								//$config_file = file_get_contents(EI_CONFIG_FILE_TEMPLATE);
@@ -249,6 +324,11 @@
 								if (!$set_errors) {
 									$completed = true;
 									session_destroy();
+									// Jeton du bouton « Supprimer le répertoire install/ »
+									$sb_remove_token = bin2hex(random_bytes(16));
+									if (!@file_put_contents(__DIR__ . '/installer/remove.token', hash('sha256', $sb_remove_token) . "\n" . time() . "\n", LOCK_EX)) {
+										$sb_remove_token = '';
+									}
 								}
 								
 							}							
@@ -323,6 +403,12 @@
 							<div class="alert alert-success"><?php echo str_replace('_CONFIG_FILE_', EI_CONFIG_FILE_PATH, lang_key('file_successfully_rewritten')); ?></div>
 							<div class="alert alert-warning"><?php echo lang_key('alert_remove_files'); ?></div>
 							<?php echo (EI_POST_INSTALLATION_TEXT != '') ? '<div class="alert alert-info">'.EI_POST_INSTALLATION_TEXT.'</div>' : ''; ?>
+							<?php if (!empty($sb_remove_token)) { ?>
+							<div class="sb-remove-install" style="margin: 10px 0;">
+								<button type="button" class="form_button" data-token="<?php echo htmlspecialchars($sb_remove_token); ?>" onclick="sbRemoveInstall(this)">Supprimer le répertoire install/ maintenant</button>
+								<div class="sb-remove-install-result alert" style="display: none; margin-top: 10px;"></div>
+							</div>
+							<?php } ?>
 							<br /><br />
 							<?php if(EI_APPLICATION_START_FILE != ''){ ?><a href="<?php echo '../'.EI_APPLICATION_START_FILE;?>"><?php echo lang_key('proceed_to_login_page'); ?></a><?php } ?>
 						</td>
@@ -344,6 +430,12 @@
 							<div class="alert alert-success"><?php echo str_replace('_CONFIG_FILE_', EI_CONFIG_FILE_PATH, lang_key('file_successfully_created')); ?></div>
 							<div class="alert alert-warning"><?php echo lang_key('alert_remove_files'); ?></div>
 							<?php echo (EI_POST_INSTALLATION_TEXT != '') ? '<div class="alert alert-info">'.EI_POST_INSTALLATION_TEXT.'</div>' : ''; ?>
+							<?php if (!empty($sb_remove_token)) { ?>
+							<div class="sb-remove-install" style="margin: 10px 0;">
+								<button type="button" class="form_button" data-token="<?php echo htmlspecialchars($sb_remove_token); ?>" onclick="sbRemoveInstall(this)">Supprimer le répertoire install/ maintenant</button>
+								<div class="sb-remove-install-result alert" style="display: none; margin-top: 10px;"></div>
+							</div>
+							<?php } ?>
 							<br /><br />
 							<?php if(EI_APPLICATION_START_FILE == '') { ?><a class="form_button" href="<?php echo '../'.EI_APPLICATION_START_FILE;?>"><?php echo lang_key('proceed_to_login_page'); ?></a><?php } ?>
 							&nbsp;&nbsp;&nbsp;
@@ -356,6 +448,39 @@
 			</table>
 			<br>
 
+			<?php if (!empty($sb_remove_token)) { ?>
+			<script>
+			// Suppression de install/ en AJAX (voir le haut de ce fichier)
+			function sbRemoveInstall(btn) {
+				if (!confirm('Supprimer définitivement le répertoire install/ ?')) return;
+				var box = btn.parentNode.querySelector('.sb-remove-install-result');
+				var body = new FormData();
+				body.append('task', 'sb_remove_install');
+				body.append('sb_remove_token', btn.getAttribute('data-token'));
+				btn.disabled = true;
+				fetch('complete_installation.php', {method: 'POST', body: body, credentials: 'same-origin'})
+					.then(function (r) { return r.json(); })
+					.then(function (j) {
+						box.className = 'sb-remove-install-result alert ' + (j.ok ? 'alert-success' : 'alert-danger');
+						box.textContent = j.message;
+						box.style.display = 'block';
+						if (j.ok) {
+							btn.style.display = 'none';
+							var warn = document.querySelectorAll('.alert-warning');
+							for (var i = 0; i < warn.length; i++) warn[i].style.display = 'none';
+						} else {
+							btn.disabled = false;
+						}
+					})
+					.catch(function () {
+						box.className = 'sb-remove-install-result alert alert-danger';
+						box.textContent = "Erreur réseau : supprimez le répertoire install/ à la main.";
+						box.style.display = 'block';
+						btn.disabled = false;
+					});
+			}
+			</script>
+			<?php } ?>
 			<?php
 				if(EI_ALLOW_START_ALL_OVER && $completed){
 					echo '<h3>'.lang_key('start_all_over').'</h3>';
