@@ -136,7 +136,10 @@
 								<li>Taille maximum autorisée à l'upload : <span class="red">{$smarty.const._AM_MEDIAS_SIZE_LIMIT}</span>
 									<br><small style="color:var(--warning)">Si des fichiers volumineux (ou autres) ne passent pas à l'upload, vérifiez directement la configuration serveur (upload_max_filesize / post_max_size ci-dessus).</small>
 								</li>
-								<li>Types de fichier autorisés : {foreach $sbfiles_medias_exts_allowed as $ext_allowed}<span class="sbmedia_ext_allowed">{$ext_allowed}</span> {foreachelse}Aucune{/foreach}</li>
+								<li>Types de fichier autorisés : {foreach $sbfiles_medias_exts_allowed as $ext_allowed}<span class="sbmedia_ext_allowed">{$ext_allowed|escape}</span> {foreachelse}<span class="red">Aucun</span>{/foreach}
+									{if $sbfiles_medias_exts_refused}<br><small style="color:var(--warning)">Ignorés pour sécurité (présents dans la Configuration) : {foreach $sbfiles_medias_exts_refused as $ext_refused}{$ext_refused|escape}{if !$ext_refused@last}, {/if}{/foreach}</small>{/if}
+									<br><small>Types acceptables : {foreach $sbfiles_medias_exts_safe as $ext_safe}{$ext_safe}{if !$ext_safe@last}, {/if}{/foreach}</small>
+								</li>
 								<li>Répertoire de depôt : {foreach $sbfiles_medias_dirs_allowed as $dir_allowed}<span class="sbmedia_ext_allowed">{$dir_allowed}</span> {foreachelse}Aucun{/foreach}</li>
 								<li>Nombre de fichiers uploadables simultanément : {$smarty.const._AM_MEDIAS_ITEM_LIMIT}</li>
 							</ul>

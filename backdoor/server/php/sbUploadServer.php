@@ -103,8 +103,12 @@ $uploader = new qqFileUploader();
 // Specify the list of valid extensions, ex. array("jpeg", "xml", "bmp")
 // --- Liste blanche : la liste noire ci-dessus arrête les scripts serveur,
 // --- mais laissait passer .html / .svg / .xml, servis depuis le domaine du
-// --- site avec leur JavaScript. Seuls les types utilisés par la médiathèque.
-$uploader->allowedExtensions = array('jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'mp4');
+// --- site avec leur JavaScript. Liste calculée dans sbuiadmin-config.php
+// --- (réglage borné à une liste sûre). Vide = qqFileUploader accepte TOUT.
+if (empty($sbfiles_medias_exts_allowed)) {
+	sbUploadDeny('Aucun type de fichier autorisé (voir Configuration).');
+}
+$uploader->allowedExtensions = $sbfiles_medias_exts_allowed;
 
 // Specify max file size in bytes.
 //$uploader->sizeLimit = 10 * 1024 * 1024;

@@ -93,7 +93,13 @@ defined('_AM_MEDIAS_DIR') OR define('_AM_MEDIAS_DIR', trim($sb_settings_config[6
 defined('_AM_MEDIAS_URL') OR define('_AM_MEDIAS_URL', trim($sb_settings_config[13]));
 // --- Array of allowed extensions
 //$sbfiles_medias_exts_allowed = array("jpg","jpeg","bmp","png","pdf", "xml", "txt", "mp4");
-$sbfiles_medias_exts_allowed = explode(",", trim($sb_settings_config[12]));
+// --- Le réglage ne peut que restreindre cette liste sûre : c'est elle que
+// --- server/php/sbUploadServer.php applique, l'encart des médias et Fine
+// --- Uploader affichent donc exactement ce que le serveur accepte.
+$sbfiles_medias_exts_safe    = array('jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'mp4', 'm4v', 'zip', 'gz');
+$sbfiles_medias_exts_setting = array_values(array_unique(array_filter(array_map(function ($e) { return strtolower(trim($e)); }, explode(",", trim($sb_settings_config[12]))), 'strlen')));
+$sbfiles_medias_exts_allowed = array_values(array_intersect($sbfiles_medias_exts_setting, $sbfiles_medias_exts_safe));
+$sbfiles_medias_exts_refused = array_values(array_diff($sbfiles_medias_exts_setting, $sbfiles_medias_exts_safe));
 // --- Define item Limit (Multiple uploads simultaneously)
 defined('_AM_MEDIAS_ITEM_LIMIT') OR define('_AM_MEDIAS_ITEM_LIMIT', trim($sb_settings_config[14]));
 // --- Define size Limit for your customers

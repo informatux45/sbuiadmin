@@ -43,7 +43,24 @@ global $sbfiles_medias_dirs_allowed, $sbfiles_medias_exts_allowed;
 // correctif, la ligne ci-dessous s'exécutait avant l'import global et ne
 // modifiait donc qu'une variable locale jamais relue par scan() plus bas
 // (bug resté latent : "subdir" n'avait jamais servi ailleurs dans le code).
-if (isset($_GET['subdir']) && $_GET['subdir'] != '') $sbfiles_medias_dirs_allowed = rtrim($sbfiles_medias_dirs_allowed . DIRECTORY_SEPARATOR . $_GET['subdir'], "/");
+// subdir= : segments [A-Za-z0-9_-] seulement, et le dossier doit rester sous
+// celui des médias ("../../" listait toute la racine web). Un sous-dossier
+// bien formé mais absent donne une liste vide (créé au premier upload).
+$sb_transfert_subdir = '';
+$sb_transfert_empty  = false;
+if (isset($_GET['subdir']) && is_string($_GET['subdir']) && preg_match('#^[A-Za-z0-9_-]+(/[A-Za-z0-9_-]+)*$#', trim($_GET['subdir'], '/'))) {
+	$sb_transfert_base = realpath($sbfiles_medias_dirs_allowed);
+	$sb_transfert_dir  = realpath($sbfiles_medias_dirs_allowed . '/' . trim($_GET['subdir'], '/'));
+	if ($sb_transfert_base && $sb_transfert_dir === false) {
+		$sb_transfert_subdir = trim($_GET['subdir'], '/');
+		$sb_transfert_empty  = true;
+	} elseif ($sb_transfert_base && is_dir($sb_transfert_dir) && strpos($sb_transfert_dir, $sb_transfert_base . DIRECTORY_SEPARATOR) === 0) {
+		$sb_transfert_subdir = trim($_GET['subdir'], '/');
+		$sbfiles_medias_dirs_allowed = $sbfiles_medias_dirs_allowed . '/' . $sb_transfert_subdir;
+	}
+}
+// id= est recopié dans les onclick de transfert.tpl
+$sb_transfert_id = (isset($_GET['id']) && is_string($_GET['id'])) ? preg_replace('/[^A-Za-z0-9_-]/', '', $_GET['id']) : '';
 
 // ---------------------------------------------------
 // ---------------------------------------------------
@@ -55,14 +72,13 @@ if (isset($_GET['subdir']) && $_GET['subdir'] != '') $sbfiles_medias_dirs_allowe
 // Scan multiple directories for all files, no sub-dirs
 // with an array of extensions
 // -----------------------
-if ($_GET['ext']) {
-	// Form extensions
-	$sbfiles_medias_exts_allowed = explode(",", $_GET['ext']);
-	$sbfiles_arr = $sbmedias->scan($sbfiles_medias_dirs_allowed, $sbfiles_medias_exts_allowed);
-} else {
-	// Default (config administration)
-	$sbfiles_arr = $sbmedias->scan($sbfiles_medias_dirs_allowed, $sbfiles_medias_exts_allowed);	
+// ext= ne peut que restreindre la liste de la configuration : il est
+// recopié dans le <script> de transfert.tpl (sans échappement Smarty).
+if (!empty($_GET['ext']) && is_string($_GET['ext'])) {
+	$sb_transfert_exts = array_values(array_intersect(array_map(function ($e) { return strtolower(trim($e)); }, explode(",", (string) $_GET['ext'])), $sbfiles_medias_exts_allowed));
+	if ($sb_transfert_exts) $sbfiles_medias_exts_allowed = $sb_transfert_exts;
 }
+$sbfiles_arr = $sb_transfert_empty ? array() : $sbmedias->scan($sbfiles_medias_dirs_allowed, $sbfiles_medias_exts_allowed);
 
 $sbfiles_new = array();
 $sbfiles     = array();
@@ -95,6 +111,8 @@ $sbsmarty->assign('medias_all', $sbfiles);
 // chaîne, pas un tableau), qui ne matche jamais aucune extension côté
 // Fine Uploader et rejette systématiquement tout upload.
 $sbsmarty->assign('sbfiles_medias_exts_allowed', $sbfiles_medias_exts_allowed);
+$sbsmarty->assign('sb_transfert_subdir', $sb_transfert_subdir);
+$sbsmarty->assign('sb_transfert_id', $sb_transfert_id);
 
 
 // ---------------------------------------------------

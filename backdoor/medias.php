@@ -39,7 +39,7 @@ $sb_msg_valid = false;
 // -----------------------
 // Global MEDIAS
 // -----------------------
-global $sbfiles_medias_dirs_allowed, $sbfiles_medias_exts_allowed;
+global $sbfiles_medias_dirs_allowed, $sbfiles_medias_exts_allowed, $sbfiles_medias_exts_refused, $sbfiles_medias_exts_safe;
 
 // Get ID of the input for DOM Inject
 $sbid = intval($_GET['id']);
@@ -116,6 +116,8 @@ $sbsmarty->assign('sbpagination', $sbpagination);
 
 // --- ASSIGN sbfile medias infos
 $sbsmarty->assign('sbfiles_medias_exts_allowed', $sbfiles_medias_exts_allowed);
+$sbsmarty->assign('sbfiles_medias_exts_refused', $sbfiles_medias_exts_refused);
+$sbsmarty->assign('sbfiles_medias_exts_safe', $sbfiles_medias_exts_safe);
 $sbsmarty->assign('sbfiles_medias_dirs_allowed', $sbfiles_medias_dirs_allowed);
 
 // --- ASSIGN Droits (l'upload lui-même est aussi vérifié côté serveur dans

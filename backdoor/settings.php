@@ -39,6 +39,9 @@ $sbsmarty->assign('module_url', $module_url);
 $sb_msg_error = false;
 $sb_msg_valid = false;
 
+// Liste sûre des types d'upload (inc/sbuiadmin-config.php), rappelée dans l'aide
+global $sbfiles_medias_exts_safe;
+
 /* ----------------------------- *
 // SB Settings File
  * Referentiel du fichier SETTINGS
@@ -245,7 +248,7 @@ switch($action) {
 		$sbform->addInput('text', 'URL d\'upload', array ('name' => 'urluploads', 'value' => "$sb_config_urluploads", 'placeholder' => "URL de l'upload (http://...)"), true, false, "Ne pas mettre le  <span style='color: red;'>/</span>  à la fin");
 		$sbform->addInput('text', 'Taille max. autorisée pour l\'upload des médias (client)', array ('name' => 'upload_max', 'value' => "$sb_config_upload_max", 'placeholder' => "Répertoire de l'upload"), true, false, "Usage : 10KB, 10.5KB, 2MB, 2.5MB, 1GB, 1TB");
 		// Upload exts Allowed
-		$sbform->addInput('text', 'Extensions autorisées', array ('name' => 'upload_exts', 'value' => "$sb_config_upload_exts", 'placeholder' => "Extensions autorisées"), true, false, "Extensions autorisées à l'upload dans votre administration séparés par des virgules sans espace");
+		$sbform->addInput('text', 'Extensions autorisées', array ('name' => 'upload_exts', 'value' => "$sb_config_upload_exts", 'placeholder' => "Extensions autorisées"), true, false, "Extensions autorisées à l'upload dans votre administration, séparées par des virgules.<br>Seules celles-ci sont acceptées : <b>" . implode(", ", $sbfiles_medias_exts_safe) . "</b> (les autres sont ignorées pour sécurité)");
 		$sbform->addInput('text', "Nombre d'uploads simultanés", array ('name' => 'upload_limit', 'value' => "$sb_config_upload_limit", 'placeholder' => "Nombre d'uploads simultanés"), true, false);
 		$sbform->addInput('text', "Taille maximum autorisée", array ('name' => 'scaling_maxsize', 'value' => "$sb_config_scaling_maxsize", 'placeholder' => "Taille maximum autorisée en pixels"), true, false, "Taille en pixels maximum autorisée pour vos médias (largeur et hauteur)<br>Ex : <b>1024</b> (CORRECT) --- Ex : <b>1024px</b> (INCORRECT)");
 		$sbform->addInput('text', 'Médias par page', array ('name' => 'medias_per_page', 'value' => "$sb_config_medias_per_page", 'placeholder' => "Nombre de médias par page"), true, false, "Nombre d'images affichées par page dans le module Médias");

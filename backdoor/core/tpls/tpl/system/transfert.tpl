@@ -94,9 +94,9 @@
 		{if isset($smarty.get.editor) && $smarty.get.editor == 'ck'}
 			<p class="sbmedia" target="_parent" onclick="sbTransfertCkeditor('{$smarty.const._AM_MEDIAS_URL}/{$sbmedia|@sbFileRealname}')">
 		{elseif isset($smarty.get.editor) && $smarty.get.editor == 'tiny'}
-			<p class="sbmedia" target="_parent" onclick='sbTransfertTiny("{$sbmedia}","{$smarty.get.id}","{$smarty.const._AM_MEDIAS_URL}")'>
+			<p class="sbmedia" target="_parent" onclick='sbTransfertTiny("{$sbmedia}","{$sb_transfert_id}","{$smarty.const._AM_MEDIAS_URL}")'>
 		{else}
-			<p class="sbmedia" target="_parent" onclick='sbTransfert("{$sbmedia}","{$smarty.get.id}")'>
+			<p class="sbmedia" target="_parent" onclick='sbTransfert("{$sbmedia}","{$sb_transfert_id}")'>
 		{/if}
 
 			{* Display thumbnail on the fly OR in the cache if exist and if it's an image ;-) *}
@@ -143,7 +143,7 @@
 		$('#fine-uploader-gallery').fineUploader({
 			template: 'qq-template-gallery',
 			request: {
-				endpoint: 'server/php/sbUploadServer.php{if isset($smarty.get.subdir)}?subdir={$smarty.get.subdir}{/if}'
+				endpoint: 'server/php/sbUploadServer.php{if $sb_transfert_subdir}?subdir={$sb_transfert_subdir|escape:'url'}{/if}'
 			},
 			scaling: {
 				sendOriginal: false,
@@ -159,7 +159,7 @@
 				}
 			},
 			validation: {
-				allowedExtensions: [{if isset($sbfiles_medias_exts_allowed) && $sbfiles_medias_exts_allowed}{foreach $sbfiles_medias_exts_allowed as $ext_allowed}"{$ext_allowed}"{if !$ext_allowed@last},{/if}{/foreach}{else}"jpg","jpeg","png","gif","pdf","xml","mp4"{/if}],
+				allowedExtensions: [{if isset($sbfiles_medias_exts_allowed) && $sbfiles_medias_exts_allowed}{foreach $sbfiles_medias_exts_allowed as $ext_allowed}"{$ext_allowed}"{if !$ext_allowed@last},{/if}{/foreach}{else}"jpg"{/if}],
 				itemLimit: {$smarty.const._AM_MEDIAS_ITEM_LIMIT},
 				sizeLimit: {$smarty.const._AM_MEDIAS_SIZE_LIMIT|@sbToByteSize}, // Bytes
 			},

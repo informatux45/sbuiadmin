@@ -118,7 +118,7 @@ class medias {
             }
         }
 
-        if($path_errors){echo "The following directories do not exists<br />";die(var_dump($path_errors));}
+        if($path_errors){die("The following directories do not exists<br />" . implode('<br />', array_map('htmlspecialchars', $path_errors)));}
     }
     
     static private function scan_dir($dir) {
