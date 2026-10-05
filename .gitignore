@@ -39,3 +39,9 @@ backdoor/assets/dist/js/vendor/tagify/_tagify.min.js_
 # Interrupteur de secours de la double authentification (voir
 # backdoor/inc/sbuiadmin-2fa.php) : propre à un serveur, jamais versionné.
 backdoor/inc/admin/2fa-disabled
+
+# Accès à la base et clé de chiffrement des secrets (voir
+# backdoor/inc/sbuiadmin-settings.php), et copies de l'ancien settings.txt
+# faites à la migration. Propres à chaque installation : NE JAMAIS committer.
+sbdbconfig.php
+sbsettings-backup-*.php

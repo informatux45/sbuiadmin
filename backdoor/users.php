@@ -478,20 +478,17 @@ switch($action) {
 		$formType        = "blockedipsettings";
 		$btn_add_edit    = "Modifier";
 		$legend_add_edit = "Paramètres anti-flood (IPs bloquées)";
-		$sb_settings_file = _AM_SETTINGS_FILE;
 
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
 		if ($_POST['form_submit']) {
-			// Ne touche qu'aux 3 lignes anti-flood (32-34) - le reste du fichier
-			// (DB, uploads, reCAPTCHA...) est préservé tel quel.
-			$sb_settings_current = file($sb_settings_file);
-			$sb_settings_current[32] = (($_POST['flood_enabled'] === "on") ? "1" : "0") . "\n";
-			$sb_settings_current[33] = $sbsanitize->displayText($_POST['flood_expiration'], 'UTF-8', 1, 0) . "\n";
-			$sb_settings_current[34] = $sbsanitize->displayText($_POST['flood_login_delay'], 'UTF-8', 1, 0) . "\n";
-
-			$result_edit = file_put_contents($sb_settings_file, implode('', $sb_settings_current), FILE_USE_INCLUDE_PATH | LOCK_EX);
+			// Réglages en base (inc/sbuiadmin-settings.php)
+			$result_edit = sbSettingsSave(array(
+				'flood_enabled'     => (isset($_POST['flood_enabled']) && $_POST['flood_enabled'] === "on") ? '1' : '0',
+				'flood_expiration'  => $sbsanitize->displayText($_POST['flood_expiration'], 'UTF-8', 1, 0),
+				'flood_login_delay' => $sbsanitize->displayText($_POST['flood_login_delay'], 'UTF-8', 1, 0),
+			));
 
 			if ($result_edit) {
 				$sb_msg_valid = 'Configuration modifiée avec succès';
@@ -501,11 +498,10 @@ switch($action) {
 		}
 
 		// --------------------------------
-		// --- Ouverture du fichier
-		$sb_settings_current      = file($sb_settings_file);
-		$sb_config_flood_enabled  = trim($sb_settings_current[32]);
-		$sb_config_flood_expiration = trim($sb_settings_current[33]);
-		$sb_config_flood_login_delay = trim($sb_settings_current[34]);
+		// --- Réglages (base de données)
+		$sb_config_flood_enabled     = sbSetting('flood_enabled');
+		$sb_config_flood_expiration  = sbSetting('flood_expiration');
+		$sb_config_flood_login_delay = sbSetting('flood_login_delay');
 
 		// --------------------------------
 		// --- Define variables

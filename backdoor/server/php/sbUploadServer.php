@@ -57,8 +57,6 @@ if (!sbHasRight('medias', 'add')) {
 // Include the uploader class
 require_once '../../server/php/qqFileUploader.php';
 
-// Get Settings
-$sb_upload_config = file('../../inc/admin/settings.txt');
 
 // -----------------------------------------------------------------------
 // Être connecté ne suffit pas : allowedExtensions est vide (tout type
@@ -106,8 +104,8 @@ if (isset($_REQUEST['subdir'])) {
 		$sbfiles_medias_subdir = '/' . $sb_upload_subdir;
 	}
 }
-$sbfiles_medias_dir = '../../' . trim($sb_upload_config[6]) . $sbfiles_medias_subdir;
-$sb_upload_root = realpath('../../' . trim($sb_upload_config[6]));
+$sbfiles_medias_dir = '../../' . _AM_MEDIAS_DIR . $sbfiles_medias_subdir;
+$sb_upload_root = realpath('../../' . _AM_MEDIAS_DIR);
 $sb_upload_real = realpath($sbfiles_medias_dir);
 if (!$sb_upload_root || !$sb_upload_real || !is_dir($sb_upload_real)
 	|| ($sb_upload_real !== $sb_upload_root && strpos($sb_upload_real . DIRECTORY_SEPARATOR, $sb_upload_root . DIRECTORY_SEPARATOR) !== 0)) {

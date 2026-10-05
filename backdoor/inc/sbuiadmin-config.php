@@ -19,8 +19,13 @@ defined('SBUIADMIN_PATH') or die('Are you crazy!');
 // Don't remove this setting              -
 // ----------------------------------------
 // --- Admin Settings File
+// Ancien fichier positionnel : vidé une fois migré en base (gardé pour la
+// migration automatique, voir inc/sbuiadmin-settings.php)
 defined('_AM_SETTINGS_FILE') OR define('_AM_SETTINGS_FILE', SBUIADMIN_PATH . '/inc/admin/settings.txt');
-$sb_settings_config = file(_AM_SETTINGS_FILE);
+// --- Réglages : table sb_settings, accès base dans sbdbconfig.php
+require_once(__DIR__ . '/sbuiadmin-settings.php');
+// Ancien tableau positionnel, pour le code tiers qui le lirait encore
+$sb_settings_config = sbSettingsLegacyArray();
 // --- Admin Dashboard File
 defined('_AM_DASHBOARD_FILE') OR define('_AM_DASHBOARD_FILE', SBUIADMIN_PATH . '/inc/admin/dashboard.txt');
 // --- Front Theme File
@@ -33,12 +38,12 @@ defined('_AM_THEME_FILE') OR define('_AM_THEME_FILE', SBUIADMIN_PATH . '/inc/adm
 // --- Defined Safe Pages
 $sb_safe_pages = ['index','sandbox','settings','cache','server','dashboard','theme','themeinfos','session','database','users','logaccess','menu','pages','blocs','medias','transfert','cmsconfig','slider','news','contact','tabbs','toggle','download','gallery','gmaps','table','toolbarck','faq','messages','profile','boutique'];
 // --- Defined Safe Modules
-$sb_safe_modules = explode(",", trim($sb_settings_config[8]));
+$sb_safe_modules = explode(",", sbSetting('modules'));
 // ------------------------------------------
 // --- Debug
-defined('_AM_SITE_DEBUG') OR define('_AM_SITE_DEBUG', (trim($sb_settings_config[9]) == 1) ? true : false);
-defined('_AM_SITE_DEBUG_FORM') OR define('_AM_SITE_DEBUG_FORM', (trim($sb_settings_config[10]) == 1) ? true : false);
-defined('_AM_SMARTY_DEBUGGING') OR define('_AM_SMARTY_DEBUGGING', (trim($sb_settings_config[11]) == 1) ? true : false);
+defined('_AM_SITE_DEBUG') OR define('_AM_SITE_DEBUG', (sbSetting('debug_admin') == 1) ? true : false);
+defined('_AM_SITE_DEBUG_FORM') OR define('_AM_SITE_DEBUG_FORM', (sbSetting('debug_form') == 1) ? true : false);
+defined('_AM_SMARTY_DEBUGGING') OR define('_AM_SMARTY_DEBUGGING', (sbSetting('debug_smarty_admin') == 1) ? true : false);
 // ------------------------------------------
 // DEGUB Mode
 if (_AM_SITE_DEBUG) {
@@ -50,10 +55,10 @@ if (_AM_SITE_DEBUG) {
 }
 // ------------------------------------------
 // CAPTCHA Mode
-defined('_AM_CAPTCHA_MODE') OR define('_AM_CAPTCHA_MODE', (trim($sb_settings_config[22]) == 1) ? true : false);
+defined('_AM_CAPTCHA_MODE') OR define('_AM_CAPTCHA_MODE', (sbSetting('captcha_mode') == 1) ? true : false);
 // ------------------------------------------
 // UPGRADE Mode
-defined('_AM_UPGRADE_MODE') OR define('_AM_UPGRADE_MODE', (trim($sb_settings_config[23]) == 1) ? true : false);
+defined('_AM_UPGRADE_MODE') OR define('_AM_UPGRADE_MODE', (sbSetting('upgrade_mode') == 1) ? true : false);
 // ------------------------------------------
 // --- Smarty CONFIG
 defined('_AM_SMARTY_FORCE_COMPILE') OR define('_AM_SMARTY_FORCE_COMPILE', true);
@@ -61,22 +66,17 @@ defined('_AM_SMARTY_CACHING') OR define('_AM_SMARTY_CACHING', false);
 defined('_AM_SMARTY_CACHE_LIFETIME') OR define('_AM_SMARTY_CACHE_LIFETIME', 120);
 // ------------------------------------------
 // --- MySQL Config (Host Client)
-// Search if there is a socket
-if (strpos(trim($sb_settings_config[2]), ":") !== false) {
-	// Define socket
-	list($db_host, $db_socket) = explode(":", trim($sb_settings_config[2]));
-	defined('_AM_DB_HOST') OR define('_AM_DB_HOST',	$db_host);
-	defined('_AM_DB_SOCKET') OR define('_AM_DB_SOCKET',	$db_socket);
-} else {
-	// Pas de socket
-	defined('_AM_DB_HOST') OR define('_AM_DB_HOST', trim($sb_settings_config[2]));
-	defined('_AM_DB_SOCKET') OR define('_AM_DB_SOCKET', false);
-}
-defined('_AM_DB_PORT') OR define('_AM_DB_PORT', 3306);
-defined('_AM_DB_NAME') OR define('_AM_DB_NAME', trim($sb_settings_config[3]));
-defined('_AM_DB_USER') OR define('_AM_DB_USER', trim($sb_settings_config[4]));
-defined('_AM_DB_PWD') OR define('_AM_DB_PWD', trim($sb_settings_config[5]));
-defined('_AM_DB_PREFIX') OR define('_AM_DB_PREFIX', trim($sb_settings_config[21]));
+// sbdbconfig.php (ou variables d'environnement SBUIADMIN_DB_*)
+$sb_db_config = sbDbConfig();
+list($sb_db_host, $sb_db_port, $sb_db_socket) = sbDbHostParts($sb_db_config['host']);
+defined('_AM_DB_HOST') OR define('_AM_DB_HOST', $sb_db_host);
+defined('_AM_DB_SOCKET') OR define('_AM_DB_SOCKET', $sb_db_socket);
+defined('_AM_DB_PORT') OR define('_AM_DB_PORT', $sb_db_port);
+defined('_AM_DB_NAME') OR define('_AM_DB_NAME', $sb_db_config['name']);
+defined('_AM_DB_USER') OR define('_AM_DB_USER', $sb_db_config['user']);
+defined('_AM_DB_PWD') OR define('_AM_DB_PWD', $sb_db_config['password']);
+defined('_AM_DB_PREFIX') OR define('_AM_DB_PREFIX', $sb_db_config['prefix']);
+unset($sb_db_config, $sb_db_host, $sb_db_port, $sb_db_socket);
 
 // ------------------------------------------
 // ---------------- MEDIAS ------------------
@@ -87,21 +87,21 @@ defined('_AM_DB_PREFIX') OR define('_AM_DB_PREFIX', trim($sb_settings_config[21]
 // --- Scan multiple directories for all files, no sub-dirs
 // --- Chemin relatif (obligatoirement), pas d'absolu !!!
 // --- Ne pas mettre le "/" à la fin
-$sbfiles_medias_dirs_allowed = trim($sb_settings_config[6]);
+$sbfiles_medias_dirs_allowed = sbSetting('medias_dir');
 // --- Pour vos formulaires ;-)
-defined('_AM_MEDIAS_DIR') OR define('_AM_MEDIAS_DIR', trim($sb_settings_config[6]));
-defined('_AM_MEDIAS_URL') OR define('_AM_MEDIAS_URL', trim($sb_settings_config[13]));
+defined('_AM_MEDIAS_DIR') OR define('_AM_MEDIAS_DIR', sbSetting('medias_dir'));
+defined('_AM_MEDIAS_URL') OR define('_AM_MEDIAS_URL', sbSetting('medias_url'));
 // --- Array of allowed extensions
 //$sbfiles_medias_exts_allowed = array("jpg","jpeg","bmp","png","pdf", "xml", "txt", "mp4");
 // --- Le réglage ne peut que restreindre cette liste sûre : c'est elle que
 // --- server/php/sbUploadServer.php applique, l'encart des médias et Fine
 // --- Uploader affichent donc exactement ce que le serveur accepte.
 $sbfiles_medias_exts_safe    = array('jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'mp4', 'm4v', 'zip', 'gz');
-$sbfiles_medias_exts_setting = array_values(array_unique(array_filter(array_map(function ($e) { return strtolower(trim($e)); }, explode(",", trim($sb_settings_config[12]))), 'strlen')));
+$sbfiles_medias_exts_setting = array_values(array_unique(array_filter(array_map(function ($e) { return strtolower(trim($e)); }, explode(",", sbSetting('upload_exts'))), 'strlen')));
 $sbfiles_medias_exts_allowed = array_values(array_intersect($sbfiles_medias_exts_setting, $sbfiles_medias_exts_safe));
 $sbfiles_medias_exts_refused = array_values(array_diff($sbfiles_medias_exts_setting, $sbfiles_medias_exts_safe));
 // --- Define item Limit (Multiple uploads simultaneously)
-defined('_AM_MEDIAS_ITEM_LIMIT') OR define('_AM_MEDIAS_ITEM_LIMIT', trim($sb_settings_config[14]));
+defined('_AM_MEDIAS_ITEM_LIMIT') OR define('_AM_MEDIAS_ITEM_LIMIT', sbSetting('upload_item_limit'));
 // --- Define size Limit for your customers
 // Usage :
 // ==> 10KB
@@ -110,14 +110,14 @@ defined('_AM_MEDIAS_ITEM_LIMIT') OR define('_AM_MEDIAS_ITEM_LIMIT', trim($sb_set
 // ==> 2.5MB
 // ==> 1GB
 // ==> 1TB
-defined('_AM_MEDIAS_SIZE_LIMIT') OR define('_AM_MEDIAS_SIZE_LIMIT', trim($sb_settings_config[7]));
+defined('_AM_MEDIAS_SIZE_LIMIT') OR define('_AM_MEDIAS_SIZE_LIMIT', sbSetting('upload_size_limit'));
 // --- Define scaling image max (Combined width AND height)
 // unit of measuring: pixels
 // Usage :
 // ==> 1024
-defined('_AM_MEDIAS_SCALING_SIXE_MAX') OR define('_AM_MEDIAS_SCALING_SIXE_MAX', trim($sb_settings_config[18]));
+defined('_AM_MEDIAS_SCALING_SIXE_MAX') OR define('_AM_MEDIAS_SCALING_SIXE_MAX', sbSetting('scaling_maxsize'));
 // --- Define number of media items shown per page (Medias listing pagination)
-defined('_AM_MEDIAS_PER_PAGE') OR define('_AM_MEDIAS_PER_PAGE', trim($sb_settings_config[31]));
+defined('_AM_MEDIAS_PER_PAGE') OR define('_AM_MEDIAS_PER_PAGE', sbSetting('medias_per_page'));
 // ------------------------------------------
 
 // ------------------------------------------
@@ -126,11 +126,11 @@ defined('_AM_MEDIAS_PER_PAGE') OR define('_AM_MEDIAS_PER_PAGE', trim($sb_setting
 // --- Master switch: kept OFF by default the first time this ships, since
 // it's brand new and depends on Memcache being reachable - turn on from
 // Utilisateurs > IP(s) bloquée(s) > Paramètres IP bloquées once verified.
-defined('_AM_FLOOD_ENABLED') OR define('_AM_FLOOD_ENABLED', trim($sb_settings_config[32]) == 1);
+defined('_AM_FLOOD_ENABLED') OR define('_AM_FLOOD_ENABLED', sbSetting('flood_enabled') == 1);
 // --- How long a blocked IP stays blocked (seconds)
-defined('_AM_FLOOD_EXPIRATION') OR define('_AM_FLOOD_EXPIRATION', (int)trim($sb_settings_config[33]));
+defined('_AM_FLOOD_EXPIRATION') OR define('_AM_FLOOD_EXPIRATION', (int)sbSetting('flood_expiration'));
 // --- Minimum delay allowed between two login attempts from the same IP (seconds)
-defined('_AM_FLOOD_LOGIN_DELAY') OR define('_AM_FLOOD_LOGIN_DELAY', (int)trim($sb_settings_config[34]));
+defined('_AM_FLOOD_LOGIN_DELAY') OR define('_AM_FLOOD_LOGIN_DELAY', (int)sbSetting('flood_login_delay'));
 // ------------------------------------------
 
 // ------------------------------------------
@@ -139,7 +139,7 @@ defined('_AM_FLOOD_LOGIN_DELAY') OR define('_AM_FLOOD_LOGIN_DELAY', (int)trim($s
 // . Manage USERS
 // . Manage DATABASE
 // . Manage SETTINGS
-$sbadministrators = explode(",", trim($sb_settings_config[1]));
+$sbadministrators = explode(",", sbSetting('administrators'));
 
 // -----------------------------------------------------------------------------------
 // -----------------------------------------------------------------------------------
@@ -163,7 +163,7 @@ defined('_AM_SITE_IMG_DIR') OR define('_AM_SITE_IMG_DIR', SBUIADMIN_PATH . '/img
 // --- Site UPLOAD URL
 defined('_AM_SITE_IMG_URL') OR define('_AM_SITE_IMG_URL',_AM_SITE_PROTOCOL . SBUIADMIN_URL . 'img/');
 // --- Avatars utilisateurs : sous-dossier "avatars" de la Médiathèque
-// existante (_AM_MEDIAS_DIR = "../upload", voir settings.txt position 6),
+// existante (_AM_MEDIAS_DIR = "../upload", réglage medias_dir),
 // choisi via l'input photo standard (addInput('text', ..., icon=>'photo',
 // medias=>'', subdir=>'avatars')) plutôt qu'un upload maison.
 defined('_AM_AVATARS_DIR') OR define('_AM_AVATARS_DIR', SBUIADMIN_PATH . '/../upload/avatars/');
@@ -173,7 +173,7 @@ defined('_AM_SITE_LANG') OR define('_AM_SITE_LANG', 'french');
 defined('_AM_SITE_LANG_DIR') OR define('_AM_SITE_LANG_DIR', SBUIADMIN_PATH . '/lang/');
 defined('_AM_SITE_LANG_URL') OR define('_AM_SITE_LANG_URL', _AM_SITE_PROTOCOL . SBUIADMIN_URL . 'lang/');
 // --- Customer name
-defined('_AM_SITE_CUSTOMER_NAME') OR define('_AM_SITE_CUSTOMER_NAME', trim($sb_settings_config[0]));
+defined('_AM_SITE_CUSTOMER_NAME') OR define('_AM_SITE_CUSTOMER_NAME', sbSetting('customer_name'));
 // ------------------------------------------
 // --- Defined Safe Pages Admins Only
 $sb_admin_pages = array('sandbox','settings','server','dashboard','theme','cache','toolbarck','database','users');

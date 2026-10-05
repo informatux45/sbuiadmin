@@ -53,8 +53,8 @@
 	// complet du site (une requête = des centaines de pages) et réécrire le
 	// sitemap. Amorçage minimal du back-office + droit "modifier" sur la
 	// configuration CMS (2026-10-01). sbconfig.php (configuration du front)
-	// n'est plus inclus : il ne servait qu'à SB_URL, relu ici dans
-	// settings.txt (même ligne, CFG_SITE_URL = 15), ainsi que
+	// n'est plus inclus : il ne servait qu'à SB_URL, relu ici dans le
+	// réglage site_url (inc/sbuiadmin-settings.php), ainsi que
 	// SBADMIN et SB_PATH, recalculés.
 	defined('SBUIADMIN_PATH') or define('SBUIADMIN_PATH', dirname(__FILE__, 4));
 	defined('SBUIADMIN_URL')  or define('SBUIADMIN_URL', $_SERVER['SERVER_NAME'] . rtrim(dirname($_SERVER['SCRIPT_NAME'], 4), '/') . '/');
@@ -74,7 +74,7 @@
 		http_response_code(403);
 		die('Accès refusé.');
 	}
-	$websiteurl = rtrim(trim($sb_settings_config[15]), '/');
+	$websiteurl = rtrim(sbSetting('site_url'), '/');
 	defined('SBADMIN') or define('SBADMIN', basename(SBUIADMIN_PATH));
 	defined('SB_PATH') or define('SB_PATH', dirname(SBUIADMIN_PATH) . DIRECTORY_SEPARATOR);
 	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

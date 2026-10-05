@@ -119,16 +119,18 @@ defined('SBUIADMIN_CKEDITOR_BEHAVIOR') or define('SBUIADMIN_CKEDITOR_BEHAVIOR', 
 // ----------------------
 // --- Settings file init
 // ----------------------
-$sb_link_settings = file(_AM_SETTINGS_FILE);
-$sbsmarty->assign('sb_url_customer', trim($sb_link_settings[15]));
-$sbsmarty->assign('sb_toast_duration', (isset($sb_link_settings[35]) && trim($sb_link_settings[35]) != '') ? trim($sb_link_settings[35]) : 7);
+// Réglages en base (inc/sbuiadmin-settings.php) ; tableau positionnel gardé
+// pour le code tiers qui le lirait encore
+$sb_link_settings = sbSettingsLegacyArray();
+$sbsmarty->assign('sb_url_customer', sbSetting('site_url'));
+$sbsmarty->assign('sb_toast_duration', sbSetting('toast_duration', '7') ?: 7);
 
 // ----------------------
 // Identification / Authentification
 // ----------------------
 // --- Initialization
-$publickey  = $sbsanitize->sTrim($sb_link_settings[19]);
-$privatekey = $sbsanitize->sTrim($sb_link_settings[20]);
+$publickey  = $sbsanitize->sTrim(sbSetting('recaptcha_public'));
+$privatekey = $sbsanitize->sTrim(sbSetting('recaptcha_secret'));
 $sbsmarty->assign('grecaptcha_publickey', $publickey);
 
 // --- Random background
@@ -394,7 +396,7 @@ if (isset($_GET['ac']) && $_GET['ac'] == 'logout') {
 	session_write_close();
 	sbSetAuthCookie(session_name(), '', 0);
 	session_regenerate_id(true);
-	header("Location: " . trim($sb_link_settings[15]));
+	header("Location: " . sbSetting('site_url'));
 	exit();
 }
 // ----------------------
@@ -428,21 +430,21 @@ $sbsmarty->assign('sb_warning_admin_user', ( ($sbusers->getUserInfo('admin', 'us
 // Get Global Configuration
 // ----------------------
 // --- Link CUSTOMER WEBSITE
-if (trim($sb_link_settings[24]) == '1') {
+if (sbSetting('maintenance') == '1') {
 	$table           = _AM_DB_PREFIX . "sb_config";
 	$query           = "SELECT config, content FROM $table WHERE config = 'coming-soon-url'";
 	$request         = $sbsql->query($query);
 	$assoc           = $sbsql->object($request);
-	$sb_url_customer = trim($sb_link_settings[15]) . '?d=' . trim($assoc->content);
+	$sb_url_customer = sbSetting('site_url') . '?d=' . trim($assoc->content);
 } else {
-	$sb_url_customer = trim($sb_link_settings[15]);
+	$sb_url_customer = sbSetting('site_url');
 }
 $sbsmarty->assign('sb_url_customer', $sb_url_customer);
 // --- Sandbox Activation (option globale ET droit "voir" de l'utilisateur -
 // ce lien est codé en dur dans main_menu.tpl, hors boucle de sbGetMenuModule())
-$sbsmarty->assign('sb_sandbox', (trim($sb_link_settings[16]) == 1 && sbHasRight('sandbox', 'view')) ? 1 : 0);
+$sbsmarty->assign('sb_sandbox', (sbSetting('sandbox') == 1 && sbHasRight('sandbox', 'view')) ? 1 : 0);
 // --- CMS Activation
-$sbsmarty->assign('sb_cms', trim($sb_link_settings[17]));
+$sbsmarty->assign('sb_cms', sbSetting('cms'));
 
 // ----------------------
 // Get Main Menu
@@ -511,13 +513,9 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 		// Yes, so include
 		sb_global_include($controlIfPhpFileExists);
 
-		// $sb_link_settings (lu tout en haut du fichier, avant de savoir quel
-		// module va s'exécuter) est relu ici pour sb_toast_duration : si le
-		// module qui vient de s'exécuter (ex: settings.php) vient de modifier
-		// settings.txt, la page affichée dans CETTE MÊME réponse doit refléter
-		// la nouvelle valeur, pas l'ancienne lue avant l'écriture.
-		$sb_link_settings = file(_AM_SETTINGS_FILE);
-		$sbsmarty->assign('sb_toast_duration', (isset($sb_link_settings[35]) && trim($sb_link_settings[35]) != '') ? trim($sb_link_settings[35]) : 7);
+		// Réassigné après le module : s'il vient d'enregistrer les réglages
+		// (settings.php), sbSettingsSave() a mis à jour la valeur en mémoire.
+		$sbsmarty->assign('sb_toast_duration', sbSetting('toast_duration', '7') ?: 7);
 	} else {
 		// No, so show error message
 		if (_AM_SITE_DEBUG && $sb_get_page != 'index') echo "Fichier php '$controlIfPhpFileExists' inexistant !";

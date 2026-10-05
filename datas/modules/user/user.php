@@ -27,10 +27,9 @@ include_once( SB_MODULES_DIR . MODULEFILE . DIRECTORY_SEPARATOR . 'lang' . DIREC
 include_once( SB_MODULES_DIR . MODULEFILE . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'functions.php' );
 
 # Initialization
-global $sb_settings_config;
-$publickey      = $sbsanitize->sTrim($sb_settings_config[19]);
-$privatekey     = $sbsanitize->sTrim($sb_settings_config[20]);
-$captcha_active = $sbsanitize->sTrim($sb_settings_config[22]);
+$publickey      = $sbsanitize->sTrim(sbSetting('recaptcha_public'));
+$privatekey     = $sbsanitize->sTrim(sbSetting('recaptcha_secret'));
+$captcha_active = $sbsanitize->sTrim(sbSetting('captcha_mode'));
 $sbsmarty->assign('grecaptcha_publickey', $publickey);
 if (!empty($publickey) && !empty($privatekey) && $captcha_active) {
 	defined('_CMS_USER_CAPTCHA_MODE') OR define('_CMS_USER_CAPTCHA_MODE', "true");

@@ -125,7 +125,7 @@ if (!empty($_SESSION['sbuiadmin_user_name']) && !$sbusers->checkSessionHash($_SE
 $sb_admin_2fa_ok = file_exists(SB_ADMIN_DIR . 'inc' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . '2fa-disabled')
 	|| (!empty($_SESSION['sb2fa_ok']) && !empty($_SESSION['sbuiadmin_user_name']) && hash_equals((string)$_SESSION['sb2fa_ok'], (string)$_SESSION['sbuiadmin_user_name']));
 if (!empty($_SESSION['sbuiadmin_user_name']) && $sb_admin_2fa_ok) {
-	$sbadministrators = explode(",", trim($sb_settings_config[1]));
+	$sbadministrators = explode(",", sbSetting('administrators'));
 	$sbuiadmin_user_type = (in_array(trim($_SESSION['sbuiadmin_user_name']), $sbadministrators)) ? 'admin' : 'user';
 	$sbsmarty->assign('sbuiadmin_user_name', $_SESSION['sbuiadmin_user_name']);
 	$sbsmarty->assign('sbuiadmin_user_type', $sbuiadmin_user_type);

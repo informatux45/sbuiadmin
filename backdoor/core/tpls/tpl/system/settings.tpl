@@ -69,42 +69,10 @@
 									</tr>
 									<tr class="data-row">
 										<td>
-											Database Host
+											Accès base de données
 										</td>
 										<td>
-											**************
-										</td>
-									</tr>
-									<tr class="data-row">
-										<td>
-											Database Name
-										</td>
-										<td>
-											**************
-										</td>
-									</tr>
-									<tr class="data-row">
-										<td>
-											Database User
-										</td>
-										<td>
-											**************
-										</td>
-									</tr>
-									<tr class="data-row">
-										<td>
-											Database Password
-										</td>
-										<td>
-											**************
-										</td>
-									</tr>
-									<tr class="data-row">
-										<td>
-											Database Prefix Table
-										</td>
-										<td>
-											**************
+											sbdbconfig.php (non modifiable ici)
 										</td>
 									</tr>
 									<tr class="data-row">

@@ -85,7 +85,6 @@ global $sbfiles_medias_exts_safe;
  * 36 - Modules utilisant le Page Builder (liste séparée par virgules de
  *      clés "module.champ", voir sbModuleUsesPageBuilder())
  * ---------------------------- */
-$sb_settings_file = _AM_SETTINGS_FILE;
 
 // ---------------------------------------------------
 // ---------------------------------------------------
@@ -107,66 +106,55 @@ switch($action) {
 		// --------------------------------
 		if ($_POST['form_submit']) {
 
-			// Injection des données
-			$sb_output_file  = $sbsanitize->displayText($_POST['customer_name'], 'UTF-8', 1, 0) . "\n";
-			$sb_output_file .= $sbsanitize->displayText($_POST['administrators'], 'UTF-8', 1, 0) . "\n";
-			$sb_output_file .= $sbsanitize->displayText($_POST['dbhost'], 'UTF-8', 1, 0) . "\n";
-			$sb_output_file .= $sbsanitize->displayText($_POST['dbname'], 'UTF-8', 1, 0) . "\n";
-			$sb_output_file .= $sbsanitize->displayText($_POST['dbuser'], 'UTF-8', 1, 0) . "\n";
-			$sb_output_file .= $sbsanitize->displayText($_POST['dbpwd'], 'UTF-8', 1, 0) . "\n";
-			$sb_output_file .= $sbsanitize->displayText($_POST['diruploads'], 'UTF-8', 1, 0) . "\n";
-			$sb_output_file .= $sbsanitize->displayText($_POST['upload_max'], 'UTF-8', 1, 0) . "\n";
-			$sb_output_file .= $sbsanitize->displayText($_POST['modules'], 'UTF-8', 1, 0) . "\n";
-			$sb_output_file .= ($_POST['debug_general'] === "on") ? "1"."\n" : "0"."\n";
-			$sb_output_file .= ($_POST['debug_form'] === "on") ? "1"."\n" : "0"."\n";
-			$sb_output_file .= ($_POST['debug_smarty'] === "on") ? "1"."\n" : "0"."\n";
-			$sb_output_file .= $sbsanitize->displayText($_POST['upload_exts'], 'UTF-8', 1, 0) . "\n";
-			$sb_output_file .= $sbsanitize->displayText($_POST['urluploads'], 'UTF-8', 1, 0) . "\n";
-			$sb_output_file .= $sbsanitize->displayText($_POST['upload_limit'], 'UTF-8', 1, 0) . "\n";
-			$sb_output_file .= $sbsanitize->displayText($_POST['url_customer'], 'UTF-8', 1, 0) . "\n";
-			$sb_output_file .= ($_POST['sandbox'] === "on") ? "1"."\n" : "0"."\n";
-			$sb_output_file .= ($_POST['cms'] === "on") ? "1"."\n" : "0"."\n";
-			$sb_output_file .= $sbsanitize->displayText($_POST['scaling_maxsize'], 'UTF-8', 1, 0) . "\n";
-			$sb_output_file .= $sbsanitize->displayText($_POST['recaptcha_public'], 'UTF-8', 1, 0) . "\n";
-			$sb_output_file .= $sbsanitize->displayText($_POST['recaptcha_secret'], 'UTF-8', 1, 0) . "\n";
-			$sb_output_file .= $sbsanitize->displayText($_POST['dbprefix'], 'UTF-8', 1, 0) . "\n";
-			$sb_output_file .= ($_POST['captcha_mode'] === "on") ? "1"."\n" : "0"."\n";
-			$sb_output_file .= ($_POST['upgrade_mode'] === "on") ? "1"."\n" : "0"."\n";
-			$sb_output_file .= ($_POST['coming_soon'] === "on") ? "1"."\n" : "0"."\n";
-			$sb_output_file .= ($_POST['debug_general_front'] === "on") ? "1"."\n" : "0"."\n";
-			$sb_output_file .= ($_POST['debug_smarty_front'] === "on") ? "1"."\n" : "0"."\n";
-			$sb_output_file .= ($_POST['smarty_force_tpls'] === "on") ? "1"."\n" : "0"."\n";
-			$sb_output_file .= ($_POST['rewrite_url'] === "on") ? "1"."\n" : "0"."\n";
-			$sb_output_file .= ($_POST['smarty_caching'] === "on") ? "1"."\n" : "0"."\n";
-			$sb_output_file .= $sbsanitize->displayText($_POST['smarty_caching_time'], 'UTF-8', 1, 0) . "\n";
-			$sb_output_file .= $sbsanitize->displayText($_POST['medias_per_page'], 'UTF-8', 1, 0) . "\n";
-
-			// Positions 32-34 (anti-flood) : gérées par users.php (action
-			// blockedipsettings), pas ce formulaire — préservées telles
-			// quelles pour ne pas les écraser à chaque sauvegarde ici.
-			$sb_settings_preserved = file($sb_settings_file);
-			$sb_output_file .= (isset($sb_settings_preserved[32]) ? trim($sb_settings_preserved[32]) : "0") . "\n";
-			$sb_output_file .= (isset($sb_settings_preserved[33]) ? trim($sb_settings_preserved[33]) : "86400") . "\n";
-			$sb_output_file .= (isset($sb_settings_preserved[34]) ? trim($sb_settings_preserved[34]) : "4") . "\n";
-			$sb_output_file .= $sbsanitize->displayText($_POST['toast_duration'], 'UTF-8', 1, 0) . "\n";
+			// Réglages en base (inc/sbuiadmin-settings.php). Les accès à la
+			// base ne se modifient plus ici (sbdbconfig.php) ; l'anti-flood
+			// est enregistré par users.php (blockedipsettings).
+			$sb_text = function ($k) use ($sbsanitize) { return $sbsanitize->displayText(isset($_POST[$k]) ? $_POST[$k] : '', 'UTF-8', 1, 0); };
+			$sb_on   = function ($k) { return (isset($_POST[$k]) && $_POST[$k] === "on") ? '1' : '0'; };
+			$sb_new_settings = array(
+				'customer_name'         => $sb_text('customer_name'),
+				'administrators'        => $sb_text('administrators'),
+				'medias_dir'            => $sb_text('diruploads'),
+				'upload_size_limit'     => $sb_text('upload_max'),
+				'modules'               => $sb_text('modules'),
+				'debug_admin'           => $sb_on('debug_general'),
+				'debug_form'            => $sb_on('debug_form'),
+				'debug_smarty_admin'    => $sb_on('debug_smarty'),
+				'upload_exts'           => $sb_text('upload_exts'),
+				'medias_url'            => $sb_text('urluploads'),
+				'upload_item_limit'     => $sb_text('upload_limit'),
+				'site_url'              => $sb_text('url_customer'),
+				'sandbox'               => $sb_on('sandbox'),
+				'cms'                   => $sb_on('cms'),
+				'scaling_maxsize'       => $sb_text('scaling_maxsize'),
+				'recaptcha_public'      => $sb_text('recaptcha_public'),
+				'captcha_mode'          => $sb_on('captcha_mode'),
+				'upgrade_mode'          => $sb_on('upgrade_mode'),
+				'maintenance'           => $sb_on('coming_soon'),
+				'debug_front'           => $sb_on('debug_general_front'),
+				'debug_smarty_front'    => $sb_on('debug_smarty_front'),
+				'smarty_force_compile'  => $sb_on('smarty_force_tpls'),
+				'rewrite_url'           => $sb_on('rewrite_url'),
+				'smarty_caching'        => $sb_on('smarty_caching'),
+				'smarty_cache_lifetime' => $sb_text('smarty_caching_time'),
+				'medias_per_page'       => $sb_text('medias_per_page'),
+				'toast_duration'        => $sb_text('toast_duration'),
+			);
+			// Secret (chiffré en base, jamais renvoyé au navigateur) : champ
+			// laissé vide = valeur inchangée.
+			if (isset($_POST['recaptcha_secret']) && trim((string) $_POST['recaptcha_secret']) !== '') {
+				$sb_new_settings['recaptcha_secret'] = trim((string) $_POST['recaptcha_secret']);
+			}
 			// Le champ est desactivé (disabled) si le multilangue est actif
 			// (voir plus bas, formulaire) - un champ disabled n'est jamais
-			// soumis par le navigateur, $_POST['pagebuilder_modules'] serait
-			// donc absent : on préserve alors la valeur déjà enregistrée
-			// plutôt que d'écraser silencieusement la sélection à chaque
-			// sauvegarde de ce formulaire tant que le multilangue est actif.
-			if (sbGetConfig('multilang')) {
-				$sb_output_file .= (isset($sb_settings_preserved[36]) ? trim($sb_settings_preserved[36]) : '') . "\n";
-			} else {
-				// sbGetTagifyDatas() retourne false si vide - jamais écrire
-				// "false"/rien de vide dans le fichier positionnel, sinon la
-				// ligne 36 se décale/disparaît à la prochaine lecture.
+			// soumis par le navigateur : on garde alors la valeur enregistrée.
+			if (!sbGetConfig('multilang')) {
+				// sbGetTagifyDatas() retourne false si vide
 				$sb_pagebuilder_modules = sbGetTagifyDatas($_POST['pagebuilder_modules']);
-				$sb_output_file .= ($sb_pagebuilder_modules !== false ? $sb_pagebuilder_modules : '') . "\n";
+				$sb_new_settings['pagebuilder_modules'] = ($sb_pagebuilder_modules !== false ? $sb_pagebuilder_modules : '');
 			}
 
-			// Locker le fichier pour qu'une seule personne a la fois ecrive dedans
-			$result_edit = file_put_contents($sb_settings_file, $sb_output_file, FILE_USE_INCLUDE_PATH | LOCK_EX);
+			$result_edit = sbSettingsSave($sb_new_settings);
 											 
 				//$result_edit = $sbsql->query($query);
 				if ($result_edit) {
@@ -187,46 +175,40 @@ switch($action) {
 		}
 		
 		// --------------------------------
-		// --- Ouverture du fichier
-		$sb_settings = file($sb_settings_file);
+		// --- Réglages (base de données)
 		// --- Initialisation
-		$sb_config_customer_name       = $sb_settings[0];
-		$sb_config_administrators      = $sb_settings[1];
-		$sb_config_dbhost              = $sb_settings[2];
-		$sb_config_dbname              = $sb_settings[3];
-		$sb_config_dbuser              = $sb_settings[4];
-		$sb_config_dbpwd               = $sb_settings[5];
-		$sb_config_diruploads          = $sb_settings[6];
-		$sb_config_upload_max          = $sb_settings[7];
-		$sb_config_modules             = $sb_settings[8];
-		$sb_config_debug_general       = $sb_settings[9];
-		$sb_config_debug_form          = $sb_settings[10];
-		$sb_config_debug_smarty        = $sb_settings[11];
-		$sb_config_upload_exts         = $sb_settings[12];
-		$sb_config_urluploads          = $sb_settings[13];
-		$sb_config_upload_limit        = $sb_settings[14];
-		$sb_config_url_customer        = $sb_settings[15];
-		$sb_config_sandbox             = $sb_settings[16];
-		$sb_config_cms                 = $sb_settings[17];
-		$sb_config_scaling_maxsize     = $sb_settings[18];
-		$sb_config_recaptcha_public    = $sb_settings[19];
-		$sb_config_recaptcha_secret    = $sb_settings[20];
-		$sb_config_dbprefix            = $sb_settings[21];
-		$sb_config_captcha_mode        = $sb_settings[22];
-		$sb_config_upgrade_mode        = $sb_settings[23];
-		$sb_config_coming_soon         = $sb_settings[24];
-		$sb_config_debug_general_front = $sb_settings[25];
-		$sb_config_debug_smarty_front  = $sb_settings[26];
-		$sb_config_smarty_force_tpls   = $sb_settings[27];
-		$sb_config_rewrite_url         = $sb_settings[28];
-		$sb_config_smarty_caching      = $sb_settings[29];
-		$sb_config_smarty_caching_time = $sb_settings[30];
-		$sb_config_medias_per_page     = $sb_settings[31];
-		$sb_config_toast_duration      = (isset($sb_settings[35]) && trim($sb_settings[35]) != '') ? $sb_settings[35] : 7;
-		$sb_config_pagebuilder_modules = isset($sb_settings[36]) ? trim($sb_settings[36]) : '';
+		$sb_config_customer_name       = sbSetting('customer_name');
+		$sb_config_administrators      = sbSetting('administrators');
+		$sb_config_diruploads          = sbSetting('medias_dir');
+		$sb_config_upload_max          = sbSetting('upload_size_limit');
+		$sb_config_modules             = sbSetting('modules');
+		$sb_config_debug_general       = sbSetting('debug_admin');
+		$sb_config_debug_form          = sbSetting('debug_form');
+		$sb_config_debug_smarty        = sbSetting('debug_smarty_admin');
+		$sb_config_upload_exts         = sbSetting('upload_exts');
+		$sb_config_urluploads          = sbSetting('medias_url');
+		$sb_config_upload_limit        = sbSetting('upload_item_limit');
+		$sb_config_url_customer        = sbSetting('site_url');
+		$sb_config_sandbox             = sbSetting('sandbox');
+		$sb_config_cms                 = sbSetting('cms');
+		$sb_config_scaling_maxsize     = sbSetting('scaling_maxsize');
+		$sb_config_recaptcha_public    = sbSetting('recaptcha_public');
+		$sb_config_recaptcha_secret    = sbSetting('recaptcha_secret');
+		$sb_config_captcha_mode        = sbSetting('captcha_mode');
+		$sb_config_upgrade_mode        = sbSetting('upgrade_mode');
+		$sb_config_coming_soon         = sbSetting('maintenance');
+		$sb_config_debug_general_front = sbSetting('debug_front');
+		$sb_config_debug_smarty_front  = sbSetting('debug_smarty_front');
+		$sb_config_smarty_force_tpls   = sbSetting('smarty_force_compile');
+		$sb_config_rewrite_url         = sbSetting('rewrite_url');
+		$sb_config_smarty_caching      = sbSetting('smarty_caching');
+		$sb_config_smarty_caching_time = sbSetting('smarty_cache_lifetime');
+		$sb_config_medias_per_page     = sbSetting('medias_per_page');
+		$sb_config_toast_duration      = sbSetting('toast_duration', '7') ?: 7;
+		$sb_config_pagebuilder_modules = sbSetting('pagebuilder_modules');
 
 		// --- Debug SQL
-		if (_AM_SITE_DEBUG) $sbsmarty->assign('file_content', $sb_settings);						
+		// (l'ancien dump de debug du fichier exposait les accès à la base)						
 		// --------------------------------		
 		// --- Define variables
 		$formAction = $module_url . "&a=" . $formType;
@@ -238,11 +220,28 @@ switch($action) {
 		$sbform->addBreak('Les administrateurs');
 		$sbform->addInput('text', 'Administrateurs', array ('name' => 'administrators', 'value' => "$sb_config_administrators", 'placeholder' => "Nom des administrateurs"), true, false, "Login des admins séparés par des virgules sans espace");
 		$sbform->addBreak('Base de données');
-		$sbform->addInput('password', 'DB Host', array ('name' => 'dbhost', 'value' => "$sb_config_dbhost"), true, false);
-		$sbform->addInput('password', 'DB Name', array ('name' => 'dbname', 'value' => "$sb_config_dbname"), true, false);
-		$sbform->addInput('password', 'DB User', array ('name' => 'dbuser', 'value' => "$sb_config_dbuser"), true, false);
-		$sbform->addInput('password', 'DB Password', array ('name' => 'dbpwd', 'value' => "$sb_config_dbpwd"), true, false);
-		$sbform->addInput('password', 'DB Prefix', array ('name' => 'dbprefix', 'value' => "$sb_config_dbprefix"), false, false);
+		// Accès base : sbdbconfig.php (ou variables d'environnement), plus
+		// modifiables ni affichés ici.
+		$sb_db_cfg = sbDbConfig();
+		if ($sb_db_cfg['source'] === 'env') {
+			$sb_db_where = "Variables d'environnement du serveur (SBUIADMIN_DB_*)";
+		} elseif ($sb_db_cfg['source'] === 'legacy') {
+			$sb_db_where = "<strong style='color: red;'>Encore dans settings.txt</strong> : sbdbconfig.php n'a pu être écrit";
+		} elseif ($sb_db_cfg['source'] !== 'none') {
+			$sb_db_where = '<code>' . htmlspecialchars($sb_db_cfg['source'], ENT_QUOTES, 'UTF-8') . '</code>'
+				. (sbDbConfigIsInsideSite($sb_db_cfg['source'])
+					? " <span style='color: var(--warning);'>(dans le dossier du site : protégé, mais un emplacement au-dessus du site serait plus sûr)</span>"
+					: " <span style='color: var(--success);'>(hors du dossier du site)</span>");
+		} else {
+			$sb_db_where = "<strong style='color: red;'>Introuvable</strong>";
+		}
+		$sb_db_html  = "<div class='form-group'><p>Les accès à la base ne sont plus modifiables depuis l'administration. Emplacement : " . $sb_db_where . "</p>";
+		$sb_db_html .= "<p>Hôte, base, utilisateur, mot de passe, préfixe : " . (($sb_db_cfg['host'] !== '' && $sb_db_cfg['name'] !== '') ? "définis ✓" : "<strong style='color: red;'>manquants</strong>") . " · Clé de chiffrement des secrets : " . (sbSecretKey() ? "définie ✓" : "<strong style='color: red;'>absente</strong>") . "</p>";
+		foreach ($GLOBALS['sb_settings_warnings'] as $sb_db_warning) {
+			$sb_db_html .= "<p style='color: red;'>" . htmlspecialchars($sb_db_warning, ENT_QUOTES, 'UTF-8') . "</p>";
+		}
+		$sb_db_html .= "</div>";
+		$sbform->addAnything($sb_db_html);
 		$sbform->addBreak('Configuration médias');
 		$sbform->addInput('text', 'Répertoire d\'upload', array ('name' => 'diruploads', 'value' => "$sb_config_diruploads", 'placeholder' => "Répertoire de l'upload"), true, false, "ex:  <strong>../votre_repertoire</strong>  -  s'il se trouve juste en dessous de l'arborescence du répertoire d'administration<br>Chemin relatif (obligatoirement), pas d'absolu !!! - Ne pas mettre le  <span style='color: red;'>/</span>  à la fin");
 		$sbform->addInput('text', 'URL d\'upload', array ('name' => 'urluploads', 'value' => "$sb_config_urluploads", 'placeholder' => "URL de l'upload (http://...)"), true, false, "Ne pas mettre le  <span style='color: red;'>/</span>  à la fin");
@@ -279,7 +278,7 @@ switch($action) {
 		$sbform->addTagifyWhitelist('Modules utilisant le Page Builder', $sb_pagebuilder_whitelist, $sb_pagebuilder_args, false, $sb_pagebuilder_help);
 		$sbform->addBreak('Captcha (Google reCAPTCHA)');
 		$sbform->addInput('password', "Google Recaptcha (Clé publique)", array ('name' => 'recaptcha_public', 'value' => "$sb_config_recaptcha_public"), false, false, "Clé du site dans le code HTML que vous proposez à vos utilisateurs");
-		$sbform->addInput('password', 'Google Recaptcha (Clé secrète)', array ('name' => 'recaptcha_secret', 'value' => "$sb_config_recaptcha_secret"), false, false, "Clé pour toute communication entre votre site et Google. Veillez à ne pas la divulguer, car il s'agit d'une clé secrète.");
+		$sbform->addInput('password', 'Google Recaptcha (Clé secrète)', array ('name' => 'recaptcha_secret', 'value' => '', 'placeholder' => ($sb_config_recaptcha_secret !== '' ? "•••••••• enregistrée (vide = inchangée)" : ''), 'autocomplete' => 'new-password'), false, false, "Clé pour toute communication entre votre site et Google. Veillez à ne pas la divulguer, car il s'agit d'une clé secrète.");
 		// Checkbox du mode CAPTCHA
 		$tab_check_4 = array();
 		$tab_check_4[0]['text']    = 'Activé';
@@ -390,10 +389,6 @@ switch($action) {
 // ----------------------
 $sbsmarty->assign('sb_config_customer_name', trim($sb_config_customer_name));
 $sbsmarty->assign('sb_config_administrators', trim($sb_config_administrators));
-$sbsmarty->assign('sb_config_dbhost', trim($sb_config_dbhost));
-$sbsmarty->assign('sb_config_dbname', trim($sb_config_dbname));
-$sbsmarty->assign('sb_config_dbuser', trim($sb_config_dbuser));
-$sbsmarty->assign('sb_config_dbpwd', trim($sb_config_dbpwd));
 $sbsmarty->assign('sb_config_diruploads', trim($sb_config_diruploads));
 $sbsmarty->assign('sb_config_urluploads', trim($sb_config_urluploads));
 $sbsmarty->assign('sb_config_upload_max', trim($sb_config_upload_max));
@@ -408,8 +403,6 @@ $sbsmarty->assign('sb_config_sandbox', trim($sb_config_sandbox));
 $sbsmarty->assign('sb_config_cms', trim($sb_config_cms));
 $sbsmarty->assign('sb_config_scaling_maxsize', trim($sb_config_scaling_maxsize));
 $sbsmarty->assign('sb_config_recaptcha_public', trim($sb_config_recaptcha_public));
-$sbsmarty->assign('sb_config_recaptcha_secret', trim($sb_config_recaptcha_secret));
-$sbsmarty->assign('sb_config_dbprefix', trim($sb_config_dbprefix));
 $sbsmarty->assign('sb_config_captcha_mode', trim($sb_config_captcha_mode));
 $sbsmarty->assign('sb_config_upgrade_mode', trim($sb_config_upgrade_mode));
 $sbsmarty->assign('sb_config_coming_soon', trim($sb_config_coming_soon));

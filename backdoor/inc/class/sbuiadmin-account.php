@@ -143,17 +143,16 @@ class account extends sql {
 	 */
 	public function getUrlHomepage() {
 		// --- Link CUSTOMER WEBSITE HOME
-		$sb_link_settings = file( SB_ADMIN_DIR . 'inc/admin/settings.txt' );
-		if (trim($sb_link_settings[24]) == '1') {
+		if (sbSetting('maintenance') == '1') {
 			// Site closed / Get the URL to display the homepage
 			$query            = "SELECT config, content FROM " . $this->tblconfig . " WHERE config = 'coming-soon-url'";
 			$request          = $this->query($query);
 			$assoc            = $this->object($request);
 			// Link homepage
-			$sb_url_customer  = trim($sb_link_settings[15]) . '?d=' . trim($assoc->content);
+			$sb_url_customer  = sbSetting('site_url') . '?d=' . trim($assoc->content);
 		} else {
 			// Link homepage without cookie (Session)
-			$sb_url_customer = trim($sb_link_settings[15]);
+			$sb_url_customer = sbSetting('site_url');
 		}
 		return $sb_url_customer;
 	}

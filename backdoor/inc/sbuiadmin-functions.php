@@ -236,14 +236,10 @@ if (!function_exists("sbGetPageBuilderModulesList")) {
 }
 
 if (!function_exists("sbModuleUsesPageBuilder")) {
-   // $sb_link_settings est chargé une fois par index.php avant le
-   // dispatch vers le module - disponible tel quel (même portée
-   // d'inclusion) dans pages.php/news.php/etc, mais une fonction a besoin
-   // de "global" pour y accéder.
+   // Réglage pagebuilder_modules (inc/sbuiadmin-settings.php)
    function sbModuleUsesPageBuilder($key) {
-      global $sb_link_settings;
-      if (empty($sb_link_settings) || !isset($sb_link_settings[36])) return false;
-      $selected = array_map('trim', explode(',', trim($sb_link_settings[36])));
+      if (!function_exists('sbSetting') || sbSetting('pagebuilder_modules') === '') return false;
+      $selected = array_map('trim', explode(',', sbSetting('pagebuilder_modules')));
       return in_array($key, $selected, true);
    }
 }
@@ -880,6 +876,11 @@ function sbGetConfig($config, $langdefault = 'fr') {
 	$request = $sbsql->query($query);
 	$result  = $sbsql->object($request);
 	
+	// Secrets chiffrés en base (mot de passe SMTP, clé reCAPTCHA du contact)
+	if (function_exists('sbConfigSecretNames') && in_array($config_name, sbConfigSecretNames(), true)) {
+		return sbSecretOpen($result ? $result->content : '');
+	}
+
 	$lang    = (isset($_SESSION['lang']) && $_SESSION['lang'] != '') ? $_SESSION['lang'] : $langdefault;
 	
 	return ($sbsanitize->displayText($sbsanitize->displayLang($result->content, $lang)));

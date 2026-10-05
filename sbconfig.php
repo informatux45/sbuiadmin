@@ -24,13 +24,18 @@ defined('SBADMIN') OR define('SBADMIN', 'backdoor');
 # Get files configuration (theme / general)
 $_sb_config_base    = dirname(__FILE__) . DIRECTORY_SEPARATOR . SBADMIN . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR;
 $sb_theme_config    = file($_sb_config_base . 'theme.txt');
-$sb_settings_config = file($_sb_config_base . 'settings.txt');
 
-if ($sb_theme_config === false || $sb_settings_config === false) {
+if ($sb_theme_config === false) {
     die('Configuration files not found or unreadable.');
 }
 
-// Helpers to safely read settings.txt values
+# Réglages : en base (table sb_settings), accès base dans sbdbconfig.php.
+# Voir SBADMIN/inc/sbuiadmin-settings.php
+require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . SBADMIN . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'sbuiadmin-settings.php');
+// Ancien tableau positionnel, pour le code tiers qui le lirait encore
+$sb_settings_config = sbSettingsLegacyArray();
+
+// Helpers to safely read positional config files (theme.txt)
 function _sbcfg(array $cfg, int $i, string $default = ''): string {
     return isset($cfg[$i]) ? trim($cfg[$i]) : $default;
 }
@@ -38,7 +43,7 @@ function _sbcfgbool(array $cfg, int $i): bool {
     return _sbcfg($cfg, $i) === '1';
 }
 
-// Named indices for settings.txt (no more magic numbers)
+// Anciennes positions de settings.txt (réglages désormais en base, voir sbSetting())
 const CFG_SITE_TITLE        = 0;
 const CFG_DB_HOST           = 2;
 const CFG_DB_NAME           = 3;
@@ -66,7 +71,7 @@ defined('SBUIADMINID') OR define('SBUIADMINID', 'sbuiadmin');
 
 # Turn on debug mode
 # Default: false
-defined('SBDEBUG') OR define('SBDEBUG', _sbcfgbool($sb_settings_config, CFG_DEBUG));
+defined('SBDEBUG') OR define('SBDEBUG', sbSettingBool('debug_front'));
 
 # Language (default fr_FR)
 defined('SBLANG')      OR define('SBLANG',      'fr_FR');
@@ -100,36 +105,36 @@ defined('SBSMARTYBC') OR define('SBSMARTYBC', true);
 # Define force compile TPL Smarty
 # Don't let this option to TRUE in production
 # Default: true
-defined('SBSMARTYFORCECOMPILE') OR define('SBSMARTYFORCECOMPILE', _sbcfgbool($sb_settings_config, CFG_SMARTY_FORCE));
+defined('SBSMARTYFORCECOMPILE') OR define('SBSMARTYFORCECOMPILE', sbSettingBool('smarty_force_compile'));
 
 # Enable caching smarty TPL
 # Default: false
-defined('SBSMARTYCACHING') OR define('SBSMARTYCACHING', _sbcfgbool($sb_settings_config, CFG_SMARTY_CACHING));
+defined('SBSMARTYCACHING') OR define('SBSMARTYCACHING', sbSettingBool('smarty_caching'));
 
 # Define lifetime of cache Smarty
 # Only available if SMARTY CACHING is true
 # Default: 120
-defined('SBSMARTYCACHELIFETIME') OR define('SBSMARTYCACHELIFETIME', (int)(_sbcfg($sb_settings_config, CFG_SMARTY_CACHE_LIFE) ?: 120));
+defined('SBSMARTYCACHELIFETIME') OR define('SBSMARTYCACHELIFETIME', (int)(sbSetting('smarty_cache_lifetime') ?: 120));
 
 # Enable Smarty Debug
 # Default: false
-defined('SBSMARTYDEBUG') OR define('SBSMARTYDEBUG', _sbcfgbool($sb_settings_config, CFG_SMARTY_DEBUG));
+defined('SBSMARTYDEBUG') OR define('SBSMARTYDEBUG', sbSettingBool('debug_smarty_front'));
 
 # Enable access to classes/files/functions Admin
 defined('SBUIADMIN_PATH') OR define('SBUIADMIN_PATH', true);
 
 # Enable rewrite url
 # Default: false
-defined('SBREWRITEURL') OR define('SBREWRITEURL', _sbcfgbool($sb_settings_config, CFG_REWRITE_URL));
+defined('SBREWRITEURL') OR define('SBREWRITEURL', sbSettingBool('rewrite_url'));
 
 # Enable maintenance mode (Coming soon)
-defined('SBMAINTENANCE') OR define('SBMAINTENANCE', _sbcfgbool($sb_settings_config, CFG_MAINTENANCE));
+defined('SBMAINTENANCE') OR define('SBMAINTENANCE', sbSettingBool('maintenance'));
 
 # Define Subdirectory Site
 # if is visible in your url
-# Default: auto-détecté depuis l'URL du site (settings.txt, position CFG_SITE_URL)
+# Default: auto-détecté depuis l'URL du site (réglage site_url)
 # Ex: http://site.com/dir/ => 'dir'
-defined('SBSITESUBDIRECTORY') OR define('SBSITESUBDIRECTORY', trim((string) parse_url(_sbcfg($sb_settings_config, CFG_SITE_URL), PHP_URL_PATH), '/'));
+defined('SBSITESUBDIRECTORY') OR define('SBSITESUBDIRECTORY', trim((string) parse_url(sbSetting('site_url'), PHP_URL_PATH), '/'));
 
 # Defined Safe Modules created by you (developer)
 //$sb_safe_modules_cms = ['your_new_module','your_new_module2'];
@@ -150,30 +155,22 @@ $sb_safe_pages_cms = ['index', 'user', 'news', 'pages', 'shop', 'account', 'down
 // ------------------------
 // --- Database
 // ------------------------
-defined('_AM_SITE_TITLE') OR define('_AM_SITE_TITLE', _sbcfg($sb_settings_config, CFG_SITE_TITLE));
+defined('_AM_SITE_TITLE') OR define('_AM_SITE_TITLE', sbSetting('customer_name'));
 
-// Search if there is a socket
-$_db_host_raw = _sbcfg($sb_settings_config, CFG_DB_HOST);
-if (strpos($_db_host_raw, ':') !== false) {
-    // Define socket
-    [$db_host, $db_socket] = explode(':', $_db_host_raw, 2);
-    defined('_AM_DB_HOST')   OR define('_AM_DB_HOST',   $db_host);
-    defined('_AM_DB_SOCKET') OR define('_AM_DB_SOCKET', $db_socket);
-} else {
-    // No socket
-    defined('_AM_DB_HOST')   OR define('_AM_DB_HOST',   $_db_host_raw);
-    defined('_AM_DB_SOCKET') OR define('_AM_DB_SOCKET', false);
-}
-
-defined('_AM_DB_PORT')    OR define('_AM_DB_PORT',    3306);
-defined('_AM_DB_NAME')    OR define('_AM_DB_NAME',    _sbcfg($sb_settings_config, CFG_DB_NAME));
-defined('_AM_DB_USER')    OR define('_AM_DB_USER',    _sbcfg($sb_settings_config, CFG_DB_USER));
-defined('_AM_DB_PWD')     OR define('_AM_DB_PWD',     _sbcfg($sb_settings_config, CFG_DB_PWD));
-defined('_AM_MEDIAS_DIR') OR define('_AM_MEDIAS_DIR', _sbcfg($sb_settings_config, CFG_MEDIAS_DIR));
-defined('_AM_MEDIAS_URL') OR define('_AM_MEDIAS_URL', _sbcfg($sb_settings_config, CFG_MEDIAS_URL));
-defined('_AM_GC_PUBLIC')  OR define('_AM_GC_PUBLIC',  _sbcfg($sb_settings_config, CFG_GC_PUBLIC));
-defined('_AM_GC_PRIVATE') OR define('_AM_GC_PRIVATE', _sbcfg($sb_settings_config, CFG_GC_PRIVATE));
-defined('_AM_DB_PREFIX')  OR define('_AM_DB_PREFIX',  _sbcfg($sb_settings_config, CFG_DB_PREFIX));
+// Accès base : sbdbconfig.php (ou variables d'environnement SBUIADMIN_DB_*)
+$_sb_db = sbDbConfig();
+[$_db_host, $_db_port, $_db_socket] = sbDbHostParts($_sb_db['host']);
+defined('_AM_DB_HOST')   OR define('_AM_DB_HOST',   $_db_host);
+defined('_AM_DB_SOCKET') OR define('_AM_DB_SOCKET', $_db_socket);
+defined('_AM_DB_PORT')   OR define('_AM_DB_PORT',   $_db_port);
+defined('_AM_DB_NAME')   OR define('_AM_DB_NAME',   $_sb_db['name']);
+defined('_AM_DB_USER')   OR define('_AM_DB_USER',   $_sb_db['user']);
+defined('_AM_DB_PWD')    OR define('_AM_DB_PWD',    $_sb_db['password']);
+defined('_AM_MEDIAS_DIR') OR define('_AM_MEDIAS_DIR', sbSetting('medias_dir'));
+defined('_AM_MEDIAS_URL') OR define('_AM_MEDIAS_URL', sbSetting('medias_url'));
+defined('_AM_GC_PUBLIC')  OR define('_AM_GC_PUBLIC',  sbSetting('recaptcha_public'));
+defined('_AM_GC_PRIVATE') OR define('_AM_GC_PRIVATE', sbSetting('recaptcha_secret'));
+defined('_AM_DB_PREFIX')  OR define('_AM_DB_PREFIX',  $_sb_db['prefix']);
 
 // ------------------------
 // --- Protocol (reverse proxy / CLI compatible)
@@ -188,7 +185,7 @@ defined('SB_PROTOCOL') OR define('SB_PROTOCOL', $_sb_protocol . '://');
 defined('SB_DEFAULT_PROTOCOL') OR define('SB_DEFAULT_PROTOCOL', SB_PROTOCOL);
 defined('SB_PATH') OR define('SB_PATH', dirname(__FILE__) . DIRECTORY_SEPARATOR);
 defined('SB_BASE') OR define('SB_BASE', basename(__FILE__));
-defined('SB_URL')  OR define('SB_URL',  _sbcfg($sb_settings_config, CFG_SITE_URL));
+defined('SB_URL')  OR define('SB_URL',  sbSetting('site_url'));
 
 // ------------------------
 // --- Theme
@@ -224,4 +221,4 @@ defined('SB_SMARTY_DIR') OR define('SB_SMARTY_DIR', SB_ADMIN_DIR . 'core' . DIRE
 // ------------------------
 defined('SB_SETTINGS_FILE') OR define('SB_SETTINGS_FILE', SB_ADMIN_DIR . 'inc' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'settings.txt');
 
-unset($_sb_config_base, $_db_host_raw, $_sb_https, $_sb_protocol);
+unset($_sb_config_base, $_sb_db, $_db_host, $_db_port, $_db_socket, $_sb_https, $_sb_protocol);

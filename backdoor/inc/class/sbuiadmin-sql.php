@@ -42,7 +42,7 @@ class sql extends Smarty {
         mysqli_report(MYSQLI_REPORT_OFF);
         if ($this->socket === false) {
             try {
-                $this->connect_id = mysqli_connect($this->host, $this->user, $this->pass, $this->base);
+                $this->connect_id = mysqli_connect($this->host, $this->user, $this->pass, $this->base, (int) $this->port);
             } catch (Exception $e) {
                 echo $e->getMessage();
                 exit;

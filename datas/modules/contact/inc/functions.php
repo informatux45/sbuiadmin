@@ -55,7 +55,7 @@ function shortcode_sbcontactajax($param = '') {
 					case "email_to": $email_to = $sbsanitize->sTrim($val['content']); break;
 					case "email_subject": $subject = $sbsanitize->displayLang(sb_utf8_encode($val['content'])); break;
 					case "email_publickey": $publickey = $sbsanitize->sTrim($val['content']); break;
-					case "email_privatekey": $privatekey = $sbsanitize->sTrim($val['content']); break;
+					case "email_privatekey": $privatekey = $sbsanitize->sTrim(sbSecretOpen($val['content'])); break;
 				}
 			}
 			// --- --- --- --- --- --- ---
@@ -206,7 +206,7 @@ function shortcode_sbcontact($param = '') {
 					case "email_to": $email_to = $sbsanitize->sTrim($val['content']); break;
 					case "email_subject": $subject = $sbsanitize->displayLang(sb_utf8_encode($val['content'])); break;
 					case "email_publickey": $publickey = $sbsanitize->sTrim($val['content']); break;
-					case "email_privatekey": $privatekey = $sbsanitize->sTrim($val['content']); break;
+					case "email_privatekey": $privatekey = $sbsanitize->sTrim(sbSecretOpen($val['content'])); break;
 				}
 			}
 			# ################################################

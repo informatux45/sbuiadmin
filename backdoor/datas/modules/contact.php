@@ -259,14 +259,16 @@ switch($action) {
 				$email_subject   .= "[en]".$email_subject_en."[/en]";
 			}
 			$email_publickey  = $sbsanitize->displayText($_POST['email_publickey'], 'UTF-8', 1, 0);
-			$email_privatekey = $sbsanitize->displayText($_POST['email_privatekey'], 'UTF-8', 1, 0);
+			// Secrets : chiffrés en base (inc/sbuiadmin-settings.php), jamais
+			// renvoyés au navigateur. Champ laissé vide = valeur inchangée.
+			$email_privatekey = $sbsql->escape_string(sbSecretSeal(trim((string) $_POST['email_privatekey'])));
 
 			$email_smtp          = $sbsanitize->displayText($_POST['email_smtp'], 'UTF-8', 1, 0);
 			$email_smtp_host     = $sbsanitize->displayText($_POST['email_smtp_host'], 'UTF-8', 1, 0);
 			$email_smtp_auth     = $sbsanitize->displayText($_POST['email_smtp_auth'], 'UTF-8', 1, 0);
 			$email_smtp_port     = $sbsanitize->displayText($_POST['email_smtp_port'], 'UTF-8', 1, 0);
 			$email_smtp_username = $sbsanitize->displayText($_POST['email_smtp_username'], 'UTF-8', 1, 0);
-			$email_smtp_password = $sbsanitize->displayText($_POST['email_smtp_password'], 'UTF-8', 1, 0);
+			$email_smtp_password = $sbsql->escape_string(sbSecretSeal(trim((string) $_POST['email_smtp_password'])));
 			$email_smtp_secure   = $sbsanitize->displayText($_POST['email_smtp_secure'], 'UTF-8', 1, 0);
 			$email_smtp_debug    = $sbsanitize->displayText($_POST['email_smtp_debug'], 'UTF-8', 1, 0);
 			
@@ -289,14 +291,14 @@ switch($action) {
 			$result_edit_email_to         = $sbsql->query($query_email_to);
 			$result_edit_email_subject    = $sbsql->query($query_email_subject);
 			$result_edit_email_publickey  = $sbsql->query($query_email_publickey);
-			$result_edit_email_privatekey = $sbsql->query($query_email_privatekey);
+			$result_edit_email_privatekey = ($email_privatekey === '') ? true : $sbsql->query($query_email_privatekey);
 			
 			$result_edit_email_smtp          = $sbsql->query($query_email_smtp);
 			$result_edit_email_smtp_host     = $sbsql->query($query_email_smtp_host);
 			$result_edit_email_smtp_auth     = $sbsql->query($query_email_smtp_auth);
 			$result_edit_email_smtp_port     = $sbsql->query($query_email_smtp_port);
 			$result_edit_email_smtp_username = $sbsql->query($query_email_smtp_username);
-			$result_edit_email_smtp_password = $sbsql->query($query_email_smtp_password);
+			$result_edit_email_smtp_password = ($email_smtp_password === '') ? true : $sbsql->query($query_email_smtp_password);
 			$result_edit_email_smtp_secure   = $sbsql->query($query_email_smtp_secure);
 			$result_edit_email_smtp_debug    = $sbsql->query($query_email_smtp_debug);
 			
@@ -363,7 +365,7 @@ switch($action) {
 		// Google RECAPTCHA Keys
 		// --------------------------------	
 		$sbform->addInput('text', "[GOOGLE RECAPTCHA] <span style='color: red;'>Clé du site</span>", array ('name' => 'email_publickey', 'value' => $assocP['content'], 'placeholder' => "clé reCAPTCHA publique", 'icon' => '0Publique'), false, false, "Clé dans le code HTML que vous proposez à vos utilisateurs");
-		$sbform->addInput('text', "[GOOGLE RECAPTCHA] <span style='color: red;'>Clé secrète</span>", array ('name' => 'email_privatekey', 'value' => $assocS['content'], 'placeholder' => "clé reCAPTCHA privée", 'icon' => '0Secrète'), false, false, "Clé pour toute communication entre votre site et Google. Veillez à ne pas la divulguer, car il s'agit d'une clé secrète");
+		$sbform->addInput('text', "[GOOGLE RECAPTCHA] <span style='color: red;'>Clé secrète</span>", array ('name' => 'email_privatekey', 'value' => '', 'placeholder' => ($assocS['content'] !== '' ? "•••••••• enregistrée (vide = inchangée)" : "clé reCAPTCHA privée"), 'autocomplete' => 'new-password', 'icon' => '0Secrète'), false, false, "Clé pour toute communication entre votre site et Google. Veillez à ne pas la divulguer, car il s'agit d'une clé secrète");
 		// --------------------------------
 		// SMTP configuration
 		// --------------------------------
@@ -383,7 +385,7 @@ switch($action) {
 		// --- SMTP Username
 		$sbform->addInput('text', "SMTP Username", array ('name' => 'email_smtp_username', 'value' => $assocEmail['email_smtp_username']['content'], 'placeholder' => "SMTP Username", 'style' => 'width: 250px;'), false);
 		// --- SMTP Password
-		$sbform->addInput('password', "SMTP Mot de passe", array('name' => 'email_smtp_password', 'value' => $assocEmail['email_smtp_password']['content'], 'autocomplete' => 'new-password', 'style' => 'width: 250px;'), false);
+		$sbform->addInput('password', "SMTP Mot de passe", array('name' => 'email_smtp_password', 'value' => '', 'placeholder' => ($assocEmail['email_smtp_password']['content'] !== '' ? "•••••••• enregistré (vide = inchangé)" : ''), 'autocomplete' => 'new-password', 'style' => 'width: 250px;'), false);
 		// --- SMTP Protocole
 		// Valeurs attendues par PHPMailer : 'tls' (STARTTLS) ou 'ssl'.
 		// L'ancienne valeur 'starttls' est lue comme 'tls' (voir sbMailer()).

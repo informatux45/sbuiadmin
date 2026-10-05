@@ -126,6 +126,7 @@ class form extends sanitize {
 												   ,'bname' => ''
 												   ,'mask' => ''
 												   ,'autocomplete' => ''
+												   ,'placeholder' => ''
 												   ),
 							   'submit' => array ('name' => ''
 												 ,'value' => 'Valider'
@@ -2581,10 +2582,16 @@ EOT;
 	*/
 	public function addBreak ($title, $align = 'left') {
 		$cpt = count ($this -> formElementArr);
-		$chaineTemp .= '<div class="well form-break-info">';
+		$chaineTemp  = '<div class="well form-break-info">';
 		$chaineTemp .= '<h4>' . $title . '</h4>';
 		$chaineTemp .= '</div>';
-		$this -> formBuffer['anything'][$cpt] = $chaineTemp;
+		// Ajoute (ne remplace pas) : sans champ entre deux, un addBreak() ou
+		// addAnything() précédent partage le même $cpt et serait effacé.
+		if (isset ($this -> formBuffer['anything'][$cpt])) {
+			$this -> formBuffer['anything'][$cpt] .= $chaineTemp;
+		} else {
+			$this -> formBuffer['anything'][$cpt] = $chaineTemp;
+		}
 	}
 
 
