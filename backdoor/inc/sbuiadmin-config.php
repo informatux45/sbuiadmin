@@ -36,7 +36,7 @@ defined('_AM_THEME_FILE') OR define('_AM_THEME_FILE', SBUIADMIN_PATH . '/inc/adm
 
 // ------------------------------------------
 // --- Defined Safe Pages
-$sb_safe_pages = ['index','sandbox','settings','cache','server','dashboard','theme','themeinfos','session','database','users','logaccess','menu','pages','blocs','medias','transfert','cmsconfig','slider','news','contact','tabbs','toggle','download','gallery','gmaps','table','toolbarck','faq','messages','profile','boutique'];
+$sb_safe_pages = ['index','sandbox','settings','cache','server','dashboard','theme','themeinfos','session','users','logaccess','menu','pages','blocs','medias','transfert','cmsconfig','slider','news','contact','tabbs','toggle','download','gallery','gmaps','table','toolbarck','faq','messages','profile','boutique'];
 // --- Defined Safe Modules
 $sb_safe_modules = explode(",", sbSetting('modules'));
 // ------------------------------------------
@@ -176,7 +176,7 @@ defined('_AM_SITE_LANG_URL') OR define('_AM_SITE_LANG_URL', _AM_SITE_PROTOCOL . 
 defined('_AM_SITE_CUSTOMER_NAME') OR define('_AM_SITE_CUSTOMER_NAME', sbSetting('customer_name'));
 // ------------------------------------------
 // --- Defined Safe Pages Admins Only
-$sb_admin_pages = array('sandbox','settings','server','dashboard','theme','cache','toolbarck','database','users');
+$sb_admin_pages = array('sandbox','settings','server','dashboard','theme','cache','toolbarck','users');
 // --- Server Config
 $sb_version_php = explode('-',PHP_VERSION);
 defined('_AM_SERVER_PHP_VERSION_ID') OR define('_AM_SERVER_PHP_VERSION_ID', $sb_version_php[0]);

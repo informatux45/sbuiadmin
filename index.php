@@ -175,7 +175,7 @@ $sb_smarty_cache_id = md5($sb_get_page . '|' . ($_SERVER['REQUEST_URI'] ?? ''));
 // --------------------------------
 // --- Search for safe page
 // --------------------------------
-if (in_array($sb_get_page, $sb_safe_pages_cms) || in_array($sb_get_page, $sb_safe_modules_cms)) {
+if (in_array($sb_get_page, $sb_safe_pages_cms) || in_array($sb_get_page, $sb_safe_modules_cms ?? [])) {
 	
 	// ---------------------------------------
 	// --- Assign modules / pages paths

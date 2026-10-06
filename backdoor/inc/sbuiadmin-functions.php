@@ -1377,8 +1377,6 @@ function sbGetMenuModule($param = '') {
 			// --- 	Specific sort
 			$modules_order = [_AM_SITE_DIR.'settings.php'
 							 ,_AM_SITE_DIR.'logaccess.php'
-							 ,_AM_SITE_DIR.'database.php'
-							 ,_AM_SITE_DIR.'explorer.php'
 							 ,_AM_SITE_DIR.'cmsconfig.php'
 							 ,_AM_SITE_DIR.'users.php'
 							 ,_AM_SITE_DIR.'medias.php'
