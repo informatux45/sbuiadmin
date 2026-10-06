@@ -505,7 +505,9 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 		// ($_POST['form_submit'], convention universelle de
 		// sbuiadmin-form.php::openForm(), qui injecte le jeton) - pas les
 		// endpoints AJAX qui ne passent pas par cette classe (ex: messages).
-		if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_submit']) && $_POST['form_submit'] != '' && !sbCheckCsrfToken()) {
+		// Les formulaires de tri (glisser-deposer, champ drag[]) n'envoient
+		// pas form_submit : ils sont couverts par leur propre champ.
+		if ($_SERVER['REQUEST_METHOD'] === 'POST' && ((isset($_POST['form_submit']) && $_POST['form_submit'] != '') || isset($_POST['drag'])) && !sbCheckCsrfToken()) {
 			$sbsmarty->display("403.tpl");
 			exit;
 		}
