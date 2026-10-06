@@ -45,3 +45,6 @@ backdoor/inc/admin/2fa-disabled
 # faites à la migration. Propres à chaque installation : NE JAMAIS committer.
 sbdbconfig.php
 sbsettings-backup-*.php
+
+# Cle de la premiere installation (creee au premier passage dans install/).
+backdoor/install/installer/install-key.php

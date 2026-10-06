@@ -13,6 +13,9 @@
 ##                                                                             #
 ################################################################################
    
+    // Meme nom de session que l'administration (inc/sbsession.php) : sinon la
+    // session admin n'est jamais reconnue par inc-auth-guard.php.
+    require_once(__DIR__ . '/../../inc/sbsession.php');
     session_start();
     require_once('inc-auth-guard.php');
 
