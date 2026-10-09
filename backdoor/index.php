@@ -75,18 +75,17 @@ global $sbdebug, $sbsmarty, $sbsql, $sbsanitize, $sbusers, $sbform, $sbpage, $sb
 // Check INSTALLATION
 // ----------------------
 $sbuiadmin_install_dir  = SBUIADMIN_PATH . '/install.php';
-$sbuiadmin_install_url  = SBUIADMIN_URL . 'install.php';
-//$sbuiadmin_install_lock = SBUIADMIN_PATH . '/install/installer/data/';
-$sbuiadmin_install_lock = SBUIADMIN_PATH . '/install/';
+$sbuiadmin_install_url  = _AM_SITE_PROTOCOL . SBUIADMIN_URL . 'install.php';
 $sbuiadmin_htaccess     = SBUIADMIN_PATH . '/htaccess';
 $sbuiadmin_dot_htaccess = SBUIADMIN_PATH . '/.htaccess';
 // ----------------------
 if (file_exists($sbuiadmin_install_dir)) {
-	// --- Check if install is done or not
-	//if (!file_exists($sbuiadmin_install_lock . 'installer.lock')) {
-	if (!file_exists($sbuiadmin_install_lock . 'config.inc.php')) {
-		header("Status: 301 Moved Permanently", false, 301);
-		header("Location: http://$sbuiadmin_install_url");
+	// --- Installation faite ? install/ supprimé, ou verrouillé en fin
+	// --- d'installation (install/installer/installer.lock) : voir
+	// --- sbSiteInstalled(). Sinon, vers l'assistant (302 : une redirection
+	// --- permanente resterait en cache du navigateur après l'installation).
+	if (!sbSiteInstalled()) {
+		header("Location: $sbuiadmin_install_url", true, 302);
 		exit();
 	} else {
 		// --- Warning Page Home Admin

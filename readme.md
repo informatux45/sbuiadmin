@@ -69,7 +69,10 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
-**4.15**
+**4.16**
+- Installation check fixed: an installed site is never sent back to the installer when backdoor/install.php is present (wrong lock paths), HTTPS-safe temporary redirect
+
+**4.15
 - Front: theme jQuery plugins no longer overwritten (Page Builder lightbox and jQuery plugin load jQuery only when missing)
 - Front: broken sample custom JavaScript from the installer fixed (migration), manifest.json loaded with credentials
 - Update page: alerts layout and release notes formatting fixed

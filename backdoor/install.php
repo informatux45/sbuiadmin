@@ -10,7 +10,7 @@
  * ©INFORMATUX.COM
  */
 
-header("Status: 301 Moved Permanently", false, 301);
-header("Location: ./install/start.php");
+// 302 : une redirection permanente resterait en cache après l'installation
+header("Location: ./install/start.php", true, 302);
 exit();
 ?> 

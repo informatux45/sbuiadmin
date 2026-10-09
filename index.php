@@ -79,13 +79,12 @@ global $sbsmarty, $sbsanitize, $sbpage;
 // ----------------------
 $sbuiadmin_install_dir  = SB_ADMIN_DIR . 'install.php';
 $sbuiadmin_install_url  = SB_ADMIN_URL . 'install.php';
-$sbuiadmin_install_lock = SB_ADMIN_DIR . 'install/installer/data/';
 // ----------------------
 if (file_exists($sbuiadmin_install_dir)) {
-	// --- Check if install is done or not
-	if (!file_exists($sbuiadmin_install_lock . 'installer.lock')) {
-		header("Status: 301 Moved Permanently", false, 301);
-		header("Location: $sbuiadmin_install_url");
+	// --- Installation faite ? install/ supprimé, ou verrouillé en fin
+	// --- d'installation : voir sbSiteInstalled() (SBADMIN/inc/sbuiadmin-settings.php)
+	if (!sbSiteInstalled()) {
+		header("Location: $sbuiadmin_install_url", true, 302);
 		exit();
 	}
 }
