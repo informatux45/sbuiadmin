@@ -42,6 +42,9 @@ $text  = "Utilisateur";
 $sbsmarty->assign('sb_form_submit_value', 'Modifier');
 
 $action = $_GET['a'];
+// Compte modifié ou supprimé : l'alerte « admin/admin » (index.php) sera
+// recalculée au prochain affichage du tableau de bord
+if (!empty($_POST) || $action == 'del') unset($_SESSION['sb_warning_admin_default']);
 switch($action) {
 	case "del":
 	default:

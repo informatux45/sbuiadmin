@@ -175,7 +175,7 @@
 					sbToast('Le fichier INSTALL.PHP existe toujours. Supprimez-le au plus vite !', 'error', '#', 'Vite');
 				{/if}
 				{if isset($sb_warning_admin_user) && $sb_warning_admin_user == true}
-					sbToast('L\'utilisateur ADMIN existe toujours. Créez d\'autres utilisateurs et supprimez-le !', 'error', 'index.php?p=users', 'Vite');
+					sbToast('Le compte « admin » a toujours le mot de passe par défaut « admin ». Changez-le ou supprimez ce compte au plus vite !', 'error', 'index.php?p=users', 'Vite');
 				{/if}
 			{/if}
 		});

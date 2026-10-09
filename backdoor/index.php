@@ -401,9 +401,16 @@ $sbsmarty->assign('sbuiadmin_user_last_login', date("d/m/Y H:i", $sbusers->getUs
 $sbsmarty->assign('sbuiadmin_user_id', sbGetCurrentUserId());
 
 // ----------------------
-// Check if user ADMIN is always in DB
+// Compte "admin" au mot de passe "admin" (dumps d'installation d'avant le
+// 2026-10-01). Depuis, l'installeur fait choisir identifiant et mot de passe :
+// un compte nommé "admin" n'est plus un problème en soi, seul ce mot de passe
+// par défaut l'est. Vérifié une fois par session (password_verify est lent).
 // ----------------------
-$sbsmarty->assign('sb_warning_admin_user', ( ($sbusers->getUserInfo('admin', 'username') == 'admin') ? true : false ) );
+if (!isset($_SESSION['sb_warning_admin_default'])) {
+	$sb_admin_hash = $sbusers->getPasswordHash('admin');
+	$_SESSION['sb_warning_admin_default'] = ($sb_admin_hash !== false && $sb_admin_hash !== '' && password_verify('admin', $sb_admin_hash));
+}
+$sbsmarty->assign('sb_warning_admin_user', $_SESSION['sb_warning_admin_default']);
 
 // ----------------------
 // Get Global Configuration
