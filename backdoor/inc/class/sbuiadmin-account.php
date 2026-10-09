@@ -125,11 +125,10 @@ class account extends sql {
         if (isset($_SESSION['sbaccount_user_email']) || $_SESSION['sbaccount_user_email'] != '') {
             if (!$this->login($_SESSION['sbaccount_user_email'], $password)) {
                 return false;
-            } elseif (_AM_CAPTCHA_MODE == 0) {
-                return true;
             } else {
-                if ($_SESSION['captchaResult'] == $captcha) return true;
-                else return false;
+                // Ancien captcha maison (session captchaResult) retiré : les
+                // formulaires sont protégés par ALTCHA (sbAltchaVerify())
+                return true;
             }
         } else {
             return false;
@@ -571,54 +570,6 @@ class account extends sql {
 		$result_currency  = $this->object($request_currency);
 		
 		return $result_currency->country;
-	}
-	
-	/**
-	 * CURL: Get response from url
-	 *
-	 * @param	string	$url	Url to access
-	 *
-	 * @return	string
-	 */
-	private function getCurlData($url) {
-		$curl = curl_init();
-		curl_setopt($curl, CURLOPT_URL, $url);
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($curl, CURLOPT_TIMEOUT, 10);
-		curl_setopt($curl, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.16) Gecko/20110319 Firefox/3.6.16");
-		$curlData = curl_exec($curl);
-		curl_close($curl);
-		return $curlData;
-	}
-	
-	/**
-	* Get Google Recaptcha Response
-	* @return bool
-	*/
-	public function checkRecaptcha($privatekey) {
-		global $_POST;
-		if ($privatekey) {
-			// --- Check Google Recaptcha
-			if (isset($_POST['g-recaptcha-response']) && !empty($_POST['g-recaptcha-response'])) {
-				// --- Get verify response data
-				$google_url = "https://www.google.com/recaptcha/api/siteverify";
-				$ip         = $_SERVER['REMOTE_ADDR'];
-				$url        = $google_url . "?secret=" . $privatekey . "&response=" . $_POST['g-recaptcha-response'] . "&remoteip=" . $ip;
-				$response   = $this->getCurlData($url);
-				$response   = json_decode($response); // Don't add TRUE setting in json_decode
-				
-				if ($response->success === false) {
-					// --- Error Google Recaptcha
-					return false;
-				} else {
-					return true;
-				}
-			} else {
-				return false;
-			}
-		} else {
-			return false;
-		}
 	}
 	
 	/**

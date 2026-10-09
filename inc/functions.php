@@ -519,7 +519,7 @@ if (!function_exists("sbGetUserIP")) {
 		// mais ces en-têtes sont choisis par le visiteur : seule la première IP
 		// VALIDE de chacun est retenue. Ne réécrit plus $_SERVER['REMOTE_ADDR'] :
 		// c'était la seule source fiable, et la fonction la rendait falsifiable
-		// pour tout le reste du code (logs, reCAPTCHA...).
+		// pour tout le reste du code (logs, blocage des tentatives...).
 		foreach (array('HTTP_CF_CONNECTING_IP', 'HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR') as $header) {
 			if (!empty($_SERVER[$header])) {
 				$ip = trim(explode(',', $_SERVER[$header])[0]);

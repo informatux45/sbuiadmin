@@ -169,7 +169,10 @@
 							<br>
 							Champs SUBMIT<br>
 							<span style="font-weight: bold;">[SUBMIT name=go]</span><br>
-							<span style="font-style: italic;">Si vous choisissez le RECAPTCHA INVISIBLE, celui-ci devient le bouton SUBMIT donc ne pas insérez le bouton SUBMIT cause double emploi.</span>
+							<br>
+							Anti-robot ALTCHA<br>
+							<span style="font-weight: bold;">[ALTCHA]</span><br>
+							<span style="font-style: italic;">Toujours exigé à l'envoi : à placer avant le bouton SUBMIT (ajouté automatiquement s'il manque).</span>
 							{/if}
                     </div>
                     <!-- /.card -->

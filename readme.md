@@ -23,7 +23,7 @@ Ready | Fonctionnalités
 *✓* | Gestion des blocs
 *✓* | Contenu additionnels HTML (Smarty ready)
 *✓* | Administration renommable (Répertoire) et autonome
-*✓* | Google Invisible Recaptcha Ready
+*✓* | ALTCHA anti-robot (auto-hébergé, sans Google)
 *✓* | Développeurs (Templates Smarty, Sandbox, Debug Kint, Modules, ...)
 *✓* | Serveurs Linux / Apache (Recommandés)
 
@@ -49,7 +49,7 @@ Ready | Fonctionnalités
 **4.11**
 - Réglages en base de données (table sb_settings), migration automatique de settings.txt
 - Accès base dans sbdbconfig.php, cherché hors de la racine web (private/, dossier parent), variables d'environnement possibles
-- Secrets (reCAPTCHA, SMTP) chiffrés en base et jamais renvoyés au navigateur
+- Secrets (clés ALTCHA, SMTP) chiffrés en base et jamais renvoyés au navigateur
 - Installeur : écriture directe des réglages, suppression de install/ en un clic, état des lieux des prérequis serveur
 
 **4.10**

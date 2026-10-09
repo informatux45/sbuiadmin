@@ -65,10 +65,10 @@ global $sbfiles_medias_exts_safe;
  * 16 - Sandbox
  * 17 - Cms
  * 18 - Image Scaling Max Size (Medias upload)
- * 19 - Google Recaptcha (Clé du site publique)
- * 20 - Google Recaptcha (Clé secrète)
+ * 19 - (ancien Google Recaptcha, clé publique - remplacé par ALTCHA)
+ * 20 - (ancien Google Recaptcha, clé secrète - remplacé par ALTCHA)
  * 21 - DB prefix
- * 22 - Captcha Mode
+ * 22 - (ancien mode captcha - remplacé par altcha_login)
  * 23 - Upgrade Mode
  * 24 - Coming soon
  * 25 - Debug General Front
@@ -127,8 +127,15 @@ switch($action) {
 				'sandbox'               => $sb_on('sandbox'),
 				'cms'                   => $sb_on('cms'),
 				'scaling_maxsize'       => $sb_text('scaling_maxsize'),
-				'recaptcha_public'      => $sb_text('recaptcha_public'),
-				'captcha_mode'          => $sb_on('captcha_mode'),
+				'altcha_login'          => $sb_on('altcha_login'),
+				'altcha_cost'           => $sb_text('altcha_cost'),
+				'altcha_counter'        => $sb_text('altcha_counter'),
+				'altcha_expire'         => $sb_text('altcha_expire'),
+				'login_lock_enabled'    => $sb_on('login_lock_enabled'),
+				'login_lock_window'     => $sb_text('login_lock_window'),
+				'login_lock_duration'   => $sb_text('login_lock_duration'),
+				'login_lock_max_login'  => $sb_text('login_lock_max_login'),
+				'login_lock_max_ip'     => $sb_text('login_lock_max_ip'),
 				'upgrade_mode'          => $sb_on('upgrade_mode'),
 				'maintenance'           => $sb_on('coming_soon'),
 				'debug_front'           => $sb_on('debug_general_front'),
@@ -140,10 +147,17 @@ switch($action) {
 				'medias_per_page'       => $sb_text('medias_per_page'),
 				'toast_duration'        => $sb_text('toast_duration'),
 			);
-			// Secret (chiffré en base, jamais renvoyé au navigateur) : champ
-			// laissé vide = valeur inchangée.
-			if (isset($_POST['recaptcha_secret']) && trim((string) $_POST['recaptcha_secret']) !== '') {
-				$sb_new_settings['recaptcha_secret'] = trim((string) $_POST['recaptcha_secret']);
+			// Clés HMAC d'ALTCHA (chiffrées en base, jamais renvoyées au
+			// navigateur) : champ laissé vide = valeur inchangée ; case
+			// « régénérer » = deux nouvelles clés tirées au sort (les défis en
+			// cours deviennent invalides).
+			foreach (array('altcha_hmac_secret', 'altcha_hmac_key_secret') as $sb_altcha_key) {
+				if (isset($_POST[$sb_altcha_key]) && trim((string) $_POST[$sb_altcha_key]) !== '') {
+					$sb_new_settings[$sb_altcha_key] = trim((string) $_POST[$sb_altcha_key]);
+				}
+				if ($sb_on('altcha_regenerate') === '1') {
+					$sb_new_settings[$sb_altcha_key] = bin2hex(random_bytes(32));
+				}
 			}
 			// Le champ est desactivé (disabled) si le multilangue est actif
 			// (voir plus bas, formulaire) - un champ disabled n'est jamais
@@ -192,9 +206,15 @@ switch($action) {
 		$sb_config_sandbox             = sbSetting('sandbox');
 		$sb_config_cms                 = sbSetting('cms');
 		$sb_config_scaling_maxsize     = sbSetting('scaling_maxsize');
-		$sb_config_recaptcha_public    = sbSetting('recaptcha_public');
-		$sb_config_recaptcha_secret    = sbSetting('recaptcha_secret');
-		$sb_config_captcha_mode        = sbSetting('captcha_mode');
+		$sb_config_altcha_login        = sbSetting('altcha_login', '1');
+		$sb_config_altcha_cost         = sbSetting('altcha_cost');
+		$sb_config_altcha_counter      = sbSetting('altcha_counter');
+		$sb_config_altcha_expire       = sbSetting('altcha_expire');
+		$sb_config_lock_enabled        = sbSetting('login_lock_enabled', '1');
+		$sb_config_lock_window         = sbSetting('login_lock_window');
+		$sb_config_lock_duration       = sbSetting('login_lock_duration');
+		$sb_config_lock_max_login      = sbSetting('login_lock_max_login');
+		$sb_config_lock_max_ip         = sbSetting('login_lock_max_ip');
 		$sb_config_upgrade_mode        = sbSetting('upgrade_mode');
 		$sb_config_coming_soon         = sbSetting('maintenance');
 		$sb_config_debug_general_front = sbSetting('debug_front');
@@ -276,15 +296,42 @@ switch($action) {
 			$sb_pagebuilder_help .= " <strong style='color: red;'>Cette fonctionnalité ne peut pas être utilisée tant que le multilangue est activé.</strong>";
 		}
 		$sbform->addTagifyWhitelist('Modules utilisant le Page Builder', $sb_pagebuilder_whitelist, $sb_pagebuilder_args, false, $sb_pagebuilder_help);
-		$sbform->addBreak('Captcha (Google reCAPTCHA)');
-		$sbform->addInput('password', "Google Recaptcha (Clé publique)", array ('name' => 'recaptcha_public', 'value' => "$sb_config_recaptcha_public"), false, false, "Clé du site dans le code HTML que vous proposez à vos utilisateurs");
-		$sbform->addInput('password', 'Google Recaptcha (Clé secrète)', array ('name' => 'recaptcha_secret', 'value' => '', 'placeholder' => ($sb_config_recaptcha_secret !== '' ? "•••••••• enregistrée (vide = inchangée)" : ''), 'autocomplete' => 'new-password'), false, false, "Clé pour toute communication entre votre site et Google. Veillez à ne pas la divulguer, car il s'agit d'une clé secrète.");
-		// Checkbox du mode CAPTCHA
-		$tab_check_4 = array();
-		$tab_check_4[0]['text']    = 'Activé';
-		$tab_check_4[0]['name']    = 'captcha_mode';
-		$tab_check_4[0]['checked'] = ($sb_config_captcha_mode == 1) ? '1' : '0';
-		$sbform->addCheckbox('Activation du mode CAPTCHA (Login)', $tab_check_4, '', false, '<br />', "Permet d'activer le captcha lors du login");
+		$sbform->addBreak('Anti-robot (ALTCHA)');
+		// ALTCHA : preuve de travail calculée par le navigateur, sans service
+		// extérieur (inc/sbuiadmin-altcha.php). Clés générées au premier usage.
+		$sb_altcha_ok = sbAltchaAvailable();
+		$sb_altcha_secrets_set = (sbSetting('altcha_hmac_secret') !== '' && sbSetting('altcha_hmac_key_secret') !== '');
+		$sbform->addAnything("<div class='form-group'><p>ALTCHA protège la connexion (administration et module user) et tous les formulaires du module contact. Aucune donnée n'est envoyée à un service extérieur. "
+			. ($sb_altcha_ok
+				? "<span style='color: var(--success);'>Opérationnel ✓</span>"
+				: "<strong style='color: red;'>Indisponible</strong> (PHP 8.1+, <code>vendor/altcha-org</code> et la base sont requis) : les formulaires ne sont pas protégés.")
+			. "</p></div>");
+		$tab_check_altcha = array();
+		$tab_check_altcha[0]['text']    = 'Activé';
+		$tab_check_altcha[0]['name']    = 'altcha_login';
+		$tab_check_altcha[0]['checked'] = ($sb_config_altcha_login == 1) ? '1' : '0';
+		$sbform->addCheckbox('ALTCHA à la connexion', $tab_check_altcha, '', false, '<br />', "Administration et module user. Le module contact l'exige toujours.");
+		$sb_secret_placeholder = ($sb_altcha_secrets_set ? "•••••••• enregistrée (vide = inchangée)" : "générée automatiquement au premier usage");
+		$sbform->addInput('password', 'Clé HMAC (signature des défis)', array ('name' => 'altcha_hmac_secret', 'value' => '', 'placeholder' => $sb_secret_placeholder, 'autocomplete' => 'new-password'), false, false, "Secrète, chiffrée en base. Laisser vide pour la conserver.");
+		$sbform->addInput('password', 'Clé HMAC (signature des solutions)', array ('name' => 'altcha_hmac_key_secret', 'value' => '', 'placeholder' => $sb_secret_placeholder, 'autocomplete' => 'new-password'), false, false, "Secrète, chiffrée en base. Permet de vérifier une réponse sans refaire le calcul.");
+		$tab_check_altcha_regen = array();
+		$tab_check_altcha_regen[0]['text']    = 'Régénérer les deux clés';
+		$tab_check_altcha_regen[0]['name']    = 'altcha_regenerate';
+		$tab_check_altcha_regen[0]['checked'] = '0';
+		$sbform->addCheckbox('Nouvelles clés', $tab_check_altcha_regen, '', false, '<br />', "Tire au sort deux nouvelles clés. Les vérifications en cours dans les navigateurs devront être refaites.");
+		$sbform->addInput('text', 'Coût (itérations PBKDF2 par essai)', array ('name' => 'altcha_cost', 'value' => "$sb_config_altcha_cost", 'placeholder' => "2000"), false, false, "Défaut : 2000 (de 100 à 100000)");
+		$sbform->addInput('text', 'Difficulté (nombre maximum d\'essais)', array ('name' => 'altcha_counter', 'value' => "$sb_config_altcha_counter", 'placeholder' => "5000"), false, false, "Défaut : 5000, environ 1 seconde sur un ordinateur (de 10 à 1000000). Le navigateur fait en moyenne les trois quarts de ce nombre d'essais : plus la valeur est haute, plus la vérification est longue pour un visiteur (et coûteuse pour un robot).");
+		$sbform->addInput('text', 'Validité d\'un défi (secondes)', array ('name' => 'altcha_expire', 'value' => "$sb_config_altcha_expire", 'placeholder' => "600"), false, false, "Défaut : 600 (10 minutes, de 60 à 86400). Chaque défi n'est accepté qu'une fois.");
+		$sbform->addBreak('Blocage des tentatives de connexion');
+		$tab_check_lock = array();
+		$tab_check_lock[0]['text']    = 'Activé';
+		$tab_check_lock[0]['name']    = 'login_lock_enabled';
+		$tab_check_lock[0]['checked'] = ($sb_config_lock_enabled == 1) ? '1' : '0';
+		$sbform->addCheckbox('Blocage temporaire', $tab_check_lock, '', false, '<br />', "Trop d'échecs (mot de passe ou code de double authentification) : la connexion est refusée sans vérifier le mot de passe. Administration et module user. Complète l'anti-flood (Utilisateurs &gt; IP bloquées), qui limite seulement la cadence et dépend de Memcache.");
+		$sbform->addInput('text', 'Fenêtre de comptage (minutes)', array ('name' => 'login_lock_window', 'value' => "$sb_config_lock_window", 'placeholder' => "15"), false, false, "Défaut : 15. Les échecs sont comptés sur cette durée.");
+		$sbform->addInput('text', 'Durée du blocage (minutes)', array ('name' => 'login_lock_duration', 'value' => "$sb_config_lock_duration", 'placeholder' => "15"), false, false, "Défaut : 15, à partir du dernier échec qui a atteint le seuil.");
+		$sbform->addInput('text', 'Échecs maximum par identifiant', array ('name' => 'login_lock_max_login', 'value' => "$sb_config_lock_max_login", 'placeholder' => "10"), false, false, "Défaut : 10.");
+		$sbform->addInput('text', 'Échecs maximum par adresse IP', array ('name' => 'login_lock_max_ip', 'value' => "$sb_config_lock_max_ip", 'placeholder' => "20"), false, false, "Défaut : 20 (tous identifiants confondus).");
 		$sbform->addBreak('Debug');
 		// Checkbox des modes debug
 		$tab_check = array();
@@ -402,8 +449,8 @@ $sbsmarty->assign('sb_config_url_customer', trim($sb_config_url_customer));
 $sbsmarty->assign('sb_config_sandbox', trim($sb_config_sandbox));
 $sbsmarty->assign('sb_config_cms', trim($sb_config_cms));
 $sbsmarty->assign('sb_config_scaling_maxsize', trim($sb_config_scaling_maxsize));
-$sbsmarty->assign('sb_config_recaptcha_public', trim($sb_config_recaptcha_public));
-$sbsmarty->assign('sb_config_captcha_mode', trim($sb_config_captcha_mode));
+$sbsmarty->assign('sb_config_altcha_login', trim($sb_config_altcha_login));
+$sbsmarty->assign('sb_config_lock_enabled', trim($sb_config_lock_enabled));
 $sbsmarty->assign('sb_config_upgrade_mode', trim($sb_config_upgrade_mode));
 $sbsmarty->assign('sb_config_coming_soon', trim($sb_config_coming_soon));
 $sbsmarty->assign('sb_config_debug_general_front', trim($sb_config_debug_general_front));

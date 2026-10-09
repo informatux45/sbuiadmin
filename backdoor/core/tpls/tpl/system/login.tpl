@@ -50,6 +50,8 @@
 								{$smarty.const.SBUIADMIN_MSG_ERROR_E6}
 							{elseif $sbuiadmin_access_code == 'E7'}
 								{$smarty.const.SBUIADMIN_MSG_ERROR_E7}
+							{elseif $sbuiadmin_access_code == 'E8'}
+								{$smarty.const.SBUIADMIN_MSG_ERROR_E8}
 							{/if}
 						</div>
 					</div>
@@ -85,40 +87,20 @@
 							<input name="remember" type="checkbox" value="longtime" id="switch"> <span class="box"></span> Se souvenir de moi
 						</label>
 
-						{if $smarty.const._AM_CAPTCHA_MODE}
-							<button
-								type="submit"
-								class="btn btn--primary auth-submit g-recaptcha"
-								data-sitekey="{$grecaptcha_publickey}"
-								data-callback="sbLoginOnSubmit">
-								Connexion
-								<svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-							</button>
-						{else}
-							<button type="submit" class="btn btn--primary auth-submit">
-								Connexion
-								<svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-							</button>
+						{* Anti-robot ALTCHA (auto-hébergé, voir inc/sbuiadmin-altcha.php) *}
+						{if $sb_altcha_widget}
+							<div class="field auth-altcha" style="--altcha-max-width: 100%">{$sb_altcha_widget}</div>
 						{/if}
-					</form>
 
-					{if $smarty.const._AM_CAPTCHA_MODE}
-						{* Google Invisible ReCaptcha *}
-						<script src="https://www.google.com/recaptcha/api.js?hl=fr&remoteip={$smarty.server.REMOTE_ADDR}" async defer></script>
-						{* ================ *}
-					{/if}
+						<button type="submit" class="btn btn--primary auth-submit">
+							Connexion
+							<svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+						</button>
+					</form>
 				{/if}
 			</div>
 		</main>
 	</div>
-
-	{if $smarty.const._AM_CAPTCHA_MODE && $get_browser != 'IE'}
-	<script type="text/javascript">
-       function sbLoginOnSubmit(token) {
-         document.getElementById("sbuiadmin-login").submit();
-       }
-	</script>
-	{/if}
 
 {include file='scripts.tpl' page='login' pagef='false'}
 

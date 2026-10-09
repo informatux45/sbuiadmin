@@ -850,11 +850,9 @@ $sbsmarty->assign('cmsconfig_headerfooter_help', "Le code du <strong>HEADER</str
 												  <br><br><span style='text-align: center; font-weight: bold; color: green; display: block;'>{insert name=\"sbGetConfig\" id=\"footer\"}</span>
 												  <br><br>");
 
-$sbsmarty->assign('cmsconfig_email_help', "<img src='img/google-recaptcha.png' alt='API reCAPTCHA' />
-										   <br><br>Vous devez créer une entrée dans l'<a href='https://www.google.com/recaptcha/admin' target='_blank'>API de Google reCAPTCHA</a> pour pouvoir utiliser vos formulaires de site.
-										   <br><br><img src='img/google-recaptcha-in-action.png' alt='Google reCAPTCHA in action' />
-										   <br><br>
-										   ");
+$sbsmarty->assign('cmsconfig_email_help', "Les formulaires de contact du site sont protégés par <strong>ALTCHA</strong>, un anti-robot auto-hébergé : aucune clé à créer chez un service extérieur, aucune donnée de vos visiteurs n'en sort.
+										   <br><br>Ses réglages (activation à la connexion, difficulté, clés) se trouvent dans la <strong><a href='"._AM_SITE_URL."index.php?p=settings'>configuration générale</a></strong>.
+										   <br><br>");
 
 $sbsmarty->assign('cmsconfig_comingsoon_help', "Le mode \"Coming Soon\" activé permet de construire son site sans que vos visiteurs puissent accéder à son contenu, ils seront redirigés vers une page d'attente ou de maintenance.<br><br>Ce mode peut également être utilisé lorsque vous effectuez une modification importante à votre site web.<br><br>L'url pour que vous puissiez accéder à votre site lorsque celui-ci est fermé au public sera celle-ci :<br><div style='text-align: center;'><span style='font-weight: bold; color: rgb(255, 102, 0);'><a target='_blank' href='".trim($sb_link_settings[15])."?d=".$cs['coming-soon-url']."'>".trim($sb_link_settings[15])."?d=".$cs['coming-soon-url']."</a></span><br></div><br>Vous pourrez voir votre site le temps de la session de votre serveur (par défaut).<br><br>Pour activer / désactiver le COMING SOON, modifier la <strong><a href='"._AM_SITE_URL."index.php?p=settings'>configuration générale</a></strong> de votre CMS SBUIADMIN ( <strong>Activation du mode COMING SOON (Maintenance)</strong> ).");
 

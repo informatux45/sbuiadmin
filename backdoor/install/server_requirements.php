@@ -159,7 +159,7 @@
 			'mbstring' => 'mbstring (texte UTF-8)',
 			'sodium'   => 'sodium (chiffrement des secrets en base)',
 			'openssl'  => 'OpenSSL (e-mails SMTP chiffrés, HTTPS sortant)',
-			'curl'     => 'cURL (reCAPTCHA, mises à jour, sitemap)',
+			'curl'     => 'cURL (mises à jour, sitemap)',
 			'gd'       => 'GD (vignettes et redimensionnement des images)',
 			'fileinfo' => 'fileinfo (type réel des fichiers envoyés)',
 			'filter'   => 'filter',

@@ -45,8 +45,6 @@
 			$_SESSION['settings_customer_url']      = '';
 			$_SESSION['settings_url_upload']        = '';
 			$_SESSION['settings_path_upload']       = '';
-			$_SESSION['settings_recaptcha_public']  = '';
-			$_SESSION['settings_recaptcha_private'] = '';
 			$_SESSION['password_encryption']        = '';
 			
 			$_SESSION['passed_step'] = 4;
@@ -58,8 +56,6 @@
 		$settings_customer_url = isset($_POST['settings_customer_url']) ? prepare_input($_POST['settings_customer_url'], false, 'medium') : '';
 		$settings_url_upload = isset($_POST['settings_url_upload']) ? prepare_input($_POST['settings_url_upload'], false, 'medium') : '';
 		$settings_path_upload = isset($_POST['settings_path_upload']) ? prepare_input($_POST['settings_path_upload']) : '';
-		$settings_recaptcha_public = isset($_POST['settings_recaptcha_public']) ? prepare_input($_POST['settings_recaptcha_public']) : '';
-		$settings_recaptcha_private = isset($_POST['settings_recaptcha_private']) ? prepare_input($_POST['settings_recaptcha_private']) : '';
 		
 		$password_encryption = isset($_POST['password_encryption']) ? prepare_input($_POST['password_encryption']) : EI_PASSWORD_ENCRYPTION_TYPE;
 
@@ -98,12 +94,6 @@
 		}else if(!hash_equals($admin_password, $admin_password_confirm)){
 			$focus_field = 'admin_password_confirm';
 			$error_msg = lang_key('alert_admin_password_mismatch');
-		//}else if($settings_recaptcha_public == ''){
-		//	$focus_field = 'settings_recaptcha_public';
-		//	$error_msg = lang_key('alert_settings_recaptcha_public_wrong');	
-		//}else if($settings_recaptcha_private == ''){
-		//	$focus_field = 'settings_recaptcha_private';
-		//	$error_msg = lang_key('alert_settings_recaptcha_private_wrong');	
 		}else{
 
 			if(EI_MODE == 'demo'){
@@ -117,8 +107,6 @@
 				$_SESSION['settings_customer_url'] = $settings_customer_url;
 				$_SESSION['settings_url_upload'] = $settings_url_upload;
 				$_SESSION['settings_path_upload']       = $settings_path_upload;
-				$_SESSION['settings_recaptcha_public']  = $settings_recaptcha_public;
-				$_SESSION['settings_recaptcha_private'] = $settings_recaptcha_private;
 				$_SESSION['password_encryption'] = $password_encryption;				
 				$_SESSION['admin_username']      = $admin_username;
 				$_SESSION['admin_password_hash'] = password_hash($admin_password, PASSWORD_DEFAULT);
@@ -141,8 +129,6 @@
 		$settings_customer_url = isset($_SESSION['settings_customer_url']) ? $_SESSION['settings_customer_url'] : $sbuiadmin_url;
 		// -----------
 		$settings_path_upload = isset($_SESSION['settings_path_upload']) ? $_SESSION['settings_path_upload'] : '../upload';
-		$settings_recaptcha_public = isset($_SESSION['settings_recaptcha_public']) ? $_SESSION['settings_recaptcha_public'] : '';
-		$settings_recaptcha_private = isset($_SESSION['settings_recaptcha_private']) ? $_SESSION['settings_recaptcha_private'] : '';
 		
 		$password_encryption = isset($_SESSION['password_encryption']) ? $_SESSION['password_encryption'] : EI_PASSWORD_ENCRYPTION_TYPE;
 		$admin_username = isset($_SESSION['admin_username']) ? $_SESSION['admin_username'] : 'admin';
@@ -208,10 +194,6 @@
 						<h4><?php echo lang_key('settings_path_upload'); ?></h4>
 						<p><?php echo lang_key('settings_path_upload_info'); ?></p>
 					</div>
-					<div id="notes_settings_recaptcha_public" class="notes_container">
-						<h4><?php echo lang_key('settings_recaptcha_public'); ?></h4>
-						<p><?php echo lang_key('settings_recaptcha_public_info'); ?></p>
-					</div>
 					<div id="notes_admin_username" class="notes_container">
 						<h4><?php echo lang_key('admin_login'); ?></h4>
 						<p><?php echo lang_key('admin_login_info'); ?></p>
@@ -219,10 +201,6 @@
 					<div id="notes_admin_password" class="notes_container">
 						<h4><?php echo lang_key('admin_password'); ?></h4>
 						<p><?php echo lang_key('admin_password_info'); ?></p>
-					</div>
-					<div id="notes_settings_recaptcha_private" class="notes_container">
-						<h4><?php echo lang_key('settings_recaptcha_private'); ?></h4>
-						<p><?php echo lang_key('settings_recaptcha_private_info'); ?></p>
 					</div>
 					<img class="loading_img" src="images/ajax_loading.gif" alt="<?php echo lang_key('loading'); ?>..." />
 					<div id="notes_message" class="notes_container"></div>					
@@ -239,14 +217,6 @@
 			<tr>
 				<td>&nbsp;<?php echo lang_key('settings_path_upload'); ?>&nbsp;<span class="star">*</span></td>
 				<td><input name="settings_path_upload" id="settings_path_upload" class="form_text" size="28" value="<?php echo $settings_path_upload; ?>" onfocus="textboxOnFocus('notes_settings_path_upload')" onblur="textboxOnBlur('notes_settings_path_upload')" <?php if(EI_MODE != 'debug') echo 'autocomplete="off"'; ?> required="" /></td>
-			</tr>
-			<tr>
-				<td>&nbsp;<?php echo lang_key('settings_recaptcha_public'); ?></td>
-				<td><input name="settings_recaptcha_public" id="settings_recaptcha_public" class="form_text" size="28" value="<?php echo $settings_recaptcha_public; ?>" onfocus="textboxOnFocus('notes_settings_recaptcha_public')" onblur="textboxOnBlur('notes_settings_recaptcha_public')" <?php if(EI_MODE != 'debug') echo 'autocomplete="off"'; ?> /></td>
-			</tr>
-			<tr>
-				<td>&nbsp;<?php echo lang_key('settings_recaptcha_private'); ?></td>
-				<td><input name="settings_recaptcha_private" id="settings_recaptcha_private" class="form_text" size="28" value="<?php echo $settings_recaptcha_private; ?>" onfocus="textboxOnFocus('notes_settings_recaptcha_private')" onblur="textboxOnBlur('notes_settings_recaptcha_private')" <?php if(EI_MODE != 'debug') echo 'autocomplete="off"'; ?> /></td>
 			</tr>
 			<tr><td nowrap height="10px" colspan="3"></td></tr>
 			<tr>

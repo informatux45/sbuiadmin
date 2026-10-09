@@ -60,8 +60,7 @@
 								{* ================================================ *}
 								{* ==== To ADD for the module CONTACT Captcha ===== *}
 								{* ================================================ *}
-								<div id="grecaptcha"></div>
-								<script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit&hl={if $smarty.session.lang == 'en'}en{else}fr{/if}&remoteip={$smarty.server.REMOTE_ADDR}" async defer></script>
+								{$sb_altcha_widget}
 								{* ================================================ *}
 							</li>
 							<li class="submit-button">
@@ -76,20 +75,7 @@
 				{* === To ADD for the module CONTACT Validation === *}
 				{* ================================================ *}
 				<script type="text/javascript" src="datas/modules/contact/inc/jquery.validate.min.js"></script>
-				{* ================================================ *}
-				{* ==== To ADD for the module CONTACT Captcha ===== *}
-				{* ================================================ *}
-				<script type="text/javascript">
-					var onloadCallback = function() {
-						grecaptcha.render('grecaptcha', {
-							'sitekey' : '{$grecaptcha_publickey}',
-							'theme' : 'light', // light, dark
-							'type' : 'image', // image, audio
-							'size' : 'normal', // normal, compact
-							'tabindex' : 0
-						});
-					};
-				</script>
+
 				{* ================================================ *}
 
 

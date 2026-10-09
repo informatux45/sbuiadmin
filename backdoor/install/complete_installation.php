@@ -95,8 +95,6 @@
 		$settings_customer_url 	    = isset($_SESSION['settings_customer_url']) ? $_SESSION['settings_customer_url'] : '';
 		$settings_url_upload 	    = isset($_SESSION['settings_url_upload']) ? $_SESSION['settings_url_upload'] : '';
 		$settings_path_upload       = isset($_SESSION['settings_path_upload']) ? stripslashes($_SESSION['settings_path_upload']) : '';
-		$settings_recaptcha_public  = isset($_SESSION['settings_recaptcha_public']) ? stripslashes($_SESSION['settings_recaptcha_public']) : '';
-		$settings_recaptcha_private = isset($_SESSION['settings_recaptcha_private']) ? stripslashes($_SESSION['settings_recaptcha_private']) : '';
 		
 		$password_encryption = isset($_SESSION['password_encryption']) ? $_SESSION['password_encryption'] : EI_PASSWORD_ENCRYPTION_TYPE;
 		
@@ -220,9 +218,18 @@
 											'sandbox'               => '1',
 											'cms'                   => '1',
 											'scaling_maxsize'       => '1024',
-											'recaptcha_public'      => $_SESSION['settings_recaptcha_public'],
-											'recaptcha_secret'      => $_SESSION['settings_recaptcha_private'],
-											'captcha_mode'          => '0',
+											// ALTCHA : clés HMAC tirées au sort ici (chiffrées par sbSettingsSave())
+											'altcha_login'          => '1',
+											'altcha_hmac_secret'    => bin2hex(random_bytes(32)),
+											'altcha_hmac_key_secret' => bin2hex(random_bytes(32)),
+											'altcha_cost'           => '2000',
+											'altcha_counter'        => '5000',
+											'altcha_expire'         => '600',
+											'login_lock_enabled'    => '1',
+											'login_lock_window'     => '15',
+											'login_lock_duration'   => '15',
+											'login_lock_max_login'  => '10',
+											'login_lock_max_ip'     => '20',
 											'upgrade_mode'          => '0',
 											'maintenance'           => '1',
 											'debug_front'           => '0',

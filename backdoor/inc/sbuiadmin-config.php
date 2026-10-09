@@ -24,6 +24,9 @@ defined('SBUIADMIN_PATH') or die('Are you crazy!');
 defined('_AM_SETTINGS_FILE') OR define('_AM_SETTINGS_FILE', SBUIADMIN_PATH . '/inc/admin/settings.txt');
 // --- Réglages : table sb_settings, accès base dans sbdbconfig.php
 require_once(__DIR__ . '/sbuiadmin-settings.php');
+// --- Anti-robot ALTCHA et blocage des tentatives de connexion
+require_once(__DIR__ . '/sbuiadmin-altcha.php');
+require_once(__DIR__ . '/sbuiadmin-loginlock.php');
 // Ancien tableau positionnel, pour le code tiers qui le lirait encore
 $sb_settings_config = sbSettingsLegacyArray();
 // --- Admin Dashboard File
@@ -54,8 +57,8 @@ if (_AM_SITE_DEBUG) {
 	ini_set('display_errors', 0);
 }
 // ------------------------------------------
-// CAPTCHA Mode
-defined('_AM_CAPTCHA_MODE') OR define('_AM_CAPTCHA_MODE', (sbSetting('captcha_mode') == 1) ? true : false);
+// ALTCHA à la connexion (administration et module user)
+defined('_AM_ALTCHA_LOGIN') OR define('_AM_ALTCHA_LOGIN', sbSetting('altcha_login', '1') === '1');
 // ------------------------------------------
 // UPGRADE Mode
 defined('_AM_UPGRADE_MODE') OR define('_AM_UPGRADE_MODE', (sbSetting('upgrade_mode') == 1) ? true : false);

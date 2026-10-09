@@ -1,0 +1,3 @@
+ALTCHA widget 3.3.0 (https://altcha.org, MIT - voir LICENSE.txt)
+Fichiers : dist/external/altcha.min.js, altcha.css, i18n/fr-fr.js, workers/pbkdf2.js
+sbaltcha.js : enregistrement du worker (SBUIADMIN)

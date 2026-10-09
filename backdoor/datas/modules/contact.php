@@ -212,15 +212,14 @@ switch($action) {
 		// --------------------------------
 		// Formulaire (construct)
 		// --------------------------------
-		$sbform->addAnything('<p class="help-block">L\'usage du RECAPTCHA INVISIBLE ne requiert pas le bouton SUBMIT car il devient le bouton de soumission de votre formulaire.</p>
+		$sbform->addAnything('<p class="help-block">ALTCHA (anti-robot auto-hébergé, réglé dans Configuration &gt; Générale) est toujours exigé à l\'envoi : placez [ALTCHA] avant le bouton SUBMIT, sinon il y est ajouté automatiquement.</p>
 							 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">
 							 <button class="btn btn--danger btn--sm" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[TEXT name=name/required=required]\')">NAME</button>
 							 <button class="btn btn--danger btn--sm" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[TEXT name=email/required=required]\')">EMAIL</button>
 							 <button class="btn btn--primary btn--sm" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[TEXT name=your-name/required=required]\')">TEXT</button>
 							 <button class="btn btn--primary btn--sm" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[TXTAREA name=your-name/required=required]\')">TXTAREA</button>
 							 <button class="btn btn--primary btn--sm" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[SELECT name=selection/options=choisissez un choix|choix1|choix2|choix3|choix4/value=0|10|20|30|40/required=required]\')">SELECT</button>
-							 <button class="btn btn--danger btn--sm" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[RECAPTCHA]\')">RECAPTCHA</button>
-							 <button class="btn btn--danger btn--sm" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[RECAPTCHA_INVISIBLE name=go/value=Envoyer]\')">RECAPTCHA_INVISIBLE</button>
+							 <button class="btn btn--danger btn--sm" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[ALTCHA]\')">ALTCHA</button>
 							 <button class="btn btn--primary btn--sm" type="button" onclick="javascript:sbInsertText(\'contactform\', \'[SUBMIT name=go/value=Envoyer]\')">SUBMIT</button>
 							 </div>');
 		$sbform->addTextarea('', $contactform, array('id' => 'contactform', 'name' => 'contactform', 'style' => 'height: 400px !important; background: url(img/form-bg-textarea.png) repeat-y; font: normal 12px verdana; line-height: 25px; padding: 2px 10px; border: 2px solid #ddd; border-left: 0px; background-attachment: local;'), false, "Les boutons rouges ont caractère d'obligation. Si vous les omettez, le formulaire de contact ne fonctionnera pas correctement.");
@@ -258,10 +257,8 @@ switch($action) {
 				$email_subject_en = $sbsanitize->displayText($_POST['email_subject_en'], 'UTF-8', 1, 0);				
 				$email_subject   .= "[en]".$email_subject_en."[/en]";
 			}
-			$email_publickey  = $sbsanitize->displayText($_POST['email_publickey'], 'UTF-8', 1, 0);
 			// Secrets : chiffrés en base (inc/sbuiadmin-settings.php), jamais
 			// renvoyés au navigateur. Champ laissé vide = valeur inchangée.
-			$email_privatekey = $sbsql->escape_string(sbSecretSeal(trim((string) $_POST['email_privatekey'])));
 
 			$email_smtp          = $sbsanitize->displayText($_POST['email_smtp'], 'UTF-8', 1, 0);
 			$email_smtp_host     = $sbsanitize->displayText($_POST['email_smtp_host'], 'UTF-8', 1, 0);
@@ -276,8 +273,6 @@ switch($action) {
 			// UPDATE DATAS
 			$query_email_to         = "UPDATE $table_cmsconfig SET content = '$email_to' WHERE config = 'email_to'";
 			$query_email_subject    = "UPDATE $table_cmsconfig SET content = '$email_subject' WHERE config = 'email_subject'";
-			$query_email_publickey  = "UPDATE $table_cmsconfig SET content = '$email_publickey' WHERE config = 'email_publickey'";
-			$query_email_privatekey = "UPDATE $table_cmsconfig SET content = '$email_privatekey' WHERE config = 'email_privatekey'";
 
 			$query_email_smtp          = "UPDATE $table_cmsconfig SET content = '$email_smtp' WHERE config = 'email_smtp'";
 			$query_email_smtp_host     = "UPDATE $table_cmsconfig SET content = '$email_smtp_host' WHERE config = 'email_smtp_host'";
@@ -290,8 +285,6 @@ switch($action) {
 			
 			$result_edit_email_to         = $sbsql->query($query_email_to);
 			$result_edit_email_subject    = $sbsql->query($query_email_subject);
-			$result_edit_email_publickey  = $sbsql->query($query_email_publickey);
-			$result_edit_email_privatekey = ($email_privatekey === '') ? true : $sbsql->query($query_email_privatekey);
 			
 			$result_edit_email_smtp          = $sbsql->query($query_email_smtp);
 			$result_edit_email_smtp_host     = $sbsql->query($query_email_smtp_host);
@@ -302,7 +295,7 @@ switch($action) {
 			$result_edit_email_smtp_secure   = $sbsql->query($query_email_smtp_secure);
 			$result_edit_email_smtp_debug    = $sbsql->query($query_email_smtp_debug);
 			
-			if ($result_edit_email_to && $result_edit_email_publickey && $result_edit_email_privatekey && $result_edit_email_subject && $result_edit_email_smtp && $result_edit_email_smtp_host && $result_edit_email_smtp_auth && $result_edit_email_smtp_port && $result_edit_email_smtp_username && $result_edit_email_smtp_password && $result_edit_email_smtp_secure && $result_edit_email_smtp_debug) {
+			if ($result_edit_email_to && $result_edit_email_subject && $result_edit_email_smtp && $result_edit_email_smtp_host && $result_edit_email_smtp_auth && $result_edit_email_smtp_port && $result_edit_email_smtp_username && $result_edit_email_smtp_password && $result_edit_email_smtp_secure && $result_edit_email_smtp_debug) {
 				// --- Message SUCCES
 				$sb_msg_valid = 'Configuration EMAIL modifiée avec succès';
 			} else {
@@ -311,7 +304,7 @@ switch($action) {
 			}
 
 			// --- Debug SQL
-			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_email_to . "\n" . $query_email_publickey . "\n" . $result_edit_email_privatekey . "\n" . $result_edit_email_subject . "\n" . 'Submit Form Type = '.$formType);
+			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_email_to . "\n" . $result_edit_email_subject . "\n" . 'Submit Form Type = '.$formType);
 			
 		}
 		
@@ -319,17 +312,11 @@ switch($action) {
 		// --- Recuperation des donnees
 		// --------------------------------
 		$queryT   = "SELECT content FROM $table_cmsconfig WHERE config = 'email_to'";
-		$queryP   = "SELECT content FROM $table_cmsconfig WHERE config = 'email_publickey'";
-		$queryS   = "SELECT content FROM $table_cmsconfig WHERE config = 'email_privatekey'";
 		$queryA   = "SELECT content FROM $table_cmsconfig WHERE config = 'email_subject'";
 
 		$requestT = $sbsql->query($queryT);
-		$requestP = $sbsql->query($queryP);
-		$requestS = $sbsql->query($queryS);
 		$requestA = $sbsql->query($queryA);
 		$assocT   = $sbsql->assoc($requestT);
-		$assocP   = $sbsql->assoc($requestP);
-		$assocS   = $sbsql->assoc($requestS);
 		$assocA   = $sbsql->assoc($requestA);
 		
 		$assocEmail['email_smtp']          = $sbsql->assoc($sbsql->query( "SELECT content FROM $table_cmsconfig WHERE config = 'email_smtp'" ));
@@ -361,11 +348,6 @@ switch($action) {
 		if ($getMultilang) {
 			$sbform->addInput('text', 'Sujet (EN)', array ('name' => 'email_subject_en', 'value' => $sbsanitize->displayLang(sb_utf8_encode($assocA['content']), 'en'), 'placeholder' => "Email(s)", 'icon' => 'pencil'), false, false, "Sujet (EN) principal de vos formulaires (si un formulaire possède un sujet, celui-ci sera utilisé en priorité)");
 		}
-		// --------------------------------
-		// Google RECAPTCHA Keys
-		// --------------------------------	
-		$sbform->addInput('text', "[GOOGLE RECAPTCHA] <span style='color: red;'>Clé du site</span>", array ('name' => 'email_publickey', 'value' => $assocP['content'], 'placeholder' => "clé reCAPTCHA publique", 'icon' => '0Publique'), false, false, "Clé dans le code HTML que vous proposez à vos utilisateurs");
-		$sbform->addInput('text', "[GOOGLE RECAPTCHA] <span style='color: red;'>Clé secrète</span>", array ('name' => 'email_privatekey', 'value' => '', 'placeholder' => ($assocS['content'] !== '' ? "•••••••• enregistrée (vide = inchangée)" : "clé reCAPTCHA privée"), 'autocomplete' => 'new-password', 'icon' => '0Secrète'), false, false, "Clé pour toute communication entre votre site et Google. Veillez à ne pas la divulguer, car il s'agit d'une clé secrète");
 		// --------------------------------
 		// SMTP configuration
 		// --------------------------------

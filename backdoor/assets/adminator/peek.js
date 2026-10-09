@@ -1,7 +1,7 @@
 /*
  * Vanilla-JS "press and hold to reveal" toggle for the sensitive
  * password fields of Configuration :: Générale (DB credentials,
- * reCAPTCHA keys). Content stays masked at all times except while the
+ * ALTCHA HMAC keys). Content stays masked at all times except while the
  * eye button is actively pressed (mouse or touch) — releasing it
  * re-masks immediately. Self-contained: injects its own styles.
  */
@@ -52,7 +52,7 @@
 		btn.addEventListener('click', function (e) { e.preventDefault(); });
 	}
 
-	var PEEK_FIELDS = ['dbhost', 'dbname', 'dbuser', 'dbpwd', 'dbprefix', 'recaptcha_public', 'recaptcha_secret'];
+	var PEEK_FIELDS = ['dbhost', 'dbname', 'dbuser', 'dbpwd', 'dbprefix', 'altcha_hmac_secret', 'altcha_hmac_key_secret'];
 
 	function init() {
 		injectStyle();

@@ -12,20 +12,22 @@
 
 // ** Log message
 defined('SBUIADMIN_MSG_LOG_ACCESS_GRANTED') OR define("SBUIADMIN_MSG_LOG_ACCESS_GRANTED", "Utilisateur [%s] identifi&eacute; depuis [%s]");
-defined('SBUIADMIN_MSG_LOG_ACCESS_CAPTCHA_ERROR') OR define("SBUIADMIN_MSG_LOG_ACCESS_CAPTCHA_ERROR", "Utilisateur [%s] identifi&eacute; depuis [%s] avec une erreur captcha");
+defined('SBUIADMIN_MSG_LOG_ACCESS_CAPTCHA_ERROR') OR define("SBUIADMIN_MSG_LOG_ACCESS_CAPTCHA_ERROR", "Connexion de [%s] depuis [%s] refus&eacute;e : v&eacute;rification anti-robot (ALTCHA) &eacute;chou&eacute;e");
+defined('SBUIADMIN_MSG_LOG_ACCESS_LOCKED') OR define("SBUIADMIN_MSG_LOG_ACCESS_LOCKED", "Connexion de [%s] depuis [%s] refus&eacute;e : blocage temporaire (trop d&#39;&eacute;checs)");
 defined('SBUIADMIN_MSG_LOG_ACCESS_CAPTCHA_ERROR2') OR define("SBUIADMIN_MSG_LOG_ACCESS_CAPTCHA_ERROR2", "Utilisateur [%s] identifi&eacute; depuis [%s] avec une erreur captcha [%s]->[%s]");
 defined('SBUIADMIN_MSG_LOG_ACCESS_USER_ERROR') OR define("SBUIADMIN_MSG_LOG_ACCESS_USER_ERROR", "Utilisateur d&eacute;sactiv&eacute; [%s] a essay&eacute; de s&#39;identifier depuis [%s]");
 defined('SBUIADMIN_MSG_LOG_ACCESS_NOGRANTED') OR define("SBUIADMIN_MSG_LOG_ACCESS_NOGRANTED", "Identification non autoris&eacute;e depuis [%s] - propablement un intru");
 defined('SBUIADMIN_MSG_LOG_ACCESS_MISSING') OR define("SBUIADMIN_MSG_LOG_ACCESS_MISSING", "Erreur d&#39;acc&egrave;s depuis [%s] - identifiant et&#47;ou mot de passe manquant");
  
  // ** Control access message
-defined('SBUIADMIN_MSG_ERROR_E1') OR define("SBUIADMIN_MSG_ERROR_E1", "Captcha incorrect");
+defined('SBUIADMIN_MSG_ERROR_E1') OR define("SBUIADMIN_MSG_ERROR_E1", "V&eacute;rification anti-robot &eacute;chou&eacute;e : merci de r&eacute;essayer.");
 defined('SBUIADMIN_MSG_ERROR_E2') OR define("SBUIADMIN_MSG_ERROR_E2", "Login incorrect");
 defined('SBUIADMIN_MSG_ERROR_E3') OR define("SBUIADMIN_MSG_ERROR_E3", "Login manquant");
 defined('SBUIADMIN_MSG_ERROR_E4') OR define("SBUIADMIN_MSG_ERROR_E4", "Compte d&eacute;sactiv&eacute;");
 defined('SBUIADMIN_MSG_ERROR_E5') OR define("SBUIADMIN_MSG_ERROR_E5", "Double authentification impossible : aucune adresse e-mail valide sur ce compte. Contactez l&#39;administrateur.");
 defined('SBUIADMIN_MSG_ERROR_E6') OR define("SBUIADMIN_MSG_ERROR_E6", "Double authentification impossible : l&#39;envoi du code par e-mail a &eacute;chou&eacute;. R&eacute;essayez ou contactez l&#39;administrateur.");
 defined('SBUIADMIN_MSG_ERROR_E7') OR define("SBUIADMIN_MSG_ERROR_E7", "Trop d&#39;essais de code : reconnectez-vous.");
+defined('SBUIADMIN_MSG_ERROR_E8') OR define("SBUIADMIN_MSG_ERROR_E8", "Trop de tentatives de connexion &eacute;chou&eacute;es : r&eacute;essayez dans quelques minutes.");
 
 // ** User Interface
 defined('SBUIADMIN_GLOBAL_LAST_LOGIN') OR define("SBUIADMIN_GLOBAL_LAST_LOGIN", "Derni&egrave;re connexion");

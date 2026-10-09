@@ -22,7 +22,7 @@ define('_CMS_CONTACT_BUTTON_SEND',					'Send Message');
 // -------------------------------------------------------------------------
 define('_CMS_CONTACT_FORM_SUCCESS',					"Your contact request have submitted successfully");
 define('_CMS_CONTACT_FORM_ERROR_CAPTCHA',			"Robot verification failed, please try again");
-define('_CMS_CONTACT_FORM_ERROR_CAPTCHA_EMPTY',		"Please click on the reCAPTCHA box");
+define('_CMS_CONTACT_FORM_ERROR_CAPTCHA_EMPTY',		"Please complete the anti-robot check before sending");
 define('_CMS_CONTACT_NOFORM',						'Form not available!');
 define('_CMS_CONTACT_FORM_NOTFOUND',				"Form not found!");
 define('_CMS_CONTACT_FORM_INACTIVE',				"Form inactive!");

@@ -192,11 +192,10 @@ class user extends sql {
         if (isset($_SESSION['sbuiadmin_user_name']) || $_SESSION['sbuiadmin_user_name'] != '') {
             if (!$this->login($_SESSION['sbuiadmin_user_name'], $password)) {
                 return false;
-            } elseif (_AM_CAPTCHA_MODE == 0) {
-                return true;
             } else {
-                if ($_SESSION['captchaResult'] == $captcha) return true;
-                else return false;
+                // Ancien captcha maison (session captchaResult) retiré : les
+                // formulaires sont protégés par ALTCHA (sbAltchaVerify())
+                return true;
             }
         } else {
             return false;

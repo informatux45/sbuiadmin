@@ -45,17 +45,15 @@ function shortcode_sbcontactajax($param = '') {
 			# Include Globals
 			global $sbsmarty, $sbsanitize, $sbsql;
 			# ################################################
-			# Settings for Recaptcha AND Global email settings
+			# Global email settings
 			# SQL Request (all config)
-			$query   = "SELECT config, content FROM {$module['tables']['config']} WHERE config = 'email_to' OR config = 'email_subject' OR config = 'email_publickey' OR config = 'email_privatekey'";
+			$query   = "SELECT config, content FROM {$module['tables']['config']} WHERE config = 'email_to' OR config = 'email_subject'";
 			$request = $sbsql->query($query);
 			$result  = $sbsql->toarray($request);
 			foreach($result as $val) {
 				switch($val['config']) {
 					case "email_to": $email_to = $sbsanitize->sTrim($val['content']); break;
 					case "email_subject": $subject = $sbsanitize->displayLang(sb_utf8_encode($val['content'])); break;
-					case "email_publickey": $publickey = $sbsanitize->sTrim($val['content']); break;
-					case "email_privatekey": $privatekey = $sbsanitize->sTrim(sbSecretOpen($val['content'])); break;
 				}
 			}
 			// --- --- --- --- --- --- ---
@@ -96,7 +94,7 @@ function shortcode_sbcontactajax($param = '') {
 			$form_html .= '<form id="ajax-contact-' . $form_t . '" action="' . SB_MODULES_URL . 'contact/contact_ajax.php?id='.$id.'" method="post" class="'.$class.'">';
 
 			// --- Construct Form
-			$form_html .= sbGetContactFormElements($form_info['form'], $publickey, $sendmail);
+			$form_html .= sbGetContactFormElements($form_info['form'], '', $sendmail);
 			
 			// --- Insert HIDDEN INPUT
 			$form_html .= '<input type="hidden" name="submitform" value="ok">';
@@ -136,6 +134,10 @@ function shortcode_sbcontactajax($param = '') {
 			
 						// Clear the form.
 						$('#name, #email, #message').val('');
+					})
+					.always(function() {
+						// Un défi ALTCHA ne sert qu'une fois : nouveau défi pour un nouvel envoi
+						$(form).find('altcha-widget').each(function() { if (this.reset) this.reset(); });
 					})
 					.fail(function(data) {
 						// Make sure that the formMessages div has the 'error' class.
@@ -196,17 +198,15 @@ function shortcode_sbcontact($param = '') {
 			# Include Globals
 			global $sbsmarty, $sbsanitize, $sbsql;
 			# ################################################
-			# Settings for Recaptcha AND Global email settings
+			# Global email settings
 			# SQL Request (all config)
-			$query   = "SELECT config, content FROM {$module['tables']['config']} WHERE config = 'email_to' OR config = 'email_subject' OR config = 'email_publickey' OR config = 'email_privatekey'";
+			$query   = "SELECT config, content FROM {$module['tables']['config']} WHERE config = 'email_to' OR config = 'email_subject'";
 			$request = $sbsql->query($query);
 			$result  = $sbsql->toarray($request);
 			foreach($result as $val) {
 				switch($val['config']) {
 					case "email_to": $email_to = $sbsanitize->sTrim($val['content']); break;
 					case "email_subject": $subject = $sbsanitize->displayLang(sb_utf8_encode($val['content'])); break;
-					case "email_publickey": $publickey = $sbsanitize->sTrim($val['content']); break;
-					case "email_privatekey": $privatekey = $sbsanitize->sTrim(sbSecretOpen($val['content'])); break;
 				}
 			}
 			# ################################################
@@ -220,67 +220,44 @@ function shortcode_sbcontact($param = '') {
 			# ################################################
 			# Check if form is submitted
 			if(isset($_POST['submitform']) && !empty($_POST['submitform'])) {
-				// --- Check Google Recaptcha
-				if(isset($_POST['g-recaptcha-response']) && !empty($_POST['g-recaptcha-response'])) {
-					function getCurlData($url) {
-						$curl = curl_init();
-						curl_setopt($curl, CURLOPT_URL, $url);
-						curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-						curl_setopt($curl, CURLOPT_TIMEOUT, 10);
-						curl_setopt($curl, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.16) Gecko/20110319 Firefox/3.6.16");
-						$curlData = curl_exec($curl);
-						curl_close($curl);
-						return $curlData;
+				// --- Anti-robot ALTCHA (une seule API : inc/sbuiadmin-altcha.php)
+				if (sbAltchaVerify()) {
+					// --- PHPMailer (UTF-8 + SMTP, voir sbMailer())
+					$PHPMailer = sbMailer();
+					// --- Initialization
+					$htmlContent = '<h1>' . $subject . ' (' . _AM_SITE_TITLE . ')</h1>';
+					// --- Get Contact form submission $_POST
+					foreach($_POST as $k => $v) {
+						if ($k == 'name')  $name  = $v;
+						if ($k == 'email') $email = $v;
+						// --- Increase html content
+						if ($k != SB_ALTCHA_FIELD && $k != 'submitform' && $k != 'go')
+							$htmlContent .= '<p><b>'.$k.' :</b> '.$sbsanitize->nl2Br($v).'</p>';
 					}
+					// --- Email Construct
+					// --- Expéditeur = le site (le SMTP n'accepte que son domaine vérifié),
+					// --- réponse = le visiteur
+					@$PHPMailer->setFrom(SBFROMEMAIL, "$name");
+					@$PHPMailer->addReplyTo($email, "$name");
+					@$PHPMailer->ClearAllRecipients();
+					@$PHPMailer->AddAddress($email_to, "$email_to");
+					@$PHPMailer->Subject  = $sbsanitize->displayText($subject, 'UTF-8');
+					@$PHPMailer->AltBody  = "To view the message, please use an HTML compatible email viewer!"; // optional, comment out and test
+					@$PHPMailer->MsgHTML($sbsanitize->displayText($htmlContent, 'UTF-8'));
+					@$PHPMailer->IsHTML(true);
 					
-					// --- Get verify response data
-					$google_url = "https://www.google.com/recaptcha/api/siteverify";
-					$ip         = $_SERVER['REMOTE_ADDR'];
-					$url        = $google_url . "?secret=" . $privatekey . "&response=" . $_POST['g-recaptcha-response'] . "&remoteip=" . $ip;
-					$response   = getCurlData($url);
-					$response   = json_decode($response); // Don't add TRUE setting in json_decode
+					// --- Send email
+					$status = $PHPMailer->Send();
+					if (!$status) error_log('Contact : envoi en échec : ' . $PHPMailer->ErrorInfo);
+					@$PHPMailer->ClearAddresses();
+					@$PHPMailer->ClearAttachments();
 					
-					if ($response->success === true) {
-						// --- PHPMailer (UTF-8 + SMTP, voir sbMailer())
-						$PHPMailer = sbMailer();
-						// --- Initialization
-						$htmlContent = '<h1>' . $subject . ' (' . _AM_SITE_TITLE . ')</h1>';
-						// --- Get Contact form submission $_POST
-						foreach($_POST as $k => $v) {
-							if ($k == 'name')  $name  = $v;
-							if ($k == 'email') $email = $v;
-							// --- Increase html content
-							if ($k != 'g-recaptcha-response' && $k != 'submitform' && $k != 'go')
-								$htmlContent .= '<p><b>'.$k.' :</b> '.$sbsanitize->nl2Br($v).'</p>';
-						}
-						// --- Email Construct
-						// --- Expéditeur = le site (le SMTP n'accepte que son domaine vérifié),
-						// --- réponse = le visiteur
-						@$PHPMailer->setFrom(SBFROMEMAIL, "$name");
-						@$PHPMailer->addReplyTo($email, "$name");
-						@$PHPMailer->ClearAllRecipients();
-						@$PHPMailer->AddAddress($email_to, "$email_to");
-						@$PHPMailer->Subject  = $sbsanitize->displayText($subject, 'UTF-8');
-						@$PHPMailer->AltBody  = "To view the message, please use an HTML compatible email viewer!"; // optional, comment out and test
-						@$PHPMailer->MsgHTML($sbsanitize->displayText($htmlContent, 'UTF-8'));
-						@$PHPMailer->IsHTML(true);
-						
-						// --- Send email
-						$status = $PHPMailer->Send();
-						if (!$status) error_log('Contact : envoi en échec : ' . $PHPMailer->ErrorInfo);
-						@$PHPMailer->ClearAddresses();
-						@$PHPMailer->ClearAttachments();
-						
-						$succMsg = _CMS_CONTACT_FORM_SUCCESS;
-						// --- Empty form fields
-						$sendmail = true;
-						
-					} else {
-						//$errMsg = _CMS_CONTACT_FORM_ERROR_CAPTCHA . '(error-codes: '.$responseData->error.')';
-						$errMsg = _CMS_CONTACT_FORM_ERROR_CAPTCHA;
-					}
+					$succMsg = _CMS_CONTACT_FORM_SUCCESS;
+					// --- Empty form fields
+					$sendmail = true;
+					
 				} else {
-					$errMsg = _CMS_CONTACT_FORM_ERROR_CAPTCHA_EMPTY;
+					$errMsg = ($GLOBALS['sb_altcha_error'] == 'missing') ? _CMS_CONTACT_FORM_ERROR_CAPTCHA_EMPTY : _CMS_CONTACT_FORM_ERROR_CAPTCHA;
 				}
 			} else {
 				$errMsg = '';
@@ -309,7 +286,7 @@ function shortcode_sbcontact($param = '') {
 			}
 			//$form_html .= '</div>';
 			// --- Form
-			$form_html .= sbGetContactFormElements($form_info['form'], $publickey, $sendmail);
+			$form_html .= sbGetContactFormElements($form_info['form'], '', $sendmail);
 			
 			// --- Insert HIDDEN INPUT
 			$form_html .= '<input type="hidden" name="submitform" value="ok">'; 
@@ -333,14 +310,15 @@ function shortcode_sbcontact($param = '') {
 /**
  * Replace all Shortcodes in string
  * form code	string	$string
- * public key	string	$publickey (reCAPTCHA Google Public Key)
+ * public key	string	$publickey (inutilisé : ancienne clé Google reCAPTCHA)
  * return HTML
  */
 function sbGetContactFormElements($string, $publickey = '', $sendmail = false) {
 	global $sbsanitize, $sbsql;
 	
 	// --- Types
-	$type_elements = ['TEXT','CHECKBOX','TXTAREA','SELECT','RECAPTCHA','SUBMIT'];
+	$type_elements = ['TEXT','CHECKBOX','TXTAREA','SELECT','ALTCHA','SUBMIT'];
+	$GLOBALS['sb_contact_altcha_widgets'] = 0;
 	
 	// ------------------------
 	// --- Get INPUTs
@@ -372,6 +350,14 @@ function sbGetContactFormElements($string, $publickey = '', $sendmail = false) {
 			}
 		}
 	}
+
+	// --- L'envoi exige toujours ALTCHA : un formulaire sans [ALTCHA]
+	// --- reçoit le widget avant son premier bouton d'envoi
+	if (!$GLOBALS['sb_contact_altcha_widgets']) {
+		$widget = sbAltchaWidget();
+		$submit = stripos($string, '<input type="submit"');
+		$string = ($submit !== false) ? substr_replace($string, $widget, $submit, 0) : $string . $widget;
+	}
 	
 	return $string;
 }
@@ -380,7 +366,7 @@ function sbGetContactFormElements($string, $publickey = '', $sendmail = false) {
  * Construct Element Form
  * key		string		$param key
  * value	string		$param value
- * type		string		$type of element (TEXT, TXTAREA, SELECT, SUBMIT, RECAPTCHA)
+ * type		string		$type of element (TEXT, TXTAREA, SELECT, SUBMIT, ALTCHA)
  * return HTML
  */
 function sbContactFormConstructElement($param, $type = '', $publickey = '', $sendmail = false) {
@@ -388,7 +374,6 @@ function sbContactFormConstructElement($param, $type = '', $publickey = '', $sen
 	$input_html  = '';
 	$required    = false;
 	$keyname     = false;
-	$recaptcha_t = time();
 	
 	switch($type) {
 		default:
@@ -477,58 +462,10 @@ function sbContactFormConstructElement($param, $type = '', $publickey = '', $sen
 			$input_html .= '>';
 		break;
 	
-		case "RECAPTCHA_INVISIBLE":
-			$input_html .= '<script src="https://www.google.com/recaptcha/api.js?hl=';
-			$input_html .= ($_SESSION['lang'] == 'en') ? 'en' : 'fr';
-			$input_html .= '&remoteip=' . $_SERVER['REMOTE_ADDR'] . '" async defer></script>';
-			$input_html .= '<input type="submit"';
-			foreach($param as $key => $val) {
-				// If Id inserted
-				if ($key == 'id') {
-					$input_html .= ' ' . $key . '="' . $val . '"';
-					$input_id    = $val;
-				}
-				// If class inserted
-				if ($key == 'class') {
-					$input_html .= ' ' . $key . '="' . $val . ' g-recaptcha"';
-					$input_class = true;
-				}
-				$input_html .= ' ' . $key . '="' . $val . '"';
-			}
-			// If no class in keys
-			if (!$input_class) $input_html .= ' class="g-recaptcha"';
-			if (!$input_id) {
-				$input_id    = 'contactform_' . $recaptcha_t;
-				$input_html .= ' id="' . $input_id . '"';
-			}
-			// Recaptcha settings
-			$input_html .= ' data-sitekey = "' . $publickey . '"';
-			$input_html .= ' data-callback = "sbLoginOnSubmit_' . $recaptcha_t . '"';
-			$input_html .= '>';
-			$input_html .= '<script type="text/javascript">';
-			$input_html .= 'function sbLoginOnSubmit_' . $recaptcha_t . '(token) {
-								document.getElementById("' . $input_id . '").submit();
-							}';
-			$input_html .= '</script>';
-		break;
-	
-		case "RECAPTCHA":
-			$recaptcha_v2 = time();
-			$input_html  .= '<div id="grecaptcha_' . $recaptcha_v2 . '"></div>';
-			$input_html  .= '<script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit&hl=';
-			$input_html  .= ($_SESSION['lang'] == 'en') ? 'en' : 'fr';
-			$input_html  .= '&remoteip=' . $_SERVER['REMOTE_ADDR'] . '" async defer></script>';
-			$input_html  .= '<script type="text/javascript">';
-			$input_html  .= "var onloadCallback = function() {
-								grecaptcha.render('grecaptcha_$recaptcha_v2', {
-									'sitekey' : '$publickey',
-									'theme' : 'light', // light, dark
-									'type' : 'image', // image, audio
-									'size' : 'normal', // normal, compact
-									'tabindex' : 0
-								});
-							};";
-			$input_html .= '</script>';
+		case "ALTCHA":
+			// --- Anti-robot ALTCHA (auto-hébergé, une seule API : inc/sbuiadmin-altcha.php)
+			$input_html .= '<div class="sb-altcha">' . sbAltchaWidget() . '</div>';
+			$GLOBALS['sb_contact_altcha_widgets']++;
 		break;
 
 	}

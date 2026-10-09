@@ -59,22 +59,19 @@ $module['tables']['contact'] = "sb_contact";
 // -------------------------------------------------
 
 # --------------------------------------------------
-# Settings for Recaptcha AND Global email settings
+# Global email settings
 # --------------------------------------------------
 // --- SQL Request (all config)
-$query   = "SELECT config, content FROM {$module['tables']['config']} WHERE config = 'email_to' OR config = 'email_subject' OR config = 'email_publickey' OR config = 'email_privatekey'";
+$query   = "SELECT config, content FROM {$module['tables']['config']} WHERE config = 'email_to' OR config = 'email_subject'";
 $request = $sbsql->query($query);
 $result  = $sbsql->toarray($request);
 foreach($result as $val) {
 	switch($val['config']) {
 		case "email_to": $email_to = $sbsanitize->sTrim($val['content']); break;
 		case "email_subject": $subject = $sbsanitize->displayLang(sb_utf8_encode($val['content'])); break;
-		case "email_publickey": $publickey = $sbsanitize->sTrim($val['content']); break;
-		case "email_privatekey": $privatekey = $sbsanitize->sTrim(sbSecretOpen($val['content'])); break;
 	}
 }
 
-$sbsmarty->assign('grecaptcha_publickey', $publickey);
 # --------------------------------------------------
 
 # --------------------------------------------------
@@ -106,63 +103,41 @@ switch($op) {
 		
 		// --- Check if form is submitted
 		if(isset($_POST['submitform']) && !empty($_POST['submitform'])) {
-			// --- Check Google Recaptcha
-			if(isset($_POST['g-recaptcha-response']) && !empty($_POST['g-recaptcha-response'])) {
-				function getCurlData($url) {
-					$curl = curl_init();
-					curl_setopt($curl, CURLOPT_URL, $url);
-					curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-					curl_setopt($curl, CURLOPT_TIMEOUT, 10);
-					curl_setopt($curl, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.16) Gecko/20110319 Firefox/3.6.16");
-					$curlData = curl_exec($curl);
-					curl_close($curl);
-					return $curlData;
+			// --- Anti-robot ALTCHA (une seule API : inc/sbuiadmin-altcha.php)
+			if (sbAltchaVerify()) {
+				// --- PHPMailer (UTF-8 + SMTP, voir sbMailer())
+				$PHPMailer = sbMailer();
+				// --- Initialization
+				$htmlContent = '<h1>Contact site ' . _AM_SITE_TITLE . '</h1>';
+				// --- Get Contact form submission $_POST
+				foreach($_POST as $k => $v) {
+					if ($k == 'name')  $name  = $v;
+					if ($k == 'email') $email = $v;
+					// --- Increase html content
+					if ($k != SB_ALTCHA_FIELD && $k != 'submit') $htmlContent .= '<p><b>'.str_replace("-", " ", $k).' :</b> '.$sbsanitize->nl2Br($v).'</p>';
 				}
+				// --- Email Construct
+				// --- Expéditeur = le site (le SMTP n'accepte que son domaine vérifié),
+				// --- réponse = le visiteur
+				@$PHPMailer->setFrom(SBFROMEMAIL, "$name");
+				@$PHPMailer->addReplyTo($email, "$name");
+				@$PHPMailer->ClearAllRecipients();
+				@$PHPMailer->AddAddress($email_to, "$email_to");
+				@$PHPMailer->Subject  = $sbsanitize->displayText($subject, 'UTF-8');
+				@$PHPMailer->AltBody  = "To view the message, please use an HTML compatible email viewer!"; // optional, comment out and test
+				@$PHPMailer->MsgHTML($sbsanitize->displayText($htmlContent, 'UTF-8'));
+				@$PHPMailer->IsHTML(true);
 				
-				// --- Get verify response data
-				$google_url = "https://www.google.com/recaptcha/api/siteverify";
-				$ip         = $_SERVER['REMOTE_ADDR'];
-				$url        = $google_url . "?secret=" . $privatekey . "&response=" . $_POST['g-recaptcha-response'] . "&remoteip=" . $ip;
-				$response   = getCurlData($url);
-				$response   = json_decode($response); // Don't add TRUE setting in json_decode
+				// --- Send email
+				$status = $PHPMailer->Send();
+				if (!$status) error_log('Contact : envoi en échec : ' . $PHPMailer->ErrorInfo);
+				@$PHPMailer->ClearAddresses();
+				@$PHPMailer->ClearAttachments();
 				
-				if ($response->success === true) {
-					// --- PHPMailer (UTF-8 + SMTP, voir sbMailer())
-					$PHPMailer = sbMailer();
-					// --- Initialization
-					$htmlContent = '<h1>Contact site ' . _AM_SITE_TITLE . '</h1>';
-					// --- Get Contact form submission $_POST
-					foreach($_POST as $k => $v) {
-						if ($k == 'name')  $name  = $v;
-						if ($k == 'email') $email = $v;
-						// --- Increase html content
-						if ($k != 'g-recaptcha-response' && $k != 'submit') $htmlContent .= '<p><b>'.str_replace("-", " ", $k).' :</b> '.$sbsanitize->nl2Br($v).'</p>';
-					}
-					// --- Email Construct
-					// --- Expéditeur = le site (le SMTP n'accepte que son domaine vérifié),
-					// --- réponse = le visiteur
-					@$PHPMailer->setFrom(SBFROMEMAIL, "$name");
-					@$PHPMailer->addReplyTo($email, "$name");
-					@$PHPMailer->ClearAllRecipients();
-					@$PHPMailer->AddAddress($email_to, "$email_to");
-					@$PHPMailer->Subject  = $sbsanitize->displayText($subject, 'UTF-8');
-					@$PHPMailer->AltBody  = "To view the message, please use an HTML compatible email viewer!"; // optional, comment out and test
-					@$PHPMailer->MsgHTML($sbsanitize->displayText($htmlContent, 'UTF-8'));
-					@$PHPMailer->IsHTML(true);
-					
-					// --- Send email
-					$status = $PHPMailer->Send();
-					if (!$status) error_log('Contact : envoi en échec : ' . $PHPMailer->ErrorInfo);
-					@$PHPMailer->ClearAddresses();
-					@$PHPMailer->ClearAttachments();
-					
-					echo '<div class="box success-ajax-msg"><i class="fa fa-check green response-ajax-msg" aria-hidden="true"></i> ' . _CMS_CONTACT_FORM_SUCCESS . '</div>';
+				echo '<div class="box success-ajax-msg"><i class="fa fa-check green response-ajax-msg" aria-hidden="true"></i> ' . _CMS_CONTACT_FORM_SUCCESS . '</div>';
 
-				} else {
-					echo '<div class="box error-ajax-msg"><i class="fa fa-times red response-ajax-msg" aria-hidden="true"></i> ' . _CMS_CONTACT_FORM_ERROR_CAPTCHA . '</div>';
-				}
 			} else {
-				echo '<div class="box error-ajax-msg"><i class="fa fa-times red response-ajax-msg" aria-hidden="true"></i> ' . _CMS_CONTACT_FORM_ERROR_CAPTCHA_EMPTY . '</div>';
+				echo '<div class="box error-ajax-msg"><i class="fa fa-times red response-ajax-msg" aria-hidden="true"></i> ' . (($GLOBALS['sb_altcha_error'] == 'missing') ? _CMS_CONTACT_FORM_ERROR_CAPTCHA_EMPTY : _CMS_CONTACT_FORM_ERROR_CAPTCHA) . '</div>';
 			}
 		} else {
 			echo '<div class="box error-ajax-msg"><i class="fa fa-times red response-ajax-msg" aria-hidden="true"></i> Form Submit Error </div>';

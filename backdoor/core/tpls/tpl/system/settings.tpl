@@ -134,15 +134,7 @@
 									</tr>
 									<tr class="data-row">
 										<td>
-											Google ReCaptcha Clé Publique
-										</td>
-										<td>
-											**************
-										</td>
-									</tr>
-									<tr class="data-row">
-										<td>
-											Google ReCaptcha Clé Secrète
+											Clés HMAC ALTCHA
 										</td>
 										<td>
 											**************
@@ -190,10 +182,18 @@
 									</tr>
 									<tr class="data-row">
 										<td>
-											Captcha (Login)
+											ALTCHA (connexion)
 										</td>
 										<td>
-											{if $sb_config_captcha_mode == 1}Activé{else}Désactivé{/if}
+											{if $sb_config_altcha_login == 1}Activé{else}Désactivé{/if}
+										</td>
+									</tr>
+									<tr class="data-row">
+										<td>
+											Blocage des tentatives de connexion
+										</td>
+										<td>
+											{if $sb_config_lock_enabled == 1}Activé{else}Désactivé{/if}
 										</td>
 									</tr>
 									<tr class="data-row">

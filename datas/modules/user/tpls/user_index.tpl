@@ -17,6 +17,9 @@
 				{if $sbuiadmin_access_code == 'E4'}
 					{$smarty.const._CMS_USER_MSG_ERROR_E4}
 				{/if}
+				{if $sbuiadmin_access_code == 'E5'}
+					{$smarty.const._CMS_USER_MSG_ERROR_E5}
+				{/if}
 				</div>
 			{/if}
 			{insert name=sbGetBrowser assign=get_browser ua="`$smarty.server.HTTP_USER_AGENT`"}
@@ -42,12 +45,10 @@
 								&nbsp;<input name="remember" type="checkbox" value="remember_me"><span class="rememberme">{$smarty.const._CMS_USER_FORM_REMEMBER_ME}</span>
 							</label>
 						</div>
-						{if $smarty.const._CMS_USER_CAPTCHA_MODE}
+						{if $sb_altcha_widget}
 						<div class="form-group">
-							{* Google ReCaptcha *}
-							<div id="grecaptcha_user"></div>
-							<script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit&hl=fr&remoteip={$smarty.server.REMOTE_ADDR}" async defer></script>
-							{* ================ *}
+							{* Anti-robot ALTCHA (auto-hébergé) *}
+							{$sb_altcha_widget}
 						</div>
 						{/if}
 						<!-- Change this to a button or input when using this as a form -->
@@ -70,20 +71,7 @@
 			});
 		</script>
 		
-		{if $smarty.const._CMS_USER_CAPTCHA_MODE}
-		{*if $smarty.const._CMS_USER_CAPTCHA_MODE && $get_browser != 'IE'*}
-		<script type="text/javascript">
-			var onloadCallback = function() {
-				grecaptcha.render('grecaptcha_user', {
-					'sitekey' : '{$grecaptcha_publickey}',
-					'theme' : 'light', // light, dark
-					'type' : 'image', // image, audio
-					'size' : 'normal', // normal, compact
-					'tabindex' : 0
-				});
-			};
-		</script>
-		{/if}
+
 	
 	{else}
 		Profil de l'utilisateur ({$smarty.session.sbuiadmin_user_name})

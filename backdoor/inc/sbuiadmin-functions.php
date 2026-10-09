@@ -876,7 +876,7 @@ function sbGetConfig($config, $langdefault = 'fr') {
 	$request = $sbsql->query($query);
 	$result  = $sbsql->object($request);
 	
-	// Secrets chiffrés en base (mot de passe SMTP, clé reCAPTCHA du contact)
+	// Secrets chiffrés en base (mot de passe SMTP du contact)
 	if (function_exists('sbConfigSecretNames') && in_array($config_name, sbConfigSecretNames(), true)) {
 		return sbSecretOpen($result ? $result->content : '');
 	}

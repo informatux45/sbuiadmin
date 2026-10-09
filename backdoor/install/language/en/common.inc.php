@@ -11,8 +11,6 @@ $arrLang['alert_min_version_php'] = "This program requires at least version _PHP
 $arrLang['alert_directory_not_writable'] = "The directory <b>_FILE_DIRECTORY_</b> is not writable! <br />You must grant 'write' permissions (access rights 0755 or 777, depending on your system settings) to this directory before you start the installation!";
 $arrLang['alert_extension_not_installed'] = "Required extension pdo_".EI_DATABASE_TYPE." is not installed on your server! You cannot proceed installation.";
 $arrLang['alert_settings_path_upload_wrong'] = "Required media upload directory.";
-$arrLang['alert_settings_recaptcha_public_wrong'] = "Public Google reCaptcha key required.";
-$arrLang['alert_settings_recaptcha_private_wrong'] = "Google reCaptcha private key required.";
 $arrLang['alert_unable_to_install'] = "Unable to install this application because an application with the same identity is already installed. <br>You may only <b>Update</b> or <b>Uninstall</b> it. Make sure you have a backup of your database before proceeding.";
 $arrLang['alert_required_fields'] = "Items marked with an asterisk are required";
 $arrLang['alert_db_host_empty'] = "Database host cannot be empty! Please re-enter.";
@@ -138,10 +136,6 @@ $arrLang['settings_customer_url'] = "Client site url (http<span style='color: re
 $arrLang['settings_customer_url_info'] = "The url of your customer site with a required <span style='color: red; font-weight: bold;'>/</span> at the end of your url.";
 $arrLang['settings_path_upload'] = "Directory of media uploads";
 $arrLang['settings_path_upload_info'] = "Use for the uploads directory of your media, a relative path such as '../upload'. You can change this path at any time in the administration.";
-$arrLang['settings_recaptcha_public'] = "Key of <a href='https://www.google.com/recaptcha/admin' target='_blank'>Google INVISIBLE reCAPTCHA</a> : Public key";
-$arrLang['settings_recaptcha_public_info'] = "Google INVISIBLE reCAPTCHA public key to fill. Create this key from the admin console of your Google Recaptcha account. You can do this later.";
-$arrLang['settings_recaptcha_private'] = "Key of <a href='https://www.google.com/recaptcha/admin' target='_blank'>Google INVISIBLE reCAPTCHA</a> : Secret key";
-$arrLang['settings_recaptcha_private_info'] = "Google INVISIBLE reCAPTCHA secret key to fill. Create this key from the admin console of your Google Recaptcha account. You can do this later.";
 $arrLang['settings_url_upload'] = "Url of media uploads (http<span style='color: red; font-weight: bold;'>s</span>://..../upload)";
 $arrLang['settings_url_upload_info'] = "Url uploads of your media. Can be changed at any time since administration also.";
 $arrLang['short_open_tag'] = "Short Open Tag";

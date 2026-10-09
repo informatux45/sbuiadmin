@@ -128,10 +128,8 @@ $sbsmarty->assign('sb_toast_duration', sbSetting('toast_duration', '7') ?: 7);
 // ----------------------
 // Identification / Authentification
 // ----------------------
-// --- Initialization
-$publickey  = $sbsanitize->sTrim(sbSetting('recaptcha_public'));
-$privatekey = $sbsanitize->sTrim(sbSetting('recaptcha_secret'));
-$sbsmarty->assign('grecaptcha_publickey', $publickey);
+// --- Anti-robot ALTCHA (inc/sbuiadmin-altcha.php) : widget du formulaire
+$sbsmarty->assign('sb_altcha_widget', _AM_ALTCHA_LOGIN ? sbAltchaWidget() : '');
 
 // --- Random background
 $sbsmarty->assign('sb_random_bg', rand(1, 10));
@@ -265,6 +263,26 @@ if ((isset($_POST['username']) && $_POST['username']) && (isset($_POST['password
 	// cookie (voir le jeton "Se souvenir de moi" plus bas).
 	$sbuiadmin_user_name     = trim($sbsanitize->stopXSS($_POST['username']));
 	$sbuiadmin_user_password = $_POST['password'];
+	// --- Blocage temporaire (trop d'échecs sur cet identifiant ou depuis
+	// cette IP) : refus sans vérifier le mot de passe
+	if (sbLoginLocked($sbuiadmin_user_name)) {
+		$sbsmarty->assign('sbuiadmin_access_code', 'E8');
+		$sbuiadmin_type = 'error';
+		$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_LOCKED, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
+		$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
+		$sbsmarty->display('system/login.tpl');
+		exit;
+	}
+	// --- ALTCHA, avant toute vérification du mot de passe (le reCAPTCHA
+	// n'était contrôlé qu'après : les mots de passe se testaient sans lui)
+	if (_AM_ALTCHA_LOGIN && !sbAltchaVerify()) {
+		$sbsmarty->assign('sbuiadmin_access_code', 'E1');
+		$sbuiadmin_type = 'error';
+		$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_CAPTCHA_ERROR, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]) . ' (' . $GLOBALS['sb_altcha_error'] . ')';
+		$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
+		$sbsmarty->display('system/login.tpl');
+		exit;
+	}
 	// --- Check User
 	if ($sbusers->login($sbuiadmin_user_name, $sbuiadmin_user_password)) {
 		// --- Check if User is active
@@ -277,50 +295,10 @@ if ((isset($_POST['username']) && $_POST['username']) && (isset($_POST['password
 			$sbsmarty->display('system/login.tpl');
 			exit;
 		} else {
-			if (_AM_CAPTCHA_MODE == true) {
-				// --- Check Google Recaptcha
-				if (isset($_POST['g-recaptcha-response']) && !empty($_POST['g-recaptcha-response'])) {
-					function getCurlData($url) {
-						$curl = curl_init();
-						curl_setopt($curl, CURLOPT_URL, $url);
-						curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-						curl_setopt($curl, CURLOPT_TIMEOUT, 10);
-						curl_setopt($curl, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.16) Gecko/20110319 Firefox/3.6.16");
-						$curlData = curl_exec($curl);
-						curl_close($curl);
-						return $curlData;
-					}
-					
-					// --- Get verify response data
-					$google_url = "https://www.google.com/recaptcha/api/siteverify";
-					$ip         = $_SERVER['REMOTE_ADDR'];
-					$url        = $google_url . "?secret=" . $privatekey . "&response=" . $_POST['g-recaptcha-response'] . "&remoteip=" . $ip;
-					$response   = getCurlData($url);
-					$response   = json_decode($response); // Don't add TRUE setting in json_decode
-					
-					if ($response->success === false) {
-						// --- Error Google Recaptcha
-						$sbsmarty->assign('sbuiadmin_access_code', 'E1');
-						$sbuiadmin_type = 'error';
-						$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_CAPTCHA_ERROR, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
-						$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
-						$sbsmarty->display('system/login.tpl');
-						exit;						
-					}
-					
-				} else {
-					// --- Error Google Recaptcha
-					$sbsmarty->assign('sbuiadmin_access_code', 'E1');
-					$sbuiadmin_type = 'error';
-					$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_CAPTCHA_ERROR, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
-					$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
-					$sbsmarty->display('system/login.tpl');
-					exit;
-				}
-			}
 			// ------------------
 			// --- Acces autorise
 			// ------------------
+			sbLoginSucceeded($sbuiadmin_user_name);
 			// Update Access Log
 			$sbuiadmin_type = 'login';
 			$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_GRANTED, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
@@ -353,6 +331,7 @@ if ((isset($_POST['username']) && $_POST['username']) && (isset($_POST['password
 		// ------------------
 		// --- Failed auth
 		// ------------------
+		sbLoginFailed($sbuiadmin_user_name);
 		$sbsmarty->assign('sbuiadmin_access_code', 'E2');
 		$sbuiadmin_type = 'error';
 		$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_NOGRANTED, $_SERVER["REMOTE_ADDR"]);

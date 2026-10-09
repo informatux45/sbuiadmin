@@ -32,6 +32,9 @@ if ($sb_theme_config === false) {
 # Réglages : en base (table sb_settings), accès base dans sbdbconfig.php.
 # Voir SBADMIN/inc/sbuiadmin-settings.php
 require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . SBADMIN . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'sbuiadmin-settings.php');
+# Anti-robot ALTCHA (une seule API pour tout le site) et blocage des tentatives de connexion
+require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . SBADMIN . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'sbuiadmin-altcha.php');
+require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . SBADMIN . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'sbuiadmin-loginlock.php');
 // Ancien tableau positionnel, pour le code tiers qui le lirait encore
 $sb_settings_config = sbSettingsLegacyArray();
 
@@ -52,8 +55,6 @@ const CFG_DB_PWD            = 5;
 const CFG_MEDIAS_DIR        = 6;
 const CFG_MEDIAS_URL        = 13;
 const CFG_SITE_URL          = 15;
-const CFG_GC_PUBLIC         = 19;
-const CFG_GC_PRIVATE        = 20;
 const CFG_DB_PREFIX         = 21;
 const CFG_MAINTENANCE       = 24;
 const CFG_DEBUG             = 25;
@@ -168,8 +169,6 @@ defined('_AM_DB_USER')   OR define('_AM_DB_USER',   $_sb_db['user']);
 defined('_AM_DB_PWD')    OR define('_AM_DB_PWD',    $_sb_db['password']);
 defined('_AM_MEDIAS_DIR') OR define('_AM_MEDIAS_DIR', sbSetting('medias_dir'));
 defined('_AM_MEDIAS_URL') OR define('_AM_MEDIAS_URL', sbSetting('medias_url'));
-defined('_AM_GC_PUBLIC')  OR define('_AM_GC_PUBLIC',  sbSetting('recaptcha_public'));
-defined('_AM_GC_PRIVATE') OR define('_AM_GC_PRIVATE', sbSetting('recaptcha_secret'));
 defined('_AM_DB_PREFIX')  OR define('_AM_DB_PREFIX',  $_sb_db['prefix']);
 
 // ------------------------

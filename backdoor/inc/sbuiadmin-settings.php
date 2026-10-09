@@ -35,6 +35,7 @@ defined('SB_SETTINGS_ENC_PREFIX') or define('SB_SETTINGS_ENC_PREFIX', 'sbenc1:')
 /**
  * Ancienne position dans settings.txt => nom du réglage.
  * Les positions 2-5 et 21 (accès base) vont dans sbdbconfig.php.
+ * 19, 20 et 22 (Google reCAPTCHA) ne sont pas reprises : remplacé par ALTCHA.
  */
 function sbSettingsLegacyMap() {
 	return array(
@@ -53,9 +54,6 @@ function sbSettingsLegacyMap() {
 		16 => 'sandbox',
 		17 => 'cms',
 		18 => 'scaling_maxsize',
-		19 => 'recaptcha_public',
-		20 => 'recaptcha_secret',
-		22 => 'captcha_mode',
 		23 => 'upgrade_mode',
 		24 => 'maintenance',
 		25 => 'debug_front',
@@ -91,9 +89,17 @@ function sbSettingsDefaults() {
 		'sandbox'               => '0',
 		'cms'                   => '1',
 		'scaling_maxsize'       => '1024',
-		'recaptcha_public'      => '',
-		'recaptcha_secret'      => '',
-		'captcha_mode'          => '0',
+		'altcha_login'          => '1',
+		'altcha_hmac_secret'    => '',
+		'altcha_hmac_key_secret' => '',
+		'altcha_cost'           => '2000',
+		'altcha_counter'        => '5000',
+		'altcha_expire'         => '600',
+		'login_lock_enabled'    => '1',
+		'login_lock_window'     => '15',
+		'login_lock_duration'   => '15',
+		'login_lock_max_login'  => '10',
+		'login_lock_max_ip'     => '20',
 		'upgrade_mode'          => '0',
 		'maintenance'           => '0',
 		'debug_front'           => '0',
@@ -113,12 +119,17 @@ function sbSettingsDefaults() {
 
 /** Réglages stockés chiffrés dans sb_settings */
 function sbSettingsSecretNames() {
-	return array('recaptcha_secret');
+	return array('altcha_hmac_secret', 'altcha_hmac_key_secret');
 }
 
 /** Entrées de sb_config (module contact) stockées chiffrées */
 function sbConfigSecretNames() {
-	return array('email_smtp_password', 'email_privatekey');
+	return array('email_smtp_password');
+}
+
+/** Anciens réglages Google reCAPTCHA, supprimés par sbAltchaSecrets() */
+function sbSettingsObsoleteNames() {
+	return array('recaptcha_public', 'recaptcha_secret', 'captcha_mode');
 }
 
 // -----------------------------------------------------------------------
