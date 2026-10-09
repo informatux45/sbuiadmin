@@ -31,6 +31,28 @@ Ready | Features
 
 ---
 
+### Installation
+
+**Net install (recommended)**
+1. Upload `sbuiadmin_netinstall.php` **alone** to the (empty) folder of your future site, then open it in your browser.
+2. Click *Install SBUIADMIN*: the latest release published on [GitHub Releases](https://github.com/informatux45/sbuiadmin/releases) is downloaded and **verified before anything is written**:
+   - HTTPS with certificate verification, GitHub hosts only;
+   - Ed25519 signature of the release manifest (the public key is embedded in `sbuiadmin_netinstall.php`, the private key is never published);
+   - exact size and SHA-256 of the archive;
+   - every archive entry is checked (no `..`, absolute path or symbolic link, nothing written outside the folder).
+
+   If any check fails, nothing is installed.
+3. The netinstall file deletes itself, then the installation wizard (`backdoor/`) takes over: database, administrator account, installation key.
+
+Net install refuses to run where SBUIADMIN is already installed: delete it from your server.
+
+**Manual install**
+Download `sbuiadmin-X.Y.zip` from a release, check its SHA-256 against `sbuiadmin-release.json`, extract it into your site folder and open `backdoor/` in your browser.
+
+Installing in a sub-folder: see `help.txt`.
+
+---
+
 ### Screenshots
 
 ![A theme (front)](https://informatux.ddns.net:744/home/tools/demo_github/sbuiadmin-theme-2.jpg "A theme (front)")
@@ -48,10 +70,12 @@ Ready | Features
 ### Changelog
 
 **4.12**
+- Signed releases: secure net install from GitHub (Ed25519 signature + SHA-256 verified)
 - ALTCHA replaces Google reCAPTCHA (admin login, user module, contact forms), single core API
 - Temporary lockout after failed logins (per login and per IP, 2FA codes included)
 - Settings merged into the sb_config table, with an updated_at column
-- PHP 8.4 Ready
+- PHP 8.4 minimum, PHP 8.5 Ready, PHP 9 preparation
+- Smarty 4.5.8 (security fix)
 
 **4.11**
 - Settings stored in database, automatic migration of settings.txt

@@ -1,28 +1,61 @@
 # #######################################################
-# Rewrite URL dans un dossier racine + /new (par exemple)
-# Racine /
-# Répertoire new
-# Chemin /new
+# SBUIADMIN - Aide à l'installation
 # #######################################################
 
-### Fichier .HTACCESS
--- Ligne 7 --
+### Prérequis
+- PHP 8.4 minimum (8.5 conseillé), extensions : mysqli, pdo_mysql,
+  session, json, mbstring, sodium, openssl, curl, gd, fileinfo, filter,
+  hash (l'assistant d'installation vérifie tout : étape « Requis Serveur »)
+  + zip pour sbuiadmin_netinstall.php
+- MySQL 5.7+ ou MariaDB 10.3+
+- Apache avec mod_rewrite (mod_headers conseillé)
+
+# #######################################################
+
+### Installation depuis GitHub (sbuiadmin_netinstall.php)
+1. Déposer SEUL le fichier sbuiadmin_netinstall.php dans le dossier
+   (vide) du futur site, puis l'ouvrir dans le navigateur.
+2. Cliquer sur « Installer SBUIADMIN » : la dernière version publiée sur
+   https://github.com/informatux45/sbuiadmin/releases est téléchargée
+   et VÉRIFIÉE avant toute écriture :
+   - HTTPS avec certificat vérifié, vers GitHub uniquement ;
+   - signature Ed25519 du manifeste de la version (clé publique écrite
+     dans sbuiadmin_netinstall.php, clé privée jamais publiée) ;
+   - taille et empreinte SHA-256 de l'archive ;
+   - aucun fichier écrit hors du dossier (pas de « .. », de chemin
+     absolu ni de lien symbolique dans l'archive).
+   Une seule de ces vérifications en échec : rien n'est installé.
+3. Le fichier netinstall se supprime de lui-même, puis l'assistant
+   d'installation (backdoor/) prend le relais : base de données, compte
+   administrateur, clé d'installation (à lire sur le serveur dans
+   backdoor/install/installer/install-key.php).
+Si SBUIADMIN est déjà installé dans le dossier, netinstall refuse de
+s'exécuter : le supprimer du serveur.
+
+### Installation manuelle
+Télécharger l'archive sbuiadmin-X.Y.zip d'une version publiée, vérifier
+son empreinte avec le manifeste sbuiadmin-release.json, la décompresser
+dans le dossier du site, puis ouvrir backdoor/ dans le navigateur.
+
+# #######################################################
+# Site dans un sous-dossier (ex. https://exemple.fr/new/)
+# #######################################################
+
+### Rien à modifier pour la réécriture d'URL
+- Le .htaccess livré renvoie vers index.php en chemin relatif : il
+  fonctionne tel quel dans un sous-dossier.
+- Le sous-dossier (SBSITESUBDIRECTORY) est déduit automatiquement de
+  l'URL du site (Configuration > Générale > URL du site client) : ne
+  plus le saisir dans sbconfig.php.
+
+### Fichier .HTACCESS : page d'erreur 404
+Apache exige un chemin complet depuis la racine du domaine :
 Changer : ErrorDocument 404 index.php?p=pages&id=404
-Par : ErrorDocument 404 new/index.php?p=pages&id=404
--- Ligne 34 --
-Changer : RewriteRule . /index.php [L]
-Par : RewriteRule . /new/index.php [L]
-
-# #######################################################
-
-### Fichier SBCONFIG.PHP
--- Ligne 96 --
-Changer : define('SBSITESUBDIRECTORY', '');
-Par : define('SBSITESUBDIRECTORY', 'new');
-
-# #######################################################
+Par :     ErrorDocument 404 /new/index.php?p=pages&id=404
 
 ### Administration
-Rubrique :: Configuration :: Activation du Rewrite URL :: Activé (Checked)
+Configuration > Générale :
+- URL du site client : https://exemple.fr/new/
+- Activation du Rewrite URL : Activé (si souhaité)
 
 # #######################################################

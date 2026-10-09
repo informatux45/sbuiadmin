@@ -1,0 +1,4 @@
+# Exclus des archives publiées (git archive / versions signées)
+sbuiadmin_netinstall.php export-ignore
+.gitignore export-ignore
+.gitattributes export-ignore
