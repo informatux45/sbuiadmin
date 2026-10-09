@@ -1,7 +1,7 @@
 # [SBUIADMIN](https://github.com/informatux45/sbuiadmin/)
 - CMS SBootstrap Admin Responsive
 - Contributors: [informatux45](https://github.com/informatux45)
-- Stable version: 4.12
+- Stable version: 4.13
 - License: [GPLv3](http://www.gnu.org/licenses/gpl-3.0.html "GNU General Public License v3")
 
 ---
@@ -13,7 +13,7 @@ Ready | Features
 *✓* | PHP 8.4+ (PHP 8.5 ready) / MySQL 5.7+ / MariaDB 10.3+
 *✓* | HTML 5 / CSS 3
 *✓* | Bootstrap (front themes), Adminator administration theme (dark mode)
-*✓* | Online installer (installation key, server requirements check)
+*✓* | Online installer (installation key, server requirements check), signed net install and admin updates with rollback
 *✓* | Responsive design (front / administration)
 *✓* | 5 themes included
 *✓* | User management (per-module rights), two-factor authentication by email
@@ -68,6 +68,13 @@ Installing in a sub-folder: see `help.txt`.
 ---
 
 ### Changelog
+
+**4.13**
+- Update from the administration: daily check of signed GitHub releases, verified before install (signature, archive and per-file SHA-256), live progress
+- Idempotent SQL migrations shipped with each release, database schema version tracked
+- One-step rollback of the last update (files and database), automatic rollback on failure
+- Encrypted backups (files and database) stored outside the web root when possible
+- Old UPGRADE mode (unverified HTTP server) removed
 
 **4.12**
 - Signed releases: secure net install from GitHub (Ed25519 signature + SHA-256 verified)
