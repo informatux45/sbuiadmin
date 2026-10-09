@@ -104,6 +104,7 @@ switch($action) {
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
+		$sb_twofa_user = (string)$_SESSION['sbuiadmin_user_name'];
 		if ($_POST['form_submit']) {
 
 			// Réglages en base (inc/sbuiadmin-settings.php). Les accès à la
@@ -168,13 +169,53 @@ switch($action) {
 			}
 
 			$result_edit = sbSettingsSave($sb_new_settings);
+
+			// Double authentification : activée seulement après saisie d'un
+			// code de test reçu par e-mail (un envoi d'e-mails qui ne marche
+			// pas ne peut pas bloquer l'accès), désactivée dès « Non ».
+			$sb_twofa_msg = '';
+			$sb_twofa_err = '';
+			$sb_twofa_want = (($_POST['twofa_enabled'] ?? '0') === '1') ? '1' : '0';
+			$sb_twofa_pending = !empty($_SESSION['sb2fa_activation']) && $_SESSION['sb2fa_activation']['user'] === $sb_twofa_user;
+			if (sbSettingBool('twofa_enabled') && $sb_twofa_want === '0') {
+				unset($_SESSION['sb2fa_activation']);
+				if (sbSettingsSave(array('twofa_enabled' => '0'))) {
+					$sbusers->updateAccessLog('login', sprintf("Double authentification désactivée par [%s]", $sb_twofa_user), $sb_twofa_user);
+					$sb_twofa_msg = 'Double authentification désactivée.';
+				}
+			} elseif (!sbSettingBool('twofa_enabled') && $sb_twofa_want === '1') {
+				$sb_twofa_code = trim((string)($_POST['twofa_code'] ?? ''));
+				if ($sb_twofa_pending && $sb_twofa_code !== '') {
+					$sb_twofa_r = sb2faActivationCheck($sb_twofa_user, $sb_twofa_code);
+					if ($sb_twofa_r == 'ok' && sbSettingsSave(array('twofa_enabled' => '1'))) {
+						$_SESSION['sb2fa_ok'] = $sb_twofa_user; // cette session a prouvé la réception
+						$sbusers->updateAccessLog('login', sprintf("Double authentification activée par [%s]", $sb_twofa_user), $sb_twofa_user);
+						$sb_twofa_msg = 'Double authentification activée : un code sera demandé à chaque connexion.';
+					} elseif ($sb_twofa_r == 'wrong') {
+						$sb_twofa_err = 'Double authentification : code incorrect.';
+					} elseif ($sb_twofa_r == 'expired' || $sb_twofa_r == 'locked') {
+						$sb_twofa_err = 'Double authentification : ' . ($sb_twofa_r == 'expired' ? 'code expiré' : "trop d'essais") . ', enregistrez de nouveau pour recevoir un nouveau code.';
+					} else {
+						$sb_twofa_err = "Double authentification : erreur d'enregistrement.";
+					}
+				} else {
+					$sb_twofa_r = sb2faActivationStart($sb_twofa_user);
+					if ($sb_twofa_r == 'ok') $sb_twofa_msg = 'Double authentification : code de test envoyé, saisissez-le dans « Code reçu » puis enregistrez.';
+					elseif ($sb_twofa_r == 'wait') $sb_twofa_err = 'Double authentification : saisissez le code déjà envoyé (nouvel envoi possible dans une minute).';
+					elseif ($sb_twofa_r == 'noemail') $sb_twofa_err = "Double authentification : votre compte n'a pas d'adresse e-mail valide.";
+					else $sb_twofa_err = "Double authentification : l'envoi de l'e-mail a échoué, vérifiez le SMTP (module Contact > Paramètres).";
+				}
+			} elseif ($sb_twofa_want === '0') {
+				unset($_SESSION['sb2fa_activation']); // activation abandonnée
+			}
 											 
 				//$result_edit = $sbsql->query($query);
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
 					// --- Message SUCCES
-					$sb_msg_valid = 'Configuration modifiée avec succès';
+					$sb_msg_valid = 'Configuration modifiée avec succès' . ($sb_twofa_msg !== '' ? '. ' . $sb_twofa_msg : '');
+					if ($sb_twofa_err !== '') $sb_msg_error = $sb_twofa_err;
 					// --- Répercute la taille max. d'upload sur les limites PHP serveur
 					// (.htaccess pour mod_php, .user.ini pour PHP-FPM/CGI)
 					$sb_upload_max_bytes = sbToByteSize($sbsanitize->displayText($_POST['upload_max'], 'UTF-8', 1, 0));
@@ -320,6 +361,26 @@ switch($action) {
 		$sbform->addInput('text', 'Coût (itérations PBKDF2 par essai)', array ('name' => 'altcha_cost', 'value' => "$sb_config_altcha_cost", 'placeholder' => "2000"), false, false, "Défaut : 2000 (de 100 à 100000)");
 		$sbform->addInput('text', 'Difficulté (nombre maximum d\'essais)', array ('name' => 'altcha_counter', 'value' => "$sb_config_altcha_counter", 'placeholder' => "5000"), false, false, "Défaut : 5000, environ 1 seconde sur un ordinateur (de 10 à 1000000). Le navigateur fait en moyenne les trois quarts de ce nombre d'essais : plus la valeur est haute, plus la vérification est longue pour un visiteur (et coûteuse pour un robot).");
 		$sbform->addInput('text', 'Validité d\'un défi (secondes)', array ('name' => 'altcha_expire', 'value' => "$sb_config_altcha_expire", 'placeholder' => "600"), false, false, "Défaut : 600 (10 minutes, de 60 à 86400). Chaque défi n'est accepté qu'une fois.");
+		$sbform->addBreak('Double authentification');
+		$sb_twofa_on      = sbSettingBool('twofa_enabled');
+		$sb_twofa_waiting = !$sb_twofa_on && !empty($_SESSION['sb2fa_activation']) && $_SESSION['sb2fa_activation']['user'] === $sb_twofa_user;
+		$sbform->addAnything("<div class='form-group'><p>Un code envoyé par e-mail est demandé à chaque connexion à l'administration. "
+			. (sb2faDisabled() ? "<strong style='color: red;'>Désactivée sur ce serveur</strong> par le fichier de secours <code>inc/admin/2fa-disabled</code>. " : '')
+			. "Envoi des e-mails : " . (sbGetConfig('email_smtp') == '1'
+				? "SMTP (module Contact &gt; Paramètres)."
+				: "fonction mail() du serveur, souvent filtrée ou classée en indésirable : paramétrez de préférence un SMTP dans le module Contact &gt; Paramètres.")
+			. "</p></div>");
+		$sbform->openSelect('Double authentification', array('id' => 'twofa_enabled', 'name' => 'twofa_enabled'));
+		foreach (array('1' => 'Oui', '0' => 'Non') as $sb_twofa_k => $sb_twofa_v) {
+			$sb_twofa_sel = (($sb_twofa_on || $sb_twofa_waiting) ? '1' : '0') === (string)$sb_twofa_k;
+			$sbform->addOption($sb_twofa_v, $sb_twofa_sel ? array('value' => $sb_twofa_k, 'selected' => '') : array('value' => $sb_twofa_k));
+		}
+		$sbform->closeSelect($sb_twofa_on
+			? "Activée. Choisir « Non » puis enregistrer pour la désactiver."
+			: "En passant à « Oui », un code de test est d'abord envoyé à l'adresse e-mail de votre compte : la double authentification n'est activée qu'une fois ce code saisi, ce qui prouve que l'envoi d'e-mails fonctionne.");
+		if ($sb_twofa_waiting) {
+			$sbform->addInput('text', 'Code reçu', array ('name' => 'twofa_code', 'value' => '', 'placeholder' => str_repeat('0', SB2FA_CODE_LENGTH), 'autocomplete' => 'one-time-code', 'inputmode' => 'numeric'), false, false, "Code envoyé à " . htmlspecialchars(sb2faMaskEmail($_SESSION['sb2fa_activation']['email']), ENT_QUOTES, 'UTF-8') . ", valable " . (int)round(SB2FA_TTL / 60) . " minutes. Saisissez-le puis enregistrez : la double authentification sera activée. Champ laissé vide : un nouveau code est envoyé (au plus un par minute).");
+		}
 		$sbform->addBreak('Blocage des tentatives de connexion');
 		$tab_check_lock = array();
 		$tab_check_lock[0]['text']    = 'Activé';

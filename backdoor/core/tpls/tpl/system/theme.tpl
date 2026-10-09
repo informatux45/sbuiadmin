@@ -34,7 +34,7 @@
 								Documentation: <i>{if $sb_theme_config_file|@sbGetFileDocData:"Documentation" && $sb_theme_config_file|@sbGetFileDocData:"Documentation" != 'N.C.'}<a target="_blank" href="{$sb_theme_config_file|@sbGetFileDocData:"Documentation"}">{$sb_theme_config_file|@sbGetFileDocData:"Documentation"}</a>{else}{$sb_theme_config_file|@sbGetFileDocData:"Documentation"}{/if}</i>
 								{if $sb_themes[theme] != $sb_theme_name}
 								<div class="theme_activate" style="margin-top:14px">
-									<a href="{$formAction}&th={$sb_themes[theme]}" class="btn btn--primary theme_selection">Activer ce thème</a>
+									<a href="{$formAction}&amp;th={$sb_themes[theme]|escape:'url'}&amp;t={$sb_csrf_token|escape:'url'}" class="btn btn--primary theme_selection">Activer ce thème</a>
 								</div>
 								{/if}
 							</div>

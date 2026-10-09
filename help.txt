@@ -61,6 +61,33 @@ Configuration > Générale :
 # #######################################################
 
 # #######################################################
+# Double authentification (code par e-mail)
+# #######################################################
+
+### Activation (Configuration > Générale > Double authentification)
+- Désactivée à l'installation : aucun envoi d'e-mails n'est encore
+  paramétré. Paramétrer d'abord un SMTP (module Contact > Paramètres),
+  la fonction mail() du serveur étant souvent filtrée.
+- Passer à « Oui » et enregistrer : un code de test est envoyé à
+  l'adresse e-mail du compte. La saisir dans « Code reçu » et
+  enregistrer : la double authentification n'est activée qu'à ce
+  moment, preuve que les e-mails arrivent.
+- SECOURS (e-mails qui n'arrivent plus) : créer le fichier vide
+  backdoor/inc/admin/2fa-disabled sur le serveur la désactive.
+
+# #######################################################
+# Plusieurs sites sur un même compte d'hébergement
+# #######################################################
+
+### sbdbconfig.php (accès à la base)
+- Chaque site écrit son fichier, marqué à son nom (clé 'site') : le
+  premier s'appelle sbdbconfig.php, les suivants sbdbconfig-<dossier>.php,
+  dans le même dossier (private/ par exemple).
+- Un site n'utilise ni ne réécrit jamais le fichier marqué au nom d'un
+  autre. Un ancien fichier sans marque est marqué au nom du premier site
+  installé qui le lit ; un site en cours d'installation ne le prend jamais.
+
+# #######################################################
 # Mises à jour depuis l'administration
 # #######################################################
 

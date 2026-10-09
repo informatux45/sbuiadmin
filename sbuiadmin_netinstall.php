@@ -565,7 +565,7 @@ if ($do_install) {
         <div class="state-success">
             <div class="checkmark">✓</div>
             <h2><?php echo $t('Installation réussie', 'Installation complete'); ?></h2>
-            <p><?php echo $t('Ce fichier netinstall a été supprimé. Poursuivez avec l\'assistant d\'installation.', 'This netinstall file has been deleted. Continue with the installation wizard.'); ?></p>
+            <p><?php echo $t('Ce fichier netinstall a été supprimé. Étape suivante : l\'assistant d\'installation vous demandera une <strong>clé d\'installation</strong>. Ouvrez sur votre serveur (FTP, SSH ou gestionnaire de fichiers de l\'hébergeur) le fichier <code>backdoor/install/installer/install-key.php</code> et copiez la clé écrite après <code>KEY:</code>. Elle prouve que c\'est bien vous qui installez : personne d\'autre ne peut prendre la main sur votre site pendant l\'installation.', 'This netinstall file has been deleted. Next step: the installation wizard will ask for an <strong>installation key</strong>. Open on your server (FTP, SSH or your host\'s file manager) the file <code>backdoor/install/installer/install-key.php</code> and copy the key written after <code>KEY:</code>. It proves you are the one installing: nobody else can take over your site during installation.'); ?></p>
             <div class="verified">
                 <b>SBUIADMIN <?php echo htmlspecialchars($installed['version']); ?></b> (<?php echo htmlspecialchars($installed['tag'] ?? ''); ?>, commit <?php echo htmlspecialchars(substr((string) ($installed['commit'] ?? ''), 0, 7)); ?>)<br>
                 <?php echo $t('Signature Ed25519 vérifiée', 'Ed25519 signature verified'); ?> ✓<br>

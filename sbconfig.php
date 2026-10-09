@@ -32,14 +32,6 @@ if (PHP_SAPI !== 'cli' && is_file($_sb_update_lock) && (time() - (int) @file_get
 }
 unset($_sb_update_lock);
 
-# Get files configuration (theme / general)
-$_sb_config_base    = dirname(__FILE__) . DIRECTORY_SEPARATOR . SBADMIN . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR;
-$sb_theme_config    = file($_sb_config_base . 'theme.txt');
-
-if ($sb_theme_config === false) {
-    die('Configuration files not found or unreadable.');
-}
-
 # Journal d'audit PHP (inactif sans SBADMIN/inc/admin/php-audit.txt)
 require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . SBADMIN . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'sbuiadmin-phpaudit.php');
 
@@ -51,14 +43,6 @@ require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . SBADMIN . DIRECTORY_SEPAR
 require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . SBADMIN . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'sbuiadmin-loginlock.php');
 // Ancien tableau positionnel, pour le code tiers qui le lirait encore
 $sb_settings_config = sbSettingsLegacyArray();
-
-// Helpers to safely read positional config files (theme.txt)
-function _sbcfg(array $cfg, int $i, string $default = ''): string {
-    return isset($cfg[$i]) ? trim($cfg[$i]) : $default;
-}
-function _sbcfgbool(array $cfg, int $i): bool {
-    return _sbcfg($cfg, $i) === '1';
-}
 
 // Anciennes positions de settings.txt (réglages désormais en base, voir sbSetting())
 const CFG_SITE_TITLE        = 0;
@@ -107,7 +91,8 @@ date_default_timezone_set(SBTIMEZONE);
 defined('SBFROMEMAIL') OR define('SBFROMEMAIL', 'noreply@mysite.fr');
 
 # Theme directory
-defined('SBTHEME') OR define('SBTHEME', _sbcfg($sb_theme_config, 0));
+# (réglage « theme » de sb_config, défini par SBADMIN/inc/sbuiadmin-settings.php)
+defined('SBTHEME') OR define('SBTHEME', sbSettingsTheme());
 
 # Module activated onto index page
 # False, if you don't have module for index page
@@ -229,9 +214,4 @@ defined('SB_ADMIN_DIR') OR define('SB_ADMIN_DIR', SB_PATH . SBADMIN . DIRECTORY_
 // ------------------------
 defined('SB_SMARTY_DIR') OR define('SB_SMARTY_DIR', SB_ADMIN_DIR . 'core' . DIRECTORY_SEPARATOR);
 
-// ------------------------
-// --- Settings (Admin)
-// ------------------------
-defined('SB_SETTINGS_FILE') OR define('SB_SETTINGS_FILE', SB_ADMIN_DIR . 'inc' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'settings.txt');
-
-unset($_sb_config_base, $_sb_db, $_db_host, $_db_port, $_db_socket, $_sb_https, $_sb_protocol);
+unset($_sb_db, $_db_host, $_db_port, $_db_socket, $_sb_https, $_sb_protocol);

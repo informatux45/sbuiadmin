@@ -386,6 +386,18 @@ function sb2faDisabled() {
 }
 
 /**
+ * Double authentification demandée à la connexion ? Réglage « twofa_enabled »
+ * (Configuration, désactivé par défaut : il faut d'abord que l'envoi
+ * d'e-mails fonctionne), sauf fichier de secours. Réglages non chargés
+ * (script appelé directement) : activée, la session doit porter sb2fa_ok.
+ * @return bool
+ */
+function sb2faEnabled() {
+	if (sb2faDisabled()) return false;
+	return function_exists('sbSettingBool') ? sbSettingBool('twofa_enabled') : true;
+}
+
+/**
  * La session courante a-t-elle validé la double authentification
  * (code reçu par e-mail, voir sbuiadmin-2fa.php) ?
  * @return bool
@@ -394,7 +406,7 @@ function sb2faIsVerified() {
 	// Session d'abord : sinon, interrupteur posé, les gardes des scripts
 	// directs (upload, status, thumb...) laissaient passer sans connexion.
 	if (empty($_SESSION['sbuiadmin_user_name'])) return false;
-	if (sb2faDisabled()) return true;
+	if (!sb2faEnabled()) return true;
 	return !empty($_SESSION['sb2fa_ok'])
 		&& hash_equals((string)$_SESSION['sb2fa_ok'], (string)$_SESSION['sbuiadmin_user_name']);
 }

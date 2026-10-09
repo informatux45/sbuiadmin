@@ -385,7 +385,11 @@ if (isset($_GET['ac']) && $_GET['ac'] == 'logout') {
 // aussi les scripts appelés directement (upload, upgrade, migration).
 // ----------------------
 require_once SBUIADMIN_PATH . '/inc/' . SBUIADMIN_ID . '-2fa.php';
-if (!sb2faIsVerified()) {
+if (!sb2faEnabled()) {
+	// 2FA non activée (Configuration) : la session vaut validée, pour les
+	// scripts directs qui lisent sb2fa_ok (update-status, thumb, front)
+	$_SESSION['sb2fa_ok'] = (string)$_SESSION['sbuiadmin_user_name'];
+} elseif (!sb2faIsVerified()) {
 	sb2faGate(); // affiche la saisie du code et s'arrête, ou valide et redirige
 }
 // ----------------------

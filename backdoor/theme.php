@@ -35,13 +35,8 @@ $sbsmarty->assign('module_url', $module_url);
 $sb_msg_error = false;
 $sb_msg_valid = false;
 
-/* ----------------------------- *
-// SB Theme File
- * Referentiel du fichier THEME
- * -----------------------------
- * 0  - Theme name
- * ---------------------------- */
-$sb_theme_file = _AM_THEME_FILE;
+// Thème du site : réglage « theme » de sb_config (inc/admin/theme.txt
+// jusqu'à la 4.14), voir sbSettingsTheme() dans inc/sbuiadmin-settings.php
 
 // ---------------------------------------------------
 // ---------------------------------------------------
@@ -52,35 +47,29 @@ $sb_theme_file = _AM_THEME_FILE;
 // ------------------------------------
 // --- Control GET information --------
 // ------------------------------------
-if ($_GET['th']) {
-
-	// Injection des données
-	$sb_output_file  = $sbsanitize->displayText($_GET['th'], 'UTF-8', 1, 0) . "\n";
-	
-	// Locker le fichier pour qu'une seule personne a la fois ecrive dedans
-	$result_edit = file_put_contents($sb_theme_file, $sb_output_file, FILE_USE_INCLUDE_PATH | LOCK_EX);
-									 
-		// Result Edit
-		if ($result_edit) {
-			// --- On ne vide pas les champs du formulaire
-			// -------------------------------------------
-			// --- Message SUCCES
-			$sb_msg_valid = 'Thème modifié avec succès';
-		} else {
-			// --- Message ERROR
-			$sb_msg_error = 'Error: Write Error (EDIT)!';
-		}
+// Lien « Activer ce thème » : jeton CSRF de la session (t=) et nom de thème
+// existant dans theme/ (le nom sert ensuite à inclure les fichiers du thème)
+if (isset($_GET['th']) && $_GET['th'] !== '') {
+	$sb_theme_new = (string)$_GET['th'];
+	if (empty($_SESSION['sbuiadmin_csrf_token']) || !hash_equals((string)$_SESSION['sbuiadmin_csrf_token'], (string)($_GET['t'] ?? ''))) {
+		$sb_msg_error = 'Lien expiré : rechargez la page puis recommencez.';
+	} elseif (!sbThemeIsValid($sb_theme_new)) {
+		$sb_msg_error = 'Thème inconnu.';
+	} elseif (sbSettingsSave(array('theme' => $sb_theme_new))) {
+		$sb_msg_valid = 'Thème modifié avec succès';
+	} else {
+		$sb_msg_error = 'Error: Write Error (EDIT)!';
+	}
 }
 
 // --------------------------------
-// --- Ouverture du fichier
-$sb_theme = file($sb_theme_file);
-// --- Initialisation
-$sb_theme_name = trim($sb_theme[0]);
+// --- Thème actif
+$sb_theme_name = sbSettingsTheme();
 $sbsmarty->assign('sb_theme_name', $sb_theme_name);
+$sbsmarty->assign('sb_csrf_token', sbCsrfToken());
 
 // --- Debug SQL
-if (_AM_SITE_DEBUG) $sbsmarty->assign('file_content', $sb_theme);						
+if (_AM_SITE_DEBUG) $sbsmarty->assign('file_content', $sb_theme_name);						
 // --------------------------------		
 // --- Define variables
 $sbsmarty->assign('formAction', $module_url);

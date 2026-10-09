@@ -18,10 +18,6 @@ defined('SBUIADMIN_PATH') or die('Are you crazy!');
 // ----------------------------------------
 // Don't remove this setting              -
 // ----------------------------------------
-// --- Admin Settings File
-// Ancien fichier positionnel : vidé une fois migré en base (gardé pour la
-// migration automatique, voir inc/sbuiadmin-settings.php)
-defined('_AM_SETTINGS_FILE') OR define('_AM_SETTINGS_FILE', SBUIADMIN_PATH . '/inc/admin/settings.txt');
 // --- Réglages : table sb_config, accès base dans sbdbconfig.php
 require_once(__DIR__ . '/sbuiadmin-phpaudit.php'); // inactif sans inc/admin/php-audit.txt
 require_once(__DIR__ . '/sbuiadmin-settings.php');
@@ -30,10 +26,6 @@ require_once(__DIR__ . '/sbuiadmin-altcha.php');
 require_once(__DIR__ . '/sbuiadmin-loginlock.php');
 // Ancien tableau positionnel, pour le code tiers qui le lirait encore
 $sb_settings_config = sbSettingsLegacyArray();
-// --- Admin Dashboard File
-defined('_AM_DASHBOARD_FILE') OR define('_AM_DASHBOARD_FILE', SBUIADMIN_PATH . '/inc/admin/dashboard.txt');
-// --- Front Theme File
-defined('_AM_THEME_FILE') OR define('_AM_THEME_FILE', SBUIADMIN_PATH . '/inc/admin/theme.txt');
 // ----------------------------------------
 // ----------------------------------------
 // ----------------------------------------

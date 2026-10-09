@@ -170,7 +170,6 @@
 								
 								# One level up
 								$settings_file  = EI_CONFIG_FILE_PATH;
-								$dashboard_file = EI_CONFIG_DASHBOARD_FILE_PATH;
 								$htaccess_file  = EI_CONFIG_FILE_HTACCESS;
 								$install_file   = EI_CONFIG_FILE_INSTALL_START;
 								//clearstatcache(true);
@@ -199,8 +198,12 @@
 									if (!$sb_dbconfig_file) {
 										$sb_install_ok = false;
 										$error_mg[] = "<b>Erreur :</b> impossible d'écrire sbdbconfig.php. Rendez inscriptible le dossier <code>" . htmlspecialchars(dirname(dirname(__DIR__, 2))) . "</code> (recommandé, hors du site) ou <code>" . htmlspecialchars(dirname(__DIR__, 2)) . "</code>, puis relancez l'installation.";
+									} elseif (($sb_db_check = sbDbConfig(true)) && $sb_db_check['source'] !== 'env' && ($sb_db_check['source'] !== $sb_dbconfig_file || $sb_db_check['prefix'] !== $sb_db_new['prefix'] || $sb_db_check['name'] !== $sb_db_new['name'])) {
+										// Relu autre chose que ce qui vient d'être écrit (fichier d'un
+										// autre site, cache) : surtout ne rien écrire dans la base
+										$sb_install_ok = false;
+										$error_mg[] = "<b>Erreur :</b> la configuration relue (" . htmlspecialchars((string) $sb_db_check['source']) . ") ne correspond pas à celle écrite dans " . htmlspecialchars($sb_dbconfig_file) . " : installation interrompue, aucun réglage enregistré.";
 									} else {
-										sbDbConfig(true);
 										sbSettingsDb(true);
 										$sb_install_settings = array(
 											'customer_name'         => $_SESSION['settings_customer_name'],
@@ -245,6 +248,11 @@
 											'flood_login_delay'     => '4',
 											'toast_duration'        => '7',
 											'pagebuilder_modules'   => '',
+											// Thème du site (ancien inc/admin/theme.txt)
+											'theme'                 => 'saxo',
+											// Double authentification : activée plus tard dans
+											// Configuration, après un code de test reçu par e-mail
+											'twofa_enabled'         => '0',
 										);
 										// Mise à jour : ne complète que les réglages absents
 										if (!sbSettingsSave($sb_install_settings, $install_type == 'update')) {
@@ -252,23 +260,12 @@
 											$error_mg[] = "<b>Erreur :</b> impossible d'enregistrer les réglages dans la table " . htmlspecialchars(sbSettingsTable()) . ".";
 										} else {
 											// Un ancien settings.txt rempli serait re-migré par-dessus
-											// au premier chargement : on le vide.
-											@file_put_contents($settings_file, '', LOCK_EX);
+											// au premier chargement : on le supprime.
+											if (file_exists($settings_file)) @unlink($settings_file);
 										}
 									}
 								}
 
-								// Injection des données (Dashboard File)
-								$output_file_2  = $_SESSION['database_prefix'] . "sb_sandbox" . "\n";
-								$output_file_2 .= $_SESSION['database_prefix'] . "sb_sandbox" . "\n";
-								$output_file_2 .= "Nom (Sandbox)" . "\n";
-								$output_file_2 .= "index.php?p=sandbox" . "\n";
-								$output_file_2 .= "ambulance" . "\n";
-								$output_file_2 .= "nom" . "\n";
-								
-								// Locker le fichier pour qu'une seule personne a la fois ecrive dedans
-								$result_edit_2 = file_put_contents($dashboard_file, $output_file_2, FILE_USE_INCLUDE_PATH | LOCK_EX);
-								
 								// Ecrire le fichier htaccess
 								//$output_htaccess  = '# Prevent viewing of .htaccess file' . "\n";
 								//$output_htaccess .= '<Files .htaccess>' . "\n";
@@ -411,7 +408,7 @@
 					<tr><td><h4><?php echo lang_key('updating_completed'); ?></h4></td></tr>
 					<tr>
 						<td>
-							<div class="alert alert-success"><?php echo str_replace('_CONFIG_FILE_', EI_CONFIG_FILE_PATH, lang_key('file_successfully_rewritten')); ?></div>
+							<div class="alert alert-success">Réglages enregistrés dans la base (table sb_config), accès à la base dans <code><?php echo htmlspecialchars(isset($sb_dbconfig_file) && $sb_dbconfig_file ? $sb_dbconfig_file : 'sbdbconfig.php'); ?></code>.</div>
 							<div class="alert alert-warning"><?php echo lang_key('alert_remove_files'); ?></div>
 							<?php echo (EI_POST_INSTALLATION_TEXT != '') ? '<div class="alert alert-info">'.EI_POST_INSTALLATION_TEXT.'</div>' : ''; ?>
 							<?php if (!empty($sb_remove_token)) { ?>
@@ -438,7 +435,7 @@
 					<tr><td><h4><?php echo lang_key('installation_completed'); ?></h4></td></tr>
 					<tr>
 						<td>
-							<div class="alert alert-success"><?php echo str_replace('_CONFIG_FILE_', EI_CONFIG_FILE_PATH, lang_key('file_successfully_created')); ?></div>
+							<div class="alert alert-success">Réglages enregistrés dans la base (table sb_config), accès à la base dans <code><?php echo htmlspecialchars(isset($sb_dbconfig_file) && $sb_dbconfig_file ? $sb_dbconfig_file : 'sbdbconfig.php'); ?></code>.</div>
 							<div class="alert alert-warning"><?php echo lang_key('alert_remove_files'); ?></div>
 							<?php echo (EI_POST_INSTALLATION_TEXT != '') ? '<div class="alert alert-info">'.EI_POST_INSTALLATION_TEXT.'</div>' : ''; ?>
 							<?php if (!empty($sb_remove_token)) { ?>

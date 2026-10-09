@@ -12,6 +12,11 @@
  *
  * Envoi autonome : PHPMailer s'il est installé, sinon mail().
  *
+ * Désactivée par défaut (installation neuve : aucun envoi d'e-mails
+ * paramétré). S'active dans Configuration, et seulement après avoir saisi un
+ * code de test reçu par e-mail : un envoi qui ne fonctionne pas ne peut plus
+ * bloquer l'accès à l'administration.
+ *
  * SECOURS : si l'envoi d'e-mails ne fonctionne pas sur un serveur, créer le
  * fichier backdoor/inc/admin/2fa-disabled désactive la 2FA (voir
  * sb2faDisabled() dans sbuiadmin-rights.php). Il faut déjà un accès aux
@@ -112,7 +117,7 @@ function sb2faSendCode($username) {
 	$email = trim(html_entity_decode((string)$sbusers->getUserInfo($username, 'email'), ENT_QUOTES, 'UTF-8'));
 	if (!filter_var($email, FILTER_VALIDATE_EMAIL)) return 'noemail';
 
-	$code    = str_pad((string)random_int(0, (int)str_repeat('9', SB2FA_CODE_LENGTH)), SB2FA_CODE_LENGTH, '0', STR_PAD_LEFT);
+	$code    = sb2faNewCode();
 	$pending = (isset($_SESSION['sb2fa']) && $_SESSION['sb2fa']['user'] === $username) ? $_SESSION['sb2fa'] : null;
 
 	$_SESSION['sb2fa'] = array(
@@ -125,16 +130,83 @@ function sb2faSendCode($username) {
 		'email'    => $email,
 	);
 
-	$minutes = (int)round(SB2FA_TTL / 60);
-	$site    = defined('_AM_SITE_TITLE') ? _AM_SITE_TITLE : 'Administration';
-	$html    = '<p>Bonjour,</p>'
-	         . '<p>Voici votre code de connexion à l\'administration du site&nbsp;:</p>'
-	         . '<p style="font-size:28px;font-weight:bold;letter-spacing:6px;font-family:monospace;">' . $code . '</p>'
-	         . '<p>Ce code est valable ' . $minutes . '&nbsp;minutes.</p>'
-	         . '<p>Demande effectuée depuis l\'adresse IP ' . htmlspecialchars($_SERVER['REMOTE_ADDR']) . ' le ' . date('d/m/Y') . ' à ' . date('H:i') . '.<br>'
-	         . 'Si vous n\'êtes pas à l\'origine de cette connexion, changez immédiatement votre mot de passe et prévenez l\'administrateur du site.</p>';
+	$site = defined('_AM_SITE_TITLE') ? _AM_SITE_TITLE : 'Administration';
+	return sb2faMail($email, $username, 'Code de connexion - ' . $site, sb2faCodeHtml($code, "Voici votre code de connexion à l'administration du site")) ? 'ok' : 'mailfail';
+}
 
-	return sb2faMail($email, $username, 'Code de connexion - ' . $site, $html) ? 'ok' : 'mailfail';
+/**
+ * Nouveau code aléatoire de SB2FA_CODE_LENGTH chiffres
+ */
+function sb2faNewCode() {
+	return str_pad((string)random_int(0, (int)str_repeat('9', SB2FA_CODE_LENGTH)), SB2FA_CODE_LENGTH, '0', STR_PAD_LEFT);
+}
+
+/**
+ * Corps HTML de l'e-mail d'un code
+ */
+function sb2faCodeHtml($code, $intro) {
+	$minutes = (int)round(SB2FA_TTL / 60);
+	return '<p>Bonjour,</p>'
+	     . '<p>' . htmlspecialchars($intro) . '&nbsp;:</p>'
+	     . '<p style="font-size:28px;font-weight:bold;letter-spacing:6px;font-family:monospace;">' . $code . '</p>'
+	     . '<p>Ce code est valable ' . $minutes . '&nbsp;minutes.</p>'
+	     . '<p>Demande effectuée depuis l\'adresse IP ' . htmlspecialchars($_SERVER['REMOTE_ADDR']) . ' le ' . date('d/m/Y') . ' à ' . date('H:i') . '.<br>'
+	     . 'Si vous n\'êtes pas à l\'origine de cette demande, changez immédiatement votre mot de passe et prévenez l\'administrateur du site.</p>';
+}
+
+/**
+ * Activation (Configuration) : envoie un code de test à l'adresse du compte
+ * connecté. La 2FA n'est activée qu'une fois ce code saisi
+ * (sb2faActivationCheck), preuve que l'envoi d'e-mails fonctionne.
+ *
+ * @return string 'ok' | 'noemail' | 'mailfail' | 'wait'
+ */
+function sb2faActivationStart($username) {
+	global $sbusers;
+
+	$email = trim(html_entity_decode((string)$sbusers->getUserInfo($username, 'email'), ENT_QUOTES, 'UTF-8'));
+	if (!filter_var($email, FILTER_VALIDATE_EMAIL)) return 'noemail';
+	$pending = $_SESSION['sb2fa_activation'] ?? null;
+	if ($pending && $pending['user'] === $username && time() - $pending['sent_at'] < SB2FA_RESEND_DELAY) return 'wait';
+
+	$code = sb2faNewCode();
+	$_SESSION['sb2fa_activation'] = array(
+		'user'     => $username,
+		'hash'     => password_hash($code, PASSWORD_DEFAULT),
+		'expires'  => time() + SB2FA_TTL,
+		'attempts' => 0,
+		'sent_at'  => time(),
+		'email'    => $email,
+	);
+	$site = defined('_AM_SITE_TITLE') ? _AM_SITE_TITLE : 'Administration';
+	if (sb2faMail($email, $username, 'Activation de la double authentification - ' . $site, sb2faCodeHtml($code, "Voici le code qui active la double authentification de l'administration du site"))) return 'ok';
+	unset($_SESSION['sb2fa_activation']);
+	return 'mailfail';
+}
+
+/**
+ * Vérifie le code de test d'activation
+ *
+ * @return string 'ok' | 'none' | 'expired' | 'wrong' | 'locked'
+ */
+function sb2faActivationCheck($username, $code) {
+	$pending = $_SESSION['sb2fa_activation'] ?? null;
+	if (!$pending || $pending['user'] !== $username) return 'none';
+	$code = preg_replace('/\D/', '', (string)$code);
+	$_SESSION['sb2fa_activation']['attempts']++;
+	if (time() > $pending['expires']) {
+		unset($_SESSION['sb2fa_activation']);
+		return 'expired';
+	}
+	if (strlen($code) == SB2FA_CODE_LENGTH && password_verify($code, $pending['hash'])) {
+		unset($_SESSION['sb2fa_activation']);
+		return 'ok';
+	}
+	if ($_SESSION['sb2fa_activation']['attempts'] >= SB2FA_MAX_ATTEMPTS) {
+		unset($_SESSION['sb2fa_activation']);
+		return 'locked';
+	}
+	return 'wrong';
 }
 
 /**

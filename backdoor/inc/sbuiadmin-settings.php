@@ -122,6 +122,10 @@ function sbSettingsDefaults() {
 		'flood_login_delay'     => '4',
 		'toast_duration'        => '7',
 		'pagebuilder_modules'   => '',
+		'theme'                 => '',
+		// Double authentification par e-mail : activée à la main dans
+		// Configuration, après un code de test reçu (inc/sbuiadmin-2fa.php)
+		'twofa_enabled'         => '0',
 	);
 }
 
@@ -205,18 +209,43 @@ function sbDbConfigCandidates() {
 /** Contenu d'un sbdbconfig.php (tableau) ou false */
 function sbDbConfigRead($file) {
 	if (!@is_file($file) || !@is_readable($file)) return false;
+	// Jamais la version en cache d'opcache : relu juste après une écriture,
+	// l'ancien contenu (un autre site) serait pris pour le nouveau
+	if (function_exists('opcache_invalidate')) @opcache_invalidate($file, true);
 	$data = include $file;
 	return is_array($data) ? $data : false;
 }
 
-/** Ce fichier appartient-il à ce site ? (sans marque : oui, fichiers d'avant la marque) */
-function sbDbConfigIsOurs($data) {
-	return is_array($data) && (empty($data['site']) || $data['site'] === sbDbConfigSiteId());
+/**
+ * Ce fichier appartient-il à ce site ? Sans marque (fichier d'avant la
+ * marque) : oui en lecture, il est alors marqué au nom du premier site qui le
+ * charge (sbDbConfig). $strict : marque exigée (écriture, installation) - un
+ * fichier sans marque peut être celui d'un autre site du compte.
+ */
+function sbDbConfigIsOurs($data, $strict = false) {
+	if (!is_array($data)) return false;
+	if (empty($data['site'])) return !$strict && sbSiteInstalled();
+	return $data['site'] === sbDbConfigSiteId();
 }
 
-/** Chemin du sbdbconfig.php de ce site, ou false */
-function sbDbConfigPath($reset = false) {
+/**
+ * Site installé ? (installeur supprimé, ou verrouillé en fin d'installation).
+ * Un site pas encore installé ne revendique jamais un fichier sans marque.
+ */
+function sbSiteInstalled() {
+	$install = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'install';
+	return !@is_dir($install) || @is_file($install . DIRECTORY_SEPARATOR . 'installer' . DIRECTORY_SEPARATOR . 'installer.lock');
+}
+
+/** Chemin du sbdbconfig.php de ce site, ou false ($strict : marqué à son nom) */
+function sbDbConfigPath($reset = false, $strict = false) {
 	static $path = null;
+	if ($strict) {
+		foreach (sbDbConfigCandidates() as $file) {
+			if (sbDbConfigIsOurs(sbDbConfigRead($file), true)) return $file;
+		}
+		return false;
+	}
 	if ($path !== null && !$reset) return $path;
 	$path = false;
 	foreach (sbDbConfigCandidates() as $file) {
@@ -247,6 +276,15 @@ function sbDbConfig($reload = false) {
 				if (isset($data[$k])) $config[$k] = (string) $data[$k];
 			}
 			$config['source'] = $file;
+			// Fichier sans marque : marqué au nom de ce site (sinon un autre
+			// site du compte, à son installation, le prendrait pour le sien)
+			if (empty($data['site']) && @is_writable($file)) {
+				$content = sbDbConfigRender($config);
+				if (@file_put_contents($file, $content, LOCK_EX) === strlen($content)) {
+					@chmod($file, 0640);
+					if (function_exists('opcache_invalidate')) @opcache_invalidate($file, true);
+				}
+			}
 		}
 	}
 
@@ -310,8 +348,10 @@ function sbDbConfigWrite(array $c) {
 	if (empty($c['key'])) $c['key'] = base64_encode(random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES));
 	$content = sbDbConfigRender($c);
 	$targets = array();
-	// Fichier déjà en place pour ce site : on le réécrit là où il est
-	$current = sbDbConfigPath(true);
+	// Fichier déjà en place pour ce site (marqué à son nom) : on le réécrit
+	// là où il est. Jamais un fichier sans marque : il peut être celui d'un
+	// autre site du compte.
+	$current = sbDbConfigPath(true, true);
 	if ($current) $targets[] = $current;
 	$env = getenv('SBUIADMIN_DBCONFIG');
 	if ($env) $targets[] = $env;
@@ -319,7 +359,7 @@ function sbDbConfigWrite(array $c) {
 		if (!$dir[2]) continue;
 		$generic = $dir[0] . DIRECTORY_SEPARATOR . 'sbdbconfig.php';
 		// Nom générique déjà pris par un autre site : nom propre à ce site
-		$targets[] = ($dir[1] && @file_exists($generic) && !sbDbConfigIsOurs(sbDbConfigRead($generic)))
+		$targets[] = ($dir[1] && @file_exists($generic) && !sbDbConfigIsOurs(sbDbConfigRead($generic), true))
 			? $dir[0] . DIRECTORY_SEPARATOR . 'sbdbconfig-' . basename(sbDbConfigSiteId()) . '.php'
 			: $generic;
 	}
@@ -327,9 +367,10 @@ function sbDbConfigWrite(array $c) {
 		$dir = dirname($file);
 		$exists = @file_exists($file);
 		if ($exists ? !@is_writable($file) : (!@is_dir($dir) || !@is_writable($dir))) continue;
-		if ($exists && !sbDbConfigIsOurs(sbDbConfigRead($file))) continue;
+		if ($exists && !sbDbConfigIsOurs(sbDbConfigRead($file), true)) continue;
 		if (@file_put_contents($file, $content, LOCK_EX) === strlen($content)) {
 			@chmod($file, 0640);
+			if (function_exists('opcache_invalidate')) @opcache_invalidate($file, true);
 			sbDbConfigPath(true);
 			return $file;
 		}
@@ -645,6 +686,26 @@ function sbSettingsSave(array $values, $only_missing = false) {
 }
 
 /**
+ * Nom de thème valide : lettres, chiffres, - et _, dossier présent dans theme/
+ */
+function sbThemeIsValid($name) {
+	return is_string($name) && preg_match('/^[A-Za-z0-9_-]{1,64}$/', $name)
+		&& is_dir(SB_SETTINGS_SITE_ROOT . '/theme/' . $name);
+}
+
+/**
+ * Thème du site : réglage « theme » de sb_config ; sinon l'ancien
+ * inc/admin/theme.txt (site pas encore migré en 4.14) ; sinon saxo.
+ */
+function sbSettingsTheme() {
+	$theme = sbSetting('theme');
+	if (sbThemeIsValid($theme)) return $theme;
+	$legacy = @file(__DIR__ . '/admin/theme.txt', FILE_IGNORE_NEW_LINES);
+	if ($legacy && sbThemeIsValid(trim($legacy[0]))) return trim($legacy[0]);
+	return 'saxo';
+}
+
+/**
  * Ancien tableau positionnel ($sb_settings_config) pour le code tiers qui le
  * lirait encore. Les accès à la base n'y figurent plus.
  */
@@ -664,3 +725,7 @@ if (sbSettingsLegacyLines()) {
 	sbSettingsMigrate();
 }
 $GLOBALS['sb_settings'] = sbSettingsLoad();
+
+// Thème du site (en base depuis la 4.14, avant dans inc/admin/theme.txt).
+// Défini ici, avant sbconfig.php : la base l'emporte sur l'ancien fichier.
+defined('SBTHEME') or define('SBTHEME', sbSettingsTheme());

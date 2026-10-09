@@ -89,8 +89,10 @@ if (!file_exists($sb_install_lock_file)) {
 				echo '<p>Le dossier <code>backdoor/install/installer/</code> n\'est pas inscriptible : la clé d\'installation n\'a pas pu être créée. '
 				   . 'Rendez ce dossier inscriptible, puis rechargez cette page.</p>';
 			} else {
+				$sb_key_path = basename(dirname(__DIR__)) . '/install/installer/install-key.php';
 				echo '<p>Pour protéger l\'installation, saisissez la clé d\'installation. Elle est écrite sur le serveur, dans le fichier '
-				   . '<code>backdoor/install/installer/install-key.php</code> (après <code>KEY:</code>) : ouvrez-le avec votre client FTP ou SSH.</p>';
+				   . '<code>' . $e($sb_key_path) . '</code> (après <code>KEY:</code>) : ouvrez-le avec votre client FTP ou SSH, ou le gestionnaire de fichiers de votre hébergeur.</p>'
+				   . '<p style="color:#555;font-size:.92em">Pourquoi ? Tant que l\'installation n\'est pas terminée, cette page est publique : sans cette clé, n\'importe qui pourrait installer le site à votre place et en devenir l\'administrateur. Seul celui qui a accès aux fichiers du serveur peut la lire. Elle ne sert qu\'une fois et disparaît à la fin de l\'installation.</p>';
 				if ($sb_install_key_error !== '') echo '<p class="err">' . $e($sb_install_key_error) . '</p>';
 				echo '<form method="post"><input type="text" name="install_key" autocomplete="off" autofocus>'
 				   . '<button type="submit">Continuer</button></form>';

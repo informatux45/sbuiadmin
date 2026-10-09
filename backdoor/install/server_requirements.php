@@ -223,7 +223,7 @@
 		$sb_modules = function_exists('apache_get_modules') ? apache_get_modules() : null;
 
 		// .htaccess pris en compte (AllowOverride) : un fichier interdit doit répondre 403
-		$sb_r = $sb_probe($sb_admin_dir . '/inc/admin/theme.txt');
+		$sb_r = $sb_probe($sb_admin_dir . '/inc/migrations/README.txt');
 		$validations['web_htaccess'] = array(true, '.htaccess pris en compte (AllowOverride All)', $sb_r === null ? null : ($sb_r['code'] === 403), lang_key('enabled'), $sb_r === null ? 'non vérifiable (accès HTTP impossible depuis le serveur)' : 'ignoré : fichiers protégés lisibles (code ' . $sb_r['code'] . ')');
 
 		// mod_rewrite : la règle [F] sur .git répond 403 même si le dossier n'existe pas
@@ -251,8 +251,6 @@
 			if ($sb_req_dir[2] && @is_dir($sb_req_dir[0]) && @is_writable($sb_req_dir[0])) { $sb_req_where = $sb_req_dir[0]; break; }
 		}
 		$validations['config_file_dir_2'] = array(true, 'sbdbconfig.php (' . ($sb_req_where ? htmlspecialchars($sb_req_where) . (strpos($sb_req_where . '/', sbDbConfigSiteId() . '/') === 0 ? ', dans le site' : ', hors du site') : 'aucun dossier inscriptible') . ')', $sb_req_where !== false, lang_key('writable'), lang_key('no_writable'));
-		$validations['config_file_dir_3'] = array(true, '../inc/admin/dashboard.txt', is_writable('../inc/admin/dashboard.txt'), lang_key('writable'), lang_key('no_writable'));
-		$validations['config_file_dir_4'] = array(true, '../inc/admin/theme.txt', is_writable('../inc/admin/theme.txt'), lang_key('writable'), lang_key('no_writable'));
 		$validations['config_file_dir_5'] = array(true, '../install.php', is_writable('../install.php'), lang_key('writable'), lang_key('no_writable'));
 		$validations['cache_file_dir_1'] = array(true, '../datas/cache/core/', is_writable('../datas/cache/core/'), lang_key('writable'), lang_key('no_writable'));
 		$validations['cache_file_dir_2'] = array(true, '../datas/cache/medias/', is_writable('../datas/cache/medias/'), lang_key('writable'), lang_key('no_writable'));

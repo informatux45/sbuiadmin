@@ -69,7 +69,14 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
-**4.13**
+**4.14**
+- Theme setting moved to the database, theme switch validated and CSRF protected
+- dashboard.txt and settings.txt removed (migration keeps their content)
+- Two-factor authentication off by default, enabled in Configuration after a test code is received
+- Several sites on one hosting account: a site never reads or rewrites another site's sbdbconfig.php
+- Installer: settings written only after checking the database configuration it reads back
+
+**4.13
 - Update from the administration: daily check of signed GitHub releases, verified before install (signature, archive and per-file SHA-256), live progress
 - Idempotent SQL migrations shipped with each release, database schema version tracked
 - One-step rollback of the last update (files and database), automatic rollback on failure
