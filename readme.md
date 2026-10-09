@@ -69,6 +69,10 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
+**4.21**
+- Saxo and Pinkrio themes: jQuery 4.0.0 + jQuery Migrate 4.0.2 shipped locally (was the frozen CDN 1.11.1), compatibility file for their older jQuery plugins
+- Removed calls to the defunct html5shim (googlecode) and $(window).load() replaced
+
 **4.20**
 - Plugins: jQuery 3.7.1 shipped locally (the CDN "latest" was frozen at 1.11.1), Lightbox 2.12.0
 - Plugins removed: Fancybox (unmaintained, non-commercial license; Tables "lightbox_fancy" now opens in Lightbox), Appear, Prism

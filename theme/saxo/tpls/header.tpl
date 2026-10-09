@@ -19,7 +19,6 @@
 	<link rel="stylesheet" href="{$smarty.const.SB_THEME_URL}css/custom-styles.css">
 	
 	<!--[if lt IE 9]>
-		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 		<link rel="stylesheet" href="{$smarty.const.SB_THEME_URL}css/style-ie.css"/>
 	<![endif]--> 
 	
@@ -32,7 +31,10 @@
 	<meta name="theme-color" content="#ffffff">
 	
 	<!-- JS -->
-	<script src="https://code.jquery.com/jquery-latest.min.js"></script>
+	{* jQuery 4 + Migrate (fonctions retirées) + compatibilité des anciens plugins, livrés avec SBUIADMIN *}
+	<script src="{$smarty.const.SB_URL}assets/jquery/jquery-4.0.0.min.js?v=4.21"></script>
+	<script src="{$smarty.const.SB_URL}assets/jquery/jquery-migrate-4.0.2.min.js?v=4.21"></script>
+	<script src="{$smarty.const.SB_URL}assets/jquery/sb-jquery-compat.js?v=4.21c"></script>
 	<script src="{$smarty.const.SB_THEME_URL}js/bootstrap.js"></script>
 	<script src="{$smarty.const.SB_THEME_URL}js/jquery.prettyPhoto.js"></script>
 	<script src="{$smarty.const.SB_THEME_URL}js/jquery.flexslider.js"></script>

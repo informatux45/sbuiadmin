@@ -68,7 +68,7 @@ jQuery( document ).ready( function( $ ) {
 	        }
 	    );
 	    
-	    $('.zoom').live('click', function(){
+	    $(document).on('click', '.zoom', function(){
 	    	if( $.browser.msie ) {
 	    		$(this).attr('href', $(this).parent().attr('href'));
 	    	}
@@ -272,7 +272,7 @@ jQuery( document ).ready( function( $ ) {
     
     
     $(".gallery-wrap .internal_page_item .overlay, .section .related_project .overlay").css({opacity:0});
-	$(".gallery-wrap .internal_page_item, .section .related_project > div").live( 'mouseover mouseout', function(event){ 
+	$(document).on( 'mouseover mouseout', ".gallery-wrap .internal_page_item, .section .related_project > div", function(event){ 
 		if ( event.type == 'mouseover' ) $('.overlay', this).show().stop(true,false).animate({ opacity: .7 }, "fast"); 
 		if ( event.type == 'mouseout' )  $('.overlay', this).animate({ opacity: 0 }, "fast", function(){ $(this).hide() }); 
 	});

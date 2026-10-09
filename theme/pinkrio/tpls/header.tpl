@@ -61,7 +61,10 @@
         {insert name="sbGetFonts"}
         
         <!-- JAVASCRIPTs -->
-        <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+        {* jQuery 4 + Migrate (fonctions retirées) + compatibilité des anciens plugins, livrés avec SBUIADMIN *}
+        <script src="{$smarty.const.SB_URL}assets/jquery/jquery-4.0.0.min.js?v=4.21"></script>
+        <script src="{$smarty.const.SB_URL}assets/jquery/jquery-migrate-4.0.2.min.js?v=4.21"></script>
+        <script src="{$smarty.const.SB_URL}assets/jquery/sb-jquery-compat.js?v=4.21c"></script>
         <script type="text/javascript" src="{$smarty.const.SB_THEME_URL}js/comment-reply.js"></script>
         <script type="text/javascript" src="{$smarty.const.SB_THEME_URL}js/jquery.quicksand.js"></script>
         <script type="text/javascript" src="{$smarty.const.SB_THEME_URL}js/jquery.tipsy.js"></script>
