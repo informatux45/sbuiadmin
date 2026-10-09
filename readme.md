@@ -1,7 +1,7 @@
 # [SBUIADMIN](https://github.com/informatux45/sbuiadmin/)
 - CMS SBootstrap Admin Responsive
 - Contributors: [informatux45](https://github.com/informatux45)
-- Stable version: 4.11
+- Stable version: 4.12
 - License: [GPLv3](http://www.gnu.org/licenses/gpl-3.0.html "GNU General Public License v3")
 
 ---
@@ -47,7 +47,7 @@ Ready | Features
 
 ### Changelog
 
-**4.12** (unreleased)
+**4.12**
 - ALTCHA replaces Google reCAPTCHA (admin login, user module, contact forms), single core API
 - Temporary lockout after failed logins (per login and per IP, 2FA codes included)
 - Settings merged into the sb_config table, with an updated_at column
