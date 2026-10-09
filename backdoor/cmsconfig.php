@@ -241,7 +241,8 @@ switch($action) {
 			$coming_soon_video       = $sbsanitize->displayText($_POST['coming_soon_video'], 'UTF-8', 1, 0);
 			$coming_soon_dark        = ($_POST['coming_soon_dark'] === "on") ? '1' : '0';
 			$coming_soon_date        = $sbsanitize->displayText($_POST['coming_soon_date'], 'UTF-8', 1, 0);
-			$coming_soon_google_plus = $sbsanitize->displayText($_POST['coming_soon_google_plus'], 'UTF-8', 1, 0);
+			$coming_soon_countdown   = (isset($_POST['coming_soon_countdown']) && $_POST['coming_soon_countdown'] === "on") ? '1' : '0';
+			$coming_soon_type        = in_array($coming_soon_type, array('image', 'video'), true) ? $coming_soon_type : 'image';
 			
 			// --- EDIT
 			// UPDATE DATAS
@@ -260,7 +261,8 @@ switch($action) {
 			$query_video        = "UPDATE $table SET content = '$coming_soon_video' WHERE config = 'coming-soon-video'";
 			$query_dark         = "UPDATE $table SET content = '$coming_soon_dark' WHERE config = 'coming-soon-dark'";
 			$query_date         = "UPDATE $table SET content = '$coming_soon_date' WHERE config = 'coming-soon-date'";
-			$query_google_plus  = "UPDATE $table SET content = '$coming_soon_google_plus' WHERE config = 'coming-soon-google-plus'";
+			// Réglage ajouté en 4.17 : créé s'il manque
+			$query_countdown    = "INSERT INTO $table (config, content) VALUES ('coming-soon-countdown', '$coming_soon_countdown') ON DUPLICATE KEY UPDATE content = VALUES(content)";
 			
 			$result_url         = $sbsql->query($query_url);			
 			$result_title       = $sbsql->query($query_title);
@@ -277,11 +279,11 @@ switch($action) {
 			$result_video       = $sbsql->query($query_video);
 			$result_dark        = $sbsql->query($query_dark);
 			$result_date        = $sbsql->query($query_date);
-			$result_google_plus = $sbsql->query($query_google_plus);
+			$result_countdown   = $sbsql->query($query_countdown);
 			
-			if ($result_url && $result_title && $result_title && $result_text && $result_tel && $result_address && $result_email && $result_facebook  && $result_twitter && $result_youtube && $result_type && $result_image && $result_video && $result_dark && $result_date && $result_google_plus) {
+			if ($result_url && $result_title && $result_title && $result_text && $result_tel && $result_address && $result_email && $result_facebook  && $result_twitter && $result_youtube && $result_type && $result_image && $result_video && $result_dark && $result_date && $result_countdown) {
 				// --- Message SUCCES
-				$sb_msg_valid = 'Coming soon modifié avec succès';
+				$sb_msg_valid = 'Page de maintenance modifiée avec succès';
 			} else {
 				// --- Message ERROR
 				$sb_msg_error = 'Error: Write Error (EDIT)!';
@@ -307,7 +309,7 @@ switch($action) {
 																			 OR config = 'coming-soon-video'
 																			 OR config = 'coming-soon-dark'
 																			 OR config = 'coming-soon-date'
-																			 OR config = 'coming-soon-google-plus'
+																			 OR config = 'coming-soon-countdown'
 																			 ";
 		$request = $sbsql->query($query);
 		$assoc   = $sbsql->toarray($request);
@@ -327,27 +329,32 @@ switch($action) {
 		// --- Form construct
 		$sbform->openForm(array('action' => "$formAction", 'name' => "$formName", 'id' => "$formName", 'reloadpage' => "$formAction", 'submitpage' => "$formAction"));
 		// --------------------------------
-		// Selection du type de Coming Soon
+		// Fond de la page de maintenance
 		// --------------------------------
-		$sb_type = ['image','video'];
-		$sbform->openSelect("Choisissez un type de coming soon", array("id"=>"coming_soon_type", "name"=>"coming_soon_type", "style" => "width: 200px;"), true);
-		for($i = 0; $i < count($sb_type); $i++) {
-			if ($sb_type[$i] == $cs['coming-soon-type'])
-				$sbform->addOption($sb_type[$i], array ("value"=>$sb_type[$i], "selected"=>""));
-		else
-				$sbform->addOption($sb_type[$i], array ("value"=>$sb_type[$i]));
+		$sb_type = ['image' => 'Image', 'video' => 'Vidéo YouTube'];
+		$sbform->openSelect("Fond de la page", array("id"=>"coming_soon_type", "name"=>"coming_soon_type", "style" => "width: 200px;"), true);
+		foreach ($sb_type as $sb_type_key => $sb_type_label) {
+			if ($sb_type_key == $cs['coming-soon-type'])
+				$sbform->addOption($sb_type_label, array ("value"=>$sb_type_key, "selected"=>""));
+			else
+				$sbform->addOption($sb_type_label, array ("value"=>$sb_type_key));
 		}
 		// --- Close Select
 		$sbform->closeSelect();
 		// --------------------------------
 		// Image / video
 		// --------------------------------
-		$sbform->addInput('text', 'Photo', array ('id'=>'inputPhoto', 'name' => 'coming_soon_image', 'value' => $cs['coming-soon-image'], 'placeholder' => "Photo (background)", "medias"=>"", 'icon' => 'photo'), false, false, 'Image commune à tous les types de Coming soon. Si vous ne choisissez pas de photo, il y en a une par défaut pour chaque type.');
-		$sbform->addInput('text', 'ID Youtube', array ('name' => 'coming_soon_video', 'value' => $cs['coming-soon-video'], 'placeholder' => "ID Youtube"), false, false, "N'indiquez que la partie en <span style='color: red;'>rouge</span>.<br>Si vous n'indiquez aucun ID vidéo, il y en une par défaut.<br>Ex: https://www.youtube.com/watch?v=<span style='color: red; font-weight: bold;'>PF0L3gvSVcg</span>");
+		$sbform->addInput('text', 'Photo', array ('id'=>'inputPhoto', 'name' => 'coming_soon_image', 'value' => $cs['coming-soon-image'], 'placeholder' => "Photo (background)", "medias"=>"", 'icon' => 'photo'), false, false, 'Image de fond (et image affichée pendant le chargement de la vidéo, et sur mobile en mode vidéo). Sans photo choisie, une image par défaut est utilisée.');
+		$sbform->addInput('text', 'ID Youtube', array ('name' => 'coming_soon_video', 'value' => $cs['coming-soon-video'], 'placeholder' => "ID Youtube"), false, false, "Fond « Vidéo YouTube » : lue sans le son et en boucle, par youtube-nocookie.com, sur ordinateur et tablette (la photo sur mobile).<br>N'indiquez que la partie en <span style='color: red;'>rouge</span>. Sans ID, une vidéo par défaut est utilisée.<br>Ex: https://www.youtube.com/watch?v=<span style='color: red; font-weight: bold;'>PF0L3gvSVcg</span>");
 		// ----------------------------
 		// Date du lancement
 		// ----------------------------
-		$sbform->addDate('Date du lancement du site (supposée)', array('id'=>'coming_soon_date', 'name'=>'coming_soon_date', 'value'=>$cs['coming-soon-date']), true);
+		$tab_check_countdown = array();
+		$tab_check_countdown[0]['text']    = 'Afficher';
+		$tab_check_countdown[0]['name']    = 'coming_soon_countdown';
+		$tab_check_countdown[0]['checked'] = (($cs['coming-soon-countdown'] ?? '0') == '1') ? '1' : '0';
+		$sbform->addCheckbox('Compte à rebours', $tab_check_countdown, '', false, '<br />', "Jours, heures, minutes et secondes jusqu'à la date de lancement ci-dessous (masqué une fois la date passée).");
+		$sbform->addDate('Date du lancement du site (supposée)', array('id'=>'coming_soon_date', 'name'=>'coming_soon_date', 'value'=>$cs['coming-soon-date']), false);
 		// --------------------------------
 		// Titre
 		// --------------------------------
@@ -379,15 +386,11 @@ switch($action) {
 		// --------------------------------
 		// Twitter
 		// --------------------------------	
-		$sbform->addInput('text', 'Twitter', array ('name' => 'coming_soon_twitter', 'value' => $cs['coming-soon-twitter'], 'placeholder' => "Lien Twitter", 'icon' => 'twitter'), false);
+		$sbform->addInput('text', 'X (Twitter)', array ('name' => 'coming_soon_twitter', 'value' => $cs['coming-soon-twitter'], 'placeholder' => "Lien X (Twitter)", 'icon' => 'twitter'), false);
 		// --------------------------------
 		// Youtube
 		// --------------------------------	
 		$sbform->addInput('text', 'Youtube', array ('name' => 'coming_soon_youtube', 'value' => $cs['coming-soon-youtube'], 'placeholder' => "Lien Youtube", 'icon' => 'youtube-play'), false);
-		// --------------------------------
-		// Google +
-		// --------------------------------	
-		$sbform->addInput('text', 'Google +', array ('name' => 'coming_soon_google_plus', 'value' => $cs['coming-soon-google-plus'], 'placeholder' => "Lien Google +", 'icon' => 'google-plus'), false);
 		// --------------------------------
 		// --------------------------------
 		// A propos (Qui sommes nous)
@@ -854,7 +857,7 @@ $sbsmarty->assign('cmsconfig_email_help', "Les formulaires de contact du site so
 										   <br><br>Ses réglages (activation à la connexion, difficulté, clés) se trouvent dans la <strong><a href='"._AM_SITE_URL."index.php?p=settings'>configuration générale</a></strong>.
 										   <br><br>");
 
-$sbsmarty->assign('cmsconfig_comingsoon_help', "Le mode \"Coming Soon\" activé permet de construire son site sans que vos visiteurs puissent accéder à son contenu, ils seront redirigés vers une page d'attente ou de maintenance.<br><br>Ce mode peut également être utilisé lorsque vous effectuez une modification importante à votre site web.<br><br>L'url pour que vous puissiez accéder à votre site lorsque celui-ci est fermé au public sera celle-ci :<br><div style='text-align: center;'><span style='font-weight: bold; color: rgb(255, 102, 0);'><a target='_blank' href='".trim($sb_link_settings[15])."?d=".$cs['coming-soon-url']."'>".trim($sb_link_settings[15])."?d=".$cs['coming-soon-url']."</a></span><br></div><br>Vous pourrez voir votre site le temps de la session de votre serveur (par défaut).<br><br>Pour activer / désactiver le COMING SOON, modifier la <strong><a href='"._AM_SITE_URL."index.php?p=settings'>configuration générale</a></strong> de votre CMS SBUIADMIN ( <strong>Activation du mode COMING SOON (Maintenance)</strong> ).");
+$sbsmarty->assign('cmsconfig_comingsoon_help', "<a class='btn btn--outline-primary btn--sm' target='_blank' rel='noopener' href='" . htmlspecialchars(rtrim(sbSetting('site_url'), '/') . '/?maintenance=apercu', ENT_QUOTES, 'UTF-8') . "'>Aperçu de la page</a><br><br>Le mode Maintenance activé permet de construire ou modifier son site sans que vos visiteurs puissent accéder à son contenu : ils voient cette page à l'adresse demandée (code HTTP 503, les moteurs de recherche reviendront plus tard). À la réouverture, un simple rafraîchissement leur rend le site.<br><br>Les utilisateurs connectés à l'administration voient le site normalement.<br><br>Ce mode peut également être utilisé lorsque vous effectuez une modification importante à votre site web.<br><br>L'url pour que vous puissiez accéder à votre site lorsque celui-ci est fermé au public sera celle-ci :<br><div style='text-align: center;'><span style='font-weight: bold; color: rgb(255, 102, 0);'><a target='_blank' href='".trim($sb_link_settings[15])."?d=".$cs['coming-soon-url']."'>".trim($sb_link_settings[15])."?d=".$cs['coming-soon-url']."</a></span><br></div><br>Vous pourrez voir votre site le temps de la session de votre serveur (par défaut).<br><br>Pour activer / désactiver la maintenance, modifier la <strong><a href='"._AM_SITE_URL."index.php?p=settings'>configuration générale</a></strong> de votre CMS SBUIADMIN ( <strong>Activation du mode Maintenance</strong> ).");
 
 $sbsmarty->assign('cmsconfig_multilang_help',	"L'option multilangue désactivé n'affichera que la langue FR sur votre site web.<br>Dans l'administration, dans la gestion des pages et des blocs ne s'afficheront également que les champs FR.<br><br>Si vous activez l'option multilangue, les langues définies dans le champs 'langue(s)' vous permettront d'avoir ces langues sur votre site web.<br>Dans l'administration, dans la gestion des pages et des blocs s'afficheront les blocs supplémentaires des langues disponibles.<br><br><img style='width: 100%;' alt=''src='img/multilang.jpg'>");
 

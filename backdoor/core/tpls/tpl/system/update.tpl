@@ -59,12 +59,12 @@
 							Jamais touchés : <code>upload/</code>, <code>.htaccess</code>, <code>sbconfig.php</code>, <code>inc/cmscustom.php</code>, réglages, caches, installeur.
 						</div></div>
 
-						<div id="sbupd-step1">
+						<div id="sbupd-step1" style="margin-top:16px">
 							<button type="button" class="btn btn--primary" data-upd-action="prepare"{if !$sb_upd_ready} disabled{/if}>Préparer la mise à jour</button>
 							<span class="sbupd-hint" style="color:var(--t-muted)">Téléchargement et vérifications, rien n'est encore modifié.</span>
 						</div>
 
-						<div id="sbupd-step2" style="display:none">
+						<div id="sbupd-step2" style="display:none;margin-top:16px">
 							<div id="sbupd-plan"></div>
 							<label class="check" id="sbupd-confirm-wrap" style="margin-top:10px">
 								<input type="checkbox" id="sbupd-confirm"> <span class="box"></span>

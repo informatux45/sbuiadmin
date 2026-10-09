@@ -76,7 +76,7 @@ function sbGetRightsSubmodules() {
 			'headerfooter' => 'En-tête/Pied de page',
 			'css'          => 'CSS',
 			'javascript'   => 'JavaScript',
-			'comingsoon'   => 'Coming soon',
+			'comingsoon'   => 'Maintenance',
 			'multilang'    => 'Multilingue',
 			'plugins'      => 'Plugins',
 			'fonts'        => 'Polices',

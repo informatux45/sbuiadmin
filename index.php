@@ -95,18 +95,23 @@ if (file_exists($sbuiadmin_install_dir)) {
 $sbsmarty->assign('sb_site_title', _AM_SITE_TITLE);
 
 // ----------------------
-// Maintenance Site
+// Maintenance Site (Configuration > Générale, page : CMS Config > Maintenance)
+// Page affichée à l'adresse demandée (503, sans redirection ni cache) :
+// à la réouverture, un rafraîchissement suffit. Passent : ?d=<code d'accès>
+// et les utilisateurs connectés au back-office. Voir inc/maintenance.php.
 // ----------------------
+// Aperçu de la page (CMS Config > Maintenance), même site ouvert :
+// utilisateurs du back-office seulement
+if (isset($_GET['maintenance']) && $_GET['maintenance'] === 'apercu') {
+	require_once(__DIR__ . '/inc/maintenance.php');
+	if (sbMaintenanceBackofficeUser()) sbMaintenancePage();
+}
 if (SBMAINTENANCE) {
+	require_once(__DIR__ . '/inc/maintenance.php');
 	$param['id'] = 'coming-soon-url';
-	$getDevUrl   = (insert_sbGetConfig($param)) ? insert_sbGetConfig($param) : 'DevProgress';
-	if ((!isset($_GET['d']) || $_GET['d'] != $getDevUrl) && (!isset($_SESSION['dev_in_progress']) && $_SESSION['dev_in_progress'] != 'SBuiadminCMS')) {
-		$moved_301_maintenance = SB_URL . "coming-soon/";
-		header("Status: 301 Moved Permanently", false, 301);
-		header("Location: " . str_replace('//coming', '/coming', $moved_301_maintenance));
-		exit();
-	} else {
-		$_SESSION['dev_in_progress'] = 'SBuiadminCMS';
+	$getDevUrl   = (insert_sbGetConfig($param)) ? (string) insert_sbGetConfig($param) : 'DevProgress';
+	if (!sbMaintenanceBypass($getDevUrl)) {
+		sbMaintenancePage(); // termine le script
 	}
 }
 

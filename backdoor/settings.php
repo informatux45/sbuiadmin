@@ -70,7 +70,7 @@ global $sbfiles_medias_exts_safe;
  * 21 - DB prefix
  * 22 - (ancien mode captcha - remplacé par altcha_login)
  * 23 - (ancien mode UPGRADE - remplacé par Configuration > Mise à jour)
- * 24 - Coming soon
+ * 24 - Maintenance (ancien Coming soon)
  * 25 - Debug General Front
  * 26 - Debug Smarty Front
  * 27 - Smarty Force Compile
@@ -427,12 +427,12 @@ switch($action) {
 		$tab_check_3[0]['name']    = 'cms';
 		$tab_check_3[0]['checked'] = ($sb_config_cms == 1) ? '1' : '0';
 		$sbform->addCheckbox('Activation du CMS', $tab_check_3, '', false, '<br />', "Permet d'afficher la gestion du menu<br>Activer SBUIADMIN en CMS (si coché) ou en Administration Autonome (si non coché)");
-		// Checkbox du mode COMING SOON
+		// Checkbox du mode Maintenance
 		$tab_check_6 = array();
 		$tab_check_6[0]['text']    = 'Activé';
 		$tab_check_6[0]['name']    = 'coming_soon';
 		$tab_check_6[0]['checked'] = ($sb_config_coming_soon == 1) ? '1' : '0';
-		$sbform->addCheckbox('Activation du mode COMING SOON (Maintenance)', $tab_check_6, '', false, '<br />', "Permet d'activer le mode COMING SOON (Maintenance du site)<br>Ouvert uniquement aux administrateurs ou par url spécifique (<a href='"._AM_SITE_URL."index.php?p=cmsconfig&op=comingsoon'>configuration</a>)");
+		$sbform->addCheckbox('Activation du mode Maintenance', $tab_check_6, '', false, '<br />', "Permet de fermer le site aux visiteurs le temps d'une maintenance<br>Le site reste visible pour les utilisateurs connectés à l'administration et par l'URL d'accès (<a href='"._AM_SITE_URL."index.php?p=cmsconfig&op=comingsoon'>page de maintenance</a>)");
 		// Checkbox du mode REWRITE URL
 		$tab_check_8 = array();
 		$tab_check_8[0]['text']    = 'Activé';

@@ -69,22 +69,28 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
+**4.17**
+- Maintenance mode (formerly "Coming soon") shown in place on any URL with HTTP 503, no redirect: visitors just refresh when the site reopens
+- Logged-in administration users see the site, maintenance page preview, optional countdown
+- YouTube background through youtube-nocookie (no plugin), user values escaped, coming-soon/ directory removed
+- Update page: "Prepare" button spacing
+
 **4.16**
 - Installation check fixed: an installed site is never sent back to the installer when backdoor/install.php is present (wrong lock paths), HTTPS-safe temporary redirect
 
-**4.15
+**4.15**
 - Front: theme jQuery plugins no longer overwritten (Page Builder lightbox and jQuery plugin load jQuery only when missing)
 - Front: broken sample custom JavaScript from the installer fixed (migration), manifest.json loaded with credentials
 - Update page: alerts layout and release notes formatting fixed
 
-**4.14
+**4.14**
 - Theme setting moved to the database, theme switch validated and CSRF protected
 - dashboard.txt and settings.txt removed (migration keeps their content)
 - Two-factor authentication off by default, enabled in Configuration after a test code is received
 - Several sites on one hosting account: a site never reads or rewrites another site's sbdbconfig.php
 - Installer: settings written only after checking the database configuration it reads back
 
-**4.13
+**4.13**
 - Update from the administration: daily check of signed GitHub releases, verified before install (signature, archive and per-file SHA-256), live progress
 - Idempotent SQL migrations shipped with each release, database schema version tracked
 - One-step rollback of the last update (files and database), automatic rollback on failure

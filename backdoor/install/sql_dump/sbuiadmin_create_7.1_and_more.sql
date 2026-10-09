@@ -145,7 +145,7 @@ INSERT INTO `<DB_PREFIX>sb_config` (`id`, `config`, `content`) VALUES
 (27, 'coming-soon-video', 'E5MO0h7NIqY'),
 (28, 'coming-soon-dark', '0'),
 (29, 'coming-soon-date', '31/05/2050'),
-(30, 'coming-soon-google-plus', '#'),
+(30, 'coming-soon-countdown', '0'),
 (31, 'toolbarck', '0'),
 (32, 'seo-rating', 'general'),
 (33, 'seo-robots', 'index,follow'),

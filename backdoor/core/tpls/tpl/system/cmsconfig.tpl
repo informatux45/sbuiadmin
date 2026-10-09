@@ -16,7 +16,7 @@
 				<h1 class="hero-title">
 					{if $action_edit == 'css'}CSS
 					{elseif $action_edit == 'javascript'}Javascript
-					{elseif $action_edit == 'comingsoon'}Coming Soon
+					{elseif $action_edit == 'comingsoon'}Maintenance
 					{elseif $action_edit == 'multilang'}Multilangue
 					{elseif $action_edit == 'plugins'}Plugins
 					{elseif $action_edit == 'fonts'}Polices
@@ -41,7 +41,7 @@
 					<button class="btn btn--outline-primary" data-dropdown aria-label="Sections CMS config">
 						{if $action_edit == 'css'}CSS
 						{elseif $action_edit == 'javascript'}Javascript
-						{elseif $action_edit == 'comingsoon'}Coming Soon
+						{elseif $action_edit == 'comingsoon'}Maintenance
 						{elseif $action_edit == 'multilang'}Multilangue
 						{elseif $action_edit == 'plugins'}Plugins
 						{elseif $action_edit == 'fonts'}Polices
@@ -54,7 +54,7 @@
 						<a class="dd-menu-item" href="index.php?p=cmsconfig"{if $action_edit == 'headerfooter'} style="color:var(--primary);font-weight:600"{/if}>Header / Footer</a>
 						<a class="dd-menu-item" href="index.php?p=cmsconfig&op=css"{if $action_edit == 'css'} style="color:var(--primary);font-weight:600"{/if}>CSS</a>
 						<a class="dd-menu-item" href="index.php?p=cmsconfig&op=javascript"{if $action_edit == 'javascript'} style="color:var(--primary);font-weight:600"{/if}>Javascript</a>
-						<a class="dd-menu-item" href="index.php?p=cmsconfig&op=comingsoon"{if $action_edit == 'comingsoon'} style="color:var(--primary);font-weight:600"{/if}>Coming Soon</a>
+						<a class="dd-menu-item" href="index.php?p=cmsconfig&op=comingsoon"{if $action_edit == 'comingsoon'} style="color:var(--primary);font-weight:600"{/if}>Maintenance</a>
 						<a class="dd-menu-item" href="index.php?p=cmsconfig&op=multilang"{if $action_edit == 'multilang'} style="color:var(--primary);font-weight:600"{/if}>Multilangue</a>
 						<a class="dd-menu-item" href="index.php?p=cmsconfig&op=plugins"{if $action_edit == 'plugins'} style="color:var(--primary);font-weight:600"{/if}>Plugins</a>
 						<a class="dd-menu-item" href="index.php?p=cmsconfig&op=fonts"{if $action_edit == 'fonts'} style="color:var(--primary);font-weight:600"{/if}>Polices</a>

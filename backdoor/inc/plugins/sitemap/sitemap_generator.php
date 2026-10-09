@@ -100,7 +100,6 @@
     //   https://www.plop.at/print/bootmanager.html
     $skip_url = array (
                        "$websiteurl/".SBADMIN,
-                       "$websiteurl/coming-soon",
                        "$websiteurl/datas",
                        "$websiteurl/inc",
                        "$websiteurl/plugins",
