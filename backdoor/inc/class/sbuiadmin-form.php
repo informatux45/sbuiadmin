@@ -223,6 +223,10 @@ class form extends sanitize {
 	private $formBuffer       = array ();
 	private $formElementArr   = array ();
 	private $formAttributeArr = array ();
+	// Lignes de plusieurs champs : position du premier champ de la ligne
+	// ouverte, et positions [début, fin] des lignes fermées
+	private $rowStart         = null;
+	private $rowRanges        = array ();
 	
 	/**
 	* Class form's operations
@@ -256,6 +260,12 @@ class form extends sanitize {
 										<script type="text/javascript" src="inc/js/jquery/ui/i18n/ui.datepicker-fr.js"></script>
 										<script type="text/javascript" src="inc/js/editor/ckeditor/ckeditor.js"></script>
 									  ';
+		// Lignes de plusieurs champs (openRow()/closeRow()) : grille, une
+		// seule colonne sur petit écran
+		$this -> formBuffer['open'] .= '<style>.sbform-row{display:grid;gap:14px;align-items:start}'
+			. '.sbform-cell{min-width:0;display:flex;flex-direction:column;gap:6px}'
+			. '.sbform-row-title{font-weight:600;font-size:13px;margin:0 0 -6px}'
+			. '@media (max-width:768px){.sbform-row{grid-template-columns:1fr !important}}</style>';
 		$this -> formBuffer['open'] .= "\n" . '<form style="display:flex;flex-direction:column;gap:14px" ';
 
 		foreach ($this -> formAttributeArr as $clef => $val) {
@@ -2637,14 +2647,43 @@ EOT;
 	*/
 	public function __toString () {
 		$chaineTemp = $this -> formBuffer['open'];
-		
-		foreach ($this -> formBuffer['elements'] as $clef => $val) {
-			if (isset ($this -> formBuffer['anything'][$clef])) {
-				$chaineTemp .= $this -> formBuffer['anything'][$clef];
+		$elements = isset ($this -> formBuffer['elements']) ? $this -> formBuffer['elements'] : array ();
+		$anything = isset ($this -> formBuffer['anything']) ? $this -> formBuffer['anything'] : array ();
+		// Positions des champs ET du HTML libre : addAnything(), addBreak(),
+		// closeRow()... placés après le dernier champ n'étaient jamais affichés
+		$keys = array_unique (array_merge (array_keys ($elements), array_keys ($anything)));
+		sort ($keys, SORT_NUMERIC);
+		// Dans une ligne (openRow) : chaque champ dans sa case. Le HTML d'un
+		// champ n'est pas toujours un seul bloc (aide, <p> après le .field), et
+		// un <select> est fait de plusieurs morceaux (ouverture, options,
+		// fermeture) : sans case, chaque morceau prendrait une colonne.
+		$cellOpen = false;
+		$depth    = 0;
+		foreach ($keys as $clef) {
+			if (isset ($anything[$clef])) {
+				$chaineTemp .= $anything[$clef];
 			}
-			$chaineTemp .= $val;
+			if (!isset ($elements[$clef])) continue;
+			$inRow = false;
+			foreach ($this -> rowRanges as $range) {
+				if ($clef >= $range[0] && $clef <= $range[1]) { $inRow = true; break; }
+			}
+			$kind   = isset ($this -> formElementArr[$clef]) ? (string) key ($this -> formElementArr[$clef]) : '';
+			$hidden = (strncasecmp (ltrim ($elements[$clef]), '<input type="hidden"', 20) === 0);
+			if ($inRow && !$cellOpen && !$hidden) {
+				$chaineTemp .= '<div class="sbform-cell">';
+				$cellOpen = true;
+			}
+			$chaineTemp .= $elements[$clef];
+			if (in_array ($kind, array ('select', 'optgroup', 'fieldset'), true)) $depth++;
+			if (in_array ($kind, array ('/select', '/optgroup', '/fieldset'), true)) $depth = max (0, $depth - 1);
+			if ($cellOpen && $depth === 0) {
+				$chaineTemp .= '</div>';
+				$cellOpen = false;
+			}
 		}
-		$chaineTemp .= $this -> formBuffer['close'];
+		if ($cellOpen) $chaineTemp .= '</div>';
+		$chaineTemp .= isset ($this -> formBuffer['close']) ? $this -> formBuffer['close'] : '';
 		
 		return $chaineTemp;
 	}
@@ -2659,6 +2698,8 @@ EOT;
 		$this -> formBuffer       = array ();
 		$this -> formElementArr   = array ();
 		$this -> formAttributeArr = array ();
+		$this -> rowStart         = null;
+		$this -> rowRanges        = array ();
 	}
 
 
@@ -2808,6 +2849,42 @@ EOT;
 	}
 	
 	// ajouter n'importe quoi
+	/**
+	* Construct form (body)
+	* Ouvre une ligne de plusieurs champs (grille), fermée par closeRow().
+	* Chaque champ ajouté entre les deux prend une colonne ; une seule
+	* colonne sous 768 px de large.
+	* @param int|array $cols nombre de colonnes égales, ou largeurs CSS
+	*                        (ex. array('2fr', '1fr'), array('200px', 'auto'))
+	* @param string    $title petit titre facultatif au-dessus de la ligne
+	*/
+	public function openRow ($cols = 2, $title = '') {
+		if (is_array ($cols)) {
+			$tpl = implode (' ', array_map (function ($c) {
+				$c = trim ((string) $c);
+				return preg_match ('/^(\d+(\.\d+)?(fr|px|%|em|rem)|auto|minmax\([^;{}<>"]*\))$/', $c) ? $c : '1fr';
+			}, $cols));
+		} else {
+			$tpl = 'repeat(' . max (1, min (6, (int) $cols)) . ', minmax(0, 1fr))';
+		}
+		$chaineTemp = ($title !== '') ? '<div class="sbform-row-title">' . $title . '</div>' : '';
+		$chaineTemp .= '<div class="sbform-row" style="grid-template-columns:' . $tpl . '">';
+		$this -> addAnything ($chaineTemp);
+		$this -> rowStart = count ($this -> formElementArr);
+	}
+
+	/**
+	* Construct form (body)
+	* Ferme la ligne ouverte par openRow()
+	*/
+	public function closeRow () {
+		if ($this -> rowStart !== null) {
+			$this -> rowRanges[] = array ($this -> rowStart, count ($this -> formElementArr) - 1);
+			$this -> rowStart = null;
+		}
+		$this -> addAnything ('</div>');
+	}
+
 	public function addAnything ($any) {
 	  $cpt = count ($this -> formElementArr);
 	  if (isset ($this -> formBuffer['anything'][$cpt])) {

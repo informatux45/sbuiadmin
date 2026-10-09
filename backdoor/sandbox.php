@@ -464,6 +464,22 @@ switch($action) {
 		// ----------------------------		
 		$sbform->addCountry('Pays', array('id' => 'country', 'name' => 'country', 'value' => $country, 'style' => 'width: auto;'), true, 'Choisissez un pays');
 		// ----------------------------
+		// --- LIGNE de plusieurs champs (openRow / closeRow)
+		// ----------------------------
+		// Tous les champs ajoutés entre openRow() et closeRow() se placent
+		// côte à côte, une colonne chacun (grille CSS). Sous 768 px de
+		// large, la ligne repasse automatiquement sur une seule colonne.
+		//
+		//   $sbform->openRow(3);                       // 3 colonnes égales (de 1 à 6)
+		//   $sbform->openRow(array('2fr', '1fr'));     // largeurs au choix : fr, px, %, em, rem, auto, minmax()
+		//   $sbform->openRow(2, 'Titre de la ligne');  // petit titre facultatif au-dessus
+		//   ... addInput(), addDate(), openSelect()/closeSelect(), addColor()...
+		//   $sbform->closeRow();
+		//
+		// Ne pas imbriquer deux lignes. Un champ très large (éditeur HTML,
+		// Page Builder) reste à placer hors d'une ligne.
+		$sbform->openRow(array('2fr', '1fr'), 'Exemple : 2 champs sur une ligne (2/3 - 1/3)');
+		// ----------------------------
 		// --- Input DATE (calendar)
 		// ----------------------------
 		$sbform->addDate('Date de naissance (Calendar)', array('id'=>'dob', 'name'=>'dob', 'value'=>$dob), true);
@@ -471,6 +487,7 @@ switch($action) {
 		// --- Input COLOR PICKER
 		// ----------------------------		
 		$sbform->addColor ('Couleur (Color PICKER)', array('id' => 'color', 'name' => 'color', 'value' => $color), false);
+		$sbform->closeRow();
 		// -----------------------------------
 		// --- Caisses
 		// -----------------------------------

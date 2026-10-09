@@ -69,6 +69,11 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
+**4.18**
+- Form class: several fields on one line (openRow / closeRow, CSS grid, single column on small screens), example in the Sandbox
+- Form class: free HTML added after the last field is now displayed
+- Maintenance and general configuration forms laid out on rows
+
 **4.17**
 - Maintenance mode (formerly "Coming soon") shown in place on any URL with HTTP 503, no redirect: visitors just refresh when the site reopens
 - Logged-in administration users see the site, maintenance page preview, optional countdown

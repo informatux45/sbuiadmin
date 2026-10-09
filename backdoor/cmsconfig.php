@@ -368,8 +368,9 @@ switch($action) {
 		// --------------------------------	
 		$sbform->addInput('text', 'Url', array ('name' => 'coming_soon_url', 'value' => $cs['coming-soon-url'], 'placeholder' => "Url d'accès"), true, false, "Ex: http://votresite.com/?d=<span style='color: red; font-weight: bold;'>DeVeLop</span><br><b>N'indiquez que la partie en <span style='color: red;'>rouge</span> ;-)</b>");
 		// --------------------------------
-		// Telephone
+		// Telephone / Adresse / Email (une ligne)
 		// --------------------------------	
+		$sbform->openRow(array('1fr', '2fr', '1.5fr'), 'Coordonnées (onglet Contact)');
 		$sbform->addInput('text', 'Téléphone', array ('name' => 'coming_soon_tel', 'value' => $cs['coming-soon-tel'], 'placeholder' => "Téléphone", 'icon' => 'phone'), false);
 		// --------------------------------
 		// Adresse
@@ -379,9 +380,11 @@ switch($action) {
 		// Email
 		// --------------------------------	
 		$sbform->addInput('text', 'Email', array ('name' => 'coming_soon_email', 'value' => $cs['coming-soon-email'], 'placeholder' => "Email", 'icon' => 'envelope'), false);
+		$sbform->closeRow();
 		// --------------------------------
-		// Facebook
+		// Facebook / X / YouTube (une ligne)
 		// --------------------------------	
+		$sbform->openRow(3, 'Réseaux sociaux (liens en https://)');
 		$sbform->addInput('text', 'Facebook', array ('name' => 'coming_soon_facebook', 'value' => $cs['coming-soon-facebook'], 'placeholder' => "Lien Facebook", 'icon' => 'facebook'), false);
 		// --------------------------------
 		// Twitter
@@ -391,6 +394,7 @@ switch($action) {
 		// Youtube
 		// --------------------------------	
 		$sbform->addInput('text', 'Youtube', array ('name' => 'coming_soon_youtube', 'value' => $cs['coming-soon-youtube'], 'placeholder' => "Lien Youtube", 'icon' => 'youtube-play'), false);
+		$sbform->closeRow();
 		// --------------------------------
 		// --------------------------------
 		// A propos (Qui sommes nous)

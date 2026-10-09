@@ -358,9 +358,11 @@ switch($action) {
 		$tab_check_altcha_regen[0]['name']    = 'altcha_regenerate';
 		$tab_check_altcha_regen[0]['checked'] = '0';
 		$sbform->addCheckbox('Nouvelles clés', $tab_check_altcha_regen, '', false, '<br />', "Tire au sort deux nouvelles clés. Les vérifications en cours dans les navigateurs devront être refaites.");
+		$sbform->openRow(3);
 		$sbform->addInput('text', 'Coût (itérations PBKDF2 par essai)', array ('name' => 'altcha_cost', 'value' => "$sb_config_altcha_cost", 'placeholder' => "2000"), false, false, "Défaut : 2000 (de 100 à 100000)");
 		$sbform->addInput('text', 'Difficulté (nombre maximum d\'essais)', array ('name' => 'altcha_counter', 'value' => "$sb_config_altcha_counter", 'placeholder' => "5000"), false, false, "Défaut : 5000, environ 1 seconde sur un ordinateur (de 10 à 1000000). Le navigateur fait en moyenne les trois quarts de ce nombre d'essais : plus la valeur est haute, plus la vérification est longue pour un visiteur (et coûteuse pour un robot).");
 		$sbform->addInput('text', 'Validité d\'un défi (secondes)', array ('name' => 'altcha_expire', 'value' => "$sb_config_altcha_expire", 'placeholder' => "600"), false, false, "Défaut : 600 (10 minutes, de 60 à 86400). Chaque défi n'est accepté qu'une fois.");
+		$sbform->closeRow();
 		$sbform->addBreak('Double authentification');
 		$sb_twofa_on      = sbSettingBool('twofa_enabled');
 		$sb_twofa_waiting = !$sb_twofa_on && !empty($_SESSION['sb2fa_activation']) && $_SESSION['sb2fa_activation']['user'] === $sb_twofa_user;
@@ -387,10 +389,14 @@ switch($action) {
 		$tab_check_lock[0]['name']    = 'login_lock_enabled';
 		$tab_check_lock[0]['checked'] = ($sb_config_lock_enabled == 1) ? '1' : '0';
 		$sbform->addCheckbox('Blocage temporaire', $tab_check_lock, '', false, '<br />', "Trop d'échecs (mot de passe ou code de double authentification) : la connexion est refusée sans vérifier le mot de passe. Administration et module user. Complète l'anti-flood (Utilisateurs &gt; IP bloquées), qui limite seulement la cadence et dépend de Memcache.");
+		$sbform->openRow(2);
 		$sbform->addInput('text', 'Fenêtre de comptage (minutes)', array ('name' => 'login_lock_window', 'value' => "$sb_config_lock_window", 'placeholder' => "15"), false, false, "Défaut : 15. Les échecs sont comptés sur cette durée.");
 		$sbform->addInput('text', 'Durée du blocage (minutes)', array ('name' => 'login_lock_duration', 'value' => "$sb_config_lock_duration", 'placeholder' => "15"), false, false, "Défaut : 15, à partir du dernier échec qui a atteint le seuil.");
+		$sbform->closeRow();
+		$sbform->openRow(2);
 		$sbform->addInput('text', 'Échecs maximum par identifiant', array ('name' => 'login_lock_max_login', 'value' => "$sb_config_lock_max_login", 'placeholder' => "10"), false, false, "Défaut : 10.");
 		$sbform->addInput('text', 'Échecs maximum par adresse IP', array ('name' => 'login_lock_max_ip', 'value' => "$sb_config_lock_max_ip", 'placeholder' => "20"), false, false, "Défaut : 20 (tous identifiants confondus).");
+		$sbform->closeRow();
 		$sbform->addBreak('Debug');
 		// Checkbox des modes debug
 		$tab_check = array();
