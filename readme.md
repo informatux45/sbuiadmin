@@ -1,61 +1,68 @@
 # [SBUIADMIN](https://github.com/informatux45/sbuiadmin/)
 - CMS SBootstrap Admin Responsive
-- Contributeurs : [informatux45](https://github.com/informatux45)
-- Version stable : 4.11
-- License: [GPLv3](http://www.gnu.org/licenses/gpl-3.0.fr.html "Licence publique générale GNU v3")
+- Contributors: [informatux45](https://github.com/informatux45)
+- Stable version: 4.11
+- License: [GPLv3](http://www.gnu.org/licenses/gpl-3.0.html "GNU General Public License v3")
 
 ---
 
-### Spécifications
+### Specifications
 
-Ready | Fonctionnalités
+Ready | Features
 --- | ---
-*✓* | PHP 8.2 / MariaDB 10.5 / MySQL
+*✓* | PHP 8.1+ (PHP 8.4 ready) / MySQL 5.7+ / MariaDB 10.3+
 *✓* | HTML 5 / CSS 3
-*✓* | Bootstrap
-*✓* | Installeur en ligne
-*✓* | Responsive design (frontend / administration)
-*✓* | Livré avec 5 thèmes
-*✓* | Gestion des utilisateurs (droits modules)
+*✓* | Bootstrap (front themes), Adminator administration theme (dark mode)
+*✓* | Online installer (installation key, server requirements check)
+*✓* | Responsive design (front / administration)
+*✓* | 5 themes included
+*✓* | User management (per-module rights), two-factor authentication by email
+*✓* | ALTCHA anti-bot (self-hosted, no Google), temporary lockout after failed logins
+*✓* | Settings stored in database, secrets encrypted, database credentials outside the web root
 *✓* | Rewrite URLs
-*✓* | Multilangues
-*✓* | 6 modules (Articles, Slider, Contact Form, Tables, Tabbs)
-*✓* | Gestion des blocs
-*✓* | Contenu additionnels HTML (Smarty ready)
-*✓* | Administration renommable (Répertoire) et autonome
-*✓* | ALTCHA anti-robot (auto-hébergé, sans Google)
-*✓* | Développeurs (Templates Smarty, Sandbox, Debug Kint, Modules, ...)
-*✓* | Serveurs Linux / Apache (Recommandés)
+*✓* | Multilanguage
+*✓* | Modules (Articles, Pages, Slider, Contact forms, Tables, Tabs, FAQ, Downloads, Galleries, Search)
+*✓* | Content blocks, Page Builder
+*✓* | Additional HTML content (Smarty ready)
+*✓* | Renamable and standalone administration directory
+*✓* | Developers (Smarty templates, Sandbox, Kint debug, Modules, ...)
+*✓* | Linux / Apache servers (recommended)
 
 
 ---
 
 ### Screenshots
 
-![Un thème (front)](https://informatux.ddns.net:744/home/tools/demo_github/sbuiadmin-theme-2.jpg "Un thème (front)")
+![A theme (front)](https://informatux.ddns.net:744/home/tools/demo_github/sbuiadmin-theme-2.jpg "A theme (front)")
 
-![Un thème (front)](https://informatux.ddns.net:744/home/tools/demo_github/sbuiadmin-theme-1.jpg "Un thème (front)")
+![A theme (front)](https://informatux.ddns.net:744/home/tools/demo_github/sbuiadmin-theme-1.jpg "A theme (front)")
 
-![Login administration](https://informatux.ddns.net:744/home/tools/demo_github/sbuiadmin-login-1.jpg "Login administration")
+![Administration login](https://informatux.ddns.net:744/home/tools/demo_github/sbuiadmin-login-1.jpg "Administration login")
 
-![L'administration](https://informatux.ddns.net:744/home/tools/demo_github/sbuiadmin-admin-2.jpg "L'administration")
+![Administration](https://informatux.ddns.net:744/home/tools/demo_github/sbuiadmin-admin-2.jpg "Administration")
 
-[D'autres copie d'écran ici...](https://informatux.ddns.net:744/home/tools/demo_img/ "SBUIADMIN Screenshots")
+[More screenshots...](https://informatux.ddns.net:744/home/tools/demo_img/ "SBUIADMIN Screenshots")
 
 ---
 
 ### Changelog
 
+**4.12** (unreleased)
+- ALTCHA replaces Google reCAPTCHA (admin login, user module, contact forms), single core API
+- Temporary lockout after failed logins (per login and per IP, 2FA codes included)
+- Settings merged into the sb_config table, with an updated_at column
+- PHP 8.4 Ready
+
 **4.11**
-- Réglages en base de données (table sb_settings), migration automatique de settings.txt
-- Accès base dans sbdbconfig.php, cherché hors de la racine web (private/, dossier parent), variables d'environnement possibles
-- Secrets (clés ALTCHA, SMTP) chiffrés en base et jamais renvoyés au navigateur
-- Installeur : écriture directe des réglages, suppression de install/ en un clic, état des lieux des prérequis serveur
+- Settings stored in database, automatic migration of settings.txt
+- Database credentials in sbdbconfig.php, outside the web root when possible
+- Encrypted secrets, never sent back to the browser
+- Installer: direct settings write, one-click removal of install/, server requirements check
 
 **4.10**
-- Refonte complète de la charte graphique de l'administration (thème Adminator, mode sombre inclus)
-- Modernisation des librairies JS legacy (DataTables, confirmations, lightbox) en vanilla JS
-- Nouvelle page d'erreur 500 avec détail de l'erreur
+- New administration theme (Adminator, dark mode)
+- Legacy JS libraries replaced with vanilla JS
+- New 500 error page
 
 **4.00**
 - Update Smarty libraries
