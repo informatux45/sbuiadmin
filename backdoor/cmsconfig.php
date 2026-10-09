@@ -488,10 +488,17 @@ switch($action) {
 			// Injection des données
 			$plugins  = ($_POST['jquery'] === "on") ? "jquery|" : "";
 			$plugins .= ($_POST['lightbox'] === "on") ? "lightbox|" : "";
-			$plugins .= ($_POST['fancybox'] === "on") ? "fancybox|" : "";
 			$plugins .= ($_POST['checkboxcss'] === "on") ? "checkboxcss|" : "";
-			$plugins .= ($_POST['appear'] === "on") ? "appear|" : "";
+			foreach (array('cookieconsent', 'backtotop', 'aos', 'highlightjs') as $sb_plugin_new) {
+				$plugins .= (isset($_POST[$sb_plugin_new]) && $_POST[$sb_plugin_new] === "on") ? $sb_plugin_new . "|" : "";
+			}
 			$plugins = rtrim($plugins, "|");
+			// Bandeau de consentement : page de politique de confidentialité
+			// (https://... ou /chemin), créée si absente
+			$sb_consent_policy = trim((string) ($_POST['consent_policy'] ?? ''));
+			if ($sb_consent_policy !== '' && !preg_match('#^(https?://|/)[^\s"\'<>\\\\]*$#i', $sb_consent_policy)) $sb_consent_policy = '';
+			$sb_consent_policy = $sbsanitize->displayText($sb_consent_policy, 'UTF-8', 1, 0);
+			$sbsql->query("INSERT INTO $table (config, content) VALUES ('plugin-consent-policy', '$sb_consent_policy') ON DUPLICATE KEY UPDATE content = VALUES(content)");
 			
 			// --- EDIT
 			// UPDATE DATAS
@@ -542,7 +549,7 @@ switch($action) {
 		$tab_jquery[0]['checked'] = (in_array("jquery", $plugins)) ? '1' : '0';
 		$config_blocks = ($tab_jquery[0]['checked'] == '1') ? 'config_blocks_active' : 'config_blocks';
 		$sbform->addAnything("<div class='$config_blocks'>");
-		$sbform->addCheckbox('JQUERY (Latest)', $tab_jquery, '', false, '<br />');
+		$sbform->addCheckbox('JQUERY 3.7.1', $tab_jquery, '', false, '<br />');
 		$sbform->addAnything(sbHowToPlugins('Comment utiliser le plugin JQUERY', 'jquery/howto.html', 'zero', 'JQUERY'));
 		$sbform->addAnything("</div>");
 		// --------------------------------
@@ -558,18 +565,6 @@ switch($action) {
 		$sbform->addAnything(sbHowToPlugins('Comment utiliser le plugin LIGHTBOX', 'lightbox/howto.html', 'One', 'LIGHTBOX'));
 		$sbform->addAnything('</div>');
 		// --------------------------------
-		// --- Plugin FANCYBOX
-		// --------------------------------
-		$tab_fancybox = array();
-		$tab_fancybox[0]['text']    = 'Activé';
-		$tab_fancybox[0]['name']    = 'fancybox';
-		$tab_fancybox[0]['checked'] = (in_array("fancybox", $plugins)) ? '1' : '0';
-		$config_blocks = ($tab_fancybox[0]['checked']) ? 'config_blocks_active' : 'config_blocks';
-		$sbform->addAnything("<div class='$config_blocks'>");
-		$sbform->addCheckbox('FANCYBOX', $tab_fancybox, '', false, '<br />');
-		$sbform->addAnything(sbHowToPlugins('Comment utiliser le plugin FANCYBOX', 'fancybox/howto.html', 'Two', 'FANCYBOX'));
-		$sbform->addAnything('</div>');
-		// --------------------------------
 		// --- Plugin CHECKBOXCSS
 		// --------------------------------
 		$tab_checkboxcss = array();
@@ -582,18 +577,32 @@ switch($action) {
 		$sbform->addAnything(sbHowToPlugins('Comment utiliser le plugin CHECKBOXCSS', 'checkboxcss/howto.html', 'Three', 'CHECKBOXCSS'));
 		$sbform->addAnything('</div>');
 		// --------------------------------
-		// --- Plugin APPEAR / DISAPPEAR
+		// --- Plugins ajoutés en 4.20 : consentement, retour en haut, AOS, highlight.js
 		// --------------------------------
-		$tab_appear = array();
-		$tab_appear[0]['text']    = 'Activé';
-		$tab_appear[0]['name']    = 'appear';
-		$tab_appear[0]['checked'] = (in_array("appear", $plugins)) ? '1' : '0';
-		$config_blocks = ($tab_appear[0]['checked']) ? 'config_blocks_active' : 'config_blocks';
-		$sbform->addAnything("<div class='$config_blocks'>");
-		$sbform->addCheckbox('APPEAR / DISAPPEAR', $tab_appear, '', false, '<br />');
-		$sbform->addAnything(sbHowToPlugins('Comment utiliser le plugin APPEAR / DISAPPEAR', 'appear/howto.html', 'Four', 'APPEAR / DISAPPEAR'));
+		$sb_plugins_new = array(
+			'cookieconsent' => array('CONSENTEMENT (cookies)', 'Comment utiliser le bandeau de consentement', 'Six', 'CONSENTEMENT'),
+			'backtotop'     => array('RETOUR EN HAUT', 'Comment utiliser le bouton Retour en haut', 'Seven', 'RETOUR EN HAUT'),
+			'aos'           => array('AOS (animations)', 'Comment utiliser le plugin AOS', 'Eight', 'AOS'),
+			'highlightjs'   => array('HIGHLIGHT.JS (code)', 'Comment utiliser le plugin HIGHLIGHT.JS', 'Nine', 'HIGHLIGHT.JS'),
+		);
+		foreach ($sb_plugins_new as $sb_plugin_key => $sb_plugin_info) {
+			$tab_plugin_new = array();
+			$tab_plugin_new[0]['text']    = 'Activé';
+			$tab_plugin_new[0]['name']    = $sb_plugin_key;
+			$tab_plugin_new[0]['checked'] = (in_array($sb_plugin_key, $plugins)) ? '1' : '0';
+			$config_blocks = ($tab_plugin_new[0]['checked']) ? 'config_blocks_active' : 'config_blocks';
+			$sbform->addAnything("<div class='$config_blocks'>");
+			$sbform->addCheckbox($sb_plugin_info[0], $tab_plugin_new, '', false, '<br />');
+			$sbform->addAnything(sbHowToPlugins($sb_plugin_info[1], $sb_plugin_key . '/howto.html', $sb_plugin_info[2], $sb_plugin_info[3]));
+			$sbform->addAnything('</div>');
+		}
 		$sbform->addAnything('</div>');
-		$sbform->addAnything('</div>');
+		// --------------------------------
+		// --- Bandeau de consentement : politique de confidentialité
+		// --------------------------------
+		$sb_consent_row = $sbsql->assoc($sbsql->query("SELECT content FROM $table WHERE config = 'plugin-consent-policy'"));
+		$sbform->addAnything('<div style="clear: both;"></div>');
+		$sbform->addInput('text', 'Bandeau de consentement : page « Politique de confidentialité »', array('name' => 'consent_policy', 'value' => html_entity_decode((string) ($sb_consent_row['content'] ?? ''), ENT_QUOTES, 'UTF-8'), 'placeholder' => 'https://votresite.fr/confidentialite ou /confidentialite'), false, false, "Facultatif. Lien affiché dans le bandeau et dans la fenêtre « Gérer les cookies ».");
 		// --------------------------------
 		// --- Hiddens / Buttons
 		// --------------------------------

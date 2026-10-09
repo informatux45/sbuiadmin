@@ -122,7 +122,9 @@ function shortcode_sbtable($param = '') {
 								$data_target = ' data-lightbox="image-' . $val['i'] . '-' . $key . '" data-title=""';
 							break;
 							case "lightbox_fancy":
-								$data_fancy = ' fancybox';
+								// Ancienne cible Fancybox (plugin retiré en 4.20,
+								// licence non commerciale) : ouverte dans Lightbox
+								$data_target = ' data-lightbox="image-' . $val['i'] . '-' . $key . '" data-title=""';
 							break;
 						}
 						// --- 

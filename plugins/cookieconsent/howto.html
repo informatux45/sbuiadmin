@@ -1,0 +1,11 @@
+<h3>Bandeau de consentement (cookies)</h3>
+<p>Affiche un bandeau de consentement conforme aux recommandations de la CNIL (CookieConsent 3, licence MIT, aucun service extérieur). Le choix du visiteur est mémorisé 6 mois.</p>
+<ul>
+<li>Si un identifiant <b>Google Analytics</b> est renseigné (CMS config &gt; SEO), le visiteur peut accepter ou refuser la mesure d'audience : le code Google n'est exécuté qu'après accord.</li>
+<li>Sinon, le bandeau indique simplement que le site n'utilise que des cookies nécessaires.</li>
+<li>Renseignez l'adresse de votre page « Politique de confidentialité » sous la liste des plugins.</li>
+</ul>
+<p>Lien « Gérer les cookies » (à placer dans le footer de votre thème, par exemple) :</p>
+<pre>&lt;a href="#" data-cc="show-preferencesModal"&gt;Gérer les cookies&lt;/a&gt;</pre>
+<p>Pour soumettre un autre script au consentement « Mesure d'audience » :</p>
+<pre>&lt;script type="text/plain" data-category="analytics"&gt; ... &lt;/script&gt;</pre>

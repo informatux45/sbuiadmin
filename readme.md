@@ -69,6 +69,11 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
+**4.20**
+- Plugins: jQuery 3.7.1 shipped locally (the CDN "latest" was frozen at 1.11.1), Lightbox 2.12.0
+- Plugins removed: Fancybox (unmaintained, non-commercial license; Tables "lightbox_fancy" now opens in Lightbox), Appear, Prism
+- New plugins: cookie consent banner (CookieConsent 3, Google Analytics only after consent), back to top button, AOS animations, highlight.js
+
 **4.19**
 - Security: no direct web access to the administration's internal files (backdoor/inc: PHP, PHAR and database migrations), settings loader refuses direct calls (also on nginx)
 - Help: nginx rules

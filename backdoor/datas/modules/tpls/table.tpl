@@ -158,7 +158,7 @@
 										<u>Les targets de champs :</u><br>
 										<b>blank</b>: Ouvre le lien dans un nouvel onglet<br>
 										<b>lightbox</b>: Ouvre votre lien dans une lightbox (NB: <i>Ne pas oublier d'activer la lightbox dans les plugins de l'administration</i>)<br>
-										<b>lightbox_fancy</b>: Ouvre votre lien dans une lightbox FANCYBOX (NB: <i>Ne pas oublier d'activer la lightbox dans les plugins de l'administration</i>)<br>
+										<b>lightbox_fancy</b>: ancienne cible Fancybox (plugin retiré), identique à <b>lightbox</b><br>
 									{elseif isset($alldatas) || $smarty.get.a == 'editdatas'}
 										Saissisez les données de votre tableau par entrée (ligne).<br>
 										<br>

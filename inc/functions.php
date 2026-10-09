@@ -836,7 +836,9 @@ if (!function_exists("insert_sbGetHeaders")) {
 		// --- Get Google Analytic
 		if ($sbsanitize->sTrim($result[2]['content']) != '') {
 			$cms_headers .= "\n" . '<!-- Google Analytics -->' . "\n";
-			$cms_headers .= '<script type="text/javascript">' . "\n";
+			// Plugin « Consentement » actif : exécuté seulement après accord
+			// du visiteur (catégorie analytics, plugins/cookieconsent/sbconsent.js)
+			$cms_headers .= (sbPluginEnabled('cookieconsent') ? '<script type="text/plain" data-category="analytics">' : '<script type="text/javascript">') . "\n";
 			$cms_headers .= "(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 								(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 								m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
@@ -848,6 +850,22 @@ if (!function_exists("insert_sbGetHeaders")) {
 		}
 		
 		return $cms_headers;
+	}
+}
+
+/**
+* Plugin activé dans CMS config > Plugins ?
+* @return bool
+*/
+if (!function_exists("sbPluginEnabled")) {
+	function sbPluginEnabled($name) {
+		static $list = null;
+		if ($list === null) {
+			global $sbsql;
+			$row  = $sbsql->assoc($sbsql->query("SELECT content FROM " . _AM_DB_PREFIX . "sb_config WHERE config = 'plugins'"));
+			$list = array_filter(explode('|', (string) ($row['content'] ?? '')));
+		}
+		return in_array($name, $list, true);
 	}
 }
 
@@ -878,13 +896,9 @@ if (!function_exists("insert_sbGetPlugins")) {
 				// jQuery remplaçait le premier et ses plugins (Bootstrap,
 				// Flexslider... « is not a function »). document.write garde
 				// l'ordre de chargement des scripts suivants.
-				$cms_plugins .= '<script>window.jQuery || document.write(\'<script src="https://code.jquery.com/jquery-latest.min.js"><\\/script>\');</script>';
-			}
-			// --------------------------
-			// --- Plugin APPEAR / DISAPPEAR
-			// --------------------------
-			if (in_array('appear', $plugins_array)) {
-				$cms_plugins .= '<script src="'.SB_URL.'plugins/appear/jquery.appear.js"></script>';
+				// jQuery 3.7.1 livré avec SBUIADMIN (l'ancien jquery-latest du CDN
+				// est figé en 1.11.1, failles XSS connues)
+				$cms_plugins .= '<script>window.jQuery || document.write(\'<script src="' . SB_URL . 'plugins/jquery/jquery.min.js"><\\/script>\');</script>';
 			}
 			
 			// --------------------------
@@ -895,30 +909,52 @@ if (!function_exists("insert_sbGetPlugins")) {
 				$cms_plugins .= '<script src="'.SB_URL.'plugins/lightbox/js/lightbox.min.js"></script>';
 			}
 	
-			// --------------------------
-			// --- Plugin FANCYBOX
-			// --------------------------
-			if (in_array('fancybox', $plugins_array)) {
-				$cms_plugins .= '<script type="text/javascript" src="'.SB_URL.'plugins/fancybox/jquery.mousewheel-3.0.6.pack.js"></script>';
-				$cms_plugins .= '<script type="text/javascript" src="'.SB_URL.'plugins/fancybox/jquery.fancybox.js"></script>';
-				$cms_plugins .= '<link rel="stylesheet" type="text/css" href="'.SB_URL.'plugins/fancybox/jquery.fancybox.css" media="screen" />';
-				$cms_plugins .= '<link rel="stylesheet" type="text/css" href="'.SB_URL.'plugins/fancybox/helpers/jquery.fancybox-buttons.css" />';
-				$cms_plugins .= '<script type="text/javascript" src="'.SB_URL.'plugins/fancybox/helpers/jquery.fancybox-buttons.js"></script>';
-				$cms_plugins .= '<link rel="stylesheet" type="text/css" href="'.SB_URL.'plugins/fancybox/helpers/jquery.fancybox-thumbs.css" />';
-				$cms_plugins .= '<script type="text/javascript" src="'.SB_URL.'plugins/fancybox/helpers/jquery.fancybox-thumbs.js"></script>';
-				$cms_plugins .= '<script type="text/javascript" src="'.SB_URL.'plugins/fancybox/helpers/jquery.fancybox-media.js"></script>';
-				$cms_plugins .= '<script type="text/javascript">
-									jQuery(document).ready(function() {
-										jQuery(".fancybox").fancybox();
-									});
-								 </script>';
-			}
 	
 			// --------------------------
 			// --- Plugin CHECKBOXCSS
 			// --------------------------
 			if (in_array('checkboxcss', $plugins_array)) {
 				$cms_plugins .= '<link href="'.SB_URL.'plugins/checkboxcss/checkboxcss.css" rel="stylesheet">';
+			}
+
+			// --------------------------
+			// --- Plugin CONSENTEMENT (bandeau cookies, CookieConsent 3, MIT)
+			// --------------------------
+			if (in_array('cookieconsent', $plugins_array)) {
+				$cc = $sbsql->toarray($sbsql->query("SELECT config, content FROM $table_config WHERE config IN ('plugin-consent-policy', 'seo-google-analytics')"));
+				$cc_cfg = array();
+				foreach ((array) $cc as $row) $cc_cfg[$row['config']] = trim(html_entity_decode((string) $row['content'], ENT_QUOTES, 'UTF-8'));
+				$cc_policy = $cc_cfg['plugin-consent-policy'] ?? '';
+				if (!preg_match('#^(https?://|/)#i', $cc_policy)) $cc_policy = '';
+				$cms_plugins .= '<link href="'.SB_URL.'plugins/cookieconsent/cookieconsent.css" rel="stylesheet">';
+				$cms_plugins .= '<script src="'.SB_URL.'plugins/cookieconsent/cookieconsent.umd.js"></script>';
+				$cms_plugins .= '<script src="'.SB_URL.'plugins/cookieconsent/sbconsent.js?v=' . @filemtime(SB_PATH . 'plugins/cookieconsent/sbconsent.js') . '" data-policy="' . htmlspecialchars($cc_policy, ENT_QUOTES, 'UTF-8') . '" data-analytics="' . (($cc_cfg['seo-google-analytics'] ?? '') !== '' ? '1' : '0') . '"></script>';
+			}
+
+			// --------------------------
+			// --- Plugin RETOUR EN HAUT (script maison, sans dépendance)
+			// --------------------------
+			if (in_array('backtotop', $plugins_array)) {
+				$cms_plugins .= '<link href="'.SB_URL.'plugins/backtotop/backtotop.css?v=' . @filemtime(SB_PATH . 'plugins/backtotop/backtotop.css') . '" rel="stylesheet">';
+				$cms_plugins .= '<script src="'.SB_URL.'plugins/backtotop/backtotop.js?v=' . @filemtime(SB_PATH . 'plugins/backtotop/backtotop.js') . '"></script>';
+			}
+
+			// --------------------------
+			// --- Plugin AOS (animations au défilement, MIT)
+			// --------------------------
+			if (in_array('aos', $plugins_array)) {
+				$cms_plugins .= '<link href="'.SB_URL.'plugins/aos/aos.css" rel="stylesheet">';
+				$cms_plugins .= '<script src="'.SB_URL.'plugins/aos/aos.js"></script>';
+				$cms_plugins .= '<script>if (window.AOS) AOS.init({ once: true, duration: 700 });</script>';
+			}
+
+			// --------------------------
+			// --- Plugin HIGHLIGHT.JS (coloration de code, BSD-3)
+			// --------------------------
+			if (in_array('highlightjs', $plugins_array)) {
+				$cms_plugins .= '<link href="'.SB_URL.'plugins/highlightjs/styles/github.min.css" rel="stylesheet">';
+				$cms_plugins .= '<script src="'.SB_URL.'plugins/highlightjs/highlight.min.js"></script>';
+				$cms_plugins .= '<script>if (window.hljs) hljs.highlightAll();</script>';
 			}
 			
 			// --------------------------

@@ -18,6 +18,6 @@ defined('SBUIADMIN_PATH') or die('Are you crazy!');
 // ------------------------------------------
 // --- Version 
 // ------------------------------------------
-defined('_AM_START_VERSION') OR define('_AM_START_VERSION', '4.19');
+defined('_AM_START_VERSION') OR define('_AM_START_VERSION', '4.20');
 
 ?>
