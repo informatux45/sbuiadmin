@@ -537,7 +537,7 @@ switch($action) {
 // ----------------------
 $sbsmarty->assign('page_title', 'Tous les utilisateurs');
 // --- Legend ADD or EDIT
-$sbsmarty->assign('legend_add_edit', sprintf($legend_add_edit, $sbsanitize->displayText($username, 'UTF-8', 0, 1)));
+$sbsmarty->assign('legend_add_edit', sprintf((string) ($legend_add_edit ?? ''), $sbsanitize->displayText($username, 'UTF-8', 0, 1)));
 
 // ----------------------
 // ASSIGN Message status

@@ -137,7 +137,6 @@ function GetPage ($url)
 
     $data = curl_exec($ch);
 
-    curl_close($ch);
 
     return $data;
 }
@@ -203,7 +202,6 @@ function GetEffectiveURL ($url)
     // "http://example.com/show_location.php?loc=München"
 
     // Close the handle
-    curl_close($ch);
 
     return $effective_url;
 }

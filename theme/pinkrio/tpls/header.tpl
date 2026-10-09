@@ -90,7 +90,7 @@
     <!-- END HEAD -->
     
     <!-- START BODY -->
-    <body class="no_js responsive {$viewtype|default:"stretched"} {insert name=sbGetBodyClass th="{$theme_view}" pt="{$sb_pages_title}" ti="{$sb_title}" pid="{$page_id}"} {insert name="sbGetMobileDetect"}">
+    <body class="no_js responsive {$viewtype|default:"stretched"} {insert name=sbGetBodyClass th="{$theme_view}" pt="{$sb_pages_title}" ti="{$sb_title}" pid="{$page_id}"} classic">
         
         <!-- START BG SHADOW -->
         <div class="bg-shadow">

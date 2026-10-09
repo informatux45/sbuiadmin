@@ -233,6 +233,8 @@ $sbsmarty->setTemplateDir(array('sys' => _AM_SMARTY_DIR . 'tpls/tpl/'
 $sbsmarty->setCompileDir(SBUIADMIN_PATH . '/datas/cache/tpls_c/');
 $sbsmarty->setConfigDir(_AM_SMARTY_DIR . 'configs/');
 $sbsmarty->setCacheDir(SBUIADMIN_PATH . '/datas/cache/core/');
+// --- Modificateurs Smarty (fonctions PHP déclarées, voir sbSmartyRegisterModifiers())
+sbSmartyRegisterModifiers($sbsmarty);
 // ------------------
 $sbsmarty->force_compile = _AM_SMARTY_FORCE_COMPILE;
 // ------------------

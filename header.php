@@ -54,28 +54,6 @@ $sbusers    = new user();
 $sbpage     = new page();
 if (class_exists('Memcache') && extension_loaded('memcache') && function_exists('memcache_connect')) $sbflood = new flood();
 
-// ----------------------
-// Include Mobile Detect
-// ----------------------
-include_once('plugins/mobile-detect/Mobile_Detect.php');
-$mobile_detect = 'classic';
-$sb_custom_detection = '';
-if (class_exists('Mobile_Detect')) {
-	$sbMobileDetect = new Mobile_Detect;
-	$sb_isMobile    = $sbMobileDetect->isMobile();
-	$sb_isTablet    = $sbMobileDetect->isTablet();
-	
-	// Layout Type
-	$mobile_detect = ($sb_isMobile ? ($sb_isTablet ? 'tablet' : 'mobile') : 'computer');
-	// Custom detection methods
-	foreach($sbMobileDetect->getRules() as $name => $regex) {
-		$sb_check_custom = $sbMobileDetect->{'is'.$name}();
-		if ($sb_check_custom)
-			$sb_custom_detection .= ' ' . $name;
-	}
-}
-$sbsmarty->assign('sb_mobile_detect', $mobile_detect);
-$sbsmarty->assign('sb_mobile_custom', $sb_custom_detection);
 
 // ----------------------
 // Smarty Configuration
@@ -117,8 +95,11 @@ if (!file_exists(SBADMIN."/install.php")) {
 	$user_ip = sbGetUserIP();
 	$is_ip_blocked = sbIsBlockedIP($user_ip);
 	if (isset($is_ip_blocked) && $is_ip_blocked == $user_ip) header("Location:403.html");
-	// --- Check FLOOD
-	if (class_exists('Memcache') && extension_loaded('memcache') && function_exists('memcache_connect')) {
+	// --- Check FLOOD : seulement si l'anti-flood est activé (Utilisateurs >
+	// --- IP bloquées > Paramètres), comme à la connexion admin. Il tournait
+	// --- dès que Memcache était présent : deux pages dans la même seconde
+	// --- bloquaient l'IP du visiteur pour la durée réglée (24 h par défaut).
+	if (sbSettingBool('flood_enabled') && isset($sbflood)) {
 		$sbflood->floodCheck();
 	}
 }
@@ -135,5 +116,10 @@ foreach ($sb_path_functions_dir as $fileinfo) {
 			include_once($functions_path);
     }
 }
+
+// ------------------------
+// Modificateurs Smarty (fonctions PHP déclarées, voir sbSmartyRegisterModifiers())
+// ------------------------
+if (function_exists('sbSmartyRegisterModifiers')) sbSmartyRegisterModifiers($sbsmarty);
 
 ?>

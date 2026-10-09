@@ -262,7 +262,7 @@ function sbGetStats($sb_pages_title) {
 if (!function_exists("sbGetShortcode")) {
 	function sbGetShortcode($string, $smarty = false) {
 		// Get the shortcode(s)
-		preg_match_all( '/\[CS(.*?)\]/', $string, $matches );
+		preg_match_all( '/\[CS(.*?)\]/', (string) $string, $matches );
 		// Get if is one more shortcode
 		$result = $shortcode = $param = array();
 		for($i = 0; $i < count($matches[1]); $i++) {
@@ -1221,36 +1221,15 @@ if (!function_exists("insert_sbGetPageTitle")) {
 }
 
 /**
- * Get Infos Mobile Detect
- * @return string (type mobile devices)
+ * Ancienne détection mobile (bibliothèque Mobile_Detect retirée : elle n'a
+ * jamais fonctionné, la classe cherchée n'existait pas dans la version livrée).
+ * Gardée pour les thèmes personnalisés qui appellent encore
+ * {insert name="sbGetMobileDetect"} : renvoie toujours 'classic', comme avant.
+ * @return string
  */
 if (!function_exists("insert_sbGetMobileDetect")) {
 	function insert_sbGetMobileDetect($param) {
-		global $sbsanitize;
-	
-		include_once('plugins/mobile-detect/Mobile_Detect.php');
-		
-		if (!class_exists('Mobile_Detect')) {
-			return 'classic';
-		} else {
-			$sbmobiledetect = new Mobile_Detect;
-			$sb_isMobile    = $sbmobiledetect->isMobile();
-			$sb_isTablet    = $sbmobiledetect->isTablet();
-			$sb_classes_md  = '';
-			
-			// Layout Type
-			$sb_classes_md .= ($sb_isMobile ? ($sb_isTablet ? 'tablet' : 'mobile') : 'computer');
-			
-			// Custom detection methods
-			$sb_custom_detection = '';
-			foreach($sbmobiledetect->getRules() as $name => $regex) {
-				$sb_check_custom = $sbmobiledetect->{'is'.$name}();
-				if ($sb_check_custom)
-					$sb_classes_md .= ' ' . $name;
-			}
-	
-			return strtolower($sb_classes_md);
-		}
+		return 'classic';
 	}
 }
 
@@ -1378,13 +1357,13 @@ if (!function_exists("insert_sbGetInfoBlockedIP")) {
 ============================================== */
 if (!function_exists("sb_utf8_encode")) {
    function sb_utf8_encode($string, $from_encoding = 'ISO-8859-1', $to_encoding = 'UTF-8') {
-      return iconv($from_encoding, $to_encoding, $string);
+      return iconv($from_encoding, $to_encoding, (string) $string);
    }
 }
 
 if (!function_exists("sb_utf8_decode")) {
    function sb_utf8_decode($string, $from_encoding = 'UTF-8', $to_encoding = 'ISO-8859-1') {
-      return iconv($from_encoding, $to_encoding, $string);
+      return iconv($from_encoding, $to_encoding, (string) $string);
    }
 }
 /* =========================================== */

@@ -48,3 +48,7 @@ sbsettings-backup-*.php
 
 # Cle de la premiere installation (creee au premier passage dans install/).
 backdoor/install/installer/install-key.php
+
+# Journal d audit PHP (inc/sbuiadmin-phpaudit.php)
+backdoor/inc/admin/php-audit.txt
+backdoor/inc/admin/php-audit.log

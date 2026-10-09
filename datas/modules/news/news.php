@@ -258,7 +258,7 @@ switch($op) {
 			// --- SQL Request
 			$query   = "SELECT * FROM {$module['tables']['news']} WHERE catid = '$catid' AND active = '1' AND id != '$id' ";
 			switch($news_options['other_news_type']) {
-				default;
+				default:
 				case "latest":
 					$query .= "ORDER BY date DESC LIMIT $other_news_per_page";
 				break;

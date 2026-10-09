@@ -33,20 +33,20 @@ defined('SB_ALTCHA_VERSION') or define('SB_ALTCHA_VERSION', '3.3.0'); // widget 
 defined('SB_ALTCHA_FIELD')   or define('SB_ALTCHA_FIELD', 'altcha');  // champ posté par le widget
 
 /**
- * ALTCHA utilisable ? (PHP 8.1+, bibliothèque livrée dans vendor/, base
+ * ALTCHA utilisable ? (PHP 8.4+, minimum du CMS ; bibliothèque livrée dans vendor/, base
  * joignable pour les clés et l'anti-rejeu)
  */
 function sbAltchaAvailable() {
 	static $ok = null;
 	if ($ok !== null) return $ok;
 	$ok = false;
-	if (PHP_VERSION_ID < 80100) return $ok;
+	if (PHP_VERSION_ID < 80400) return $ok;
 	if (!class_exists('\\AltchaOrg\\Altcha\\Altcha')) {
 		$autoload = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 		if (is_readable($autoload)) require_once $autoload;
 	}
 	$ok = class_exists('\\AltchaOrg\\Altcha\\Altcha') && sbSettingsDb() && sbAltchaSecrets() !== false;
-	if (!$ok) error_log('SBUIADMIN ALTCHA indisponible (PHP 8.1+, vendor/altcha-org et base requis) : formulaires non protégés');
+	if (!$ok) error_log('SBUIADMIN ALTCHA indisponible (PHP 8.4+, vendor/altcha-org et base requis) : formulaires non protégés');
 	return $ok;
 }
 

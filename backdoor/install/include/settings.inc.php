@@ -34,7 +34,7 @@
     // *** check for PHP minimum version number (true, false) -
     //     checks if a minimum required version of PHP runs on a server
     define('EI_CHECK_PHP_MINIMUM_VERSION', true);
-    define('EI_PHP_MINIMUM_VERSION', '8.1.0');
+    define('EI_PHP_MINIMUM_VERSION', '8.4.0');
     
     // *** check or not config directory for writability
     define('EI_CHECK_CONFIG_DIR_WRITABILITY', false);

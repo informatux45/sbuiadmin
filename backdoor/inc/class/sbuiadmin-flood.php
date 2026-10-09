@@ -95,7 +95,6 @@ class flood extends sql {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         // --- Store the data
         $history_json = curl_exec($ch);
-        curl_close($ch);
 		// --------------------------------
         $client_info = "";
 		// --------------------------------

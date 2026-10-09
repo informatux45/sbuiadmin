@@ -78,6 +78,11 @@ function smarty_modifier_date_format($string, $format = null, $default_date = ''
             }
             $format = str_replace($_win_from, $_win_to, $format);
         }
+        // SBUIADMIN : strftime() est dépréciée (PHP 8.1) et retirée en PHP 9 ;
+        // sb_strftime() (inc/sbuiadmin-functions.php) en donne le même résultat.
+        if (function_exists('sb_strftime')) {
+            return sb_strftime($format, $timestamp);
+        }
         // @ to suppress deprecation errors when running in PHP8.1 or higher.
         return @strftime($format, $timestamp);
     } else {

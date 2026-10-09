@@ -70,14 +70,14 @@ defined('SBUIADMIN_PATH') or die('Are you crazy!');
 if (!function_exists("sb_utf8_encode")) {
    function sb_utf8_encode($string, $from_encoding = 'ISO-8859-1', $to_encoding = 'UTF-8') {
       // mb_convert_encoding($string, 'ISO-8859-1', 'UTF-8');
-      return iconv($from_encoding, $to_encoding, $string);
+      return iconv($from_encoding, $to_encoding, (string) $string);
    }
 }
 
 if (!function_exists("sb_utf8_decode")) {
    function sb_utf8_decode($string, $from_encoding = 'UTF-8', $to_encoding = 'ISO-8859-1') {
       // mb_convert_encoding($string, 'ISO-8859-1', 'UTF-8');
-      return iconv($from_encoding, $to_encoding, $string);
+      return iconv($from_encoding, $to_encoding, (string) $string);
    }
 }
 /* =========================================== */
@@ -183,7 +183,6 @@ function sbDisplayMediaSize($file) {
 function sbDisplayMediaMime($file) {
    $fileinfo = finfo_open(FILEINFO_MIME_TYPE); // Retourne le type mime à l'extension mimetype
    $filemime = finfo_file($fileinfo, $file) . "\n";
-   finfo_close($fileinfo);
    
    return $filemime;
 }
@@ -506,284 +505,110 @@ function sbGetFileList($HowToSearch, $Condition, $Directory, $AddPath) {
 	return $result;
 }
 
-/*
- * This PHP script defines (if not exists) a strftime() function that is
- * deprecated and will be removed from standard PHP functions in the future.
- * The only thing you need to do is to load the script before everything else.
- * In this way, it is possible to run older code work based on strftime()
- * function on PHP version that doesn't support it without modifying your code.
+/**
+ * strftime() sans strftime() : dépréciée depuis PHP 8.1, retirée en PHP 9.
+ * Implémentation en PHP pur (date()), noms des jours et des mois en
+ * français si la locale LC_TIME est française (setlocale de sbconfig.php),
+ * en anglais sinon - comme strftime(). Aucune commande shell.
+ * Spécificateurs : %a %A %d %e %j %u %w %U %V %W %b %h %B %m %y %Y %C %g %G
+ * %H %k %I %l %M %p %P %r %R %S %T %X %D %F %x %c %s %z %Z %n %t %%.
  *
- * The script uses two methods to get the text:
- *   - using shell command;
- *   - using intl IntlDateFormatter class and additional processing.
- *
- * The choice between these two methods is automatic. The first method is used
- * if the system allows execution of shell commands and is the more reliable
- * option. The second method is not complete. I'm having trouble finding
- * a solution for the %V, %g, %G, %X, %c, %x tags.
- *
- * Pavel Tzonkov (C)2023
+ * @param string   $format    format strftime()
+ * @param int|null $timestamp horodatage (défaut : maintenant)
+ * @return string
  */
+function sb_strftime($format, $timestamp = null) {
+	$ts = ($timestamp === null) ? time() : (int) $timestamp;
+	$fr = (stripos((string) setlocale(LC_TIME, '0'), 'fr') === 0);
+	$days   = $fr ? array('dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi')
+	              : array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
+	$months = $fr ? array(1 => 'janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre')
+	              : array(1 => 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
+	// Abréviations de la glibc (locale fr_FR)
+	$days_short   = $fr ? array('dim.', 'lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.')
+	                    : array('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat');
+	$months_short = $fr ? array(1 => 'janv.', 'févr.', 'mars', 'avril', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.')
+	                    : array(1 => 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
+	$w = (int) date('w', $ts);
+	$n = (int) date('n', $ts);
+	$map = array(
+		'a' => $days_short[$w],
+		'A' => $days[$w],
+		'd' => date('d', $ts),
+		'e' => sprintf('%2d', date('j', $ts)),
+		'j' => sprintf('%03d', date('z', $ts) + 1),
+		'u' => date('N', $ts),
+		'w' => (string) $w,
+		'U' => sprintf('%02d', (int) floor((date('z', $ts) + 7 - $w) / 7)),
+		'V' => date('W', $ts),
+		'W' => sprintf('%02d', (int) floor((date('z', $ts) + 7 - (($w + 6) % 7)) / 7)),
+		'b' => $months_short[$n],
+		'h' => $months_short[$n],
+		'B' => $months[$n],
+		'm' => date('m', $ts),
+		'y' => date('y', $ts),
+		'Y' => date('Y', $ts),
+		'C' => sprintf('%02d', (int) floor(date('Y', $ts) / 100)),
+		'g' => substr(date('o', $ts), -2),
+		'G' => date('o', $ts),
+		'H' => date('H', $ts),
+		'k' => sprintf('%2d', date('G', $ts)),
+		'I' => date('h', $ts),
+		'l' => sprintf('%2d', date('g', $ts)),
+		'M' => date('i', $ts),
+		'p' => $fr ? '' : date('A', $ts),
+		'P' => $fr ? '' : date('a', $ts),
+		'r' => date('h:i:s ', $ts) . ($fr ? '' : date('A', $ts)),
+		'R' => date('H:i', $ts),
+		'S' => date('s', $ts),
+		'T' => date('H:i:s', $ts),
+		'X' => date('H:i:s', $ts),
+		'D' => date('m/d/y', $ts),
+		'F' => date('Y-m-d', $ts),
+		'x' => $fr ? date('d/m/Y', $ts) : date('m/d/y', $ts),
+		'c' => $fr ? $days_short[$w] . ' ' . date('d', $ts) . ' ' . $months_short[$n] . ' ' . date('Y H:i:s', $ts)
+		           : $days_short[$w] . ' ' . $months_short[$n] . ' ' . sprintf('%2d', date('j', $ts)) . ' ' . date('H:i:s Y', $ts),
+		's' => (string) $ts,
+		'z' => date('O', $ts),
+		'Z' => date('T', $ts),
+		'n' => "\n",
+		't' => "\t",
+		'%' => '%',
+	);
+	return preg_replace_callback('/%([a-zA-Z%])/', function ($m) use ($map) {
+		return isset($map[$m[1]]) ? $map[$m[1]] : $m[0];
+	}, (string) $format);
+}
+
+/**
+ * Fonctions PHP employées comme modificateurs dans les gabarits ({$x|sbFilename}).
+ * Smarty 4.5 déprécie les fonctions non déclarées, Smarty 5 les refuse : on
+ * les déclare explicitement. Une fonction absente (côté admin ou côté site)
+ * est simplement ignorée. Ajouter ici tout nouveau modificateur.
+ * @param Smarty $smarty
+ */
+function sbSmartyRegisterModifiers($smarty) {
+	$modifiers = array(
+		// PHP
+		'sprintf', 'strtoupper', 'ucfirst',
+		// SBUIADMIN
+		'sbCleanPageBuilderContent', 'sbDisplayMediaMime', 'sbDisplayMediaSize', 'sbFilename',
+		'sbFileRealname', 'sbGetFileDocData', 'sbGetGravatar', 'sbGetIfIsImg', 'sbGetInfoImg',
+		'sbGetUserAvatar', 'sbGetUserGroup', 'sbModifiedFileTime', 'sbRewriteTags', 'sbToByteSize',
+	);
+	foreach ($modifiers as $name) {
+		if (function_exists($name) && !isset($smarty->registered_plugins[Smarty::PLUGIN_MODIFIER][$name])) {
+			$smarty->registerPlugin(Smarty::PLUGIN_MODIFIER, $name, $name);
+		}
+	}
+}
+
+// strftime() disparue (PHP 9) : le code tiers qui l'appelle encore (plugin
+// Smarty date_format) passe par sb_strftime()
 if (!function_exists('strftime')) {
-    function strftime($format, $timestamp=null) {
-
-    // PARAMETER 1 CHECK
-
-        if (($format === null) || ($format === false))
-            return false;
-
-        if ($format === true)
-            return '1';
-
-        $type = gettype($format);
-
-        if (preg_match('/^(array|object|resource|resource \(closed\)|unknown type)$/', $type)) {
-            trigger_error('strftime() expects parameter 1 to be string, ' . $type . ' given', E_USER_WARNING);
-            return false;
-        }
-
-        if (preg_match('/^(integer|double)$/', $type))
-            return (string) $format;
-
-        if ($type !== 'string')
-            return false;
-
-    // PARAMETER 2 CHECK
-
-        $type = gettype($timestamp);
-
-        if ($timestamp === null)
-            $timestamp = time();
-
-        elseif (
-            !is_scalar($timestamp) ||
-            (is_string($timestamp) && !preg_match('/^(0|[1-9]\d*)$/', $timestamp))
-        ) {
-            trigger_error('strftime() expects parameter 2 to be integer, ' . $type . ' given', E_USER_WARNING);
-            return false;
-        }
-
-        if (!is_integer($timestamp))
-            $timestamp = (int) $timestamp;
-
-        $locale = setlocale(LC_TIME, '0');
-
-
-// EASY WAY - USING SHELL TO GET DATE TEXT
-
-        if (is_callable('shell_exec') && (stripos(ini_get('disable_functions'), 'shell_exec') === false)) {
-            $cmd = 'export LC_TIME=' . escapeshellarg($locale) . '; date --date @' . escapeshellarg($timestamp) . ' +' . escapeshellarg($format);
-            return preg_replace('/\r?\n$/', '', shell_exec($cmd));
-        }
-
-
-// HARD WAY - NOT COMPLETED
-
-    // CHECK FORMAT
-
-        $format = strtr($format,[
-            '%r' => '%I:%M:%S %p',
-            '%R' => '%H:%M',
-            '%T' => '%H:%M:%S',
-            '%D' => '%m/%d/%y',
-            '%F' => '%Y-%m-%d'
-        ]);
-
-        $modifiers = 'aAdejuwUVWbBhmCgGyYHkIlMpPSXzZcsxnt%';
-        if (!preg_match('/%[' . $modifiers . ']/', $format))
-            return $format;
-
-    // FORMAT MAP
-
-        $map = [    // https://unicode-org.github.io/icu/userguide/format_parse/datetime/
-                    // https://www.php.net/manual/en/function.strftime.php#refsect1-function.strftime-parameters
-
-            // DAY
-            '%a' => 'ccc',      // Mon - Sun
-            '%A' => 'cccc',     // Monday - Sunday
-            '%d' => 'dd',       // 01 - 31
-            '%e' => 'd',        // 1 - 31
-            '%j' => ['D'],      // 001 - 366
-            '%u' => ['c'],      // 1 - 7
-            '%w' => ['c'],      // 0 - 6
-
-            // WEEK
-            '%U' => ['w'],      // Week number of the given year, starting with the first Sunday as the first week
-            '%V' => ['ww'],     // Week number of the given year, starting with the first week of the year with at least 4 weekdays, with Monday being the start of the week (ISO-8601:1988)
-            '%W' => ['w'],      // A numeric representation of the week of the year, starting with the first Monday as the first week
-
-            // MONTH
-            '%b' => 'LLL',      // Jan - Dec
-            '%B' => 'LLLL',     // January - December
-            '%h' => 'LLL',      // Jan - Dec
-            '%m' => 'LL',       // 01 - 12
-
-            // YEAR
-            '%C' => ['y'],      // Two digit representation of the century (year divided by 100, truncated to an integer)
-            '%g' => ['yy'],     // Two digit representation of the year (ISO-8601:1988 see %V)
-            '%G' => ['y'],      // Full digit representation of the year (ISO-8601:1988 see %V)
-            '%y' => 'yy',       // Two digit representation of the year
-            '%Y' => 'y',        // Full digit representation of the year
-
-            // TIME
-            '%H' => 'HH',       // Hour 00 - 23
-            '%k' => 'H',        // Hour 0 - 23
-            '%I' => 'hh',       // Hour 01 - 12
-            '%l' => 'h',        // Hour 1 - 12
-            '%M' => 'mm',       // Minutes 00 - 59
-            '%p' => [],         // AM / PM
-            '%P' => [],         // am / pm
-            '%S' => 'ss',       // Seconds 00 - 59
-            '%X' => [],         // Preferred time representation based on locale, without the date. Example: 03:59:16 or 15:59:16
-            '%z' => 'Z',        // Time zone -0500 for US Eastern Time
-            '%Z' => 'z',        // Time zone EST for Eastern Time
-
-            // TIME AND DATA STAMPS
-            '%c' => [],         // Preferred date and time stamp based on locale. Example: Tue Feb 5 00:45:10 2009
-            '%s' => [],         // Unix Epoch Time timestamp (same as the time() function)
-            '%x' => [],         // Preferred date representation based on locale, without the time. Example: 02/05/09
-
-            // MISCELLANEOUS
-            '%n' => [],         // \n
-            '%t' => [],         // \t
-            '%%' => []          // %
-        ];
-
-        $timezone = date_default_timezone_get();
-
-        $return = '';
-
-        $length = strlen($format);
-
-        for ($i = 0; $i < $length; $i++) {
-
-            $current_char = $format[$i];
-            $next_char = $i < $length - 1 ? $format[$i + 1] : false;
-
-            // NORMAL TEXT
-            if ($current_char !== '%') {
-                $return .= $current_char;
-                continue;
-            }
-
-            // MODIFIER
-            else {
-
-                // LAST CHARACTER
-                if ($next_char === false) {
-                    $return .= '%';
-                    continue;
-                }
-
-                $fmt = $current_char . $next_char;
-                $i++;
-
-                // NOT FOUND
-                if (!isset($map[$fmt])) {
-                    $return .= $fmt;
-                    continue;
-                }
-
-                // SIMPLE MODIFIER
-                if (is_string($map[$fmt])) {
-                    $return .= datefmt_format(datefmt_create(
-                        $locale,
-                        IntlDateFormatter::FULL,
-                        IntlDateFormatter::FULL,
-                        $timezone,
-                        IntlDateFormatter::GREGORIAN,
-                        $map[$fmt]
-                    ), $timestamp);
-                    continue;
-                }
-
-                // SPECIAL MODIFIERS
-                if (!empty($map['fmt']))
-                    $str = datefmt_format(datefmt_create(
-                        $locale,
-                        IntlDateFormatter::FULL,
-                        IntlDateFormatter::FULL,
-                        $timezone,
-                        IntlDateFormatter::GREGORIAN,
-                        $map[$fmt][0]
-                    ), $timestamp);
-
-                if ($fmt == '%j')
-                    $return .= sprintf("%03d", $str);
-
-                elseif ($fmt == '%u')
-                    $return .= (--$str ? $str : '7');
-
-                elseif ($fmt == '%w')
-                    $return .= --$str;
-
-                elseif ($fmt == '%U') {
-
-                }
-
-                elseif ($fmt == '%V') {
-
-                }
-
-                elseif ($fmt == '%W') {
-
-                }
-
-                elseif ($fmt == '%C')
-                    $return .= (string) floor($str / 100);
-
-                elseif ($fmt == '%g') {
-
-                }
-
-                elseif ($fmt == '%G') {
-
-                }
-
-                elseif (($fmt == '%p') || ($fmt == '%P')) {
-                    $str = datefmt_format(datefmt_create(
-                        'en_US',
-                        IntlDateFormatter::FULL,
-                        IntlDateFormatter::FULL,
-                        $timezone,
-                        IntlDateFormatter::GREGORIAN,
-                        'a'
-                    ), $timestamp);
-                    $return .= ($fmt == '%p') ? strtoupper($str) : strtolower($str);
-                }
-
-                elseif ($fmt == '%X') {
-
-                }
-
-                elseif ($fmt == '%c') {
-
-                }
-
-                elseif ($fmt == '%s')
-                    $return .= $timestamp;
-
-                elseif ($fmt == '%x') {
-
-                }
-
-                elseif ($fmt == '%n')
-                    $return .= "\n";
-
-                elseif ($fmt == '%t')
-                    $return .= "\t";
-
-                elseif ($fmt == '%%')
-                    $return .= '%';
-
-                else
-                    $return .= $fmt;
-
-                continue;
-            }
-        }
-        return $return;
-    }
+	function strftime($format, $timestamp = null) {
+		return sb_strftime($format, $timestamp);
+	}
 }
 
 /**
@@ -798,23 +623,23 @@ if (!function_exists('strftime')) {
 function sbConvertDate($date, $format = 'ISO') {
 	switch(strtoupper($format)) {
 		// Format ISO (AAAA-MM-DD)
-		default: return strftime("%F", strtotime($date)); break;
+		default: return sb_strftime("%F", strtotime($date)); break;
 		// Format US (MM-DD-AAAA)
-		case "US": return strftime("%m/%d/%Y", strtotime($date)); break;
+		case "US": return sb_strftime("%m/%d/%Y", strtotime($date)); break;
 		// Format US (MM-DD-AAAA HH:mm:ss)
-		case "UST": return strftime("%m/%d/%Y %T", strtotime($date)); break;
+		case "UST": return sb_strftime("%m/%d/%Y %T", strtotime($date)); break;
 		// Format FR (DD-MM-AAAA)
-		case "FR": return strftime("%d/%m/%Y", strtotime($date)); break;
+		case "FR": return sb_strftime("%d/%m/%Y", strtotime($date)); break;
 		// Format FR (DD-MM-AAAA)
-		case "FR2": return strftime("%d-%m-%Y", strtotime($date)); break;
+		case "FR2": return sb_strftime("%d-%m-%Y", strtotime($date)); break;
 		// Format FR (DD-MM-AAAA à HH:mm:ss)
-		case "FR3": return strftime("%d-%m-%Y à %T", strtotime($date)); break;
+		case "FR3": return sb_strftime("%d-%m-%Y à %T", strtotime($date)); break;
 		// Format FR (DD-MM-AAAA HH:mm:ss) with time
-		case "FRT": return strftime("%d-%m-%Y %T", strtotime($date)); break;
+		case "FRT": return sb_strftime("%d-%m-%Y %T", strtotime($date)); break;
 		// Format FRH (DD MM AAAA) Human readable
-		case "FRH": return strftime("%e %B %Y", strtotime($date)); break;
+		case "FRH": return sb_strftime("%e %B %Y", strtotime($date)); break;
 		// Year (AAAA)
-		case "YEAR": return strftime("%Y", strtotime($date)); break;
+		case "YEAR": return sb_strftime("%Y", strtotime($date)); break;
 	}
 }
 
@@ -1148,7 +973,6 @@ function sbGetWeatherWidgetValue($location) {
     curl_setopt($curl, CURLOPT_USERAGENT, 'SBUIADMIN Dashboard Widget');
     $response  = curl_exec($curl);
     $curlError = curl_errno($curl);
-    curl_close($curl);
 
     if ($curlError || !$response) return false;
 
@@ -1213,7 +1037,6 @@ function sbGeocodeCity($city) {
     curl_setopt($curl, CURLOPT_USERAGENT, 'SBUIADMIN Dashboard Widget');
     $response  = curl_exec($curl);
     $curlError = curl_errno($curl);
-    curl_close($curl);
 
     if ($curlError || !$response) return false;
 
@@ -1243,7 +1066,6 @@ function sbGetRssWidgetValue($url, $limit = 5) {
     curl_setopt($curl, CURLOPT_USERAGENT, 'SBUIADMIN Dashboard Widget');
     $response  = curl_exec($curl);
     $curlError = curl_errno($curl);
-    curl_close($curl);
 
     if ($curlError || !$response) return false;
 
@@ -1652,12 +1474,12 @@ function sbEncryptStringWithSalt($string, $hash = 'md5', $salt = '') {
  * return string
  */
 function sbGenerateRandKey($length = 64) {
+    // random_int() (aléa cryptographique) : rand() semé par microtime() ne
+    // laissait qu'environ un million de clés possibles. Longueur inchangée
+    // ($length + 1 caractères), alphabet inchangé.
     $salt = '';
     $base = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    $microtime = function_exists('microtime') ? microtime() : time();
-    srand((double)$microtime * 1000000);
-    for($i=0; $i<=$length; $i++)
-	$salt.= substr($base, rand() % strlen($base), 1);
+    for ($i = 0; $i <= $length; $i++) $salt .= $base[random_int(0, strlen($base) - 1)];
     return $salt;
 }
 

@@ -1,5 +1,6 @@
 {
     "require": {
+        "php": ">=8.4",
         "phpmailer/phpmailer": "^7.1",
         "altcha-org/altcha": "2.3.0"
     },

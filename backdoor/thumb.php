@@ -82,7 +82,7 @@ Twitter:    @jamiebicknell
 // routeur : réservé à une session admin ayant validé la double authentification.
 defined('SBUIADMIN_PATH') or define('SBUIADMIN_PATH', __DIR__);
 require_once(__DIR__ . '/../inc/sbsession.php');
-session_start();
+if (session_status() !== PHP_SESSION_ACTIVE) session_start(); // inclus par index.php : session déjà ouverte
 require_once(SBUIADMIN_PATH . '/inc/sbuiadmin-rights.php');
 $sb_thumb_auth = sb2faIsVerified();
 session_write_close();
@@ -265,7 +265,6 @@ if (!file_exists($file_temp)) {
                 $nm = $oi;
                 $oi = imagecreatetruecolor($w0, $h0);
                 imagecopyresampled($oi, $nm, 0, 0, $w0 - 1, 0, $w0, $h0, -$w0, $h0);
-                imagedestroy($nm);
             }
         }
     }
@@ -358,8 +357,6 @@ if (!file_exists($file_temp)) {
             imagepng($im, $file_temp);
             break;
     }
-    imagedestroy($im);
-    imagedestroy($oi);
 }
 
 header('Content-Type: image/' . $file_type);

@@ -38,6 +38,7 @@ class sanitize extends sql {
 	* @return string
 	*/
 	public function nl2Br($text) {
+		$text = (string) $text; // null refusé par les fonctions de chaîne en PHP 9
 		return preg_replace("/(\015\012)|(\015)|(\012)/","<br />",$text);
 	}
 
@@ -58,6 +59,7 @@ class sanitize extends sql {
 	* @return string
 	**/
 	public function addSlashes($text) {
+		$text = (string) $text; // null refusé par les fonctions de chaîne en PHP 9
 		if (!function_exists("get_magic_quotes_gpc")) {
 			$text = addslashes($text);
 		}
@@ -98,6 +100,7 @@ class sanitize extends sql {
 	* @return string
 	*/
 	public function stripTags($text) {
+		$text = (string) $text; // null refusé par les fonctions de chaîne en PHP 9
 		return strip_tags($text);
 	}
 
@@ -126,6 +129,7 @@ class sanitize extends sql {
 	* ------------------------------------------------------------------------------
 	*/
 	public function htmlEntities($text, $encode = 'UTF-8') {
+		$text = (string) $text; // null refusé par les fonctions de chaîne en PHP 9
 		return htmlentities($text, ENT_QUOTES, $encode);
 	}
 
@@ -154,6 +158,7 @@ class sanitize extends sql {
 	* ------------------------------------------------------------------------------
 	*/
 	public function htmlEntitiesDecode($text, $encode = 'UTF-8') {
+		$text = (string) $text; // null refusé par les fonctions de chaîne en PHP 9
 		return html_entity_decode($text, ENT_QUOTES, $encode);
 	}
 
@@ -167,6 +172,7 @@ class sanitize extends sql {
 	* @return    string
 	*/
 	public function htmlSpecialChars($text, $charset = "UTF-8", $double_encode = true) {
+		$text = (string) $text; // null refusé par les fonctions de chaîne en PHP 9
 		if ( version_compare( phpversion(), "5.2.3", ">=" ) ) {
 			$text = htmlspecialchars( $text, ENT_QUOTES, $charset, $double_encode );
 		} else {
@@ -205,10 +211,11 @@ class sanitize extends sql {
 	*------------------------------------------------------------------------------
 	**/
 	public function sTrim($text, $character_mask = '') {
+		// (string) : null refusé par trim() en PHP 9
 		if ($character_mask != '')
-			return trim($text, $character_mask);
+			return trim((string) $text, $character_mask);
 		else
-			return trim($text);
+			return trim((string) $text);
 	}
 
 	/**
@@ -231,6 +238,7 @@ class sanitize extends sql {
 	* @return string string
 	*/	
 	public function rewriteString($string, $lowupp = false) {
+		$string = (string) $string; // null refusé par les fonctions de chaîne en PHP 9
 		$noValidString = trim($this->displayText($string));
 		$noValidString = preg_replace('`\s+`', '-', trim($noValidString));
 		$noValidString = str_replace("'", "-", $noValidString);
@@ -281,6 +289,7 @@ class sanitize extends sql {
 	* @return string $text The purified text
 	*/
 	public function stopXSS($text) {
+		$text = (string) $text; // null refusé par les fonctions de chaîne en PHP 9
 		if (!is_array($text)) {
 			$text = preg_replace("/\(\)/si", "", $text);
 			$text = strip_tags($text);
@@ -311,6 +320,7 @@ class sanitize extends sql {
 	* @return  string
 	**/
 	public function displayText($text, $encode = 'UTF-8', $entities = 0, $decode_entities = 1, $html = 0, $br = 0, $clickable = 0, $xss = 1) {
+		$text = (string) $text; // null refusé par les fonctions de chaîne en PHP 9
 
 		// Trim text
 		$text = $this->sTrim($text);
@@ -373,6 +383,7 @@ class sanitize extends sql {
 	* ------------------------------------------------------------------------------
 	**/
 	public function displayLang($string, $lang = "fr", $encode = "UTF-8") {
+		$string = (string) $string; // null refusé par les fonctions de chaîne en PHP 9
 		// Show the language session (fr OR en OR ...)
 		$string = $this->htmlEntitiesDecode($string, $encode);
 		$string = $this->stripSlashesGPC($string);

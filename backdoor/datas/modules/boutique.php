@@ -689,7 +689,7 @@ switch($action) {
 // ----------------------------------------
 $sbsmarty->assign('page_title', $text_s);
 // --- Legend ADD or EDIT
-$sbsmarty->assign('legend_add_edit', sprintf($legend_add_edit, $sbsanitize->displayText($sbsanitize->displayLang(isset($title) ? $title : ''), 'UTF-8', 0, 1)));
+$sbsmarty->assign('legend_add_edit', sprintf((string) ($legend_add_edit ?? ''), $sbsanitize->displayText($sbsanitize->displayLang(isset($title) ? $title : ''), 'UTF-8', 0, 1)));
 
 // ----------------------
 // ASSIGN Message status

@@ -138,7 +138,7 @@ $sbsmarty->assign('sb_theme_view', trim($sb_theme_view));
 // ----------------------
 $sbsmarty->assign('page_title', 'Infos des sessions utilisateurs');
 // --- Legend ADD or EDIT
-$sbsmarty->assign('legend_add_edit', sprintf($legend_add_edit, $sbsanitize->displayText($action, 'UTF-8', 0, 1)));
+$sbsmarty->assign('legend_add_edit', sprintf((string) ($legend_add_edit ?? ''), $sbsanitize->displayText($action, 'UTF-8', 0, 1)));
 // --- Second submit Button
 $sbsmarty->assign('sb_form_id', $formName);
 $sbsmarty->assign('sb_form_submit_value', $btn_add_edit);

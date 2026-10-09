@@ -23,6 +23,7 @@ defined('SBUIADMIN_PATH') or die('Are you crazy!');
 // migration automatique, voir inc/sbuiadmin-settings.php)
 defined('_AM_SETTINGS_FILE') OR define('_AM_SETTINGS_FILE', SBUIADMIN_PATH . '/inc/admin/settings.txt');
 // --- Réglages : table sb_config, accès base dans sbdbconfig.php
+require_once(__DIR__ . '/sbuiadmin-phpaudit.php'); // inactif sans inc/admin/php-audit.txt
 require_once(__DIR__ . '/sbuiadmin-settings.php');
 // --- Anti-robot ALTCHA et blocage des tentatives de connexion
 require_once(__DIR__ . '/sbuiadmin-altcha.php');

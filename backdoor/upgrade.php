@@ -20,7 +20,7 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date dans le passé
 // --- point d'entree repose sa propre session sous PHPSESSID et perd tout
 // --- ce que les autres y ont mis. Voir inc/sbsession.php.
 require_once(__DIR__ . '/../inc/sbsession.php');
-session_start();
+if (session_status() !== PHP_SESSION_ACTIVE) session_start(); // inclus par index.php : session déjà ouverte
  
 // ----------------------
 // Global defined

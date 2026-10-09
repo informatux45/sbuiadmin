@@ -463,7 +463,7 @@ class Database
     public function ShowTables($schema = '')
     {
 		switch($this->db_driver){
-			case 'mssql';
+			case 'mssql':
             case 'sqlsrv':
 				$sql = 'SELECT * FROM sys.all_objects WHERE type = \'U\'';
 				break;

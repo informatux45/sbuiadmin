@@ -252,7 +252,6 @@ if (!file_exists($file_temp)) {
                 $nm = $oi;
                 $oi = imagecreatetruecolor($w0, $h0);
                 imagecopyresampled($oi, $nm, 0, 0, $w0 - 1, 0, $w0, $h0, -$w0, $h0);
-                imagedestroy($nm);
             }
         }
     }
@@ -345,8 +344,6 @@ if (!file_exists($file_temp)) {
             imagepng($im, $file_temp);
             break;
     }
-    imagedestroy($im);
-    imagedestroy($oi);
 }
 
 header('Content-Type: image/' . $file_type);

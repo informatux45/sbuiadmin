@@ -148,7 +148,7 @@
 	};
 
 	if(EI_CHECK_EXTENSIONS){
-		$validations['php_recommended'] = array(false, 'Version PHP recommandée (8.4, version testée)', version_compare(PHP_VERSION, '8.4.0', '>='), PHP_VERSION, PHP_VERSION . ' (fonctionne, 8.4 conseillé)');
+		$validations['php_recommended'] = array(false, 'Version PHP recommandée (8.5, version testée)', version_compare(PHP_VERSION, '8.5.0', '>='), PHP_VERSION, PHP_VERSION . ' (fonctionne, 8.5 conseillé)');
 
 		$validations['divider_extensions'] = array('title' => 'Extensions PHP requises', 'description' => '');
 		foreach (array(
@@ -217,7 +217,6 @@
 			$raw = curl_exec($ch);
 			$code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
 			$hsize = (int) curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-			curl_close($ch);
 			if ($raw === false || $code === 0 || $code === 401) return null;
 			return array('code' => $code, 'headers' => strtolower(substr($raw, 0, $hsize)));
 		};

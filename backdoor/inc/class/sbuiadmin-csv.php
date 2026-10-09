@@ -40,6 +40,7 @@ class csv extends sanitize {
     private $header;
     private $delimiter;
     private $length;
+    private $lines; // déclarée : propriété dynamique dépréciée (PHP 8.2), erreur en PHP 9
 	var $mappings = array(); 
     //--------------------------------------------------------------------
     public function file($file_name, $parse_header = false, $delimiter = "\t", $length = 8000) {
@@ -215,8 +216,8 @@ class csv extends sanitize {
 		if ($this->fp !== false) {
 		
 			if (!is_string($key) && !is_int($key) && !is_float($key) && !is_callable($key) ) {
-				trigger_error('group_by(): The key should be a string, an integer, or a callback', E_USER_ERROR);
-				return null;
+				// E_USER_ERROR est déprécié pour trigger_error() depuis PHP 8.4
+				throw new \InvalidArgumentException('group_by(): The key should be a string, an integer, or a callback');
 			}
 	
 			$func = (!is_string($key) && is_callable($key) ? $key : null);

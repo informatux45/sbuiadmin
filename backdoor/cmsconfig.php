@@ -888,7 +888,7 @@ function sbHowToPlugins($title, $htmlpage, $id, $button = '') {
 // ----------------------------------------
 $sbsmarty->assign('page_title', 'CMS Configuration');
 // --- Legend ADD or EDIT
-$sbsmarty->assign('legend_add_edit', sprintf($legend_add_edit, $sbsanitize->displayText($action, 'UTF-8', 0, 1)));
+$sbsmarty->assign('legend_add_edit', sprintf((string) ($legend_add_edit ?? ''), $sbsanitize->displayText($action, 'UTF-8', 0, 1)));
 // --- Assign Action for ACE JS loading
 $sbsmarty->assign('action_edit', $action);
 

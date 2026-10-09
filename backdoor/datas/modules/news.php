@@ -311,7 +311,7 @@ switch($action) {
 		// --- DATE
 		// ----------------------------
 		$date = ($date == '') ? date('Y-m-d') : $date;
-		$sbform->addDate('Date', array('id'=>'date', 'name'=>'date', 'value'=>strftime("%d/%m/%Y", strtotime($date))), true);
+		$sbform->addDate('Date', array('id'=>'date', 'name'=>'date', 'value'=>date("d/m/Y", strtotime($date))), true);
 		// -----------------------------------
 		// --- CATEGORIES
 		// -----------------------------------
@@ -1136,7 +1136,7 @@ switch($action) {
 // ----------------------------------------
 $sbsmarty->assign('page_title', 'Articles');
 // --- Legend ADD or EDIT
-$sbsmarty->assign('legend_add_edit', sprintf($legend_add_edit, $sbsanitize->displayText($sbsanitize->displayLang($title_fr), 'UTF-8', 0, 1)));
+$sbsmarty->assign('legend_add_edit', sprintf((string) ($legend_add_edit ?? ''), $sbsanitize->displayText($sbsanitize->displayLang($title_fr), 'UTF-8', 0, 1)));
 
 // ----------------------
 // ASSIGN Message status

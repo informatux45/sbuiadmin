@@ -22,7 +22,7 @@ defined('SBUIADMIN_PATH') or die('Are you crazy!');
 // --- point d'entree repose sa propre session sous PHPSESSID et perd tout
 // --- ce que les autres y ont mis. Voir inc/sbsession.php.
 require_once(__DIR__ . '/../inc/sbsession.php');
-session_start();
+if (session_status() !== PHP_SESSION_ACTIVE) session_start(); // inclus par index.php : session déjà ouverte
 
 // -----------------------
 // Module URL
@@ -304,7 +304,7 @@ switch($action) {
 		$sbform->addAnything("<div class='form-group'><p>ALTCHA protège la connexion (administration et module user) et tous les formulaires du module contact. Aucune donnée n'est envoyée à un service extérieur. "
 			. ($sb_altcha_ok
 				? "<span style='color: var(--success);'>Opérationnel ✓</span>"
-				: "<strong style='color: red;'>Indisponible</strong> (PHP 8.1+, <code>vendor/altcha-org</code> et la base sont requis) : les formulaires ne sont pas protégés.")
+				: "<strong style='color: red;'>Indisponible</strong> (PHP 8.4+, <code>vendor/altcha-org</code> et la base sont requis) : les formulaires ne sont pas protégés.")
 			. "</p></div>");
 		$tab_check_altcha = array();
 		$tab_check_altcha[0]['text']    = 'Activé';

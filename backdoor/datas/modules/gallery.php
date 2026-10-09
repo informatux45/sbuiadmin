@@ -536,7 +536,7 @@ switch($action) {
 // ----------------------------------------
 $sbsmarty->assign('page_title', 'Galeries');
 // --- Legend ADD or EDIT
-$sbsmarty->assign('legend_add_edit', sprintf($legend_add_edit, $sbsanitize->displayText($title, 'UTF-8', 0, 1)));
+$sbsmarty->assign('legend_add_edit', sprintf((string) ($legend_add_edit ?? ''), $sbsanitize->displayText($title, 'UTF-8', 0, 1)));
 
 // ----------------------
 // ASSIGN Message status

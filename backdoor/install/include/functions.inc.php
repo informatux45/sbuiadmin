@@ -57,7 +57,7 @@ function apphp_db_install($sql_dump_file) {
 	}		
 	
 	foreach($sql_dump as $sql_line){
-		$tsl = trim(utf8_decode($sql_line));
+		$tsl = trim($sql_line); // utf8_decode() retiré en PHP 9 : inutile pour tester le début de ligne
 		if(($sql_line != '') && (substr($tsl, 0, 2) != '--') && (substr($tsl, 0, 1) != '?') && (substr($tsl, 0, 1) != '#')){
 			$query .= $sql_line;
 			if(preg_match("/;\s*$/", $sql_line)){

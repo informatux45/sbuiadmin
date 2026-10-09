@@ -10,7 +10,7 @@
 
 Ready | Features
 --- | ---
-*✓* | PHP 8.1+ (PHP 8.4 ready) / MySQL 5.7+ / MariaDB 10.3+
+*✓* | PHP 8.4+ (PHP 8.5 ready) / MySQL 5.7+ / MariaDB 10.3+
 *✓* | HTML 5 / CSS 3
 *✓* | Bootstrap (front themes), Adminator administration theme (dark mode)
 *✓* | Online installer (installation key, server requirements check)

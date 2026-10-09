@@ -22,7 +22,7 @@ defined('SBUIADMIN_PATH') or die('Are you crazy!');
 // --- point d'entree repose sa propre session sous PHPSESSID et perd tout
 // --- ce que les autres y ont mis. Voir inc/sbsession.php.
 require_once(__DIR__ . '/../inc/sbsession.php');
-session_start();
+if (session_status() !== PHP_SESSION_ACTIVE) session_start(); // inclus par index.php : session déjà ouverte
 
 // -----------------------
 // Module URL

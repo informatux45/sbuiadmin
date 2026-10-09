@@ -472,7 +472,7 @@ class form extends sanitize {
 	* add a form element (input radio)
 	* @return html code
 	*/
-	public function addRadio ($label = '', $tabRadio, $arrArgs = array (), $isRequired = false, $separator = '&nbsp;', $helpDsc = '') {
+	public function addRadio ($label, $tabRadio, $arrArgs = array (), $isRequired = false, $separator = '&nbsp;', $helpDsc = '') {
 		$elem = 'radio';
 		if (!array_key_exists ($elem, $this -> inputArr)) {
 			throw new Exception ($elem . ' n\'est pas un élément valide');
@@ -617,7 +617,7 @@ class form extends sanitize {
 	* add a form element (checkbox)
 	* @return html code
 	*/
-	public function addCheckbox ($label = '', $tabCheck, $arrArgs = array (), $isRequired = false, $separator = '&nbsp;', $helpDsc = '') {
+	public function addCheckbox ($label, $tabCheck, $arrArgs = array (), $isRequired = false, $separator = '&nbsp;', $helpDsc = '') {
 		$elem = 'checkbox';
 		if (!array_key_exists ($elem, $this -> inputArr)) {
 			throw new Exception ($elem . ' ' . UIADMIN_SYS_DEBUG_FORM_ERROR_INPUT);
@@ -674,7 +674,7 @@ class form extends sanitize {
 	* add a form element (textarea)
 	* @return html code
 	*/
-	public function addTextarea ($label = '', $txt, $arrArgs = array (), $isRequired = false, $helpDsc = '') {
+	public function addTextarea ($label, $txt, $arrArgs = array (), $isRequired = false, $helpDsc = '') {
 		$cpt = count ($this -> formElementArr);
 		$this -> formElementArr[$cpt]['textarea']['innerHTML'] = $txt;
 		$arrTemp = array_merge ($this -> eventArr, $this -> commonArr, $this -> textareaArr);
@@ -1197,7 +1197,7 @@ class form extends sanitize {
 	* add a form element (textarea with editor wysiwyg)
 	* @return html code (editor CKEditor)
 	*/
-	public function addTextareaHtml ($label = '', $txt, $arrArgs = array (), $isRequired = false, $toolbar = 'full', $width = '100%', $height = '200px', $helpDsc = '') {
+	public function addTextareaHtml ($label, $txt, $arrArgs = array (), $isRequired = false, $toolbar = 'full', $width = '100%', $height = '200px', $helpDsc = '') {
 		$cpt = count ($this -> formElementArr);
 		$this -> formElementArr[$cpt]['textarea']['innerHTML'] = $txt;
 		$arrTemp = array_merge ($this -> eventArr, $this -> commonArr, $this -> textareaArr);

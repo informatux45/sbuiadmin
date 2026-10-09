@@ -580,12 +580,10 @@ class account extends sql {
 	 * return string 
 	 */
 	public function generatePassword($length = 64) {
+		// random_int() (aléa cryptographique) au lieu de rand() semé par microtime()
 		$salt = '';
 		$base = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-		$microtime = function_exists('microtime') ? microtime() : time();
-		srand((double)$microtime * 1000000);
-		for($i=0; $i<=$length; $i++)
-		$salt.= substr($base, rand() % strlen($base), 1);
+		for ($i = 0; $i <= $length; $i++) $salt .= $base[random_int(0, strlen($base) - 1)];
 		return $salt;
 	}
 	
