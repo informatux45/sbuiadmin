@@ -69,6 +69,11 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
+**4.19**
+- Security: no direct web access to the administration's internal files (backdoor/inc: PHP, PHAR and database migrations), settings loader refuses direct calls (also on nginx)
+- Help: nginx rules
+- CMS config > Plugins: long code lines wrap in the Howto windows, missing Magnific Popup plugin removed
+
 **4.18**
 - Form class: several fields on one line (openRow / closeRow, CSS grid, single column on small screens), example in the Sandbox
 - Form class: free HTML added after the last field is now displayed

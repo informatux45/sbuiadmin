@@ -88,6 +88,22 @@ Configuration > Générale :
   installé qui le lit ; un site en cours d'installation ne le prend jamais.
 
 # #######################################################
+# Serveur nginx (les fichiers .htaccess sont ignorés)
+# #######################################################
+
+### Règles à reprendre dans la configuration du site
+Sous Apache, des fichiers .htaccess refusent l'accès direct aux fichiers
+internes. Sous nginx, ajouter l'équivalent (ADMIN = nom du dossier
+d'administration, backdoor par défaut) :
+  location ~ ^/ADMIN/inc/plugins/sitemap/sitemap_generator\.php$ { include fastcgi_params; ... }
+  location ~ ^/ADMIN/inc/.*\.(php|phar|txt|log|sql|ini)$ { deny all; }
+  location ~ /\. { deny all; }
+  location ~ (^|/)(sbdbconfig[^/]*|sbsettings-backup-[^/]*)\.php$ { deny all; }
+Le chargeur des réglages (inc/sbuiadmin-settings.php) refuse aussi de
+lui-même un appel direct, mais
+ces règles restent la protection principale.
+
+# #######################################################
 # Mises à jour depuis l'administration
 # #######################################################
 

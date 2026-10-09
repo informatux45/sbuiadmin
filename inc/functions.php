@@ -922,13 +922,6 @@ if (!function_exists("insert_sbGetPlugins")) {
 			}
 			
 			// --------------------------
-			// --- Plugin MAGNIFIC POPUP
-			// --------------------------
-			if (in_array('magnificpopup', $plugins_array)) {
-				$cms_plugins .= '<script src="'.SB_URL.'plugins/magnific-popup/dist/jquery.magnific-popup.min.js"></script>';
-				$cms_plugins .= '<script src="'.SB_URL.'plugins/magnific-popup/dist/jquery.magnific-popup-init.js"></script>';
-			}
-			// --------------------------
 			
 		}
 		

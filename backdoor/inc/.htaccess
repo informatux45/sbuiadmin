@@ -1,3 +1,13 @@
-<FilesMatch "\.(txt|log|sql|ini)$">
-    Require all denied
+## Fichiers internes de l'administration : jamais servis directement.
+## Les .php et .phar ne sont qu'inclus par index.php (une inclusion PHP ne
+## passe pas par Apache) ; exception : plugins/sitemap/.htaccess.
+## Les .js et .css de inc/js et inc/plugins restent servis.
+<FilesMatch "\.(txt|log|sql|ini|php|phar)$">
+<IfModule mod_authz_core.c>
+	Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+	Order allow,deny
+	Deny from all
+</IfModule>
 </FilesMatch>

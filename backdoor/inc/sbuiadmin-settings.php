@@ -25,6 +25,14 @@
  * ©INFORMATUX.COM
  */
 
+// Appelé directement par le web (et non inclus) : rien. Sinon il se
+// connecterait à la base et pourrait lancer une migration. Protège aussi
+// les serveurs qui ignorent les .htaccess (nginx).
+if (PHP_SAPI !== 'cli' && isset($_SERVER['SCRIPT_FILENAME']) && @realpath($_SERVER['SCRIPT_FILENAME']) === __FILE__) {
+	http_response_code(404);
+	exit;
+}
+
 if (defined('SBUIADMIN_SETTINGS_LOADED')) return;
 define('SBUIADMIN_SETTINGS_LOADED', true);
 

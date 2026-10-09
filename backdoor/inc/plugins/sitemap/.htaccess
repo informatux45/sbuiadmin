@@ -1,0 +1,11 @@
+## Seul script de inc/ appelé par le navigateur (CMS config, AJAX POST) ;
+## il vérifie lui-même la session, le droit cmsconfig et la 2FA.
+<Files "sitemap_generator.php">
+<IfModule mod_authz_core.c>
+	Require all granted
+</IfModule>
+<IfModule !mod_authz_core.c>
+	Order allow,deny
+	Allow from all
+</IfModule>
+</Files>

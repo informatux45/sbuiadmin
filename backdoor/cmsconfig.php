@@ -491,7 +491,6 @@ switch($action) {
 			$plugins .= ($_POST['fancybox'] === "on") ? "fancybox|" : "";
 			$plugins .= ($_POST['checkboxcss'] === "on") ? "checkboxcss|" : "";
 			$plugins .= ($_POST['appear'] === "on") ? "appear|" : "";
-			$plugins .= ($_POST['magnificpopup'] === "on") ? "magnificpopup|" : "";
 			$plugins = rtrim($plugins, "|");
 			
 			// --- EDIT
@@ -593,18 +592,6 @@ switch($action) {
 		$sbform->addAnything("<div class='$config_blocks'>");
 		$sbform->addCheckbox('APPEAR / DISAPPEAR', $tab_appear, '', false, '<br />');
 		$sbform->addAnything(sbHowToPlugins('Comment utiliser le plugin APPEAR / DISAPPEAR', 'appear/howto.html', 'Four', 'APPEAR / DISAPPEAR'));
-		$sbform->addAnything('</div>');
-		// --------------------------------
-		// --- Plugin MAGNIFIC POPUP
-		// --------------------------------
-		$tab_magnificpopup = array();
-		$tab_magnificpopup[0]['text']    = 'Activé';
-		$tab_magnificpopup[0]['name']    = 'magnificpopup';
-		$tab_magnificpopup[0]['checked'] = (in_array("magnificpopup", $plugins)) ? '1' : '0';
-		$config_blocks = ($tab_magnificpopup[0]['checked']) ? 'config_blocks_active' : 'config_blocks';
-		$sbform->addAnything("<div class='$config_blocks'>");
-		$sbform->addCheckbox('MAGNIFIC POPUP', $tab_magnificpopup, '', false, '<br />');
-		$sbform->addAnything(sbHowToPlugins('Comment utiliser le plugin MAGNIFIC POPUP', 'magnificpopup/howto.html', 'Five', 'MAGNIFIC POPUP'));
 		$sbform->addAnything('</div>');
 		$sbform->addAnything('</div>');
 		// --------------------------------
@@ -866,15 +853,24 @@ $sbsmarty->assign('cmsconfig_comingsoon_help', "<a class='btn btn--outline-prima
 $sbsmarty->assign('cmsconfig_multilang_help',	"L'option multilangue désactivé n'affichera que la langue FR sur votre site web.<br>Dans l'administration, dans la gestion des pages et des blocs ne s'afficheront également que les champs FR.<br><br>Si vous activez l'option multilangue, les langues définies dans le champs 'langue(s)' vous permettront d'avoir ces langues sur votre site web.<br>Dans l'administration, dans la gestion des pages et des blocs s'afficheront les blocs supplémentaires des langues disponibles.<br><br><img style='width: 100%;' alt=''src='img/multilang.jpg'>");
 
 function sbHowToPlugins($title, $htmlpage, $id, $button = '') {
-	return '<button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#'.$id.'" onclick="javascript:return false;">Howto '.$button.'</button>
+	// Documentation du plugin (plugins/<plugin>/howto.html) ; absente :
+	// message plutôt qu'un avertissement PHP et une fenêtre vide
+	$howto = @file_get_contents('../plugins/' . $htmlpage);
+	if ($howto === false || trim($howto) === '') $howto = '<p><em>Documentation indisponible pour ce plugin.</em></p>';
+	// Une seule fois : retour à la ligne dans les blocs de code et les mots
+	// très longs (URL), sinon coupés au bord de la fenêtre
+	static $style_done = false;
+	$style = $style_done ? '' : '<style>.sbhowto{overflow-wrap:anywhere}.sbhowto pre,.sbhowto code{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}.sbhowto pre{max-width:100%;overflow-x:auto}</style>';
+	$style_done = true;
+	return $style . '<button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#'.$id.'" onclick="javascript:return false;">Howto '.$button.'</button>
 			<div class="modal fade" id="'.$id.'" tabindex="-1" role="dialog" aria-labelledby="'.$id.'Label" aria-hidden="true">
-				<div class="modal-dialog">
+				<div class="modal-dialog" style="max-width:760px;width:calc(100% - 32px)">
 					<div class="modal-content">
 						<div class="modal-header">
 							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
 							<h4 class="modal-title" id="'.$id.'Label">'.$title.'</h4>
 						</div>
-						<div class="modal-body" style="text-align: left;">'.file_get_contents('../plugins/'.$htmlpage).'</div>
+						<div class="modal-body sbhowto" style="text-align: left;">'.$howto.'</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 						</div>
