@@ -59,3 +59,47 @@ Configuration > Générale :
 - Activation du Rewrite URL : Activé (si souhaité)
 
 # #######################################################
+
+# #######################################################
+# Mises à jour depuis l'administration
+# #######################################################
+
+### Fonctionnement (Configuration > Mise à jour, administrateurs)
+- Vérification sur GitHub une fois par 24 h (tableau de bord) ou à la
+  demande. Seules les versions signées (Ed25519) sont proposées.
+- « Préparer » : téléchargement et vérifications (signature, SHA-256 de
+  l'archive et de chaque fichier), plan (fichiers modifiés localement,
+  migrations de la base). Rien n'est encore modifié.
+- « Lancer » (mot de passe redemandé) : sauvegarde CHIFFRÉE des fichiers
+  remplacés et de la base, maintenance, copie, migrations. En cas d'échec :
+  retour automatique (base et fichiers).
+- Retour arrière : seulement la DERNIÈRE mise à jour, une seule fois.
+
+### Emplacement des sauvegardes (dans cet ordre)
+1. Imposé : variable d'environnement SBUIADMIN_BACKUP_DIR, ou clé
+   'backup_dir' (chemin absolu) dans sbdbconfig.php ;
+2. à côté de sbdbconfig.php s'il est hors du dossier publié ;
+3. sinon dans le site : backdoor/datas/updates/<nom aléatoire>, interdit au
+   web (.htaccess, web.config) et vérifié par un auto-test HTTP.
+Sous nginx (qui ignore .htaccess), préférer 1 ou 2.
+Les sauvegardes sont chiffrées avec la clé de sbdbconfig.php : la perdre
+rend les sauvegardes illisibles. Elles ne remplacent PAS les sauvegardes
+externes du serveur.
+
+### Migrations de la base (développeurs)
+- Un fichier backdoor/inc/migrations/<version>.php par version qui touche à
+  la base, modèle en tête de backdoor/inc/sbuiadmin-update-db.php.
+- IDEMPOTENT : uniquement les méthodes de SbMigration (createTable,
+  addColumn, modifyColumn, renameColumn, dropColumn, addIndex, dropIndex,
+  addConfig, deleteConfig...), qui vérifient l'état réel de la base avant
+  d'agir ; $m->query() seulement pour des requêtes elles-mêmes idempotentes.
+- Une partie 'down' (annulation) dès que possible : le retour arrière
+  conserve alors les contenus saisis depuis la mise à jour. Sans 'down'
+  ('reversible' => false), le retour passe par la sauvegarde SQL et ces
+  contenus sont perdus (l'administrateur doit l'accepter).
+- Suppression en DEUX TEMPS : la version N cesse d'utiliser une table ou un
+  champ, la version N+1 le supprime. Le retour de N+1 vers N reste sûr.
+  Même règle pour un changement de type ou un renommage.
+- Tables sans préfixe (ajouté automatiquement).
+
+# #######################################################

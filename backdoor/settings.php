@@ -69,7 +69,7 @@ global $sbfiles_medias_exts_safe;
  * 20 - (ancien Google Recaptcha, clé secrète - remplacé par ALTCHA)
  * 21 - DB prefix
  * 22 - (ancien mode captcha - remplacé par altcha_login)
- * 23 - Upgrade Mode
+ * 23 - (ancien mode UPGRADE - remplacé par Configuration > Mise à jour)
  * 24 - Coming soon
  * 25 - Debug General Front
  * 26 - Debug Smarty Front
@@ -136,7 +136,6 @@ switch($action) {
 				'login_lock_duration'   => $sb_text('login_lock_duration'),
 				'login_lock_max_login'  => $sb_text('login_lock_max_login'),
 				'login_lock_max_ip'     => $sb_text('login_lock_max_ip'),
-				'upgrade_mode'          => $sb_on('upgrade_mode'),
 				'maintenance'           => $sb_on('coming_soon'),
 				'debug_front'           => $sb_on('debug_general_front'),
 				'debug_smarty_front'    => $sb_on('debug_smarty_front'),
@@ -215,7 +214,6 @@ switch($action) {
 		$sb_config_lock_duration       = sbSetting('login_lock_duration');
 		$sb_config_lock_max_login      = sbSetting('login_lock_max_login');
 		$sb_config_lock_max_ip         = sbSetting('login_lock_max_ip');
-		$sb_config_upgrade_mode        = sbSetting('upgrade_mode');
 		$sb_config_coming_soon         = sbSetting('maintenance');
 		$sb_config_debug_general_front = sbSetting('debug_front');
 		$sb_config_debug_smarty_front  = sbSetting('debug_smarty_front');
@@ -368,12 +366,6 @@ switch($action) {
 		$tab_check_3[0]['name']    = 'cms';
 		$tab_check_3[0]['checked'] = ($sb_config_cms == 1) ? '1' : '0';
 		$sbform->addCheckbox('Activation du CMS', $tab_check_3, '', false, '<br />', "Permet d'afficher la gestion du menu<br>Activer SBUIADMIN en CMS (si coché) ou en Administration Autonome (si non coché)");
-		// Checkbox du mode UPGRADE
-		$tab_check_5 = array();
-		$tab_check_5[0]['text']    = 'Activé';
-		$tab_check_5[0]['name']    = 'upgrade_mode';
-		$tab_check_5[0]['checked'] = ($sb_config_upgrade_mode == 1) ? '1' : '0';
-		$sbform->addCheckbox('Activation du mode UPGRADE (Admin)', $tab_check_5, '', false, '<br />', "Permet d'activer le mode UPGRADE de l'administration");
 		// Checkbox du mode COMING SOON
 		$tab_check_6 = array();
 		$tab_check_6[0]['text']    = 'Activé';
@@ -451,7 +443,6 @@ $sbsmarty->assign('sb_config_cms', trim($sb_config_cms));
 $sbsmarty->assign('sb_config_scaling_maxsize', trim($sb_config_scaling_maxsize));
 $sbsmarty->assign('sb_config_altcha_login', trim($sb_config_altcha_login));
 $sbsmarty->assign('sb_config_lock_enabled', trim($sb_config_lock_enabled));
-$sbsmarty->assign('sb_config_upgrade_mode', trim($sb_config_upgrade_mode));
 $sbsmarty->assign('sb_config_coming_soon', trim($sb_config_coming_soon));
 $sbsmarty->assign('sb_config_debug_general_front', trim($sb_config_debug_general_front));
 $sbsmarty->assign('sb_config_debug_smarty_front', trim($sb_config_debug_smarty_front));

@@ -230,7 +230,8 @@
 											'login_lock_duration'   => '15',
 											'login_lock_max_login'  => '10',
 											'login_lock_max_ip'     => '20',
-											'upgrade_mode'          => '0',
+											// Version du schéma de la base (migrations des mises à jour)
+											'db_version'            => _AM_START_VERSION,
 											'maintenance'           => '1',
 											'debug_front'           => '0',
 											'debug_smarty_front'    => '0',

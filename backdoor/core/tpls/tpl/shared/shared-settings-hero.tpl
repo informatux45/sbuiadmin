@@ -29,6 +29,9 @@
 {elseif $smarty.get.p == 'themeinfos'}
 	{assign var="sh_title" value="Thème infos"}
 	{assign var="sh_sub" value="Coordonnées et réseaux sociaux affichés par le thème."}
+{elseif $smarty.get.p == 'update'}
+	{assign var="sh_title" value="Mise à jour"}
+	{assign var="sh_sub" value="Nouvelles versions de SBUIADMIN publiées sur GitHub, vérifiées (signature) avant installation."}
 {else}
 	{assign var="sh_title" value="Configuration"}
 	{assign var="sh_sub" value="Réglages de l'administration."}
@@ -55,6 +58,7 @@
 				<a class="dd-menu-item" href="index.php?p=toolbarck"{if $smarty.get.p == 'toolbarck'} style="color:var(--primary);font-weight:600"{/if}>Toolbar CKEditor</a>
 				<a class="dd-menu-item" href="index.php?p=theme"{if $smarty.get.p == 'theme'} style="color:var(--primary);font-weight:600"{/if}>Thème</a>
 				<a class="dd-menu-item" href="index.php?p=themeinfos"{if $smarty.get.p == 'themeinfos'} style="color:var(--primary);font-weight:600"{/if}>Thème infos</a>
+				<a class="dd-menu-item" href="index.php?p=update"{if $smarty.get.p == 'update'} style="color:var(--primary);font-weight:600"{/if}>Mise à jour</a>
 				<div class="dd-divider"></div>
 				<a class="dd-menu-item" href="{$smarty.const.SB_ADMIN_URL}assets/samples/" target="_blank">Thème sample</a>
 			</div>

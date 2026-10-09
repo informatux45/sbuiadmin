@@ -10,7 +10,6 @@
  * sbTransfertCkeditor
  * sbAllUploadsCompleted
  * sbEnabledInput
- * sbUgrade
  * sbToggleFullScreen
  * sbInsertText
  *
@@ -132,26 +131,6 @@ function sbAllUploadsCompleted() {
 function sbEnabledInput(field) {
 	$("input[name=video],input[name=youtube],input[name=photo],input[name=pdf]").attr('disabled','disabled').val('');
 	$('input[name='+field+']').removeAttr('disabled');
-}
-
-// Upgrade Ajax
-function sbUgrade(mode, url) {
-	// Upgrade default
-	if (!mode) mode = 'core';
-	// Remove upgrade button
-	$('#upgrade-core').remove();
-	// Remove upgrade file list
-	$('.sbupgrade-filelist').remove();
-	// Show upgrade in progress
-	$('#sbupgrade-inprogress').attr('style','display: block');
-	
-	// --- Action
-	$.post( url + "upgrade.php", { m: mode })
-	.done(function( data ) {
-		var res = data.split("|");
-		//alert( res[1] );
-		$('#sbupgrade-inprogress').text(res[1]);
-	});
 }
 
 // Full screen

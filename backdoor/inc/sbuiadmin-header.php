@@ -85,7 +85,7 @@ $sbsmarty = new Smarty();
 // ----------------------
 // CLASSES by array
 // ----------------------
-$sbuiadmin_classes = array('sql', 'sanitize', 'users', 'medias', 'form', 'page', 'pagination', 'upgrade', 'flood');
+$sbuiadmin_classes = array('sql', 'sanitize', 'users', 'medias', 'form', 'page', 'pagination', 'flood');
 foreach ($sbuiadmin_classes as $sbuiadmin_class) {
     sb_global_include(SBUIADMIN_PATH . '/inc/class/' . SBUIADMIN_ID . '-' . $sbuiadmin_class . '.php');
 }
@@ -105,27 +105,14 @@ $sbmedias   = new medias();
 $sbsmarty->assign('bridge_css_version', @filemtime(SBUIADMIN_PATH . '/assets/adminator/bridge.css'));
 
 // ------------------
-// --- Check for upgrade (CORE)
+// --- Mise à jour disponible (Configuration > Mise à jour) : état lu en base,
+// vérifié sur GitHub au plus une fois par 24 h depuis le tableau de bord
+// (l'ancien mode UPGRADE interrogeait un serveur en HTTP clair à chaque page)
 // ------------------
-if (_AM_UPGRADE_MODE) {
-	$sb_upgrade_server  = "http://dev.sbuiadmin.fr/update";
-	$sb_upgrade_version = _AM_START_VERSION;
-	$sbupgrade  = new upgrade($sb_upgrade_server, $sb_upgrade_version);
-	ob_flush(); // the buffer contents are discarded
-	if ($sbupgrade->check_for_updates()) {
-		$sbsmarty->assign('sbuiadmin_upgrade_core', $sbupgrade->server_version);
-		ob_flush(); // the buffer contents are discarded
-		$sbsmarty->assign('sbuiadmin_upgrade_core_filelist', $sbupgrade->print_updated_files_list());
-		ob_flush(); // the buffer contents are discarded
-	} else {
-		$sbsmarty->assign('sbuiadmin_upgrade_core', false);
-		ob_flush(); // the buffer contents are discarded
-	}
-} else {
-    $sbsmarty->assign('sbuiadmin_upgrade_core', false);
-    $sbsmarty->assign('sbuiadmin_upgrade_core_filelist', false);
-}
-$sbsmarty->assign('sbuiadmin_upgrade_modules', false);
+$sb_update_latest = json_decode(sbSetting('update_latest'), true);
+$sbsmarty->assign('sbuiadmin_upgrade_core', (is_array($sb_update_latest) && version_compare((string) ($sb_update_latest['version'] ?? '0'), _AM_START_VERSION, '>')) ? $sb_update_latest['version'] : false);
+$sbsmarty->assign('sb_update_check_due', (time() - (int) sbSetting('update_last_check', '0')) >= 86400);
+unset($sb_update_latest);
 // ------------------
 
 // ------------------

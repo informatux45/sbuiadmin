@@ -177,8 +177,15 @@
 				{if isset($sb_warning_admin_user) && $sb_warning_admin_user == true}
 					sbToast('Le compte « admin » a toujours le mot de passe par défaut « admin ». Changez-le ou supprimez ce compte au plus vite !', 'error', 'index.php?p=users', 'Vite');
 				{/if}
+				{if $sbuiadmin_upgrade_core && !$sb_update_check_due}
+					sbToast('SBUIADMIN {$sbuiadmin_upgrade_core|escape:'javascript'} est disponible (version installée : {$smarty.const._AM_START_VERSION}).', 'info', 'index.php?p=update', 'Voir');
+				{/if}
 			{/if}
 		});
 		</script>
+		{* Vérification des mises à jour sur GitHub : au plus une fois par 24 h *}
+		{if $sbuiadmin_user_type == 'admin' && $sb_update_check_due}
+			<script src="{$smarty.const._AM_SITE_URL}assets/sbupdate-check.js?v={$smarty.const._AM_START_VERSION}"></script>
+		{/if}
 
 	{include file='sb_footer.tpl' page='false' pagef='false'}

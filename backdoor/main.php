@@ -48,6 +48,8 @@ $module_menu['settings']['li'][8]['target'] = "_blank";
 // via l'URL comme les autres entrées, on le rattache donc explicitement à
 // sa propre ligne (voir sbGetRightsSubmodules()/sbHasMenuLinkRight()).
 $module_menu['settings']['li'][8]['rights'] = 'settings:samples';
+$module_menu['settings']['li'][9]['title'] = SBUIADMIN_MENU_CONFIGURATION_UPDATE;
+$module_menu['settings']['li'][9]['link']  = "index.php?p=update";
 
 $module_menu['logaccess']['main']  = SBUIADMIN_MENU_LOG;
 $module_menu['logaccess']['icon']  = "list-alt";

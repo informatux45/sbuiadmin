@@ -52,3 +52,6 @@ backdoor/install/installer/install-key.php
 # Journal d audit PHP (inc/sbuiadmin-phpaudit.php)
 backdoor/inc/admin/php-audit.txt
 backdoor/inc/admin/php-audit.log
+
+# Verrou de mise a jour (backdoor/inc/sbuiadmin-update.php)
+.sbuiadmin-update.lock

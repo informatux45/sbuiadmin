@@ -1267,7 +1267,7 @@ function sbGetMenuModule($param = '') {
 						     $class_active = ' is-active';
 						} elseif (isset($_GET['p']) && trim($_GET['p']) == $module_name && $ul_module_menu == 0) {
 						     $class_active = ' is-active';
-						} elseif ( isset($_GET['p']) && (trim($_GET['p']) == 'session' || trim($_GET['p']) == 'cache' || trim($_GET['p']) == 'dashboard' || trim($_GET['p']) == 'toolbarck' || trim($_GET['p']) == 'theme' || trim($_GET['p']) == 'themeinfos') && $module_name == 'settings' && $ul_module_menu == 0) {
+						} elseif ( isset($_GET['p']) && (trim($_GET['p']) == 'session' || trim($_GET['p']) == 'cache' || trim($_GET['p']) == 'dashboard' || trim($_GET['p']) == 'toolbarck' || trim($_GET['p']) == 'theme' || trim($_GET['p']) == 'themeinfos' || trim($_GET['p']) == 'update') && $module_name == 'settings' && $ul_module_menu == 0) {
 						     $class_active = ' is-active';
 						} else {
 						     $class_active = '';

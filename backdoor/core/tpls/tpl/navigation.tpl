@@ -51,45 +51,25 @@
 					<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg>
 				</a>
 
+				{if $sbuiadmin_user_type == 'admin'}
 				<div class="dd-wrap">
-					<button class="icon-btn" data-dropdown aria-label="Mises à jour" data-tip="Mises à jour"{if $sbuiadmin_upgrade_core || $sbuiadmin_upgrade_modules} style="color:var(--warning)"{/if}>
+					<button class="icon-btn" data-dropdown aria-label="Mises à jour" data-tip="Mises à jour"{if $sbuiadmin_upgrade_core} style="color:var(--warning)"{/if}>
 						<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
-						{if $sbuiadmin_upgrade_core || $sbuiadmin_upgrade_modules}<span class="count warning">!</span>{/if}
+						{if $sbuiadmin_upgrade_core}<span class="count warning">!</span>{/if}
 					</button>
 					<div class="dd-menu" role="menu">
 						<div class="dd-head"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg> Mises à jour</div>
 						<div class="dd-list">
-							{if $sbuiadmin_upgrade_core}
-								<a class="dd-item" href="#" data-target="#sbupgradecore" data-toggle="modal">
-									<div class="dd-body">
-										<div class="dd-text"><strong>Nouvelle version {$sbuiadmin_upgrade_core}</strong></div>
-										<div class="dd-time">Version actuelle {$smarty.const._AM_START_VERSION}</div>
-									</div>
-								</a>
-							{else}
-								<div class="dd-item">
-									<div class="dd-body">
-										<div class="dd-text">Système à jour</div>
-										<div class="dd-time">Version actuelle {$smarty.const._AM_START_VERSION}</div>
-									</div>
+							<a class="dd-item" href="index.php?p=update">
+								<div class="dd-body">
+									<div class="dd-text">{if $sbuiadmin_upgrade_core}<strong>Nouvelle version {$sbuiadmin_upgrade_core|escape}</strong>{else}Système à jour{/if}</div>
+									<div class="dd-time">Version actuelle {$smarty.const._AM_START_VERSION}</div>
 								</div>
-							{/if}
-							{if $sbuiadmin_upgrade_modules}
-								<a class="dd-item" href="#" data-target="#sbupgrademodules" data-toggle="modal">
-									<div class="dd-body">
-										<div class="dd-text"><strong>{$sbuiadmin_upgrade_modules} nouveaux modules</strong></div>
-									</div>
-								</a>
-							{else}
-								<div class="dd-item">
-									<div class="dd-body">
-										<div class="dd-text">Modules à jour</div>
-									</div>
-								</div>
-							{/if}
+							</a>
 						</div>
 					</div>
 				</div>
+				{/if}
 
 				{if $sb_can_view_messages}
 				<div class="dd-wrap">
@@ -167,45 +147,3 @@
 			</div>
 		</header>
 
-		{* --- Dialog box UPGRADE CORE --- *}
-		<div aria-hidden="true" aria-labelledby="sbupgradecoreLabel" role="dialog" tabindex="-1" id="sbupgradecore" class="modal fade" style="display: none;">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button aria-hidden="true" data-dismiss="modal" class="close" type="button">&times;</button>
-						<h4 id="sbupgradecoreLabel" class="modal-title">Mise à niveau vers la version <span style="color: red;">{$sbuiadmin_upgrade_core}</span></h4><a onclick="javascript:sbUgrade('core','{$smarty.const._AM_SITE_URL}');" role="button" class="upgrade-now btn btn--danger" id="upgrade-core">upgrade now!</a>
-					</div>
-					<div id="upgrade-ajax-content" class="modal-body">
-						<div class="sbupgrade-filelist">
-							<span>Liste des fichiers à mettre à niveau :</span><br>
-							{$sbuiadmin_upgrade_core_filelist}
-						</div>
-						<div id="sbupgrade-inprogress" class="center" style="display: none;">
-							<br>Mise à niveau en cours<br>
-							<img src="{$smarty.const._AM_SITE_URL}img/ajax-loader-upgrade.gif" alt="Upgrade in progress" />
-						</div>
-					</div>
-					<div class="modal-footer">
-						<button data-dismiss="modal" class="btn btn--ghost" type="button" onclick="javascript:location.href='{$smarty.const._AM_SITE_URL}'">Close</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		{* --- Dialog box UPGRADE MODULES --- *}
-		<div aria-hidden="true" aria-labelledby="sbupgrademodulesLabel" role="dialog" tabindex="-1" id="sbupgrademodules" class="modal fade" style="display: none;">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button aria-hidden="true" data-dismiss="modal" class="close" type="button">&times;</button>
-						<h4 id="sbupgrademodulesLabel" class="modal-title">Mise à niveau des modules <span style="color: red;">{$sbuiadmin_upgrade_modules}</span></h4>
-					</div>
-					<div class="modal-body">
-						Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-					</div>
-					<div class="modal-footer">
-						<button data-dismiss="modal" class="btn btn--ghost" type="button">Close</button>
-					</div>
-				</div>
-			</div>
-		</div>

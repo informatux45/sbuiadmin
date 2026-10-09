@@ -389,6 +389,17 @@ if (!sb2faIsVerified()) {
 	sb2faGate(); // affiche la saisie du code et s'arrête, ou valide et redirige
 }
 // ----------------------
+// Mise à jour en cours (Configuration > Mise à jour) : seule cette page reste
+// accessible pendant la copie des fichiers (verrou de 15 min maximum)
+// ----------------------
+$sb_update_lock = dirname(SBUIADMIN_PATH) . '/.sbuiadmin-update.lock';
+if (is_file($sb_update_lock) && (time() - (int) @file_get_contents($sb_update_lock)) < 900 && (!isset($_GET['p']) || $_GET['p'] !== 'update')) {
+	http_response_code(503);
+	header('Retry-After: 60');
+	echo '<!doctype html><html lang="fr"><meta charset="utf-8"><title>Mise à jour en cours</title><p style="font-family:sans-serif;text-align:center;margin-top:20vh">Mise à jour de SBUIADMIN en cours, merci de patienter.<br><a href="index.php?p=update">Suivre la mise à jour</a></p></html>';
+	exit;
+}
+// ----------------------
 // Get Global Infos
 // ----------------------
 global $sbadministrators, $sb_admin_pages;

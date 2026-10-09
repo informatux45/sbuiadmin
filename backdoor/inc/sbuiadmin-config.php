@@ -40,7 +40,7 @@ defined('_AM_THEME_FILE') OR define('_AM_THEME_FILE', SBUIADMIN_PATH . '/inc/adm
 
 // ------------------------------------------
 // --- Defined Safe Pages
-$sb_safe_pages = ['index','sandbox','settings','cache','server','dashboard','theme','themeinfos','session','users','logaccess','menu','pages','blocs','medias','transfert','cmsconfig','slider','news','contact','tabbs','toggle','download','gallery','gmaps','table','toolbarck','faq','messages','profile','boutique'];
+$sb_safe_pages = ['index','sandbox','settings','cache','server','dashboard','theme','themeinfos','session','users','logaccess','menu','pages','blocs','medias','transfert','cmsconfig','slider','news','contact','tabbs','toggle','download','gallery','gmaps','table','toolbarck','faq','messages','profile','boutique','update'];
 // --- Defined Safe Modules
 $sb_safe_modules = explode(",", sbSetting('modules'));
 // ------------------------------------------
@@ -61,8 +61,6 @@ if (_AM_SITE_DEBUG) {
 // ALTCHA à la connexion (administration et module user)
 defined('_AM_ALTCHA_LOGIN') OR define('_AM_ALTCHA_LOGIN', sbSetting('altcha_login', '1') === '1');
 // ------------------------------------------
-// UPGRADE Mode
-defined('_AM_UPGRADE_MODE') OR define('_AM_UPGRADE_MODE', (sbSetting('upgrade_mode') == 1) ? true : false);
 // ------------------------------------------
 // --- Smarty CONFIG
 defined('_AM_SMARTY_FORCE_COMPILE') OR define('_AM_SMARTY_FORCE_COMPILE', true);
@@ -180,7 +178,7 @@ defined('_AM_SITE_LANG_URL') OR define('_AM_SITE_LANG_URL', _AM_SITE_PROTOCOL . 
 defined('_AM_SITE_CUSTOMER_NAME') OR define('_AM_SITE_CUSTOMER_NAME', sbSetting('customer_name'));
 // ------------------------------------------
 // --- Defined Safe Pages Admins Only
-$sb_admin_pages = array('sandbox','settings','server','dashboard','theme','cache','toolbarck','users');
+$sb_admin_pages = array('sandbox','settings','server','dashboard','theme','cache','toolbarck','users','update');
 // --- Server Config
 $sb_version_php = explode('-',PHP_VERSION);
 defined('_AM_SERVER_PHP_VERSION_ID') OR define('_AM_SERVER_PHP_VERSION_ID', $sb_version_php[0]);

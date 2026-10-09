@@ -196,14 +196,6 @@
 											{if $sb_config_lock_enabled == 1}Activé{else}Désactivé{/if}
 										</td>
 									</tr>
-									<tr class="data-row">
-										<td>
-											Mode UPGRADE
-										</td>
-										<td>
-											{if $sb_config_upgrade_mode == 1}Activé{else}Désactivé{/if}
-										</td>
-									</tr>
 								</tbody>
 							</table>
 							</div>

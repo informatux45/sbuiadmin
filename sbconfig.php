@@ -21,6 +21,17 @@ if (basename($_SERVER['PHP_SELF']) === 'sbconfig.php') {
 # Don't miss to change the htaccess file in administration
 defined('SBADMIN') OR define('SBADMIN', 'backdoor');
 
+# Mise à jour en cours depuis l'administration (Configuration > Mise à jour) :
+# le site répond « maintenance » pendant la copie (verrou de 15 min maximum)
+$_sb_update_lock = dirname(__FILE__) . DIRECTORY_SEPARATOR . '.sbuiadmin-update.lock';
+if (PHP_SAPI !== 'cli' && is_file($_sb_update_lock) && (time() - (int) @file_get_contents($_sb_update_lock)) < 900) {
+	http_response_code(503);
+	header('Retry-After: 60');
+	header('Content-Type: text/html; charset=utf-8');
+	exit('<!doctype html><html lang="fr"><meta charset="utf-8"><title>Mise à jour en cours</title><p style="font-family:sans-serif;text-align:center;margin-top:20vh">Mise à jour en cours, merci de revenir dans quelques instants.</p></html>');
+}
+unset($_sb_update_lock);
+
 # Get files configuration (theme / general)
 $_sb_config_base    = dirname(__FILE__) . DIRECTORY_SEPARATOR . SBADMIN . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR;
 $sb_theme_config    = file($_sb_config_base . 'theme.txt');
