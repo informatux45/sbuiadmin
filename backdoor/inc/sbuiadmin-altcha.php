@@ -15,7 +15,7 @@
  * Preuve de travail PBKDF2/SHA-256 (bibliothèque altcha-org/altcha, vendor/,
  * widget assets/altcha/). Aucun appel à un service extérieur. Les deux clés
  * HMAC sont tirées au sort au premier usage et rangées chiffrées dans
- * sb_settings (Réglages > ALTCHA).
+ * sb_config (Réglages > ALTCHA).
  *
  * Chargé par sbconfig.php (site) et inc/sbuiadmin-config.php (admin).
  *
@@ -75,10 +75,9 @@ function sbAltchaSecrets() {
 function sbAltchaDropObsolete() {
 	$link = sbSettingsDb();
 	if (!$link) return;
-	$c = sbDbConfig();
 	$quote = function ($v) use ($link) { return "'" . mysqli_real_escape_string($link, $v) . "'"; };
-	@mysqli_query($link, "DELETE FROM `" . sbSettingsTable() . "` WHERE `name` IN (" . implode(',', array_map($quote, sbSettingsObsoleteNames())) . ")");
-	@mysqli_query($link, "DELETE FROM `" . $c['prefix'] . "sb_config` WHERE `config` IN ('email_publickey', 'email_privatekey')");
+	$obsolete = array_merge(sbSettingsObsoleteNames(), array('email_publickey', 'email_privatekey'));
+	@mysqli_query($link, "DELETE FROM `" . sbSettingsTable() . "` WHERE `config` IN (" . implode(',', array_map($quote, $obsolete)) . ")");
 }
 
 /** Bornes des réglages numériques (valeur saisie hors bornes = défaut) */

@@ -3,7 +3,9 @@
  * Admin Startbootstrap
  * SBUIADMIN Réglages (base de données)
  *
- * Les réglages vivent dans la table {préfixe}sb_settings. Seuls les accès à
+ * Les réglages vivent dans la table {préfixe}sb_config, avec les autres
+ * entrées de configuration du CMS (une ligne par réglage, colonne updated_at
+ * datée par MySQL à chaque modification). Seuls les accès à
  * la base (et la clé de chiffrement des secrets) restent hors base, dans
  * sbdbconfig.php, cherché comme wp-config.php : un niveau au-dessus du site
  * d'abord, puis à la racine du site. Les variables d'environnement
@@ -11,7 +13,8 @@
  *
  * L'ancien backdoor/inc/admin/settings.txt (positionnel) est migré
  * automatiquement au premier chargement, puis vidé (copie de sauvegarde
- * posée à côté de sbdbconfig.php).
+ * posée à côté de sbdbconfig.php). La table sb_settings de la 4.11 est
+ * fusionnée dans sb_config puis supprimée (sbSettingsMergeOldTable()).
  *
  * Chargé par sbconfig.php (site) et inc/sbuiadmin-config.php (admin).
  *
@@ -117,14 +120,14 @@ function sbSettingsDefaults() {
 	);
 }
 
-/** Réglages stockés chiffrés dans sb_settings */
+/** Réglages stockés chiffrés dans sb_config */
 function sbSettingsSecretNames() {
 	return array('altcha_hmac_secret', 'altcha_hmac_key_secret');
 }
 
-/** Entrées de sb_config (module contact) stockées chiffrées */
+/** Toutes les entrées de sb_config stockées chiffrées (sbGetConfig() les déchiffre) */
 function sbConfigSecretNames() {
-	return array('email_smtp_password');
+	return array_merge(array('email_smtp_password'), sbSettingsSecretNames());
 }
 
 /** Anciens réglages Google reCAPTCHA, supprimés par sbAltchaSecrets() */
@@ -393,19 +396,74 @@ function sbSettingsDb($reset = false) {
 	return $link;
 }
 
+/** Table des réglages : sb_config, partagée avec la configuration du CMS */
 function sbSettingsTable() {
+	$c = sbDbConfig();
+	return $c['prefix'] . 'sb_config';
+}
+
+/** Ancienne table des réglages (4.11), fusionnée dans sb_config */
+function sbSettingsOldTable() {
 	$c = sbDbConfig();
 	return $c['prefix'] . 'sb_settings';
 }
 
+/**
+ * sb_config présente, avec sa colonne updated_at : NULL pour les valeurs
+ * d'avant la colonne, puis datée par MySQL à l'ajout et à chaque
+ * modification réelle d'une valeur (y compris par les écrans du CMS qui
+ * écrivent dans sb_config sans la nommer).
+ * @return bool table utilisable
+ */
 function sbSettingsEnsureTable($link) {
+	static $done = array();
 	$t = sbSettingsTable();
-	return (bool) mysqli_query($link, "CREATE TABLE IF NOT EXISTS `$t` (
-		`name` varchar(64) NOT NULL,
-		`value` text NOT NULL,
-		`updated_at` datetime DEFAULT NULL,
-		PRIMARY KEY (`name`)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+	if (isset($done[$t])) return $done[$t];
+	if (!mysqli_query($link, "CREATE TABLE IF NOT EXISTS `$t` (
+		`id` int(11) NOT NULL AUTO_INCREMENT,
+		`config` varchar(50) NOT NULL COMMENT 'Nom de la configuration',
+		`content` text NOT NULL COMMENT 'Valeur de la configuration',
+		`updated_at` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Dernière modification',
+		PRIMARY KEY (`id`),
+		UNIQUE KEY `config` (`config`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8")) return $done[$t] = false;
+	$res = mysqli_query($link, "SHOW COLUMNS FROM `$t` LIKE 'updated_at'");
+	if ($res && mysqli_num_rows($res) === 0) {
+		// Ajoutée vide (date inconnue), puis datée pour les ajouts suivants
+		if (@mysqli_query($link, "ALTER TABLE `$t` ADD `updated_at` datetime NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'Dernière modification'")) {
+			@mysqli_query($link, "ALTER TABLE `$t` MODIFY `updated_at` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Dernière modification'");
+		}
+	}
+	return $done[$t] = true;
+}
+
+/** sb_config a-t-elle sa colonne updated_at ? */
+function sbSettingsHasUpdatedAt($link) {
+	$res = @mysqli_query($link, "SHOW COLUMNS FROM `" . sbSettingsTable() . "` LIKE 'updated_at'");
+	return $res && mysqli_num_rows($res) > 0;
+}
+
+/**
+ * Installations 4.11 : réglages de sb_settings copiés dans sb_config (dates de
+ * modification comprises), puis sb_settings supprimée. Sans effet si elle
+ * n'existe pas.
+ * @return bool fusion faite
+ */
+function sbSettingsMergeOldTable($link) {
+	$old = sbSettingsOldTable();
+	$res = @mysqli_query($link, "SHOW TABLES LIKE '" . mysqli_real_escape_string($link, $old) . "'");
+	if (!$res || mysqli_num_rows($res) === 0) return false;
+	if (!sbSettingsEnsureTable($link)) return false;
+	@mysqli_query($link, "SELECT GET_LOCK('sbsettings_migrate', 10)");
+	$t  = sbSettingsTable();
+	$ok = sbSettingsHasUpdatedAt($link)
+		? @mysqli_query($link, "INSERT INTO `$t` (`config`, `content`, `updated_at`) SELECT `name`, `value`, `updated_at` FROM `$old` ON DUPLICATE KEY UPDATE `content` = VALUES(`content`), `updated_at` = VALUES(`updated_at`)")
+		: @mysqli_query($link, "INSERT INTO `$t` (`config`, `content`) SELECT `name`, `value` FROM `$old` ON DUPLICATE KEY UPDATE `content` = VALUES(`content`)");
+	if ($ok && !@mysqli_query($link, "DROP TABLE `$old`")) {
+		$GLOBALS['sb_settings_warnings'][] = "Réglages copiés dans sb_config, mais l'ancienne table " . $old . " n'a pu être supprimée (droit DROP) : la supprimer à la main.";
+	}
+	@mysqli_query($link, "SELECT RELEASE_LOCK('sbsettings_migrate')");
+	return (bool) $ok;
 }
 
 /** Lignes de l'ancien settings.txt s'il contient encore des réglages, sinon false */
@@ -417,7 +475,7 @@ function sbSettingsLegacyLines() {
 }
 
 /**
- * Migration de l'ancien settings.txt : sbdbconfig.php, table sb_settings,
+ * Migration de l'ancien settings.txt : sbdbconfig.php, table sb_config,
  * secrets de sb_config chiffrés, puis settings.txt vidé (copie à côté de
  * sbdbconfig.php). Sans effet si déjà faite.
  */
@@ -450,10 +508,10 @@ function sbSettingsMigrate() {
 	if (!$link || !sbSettingsEnsureTable($link)) return false;
 	@mysqli_query($link, "SELECT GET_LOCK('sbsettings_migrate', 10)");
 
-	// 2. Réglages : settings.txt -> sb_settings (écrase, voir plus haut)
+	// 2. Réglages : settings.txt -> sb_config (écrase, voir plus haut)
 	$t = sbSettingsTable();
 	$secret = sbSettingsSecretNames();
-	$stmt = mysqli_prepare($link, "INSERT INTO `$t` (`name`, `value`, `updated_at`) VALUES (?, ?, NOW()) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`), `updated_at` = NOW()");
+	$stmt = mysqli_prepare($link, "INSERT INTO `$t` (`config`, `content`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `content` = VALUES(`content`)");
 	$ok = (bool) $stmt;
 	if ($ok) {
 		foreach (sbSettingsLegacyMap() as $i => $name) {
@@ -505,15 +563,27 @@ function sbConfigSealSecrets($link) {
 	}
 }
 
+/** Lignes de réglages présentes dans sb_config (false si la requête échoue) */
+function sbSettingsFetch($link) {
+	$names = array_map(function ($n) use ($link) { return "'" . mysqli_real_escape_string($link, $n) . "'"; }, array_keys(sbSettingsDefaults()));
+	$res = @mysqli_query($link, "SELECT `config`, `content` FROM `" . sbSettingsTable() . "` WHERE `config` IN (" . implode(',', $names) . ")");
+	if (!$res) return false;
+	$rows = array();
+	while ($row = mysqli_fetch_row($res)) $rows[$row[0]] = $row[1];
+	return $rows;
+}
+
 /** Charge tous les réglages (valeurs par défaut pour les absents) */
 function sbSettingsLoad() {
 	$settings = sbSettingsDefaults();
 	$link = sbSettingsDb();
 	if ($link) {
-		$t = sbSettingsTable();
-		$res = @mysqli_query($link, "SELECT `name`, `value` FROM `$t`");
-		if ($res) {
-			while ($row = mysqli_fetch_row($res)) $settings[$row[0]] = $row[1];
+		$rows = sbSettingsFetch($link);
+		// Aucun réglage dans sb_config : installation 4.11, réglages encore
+		// dans sb_settings (fusion, une seule fois)
+		if (!$rows && sbSettingsMergeOldTable($link)) $rows = sbSettingsFetch($link);
+		if ($rows !== false) {
+			$settings = array_merge($settings, $rows);
 			$GLOBALS['sb_settings_loaded_from_db'] = true;
 		}
 	}
@@ -549,9 +619,10 @@ function sbSettingsSave(array $values, $only_missing = false) {
 	$t = sbSettingsTable();
 	$secret = sbSettingsSecretNames();
 	$known = sbSettingsDefaults();
+	// updated_at : posée par MySQL (ajout, ou valeur réellement modifiée)
 	$stmt = mysqli_prepare($link, $only_missing
-		? "INSERT IGNORE INTO `$t` (`name`, `value`, `updated_at`) VALUES (?, ?, NOW())"
-		: "INSERT INTO `$t` (`name`, `value`, `updated_at`) VALUES (?, ?, NOW()) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`), `updated_at` = NOW()");
+		? "INSERT IGNORE INTO `$t` (`config`, `content`) VALUES (?, ?)"
+		: "INSERT INTO `$t` (`config`, `content`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `content` = VALUES(`content`)");
 	if (!$stmt) return false;
 	$ok = true;
 	foreach ($values as $name => $value) {

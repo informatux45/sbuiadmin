@@ -179,7 +179,7 @@
 								
 								// Réglages : accès base + clé de chiffrement dans sbdbconfig.php
 								// (au-dessus du site si possible, sinon à sa racine), le reste
-								// dans la table sb_settings. Plus rien dans settings.txt.
+								// dans la table sb_config. Plus rien dans settings.txt.
 								// Voir inc/sbuiadmin-settings.php.
 								require_once(dirname(__DIR__) . '/inc/sbuiadmin-settings.php');
 								$sb_install_ok = true;

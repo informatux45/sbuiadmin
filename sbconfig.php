@@ -29,7 +29,7 @@ if ($sb_theme_config === false) {
     die('Configuration files not found or unreadable.');
 }
 
-# Réglages : en base (table sb_settings), accès base dans sbdbconfig.php.
+# Réglages : en base (table sb_config), accès base dans sbdbconfig.php.
 # Voir SBADMIN/inc/sbuiadmin-settings.php
 require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . SBADMIN . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'sbuiadmin-settings.php');
 # Anti-robot ALTCHA (une seule API pour tout le site) et blocage des tentatives de connexion

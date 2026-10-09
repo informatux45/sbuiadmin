@@ -109,7 +109,8 @@ DROP TABLE IF EXISTS `<DB_PREFIX>sb_config`;
 CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_config` (
   `id` int(11) NOT NULL,
   `config` varchar(50) NOT NULL COMMENT 'Nom de la configuration',
-  `content` text NOT NULL COMMENT 'Valeur de la configuration'
+  `content` text NOT NULL COMMENT 'Valeur de la configuration',
+  `updated_at` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Dernière modification'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
