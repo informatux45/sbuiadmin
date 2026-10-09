@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_config` (
 
 INSERT INTO `<DB_PREFIX>sb_config` (`id`, `config`, `content`) VALUES
 (1, 'css', '.fright {float: right;} .fcenter {float: center;} .fleft {float: left;} .aright {text-align: right;} .acenter {text-align: center;} .aleft {text-align: left;} .dnone {display: none !important;}'),
-(2, 'javascript', 'jQuery(document).ready(function() { 	// Recherche cach&eacute;e 	jQuery(&#039;#votrediv&#039;).css(&#039;color&#039;,&#039;red&#039;); });'),
+(2, 'javascript', 'jQuery(document).ready(function() { /* Recherche cach&eacute;e */ jQuery(&#039;#votrediv&#039;).css(&#039;color&#039;,&#039;red&#039;); });'),
 (3, 'header', '[fr]&lt;h3&gt;Bienvenue sur SBUIADMIN&lt;/h3&gt;  &lt;h5&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit.&lt;/h5&gt;  &lt;p&gt;Cras rutrum, massa non blandit convallis, est lacus gravida enim, eu fermentum ligula orci et tortor.&lt;/p&gt; &lt;a href=&quot;#&quot;&gt;Lire la suite&lt;/a&gt;[/fr]'),
 (4, 'footer', '[fr]&amp;copy; [CS name=sbyear] &amp;bull; www.votresite.com &amp;bull; Cr&amp;eacute;&amp;eacute; &amp;amp; r&amp;eacute;alis&amp;eacute; par &lt;a href=&quot;//informatux.com&quot; target=&quot;_blank&quot;&gt;informatux.com&lt;/a&gt;[/fr]'),
 (5, 'email_to', 'contact@votresite.fr'),

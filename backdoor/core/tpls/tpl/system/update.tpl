@@ -15,7 +15,7 @@
 
 				{if $sb_msg_error}
 				<section class="col-12">
-					<div class="alert danger"><div class="body">{$sb_msg_error|escape}</div></div>
+					<div class="alert danger"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg></span><div class="body">{$sb_msg_error|escape}</div></div>
 				</section>
 				{/if}
 
@@ -36,7 +36,7 @@
 						<p style="color:var(--t-muted)">Dernière vérification : {$sb_upd_last_check} (automatique une fois par jour, à l'ouverture du tableau de bord).
 						{if $sb_upd_state.error}<br><span style="color:var(--danger)">Dernière vérification en échec : {$sb_upd_state.error|escape}</span>{/if}</p>
 						<p style="color:var(--t-muted)">Seules les versions signées (Ed25519) publiées sur <a href="https://github.com/informatux45/sbuiadmin/releases" target="_blank" rel="noopener">GitHub</a> sont proposées ; l'archive, la liste des fichiers et chaque fichier écrit sont vérifiés.</p>
-						{if !$sb_upd_ready}<div class="alert warning"><div class="body">Extensions PHP manquantes (zip, curl ou sodium) : mise à jour impossible depuis l'administration.</div></div>{/if}
+						{if !$sb_upd_ready}<div class="alert warning"><span class="ico"><svg viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg></span><div class="body">Extensions PHP manquantes (zip, curl ou sodium) : mise à jour impossible depuis l'administration.</div></div>{/if}
 					</div>
 				</section>
 
@@ -50,10 +50,10 @@
 					</div>
 					<div class="card-body">
 						{if $sb_upd_state.latest.notes}
-							<div class="sbupd-notes">{$sb_upd_state.latest.notes|escape|nl2br}</div>
+							<div class="sbupd-notes">{$sb_upd_notes_html}</div>
 						{/if}
 
-						<div class="alert info" style="margin-top:12px"><div class="body">
+						<div class="alert info" style="margin-top:12px"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span><div class="body">
 							Une sauvegarde chiffrée des fichiers remplacés et de la base de données est faite automatiquement : en cas d'échec, le retour à la version actuelle est automatique, et la mise à jour peut ensuite être annulée (une fois) depuis cette page.
 							Pendant la copie, le site et l'administration affichent « mise à jour en cours ».
 							Jamais touchés : <code>upload/</code>, <code>.htaccess</code>, <code>sbconfig.php</code>, <code>inc/cmscustom.php</code>, réglages, caches, installeur.
@@ -98,10 +98,10 @@
 				</section>
 
 				{* --- Erreur / opération précédente --- *}
-				<section class="col-12" style="display:none" id="sbupd-error"><div class="alert danger"><div class="body" id="sbupd-error-text"></div></div></section>
+				<section class="col-12" style="display:none" id="sbupd-error"><div class="alert danger"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg></span><div class="body" id="sbupd-error-text"></div></div></section>
 				{if $sb_upd_job && ($sb_upd_job.status == 'failed' || $sb_upd_job.status == 'running' || $sb_upd_job.status == 'rolledback')}
 				<section class="col-12">
-					<div class="alert {if $sb_upd_job.status == 'rolledback'}info{else}warning{/if}"><div class="body">
+					<div class="alert {if $sb_upd_job.status == 'rolledback'}info{else}warning{/if}"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span><div class="body">
 						Dernière opération vers {$sb_upd_job.to|escape} : {$sb_upd_job.step|escape}
 					</div></div>
 				</section>
@@ -115,7 +115,7 @@
 							<p>Dernière mise à jour : <strong>{$sb_upd_rollback.from|escape} → {$sb_upd_rollback.to|escape}</strong> le {$sb_upd_rollback.date_fr} ({$sb_upd_rollback.size_mo} Mo chiffrés).</p>
 							{if $sb_upd_rollback.migrations}
 								{if $sb_upd_rollback.needs_dump}
-									<div class="alert warning"><div class="body">Cette mise à jour a modifié la base de façon non réversible : le retour remettra la base telle qu'elle était le {$sb_upd_rollback.date_fr}. <strong>Les contenus saisis depuis seront perdus.</strong></div></div>
+									<div class="alert warning"><span class="ico"><svg viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg></span><div class="body">Cette mise à jour a modifié la base de façon non réversible : le retour remettra la base telle qu'elle était le {$sb_upd_rollback.date_fr}. <strong>Les contenus saisis depuis seront perdus.</strong></div></div>
 									<label class="check"><input type="checkbox" id="sbupd-accept-loss"> <span class="box"></span> J'accepte la perte des contenus saisis depuis cette date.</label>
 								{else}
 									<p style="color:var(--t-muted)">La base sera ramenée au schéma {$sb_upd_rollback.db_from|escape} en annulant les migrations ({$sb_upd_rollback.migrations_str|escape}) : les contenus saisis depuis sont conservés. Si l'annulation échoue, la base est remise depuis la sauvegarde.</p>
@@ -145,7 +145,7 @@
 							{if $sb_upd_storage.outside} — <span style="color:var(--success)">hors du dossier publié ✓</span>{/if}</p>
 							<p><code style="font-size:11px;word-break:break-all">{$sb_upd_storage.path|escape}</code></p>
 							{if $sb_upd_selftest == 'exposed'}
-								<div class="alert danger"><div class="body">Le serveur web sert ce dossier (l'interdiction n'est pas appliquée, cas de nginx par exemple). Les sauvegardes restent chiffrées et leur nom imprévisible, mais placez-les hors du site : variable d'environnement <code>SBUIADMIN_BACKUP_DIR</code> ou clé <code>'backup_dir'</code> de sbdbconfig.php.</div></div>
+								<div class="alert danger"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg></span><div class="body">Le serveur web sert ce dossier (l'interdiction n'est pas appliquée, cas de nginx par exemple). Les sauvegardes restent chiffrées et leur nom imprévisible, mais placez-les hors du site : variable d'environnement <code>SBUIADMIN_BACKUP_DIR</code> ou clé <code>'backup_dir'</code> de sbdbconfig.php.</div></div>
 							{elseif $sb_upd_selftest == 'protected'}
 								<p style="color:var(--success)">Auto-test : dossier refusé au web ✓</p>
 							{elseif $sb_upd_selftest == 'unknown' && !$sb_upd_storage.outside}

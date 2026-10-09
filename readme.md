@@ -69,7 +69,12 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
-**4.14**
+**4.15**
+- Front: theme jQuery plugins no longer overwritten (Page Builder lightbox and jQuery plugin load jQuery only when missing)
+- Front: broken sample custom JavaScript from the installer fixed (migration), manifest.json loaded with credentials
+- Update page: alerts layout and release notes formatting fixed
+
+**4.14
 - Theme setting moved to the database, theme switch validated and CSRF protected
 - dashboard.txt and settings.txt removed (migration keeps their content)
 - Two-factor authentication off by default, enabled in Configuration after a test code is received

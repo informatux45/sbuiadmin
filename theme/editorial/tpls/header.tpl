@@ -13,7 +13,7 @@
 		<link rel="apple-touch-icon" sizes="152x152" href="{$smarty.const.SB_THEME_URL}images/favicons/apple-touch-icon.png">
 		<link rel="icon" type="image/png" sizes="32x32" href="{$smarty.const.SB_THEME_URL}images/favicons/favicon-32x32.png">
 		<link rel="icon" type="image/png" sizes="16x16" href="{$smarty.const.SB_THEME_URL}images/favicons/favicon-16x16.png">
-		<link rel="manifest" href="{$smarty.const.SB_THEME_URL}images/favicons/manifest.json">
+		<link rel="manifest" crossorigin="use-credentials" href="{$smarty.const.SB_THEME_URL}images/favicons/manifest.json">
 		<link rel="mask-icon" href="{$smarty.const.SB_THEME_URL}images/favicons/safari-pinned-tab.svg" color="#5bbad5">
 		<meta name="theme-color" content="#ffffff">
 		

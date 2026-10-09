@@ -125,6 +125,10 @@ $sb_upd_history = json_decode(sbSetting('update_history'), true);
 
 $sbsmarty->assign('sb_upd_state', $sb_upd_state);
 $sbsmarty->assign('sb_upd_available', sbUpdIsAvailable($sb_upd_state));
+// Notes de version (GitHub, hors signature) : échappées, puis **gras** et `code`
+$sb_upd_notes = htmlspecialchars((string) ($sb_upd_state['latest']['notes'] ?? ''), ENT_QUOTES, 'UTF-8');
+$sb_upd_notes = preg_replace(array('/\*\*(.+?)\*\*/', '/`([^`]+)`/'), array('<strong>$1</strong>', '<code>$1</code>'), $sb_upd_notes);
+$sbsmarty->assign('sb_upd_notes_html', nl2br($sb_upd_notes));
 $sbsmarty->assign('sb_upd_job', $sb_upd_job);
 $sbsmarty->assign('sb_upd_storage', $sb_upd_storage);
 $sbsmarty->assign('sb_upd_selftest', $sb_upd_selftest);
@@ -132,7 +136,8 @@ $sbsmarty->assign('sb_upd_rollback', $sb_upd_rollback);
 $sbsmarty->assign('sb_upd_db_version', sbSetting('db_version'));
 $sbsmarty->assign('sb_upd_history', is_array($sb_upd_history) ? $sb_upd_history : array());
 $sbsmarty->assign('sb_upd_token', $_SESSION['sbupd_token']);
-$sbsmarty->assign('sb_upd_last_check', $sb_upd_state['last_check'] ? date('d/m/Y H:i', $sb_upd_state['last_check']) : 'jamais');
+// 0 après une mise à jour ou un retour arrière : nouvelle vérification forcée
+$sbsmarty->assign('sb_upd_last_check', $sb_upd_state['last_check'] ? date('d/m/Y H:i', $sb_upd_state['last_check']) : (is_array($sb_upd_history) && $sb_upd_history ? 'à refaire (après la dernière opération)' : 'jamais'));
 $sbsmarty->assign('sb_upd_ready', class_exists('ZipArchive') && function_exists('curl_init') && function_exists('sodium_crypto_sign_verify_detached'));
 
 $sbsmarty->assign('page_title', 'Mise à jour');

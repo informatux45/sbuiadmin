@@ -766,7 +766,17 @@ if (!function_exists("insert_sbGetHeaders")) {
 		// d'ouvrir la visionneuse. `defer` reporte l'exécution après
 		// l'analyse complète du HTML (donc une fois <body> réellement là).
 		$cms_headers .= '<link href="' . SB_URL . 'plugins/lightbox/css/lightbox.min.css" rel="stylesheet">';
-		$cms_headers .= '<script defer src="' . SB_URL . 'plugins/lightbox/js/lightbox-plus-jquery.min.js"></script>';
+		// Version SANS jQuery si la page en a déjà un : « -plus-jquery » embarque
+		// son propre jQuery, qui remplaçait celui du thème et ses plugins
+		// (« $(...).tooltip / flexslider is not a function »). Choix fait au
+		// DOMContentLoaded (<body> présent, voir ci-dessus) ; rien si le
+		// plugin « lightbox » de Configuration > Plugins l'a déjà chargé.
+		$cms_headers .= '<script>document.addEventListener("DOMContentLoaded", function () {'
+			. 'if (window.lightbox) return;'
+			. 'var s = document.createElement("script");'
+			. 's.src = "' . SB_URL . 'plugins/lightbox/js/" + (window.jQuery ? "lightbox.min.js" : "lightbox-plus-jquery.min.js");'
+			. 'document.head.appendChild(s);'
+			. '});</script>';
 
 		// Bloc "Carte" (Point 15) - Leaflet + tuiles OpenStreetMap, remplace
 		// l'ancien iframe Google Maps. Fichiers vendorisés en assets/leaflet/
@@ -864,7 +874,11 @@ if (!function_exists("insert_sbGetPlugins")) {
 			// --- Plugin JQUERY Latest
 			// --------------------------
 			if (in_array('jquery', $plugins_array)) {
-				$cms_plugins .= '<script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>';
+				// Seulement si le thème n'a pas déjà chargé jQuery : un second
+				// jQuery remplaçait le premier et ses plugins (Bootstrap,
+				// Flexslider... « is not a function »). document.write garde
+				// l'ordre de chargement des scripts suivants.
+				$cms_plugins .= '<script>window.jQuery || document.write(\'<script src="https://code.jquery.com/jquery-latest.min.js"><\\/script>\');</script>';
 			}
 			// --------------------------
 			// --- Plugin APPEAR / DISAPPEAR
