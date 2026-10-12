@@ -32,8 +32,9 @@
     <link rel="stylesheet" href="{$smarty.const.SB_THEME_URL}css/responsive.css">
     <link rel="stylesheet" href="{$smarty.const.SB_THEME_URL}css/animate.min.css">
     
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="{$smarty.const.SB_THEME_URL}js/jquery.min.js"><\/script>')</script>
+    <script src="{$smarty.const.SB_URL}assets/jquery/jquery-4.0.0.min.js?v=4.22"></script>
+    <script src="{$smarty.const.SB_URL}assets/jquery/jquery-migrate-4.0.2.min.js?v=4.22"></script>
+    <script src="{$smarty.const.SB_URL}assets/jquery/sb-jquery-compat.js?v=4.22"></script>
 	
     {* --- ---------------------------------------- --- *}
     {* --- Style/JS modifiables pour le site client --- *}

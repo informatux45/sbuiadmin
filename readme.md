@@ -69,66 +69,46 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
+**4.22**
+- Activebox, Editorial and Volton themes: local jQuery 4, Waypoints 4.0.1
+- Shorter help.txt and changelog
+
 **4.21**
-- Saxo and Pinkrio themes: jQuery 4.0.0 + jQuery Migrate 4.0.2 shipped locally (was the frozen CDN 1.11.1), compatibility file for their older jQuery plugins
-- Removed calls to the defunct html5shim (googlecode) and $(window).load() replaced
+- Saxo and Pinkrio themes: local jQuery 4
 
 **4.20**
-- Plugins: jQuery 3.7.1 shipped locally (the CDN "latest" was frozen at 1.11.1), Lightbox 2.12.0
-- Plugins removed: Fancybox (unmaintained, non-commercial license; Tables "lightbox_fancy" now opens in Lightbox), Appear, Prism
-- New plugins: cookie consent banner (CookieConsent 3, Google Analytics only after consent), back to top button, AOS animations, highlight.js
+- Plugins: local jQuery 3.7.1, Lightbox 2.12, CookieConsent, back to top, AOS, highlight.js
+- Fancybox, Appear, Prism removed
 
 **4.19**
-- Security: no direct web access to the administration's internal files (backdoor/inc: PHP, PHAR and database migrations), settings loader refuses direct calls (also on nginx)
-- Help: nginx rules
-- CMS config > Plugins: long code lines wrap in the Howto windows, missing Magnific Popup plugin removed
+- Security: no direct access to backdoor/inc files, nginx rules in help.txt
+- Howto windows: long lines wrap
 
 **4.18**
-- Form class: several fields on one line (openRow / closeRow, CSS grid, single column on small screens), example in the Sandbox
-- Form class: free HTML added after the last field is now displayed
-- Maintenance and general configuration forms laid out on rows
+- Form class: several fields per row (openRow / closeRow)
 
 **4.17**
-- Maintenance mode (formerly "Coming soon") shown in place on any URL with HTTP 503, no redirect: visitors just refresh when the site reopens
-- Logged-in administration users see the site, maintenance page preview, optional countdown
-- YouTube background through youtube-nocookie (no plugin), user values escaped, coming-soon/ directory removed
-- Update page: "Prepare" button spacing
+- Maintenance mode (HTTP 503, no redirect) replaces Coming soon
 
 **4.16**
-- Installation check fixed: an installed site is never sent back to the installer when backdoor/install.php is present (wrong lock paths), HTTPS-safe temporary redirect
+- Fixed installer detection on installed sites
 
 **4.15**
-- Front: theme jQuery plugins no longer overwritten (Page Builder lightbox and jQuery plugin load jQuery only when missing)
-- Front: broken sample custom JavaScript from the installer fixed (migration), manifest.json loaded with credentials
-- Update page: alerts layout and release notes formatting fixed
+- Front: theme jQuery no longer overwritten, sample JavaScript fixed
 
 **4.14**
-- Theme setting moved to the database, theme switch validated and CSRF protected
-- dashboard.txt and settings.txt removed (migration keeps their content)
-- Two-factor authentication off by default, enabled in Configuration after a test code is received
-- Several sites on one hosting account: a site never reads or rewrites another site's sbdbconfig.php
-- Installer: settings written only after checking the database configuration it reads back
+- Theme setting in database, optional 2FA, one sbdbconfig.php per site
 
 **4.13**
-- Update from the administration: daily check of signed GitHub releases, verified before install (signature, archive and per-file SHA-256), live progress
-- Idempotent SQL migrations shipped with each release, database schema version tracked
-- One-step rollback of the last update (files and database), automatic rollback on failure
-- Encrypted backups (files and database) stored outside the web root when possible
-- Old UPGRADE mode (unverified HTTP server) removed
+- Update from the administration (signed releases, migrations, encrypted backups, rollback)
 
 **4.12**
-- Signed releases: secure net install from GitHub (Ed25519 signature + SHA-256 verified)
-- ALTCHA replaces Google reCAPTCHA (admin login, user module, contact forms), single core API
-- Temporary lockout after failed logins (per login and per IP, 2FA codes included)
-- Settings merged into the sb_config table, with an updated_at column
-- PHP 8.4 minimum, PHP 8.5 Ready, PHP 9 preparation
-- Smarty 4.5.8 (security fix)
+- Signed releases and secure net install
+- ALTCHA replaces reCAPTCHA, login lockout
+- PHP 8.4 minimum, PHP 8.5 ready, Smarty 4.5.8
 
 **4.11**
-- Settings stored in database, automatic migration of settings.txt
-- Database credentials in sbdbconfig.php, outside the web root when possible
-- Encrypted secrets, never sent back to the browser
-- Installer: direct settings write, one-click removal of install/, server requirements check
+- Settings in database, credentials in sbdbconfig.php, encrypted secrets
 
 **4.10**
 - New administration theme (Adminator, dark mode)

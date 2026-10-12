@@ -1,148 +1,43 @@
-# #######################################################
-# SBUIADMIN - Aide à l'installation
-# #######################################################
+# SBUIADMIN - Installation
 
 ### Prérequis
-- PHP 8.4 minimum (8.5 conseillé), extensions : mysqli, pdo_mysql,
-  session, json, mbstring, sodium, openssl, curl, gd, fileinfo, filter,
-  hash (l'assistant d'installation vérifie tout : étape « Requis Serveur »)
-  + zip pour sbuiadmin_netinstall.php
-- MySQL 5.7+ ou MariaDB 10.3+
-- Apache avec mod_rewrite (mod_headers conseillé)
+- PHP 8.4+ (mysqli, sodium, openssl, curl, gd, mbstring, zip pour netinstall)
+- MySQL 5.7+ / MariaDB 10.3+, Apache + mod_rewrite
 
-# #######################################################
+### Installation
+- Depuis GitHub : déposer seul sbuiadmin_netinstall.php dans le dossier
+  vide du site et l'ouvrir. L'archive est vérifiée (signature) avant
+  extraction, puis l'assistant backdoor/ prend le relais.
+- Manuelle : décompresser sbuiadmin-X.Y.zip (releases GitHub), ouvrir backdoor/.
+- Clé d'installation : backdoor/install/installer/install-key.php
 
-### Installation depuis GitHub (sbuiadmin_netinstall.php)
-1. Déposer SEUL le fichier sbuiadmin_netinstall.php dans le dossier
-   (vide) du futur site, puis l'ouvrir dans le navigateur.
-2. Cliquer sur « Installer SBUIADMIN » : la dernière version publiée sur
-   https://github.com/informatux45/sbuiadmin/releases est téléchargée
-   et VÉRIFIÉE avant toute écriture :
-   - HTTPS avec certificat vérifié, vers GitHub uniquement ;
-   - signature Ed25519 du manifeste de la version (clé publique écrite
-     dans sbuiadmin_netinstall.php, clé privée jamais publiée) ;
-   - taille et empreinte SHA-256 de l'archive ;
-   - aucun fichier écrit hors du dossier (pas de « .. », de chemin
-     absolu ni de lien symbolique dans l'archive).
-   Une seule de ces vérifications en échec : rien n'est installé.
-3. Le fichier netinstall se supprime de lui-même, puis l'assistant
-   d'installation (backdoor/) prend le relais : base de données, compte
-   administrateur, clé d'installation (à lire sur le serveur dans
-   backdoor/install/installer/install-key.php).
-Si SBUIADMIN est déjà installé dans le dossier, netinstall refuse de
-s'exécuter : le supprimer du serveur.
+### Site dans un sous-dossier (ex. /new/)
+- Configuration > Générale > URL du site : https://exemple.fr/new/
+- .htaccess : ErrorDocument 404 /new/index.php?p=pages&id=404
 
-### Installation manuelle
-Télécharger l'archive sbuiadmin-X.Y.zip d'une version publiée, vérifier
-son empreinte avec le manifeste sbuiadmin-release.json, la décompresser
-dans le dossier du site, puis ouvrir backdoor/ dans le navigateur.
+### Double authentification
+- Configurer d'abord le SMTP (Contact > Paramètres), puis l'activer dans
+  Configuration > Générale avec le code de test reçu.
+- Secours : créer le fichier vide backdoor/inc/admin/2fa-disabled
 
-# #######################################################
-# Site dans un sous-dossier (ex. https://exemple.fr/new/)
-# #######################################################
+### Plusieurs sites sur un même hébergement
+Chaque site a son sbdbconfig.php (sbdbconfig-<dossier>.php pour les suivants).
 
-### Rien à modifier pour la réécriture d'URL
-- Le .htaccess livré renvoie vers index.php en chemin relatif : il
-  fonctionne tel quel dans un sous-dossier.
-- Le sous-dossier (SBSITESUBDIRECTORY) est déduit automatiquement de
-  l'URL du site (Configuration > Générale > URL du site client) : ne
-  plus le saisir dans sbconfig.php.
-
-### Fichier .HTACCESS : page d'erreur 404
-Apache exige un chemin complet depuis la racine du domaine :
-Changer : ErrorDocument 404 index.php?p=pages&id=404
-Par :     ErrorDocument 404 /new/index.php?p=pages&id=404
-
-### Administration
-Configuration > Générale :
-- URL du site client : https://exemple.fr/new/
-- Activation du Rewrite URL : Activé (si souhaité)
-
-# #######################################################
-
-# #######################################################
-# Double authentification (code par e-mail)
-# #######################################################
-
-### Activation (Configuration > Générale > Double authentification)
-- Désactivée à l'installation : aucun envoi d'e-mails n'est encore
-  paramétré. Paramétrer d'abord un SMTP (module Contact > Paramètres),
-  la fonction mail() du serveur étant souvent filtrée.
-- Passer à « Oui » et enregistrer : un code de test est envoyé à
-  l'adresse e-mail du compte. La saisir dans « Code reçu » et
-  enregistrer : la double authentification n'est activée qu'à ce
-  moment, preuve que les e-mails arrivent.
-- SECOURS (e-mails qui n'arrivent plus) : créer le fichier vide
-  backdoor/inc/admin/2fa-disabled sur le serveur la désactive.
-
-# #######################################################
-# Plusieurs sites sur un même compte d'hébergement
-# #######################################################
-
-### sbdbconfig.php (accès à la base)
-- Chaque site écrit son fichier, marqué à son nom (clé 'site') : le
-  premier s'appelle sbdbconfig.php, les suivants sbdbconfig-<dossier>.php,
-  dans le même dossier (private/ par exemple).
-- Un site n'utilise ni ne réécrit jamais le fichier marqué au nom d'un
-  autre. Un ancien fichier sans marque est marqué au nom du premier site
-  installé qui le lit ; un site en cours d'installation ne le prend jamais.
-
-# #######################################################
-# Serveur nginx (les fichiers .htaccess sont ignorés)
-# #######################################################
-
-### Règles à reprendre dans la configuration du site
-Sous Apache, des fichiers .htaccess refusent l'accès direct aux fichiers
-internes. Sous nginx, ajouter l'équivalent (ADMIN = nom du dossier
-d'administration, backdoor par défaut) :
+### nginx (.htaccess ignorés)
   location ~ ^/ADMIN/inc/plugins/sitemap/sitemap_generator\.php$ { include fastcgi_params; ... }
   location ~ ^/ADMIN/inc/.*\.(php|phar|txt|log|sql|ini)$ { deny all; }
   location ~ /\. { deny all; }
   location ~ (^|/)(sbdbconfig[^/]*|sbsettings-backup-[^/]*)\.php$ { deny all; }
-Le chargeur des réglages (inc/sbuiadmin-settings.php) refuse aussi de
-lui-même un appel direct, mais
-ces règles restent la protection principale.
+(ADMIN = dossier d'administration, backdoor par défaut)
 
-# #######################################################
-# Mises à jour depuis l'administration
-# #######################################################
-
-### Fonctionnement (Configuration > Mise à jour, administrateurs)
-- Vérification sur GitHub une fois par 24 h (tableau de bord) ou à la
-  demande. Seules les versions signées (Ed25519) sont proposées.
-- « Préparer » : téléchargement et vérifications (signature, SHA-256 de
-  l'archive et de chaque fichier), plan (fichiers modifiés localement,
-  migrations de la base). Rien n'est encore modifié.
-- « Lancer » (mot de passe redemandé) : sauvegarde CHIFFRÉE des fichiers
-  remplacés et de la base, maintenance, copie, migrations. En cas d'échec :
-  retour automatique (base et fichiers).
-- Retour arrière : seulement la DERNIÈRE mise à jour, une seule fois.
-
-### Emplacement des sauvegardes (dans cet ordre)
-1. Imposé : variable d'environnement SBUIADMIN_BACKUP_DIR, ou clé
-   'backup_dir' (chemin absolu) dans sbdbconfig.php ;
-2. à côté de sbdbconfig.php s'il est hors du dossier publié ;
-3. sinon dans le site : backdoor/datas/updates/<nom aléatoire>, interdit au
-   web (.htaccess, web.config) et vérifié par un auto-test HTTP.
-Sous nginx (qui ignore .htaccess), préférer 1 ou 2.
-Les sauvegardes sont chiffrées avec la clé de sbdbconfig.php : la perdre
-rend les sauvegardes illisibles. Elles ne remplacent PAS les sauvegardes
-externes du serveur.
+### Mises à jour (Configuration > Mise à jour)
+- Versions signées uniquement, sauvegarde chiffrée avant, retour arrière
+  de la dernière mise à jour.
+- Sauvegardes : SBUIADMIN_BACKUP_DIR ou 'backup_dir' (sbdbconfig.php),
+  sinon à côté de sbdbconfig.php, sinon backdoor/datas/updates/.
+  Perdre sbdbconfig.php rend les sauvegardes illisibles.
 
 ### Migrations de la base (développeurs)
-- Un fichier backdoor/inc/migrations/<version>.php par version qui touche à
-  la base, modèle en tête de backdoor/inc/sbuiadmin-update-db.php.
-- IDEMPOTENT : uniquement les méthodes de SbMigration (createTable,
-  addColumn, modifyColumn, renameColumn, dropColumn, addIndex, dropIndex,
-  addConfig, deleteConfig...), qui vérifient l'état réel de la base avant
-  d'agir ; $m->query() seulement pour des requêtes elles-mêmes idempotentes.
-- Une partie 'down' (annulation) dès que possible : le retour arrière
-  conserve alors les contenus saisis depuis la mise à jour. Sans 'down'
-  ('reversible' => false), le retour passe par la sauvegarde SQL et ces
-  contenus sont perdus (l'administrateur doit l'accepter).
-- Suppression en DEUX TEMPS : la version N cesse d'utiliser une table ou un
-  champ, la version N+1 le supprime. Le retour de N+1 vers N reste sûr.
-  Même règle pour un changement de type ou un renommage.
-- Tables sans préfixe (ajouté automatiquement).
-
-# #######################################################
+- backdoor/inc/migrations/<version>.php, modèle dans inc/sbuiadmin-update-db.php
+- Idempotentes (méthodes SbMigration), avec une partie 'down' si possible.
+- Supprimer en deux versions : N n'utilise plus, N+1 supprime.

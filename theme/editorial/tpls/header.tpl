@@ -25,7 +25,9 @@
 		<!--[if lte IE 8]><link rel="stylesheet" href="{$smarty.const.SB_THEME_URL}assets/css/ie8.css" /><![endif]-->
 		
 		<!-- Scripts -->
-		<script src="{$smarty.const.SB_THEME_URL}assets/js/jquery.min.js"></script>
+		<script src="{$smarty.const.SB_URL}assets/jquery/jquery-4.0.0.min.js?v=4.22"></script>
+		<script src="{$smarty.const.SB_URL}assets/jquery/jquery-migrate-4.0.2.min.js?v=4.22"></script>
+		<script src="{$smarty.const.SB_URL}assets/jquery/sb-jquery-compat.js?v=4.22"></script>
 		
 		{* --- ------------------------------------ --- *}
 		{* --- Style modifiable pour le site client --- *}

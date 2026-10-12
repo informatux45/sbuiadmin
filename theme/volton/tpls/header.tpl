@@ -24,13 +24,14 @@
 		<meta name="theme-color" content="#ffffff">
 		
 		<!-- Scripts -->
-        <script src="{$smarty.const.SB_THEME_URL}js/vendor/jquery-1.10.2.min.js"></script>
+        <script src="{$smarty.const.SB_URL}assets/jquery/jquery-4.0.0.min.js?v=4.22"></script>
+        <script src="{$smarty.const.SB_URL}assets/jquery/jquery-migrate-4.0.2.min.js?v=4.22"></script>
+        <script src="{$smarty.const.SB_URL}assets/jquery/sb-jquery-compat.js?v=4.22"></script>
         
         <link rel="stylesheet" href="{$smarty.const.SB_THEME_URL}css/normalize.css">
         <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
         <link rel="stylesheet" href="{$smarty.const.SB_THEME_URL}css/bootstrap.min.css">
         <link rel="stylesheet" href="{$smarty.const.SB_THEME_URL}css/templatemo-style.css">
-		<link rel="stylesheet" href="{$smarty.const.SB_THEME_URL}dist/css/lightbox.min.css">
 		
 		{* --- ------------------------------------ --- *}
 		{* --- Style modifiable pour le site client --- *}
