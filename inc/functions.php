@@ -833,18 +833,17 @@ if (!function_exists("insert_sbGetHeaders")) {
 			$cms_headers .= '</script>';
 		}
 		
-		// --- Get Google Analytic
-		if ($sbsanitize->sTrim($result[2]['content']) != '') {
+		// --- Get Google Analytics (GA4, identifiant G-XXXXXXXXXX)
+		// Un ancien identifiant Universal Analytics (UA-, service arrêté) est ignoré
+		$ga_id = sbGa4Id($result[2]['content'] ?? '');
+		if ($ga_id !== '') {
 			$cms_headers .= "\n" . '<!-- Google Analytics -->' . "\n";
 			// Plugin « Consentement » actif : exécuté seulement après accord
 			// du visiteur (catégorie analytics, plugins/cookieconsent/sbconsent.js)
 			$cms_headers .= (sbPluginEnabled('cookieconsent') ? '<script type="text/plain" data-category="analytics">' : '<script type="text/javascript">') . "\n";
-			$cms_headers .= "(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-								(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-								m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-							 })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');" . "\n";
-			$cms_headers .= "ga('create', 'UA-".$sbsanitize->displayText($result[2]['content'])."', 'auto');" . "\n";
-			$cms_headers .= "ga('send', 'pageview');" . "\n";
+			$cms_headers .= "(function(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=" . $ga_id . "';document.head.appendChild(s);})();" . "\n";
+			$cms_headers .= "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}" . "\n";
+			$cms_headers .= "gtag('js',new Date());gtag('config','" . $ga_id . "');" . "\n";
 			$cms_headers .= '</script>' . "\n";
 			$cms_headers .= '<!-- End Google Analytics -->' . "\n";
 		}
@@ -966,26 +965,14 @@ if (!function_exists("insert_sbGetPlugins")) {
 }
 
 /**
-* Get CMS footer plugins
-* @return html
+* Ancien CMS Config > Polices (Google Fonts), retiré en 4.23.
+* Conservée vide : un thème personnalisé peut encore appeler
+* {insert name="sbGetFonts"} (Smarty échoue sur un insert inconnu).
+* @return string
 */
 if (!function_exists("insert_sbGetFonts")) {
 	function insert_sbGetFonts() {
-		global $sbsql, $sbsanitize;
-		$cms_fonts    = '';
-		$table_config = _AM_DB_PREFIX . 'sb_config';
-		
-		// --- Get CMS Plugins CODE (PLUGINS)
-		$query   = "SELECT content FROM $table_config WHERE config = 'fonts' ORDER BY config ASC";
-		$request = $sbsql->query($query);
-		$result  = $sbsql->assoc($request);
-		
-		if ($sbsanitize->sTrim($result['content'])) {
-			$cms_fonts .= $sbsanitize->displayText($result['content']);
-		}
-		
-		return $cms_fonts;
-		
+		return '';
 	}
 }
 
@@ -1320,7 +1307,7 @@ if (!function_exists("insert_sbGetSeoMetas")) {
 						case "seo-generator":
 							$metas_seo .= "\t\t" . '<meta name="generator" content="' . $cs[$row['config']] . '">' . "\n";
 						break;
-						case "seo-google-analytics":
+						case "seo-google-site-verification":
 							$metas_seo .= "\t\t" . '<meta name="google-site-verification" content="' . $cs[$row['config']] . '">' . "\n";
 						break;
 					}
@@ -1389,6 +1376,17 @@ if (!function_exists("insert_sbIsBlockedIP")) {
 if (!function_exists("insert_sbGetInfoBlockedIP")) {
 	function insert_sbGetInfoBlockedIP() {
 		return (function_exists("sbGetInfoBlockedIP")) ? sbGetInfoBlockedIP() : false;
+	}
+}
+
+/** Identifiant Google Analytics 4 (G-XXXXXXXXXX), '' si invalide
+ * Même fonction dans inc/functions.php (front) et
+ * backdoor/inc/sbuiadmin-functions.php (admin).
+============================================== */
+if (!function_exists("sbGa4Id")) {
+	function sbGa4Id($id) {
+		$id = strtoupper(trim(html_entity_decode(strip_tags((string) $id), ENT_QUOTES, 'UTF-8')));
+		return preg_match('/^G-[A-Z0-9]{4,20}$/', $id) ? $id : '';
 	}
 }
 

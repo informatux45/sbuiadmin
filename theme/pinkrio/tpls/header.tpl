@@ -56,9 +56,8 @@
         <link rel="stylesheet" id="cache-custom-css" href="{$smarty.const.SB_THEME_URL}css/cache-custom.css" type="text/css" media="all" />
 	    
         <!-- FONTs -->
-        <link rel="stylesheet" id="google-fonts-css" href="https://fonts.googleapis.com/css?family=Oswald%7CDroid+Sans%7CPlayfair+Display%7COpen+Sans+Condensed%3A300%7CRokkitt%7CShadows+Into+Light%7CAbel%7CDamion%7CMontez&amp;ver=3.4.2" type="text/css" media="all" />
+        <link rel="stylesheet" id="google-fonts-css" href="{$smarty.const.SB_THEME_URL}css/sbfonts.css" type="text/css" media="all" />
 		<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-        {insert name="sbGetFonts"}
         
         <!-- JAVASCRIPTs -->
         {* jQuery 4 + Migrate (fonctions retirées) + compatibilité des anciens plugins, livrés avec SBUIADMIN *}
@@ -77,7 +76,7 @@
         <script type="text/javascript" src="{$smarty.const.SB_THEME_URL}js/jquery.aw-showcase.js"></script>
         <script type="text/javascript" src="{$smarty.const.SB_THEME_URL}js/layerslider.kreaturamedia.jquery-min.js"></script>
         <script type="text/javascript" src="{$smarty.const.SB_THEME_URL}js/shortcodes.js"></script>
-		<script type="text/javascript" src="{$smarty.const.SB_THEME_URL}js/jquery.colorbox-min.js"></script> 
+		<script type="text/javascript" src="{$smarty.const.SB_THEME_URL}js/jquery.colorbox-min.js?v=4.23"></script> 
 		<script type="text/javascript" src="{$smarty.const.SB_THEME_URL}js/jquery.tweetable.js"></script>
 
 		{* --- ------------------------------------ --- *}

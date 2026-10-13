@@ -137,7 +137,6 @@ INSERT INTO `<DB_PREFIX>sb_config` (`id`, `config`, `content`) VALUES
 (19, 'coming-soon-youtube', 'https://www.youtube.com/channel/UCLk-U6SQ6Syj1XXkvdVgoAQ'),
 (20, 'multilang', '0'),
 (21, 'plugins', ''),
-(22, 'fonts', ''),
 (23, 'seo-keywords', 'sbuiadmin,cms,bootstrap,sbadmin2'),
 (24, 'seo-description', 'Le CMS Bootstrap by BooBoo'),
 (25, 'coming-soon-type', 'image'),

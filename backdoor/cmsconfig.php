@@ -618,68 +618,6 @@ switch($action) {
 		// --------------------------------
 	break;
 	
-	case "fonts":
-		// --------------------------------
-		// --- Control form submit --------
-		// --------------------------------
-		if ($_POST['form_submit']) {
-
-			// Injection des données
-			$fonts = $sbsanitize->displayText($_POST['fonts'], 'UTF-8', 1, 0);
-			
-			// --- EDIT
-			// UPDATE DATAS
-			$query  = "UPDATE $table SET content = '$fonts' WHERE config = 'fonts'";
-			$result = $sbsql->query($query);
-			if ($result) {
-				// --- Message SUCCES
-				$sb_msg_valid = 'Fonts modifiées avec succès';
-			} else {
-				// --- Message ERROR
-				$sb_msg_error = 'Error: Write Error (EDIT)!';
-			}
-
-			// --- Debug SQL
-			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query . "\n" . 'Submit Form Type = '.$formType);
-			
-		}
-		
-		// --------------------------------
-		// --- Recuperation des donnees
-		// --------------------------------
-		$query   = "SELECT content FROM $table WHERE config = 'fonts'";
-		$request = $sbsql->query($query);
-		$assoc   = $sbsql->assoc($request);
-		$fonts   = sb_utf8_encode($assoc['content']);
-		// --------------------------------
-
-		// --- Debug SQL
-		if (_AM_SITE_DEBUG && !$_POST['form_submit']) $sbsmarty->assign('sbdebugsql', $query . "\n" . 'Form Type = '.$formType);						
-		
-		// --------------------------------		
-		// --- Define variables
-		$formAction = $module_url . "&a=" . $formType . "&op=" . $action;
-		// --- Form construct
-		$sbform->openForm(array('action' => "$formAction", 'name' => "$formName", 'id' => "$formName", 'reloadpage' => "$formAction", 'submitpage' => "$formAction"));
-		// --- Add inputs and more
-		// --------------------------------
-		// --- Code to insert
-		// --------------------------------
-		$sbform->addTextarea('Code GOOGLE FONTS', $fonts, array('id' => 'fonts', 'name' => 'fonts', 'style' => 'height: 200px !important;'), false, "Vous pouvez insérer le code à l'aide :<br>- du GOOGLE FONT SELECTOR<br>- ou bien depuis l'interface de <a href='https://fonts.google.com/' target='_blank'>Google Fonts</a><p><button type='button' class='btn btn--warning btn--sm'>Plus vous insèrerez de Google Fonts et plus le chargement de vos pages sera ralenti !</button></p><br>");
-		// --------------------------------
-		// --- Hiddens / Buttons
-		// --------------------------------	
-		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => "$formName"));
-		$sbform->addInput('hidden', '', array('name' => 'code_hidden', 'value' => ""));
-		$sbform->addInput('hidden', '', array('name' => 'id', 'value' => "$id"));
-		$sbform->addInput('submit', '', array('value' => "$btn_add_edit"));
-		// --------------------------------	
-		// --- Close Form
-		// --------------------------------	
-		$sbform->closeForm();
-		// --------------------------------
-	break;
-	
 	case "seo":
 		// --------------------------------
 		// --- Control form submit --------
@@ -695,7 +633,9 @@ switch($action) {
 			$seo_copyright                = $sbsanitize->displayText($_POST['seo_copyright'], 'UTF-8', 1, 0);
 			$seo_generator                = $sbsanitize->displayText($_POST['seo_generator'], 'UTF-8', 1, 0);
 			$seo_google_site_verification = $sbsanitize->displayText($_POST['seo_google_site_verification'], 'UTF-8', 1, 0);
-			$seo_google_analytics         = $sbsanitize->displayText($_POST['seo_google_analytics'], 'UTF-8', 1, 0);
+			// GA4 : identifiant G-XXXXXXXXXX seulement (Universal Analytics UA- arrêté par Google)
+			$seo_google_analytics         = sbGa4Id($_POST['seo_google_analytics'] ?? '');
+			$ga_refused                   = $seo_google_analytics === '' && trim((string) ($_POST['seo_google_analytics'] ?? '')) !== '';
 			
 			// --- EDIT
 			// UPDATE DATAS
@@ -722,7 +662,8 @@ switch($action) {
 			
 			if ($result_keywords && $result_description && $result_robots && $result_rating && $result_author && $result_copyright && $result_generator && $result_google_site_verification && $result_google_analytics) {
 				// --- Message SUCCES
-				$sb_msg_valid = 'SEO modifié avec succès';
+				if ($ga_refused) $sb_msg_error = 'SEO modifié, mais identifiant Google Analytics refusé (attendu : G-XXXXXXXXXX, Google Analytics 4) : champ vidé';
+				else $sb_msg_valid = 'SEO modifié avec succès';
 			} else {
 				// --- Message ERROR
 				$sb_msg_error = 'Error: Write Error (EDIT)!';
@@ -812,7 +753,8 @@ switch($action) {
 		// -----------------------------------
 		// Meta Tag (Google Analytics)
 		// -----------------------------------
-		$sbform->addInput('text', 'Meta Google Analytics', array ('name' => 'seo_google_analytics', 'value' => "{$cs['seo-google-analytics']}", 'placeholder' => "Meta Google Analytics"), false, false, "La Méta Google Google Analytics vous permet d'effectuer le suivi du trafic de votre site sur l'outil fournit par Google Analytics. Indiquer seulement le code fournit en <span style='color: red'>rouge</span> sous cette forme UA-<span style='color: red'>xxxxxxx-x</span>");
+		$ga_old = ($cs['seo-google-analytics'] ?? '') !== '' && sbGa4Id($cs['seo-google-analytics']) === '';
+		$sbform->addInput('text', 'Google Analytics 4', array ('name' => 'seo_google_analytics', 'value' => "{$cs['seo-google-analytics']}", 'placeholder' => "G-XXXXXXXXXX"), false, false, "Identifiant de mesure Google Analytics 4 (GA4 &gt; Admin &gt; Flux de données), sous cette forme <span style='color: red'>G-XXXXXXXXXX</span>. Avec le plugin Consentement actif, Google Analytics n'est chargé qu'après accord du visiteur." . ($ga_old ? "<p><button type='button' class='btn btn--danger btn--sm'>Ancien identifiant Universal Analytics (UA-) : service arrêté par Google, plus utilisé. Saisissez votre identifiant G-</button></p>" : ""));
 		// --------------------------------
 		// --- Hiddens / Buttons
 		// --------------------------------	

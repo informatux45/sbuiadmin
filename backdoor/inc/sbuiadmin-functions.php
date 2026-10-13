@@ -65,6 +65,17 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
+/** Identifiant Google Analytics 4 (G-XXXXXXXXXX), '' si invalide
+ * Même fonction dans inc/functions.php (front) et
+ * backdoor/inc/sbuiadmin-functions.php (admin).
+============================================== */
+if (!function_exists("sbGa4Id")) {
+	function sbGa4Id($id) {
+		$id = strtoupper(trim(html_entity_decode(strip_tags((string) $id), ENT_QUOTES, 'UTF-8')));
+		return preg_match('/^G-[A-Z0-9]{4,20}$/', $id) ? $id : '';
+	}
+}
+
 /** UTF8_ENCODE / UTF8_DECODE Deprecated for PHP8.2
 ============================================== */
 if (!function_exists("sb_utf8_encode")) {

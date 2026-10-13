@@ -85,10 +85,8 @@ $module_menu['cmsconfig']['li'][4]['title'] = SBUIADMIN_MENU_CMSCONFIG_MULTILANG
 $module_menu['cmsconfig']['li'][4]['link']  = "index.php?p=cmsconfig&op=multilang";
 $module_menu['cmsconfig']['li'][5]['title'] = SBUIADMIN_MENU_CMSCONFIG_PLUGINS;
 $module_menu['cmsconfig']['li'][5]['link']  = "index.php?p=cmsconfig&op=plugins";
-$module_menu['cmsconfig']['li'][6]['title'] = SBUIADMIN_MENU_CMSCONFIG_FONTS;
-$module_menu['cmsconfig']['li'][6]['link']  = "index.php?p=cmsconfig&op=fonts";
-$module_menu['cmsconfig']['li'][7]['title'] = SBUIADMIN_MENU_CMSCONFIG_SEO;
-$module_menu['cmsconfig']['li'][7]['link']  = "index.php?p=cmsconfig&op=seo";
+$module_menu['cmsconfig']['li'][6]['title'] = SBUIADMIN_MENU_CMSCONFIG_SEO;
+$module_menu['cmsconfig']['li'][6]['link']  = "index.php?p=cmsconfig&op=seo";
 
 $module_menu['menu']['main']  = SBUIADMIN_MENU_MENU;
 $module_menu['menu']['icon']  = "th-list";

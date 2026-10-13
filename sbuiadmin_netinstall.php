@@ -285,7 +285,6 @@ if ($do_install) {
     <meta name="description" content="SBUIADMIN, le CMS By INFORMATUX">
     <meta name="author" content="INFORMATUX">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <style>
         /* ── Reset minimal ── */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -303,8 +302,9 @@ if ($do_install) {
             --c-text:      #e6edf3;
             --c-muted:     #8b949e;
             --r:           12px;
-            --font-display: 'Space Grotesk', sans-serif;
-            --font-body:    'Inter', sans-serif;
+            /* Polices du système : fichier autonome, rien chargé chez Google (RGPD) */
+            --font-display: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            --font-body:    system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
         }
 
         body {

@@ -1,0 +1,146 @@
+/* Polices hébergées par le site (RGPD), copiées depuis Google Fonts par outils/sbuiadmin-fonts.php */
+/* https://fonts.googleapis.com/css?family=Oswald|Droid+Sans|Playfair+Display|Open+Sans+Condensed:300|Rokkitt|Shadows+Into+Light|Abel|Damion|Montez */
+/* latin */
+@font-face {
+	font-family: 'Abel';
+	font-style: normal;
+	font-weight: 400;
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+	font-display: swap;
+	src: url('../fonts/google/abel-400-latin.woff2') format('woff2');
+}
+/* latin-ext */
+@font-face {
+	font-family: 'Damion';
+	font-style: normal;
+	font-weight: 400;
+	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+	font-display: swap;
+	src: url('../fonts/google/damion-400-latin-ext.woff2') format('woff2');
+}
+/* latin */
+@font-face {
+	font-family: 'Damion';
+	font-style: normal;
+	font-weight: 400;
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+	font-display: swap;
+	src: url('../fonts/google/damion-400-latin.woff2') format('woff2');
+}
+/* latin */
+@font-face {
+	font-family: 'Droid Sans';
+	font-style: normal;
+	font-weight: 400;
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+	font-display: swap;
+	src: url('../fonts/google/droid-sans-400-latin.woff2') format('woff2');
+}
+/* latin-ext */
+@font-face {
+	font-family: 'Montez';
+	font-style: normal;
+	font-weight: 400;
+	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+	font-display: swap;
+	src: url('../fonts/google/montez-400-latin-ext.woff2') format('woff2');
+}
+/* latin */
+@font-face {
+	font-family: 'Montez';
+	font-style: normal;
+	font-weight: 400;
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+	font-display: swap;
+	src: url('../fonts/google/montez-400-latin.woff2') format('woff2');
+}
+/* latin-ext */
+@font-face {
+	font-family: 'Open Sans Condensed';
+	font-style: normal;
+	font-weight: 300;
+	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+	font-display: swap;
+	src: url('../fonts/google/open-sans-condensed-300-latin-ext.woff2') format('woff2');
+}
+/* latin */
+@font-face {
+	font-family: 'Open Sans Condensed';
+	font-style: normal;
+	font-weight: 300;
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+	font-display: swap;
+	src: url('../fonts/google/open-sans-condensed-300-latin.woff2') format('woff2');
+}
+/* latin-ext */
+@font-face {
+	font-family: 'Oswald';
+	font-style: normal;
+	font-weight: 400;
+	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+	font-display: swap;
+	src: url('../fonts/google/oswald-400-latin-ext.woff2') format('woff2');
+}
+/* latin */
+@font-face {
+	font-family: 'Oswald';
+	font-style: normal;
+	font-weight: 400;
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+	font-display: swap;
+	src: url('../fonts/google/oswald-400-latin.woff2') format('woff2');
+}
+/* latin-ext */
+@font-face {
+	font-family: 'Playfair Display';
+	font-style: normal;
+	font-weight: 400;
+	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+	font-display: swap;
+	src: url('../fonts/google/playfair-display-400-latin-ext.woff2') format('woff2');
+}
+/* latin */
+@font-face {
+	font-family: 'Playfair Display';
+	font-style: normal;
+	font-weight: 400;
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+	font-display: swap;
+	src: url('../fonts/google/playfair-display-400-latin.woff2') format('woff2');
+}
+/* latin-ext */
+@font-face {
+	font-family: 'Rokkitt';
+	font-style: normal;
+	font-weight: 400;
+	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+	font-display: swap;
+	src: url('../fonts/google/rokkitt-400-latin-ext.woff2') format('woff2');
+}
+/* latin */
+@font-face {
+	font-family: 'Rokkitt';
+	font-style: normal;
+	font-weight: 400;
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+	font-display: swap;
+	src: url('../fonts/google/rokkitt-400-latin.woff2') format('woff2');
+}
+/* latin-ext */
+@font-face {
+	font-family: 'Shadows Into Light';
+	font-style: normal;
+	font-weight: 400;
+	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+	font-display: swap;
+	src: url('../fonts/google/shadows-into-light-400-latin-ext.woff2') format('woff2');
+}
+/* latin */
+@font-face {
+	font-family: 'Shadows Into Light';
+	font-style: normal;
+	font-weight: 400;
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+	font-display: swap;
+	src: url('../fonts/google/shadows-into-light-400-latin.woff2') format('woff2');
+}

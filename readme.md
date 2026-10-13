@@ -69,6 +69,11 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
+**4.23**
+- Google Analytics 4 (G-) instead of Universal Analytics, Google verification meta fixed
+- Google Fonts served locally by the themes, CMS config > Fonts removed
+- Pinkrio: ColorBox no longer opens by itself (jQuery 4)
+
 **4.22**
 - Activebox, Editorial and Volton themes: local jQuery 4, Waypoints 4.0.1
 - Shorter help.txt and changelog

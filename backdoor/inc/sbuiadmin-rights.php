@@ -79,7 +79,6 @@ function sbGetRightsSubmodules() {
 			'comingsoon'   => 'Maintenance',
 			'multilang'    => 'Multilingue',
 			'plugins'      => 'Plugins',
-			'fonts'        => 'Polices',
 			'seo'          => 'SEO',
 		),
 	);
@@ -286,7 +285,7 @@ function sbClassifyAction($module) {
 		'menu'      => array('sort' => 'edit'),
 		'blocs'     => array('sort' => 'edit', 'sortmod' => 'edit'),
 		'sandbox'   => array('sort' => 'edit'),
-		'cmsconfig' => array('headerfooter' => 'edit', 'css' => 'edit', 'javascript' => 'edit', 'comingsoon' => 'edit', 'multilang' => 'edit', 'plugins' => 'edit', 'fonts' => 'edit', 'seo' => 'edit'),
+		'cmsconfig' => array('headerfooter' => 'edit', 'css' => 'edit', 'javascript' => 'edit', 'comingsoon' => 'edit', 'multilang' => 'edit', 'plugins' => 'edit', 'seo' => 'edit'),
 	);
 	if (isset($overrides[$module][$action])) {
 		$classified = $overrides[$module][$action];

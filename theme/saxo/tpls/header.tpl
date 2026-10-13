@@ -8,9 +8,8 @@
 	<!-- Title -->
 	<title>{insert name=sbGetPageTitle pti="{$sb_title}" mti="{$sb_pages_title}"} {$sb_site_title|default:""}</title>
 	<!-- FONTs -->
-	<link href='https://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="{$smarty.const.SB_THEME_URL}css/sbfonts.css">
 	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-	{insert name="sbGetFonts"}
 	<!-- CSS -->
 	<link rel="stylesheet" href="{$smarty.const.SB_THEME_URL}css/bootstrap.css">
 	<link rel="stylesheet" href="{$smarty.const.SB_THEME_URL}css/bootstrap-responsive.css">
