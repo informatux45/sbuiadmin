@@ -598,12 +598,30 @@ function sb_strftime($format, $timestamp = null) {
  * est simplement ignorée. Ajouter ici tout nouveau modificateur.
  * @param Smarty $smarty
  */
+// IP bloquée ou flood : redirige vers la page 403.html à la racine du site
+// (une redirection relative visait backdoor/403.html depuis l'admin, ou un
+// faux dossier avec la réécriture d'URL) et arrête le script
+if (!function_exists('sbForbiddenRedirect')) {
+	function sbForbiddenRedirect() {
+		$base = function_exists('sbSetting') ? (string) sbSetting('site_url') : (defined('SB_URL') ? (string) SB_URL : '');
+		$url  = preg_match('#^https?://#i', $base) ? rtrim($base, '/') . '/403.html' : '/403.html';
+		if (!headers_sent()) {
+			header('Cache-Control: no-store');
+			header('Location: ' . $url, true, 302);
+		}
+		exit;
+	}
+}
+
+// Font Awesome 7 : sbFaClass() (classes d'une icône, anciens noms FA4 acceptés)
+require_once __DIR__ . '/../../inc/sbfontawesome.php';
+
 function sbSmartyRegisterModifiers($smarty) {
 	$modifiers = array(
 		// PHP
 		'sprintf', 'strtoupper', 'ucfirst',
 		// SBUIADMIN
-		'sbCleanPageBuilderContent', 'sbDisplayMediaMime', 'sbDisplayMediaSize', 'sbFilename',
+		'sbCleanPageBuilderContent', 'sbDisplayMediaMime', 'sbFaClass', 'sbDisplayMediaSize', 'sbFilename',
 		'sbFileRealname', 'sbGetFileDocData', 'sbGetGravatar', 'sbGetIfIsImg', 'sbGetInfoImg',
 		'sbGetUserAvatar', 'sbGetUserGroup', 'sbModifiedFileTime', 'sbRewriteTags', 'sbToByteSize',
 	);
@@ -1313,7 +1331,7 @@ function sbGetMenuModule($param = '') {
 							$is_current_section = ($collapse_in != '') ? ' is-current' : '';
 							$ret_module_menu .= '<div class="nav-item-group' . $collapse_in . '" data-nav-group id="' . $module_name . '">';
 							$ret_module_menu .= '<a class="nav-link' . $is_current_section . '" href="javascript:void(0)" data-nav-toggle>';
-							$ret_module_menu .= '<i class="fa fa-' . $module_menu[$module_name]['icon'].' fa-fw"></i><span>'. $module_menu[$module_name]['main'] . '</span>';
+							$ret_module_menu .= '<i class="' . sbFaClass($module_menu[$module_name]['icon']) . ' fa-fw"></i><span>'. $module_menu[$module_name]['main'] . '</span>';
 							$ret_module_menu .= '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 18 6-6-6-6"/></svg>';
 							$ret_module_menu .= '</a>';
 							$ret_module_menu .= '<div class="nav-submenu">';
@@ -1367,7 +1385,7 @@ function sbGetMenuModule($param = '') {
 						} else {
 							// Flat item, no submenu
 							$ret_module_menu .= '<a class="nav-link' . $class_active . '" id="' . $module_name . '" href="index.php?p=' . $module_name . '">';
-							$ret_module_menu .= '<i class="fa fa-' . $module_menu[$module_name]['icon'].' fa-fw"></i><span>'. $module_menu[$module_name]['main'] . '</span>';
+							$ret_module_menu .= '<i class="' . sbFaClass($module_menu[$module_name]['icon']) . ' fa-fw"></i><span>'. $module_menu[$module_name]['main'] . '</span>';
 							$ret_module_menu .= '</a>';
 						}
 					}

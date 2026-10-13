@@ -383,7 +383,7 @@
 					{*<div class="col-lg-12">
 						<div class="panel panel-default">
 							<div class="panel-heading">
-								<span class="fa fa-list-alt fa-fw"></span> <strong>Trier les données du tableau &laquo; <span class="red">{$tabname}</span> &raquo;</strong>
+								<span class="fa-regular fa-rectangle-list fa-fw"></span> <strong>Trier les données du tableau &laquo; <span class="red">{$tabname}</span> &raquo;</strong>
 							</div>
 							<!-- /.panel-heading -->
 							<div class="panel-body">*}

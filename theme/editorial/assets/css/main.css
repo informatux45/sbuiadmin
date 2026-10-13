@@ -1,4 +1,4 @@
-@import url(font-awesome.min.css);
+@import url(fa4-icons.css);
 @import url("sbfonts.css");
 
 /*
@@ -2362,9 +2362,9 @@
 		.select-wrapper:before {
 			-moz-osx-font-smoothing: grayscale;
 			-webkit-font-smoothing: antialiased;
-			font-family: FontAwesome;
+			font-family: var(--sb-fa-family, "Font Awesome 7 Free");
 			font-style: normal;
-			font-weight: normal;
+			font-weight: var(--sb-fa-weight, 900);
 			text-transform: none !important;
 		}
 
@@ -2431,9 +2431,9 @@
 			input[type="radio"] + label:before {
 				-moz-osx-font-smoothing: grayscale;
 				-webkit-font-smoothing: antialiased;
-				font-family: FontAwesome;
+				font-family: var(--sb-fa-family, "Font Awesome 7 Free");
 				font-style: normal;
-				font-weight: normal;
+				font-weight: var(--sb-fa-weight, 900);
 				text-transform: none !important;
 			}
 
@@ -2532,10 +2532,20 @@
 		.icon:before {
 			-moz-osx-font-smoothing: grayscale;
 			-webkit-font-smoothing: antialiased;
-			font-family: FontAwesome;
+			font-family: var(--sb-fa-family, "Font Awesome 7 Free");
 			font-style: normal;
-			font-weight: normal;
+			font-weight: var(--sb-fa-weight, 900);
 			text-transform: none !important;
+			content: var(--fa);
+		}
+
+		.icon.brands, ul.contact li.brands {
+			--sb-fa-family: "Font Awesome 7 Brands";
+			--sb-fa-weight: 400;
+		}
+
+		.icon.regular, ul.contact li.regular {
+			--sb-fa-weight: 400;
 		}
 
 		.icon > .label {
@@ -2690,10 +2700,11 @@
 				ul.contact li:before {
 					-moz-osx-font-smoothing: grayscale;
 					-webkit-font-smoothing: antialiased;
-					font-family: FontAwesome;
+					font-family: var(--sb-fa-family, "Font Awesome 7 Free");
 					font-style: normal;
-					font-weight: normal;
+					font-weight: var(--sb-fa-weight, 900);
 					text-transform: none !important;
+					content: var(--fa);
 				}
 
 				ul.contact li:before {
@@ -3544,9 +3555,9 @@
 		#search form:before {
 			-moz-osx-font-smoothing: grayscale;
 			-webkit-font-smoothing: antialiased;
-			font-family: FontAwesome;
+			font-family: var(--sb-fa-family, "Font Awesome 7 Free");
 			font-style: normal;
-			font-weight: normal;
+			font-weight: var(--sb-fa-weight, 900);
 			text-transform: none !important;
 		}
 
@@ -3652,9 +3663,9 @@
 			#sidebar .toggle:before {
 				-moz-osx-font-smoothing: grayscale;
 				-webkit-font-smoothing: antialiased;
-				font-family: FontAwesome;
+				font-family: var(--sb-fa-family, "Font Awesome 7 Free");
 				font-style: normal;
-				font-weight: normal;
+				font-weight: var(--sb-fa-weight, 900);
 				text-transform: none !important;
 			}
 
@@ -4003,9 +4014,9 @@
 				#menu ul a.opener:before, #menu ul span.opener:before {
 					-moz-osx-font-smoothing: grayscale;
 					-webkit-font-smoothing: antialiased;
-					font-family: FontAwesome;
+					font-family: var(--sb-fa-family, "Font Awesome 7 Free");
 					font-style: normal;
-					font-weight: normal;
+					font-weight: var(--sb-fa-weight, 900);
 					text-transform: none !important;
 				}
 

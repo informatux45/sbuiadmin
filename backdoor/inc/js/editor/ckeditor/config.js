@@ -37,7 +37,8 @@ CKEDITOR.editorConfig = function( config ) {
 	// Add Code Snippet Plugin
 	// Add HTML5 Video / Audio Plugins
 	// Add Color Dialog Plugin
-	config.fontawesomePath = 'assets/bower_components/font-awesome/css/font-awesome.min.css';
+	// Font Awesome 7 Free (assets/fontawesome/ à la racine du site) + compatibilité des anciennes classes FA4
+	config.fontawesomePath = ['../assets/fontawesome/css/all.min.css?v=7.3.1', '../assets/fontawesome/css/v4-shims.min.css?v=7.3.1'];
 	config.extraPlugins = 'lineutils,colordialog,ckawesome,justify,youtube,panelbutton,floatpanel,colorbutton,image2,codesnippet,html5video,html5audio';
     config.allowedContent = true;
 	// -----------------------------------------------------

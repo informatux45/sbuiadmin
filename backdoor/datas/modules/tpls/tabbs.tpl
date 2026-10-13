@@ -53,7 +53,7 @@
 					<div class="card-head">
 						<div class="card-title-wrap">
 							<h2 class="card-title">
-								<a href="#" onclick="document.getElementById('collapse').classList.toggle('is-open'); return false;" style="color:inherit"><i class="fa fa-arrow-circle-down"></i> &nbsp;&nbsp;Que fait TABBS ?</a>
+								<a href="#" onclick="document.getElementById('collapse').classList.toggle('is-open'); return false;" style="color:inherit"><i class="fa-solid fa-circle-arrow-down"></i> &nbsp;&nbsp;Que fait TABBS ?</a>
 							</h2>
 						</div>
 					</div>

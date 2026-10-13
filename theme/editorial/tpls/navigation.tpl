@@ -31,11 +31,11 @@
 									</header>
 									{*<p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>*}
 									<ul class="contact">
-                                        <li class="fa-globe">
+                                        <li class="fa-earth-americas">
                                             {$sb_site_title|default:""}
                                         </li>
 										{if $sb_theme_infos.theme_infos_email}
-                                        <li class="fa-envelope-o">
+                                        <li class="regular fa-envelope">
                                             <a href="mailto:{$sb_theme_infos.theme_infos_email|escape:'mail'}">{$sb_theme_infos.theme_infos_email|escape:'mail'}</a>
                                         </li>
                                         {/if}
@@ -45,7 +45,7 @@
                                         </li>
                                         {/if}
                                         {if $sb_theme_infos.theme_infos_address}
-										<li class="fa-home">
+										<li class="fa-house">
                                             {$sb_theme_infos.theme_infos_address|@nl2br}
                                         </li>
                                         {/if}

@@ -62,7 +62,7 @@ function shortcode_sbdownload($param = '') {
 					$item_html .= '</span>';
 					$item_html .= '<span class="file">'.$title.'</span>';
 					$item_html .= '<br>';
-					$item_html .= '<span class="count"><span style="padding-right: 2px; color: #8F8DD8;"><i class="fa fa-download"></i></span>'.$downloaded.'</span>';
+					$item_html .= '<span class="count"><span style="padding-right: 2px; color: #8F8DD8;"><i class="fa-solid fa-download"></i></span>'.$downloaded.'</span>';
 					$item_html .= '<span class="size">'.$size.'</span>';
 				$item_html .= '</button>';
 			$item_html .= '</a>';

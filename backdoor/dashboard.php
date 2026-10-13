@@ -539,7 +539,7 @@ switch ($action) {
 		foreach ($sb_type_options as $sb_type_key => $sb_type_label) {
 			$sb_type_active = ($sb_type_key == $type) ? ' is-active' : '';
 			$sb_type_icon   = isset($sb_type_icons[$sb_type_key]) ? $sb_type_icons[$sb_type_key] : 'circle-o';
-			$sb_type_buttons .= '<button type="button" class="tab' . $sb_type_active . '" data-type-value="' . $sb_type_key . '"><i class="fa fa-' . $sb_type_icon . '"></i> ' . $sb_type_label . '</button>';
+			$sb_type_buttons .= '<button type="button" class="tab' . $sb_type_active . '" data-type-value="' . $sb_type_key . '"><i class="' . sbFaClass($sb_type_icon) . '"></i> ' . $sb_type_label . '</button>';
 		}
 		$sbform->addAnything(
 			'<div class="field"><label class="field-label form_required">Type de widget <span class="req">*</span></label>'

@@ -17,44 +17,44 @@
                     </address>
                     <ul class="social-icons">
 						{if $sb_theme_infos.theme_infos_facebook}<a href="{$sb_theme_infos.theme_infos_facebook}" class="fa-stack fa-2x" aria-hidden="true">
-							<i class="fa fa-square-o fa-stack-2x"></i>
-							<i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+							<i class="fa-regular fa-square fa-stack-2x"></i>
+							<i class="fa-brands fa-facebook-f fa-stack-1x fa-inverse"></i>
 						</a>{/if}
 						{if $sb_theme_infos.theme_infos_twitter}<a href="{$sb_theme_infos.theme_infos_twitter}" class="fa-stack fa-2x" aria-hidden="true">
-							<i class="fa fa-square-o fa-stack-2x"></i>
-							<i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+							<i class="fa-regular fa-square fa-stack-2x"></i>
+							<i class="fa-brands fa-twitter fa-stack-1x fa-inverse"></i>
 						</a>{/if}
 						{if $sb_theme_infos.theme_infos_google_plus}<a href="{$sb_theme_infos.theme_infos_google_plus}" class="fa-stack fa-2x" aria-hidden="true">
-							<i class="fa fa-square-o fa-stack-2x"></i>
-							<i class="fa fa-google fa-stack-1x fa-inverse"></i>
+							<i class="fa-regular fa-square fa-stack-2x"></i>
+							<i class="fa-brands fa-google fa-stack-1x fa-inverse"></i>
 						</a>{/if}
 						{if $sb_theme_infos.theme_infos_pinterest}<a href="{$sb_theme_infos.theme_infos_pinterest}" class="fa-stack fa-2x" aria-hidden="true">
-							<i class="fa fa-square-o fa-stack-2x"></i>
-							<i class="fa fa-pinterest fa-stack-1x fa-inverse"></i>
+							<i class="fa-regular fa-square fa-stack-2x"></i>
+							<i class="fa-brands fa-pinterest fa-stack-1x fa-inverse"></i>
 						</a>{/if}
 						{if $sb_theme_infos.theme_infos_instagram}<a href="{$sb_theme_infos.theme_infos_instagram}" class="fa-stack fa-2x" aria-hidden="true">
-							<i class="fa fa-square-o fa-stack-2x"></i>
-							<i class="fa fa-instagram fa-stack-1x fa-inverse"></i>
+							<i class="fa-regular fa-square fa-stack-2x"></i>
+							<i class="fa-brands fa-instagram fa-stack-1x fa-inverse"></i>
 						</a>{/if}
 						{if $sb_theme_infos.theme_infos_skype}<a href="{$sb_theme_infos.theme_infos_skype}" class="fa-stack fa-2x" aria-hidden="true">
-							<i class="fa fa-square-o fa-stack-2x"></i>
-							<i class="fa fa-skype fa-stack-1x fa-inverse"></i>
+							<i class="fa-regular fa-square fa-stack-2x"></i>
+							<i class="fa-brands fa-skype fa-stack-1x fa-inverse"></i>
 						</a>{/if}
 						{if $sb_theme_infos.theme_infos_viadeo}<a href="{$sb_theme_infos.theme_infos_viadeo}" class="fa-stack fa-2x" aria-hidden="true">
-							<i class="fa fa-square-o fa-stack-2x"></i>
-							<i class="fa fa-viadeo fa-stack-1x fa-inverse"></i>
+							<i class="fa-regular fa-square fa-stack-2x"></i>
+							<i class="fa-brands fa-viadeo fa-stack-1x fa-inverse"></i>
 						</a>{/if}
 						{if $sb_theme_infos.theme_infos_vimeo}<a href="{$sb_theme_infos.theme_infos_vimeo}" class="fa-stack fa-2x" aria-hidden="true">
-							<i class="fa fa-square-o fa-stack-2x"></i>
-							<i class="fa fa-vimeo fa-stack-1x fa-inverse"></i>
+							<i class="fa-regular fa-square fa-stack-2x"></i>
+							<i class="fa-brands fa-vimeo-v fa-stack-1x fa-inverse"></i>
 						</a>{/if}
 						{if $sb_theme_infos.theme_infos_youtube}<a href="{$sb_theme_infos.theme_infos_youtube}" class="fa-stack fa-2x" aria-hidden="true">
-							<i class="fa fa-square-o fa-stack-2x"></i>
-							<i class="fa fa-youtube fa-stack-1x fa-inverse"></i>
+							<i class="fa-regular fa-square fa-stack-2x"></i>
+							<i class="fa-brands fa-youtube fa-stack-1x fa-inverse"></i>
 						</a>{/if}
 						{if $sb_theme_infos.theme_infos_linkedin}<a href="{$sb_theme_infos.theme_infos_linkedin}" class="fa-stack fa-2x" aria-hidden="true">
-							<i class="fa fa-square-o fa-stack-2x"></i>
-							<i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+							<i class="fa-regular fa-square fa-stack-2x"></i>
+							<i class="fa-brands fa-linkedin-in fa-stack-1x fa-inverse"></i>
 						</a>{/if}
                     </ul>
                 </div>

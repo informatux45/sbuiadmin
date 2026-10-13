@@ -15,7 +15,7 @@
 				                                <span class="label">Name</span>
 				                                <br /><span class="sublabel">This is the name</span><br />
 				                                </label>
-				                                <div class="input-prepend"><span class="add-on"><i class="fa fa-user"></i></span><input type="text" name="name" id="name-contact-us" class="required" value="" /></div>
+				                                <div class="input-prepend"><span class="add-on"><i class="fa-solid fa-user"></i></span><input type="text" name="name" id="name-contact-us" class="required" value="" /></div>
 				                                <div class="msg-error"></div>
 				                            </li>
 				                            <li class="text-field">
@@ -23,14 +23,14 @@
 				                                <span class="label">Email</span>
 				                                <br /><span class="sublabel">This is a field email</span><br />
 				                                </label>
-				                                <div class="input-prepend"><span class="add-on"><i class="fa fa-envelope"></i></span><input type="text" name="email" id="email-contact-us" class="required email-validate" value="" /></div>
+				                                <div class="input-prepend"><span class="add-on"><i class="fa-solid fa-envelope"></i></span><input type="text" name="email" id="email-contact-us" class="required email-validate" value="" /></div>
 				                                <div class="msg-error"></div>
 				                            </li>
 				                            <li class="textarea-field">
 				                                <label for="message-contact-us">
 				                                <span class="label">Message</span>
 				                                </label>
-				                                <div class="input-prepend"><span class="add-on"><i class="fa fa-pencil"></i></span><textarea name="message" id="message-contact-us" rows="8" cols="30" class="required"></textarea></div>
+				                                <div class="input-prepend"><span class="add-on"><i class="fa-solid fa-pencil"></i></span><textarea name="message" id="message-contact-us" rows="8" cols="30" class="required"></textarea></div>
 				                                <div class="msg-error"></div>
 				                            </li>
 				                            <li class="submit-button">
@@ -65,16 +65,16 @@
 				                <div class="sidebar-nav">
 				                    <ul>
 				                        <li>
-				                            <i class="fa fa-map-marker" style="color:#979797;font-size:20pxpx"></i> Location: PinkRio, 115  Avenue street - Italy
+				                            <i class="fa-solid fa-location-dot" style="color:#979797;font-size:20pxpx"></i> Location: PinkRio, 115  Avenue street - Italy
 				                        </li>
 				                        <li>
-				                            <i class="fa fa-phone" style="color:#979797;font-size:20pxpx"></i> Phone: 3471717174
+				                            <i class="fa-solid fa-phone" style="color:#979797;font-size:20pxpx"></i> Phone: 3471717174
 				                        </li>
 				                        <li>
-				                            <i class="fa fa-print" style="color:#979797;font-size:20pxpx"></i> Fax: +39 0035 356 765
+				                            <i class="fa-solid fa-print" style="color:#979797;font-size:20pxpx"></i> Fax: +39 0035 356 765
 				                        </li>
 				                        <li>
-				                            <i class="fa fa-envelope" style="color:#979797;font-size:20pxpx"></i> Email: pinkrio@yit.com
+				                            <i class="fa-solid fa-envelope" style="color:#979797;font-size:20pxpx"></i> Email: pinkrio@yit.com
 				                        </li>
 				                    </ul>
 				                </div>

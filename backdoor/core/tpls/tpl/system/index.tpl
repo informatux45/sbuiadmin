@@ -21,7 +21,7 @@
 				<a href="{$widget.link}" class="kpi-card c-{$widget.color}">
 					<div class="kpi-top">
 						<div class="kpi-identity">
-							<div class="kpi-icon {$widget.color}"><i class="fa fa-{$widget.icon}"></i></div>
+							<div class="kpi-icon {$widget.color}"><i class="{$widget.icon|sbFaClass}"></i></div>
 							<div class="kpi-label">{$widget.title|@sbDisplayLang}</div>
 						</div>
 						{if $widget.trend}
@@ -54,7 +54,7 @@
 					<div class="card-head">
 						<div class="card-title-wrap">
 							<span class="eyebrow">Récent</span>
-							<h2 class="card-title"><i class="fa fa-{$widget.icon} fa-fw" style="color:var(--{$widget.color})"></i> {$widget.title|@sbDisplayLang}</h2>
+							<h2 class="card-title"><i class="{$widget.icon|sbFaClass} fa-fw" style="color:var(--{$widget.color})"></i> {$widget.title|@sbDisplayLang}</h2>
 						</div>
 						<a class="card-action" href="{$widget.link}">Voir tout <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
 					</div>
@@ -76,7 +76,7 @@
 				<section class="col-4 card">
 					<div class="card-head">
 						<div class="card-title-wrap">
-							<h2 class="card-title">{if $widget.icon}<i class="fa fa-{$widget.icon} fa-fw" style="color:var(--{$widget.color})"></i> {/if}{$widget.title|@sbDisplayLang}</h2>
+							<h2 class="card-title">{if $widget.icon}<i class="{$widget.icon|sbFaClass} fa-fw" style="color:var(--{$widget.color})"></i> {/if}{$widget.title|@sbDisplayLang}</h2>
 						</div>
 						{if $widget.link}<a class="card-action" href="{$widget.link}">Voir tout <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>{/if}
 					</div>
@@ -87,7 +87,7 @@
 					<div class="card-head">
 						<div class="card-title-wrap">
 							<span class="eyebrow">Flux RSS</span>
-							<h2 class="card-title">{if $widget.icon}<i class="fa fa-{$widget.icon} fa-fw" style="color:var(--{$widget.color})"></i> {/if}{$widget.title|@sbDisplayLang}</h2>
+							<h2 class="card-title">{if $widget.icon}<i class="{$widget.icon|sbFaClass} fa-fw" style="color:var(--{$widget.color})"></i> {/if}{$widget.title|@sbDisplayLang}</h2>
 						</div>
 						{if $widget.link}<a class="card-action" href="{$widget.link}">Voir tout <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>{/if}
 					</div>
@@ -108,7 +108,7 @@
 				<section class="col-4 card">
 					<div class="card-head">
 						<div class="card-title-wrap">
-							<h2 class="card-title">{if $widget.icon}<i class="fa fa-{$widget.icon} fa-fw" style="color:var(--{$widget.color})"></i> {/if}{$widget.title|@sbDisplayLang}</h2>
+							<h2 class="card-title">{if $widget.icon}<i class="{$widget.icon|sbFaClass} fa-fw" style="color:var(--{$widget.color})"></i> {/if}{$widget.title|@sbDisplayLang}</h2>
 						</div>
 						{if $widget.link}<a class="card-action" href="{$widget.link}">Voir tout <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>{/if}
 					</div>
@@ -118,7 +118,7 @@
 				<section class="col-4 card">
 					<div class="card-head">
 						<div class="card-title-wrap">
-							<h2 class="card-title">{if $widget.icon}<i class="fa fa-{$widget.icon} fa-fw" style="color:var(--{$widget.color})"></i> {/if}{$widget.title|@sbDisplayLang}</h2>
+							<h2 class="card-title">{if $widget.icon}<i class="{$widget.icon|sbFaClass} fa-fw" style="color:var(--{$widget.color})"></i> {/if}{$widget.title|@sbDisplayLang}</h2>
 						</div>
 					</div>
 					{if $widget.lines}
@@ -133,7 +133,7 @@
 					<div class="card-head">
 						<div class="card-title-wrap">
 							<span class="eyebrow">Journaux</span>
-							<h2 class="card-title">{if $widget.icon}<i class="fa fa-{$widget.icon} fa-fw" style="color:var(--{$widget.color})"></i> {/if}{$widget.title|@sbDisplayLang}</h2>
+							<h2 class="card-title">{if $widget.icon}<i class="{$widget.icon|sbFaClass} fa-fw" style="color:var(--{$widget.color})"></i> {/if}{$widget.title|@sbDisplayLang}</h2>
 						</div>
 						<a class="card-action" href="{if $widget.link}{$widget.link}{else}index.php?p=logaccess{/if}">Voir tout <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
 					</div>

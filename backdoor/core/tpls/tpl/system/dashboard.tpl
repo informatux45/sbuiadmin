@@ -48,7 +48,7 @@
 											{foreach from=$all_widgets item=widget}
 												<tr class="data-row">
 													<td>{$widget.position}</td>
-													<td>{if $widget.icon}<i class="fa fa-{$widget.icon} fa-fw" style="color:var(--{$widget.color})"></i> {/if}{$widget.title|unescape:"htmlall"}</td>
+													<td>{if $widget.icon}<i class="{$widget.icon|sbFaClass} fa-fw" style="color:var(--{$widget.color})"></i> {/if}{$widget.title|unescape:"htmlall"}</td>
 													<td>{if isset($sb_type_options[$widget.type])}{$sb_type_options[$widget.type]}{else}{$widget.type}{/if}</td>
 													<td>
 														{if $widget.type == 'system'}

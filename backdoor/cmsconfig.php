@@ -389,7 +389,7 @@ switch($action) {
 		// --------------------------------
 		// Twitter
 		// --------------------------------	
-		$sbform->addInput('text', 'X (Twitter)', array ('name' => 'coming_soon_twitter', 'value' => $cs['coming-soon-twitter'], 'placeholder' => "Lien X (Twitter)", 'icon' => 'twitter'), false);
+		$sbform->addInput('text', 'X (Twitter)', array ('name' => 'coming_soon_twitter', 'value' => $cs['coming-soon-twitter'], 'placeholder' => "Lien X (Twitter)", 'icon' => 'fa-brands fa-x-twitter'), false);
 		// --------------------------------
 		// Youtube
 		// --------------------------------	

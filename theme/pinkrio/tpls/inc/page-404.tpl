@@ -19,7 +19,7 @@
 				                        <ul>
 				                            <li class="text-field" style="width: 100%">
 				                                <div class="input-prepend">
-													<span class="add-on"><i class="fa fa-search"></i></span>
+													<span class="add-on"><i class="fa-solid fa-magnifying-glass"></i></span>
 													<input name="name" id="search-submit" class="required" value="" type="text" placeholder="{$smarty.const._CMS_GLOBAL_SEARCH}">
 												</div>
 				                            </li>

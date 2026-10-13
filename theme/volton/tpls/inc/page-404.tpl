@@ -24,7 +24,7 @@
 											<input type="text" class="form-control" placeholder="Search">
 											<div class="input-group-btn">
 											  <button class="btn btn-default" type="submit">
-												<i class="fa fa-search"></i>
+												<i class="fa-solid fa-magnifying-glass"></i>
 											  </button>
 											</div>
 										  </div>

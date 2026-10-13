@@ -387,7 +387,7 @@ class form extends sanitize {
 				if ($isTextPrefix)
 					$chaineTemp .= '<span class="addon">' . substr($labelInputGroup, 1) . '</span>';
 				else
-					$chaineTemp .= '<span class="ico"><i class="fa fa-' . $labelInputGroup . '"></i></span>';
+					$chaineTemp .= '<span class="ico"><i class="' . sbFaClass($labelInputGroup) . '"></i></span>';
 			}
 
 			$chaineTemp .= '<input class="input" type="'.$elem.'" ';
@@ -445,8 +445,8 @@ class form extends sanitize {
 
 			$media_dir = (isset($dir) && $dir != '') ? $dir : _AM_MEDIAS_DIR;
 			
-			// Si icon1 present et si icon = photo
-			if ($labelInputGroup === 'photo') {				
+			// Si icon1 present et si icon = photo (ancien nom FA4 ou sa forme FA7)
+			if ($labelInputGroup === 'photo' || $labelInputGroup === 'fa-regular fa-image') {				
 				$media_class = ($photo || $photo != "") ? 'transfert-media-img-pictures-without' : 'transfert-media-img-pictures';
 				$media_photo = '<div id="' . $id . 'Thumb" class="' . $media_class . ' icon-transfert">';
 				if ($photo || $photo != "") {
@@ -758,7 +758,7 @@ class form extends sanitize {
 			if ($extra)
 				$chaineTemp .= '<li id="drag_' . $clef . '"  class="ui-state-default sortable-extra" > ' . $this->displayLang($val, $lang, $encode);
 			else
-				$chaineTemp .= '<li id="drag_' . $clef . '"  class="ui-state-default" ><i class="fa fa-sort sb-sort-i"></i> ' . $this->displayLang($val, $lang, $encode);
+				$chaineTemp .= '<li id="drag_' . $clef . '"  class="ui-state-default" ><i class="fa-solid fa-sort sb-sort-i"></i> ' . $this->displayLang($val, $lang, $encode);
 
 			$chaineTemp .= '<input type="hidden" value="' . $clef . '" name="drag[]">';
 			$chaineTemp .= '</li>';
@@ -895,7 +895,7 @@ class form extends sanitize {
 		$chaineTemp .= $this -> isRequired ($isRequired, $label, '', 'red', 'calendar');
 
 		// Show the form element
-		$chaineTemp .= '<span class="ico"><i class="fa fa-calendar"></i></span>';
+		$chaineTemp .= '<span class="ico"><i class="fa-solid fa-calendar-days"></i></span>';
 		$chaineTemp .= '<input class="input" type="'.$elem.'" ';
 
 		foreach ($this -> formElementArr[$cpt][$elem] as $clef => $val) {
@@ -1394,9 +1394,9 @@ class form extends sanitize {
 		// automatiquement à la soumission (voir pagebuilder.js).
 		$chaineTemp .= '<div class="navbar-page-builder navbar-inverse navbar-htmleditor" data-pagebuilder-target="' . $fieldId . '">
 							<div class="navbar-header">
-								<a class="navbar-brand"><i class="fa fa-magic"></i>&nbsp;&nbsp;Page Builder</a>
+								<a class="navbar-brand"><i class="fa-solid fa-wand-magic-sparkles"></i>&nbsp;&nbsp;Page Builder</a>
 								<a href="#" class="btn btn-default btn-xs" id="pbShowCode" data-pagebuilder-code-target="' . $fieldId . '">
-									<i class="fa fa-code"></i>&nbsp;Code généré
+									<i class="fa-solid fa-code"></i>&nbsp;Code généré
 								</a>
 							</div>
 						</div>';
@@ -1459,28 +1459,28 @@ class form extends sanitize {
 		// Page Builder NavBar (Box Elements)
 		$chaineTemp .= '<ul class="nav nav-list pagebuilder">
 							<li class="boxes" id="elmBase">
-								<div class="box box-element" data-type="paragraph"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings"  href="#" ><i class="fa fa-gear"></i></a> </span>
-									<div class="preview"> <i class="fa fa-font fa-2x"></i>
+								<div class="box box-element" data-type="paragraph"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings"  href="#" ><i class="fa-solid fa-gear"></i></a> </span>
+									<div class="preview"> <i class="fa-solid fa-font fa-2x"></i>
 										<div class="element-desc">Texte</div>
 									</div>
 									<div class="view">
 										<p>Lorem ipsum dolor sit amet, consectetur adipisci elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 									</div>
 								</div>
-								<div class="box box-element" data-type="image"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings"  href="#" ><i class="fa fa-gear"></i></a> </span>
-									<div class="preview"> <i class="fa fa-picture-o fa-2x"></i>
+								<div class="box box-element" data-type="image"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings"  href="#" ><i class="fa-solid fa-gear"></i></a> </span>
+									<div class="preview"> <i class="fa-regular fa-image fa-2x"></i>
 										<div class="element-desc">Image</div>
 									</div>
 									<div class="view"> <img id="" class="" title="Votre image" src="img/add-image.svg" width="130" height="130"> </div>
 								</div>
-								<div class="box box-element" data-type="button"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings"  href="#" ><i class="fa fa-gear"></i></a> </span>
-									<div class="preview"> <i class="fa  fa-hand-o-up fa-2x"></i>
+								<div class="box box-element" data-type="button"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings"  href="#" ><i class="fa-solid fa-gear"></i></a> </span>
+									<div class="preview"> <i class="fa-regular  fa-hand-point-up fa-2x"></i>
 										<div class="element-desc">Bouton</div>
 									</div>
 									<div class="view"> <a class="btn btn-default" href="#">Click Me !</a> </div>
 								</div>
-								<div class="box box-element" data-type="youtube"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings"  href="#" ><i class="fa fa-gear"></i></a> </span>
-									<div class="preview"> <i class="fa  fa fa-youtube-play  fa-2x"></i>
+								<div class="box box-element" data-type="youtube"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings"  href="#" ><i class="fa-solid fa-gear"></i></a> </span>
+									<div class="preview"> <i class="fa-brands  fa-youtube  fa-2x"></i>
 										<div class="element-desc">Youtube</div>
 									</div>
 									<div class="view">
@@ -1488,42 +1488,42 @@ class form extends sanitize {
 									</div>
 								</div>
 								<!-- Vimeo -->
-								<div class="box box-element" data-type="youtube"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings"  href="#" ><i class="fa fa-gear"></i></a> </span>
-									<div class="preview"> <i class="fa  fa-vimeo-square fa-2x"></i>
+								<div class="box box-element" data-type="youtube"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings"  href="#" ><i class="fa-solid fa-gear"></i></a> </span>
+									<div class="preview"> <i class="fa-brands  fa-square-vimeo fa-2x"></i>
 										<div class="element-desc">Vimeo</div>
 									</div>
 									<div class="view">
 										<iframe class="img-responsive" src="https://player.vimeo.com/video/20016963?byline=0&portrait=0" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
 									</div>
 								</div>
-								<div class="box box-element" data-type="map"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings"  href="#" ><i class="fa fa-gear"></i></a> </span>
-									<div class="preview"> <i class="fa fa-map-marker fa-2x"></i>
+								<div class="box box-element" data-type="map"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings"  href="#" ><i class="fa-solid fa-gear"></i></a> </span>
+									<div class="preview"> <i class="fa-solid fa-location-dot fa-2x"></i>
 										<div class="element-desc">Carte</div>
 									</div>
 									<div class="view">
 										<div class="sb-pagebuilder-map" data-lat="48.8566" data-lng="2.3522" data-zoom="13" data-popup="" style="width: 100%; height: 300px;"></div>
 									</div>
 								</div>
-								<div class="box box-element" data-type="code"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#" ><i class="fa fa-gear"></i></a> </span>
-									<div class="preview"> <i class="fa fa-code fa-2x"></i>
+								<div class="box box-element" data-type="code"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#" ><i class="fa-solid fa-gear"></i></a> </span>
+									<div class="preview"> <i class="fa-solid fa-code fa-2x"></i>
 										<div class="element-desc">Code</div>
 									</div>
 									<div class="view"> Put your html code here </div>
 								</div>
-								<div class="box box-element" data-type="separator"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#" ><i class="fa fa-gear"></i></a> </span>
-									<div class="preview"> <i class="fa fa-minus fa-2x"></i>
+								<div class="box box-element" data-type="separator"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#" ><i class="fa-solid fa-gear"></i></a> </span>
+									<div class="preview"> <i class="fa-solid fa-minus fa-2x"></i>
 										<div class="element-desc">Séparateur</div>
 									</div>
 									<div class="view"> <hr class="sb-separator" style="border-top-style:solid;margin-top:20px;margin-bottom:20px;"> </div>
 								</div>
-								<div class="box box-element" data-type="icon"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#" ><i class="fa fa-gear"></i></a> </span>
-									<div class="preview"> <i class="fa fa-star fa-2x"></i>
+								<div class="box box-element" data-type="icon"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#" ><i class="fa-solid fa-gear"></i></a> </span>
+									<div class="preview"> <i class="fa-solid fa-star fa-2x"></i>
 										<div class="element-desc">Icône</div>
 									</div>
-									<div class="view"> <i class="sb-icon fa fa-star" style="font-size:32px;color:#333333;"></i> </div>
+									<div class="view"> <i class="sb-icon fa-solid fa-star" style="font-size:32px;color:#333333;"></i> </div>
 								</div>
-								<div class="box box-element" data-type="quote"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#" ><i class="fa fa-gear"></i></a> </span>
-									<div class="preview"> <i class="fa fa-quote-right fa-2x"></i>
+								<div class="box box-element" data-type="quote"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#" ><i class="fa-solid fa-gear"></i></a> </span>
+									<div class="preview"> <i class="fa-solid fa-quote-right fa-2x"></i>
 										<div class="element-desc">Citation</div>
 									</div>
 									<div class="view">
@@ -1533,8 +1533,8 @@ class form extends sanitize {
 										</blockquote>
 									</div>
 								</div>
-								<div class="box box-element" data-type="accordion"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#" ><i class="fa fa-gear"></i></a> </span>
-									<div class="preview"> <i class="fa fa-caret-square-o-down fa-2x"></i>
+								<div class="box box-element" data-type="accordion"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#" ><i class="fa-solid fa-gear"></i></a> </span>
+									<div class="preview"> <i class="fa-regular fa-square-caret-down fa-2x"></i>
 										<div class="element-desc">Accordéon</div>
 									</div>
 									<div class="view">
@@ -1554,8 +1554,8 @@ class form extends sanitize {
 										</div>
 									</div>
 								</div>
-								<div class="box box-element" data-type="tabs"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#" ><i class="fa fa-gear"></i></a> </span>
-									<div class="preview"> <i class="fa fa-folder-o fa-2x"></i>
+								<div class="box box-element" data-type="tabs"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#" ><i class="fa-solid fa-gear"></i></a> </span>
+									<div class="preview"> <i class="fa-regular fa-folder fa-2x"></i>
 										<div class="element-desc">Onglets</div>
 									</div>
 									<div class="view">
@@ -1571,8 +1571,8 @@ class form extends sanitize {
 										</div>
 									</div>
 								</div>
-								<div class="box box-element" data-type="gallery"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#" ><i class="fa fa-gear"></i></a> </span>
-									<div class="preview"> <i class="fa fa-th fa-2x"></i>
+								<div class="box box-element" data-type="gallery"> <a href="#close" class="remove btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a> <a class="drag btn btn-default btn-xs"><i class="glyphicon glyphicon-move"></i></a> <span class="configuration"> <a class="btn btn-xs btn-warning settings" href="#" ><i class="fa-solid fa-gear"></i></a> </span>
+									<div class="preview"> <i class="fa-solid fa-table-cells fa-2x"></i>
 										<div class="element-desc">Galerie</div>
 									</div>
 									<div class="view">
@@ -1666,7 +1666,7 @@ class form extends sanitize {
 											<i class="glyphicon glyphicon-move" title="Move"></i>
 										</a>
 										<a href="#" class="btn btn-info btn-xs clone" title="Clone">
-											<i class="fa fa-copy"></i>
+											<i class="fa-solid fa-copy"></i>
 										</a>'; 
 				break;
 			
@@ -1859,7 +1859,7 @@ $htmlpagebuilder = <<<EOT
 					<div id="image" style="display:none">
 						<div class="row">
 							<div class="col-md-5">
-								<div id="img-urlThumb" class="icon-transfert"> </div> <a class="btn btn-default form-control" href="#" onclick="sbOpenPopup('img-url', 'jpg,jpeg,jpe,png,gif,tif,tiff,bmp,ico,svg', '', ''); return false;"><i class="icon-upload-alt"></i>&nbsp;Choisir une image ...</a> </div>
+								<div id="img-urlThumb" class="icon-transfert"> </div> <a class="btn btn-default form-control" href="#" onclick="sbOpenPopup('img-url', 'jpg,jpeg,jpe,png,gif,tif,tiff,bmp,ico,svg', '', ''); return false;"><i class="fa-solid fa-upload"></i>&nbsp;Choisir une image ...</a> </div>
 							<div class="col-md-7">
 								<div class="form-group">
 									<label for="img-url">Url :</label>
@@ -2084,10 +2084,10 @@ $htmlpagebuilder = <<<EOT
 							<label for="icon-class">Icône :</label>
 							<!-- Réutilise le sélecteur d'icônes global de addIconFA()
 							     (icon-picker.js, chargé par scripts.tpl) - même
-							     convention de valeur stockée (nom brut sans préfixe
-							     "fa-", ex: "star"). -->
+							     convention de valeur stockée (classe FA7 complète,
+							     ex: "fa-solid fa-star"). -->
 							<div class="icon-picker-wrap">
-								<span class="icon-picker-preview" id="icon-classPreview"><i class="fa fa-fw fa-star"></i></span>
+								<span class="icon-picker-preview" id="icon-classPreview"><i class="fa-solid fa-fw fa-star"></i></span>
 								<input class="input" type="text" id="icon-class" readonly />
 								<button type="button" class="btn btn--ghost icon-picker-trigger" data-icon-popover-trigger="icon-class">Choisir</button>
 							</div>
@@ -2184,21 +2184,21 @@ $htmlpagebuilder = <<<EOT
 					<div id="accordion" style="display:none">
 						<div id="accordion-items"></div>
 						<button type="button" id="accordion-add" class="btn btn--ghost" style="margin-top:8px;">
-							<i class="fa fa-plus"></i>&nbsp;Ajouter une question
+							<i class="fa-solid fa-plus"></i>&nbsp;Ajouter une question
 						</button>
 					</div>
 					<!-- fine accordion -->
 					<div id="tabs" style="display:none">
 						<div id="tabs-items"></div>
 						<button type="button" id="tabs-add" class="btn btn--ghost" style="margin-top:8px;">
-							<i class="fa fa-plus"></i>&nbsp;Ajouter un onglet
+							<i class="fa-solid fa-plus"></i>&nbsp;Ajouter un onglet
 						</button>
 					</div>
 					<!-- fine tabs -->
 					<div id="gallery" style="display:none">
 						<div id="gallery-items"></div>
 						<button type="button" id="gallery-add" class="btn btn--ghost" style="margin-top:8px;">
-							<i class="fa fa-plus"></i>&nbsp;Ajouter une image
+							<i class="fa-solid fa-plus"></i>&nbsp;Ajouter une image
 						</button>
 					</div>
 					<!-- fine gallery -->
@@ -2423,8 +2423,8 @@ $htmlpagebuilder = <<<EOT
 		</div>
 	</div>
 	<div class="modal-footer">
-		<button type="button" class="btn btn-default" data-dismiss="modal"><i class='fa fa-close'></i>&nbsp;Fermer</button>
-		<button type="button" class="btn btn-success" id="applyChanges"><i class='fa fa-check'></i>&nbsp;Sauvegarder</button>
+		<button type="button" class="btn btn-default" data-dismiss="modal"><i class='fa-solid fa-xmark'></i>&nbsp;Fermer</button>
+		<button type="button" class="btn btn-success" id="applyChanges"><i class='fa-solid fa-check'></i>&nbsp;Sauvegarder</button>
 	</div>
 </div>
 EOT;
@@ -2524,11 +2524,11 @@ EOT;
 	/**
 	* Construct form (body)
 	* add a form element (Font Awesome icon picker : aperçu + champ texte +
-	* bouton ouvrant une grille filtrable de toutes les icônes du bundle FA
-	* embarqué, via le composant vanilla JS assets/adminator/icon-picker.js,
+	* bouton ouvrant une grille filtrable de toutes les icônes Font Awesome 7
+	* Free (assets/fontawesome/), via le composant vanilla JS assets/adminator/icon-picker.js,
 	* chargé globalement comme peek.js/modal.js). La valeur stockée/soumise
-	* reste le nom brut de l'icône (ex: "comments"), identique à ce
-	* qu'attendaient déjà tous les usages existants (<i class="fa fa-...">).
+	* est la classe Font Awesome 7 complète (ex: "fa-solid fa-comments") ;
+	* un ancien nom FA4 déjà en base ("comments") reste accepté (sbFaClass()).
 	* @return html code
 	*/
 	public function addIconFA ($label = '', $arrArgs = array (), $isRequired = false, $helpDsc = '') {
@@ -2559,7 +2559,7 @@ EOT;
 
 		// Show the form element
 		$chaineTemp .= '<div class="icon-picker-wrap">';
-		$chaineTemp .= '<span class="icon-picker-preview" id="' . $fieldId . 'Preview"><i class="fa fa-fw' . ($fieldValue != '' ? ' fa-' . $fieldValue : '') . '"></i></span>';
+		$chaineTemp .= '<span class="icon-picker-preview" id="' . $fieldId . 'Preview"><i class="fa-fw ' . sbFaClass($fieldValue) . '"></i></span>';
 		$chaineTemp .= '<input class="input" type="'.$elem.'" data-icon-picker id="' . $fieldId . '" ';
 
 		foreach ($this -> formElementArr[$cpt][$elem] as $clef => $val) {

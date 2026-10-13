@@ -17,10 +17,12 @@ CKEDITOR.plugins.add('ckawesome', {
     
     init: function(editor) {
     	var config = editor.config;
-    	editor.fontawesomePath = config.fontawesomePath ? config.fontawesomePath : CKEDITOR.plugins.getPath('ckawesome') + 'fontawesome/css/font-awesome.min.css';
-
-    	CKEDITOR.document.appendStyleSheet(editor.fontawesomePath);
-    	editor.addContentsCss(editor.fontawesomePath);
+    	// SBUIADMIN : une ou plusieurs feuilles Font Awesome (FA7 + v4-shims), voir config.js
+    	editor.fontawesomePath = [].concat(config.fontawesomePath || []);
+    	editor.fontawesomePath.forEach(function (path) {
+    		CKEDITOR.document.appendStyleSheet(path);
+    		editor.addContentsCss(path);
+    	});
     	
         CKEDITOR.dialog.add('ckawesomeDialog', this.path + 'dialogs/ckawesome.js');
         editor.addCommand( 'ckawesome', new CKEDITOR.dialogCommand( 'ckawesomeDialog', { allowedContent: 'span[class,style]{color,font-size}(*);' }));

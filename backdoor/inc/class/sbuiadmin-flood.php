@@ -153,15 +153,13 @@ class flood extends sql {
         // Limit All User
         if ((microtime ( true ) - $iptime) < $limitUser) {
             $this->insertNewIP($datas);
-            header("Location:403.html");
-            exit();
+            sbForbiddenRedirect();
         }
 
         // Limit All request
         if ((microtime ( true ) - $runtime) < $limitProcess) {
             $this->insertNewIP($datas);
-            header("Location:403.html");
-            exit();
+            sbForbiddenRedirect();
         }
 
         $this->memcache->set ( "floodControl", microtime ( true ) );

@@ -7,9 +7,18 @@
 /* Icon */
 
 	.icon {
-		@include icon;
+		@include icon(var(--fa));
 		border-bottom: none;
 		position: relative;
+
+		&.brands {
+			--sb-fa-family: "Font Awesome 7 Brands";
+			--sb-fa-weight: 400;
+		}
+
+		&.regular {
+			--sb-fa-weight: 400;
+		}
 
 		> .label {
 			display: none;

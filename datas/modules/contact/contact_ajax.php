@@ -134,13 +134,13 @@ switch($op) {
 				@$PHPMailer->ClearAddresses();
 				@$PHPMailer->ClearAttachments();
 				
-				echo '<div class="box success-ajax-msg"><i class="fa fa-check green response-ajax-msg" aria-hidden="true"></i> ' . _CMS_CONTACT_FORM_SUCCESS . '</div>';
+				echo '<div class="box success-ajax-msg"><i class="fa-solid fa-check green response-ajax-msg" aria-hidden="true"></i> ' . _CMS_CONTACT_FORM_SUCCESS . '</div>';
 
 			} else {
-				echo '<div class="box error-ajax-msg"><i class="fa fa-times red response-ajax-msg" aria-hidden="true"></i> ' . (($GLOBALS['sb_altcha_error'] == 'missing') ? _CMS_CONTACT_FORM_ERROR_CAPTCHA_EMPTY : _CMS_CONTACT_FORM_ERROR_CAPTCHA) . '</div>';
+				echo '<div class="box error-ajax-msg"><i class="fa-solid fa-xmark red response-ajax-msg" aria-hidden="true"></i> ' . (($GLOBALS['sb_altcha_error'] == 'missing') ? _CMS_CONTACT_FORM_ERROR_CAPTCHA_EMPTY : _CMS_CONTACT_FORM_ERROR_CAPTCHA) . '</div>';
 			}
 		} else {
-			echo '<div class="box error-ajax-msg"><i class="fa fa-times red response-ajax-msg" aria-hidden="true"></i> Form Submit Error </div>';
+			echo '<div class="box error-ajax-msg"><i class="fa-solid fa-xmark red response-ajax-msg" aria-hidden="true"></i> Form Submit Error </div>';
 		}
 		
 	break;

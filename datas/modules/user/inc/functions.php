@@ -44,7 +44,7 @@ function shortcode_sbuser($param = '') {
 	// --- LOGIN / PROFILE
 	if ($icon_menu) $user_html .= '<li class="' . $class_menu . '">';
 	$user_html .= '<a href="' . $login_url . '" class="' . $class_href . '" title="' . $login_text . '">';
-	$user_html .= '<i class="fa fa-user"></i>';
+	$user_html .= '<i class="fa-solid fa-user"></i>';
 	if ($icon_text) $user_html .= ' ' . $login_text;
 	$user_html .= '</a>';
 	if ($icon_menu) $user_html .= '</li>';
@@ -56,7 +56,7 @@ function shortcode_sbuser($param = '') {
 		else
 			$user_html .= '&nbsp;&nbsp;';
 		$user_html .= '<a href="' . $admin_url . '" class="' . $class_href . '" title="' . $admin_text . '">';
-		$user_html .= '<i class="fa fa-cogs"></i>';
+		$user_html .= '<i class="fa-solid fa-gears"></i>';
 		if ($icon_text) $user_html .= ' ' . $admin_text;
 		$user_html .= '</a>';
 		if ($icon_menu) $user_html .= '</li>';
@@ -70,7 +70,7 @@ function shortcode_sbuser($param = '') {
 		else
 			$user_html .= '&nbsp;&nbsp;';
 		$user_html .= '<a href="' . $logout_url . '" class="' . $class_href . '" title="' . $logout_text . '">';
-		$user_html .= '<i class="fa fa-lock"></i>';
+		$user_html .= '<i class="fa-solid fa-lock"></i>';
 		if ($icon_text) $user_html .= ' ' . $logout_text;
 		$user_html .= '</a>';		
 		if ($icon_menu) $user_html .= '</li>';

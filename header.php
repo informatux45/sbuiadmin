@@ -90,11 +90,13 @@ if (file_exists($sb_custom_path)) require_once($sb_custom_path);
 // ----------------------
 // Anti flood PROTECTION
 // ----------------------
-if (!file_exists(SBADMIN."/install.php")) {
+// --- Site installé : SBADMIN/install.php est toujours livré depuis 4.16 (simple
+// --- redirection vers l'installeur), le tester désactivait ce contrôle partout
+if (!function_exists('sbSiteInstalled') || sbSiteInstalled()) {
 	// --- Check if Blocked IP
 	$user_ip = sbGetUserIP();
 	$is_ip_blocked = sbIsBlockedIP($user_ip);
-	if (isset($is_ip_blocked) && $is_ip_blocked == $user_ip) header("Location:403.html");
+	if (isset($is_ip_blocked) && $is_ip_blocked == $user_ip) sbForbiddenRedirect();
 	// --- Check FLOOD : seulement si l'anti-flood est activé (Utilisateurs >
 	// --- IP bloquées > Paramètres), comme à la connexion admin. Il tournait
 	// --- dès que Memcache était présent : deux pages dans la même seconde

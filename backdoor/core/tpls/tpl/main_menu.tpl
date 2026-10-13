@@ -8,7 +8,7 @@
 {* Dashboard - Don't Remove this entry *}
 {* ----------------------------------- *}
 <a class="nav-link{if !isset($smarty.get.p) || $smarty.get.p == 'index'} is-active{/if}" href="index.php">
-	<i class="fa fa-dashboard fa-fw"></i>
+	<i class="fa-solid fa-gauge-high fa-fw"></i>
 	<span>Dashboard</span>
 </a>
 
@@ -17,7 +17,7 @@
 {* --------------------------------------------- *}
 {if $sb_sandbox == 1}
 <a class="nav-link{if isset($smarty.get.p) && $smarty.get.p == 'sandbox'} is-active{/if}" href="index.php?p=sandbox">
-	<i class="fa fa-ambulance fa-fw"></i>
+	<i class="fa-solid fa-truck-medical fa-fw"></i>
 	<span>Sandbox</span>
 </a>
 {/if}
@@ -25,7 +25,7 @@
 {if $sb_can_view_messages}
 <div class="nav-label">Communications</div>
 <a class="nav-link{if isset($smarty.get.p) && $smarty.get.p == 'messages'} is-active{/if}" href="index.php?p=messages">
-	<i class="fa fa-envelope fa-fw"></i>
+	<i class="fa-solid fa-envelope fa-fw"></i>
 	<span>Messages</span>
 	<span class="nav-badge pro sb-messages-badge" style="{if $sb_unread_messages <= 0}display:none{/if}">{$sb_unread_messages}</span>
 </a>

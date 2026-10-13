@@ -173,7 +173,7 @@
 									</a>
 								{else}
 									{insert name=sbFileOtherImg assign=other f=$sbmedia}
-									<span class="fa fa-{$other}-o fa-fw sbmedia-other"></span>
+									<span class="{"`$other`-o"|sbFaClass} fa-fw sbmedia-other"></span>
 								{/if}
 								
 								{* Display File name truncate *}
@@ -200,7 +200,7 @@
 								{* Display Delete Button *}
 								{if $sb_can_delete_medias}
 								<a class="sbmedia-delete" data-confirm="Sûr de vouloir supprimer ceci ?" type="button" href="{$module_short_url}&del={$sbmedia|escape:'url'}&t={$sb_csrf_token}{if $sb_medias_page > 1}&page={$sb_medias_page}{/if}">
-									<i class="fa fa-times"></i>
+									<i class="fa-solid fa-xmark"></i>
 								</a>
 								{/if}
 								

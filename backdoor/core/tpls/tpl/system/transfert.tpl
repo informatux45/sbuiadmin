@@ -104,7 +104,7 @@
 				<img src="thumb.php?src={$sbmedia}&size=x84" title="{$sbmedia|@sbFilename|@sbRewriteTags}" />
 			{else}
 				{insert name=sbFileOtherImg assign=other f=$sbmedia}
-				<span class="fa fa-{$other}-o fa-fw sbmedia-other"></span>
+				<span class="{"`$other`-o"|sbFaClass} fa-fw sbmedia-other"></span>
 			{/if}
 			
 			{* Display File name truncate *}

@@ -13,9 +13,9 @@
 
 		-moz-osx-font-smoothing: grayscale;
 		-webkit-font-smoothing: antialiased;
-		font-family: FontAwesome;
+		font-family: var(--sb-fa-family, "Font Awesome 7 Free");
 		font-style: normal;
-		font-weight: normal;
+		font-weight: var(--sb-fa-weight, 900);
 		text-transform: none !important;
 
 	}

@@ -35,8 +35,9 @@
     <link href="assets/adminator/fonts/fonts.css" rel="stylesheet">
     <link href="assets/adminator/style.css" rel="stylesheet">
 
-    <!-- Font Awesome (self-hosted, no CDN) — used for icons throughout the app -->
-    <link rel="stylesheet" href="assets/bower_components/font-awesome/css/font-awesome.min.css">
+    <!-- Font Awesome 7 Free (hébergé dans assets/fontawesome/ à la racine du site) + compatibilité des anciennes classes FA4 -->
+    <link rel="stylesheet" href="../assets/fontawesome/css/all.min.css?v=7.3.1">
+    <link rel="stylesheet" href="../assets/fontawesome/css/v4-shims.min.css?v=7.3.1">
 
     <!-- Adminator theme extension: grid gap-fills, third-party widget dark-mode skinning,
          and small custom classes ported from the removed sb-admin-2/sb-admin-custom stack -->

@@ -68,11 +68,20 @@
 			padding: 0;
 
 			li {
-				@include icon;
+				@include icon(var(--fa));
 				border-top: solid 1px _palette(border);
 				margin: 1.5em 0 0 0;
 				padding: 1.5em 0 0 3em;
 				position: relative;
+
+				&.brands {
+					--sb-fa-family: "Font Awesome 7 Brands";
+					--sb-fa-weight: 400;
+				}
+
+				&.regular {
+					--sb-fa-weight: 400;
+				}
 
 				&:before {
 					color: _palette(accent);

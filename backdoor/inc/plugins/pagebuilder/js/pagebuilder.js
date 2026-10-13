@@ -504,11 +504,11 @@ function sbOpenIconPopover(anchorBtn, onPick) {
     var grid = pop.find('.sb-icon-popover-grid');
     function render(filter) {
         grid.empty();
-        icons.forEach(function (name) {
-            if (filter && name.indexOf(filter) === -1) return;
-            $('<button type="button" class="sb-icon-popover-item" title="' + name + '"><i class="fa fa-' + name + '"></i></button>')
+        icons.forEach(function (icon) {
+            if (!window.sbFaIconMatch(icon, filter)) return;
+            $('<button type="button" class="sb-icon-popover-item" title="' + icon.cls + '"><i class="' + icon.cls + '"></i></button>')
                 .on('click', function () {
-                    onPick(name);
+                    onPick(icon.cls);
                     sbCloseIconPopover();
                 })
                 .appendTo(grid);
@@ -539,7 +539,7 @@ $(document).on('click', '[data-icon-popover-trigger]', function (e) {
     var preview = $('#' + targetId + 'Preview');
     sbOpenIconPopover($(this), function (name) {
         input.val(name).trigger('change');
-        preview.html('<i class="fa fa-fw fa-' + name + '"></i>');
+        preview.html('<i class="fa-fw ' + window.sbFaClass(name) + '"></i>');
     });
 });
 
@@ -594,9 +594,9 @@ function sbBuildRepeaterEditor(container, items, opts) {
             '<div class="sb-repeater-item">' +
                 '<div class="sb-repeater-item-head">' +
                     '<input type="text" class="form-control sb-repeater-title" placeholder="' + opts.titlePlaceholder + '">' +
-                    '<button type="button" class="btn btn-default btn-xs sb-repeater-up" title="Monter"><i class="fa fa-arrow-up"></i></button>' +
-                    '<button type="button" class="btn btn-default btn-xs sb-repeater-down" title="Descendre"><i class="fa fa-arrow-down"></i></button>' +
-                    '<button type="button" class="btn btn-danger btn-xs sb-repeater-remove" title="Supprimer"><i class="fa fa-trash"></i></button>' +
+                    '<button type="button" class="btn btn-default btn-xs sb-repeater-up" title="Monter"><i class="fa-solid fa-arrow-up"></i></button>' +
+                    '<button type="button" class="btn btn-default btn-xs sb-repeater-down" title="Descendre"><i class="fa-solid fa-arrow-down"></i></button>' +
+                    '<button type="button" class="btn btn-danger btn-xs sb-repeater-remove" title="Supprimer"><i class="fa-solid fa-trash-can"></i></button>' +
                 '</div>' +
                 '<textarea class="form-control sb-repeater-content" rows="2" placeholder="' + opts.contentPlaceholder + '"></textarea>' +
             '</div>'
@@ -647,13 +647,13 @@ function sbBuildGalleryRepeaterEditor(container, items) {
         var row = $(
             '<div class="sb-repeater-item">' +
                 '<div class="sb-repeater-item-head">' +
-                    '<div class="sb-gallery-thumb"><div id="' + imgId + 'Thumb" class="icon-transfert"><i class="fa fa-picture-o"></i></div></div>' +
+                    '<div class="sb-gallery-thumb"><div id="' + imgId + 'Thumb" class="icon-transfert"><i class="fa-regular fa-image"></i></div></div>' +
                     '<input type="hidden" id="' + imgId + '" class="sb-gallery-url">' +
                     '<input type="text" class="form-control sb-gallery-caption" placeholder="Légende (optionnel)">' +
                     '<button type="button" class="btn btn-default btn-xs sb-gallery-browse">Parcourir</button>' +
-                    '<button type="button" class="btn btn-default btn-xs sb-repeater-up" title="Monter"><i class="fa fa-arrow-up"></i></button>' +
-                    '<button type="button" class="btn btn-default btn-xs sb-repeater-down" title="Descendre"><i class="fa fa-arrow-down"></i></button>' +
-                    '<button type="button" class="btn btn-danger btn-xs sb-repeater-remove" title="Supprimer"><i class="fa fa-trash"></i></button>' +
+                    '<button type="button" class="btn btn-default btn-xs sb-repeater-up" title="Monter"><i class="fa-solid fa-arrow-up"></i></button>' +
+                    '<button type="button" class="btn btn-default btn-xs sb-repeater-down" title="Descendre"><i class="fa-solid fa-arrow-down"></i></button>' +
+                    '<button type="button" class="btn btn-danger btn-xs sb-repeater-remove" title="Supprimer"><i class="fa-solid fa-trash-can"></i></button>' +
                 '</div>' +
             '</div>'
         );
@@ -1160,15 +1160,17 @@ function prepareEditor(part, row, column) {
 
         case 'icon':
             var iconEl = part.find('.sb-icon');
-            // Convention alignée sur addIconFA()/icon-picker.js : nom brut
-            // sans préfixe "fa-" (ex: "star") - le picker écrit/lit cette
-            // valeur telle quelle dans #icon-class.
-            var currentIconName = (iconEl.attr('class') || '').split(/\s+/).filter(function (c) {
-                return c.indexOf('fa-') === 0 && c !== 'fa-2x';
+            // Convention alignée sur addIconFA()/icon-picker.js : classe FA7
+            // complète (ex: "fa-solid fa-star") ; un ancien bloc FA4
+            // ("fa fa-star") est repris par son nom, affiché via v4-shims.
+            var iconClasses = (iconEl.attr('class') || '').split(/\s+/);
+            var iconStyle = iconClasses.filter(function (c) { return /^fa-(solid|regular|brands)$/.test(c); })[0];
+            var iconName = iconClasses.filter(function (c) {
+                return /^fa-[a-z0-9-]+$/.test(c) && !/^fa-(solid|regular|brands|fw|lg|[0-9]+x)$/.test(c);
             })[0];
-            currentIconName = currentIconName ? currentIconName.replace(/^fa-/, '') : 'star';
+            var currentIconName = iconName ? (iconStyle ? iconStyle + ' ' + iconName : iconName.replace(/^fa-/, '')) : 'fa-solid fa-star';
             $('#icon-class').val(currentIconName);
-            $('#icon-classPreview').html('<i class="fa fa-fw fa-' + currentIconName + '"></i>');
+            $('#icon-classPreview').html('<i class="fa-fw ' + window.sbFaClass(currentIconName) + '"></i>');
             $('#icon-size').val(parseInt(iconEl.css('font-size'), 10) || 32);
             $('#icon-color').val(iconEl.css('color'));
             $('#icon').show();
@@ -1177,8 +1179,8 @@ function prepareEditor(part, row, column) {
                 e.preventDefault();
                 saveRowSettings(row);
                 saveColumnSettings(column);
-                var newName = ($('#icon-class').val() || 'star').trim().replace(/^fa-/, '');
-                iconEl.attr('class', 'sb-icon fa fa-' + newName);
+                var newClass = window.sbFaClass($('#icon-class').val()) || 'fa-solid fa-star';
+                iconEl.attr('class', 'sb-icon ' + newClass);
                 iconEl.css('font-size', ($('#icon-size').val() || 32) + 'px');
                 iconEl.css('color', $('#icon-color').val());
                 $('#preferences').modal('hide');

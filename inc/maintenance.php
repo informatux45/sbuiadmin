@@ -73,7 +73,7 @@ function sbMaintenancePage() {
 	$email  = filter_var(html_entity_decode($g('coming-soon-email'), ENT_QUOTES, 'UTF-8'), FILTER_VALIDATE_EMAIL) ?: '';
 	$tel    = preg_replace('/[^0-9+]/', '', html_entity_decode($g('coming-soon-tel'), ENT_QUOTES, 'UTF-8'));
 	$social = array();
-	foreach (array('coming-soon-facebook' => array('facebook', 'Facebook'), 'coming-soon-twitter' => array('twitter', 'X (Twitter)'), 'coming-soon-youtube' => array('youtube', 'YouTube')) as $k => $info) {
+	foreach (array('coming-soon-facebook' => array('fa-brands fa-facebook-f', 'Facebook'), 'coming-soon-twitter' => array('fa-brands fa-x-twitter', 'X (Twitter)'), 'coming-soon-youtube' => array('fa-brands fa-youtube', 'YouTube')) as $k => $info) {
 		if ($url($g($k)) !== '') $social[] = array($url($g($k)), $info[0], $info[1]);
 	}
 	$has_about   = trim(strip_tags(html_entity_decode($g('coming-soon-text'), ENT_QUOTES, 'UTF-8'))) !== '';
@@ -90,7 +90,7 @@ function sbMaintenancePage() {
 
 	$social_html = '';
 	foreach ($social as $s) {
-		$social_html .= '<li><a href="' . htmlspecialchars($s[0], ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener" title="' . $s[2] . '"><i class="fa fa-' . $s[1] . '" aria-hidden="true"></i></a></li>';
+		$social_html .= '<li><a href="' . htmlspecialchars($s[0], ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener" title="' . $s[2] . '"><i class="' . $s[1] . '" aria-hidden="true"></i></a></li>';
 	}
 	$footer = '&copy; ' . $e($title) . ' ' . date('Y') . '. Tous droits r&eacute;serv&eacute;s.';
 	?>
@@ -105,7 +105,7 @@ function sbMaintenancePage() {
 <link href="<?php echo $assets; ?>css/style.css" rel="stylesheet">
 <link href="<?php echo $assets; ?>css/bootstrap.min.css" rel="stylesheet">
 <link href="<?php echo $assets; ?>css/responsive.css" rel="stylesheet">
-<link href="<?php echo $assets; ?>css/font-awesome.min.css" rel="stylesheet">
+<link href="<?php echo SB_URL; ?>assets/fontawesome/css/all.min.css?v=7.3.1" rel="stylesheet">
 <style>
 main[role="main-wrapper-iamge"],main[role="main-wrapper-iamge"] > .over-bg-color{background-image:url(<?php echo htmlspecialchars($image, ENT_QUOTES, 'UTF-8'); ?>);background-size:cover;background-position:50% 0;background-repeat:no-repeat;width:100%;height:100%;position:fixed}
 main[role="main-wrapper-iamge"] > .over-bg-color{background-color:rgba(255,255,255,0.5);background-image:none;padding:0}
@@ -154,8 +154,8 @@ main[role="video-container"]{position:relative;z-index:6}
 		  <header class="page-title"><h2>Contactez nous</h2></header>
 		  <?php if ($email !== '') { ?><h3><a href="mailto:<?php echo $e($email); ?>"><?php echo $e($email); ?></a></h3><?php } ?>
 		  <ul class="contact-infos">
-			<?php if ($g('coming-soon-address') !== '') { ?><li><i class="fa fa-map-marker" aria-hidden="true"></i> <?php echo $e($g('coming-soon-address')); ?></li><?php } ?>
-			<?php if ($tel !== '') { ?><li><i class="fa fa-phone" aria-hidden="true"></i> <a href="tel:<?php echo $e($tel); ?>"><?php echo $e($g('coming-soon-tel')); ?></a></li><?php } ?>
+			<?php if ($g('coming-soon-address') !== '') { ?><li><i class="fa-solid fa-location-dot" aria-hidden="true"></i> <?php echo $e($g('coming-soon-address')); ?></li><?php } ?>
+			<?php if ($tel !== '') { ?><li><i class="fa-solid fa-phone" aria-hidden="true"></i> <a href="tel:<?php echo $e($tel); ?>"><?php echo $e($g('coming-soon-tel')); ?></a></li><?php } ?>
 		  </ul>
 		</article>
 	  </section>

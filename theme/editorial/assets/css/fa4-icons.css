@@ -1,0 +1,626 @@
+/* Anciens noms d'icônes Font Awesome 4 (class="icon fa-xxx", ul.contact li.fa-xxx) vers Font Awesome 7,
+   générés depuis css/v4-shims.css de Font Awesome Free 7.3.1 (MIT). Voir .icon:before dans main.css. */
+.icon.fa-glass,ul.contact li.fa-glass{--fa:"\f000"}
+.icon.fa-envelope-o,ul.contact li.fa-envelope-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-envelope-o,ul.contact li.fa-envelope-o{--fa:"\f0e0"}
+.icon.fa-star-o,ul.contact li.fa-star-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-star-o,ul.contact li.fa-star-o{--fa:"\f005"}
+.icon.fa-remove,ul.contact li.fa-remove{--fa:"\f00d"}
+.icon.fa-close,ul.contact li.fa-close{--fa:"\f00d"}
+.icon.fa-gear,ul.contact li.fa-gear{--fa:"\f013"}
+.icon.fa-trash-o,ul.contact li.fa-trash-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-trash-o,ul.contact li.fa-trash-o{--fa:"\f2ed"}
+.icon.fa-home,ul.contact li.fa-home{--fa:"\f015"}
+.icon.fa-file-o,ul.contact li.fa-file-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-file-o,ul.contact li.fa-file-o{--fa:"\f15b"}
+.icon.fa-clock-o,ul.contact li.fa-clock-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-clock-o,ul.contact li.fa-clock-o{--fa:"\f017"}
+.icon.fa-arrow-circle-o-down,ul.contact li.fa-arrow-circle-o-down{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-arrow-circle-o-down,ul.contact li.fa-arrow-circle-o-down{--fa:"\f358"}
+.icon.fa-arrow-circle-o-up,ul.contact li.fa-arrow-circle-o-up{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-arrow-circle-o-up,ul.contact li.fa-arrow-circle-o-up{--fa:"\f35b"}
+.icon.fa-play-circle-o,ul.contact li.fa-play-circle-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-play-circle-o,ul.contact li.fa-play-circle-o{--fa:"\f144"}
+.icon.fa-repeat,ul.contact li.fa-repeat{--fa:"\f01e"}
+.icon.fa-rotate-right,ul.contact li.fa-rotate-right{--fa:"\f01e"}
+.icon.fa-refresh,ul.contact li.fa-refresh{--fa:"\f021"}
+.icon.fa-list-alt,ul.contact li.fa-list-alt{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-list-alt,ul.contact li.fa-list-alt{--fa:"\f022"}
+.icon.fa-dedent,ul.contact li.fa-dedent{--fa:"\f03b"}
+.icon.fa-video-camera,ul.contact li.fa-video-camera{--fa:"\f03d"}
+.icon.fa-picture-o,ul.contact li.fa-picture-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-picture-o,ul.contact li.fa-picture-o{--fa:"\f03e"}
+.icon.fa-photo,ul.contact li.fa-photo{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-photo,ul.contact li.fa-photo{--fa:"\f03e"}
+.icon.fa-image,ul.contact li.fa-image{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-image,ul.contact li.fa-image{--fa:"\f03e"}
+.icon.fa-map-marker,ul.contact li.fa-map-marker{--fa:"\f3c5"}
+.icon.fa-pencil-square-o,ul.contact li.fa-pencil-square-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-pencil-square-o,ul.contact li.fa-pencil-square-o{--fa:"\f044"}
+.icon.fa-edit,ul.contact li.fa-edit{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-edit,ul.contact li.fa-edit{--fa:"\f044"}
+.icon.fa-share-square-o,ul.contact li.fa-share-square-o{--fa:"\f14d"}
+.icon.fa-check-square-o,ul.contact li.fa-check-square-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-check-square-o,ul.contact li.fa-check-square-o{--fa:"\f14a"}
+.icon.fa-arrows,ul.contact li.fa-arrows{--fa:"\f0b2"}
+.icon.fa-times-circle-o,ul.contact li.fa-times-circle-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-times-circle-o,ul.contact li.fa-times-circle-o{--fa:"\f057"}
+.icon.fa-check-circle-o,ul.contact li.fa-check-circle-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-check-circle-o,ul.contact li.fa-check-circle-o{--fa:"\f058"}
+.icon.fa-mail-forward,ul.contact li.fa-mail-forward{--fa:"\f064"}
+.icon.fa-expand,ul.contact li.fa-expand{--fa:"\f424"}
+.icon.fa-compress,ul.contact li.fa-compress{--fa:"\f422"}
+.icon.fa-eye,ul.contact li.fa-eye{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-eye-slash,ul.contact li.fa-eye-slash{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-warning,ul.contact li.fa-warning{--fa:"\f071"}
+.icon.fa-calendar,ul.contact li.fa-calendar{--fa:"\f073"}
+.icon.fa-arrows-v,ul.contact li.fa-arrows-v{--fa:"\f338"}
+.icon.fa-arrows-h,ul.contact li.fa-arrows-h{--fa:"\f337"}
+.icon.fa-bar-chart,ul.contact li.fa-bar-chart{--fa:"\e0e3"}
+.icon.fa-bar-chart-o,ul.contact li.fa-bar-chart-o{--fa:"\e0e3"}
+.icon.fa-twitter-square,ul.contact li.fa-twitter-square{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-twitter-square,ul.contact li.fa-twitter-square{--fa:"\f081"}
+.icon.fa-facebook-square,ul.contact li.fa-facebook-square{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-facebook-square,ul.contact li.fa-facebook-square{--fa:"\f082"}
+.icon.fa-gears,ul.contact li.fa-gears{--fa:"\f085"}
+.icon.fa-thumbs-o-up,ul.contact li.fa-thumbs-o-up{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-thumbs-o-up,ul.contact li.fa-thumbs-o-up{--fa:"\f164"}
+.icon.fa-thumbs-o-down,ul.contact li.fa-thumbs-o-down{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-thumbs-o-down,ul.contact li.fa-thumbs-o-down{--fa:"\f165"}
+.icon.fa-heart-o,ul.contact li.fa-heart-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-heart-o,ul.contact li.fa-heart-o{--fa:"\f004"}
+.icon.fa-sign-out,ul.contact li.fa-sign-out{--fa:"\f2f5"}
+.icon.fa-linkedin-square,ul.contact li.fa-linkedin-square{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-linkedin-square,ul.contact li.fa-linkedin-square{--fa:"\f08c"}
+.icon.fa-thumb-tack,ul.contact li.fa-thumb-tack{--fa:"\f08d"}
+.icon.fa-external-link,ul.contact li.fa-external-link{--fa:"\f35d"}
+.icon.fa-sign-in,ul.contact li.fa-sign-in{--fa:"\f2f6"}
+.icon.fa-github-square,ul.contact li.fa-github-square{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-github-square,ul.contact li.fa-github-square{--fa:"\f092"}
+.icon.fa-lemon-o,ul.contact li.fa-lemon-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-lemon-o,ul.contact li.fa-lemon-o{--fa:"\f094"}
+.icon.fa-square-o,ul.contact li.fa-square-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-square-o,ul.contact li.fa-square-o{--fa:"\f0c8"}
+.icon.fa-bookmark-o,ul.contact li.fa-bookmark-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-bookmark-o,ul.contact li.fa-bookmark-o{--fa:"\f02e"}
+.icon.fa-twitter,ul.contact li.fa-twitter{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-facebook,ul.contact li.fa-facebook{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-facebook,ul.contact li.fa-facebook{--fa:"\f39e"}
+.icon.fa-facebook-f,ul.contact li.fa-facebook-f{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-facebook-f,ul.contact li.fa-facebook-f{--fa:"\f39e"}
+.icon.fa-github,ul.contact li.fa-github{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-credit-card,ul.contact li.fa-credit-card{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-feed,ul.contact li.fa-feed{--fa:"\f09e"}
+.icon.fa-hdd-o,ul.contact li.fa-hdd-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-hdd-o,ul.contact li.fa-hdd-o{--fa:"\f0a0"}
+.icon.fa-hand-o-right,ul.contact li.fa-hand-o-right{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-hand-o-right,ul.contact li.fa-hand-o-right{--fa:"\f0a4"}
+.icon.fa-hand-o-left,ul.contact li.fa-hand-o-left{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-hand-o-left,ul.contact li.fa-hand-o-left{--fa:"\f0a5"}
+.icon.fa-hand-o-up,ul.contact li.fa-hand-o-up{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-hand-o-up,ul.contact li.fa-hand-o-up{--fa:"\f0a6"}
+.icon.fa-hand-o-down,ul.contact li.fa-hand-o-down{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-hand-o-down,ul.contact li.fa-hand-o-down{--fa:"\f0a7"}
+.icon.fa-globe,ul.contact li.fa-globe{--fa:"\f57d"}
+.icon.fa-tasks,ul.contact li.fa-tasks{--fa:"\f828"}
+.icon.fa-arrows-alt,ul.contact li.fa-arrows-alt{--fa:"\f31e"}
+.icon.fa-group,ul.contact li.fa-group{--fa:"\f0c0"}
+.icon.fa-chain,ul.contact li.fa-chain{--fa:"\f0c1"}
+.icon.fa-cut,ul.contact li.fa-cut{--fa:"\f0c4"}
+.icon.fa-files-o,ul.contact li.fa-files-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-files-o,ul.contact li.fa-files-o{--fa:"\f0c5"}
+.icon.fa-floppy-o,ul.contact li.fa-floppy-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-floppy-o,ul.contact li.fa-floppy-o{--fa:"\f0c7"}
+.icon.fa-save,ul.contact li.fa-save{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-save,ul.contact li.fa-save{--fa:"\f0c7"}
+.icon.fa-navicon,ul.contact li.fa-navicon{--fa:"\f0c9"}
+.icon.fa-reorder,ul.contact li.fa-reorder{--fa:"\f0c9"}
+.icon.fa-magic,ul.contact li.fa-magic{--fa:"\e2ca"}
+.icon.fa-pinterest,ul.contact li.fa-pinterest{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-pinterest-square,ul.contact li.fa-pinterest-square{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-pinterest-square,ul.contact li.fa-pinterest-square{--fa:"\f0d3"}
+.icon.fa-google-plus-square,ul.contact li.fa-google-plus-square{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-google-plus-square,ul.contact li.fa-google-plus-square{--fa:"\f0d4"}
+.icon.fa-google-plus,ul.contact li.fa-google-plus{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-google-plus,ul.contact li.fa-google-plus{--fa:"\f0d5"}
+.icon.fa-money,ul.contact li.fa-money{--fa:"\f3d1"}
+.icon.fa-unsorted,ul.contact li.fa-unsorted{--fa:"\f0dc"}
+.icon.fa-sort-desc,ul.contact li.fa-sort-desc{--fa:"\f0dd"}
+.icon.fa-sort-asc,ul.contact li.fa-sort-asc{--fa:"\f0de"}
+.icon.fa-linkedin,ul.contact li.fa-linkedin{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-linkedin,ul.contact li.fa-linkedin{--fa:"\f0e1"}
+.icon.fa-rotate-left,ul.contact li.fa-rotate-left{--fa:"\f0e2"}
+.icon.fa-legal,ul.contact li.fa-legal{--fa:"\f0e3"}
+.icon.fa-tachometer,ul.contact li.fa-tachometer{--fa:"\f625"}
+.icon.fa-dashboard,ul.contact li.fa-dashboard{--fa:"\f625"}
+.icon.fa-comment-o,ul.contact li.fa-comment-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-comment-o,ul.contact li.fa-comment-o{--fa:"\f075"}
+.icon.fa-comments-o,ul.contact li.fa-comments-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-comments-o,ul.contact li.fa-comments-o{--fa:"\f086"}
+.icon.fa-flash,ul.contact li.fa-flash{--fa:"\f0e7"}
+.icon.fa-clipboard,ul.contact li.fa-clipboard{--fa:"\f0ea"}
+.icon.fa-lightbulb-o,ul.contact li.fa-lightbulb-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-lightbulb-o,ul.contact li.fa-lightbulb-o{--fa:"\f0eb"}
+.icon.fa-exchange,ul.contact li.fa-exchange{--fa:"\f362"}
+.icon.fa-cloud-download,ul.contact li.fa-cloud-download{--fa:"\f0ed"}
+.icon.fa-cloud-upload,ul.contact li.fa-cloud-upload{--fa:"\f0ee"}
+.icon.fa-bell-o,ul.contact li.fa-bell-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-bell-o,ul.contact li.fa-bell-o{--fa:"\f0f3"}
+.icon.fa-cutlery,ul.contact li.fa-cutlery{--fa:"\f2e7"}
+.icon.fa-file-text-o,ul.contact li.fa-file-text-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-file-text-o,ul.contact li.fa-file-text-o{--fa:"\f15c"}
+.icon.fa-building-o,ul.contact li.fa-building-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-building-o,ul.contact li.fa-building-o{--fa:"\f1ad"}
+.icon.fa-hospital-o,ul.contact li.fa-hospital-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-hospital-o,ul.contact li.fa-hospital-o{--fa:"\f0f8"}
+.icon.fa-tablet,ul.contact li.fa-tablet{--fa:"\f3fa"}
+.icon.fa-mobile,ul.contact li.fa-mobile{--fa:"\f3cd"}
+.icon.fa-mobile-phone,ul.contact li.fa-mobile-phone{--fa:"\f3cd"}
+.icon.fa-circle-o,ul.contact li.fa-circle-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-circle-o,ul.contact li.fa-circle-o{--fa:"\f111"}
+.icon.fa-mail-reply,ul.contact li.fa-mail-reply{--fa:"\f3e5"}
+.icon.fa-github-alt,ul.contact li.fa-github-alt{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-folder-o,ul.contact li.fa-folder-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-folder-o,ul.contact li.fa-folder-o{--fa:"\f07b"}
+.icon.fa-folder-open-o,ul.contact li.fa-folder-open-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-folder-open-o,ul.contact li.fa-folder-open-o{--fa:"\f07c"}
+.icon.fa-smile-o,ul.contact li.fa-smile-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-smile-o,ul.contact li.fa-smile-o{--fa:"\f118"}
+.icon.fa-frown-o,ul.contact li.fa-frown-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-frown-o,ul.contact li.fa-frown-o{--fa:"\f119"}
+.icon.fa-meh-o,ul.contact li.fa-meh-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-meh-o,ul.contact li.fa-meh-o{--fa:"\f11a"}
+.icon.fa-keyboard-o,ul.contact li.fa-keyboard-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-keyboard-o,ul.contact li.fa-keyboard-o{--fa:"\f11c"}
+.icon.fa-flag-o,ul.contact li.fa-flag-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-flag-o,ul.contact li.fa-flag-o{--fa:"\f024"}
+.icon.fa-mail-reply-all,ul.contact li.fa-mail-reply-all{--fa:"\f122"}
+.icon.fa-star-half-o,ul.contact li.fa-star-half-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-star-half-o,ul.contact li.fa-star-half-o{--fa:"\f5c0"}
+.icon.fa-star-half-empty,ul.contact li.fa-star-half-empty{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-star-half-empty,ul.contact li.fa-star-half-empty{--fa:"\f5c0"}
+.icon.fa-star-half-full,ul.contact li.fa-star-half-full{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-star-half-full,ul.contact li.fa-star-half-full{--fa:"\f5c0"}
+.icon.fa-code-fork,ul.contact li.fa-code-fork{--fa:"\f126"}
+.icon.fa-chain-broken,ul.contact li.fa-chain-broken{--fa:"\f127"}
+.icon.fa-unlink,ul.contact li.fa-unlink{--fa:"\f127"}
+.icon.fa-calendar-o,ul.contact li.fa-calendar-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-calendar-o,ul.contact li.fa-calendar-o{--fa:"\f133"}
+.icon.fa-maxcdn,ul.contact li.fa-maxcdn{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-html5,ul.contact li.fa-html5{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-css3,ul.contact li.fa-css3{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-unlock-alt,ul.contact li.fa-unlock-alt{--fa:"\f09c"}
+.icon.fa-minus-square-o,ul.contact li.fa-minus-square-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-minus-square-o,ul.contact li.fa-minus-square-o{--fa:"\f146"}
+.icon.fa-level-up,ul.contact li.fa-level-up{--fa:"\f3bf"}
+.icon.fa-level-down,ul.contact li.fa-level-down{--fa:"\f3be"}
+.icon.fa-pencil-square,ul.contact li.fa-pencil-square{--fa:"\f14b"}
+.icon.fa-external-link-square,ul.contact li.fa-external-link-square{--fa:"\f360"}
+.icon.fa-compass,ul.contact li.fa-compass{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-caret-square-o-down,ul.contact li.fa-caret-square-o-down{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-caret-square-o-down,ul.contact li.fa-caret-square-o-down{--fa:"\f150"}
+.icon.fa-toggle-down,ul.contact li.fa-toggle-down{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-toggle-down,ul.contact li.fa-toggle-down{--fa:"\f150"}
+.icon.fa-caret-square-o-up,ul.contact li.fa-caret-square-o-up{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-caret-square-o-up,ul.contact li.fa-caret-square-o-up{--fa:"\f151"}
+.icon.fa-toggle-up,ul.contact li.fa-toggle-up{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-toggle-up,ul.contact li.fa-toggle-up{--fa:"\f151"}
+.icon.fa-caret-square-o-right,ul.contact li.fa-caret-square-o-right{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-caret-square-o-right,ul.contact li.fa-caret-square-o-right{--fa:"\f152"}
+.icon.fa-toggle-right,ul.contact li.fa-toggle-right{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-toggle-right,ul.contact li.fa-toggle-right{--fa:"\f152"}
+.icon.fa-eur,ul.contact li.fa-eur{--fa:"\f153"}
+.icon.fa-euro,ul.contact li.fa-euro{--fa:"\f153"}
+.icon.fa-gbp,ul.contact li.fa-gbp{--fa:"\f154"}
+.icon.fa-usd,ul.contact li.fa-usd{--fa:"\$"}
+.icon.fa-dollar,ul.contact li.fa-dollar{--fa:"\$"}
+.icon.fa-inr,ul.contact li.fa-inr{--fa:"\e1bc"}
+.icon.fa-rupee,ul.contact li.fa-rupee{--fa:"\e1bc"}
+.icon.fa-jpy,ul.contact li.fa-jpy{--fa:"\f157"}
+.icon.fa-cny,ul.contact li.fa-cny{--fa:"\f157"}
+.icon.fa-rmb,ul.contact li.fa-rmb{--fa:"\f157"}
+.icon.fa-yen,ul.contact li.fa-yen{--fa:"\f157"}
+.icon.fa-rub,ul.contact li.fa-rub{--fa:"\f158"}
+.icon.fa-ruble,ul.contact li.fa-ruble{--fa:"\f158"}
+.icon.fa-rouble,ul.contact li.fa-rouble{--fa:"\f158"}
+.icon.fa-krw,ul.contact li.fa-krw{--fa:"\f159"}
+.icon.fa-won,ul.contact li.fa-won{--fa:"\f159"}
+.icon.fa-btc,ul.contact li.fa-btc{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-bitcoin,ul.contact li.fa-bitcoin{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-bitcoin,ul.contact li.fa-bitcoin{--fa:"\f15a"}
+.icon.fa-file-text,ul.contact li.fa-file-text{--fa:"\f15c"}
+.icon.fa-sort-alpha-asc,ul.contact li.fa-sort-alpha-asc{--fa:"\f15d"}
+.icon.fa-sort-alpha-desc,ul.contact li.fa-sort-alpha-desc{--fa:"\f881"}
+.icon.fa-sort-amount-asc,ul.contact li.fa-sort-amount-asc{--fa:"\f884"}
+.icon.fa-sort-amount-desc,ul.contact li.fa-sort-amount-desc{--fa:"\f160"}
+.icon.fa-sort-numeric-asc,ul.contact li.fa-sort-numeric-asc{--fa:"\f162"}
+.icon.fa-sort-numeric-desc,ul.contact li.fa-sort-numeric-desc{--fa:"\f886"}
+.icon.fa-youtube-square,ul.contact li.fa-youtube-square{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-youtube-square,ul.contact li.fa-youtube-square{--fa:"\f431"}
+.icon.fa-youtube,ul.contact li.fa-youtube{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-xing,ul.contact li.fa-xing{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-xing-square,ul.contact li.fa-xing-square{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-xing-square,ul.contact li.fa-xing-square{--fa:"\f169"}
+.icon.fa-youtube-play,ul.contact li.fa-youtube-play{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-youtube-play,ul.contact li.fa-youtube-play{--fa:"\f167"}
+.icon.fa-dropbox,ul.contact li.fa-dropbox{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-stack-overflow,ul.contact li.fa-stack-overflow{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-instagram,ul.contact li.fa-instagram{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-flickr,ul.contact li.fa-flickr{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-adn,ul.contact li.fa-adn{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-bitbucket,ul.contact li.fa-bitbucket{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-bitbucket-square,ul.contact li.fa-bitbucket-square{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-bitbucket-square,ul.contact li.fa-bitbucket-square{--fa:"\f171"}
+.icon.fa-tumblr,ul.contact li.fa-tumblr{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-tumblr-square,ul.contact li.fa-tumblr-square{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-tumblr-square,ul.contact li.fa-tumblr-square{--fa:"\f174"}
+.icon.fa-long-arrow-down,ul.contact li.fa-long-arrow-down{--fa:"\f309"}
+.icon.fa-long-arrow-up,ul.contact li.fa-long-arrow-up{--fa:"\f30c"}
+.icon.fa-long-arrow-left,ul.contact li.fa-long-arrow-left{--fa:"\f30a"}
+.icon.fa-long-arrow-right,ul.contact li.fa-long-arrow-right{--fa:"\f30b"}
+.icon.fa-apple,ul.contact li.fa-apple{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-windows,ul.contact li.fa-windows{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-android,ul.contact li.fa-android{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-linux,ul.contact li.fa-linux{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-dribbble,ul.contact li.fa-dribbble{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-skype,ul.contact li.fa-skype{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-foursquare,ul.contact li.fa-foursquare{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-trello,ul.contact li.fa-trello{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-gratipay,ul.contact li.fa-gratipay{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-gittip,ul.contact li.fa-gittip{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-gittip,ul.contact li.fa-gittip{--fa:"\f184"}
+.icon.fa-sun-o,ul.contact li.fa-sun-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-sun-o,ul.contact li.fa-sun-o{--fa:"\f185"}
+.icon.fa-moon-o,ul.contact li.fa-moon-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-moon-o,ul.contact li.fa-moon-o{--fa:"\f186"}
+.icon.fa-vk,ul.contact li.fa-vk{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-weibo,ul.contact li.fa-weibo{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-renren,ul.contact li.fa-renren{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-pagelines,ul.contact li.fa-pagelines{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-stack-exchange,ul.contact li.fa-stack-exchange{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-arrow-circle-o-right,ul.contact li.fa-arrow-circle-o-right{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-arrow-circle-o-right,ul.contact li.fa-arrow-circle-o-right{--fa:"\f35a"}
+.icon.fa-arrow-circle-o-left,ul.contact li.fa-arrow-circle-o-left{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-arrow-circle-o-left,ul.contact li.fa-arrow-circle-o-left{--fa:"\f359"}
+.icon.fa-caret-square-o-left,ul.contact li.fa-caret-square-o-left{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-caret-square-o-left,ul.contact li.fa-caret-square-o-left{--fa:"\f191"}
+.icon.fa-toggle-left,ul.contact li.fa-toggle-left{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-toggle-left,ul.contact li.fa-toggle-left{--fa:"\f191"}
+.icon.fa-dot-circle-o,ul.contact li.fa-dot-circle-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-dot-circle-o,ul.contact li.fa-dot-circle-o{--fa:"\f192"}
+.icon.fa-vimeo-square,ul.contact li.fa-vimeo-square{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-vimeo-square,ul.contact li.fa-vimeo-square{--fa:"\f194"}
+.icon.fa-try,ul.contact li.fa-try{--fa:"\e2bb"}
+.icon.fa-turkish-lira,ul.contact li.fa-turkish-lira{--fa:"\e2bb"}
+.icon.fa-plus-square-o,ul.contact li.fa-plus-square-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-plus-square-o,ul.contact li.fa-plus-square-o{--fa:"\f0fe"}
+.icon.fa-slack,ul.contact li.fa-slack{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-wordpress,ul.contact li.fa-wordpress{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-openid,ul.contact li.fa-openid{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-institution,ul.contact li.fa-institution{--fa:"\f19c"}
+.icon.fa-bank,ul.contact li.fa-bank{--fa:"\f19c"}
+.icon.fa-mortar-board,ul.contact li.fa-mortar-board{--fa:"\f19d"}
+.icon.fa-yahoo,ul.contact li.fa-yahoo{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-google,ul.contact li.fa-google{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-reddit,ul.contact li.fa-reddit{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-reddit-square,ul.contact li.fa-reddit-square{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-reddit-square,ul.contact li.fa-reddit-square{--fa:"\f1a2"}
+.icon.fa-stumbleupon-circle,ul.contact li.fa-stumbleupon-circle{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-stumbleupon,ul.contact li.fa-stumbleupon{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-delicious,ul.contact li.fa-delicious{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-digg,ul.contact li.fa-digg{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-pied-piper-pp,ul.contact li.fa-pied-piper-pp{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-pied-piper-alt,ul.contact li.fa-pied-piper-alt{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-drupal,ul.contact li.fa-drupal{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-joomla,ul.contact li.fa-joomla{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-behance,ul.contact li.fa-behance{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-behance-square,ul.contact li.fa-behance-square{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-behance-square,ul.contact li.fa-behance-square{--fa:"\f1b5"}
+.icon.fa-steam,ul.contact li.fa-steam{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-steam-square,ul.contact li.fa-steam-square{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-steam-square,ul.contact li.fa-steam-square{--fa:"\f1b7"}
+.icon.fa-automobile,ul.contact li.fa-automobile{--fa:"\f1b9"}
+.icon.fa-cab,ul.contact li.fa-cab{--fa:"\f1ba"}
+.icon.fa-spotify,ul.contact li.fa-spotify{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-deviantart,ul.contact li.fa-deviantart{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-soundcloud,ul.contact li.fa-soundcloud{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-file-pdf-o,ul.contact li.fa-file-pdf-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-file-pdf-o,ul.contact li.fa-file-pdf-o{--fa:"\f1c1"}
+.icon.fa-file-word-o,ul.contact li.fa-file-word-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-file-word-o,ul.contact li.fa-file-word-o{--fa:"\f1c2"}
+.icon.fa-file-excel-o,ul.contact li.fa-file-excel-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-file-excel-o,ul.contact li.fa-file-excel-o{--fa:"\f1c3"}
+.icon.fa-file-powerpoint-o,ul.contact li.fa-file-powerpoint-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-file-powerpoint-o,ul.contact li.fa-file-powerpoint-o{--fa:"\f1c4"}
+.icon.fa-file-image-o,ul.contact li.fa-file-image-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-file-image-o,ul.contact li.fa-file-image-o{--fa:"\f1c5"}
+.icon.fa-file-photo-o,ul.contact li.fa-file-photo-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-file-photo-o,ul.contact li.fa-file-photo-o{--fa:"\f1c5"}
+.icon.fa-file-picture-o,ul.contact li.fa-file-picture-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-file-picture-o,ul.contact li.fa-file-picture-o{--fa:"\f1c5"}
+.icon.fa-file-archive-o,ul.contact li.fa-file-archive-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-file-archive-o,ul.contact li.fa-file-archive-o{--fa:"\f1c6"}
+.icon.fa-file-zip-o,ul.contact li.fa-file-zip-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-file-zip-o,ul.contact li.fa-file-zip-o{--fa:"\f1c6"}
+.icon.fa-file-audio-o,ul.contact li.fa-file-audio-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-file-audio-o,ul.contact li.fa-file-audio-o{--fa:"\f1c7"}
+.icon.fa-file-sound-o,ul.contact li.fa-file-sound-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-file-sound-o,ul.contact li.fa-file-sound-o{--fa:"\f1c7"}
+.icon.fa-file-video-o,ul.contact li.fa-file-video-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-file-video-o,ul.contact li.fa-file-video-o{--fa:"\f1c8"}
+.icon.fa-file-movie-o,ul.contact li.fa-file-movie-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-file-movie-o,ul.contact li.fa-file-movie-o{--fa:"\f1c8"}
+.icon.fa-file-code-o,ul.contact li.fa-file-code-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-file-code-o,ul.contact li.fa-file-code-o{--fa:"\f1c9"}
+.icon.fa-vine,ul.contact li.fa-vine{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-codepen,ul.contact li.fa-codepen{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-jsfiddle,ul.contact li.fa-jsfiddle{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-life-bouy,ul.contact li.fa-life-bouy{--fa:"\f1cd"}
+.icon.fa-life-buoy,ul.contact li.fa-life-buoy{--fa:"\f1cd"}
+.icon.fa-life-saver,ul.contact li.fa-life-saver{--fa:"\f1cd"}
+.icon.fa-support,ul.contact li.fa-support{--fa:"\f1cd"}
+.icon.fa-circle-o-notch,ul.contact li.fa-circle-o-notch{--fa:"\f1ce"}
+.icon.fa-rebel,ul.contact li.fa-rebel{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-ra,ul.contact li.fa-ra{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-ra,ul.contact li.fa-ra{--fa:"\f1d0"}
+.icon.fa-resistance,ul.contact li.fa-resistance{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-resistance,ul.contact li.fa-resistance{--fa:"\f1d0"}
+.icon.fa-empire,ul.contact li.fa-empire{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-ge,ul.contact li.fa-ge{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-ge,ul.contact li.fa-ge{--fa:"\f1d1"}
+.icon.fa-git-square,ul.contact li.fa-git-square{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-git-square,ul.contact li.fa-git-square{--fa:"\f1d2"}
+.icon.fa-git,ul.contact li.fa-git{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-hacker-news,ul.contact li.fa-hacker-news{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-y-combinator-square,ul.contact li.fa-y-combinator-square{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-y-combinator-square,ul.contact li.fa-y-combinator-square{--fa:"\f1d4"}
+.icon.fa-yc-square,ul.contact li.fa-yc-square{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-yc-square,ul.contact li.fa-yc-square{--fa:"\f1d4"}
+.icon.fa-tencent-weibo,ul.contact li.fa-tencent-weibo{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-qq,ul.contact li.fa-qq{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-weixin,ul.contact li.fa-weixin{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-wechat,ul.contact li.fa-wechat{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-wechat,ul.contact li.fa-wechat{--fa:"\f1d7"}
+.icon.fa-send,ul.contact li.fa-send{--fa:"\f1d8"}
+.icon.fa-paper-plane-o,ul.contact li.fa-paper-plane-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-paper-plane-o,ul.contact li.fa-paper-plane-o{--fa:"\f1d8"}
+.icon.fa-send-o,ul.contact li.fa-send-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-send-o,ul.contact li.fa-send-o{--fa:"\f1d8"}
+.icon.fa-circle-thin,ul.contact li.fa-circle-thin{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-circle-thin,ul.contact li.fa-circle-thin{--fa:"\f111"}
+.icon.fa-header,ul.contact li.fa-header{--fa:"\f1dc"}
+.icon.fa-futbol-o,ul.contact li.fa-futbol-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-futbol-o,ul.contact li.fa-futbol-o{--fa:"\f1e3"}
+.icon.fa-soccer-ball-o,ul.contact li.fa-soccer-ball-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-soccer-ball-o,ul.contact li.fa-soccer-ball-o{--fa:"\f1e3"}
+.icon.fa-slideshare,ul.contact li.fa-slideshare{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-twitch,ul.contact li.fa-twitch{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-yelp,ul.contact li.fa-yelp{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-newspaper-o,ul.contact li.fa-newspaper-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-newspaper-o,ul.contact li.fa-newspaper-o{--fa:"\f1ea"}
+.icon.fa-paypal,ul.contact li.fa-paypal{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-google-wallet,ul.contact li.fa-google-wallet{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-cc-visa,ul.contact li.fa-cc-visa{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-cc-mastercard,ul.contact li.fa-cc-mastercard{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-cc-discover,ul.contact li.fa-cc-discover{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-cc-amex,ul.contact li.fa-cc-amex{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-cc-paypal,ul.contact li.fa-cc-paypal{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-cc-stripe,ul.contact li.fa-cc-stripe{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-bell-slash-o,ul.contact li.fa-bell-slash-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-bell-slash-o,ul.contact li.fa-bell-slash-o{--fa:"\f1f6"}
+.icon.fa-trash,ul.contact li.fa-trash{--fa:"\f2ed"}
+.icon.fa-copyright,ul.contact li.fa-copyright{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-eyedropper,ul.contact li.fa-eyedropper{--fa:"\f1fb"}
+.icon.fa-area-chart,ul.contact li.fa-area-chart{--fa:"\f1fe"}
+.icon.fa-pie-chart,ul.contact li.fa-pie-chart{--fa:"\f200"}
+.icon.fa-line-chart,ul.contact li.fa-line-chart{--fa:"\f201"}
+.icon.fa-lastfm,ul.contact li.fa-lastfm{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-lastfm-square,ul.contact li.fa-lastfm-square{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-lastfm-square,ul.contact li.fa-lastfm-square{--fa:"\f203"}
+.icon.fa-ioxhost,ul.contact li.fa-ioxhost{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-angellist,ul.contact li.fa-angellist{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-cc,ul.contact li.fa-cc{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-cc,ul.contact li.fa-cc{--fa:"\f20a"}
+.icon.fa-ils,ul.contact li.fa-ils{--fa:"\f20b"}
+.icon.fa-shekel,ul.contact li.fa-shekel{--fa:"\f20b"}
+.icon.fa-sheqel,ul.contact li.fa-sheqel{--fa:"\f20b"}
+.icon.fa-buysellads,ul.contact li.fa-buysellads{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-connectdevelop,ul.contact li.fa-connectdevelop{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-dashcube,ul.contact li.fa-dashcube{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-forumbee,ul.contact li.fa-forumbee{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-leanpub,ul.contact li.fa-leanpub{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-sellsy,ul.contact li.fa-sellsy{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-shirtsinbulk,ul.contact li.fa-shirtsinbulk{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-simplybuilt,ul.contact li.fa-simplybuilt{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-skyatlas,ul.contact li.fa-skyatlas{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-diamond,ul.contact li.fa-diamond{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-diamond,ul.contact li.fa-diamond{--fa:"\f3a5"}
+.icon.fa-transgender,ul.contact li.fa-transgender{--fa:"\f224"}
+.icon.fa-intersex,ul.contact li.fa-intersex{--fa:"\f224"}
+.icon.fa-transgender-alt,ul.contact li.fa-transgender-alt{--fa:"\f225"}
+.icon.fa-facebook-official,ul.contact li.fa-facebook-official{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-facebook-official,ul.contact li.fa-facebook-official{--fa:"\f09a"}
+.icon.fa-pinterest-p,ul.contact li.fa-pinterest-p{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-whatsapp,ul.contact li.fa-whatsapp{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-hotel,ul.contact li.fa-hotel{--fa:"\f236"}
+.icon.fa-viacoin,ul.contact li.fa-viacoin{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-medium,ul.contact li.fa-medium{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-y-combinator,ul.contact li.fa-y-combinator{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-yc,ul.contact li.fa-yc{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-yc,ul.contact li.fa-yc{--fa:"\f23b"}
+.icon.fa-optin-monster,ul.contact li.fa-optin-monster{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-opencart,ul.contact li.fa-opencart{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-expeditedssl,ul.contact li.fa-expeditedssl{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-battery-4,ul.contact li.fa-battery-4{--fa:"\f240"}
+.icon.fa-battery,ul.contact li.fa-battery{--fa:"\f240"}
+.icon.fa-battery-3,ul.contact li.fa-battery-3{--fa:"\f241"}
+.icon.fa-battery-2,ul.contact li.fa-battery-2{--fa:"\f242"}
+.icon.fa-battery-1,ul.contact li.fa-battery-1{--fa:"\f243"}
+.icon.fa-battery-0,ul.contact li.fa-battery-0{--fa:"\f244"}
+.icon.fa-object-group,ul.contact li.fa-object-group{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-object-ungroup,ul.contact li.fa-object-ungroup{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-sticky-note-o,ul.contact li.fa-sticky-note-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-sticky-note-o,ul.contact li.fa-sticky-note-o{--fa:"\f249"}
+.icon.fa-cc-jcb,ul.contact li.fa-cc-jcb{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-cc-diners-club,ul.contact li.fa-cc-diners-club{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-clone,ul.contact li.fa-clone{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-hourglass-o,ul.contact li.fa-hourglass-o{--fa:"\f254"}
+.icon.fa-hourglass-1,ul.contact li.fa-hourglass-1{--fa:"\f251"}
+.icon.fa-hourglass-2,ul.contact li.fa-hourglass-2{--fa:"\f252"}
+.icon.fa-hourglass-3,ul.contact li.fa-hourglass-3{--fa:"\f253"}
+.icon.fa-hand-rock-o,ul.contact li.fa-hand-rock-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-hand-rock-o,ul.contact li.fa-hand-rock-o{--fa:"\f255"}
+.icon.fa-hand-grab-o,ul.contact li.fa-hand-grab-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-hand-grab-o,ul.contact li.fa-hand-grab-o{--fa:"\f255"}
+.icon.fa-hand-paper-o,ul.contact li.fa-hand-paper-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-hand-paper-o,ul.contact li.fa-hand-paper-o{--fa:"\f256"}
+.icon.fa-hand-stop-o,ul.contact li.fa-hand-stop-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-hand-stop-o,ul.contact li.fa-hand-stop-o{--fa:"\f256"}
+.icon.fa-hand-scissors-o,ul.contact li.fa-hand-scissors-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-hand-scissors-o,ul.contact li.fa-hand-scissors-o{--fa:"\f257"}
+.icon.fa-hand-lizard-o,ul.contact li.fa-hand-lizard-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-hand-lizard-o,ul.contact li.fa-hand-lizard-o{--fa:"\f258"}
+.icon.fa-hand-spock-o,ul.contact li.fa-hand-spock-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-hand-spock-o,ul.contact li.fa-hand-spock-o{--fa:"\f259"}
+.icon.fa-hand-pointer-o,ul.contact li.fa-hand-pointer-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-hand-pointer-o,ul.contact li.fa-hand-pointer-o{--fa:"\f25a"}
+.icon.fa-hand-peace-o,ul.contact li.fa-hand-peace-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-hand-peace-o,ul.contact li.fa-hand-peace-o{--fa:"\f25b"}
+.icon.fa-registered,ul.contact li.fa-registered{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-creative-commons,ul.contact li.fa-creative-commons{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-gg,ul.contact li.fa-gg{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-gg-circle,ul.contact li.fa-gg-circle{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-odnoklassniki,ul.contact li.fa-odnoklassniki{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-odnoklassniki-square,ul.contact li.fa-odnoklassniki-square{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-odnoklassniki-square,ul.contact li.fa-odnoklassniki-square{--fa:"\f264"}
+.icon.fa-get-pocket,ul.contact li.fa-get-pocket{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-wikipedia-w,ul.contact li.fa-wikipedia-w{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-safari,ul.contact li.fa-safari{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-chrome,ul.contact li.fa-chrome{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-firefox,ul.contact li.fa-firefox{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-opera,ul.contact li.fa-opera{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-internet-explorer,ul.contact li.fa-internet-explorer{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-television,ul.contact li.fa-television{--fa:"\f26c"}
+.icon.fa-contao,ul.contact li.fa-contao{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-500px,ul.contact li.fa-500px{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-amazon,ul.contact li.fa-amazon{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-calendar-plus-o,ul.contact li.fa-calendar-plus-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-calendar-plus-o,ul.contact li.fa-calendar-plus-o{--fa:"\f271"}
+.icon.fa-calendar-minus-o,ul.contact li.fa-calendar-minus-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-calendar-minus-o,ul.contact li.fa-calendar-minus-o{--fa:"\f272"}
+.icon.fa-calendar-times-o,ul.contact li.fa-calendar-times-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-calendar-times-o,ul.contact li.fa-calendar-times-o{--fa:"\f273"}
+.icon.fa-calendar-check-o,ul.contact li.fa-calendar-check-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-calendar-check-o,ul.contact li.fa-calendar-check-o{--fa:"\f274"}
+.icon.fa-map-o,ul.contact li.fa-map-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-map-o,ul.contact li.fa-map-o{--fa:"\f279"}
+.icon.fa-commenting,ul.contact li.fa-commenting{--fa:"\f4ad"}
+.icon.fa-commenting-o,ul.contact li.fa-commenting-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-commenting-o,ul.contact li.fa-commenting-o{--fa:"\f4ad"}
+.icon.fa-houzz,ul.contact li.fa-houzz{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-vimeo,ul.contact li.fa-vimeo{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-vimeo,ul.contact li.fa-vimeo{--fa:"\f27d"}
+.icon.fa-black-tie,ul.contact li.fa-black-tie{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-fonticons,ul.contact li.fa-fonticons{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-reddit-alien,ul.contact li.fa-reddit-alien{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-edge,ul.contact li.fa-edge{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-credit-card-alt,ul.contact li.fa-credit-card-alt{--fa:"\f09d"}
+.icon.fa-codiepie,ul.contact li.fa-codiepie{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-modx,ul.contact li.fa-modx{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-fort-awesome,ul.contact li.fa-fort-awesome{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-usb,ul.contact li.fa-usb{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-product-hunt,ul.contact li.fa-product-hunt{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-mixcloud,ul.contact li.fa-mixcloud{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-scribd,ul.contact li.fa-scribd{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-pause-circle-o,ul.contact li.fa-pause-circle-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-pause-circle-o,ul.contact li.fa-pause-circle-o{--fa:"\f28b"}
+.icon.fa-stop-circle-o,ul.contact li.fa-stop-circle-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-stop-circle-o,ul.contact li.fa-stop-circle-o{--fa:"\f28d"}
+.icon.fa-bluetooth,ul.contact li.fa-bluetooth{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-bluetooth-b,ul.contact li.fa-bluetooth-b{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-gitlab,ul.contact li.fa-gitlab{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-wpbeginner,ul.contact li.fa-wpbeginner{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-wpforms,ul.contact li.fa-wpforms{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-envira,ul.contact li.fa-envira{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-wheelchair-alt,ul.contact li.fa-wheelchair-alt{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-wheelchair-alt,ul.contact li.fa-wheelchair-alt{--fa:"\f368"}
+.icon.fa-question-circle-o,ul.contact li.fa-question-circle-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-question-circle-o,ul.contact li.fa-question-circle-o{--fa:"\f059"}
+.icon.fa-volume-control-phone,ul.contact li.fa-volume-control-phone{--fa:"\f2a0"}
+.icon.fa-asl-interpreting,ul.contact li.fa-asl-interpreting{--fa:"\f2a3"}
+.icon.fa-deafness,ul.contact li.fa-deafness{--fa:"\f2a4"}
+.icon.fa-hard-of-hearing,ul.contact li.fa-hard-of-hearing{--fa:"\f2a4"}
+.icon.fa-glide,ul.contact li.fa-glide{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-glide-g,ul.contact li.fa-glide-g{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-signing,ul.contact li.fa-signing{--fa:"\f2a7"}
+.icon.fa-viadeo,ul.contact li.fa-viadeo{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-viadeo-square,ul.contact li.fa-viadeo-square{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-viadeo-square,ul.contact li.fa-viadeo-square{--fa:"\f2aa"}
+.icon.fa-snapchat,ul.contact li.fa-snapchat{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-snapchat-ghost,ul.contact li.fa-snapchat-ghost{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-snapchat-ghost,ul.contact li.fa-snapchat-ghost{--fa:"\f2ab"}
+.icon.fa-snapchat-square,ul.contact li.fa-snapchat-square{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-snapchat-square,ul.contact li.fa-snapchat-square{--fa:"\f2ad"}
+.icon.fa-pied-piper,ul.contact li.fa-pied-piper{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-first-order,ul.contact li.fa-first-order{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-yoast,ul.contact li.fa-yoast{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-themeisle,ul.contact li.fa-themeisle{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-google-plus-official,ul.contact li.fa-google-plus-official{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-google-plus-official,ul.contact li.fa-google-plus-official{--fa:"\f2b3"}
+.icon.fa-google-plus-circle,ul.contact li.fa-google-plus-circle{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-google-plus-circle,ul.contact li.fa-google-plus-circle{--fa:"\f2b3"}
+.icon.fa-font-awesome,ul.contact li.fa-font-awesome{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-fa,ul.contact li.fa-fa{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-fa,ul.contact li.fa-fa{--fa:"\f2b4"}
+.icon.fa-handshake-o,ul.contact li.fa-handshake-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-handshake-o,ul.contact li.fa-handshake-o{--fa:"\f2b5"}
+.icon.fa-envelope-open-o,ul.contact li.fa-envelope-open-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-envelope-open-o,ul.contact li.fa-envelope-open-o{--fa:"\f2b6"}
+.icon.fa-linode,ul.contact li.fa-linode{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-address-book-o,ul.contact li.fa-address-book-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-address-book-o,ul.contact li.fa-address-book-o{--fa:"\f2b9"}
+.icon.fa-vcard,ul.contact li.fa-vcard{--fa:"\f2bb"}
+.icon.fa-address-card-o,ul.contact li.fa-address-card-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-address-card-o,ul.contact li.fa-address-card-o{--fa:"\f2bb"}
+.icon.fa-vcard-o,ul.contact li.fa-vcard-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-vcard-o,ul.contact li.fa-vcard-o{--fa:"\f2bb"}
+.icon.fa-user-circle-o,ul.contact li.fa-user-circle-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-user-circle-o,ul.contact li.fa-user-circle-o{--fa:"\f2bd"}
+.icon.fa-user-o,ul.contact li.fa-user-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-user-o,ul.contact li.fa-user-o{--fa:"\f007"}
+.icon.fa-id-badge,ul.contact li.fa-id-badge{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-drivers-license,ul.contact li.fa-drivers-license{--fa:"\f2c2"}
+.icon.fa-id-card-o,ul.contact li.fa-id-card-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-id-card-o,ul.contact li.fa-id-card-o{--fa:"\f2c2"}
+.icon.fa-drivers-license-o,ul.contact li.fa-drivers-license-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-drivers-license-o,ul.contact li.fa-drivers-license-o{--fa:"\f2c2"}
+.icon.fa-quora,ul.contact li.fa-quora{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-free-code-camp,ul.contact li.fa-free-code-camp{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-telegram,ul.contact li.fa-telegram{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-thermometer-4,ul.contact li.fa-thermometer-4{--fa:"\f2c7"}
+.icon.fa-thermometer,ul.contact li.fa-thermometer{--fa:"\f2c7"}
+.icon.fa-thermometer-3,ul.contact li.fa-thermometer-3{--fa:"\f2c8"}
+.icon.fa-thermometer-2,ul.contact li.fa-thermometer-2{--fa:"\f2c9"}
+.icon.fa-thermometer-1,ul.contact li.fa-thermometer-1{--fa:"\f2ca"}
+.icon.fa-thermometer-0,ul.contact li.fa-thermometer-0{--fa:"\f2cb"}
+.icon.fa-bathtub,ul.contact li.fa-bathtub{--fa:"\f2cd"}
+.icon.fa-s15,ul.contact li.fa-s15{--fa:"\f2cd"}
+.icon.fa-window-maximize,ul.contact li.fa-window-maximize{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-window-restore,ul.contact li.fa-window-restore{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-times-rectangle,ul.contact li.fa-times-rectangle{--fa:"\f410"}
+.icon.fa-window-close-o,ul.contact li.fa-window-close-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-window-close-o,ul.contact li.fa-window-close-o{--fa:"\f410"}
+.icon.fa-times-rectangle-o,ul.contact li.fa-times-rectangle-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-times-rectangle-o,ul.contact li.fa-times-rectangle-o{--fa:"\f410"}
+.icon.fa-bandcamp,ul.contact li.fa-bandcamp{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-grav,ul.contact li.fa-grav{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-etsy,ul.contact li.fa-etsy{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-imdb,ul.contact li.fa-imdb{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-ravelry,ul.contact li.fa-ravelry{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-eercast,ul.contact li.fa-eercast{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-eercast,ul.contact li.fa-eercast{--fa:"\f2da"}
+.icon.fa-snowflake-o,ul.contact li.fa-snowflake-o{--sb-fa-family:"Font Awesome 7 Free";--sb-fa-weight:400}
+.icon.fa-snowflake-o,ul.contact li.fa-snowflake-o{--fa:"\f2dc"}
+.icon.fa-superpowers,ul.contact li.fa-superpowers{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-wpexplorer,ul.contact li.fa-wpexplorer{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}
+.icon.fa-meetup,ul.contact li.fa-meetup{--sb-fa-family:"Font Awesome 7 Brands";--sb-fa-weight:400}

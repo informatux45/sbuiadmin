@@ -9,16 +9,16 @@
 										<strong>{$sb_site_title}</strong>
 									</a>
 									<ul class="icons">
-										{if $sb_theme_infos.theme_infos_twitter}<li><a href="{$sb_theme_infos.theme_infos_twitter}" class="icon fa-twitter"><span class="label">Twitter</span></a></li>{/if}
-										{if $sb_theme_infos.theme_infos_facebook}<li><a href="{$sb_theme_infos.theme_infos_facebook}" class="icon fa-facebook"><span class="label">Facebook</span></a></li>{/if}
-										{if $sb_theme_infos.theme_infos_google_plus}<li><a href="{$sb_theme_infos.theme_infos_google_plus}" class="icon fa-google-plus"><span class="label">Google +</span></a></li>{/if}
-										{if $sb_theme_infos.theme_infos_pinterest}<li><a href="{$sb_theme_infos.theme_infos_pinterest}" class="icon fa-pinterest"><span class="label">Pinterest</span></a></li>{/if}
-										{if $sb_theme_infos.theme_infos_instagram}<li><a href="{$sb_theme_infos.theme_infos_instagram}" class="icon fa-instagram"><span class="label">Instagram</span></a></li>{/if}
-										{if $sb_theme_infos.theme_infos_vimeo}<li><a href="{$sb_theme_infos.theme_infos_vimeo}" class="icon fa-vimeo"><span class="label">Vimeo</span></a></li>{/if}
-										{if $sb_theme_infos.theme_infos_viadeo}<li><a href="{$sb_theme_infos.theme_infos_viadeo}" class="icon fa-viadeo"><span class="label">Viadeo</span></a></li>{/if}
-										{if $sb_theme_infos.theme_infos_youtube}<li><a href="{$sb_theme_infos.theme_infos_youtube}" class="icon fa-youtube"><span class="label">Youtube</span></a></li>{/if}
-										{if $sb_theme_infos.theme_infos_skype}<li><a href="{$sb_theme_infos.theme_infos_skype}" class="icon fa-skype"><span class="label">Skype</span></a></li>{/if}
-										{if $sb_theme_infos.theme_infos_linkedin}<li><a href="{$sb_theme_infos.theme_infos_linkedin}" class="icon fa-linkedin"><span class="label">Linkedin</span></a></li>{/if}
+										{if $sb_theme_infos.theme_infos_twitter}<li><a href="{$sb_theme_infos.theme_infos_twitter}" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>{/if}
+										{if $sb_theme_infos.theme_infos_facebook}<li><a href="{$sb_theme_infos.theme_infos_facebook}" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>{/if}
+										{if $sb_theme_infos.theme_infos_google_plus}<li><a href="{$sb_theme_infos.theme_infos_google_plus}" class="icon brands fa-google-plus-g"><span class="label">Google +</span></a></li>{/if}
+										{if $sb_theme_infos.theme_infos_pinterest}<li><a href="{$sb_theme_infos.theme_infos_pinterest}" class="icon brands fa-pinterest"><span class="label">Pinterest</span></a></li>{/if}
+										{if $sb_theme_infos.theme_infos_instagram}<li><a href="{$sb_theme_infos.theme_infos_instagram}" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>{/if}
+										{if $sb_theme_infos.theme_infos_vimeo}<li><a href="{$sb_theme_infos.theme_infos_vimeo}" class="icon brands fa-vimeo-v"><span class="label">Vimeo</span></a></li>{/if}
+										{if $sb_theme_infos.theme_infos_viadeo}<li><a href="{$sb_theme_infos.theme_infos_viadeo}" class="icon brands fa-viadeo"><span class="label">Viadeo</span></a></li>{/if}
+										{if $sb_theme_infos.theme_infos_youtube}<li><a href="{$sb_theme_infos.theme_infos_youtube}" class="icon brands fa-youtube"><span class="label">Youtube</span></a></li>{/if}
+										{if $sb_theme_infos.theme_infos_skype}<li><a href="{$sb_theme_infos.theme_infos_skype}" class="icon brands fa-skype"><span class="label">Skype</span></a></li>{/if}
+										{if $sb_theme_infos.theme_infos_linkedin}<li><a href="{$sb_theme_infos.theme_infos_linkedin}" class="icon brands fa-linkedin-in"><span class="label">Linkedin</span></a></li>{/if}
 										{insert name="sbGetThemeOption" option="slogan"}
 									</ul>
 								</header>

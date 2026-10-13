@@ -1,30 +1,12 @@
 
 CKEDITOR.dialog.add('ckawesomeDialog', function( editor ) {
+	// SBUIADMIN : liste des icônes Font Awesome 7 Free du sélecteur d'icônes
+	// de l'admin (assets/adminator/icon-picker.js, window.SB_FA_ICON_LIST)
+	// au lieu de lire les classes dans la feuille FA4 ; valeur = classe FA7
+	// complète (ex: "fa-solid fa-star").
 	function getCKAwesomeIcons(selectList ){
-	     var result = [];
-	     var scriptUrl = editor.fontawesomePath;
-	     
-	     $.ajax({
-	        url: scriptUrl,
-	        type: 'get',
-	        dataType: 'html',
-	        async: false,
-	        success: function(response) {
-	        	var excludeStyles = [".fa.",".fa",".fa-lg",".fa-2x",".fa-3x",".fa-4x",".fa-5x",".fa-fw",".fa-ul",".fa-ul>",".fa-li",".fa-border",".fa-pull-left",".fa-pull-right",".fa-spin",".fa-pulse",".fa-rotate-90",".fa-rotate-180",".fa-rotate-270",".fa-flip-horizontal",".fa-flip-vertical",".fa-stack",".fa-stack-1x",".fa-stack-2x",".fa-inverse"];
-	        	var regxstyles = new RegExp(/\.[a-zA-Z_][\w-_]*[^\.\s\{#:\,;]/,"g" );
-	        	var styles = response.match(regxstyles);
-	        	styles.sort();
-	        	$.each(styles, function( index, value ) {
-	        		var xstart=value.substring(0, 3).substring(1);
-	        		if (xstart != 'fa' || excludeStyles.indexOf(value) > 0){ return; }
-	        		value = value.substring(1);
-	        		selectList.add(value, value);
-	        	})
-
-	        },
-	        error: function (jqXHR, exception) {
-	            alert("Error loading Font Awesome css: \n" + scriptUrl);
-	        },
+	     $.each(window.SB_FA_ICON_LIST || [], function( index, icon ) {
+	     	selectList.add(icon.name + ' (' + icon.cls.split(' ')[0].substring(3) + ')', icon.cls);
 	     });
 	}
 
@@ -47,8 +29,8 @@ CKEDITOR.dialog.add('ckawesomeDialog', function( editor ) {
 
 	function formatCKAwesome (icon) {
 	  if (!icon.id) { return icon.text; }
-	  var text = icon.text.replace(/fa-|\.|\-/gi, " ");
-	  var icon = $('<span class="ckawesome_options"><i class="fa ' + icon.element.value + ' fa-fw"></i> ' + text + "</span>");
+	  var text = icon.text.replace(/-/g, " ");
+	  var icon = $('<span class="ckawesome_options"><i class="' + icon.element.value + ' fa-fw"></i> ' + text + "</span>");
 	  return icon;
 	};
 	
@@ -136,7 +118,7 @@ CKEDITOR.dialog.add('ckawesomeDialog', function( editor ) {
             var cka = editor.document.createElement( 'span' );
             var cka_size = dialog.getValueOf( 'options', 'textsize' );
             var cka_color = dialog.getValueOf( 'options', 'fontcolor' );
-            var cka_class = "fa fa-fw " + dialog.getValueOf( 'options', 'ckawesomebox' );
+            var cka_class = dialog.getValueOf( 'options', 'ckawesomebox' ) + " fa-fw";
             var cka_style = ( cka_size != '' ? 'font-size: '+cka_size+'px;' : '' ) + ( cka_color != '' ? 'color: '+cka_color+';' : '' ) ;
             
             cka.setAttribute( 'class', cka_class );

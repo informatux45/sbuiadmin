@@ -35,7 +35,7 @@
 					<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
 				</button>
 				{if $page_title}
-					<a href="{$smarty.const._AM_SITE_URL}"><i class="fa fa-home fa-fw"></i> Dashboard</a>
+					<a href="{$smarty.const._AM_SITE_URL}"><i class="fa-solid fa-house fa-fw"></i> Dashboard</a>
 					<svg class="sep" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
 					<a href="{if isset($smarty.get.p)}{$smarty.const._AM_SITE_URL}index.php?p={$smarty.get.p}{else}#{/if}">{$page_title|lower|@ucfirst}</a>
 					{if isset($smarty.get.a)}
@@ -43,7 +43,7 @@
 						<span class="current">{$smarty.get.a|lower|@ucfirst}</span>
 					{/if}
 				{else}
-					<i class="fa fa-home fa-fw"></i> <span class="current">{$pageindex|upper}</span>
+					<i class="fa-solid fa-house fa-fw"></i> <span class="current">{$pageindex|upper}</span>
 				{/if}
 			</div>
 			<div class="topbar-actions">

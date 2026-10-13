@@ -69,6 +69,10 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
+**4.24**
+- Font Awesome 7 Free served locally (themes, admin, editor, icon picker), old icon names still accepted
+- Blocked IPs and front anti-flood active again, 403 redirect fixed; local Chart.js 4.5.1
+
 **4.23**
 - Google Analytics 4 (G-) instead of Universal Analytics, Google verification meta fixed
 - Google Fonts served locally by the themes, CMS config > Fonts removed
