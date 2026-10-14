@@ -69,6 +69,10 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
+**4.26**
+- Media uploads hardened: safe file names (duplicates included), content must match the extension, size limit enforced server-side, CSRF token
+- Media folder fixed to upload/ (no longer set at install or in Configuration), media URL derived from the site URL; no more double slashes
+
 **4.25**
 - Configuration > Server rebuilt: shared / VPS / dedicated detected (or forced), disk ring, live CPU load chart, "not detected" instead of zeros
 - Container load read from /proc/loadavg (not the host); old status iframe and Chart.js removed

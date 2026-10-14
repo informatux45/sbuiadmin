@@ -81,10 +81,10 @@ unset($sb_db_config, $sb_db_host, $sb_db_port, $sb_db_socket);
 // --- Scan multiple directories for all files, no sub-dirs
 // --- Chemin relatif (obligatoirement), pas d'absolu !!!
 // --- Ne pas mettre le "/" à la fin
-$sbfiles_medias_dirs_allowed = sbSetting('medias_dir');
+$sbfiles_medias_dirs_allowed = sbMediasDir();
 // --- Pour vos formulaires ;-)
-defined('_AM_MEDIAS_DIR') OR define('_AM_MEDIAS_DIR', sbSetting('medias_dir'));
-defined('_AM_MEDIAS_URL') OR define('_AM_MEDIAS_URL', sbSetting('medias_url'));
+defined('_AM_MEDIAS_DIR') OR define('_AM_MEDIAS_DIR', sbMediasDir()); // toujours upload/ (sbuiadmin-settings.php)
+defined('_AM_MEDIAS_URL') OR define('_AM_MEDIAS_URL', sbMediasUrl());
 // --- Array of allowed extensions
 //$sbfiles_medias_exts_allowed = array("jpg","jpeg","bmp","png","pdf", "xml", "txt", "mp4");
 // --- Le réglage ne peut que restreindre cette liste sûre : c'est elle que

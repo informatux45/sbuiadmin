@@ -229,14 +229,21 @@ class qqFileUploader {
         $ext = isset($pathinfo['extension']) ? $pathinfo['extension'] : '';
         $ext = $ext == '' ? $ext : '.' . $ext;
 
-        $unique = $this->sbRewriteString($base);
+        // Nom sûr : minuscules, chiffres et tirets seulement (le nom est
+        // recopié dans des attributs HTML et du JavaScript). Le suffixe d'un
+        // doublon part du nom assaini, jamais du nom envoyé (avant : guillemets
+        // et espaces conservés en cas de doublon).
+        $safe = trim(preg_replace('/[^a-z0-9-]+/', '', (string) $this->sbRewriteString($base)), '-');
+        $safe = $safe === '' ? 'fichier' : substr($safe, 0, 100);
+        $ext = strtolower(preg_replace('/[^A-Za-z0-9.]/', '', $ext));
+        $unique = $safe;
         $suffix = 0;
 
         // Get unique file name for the file, by appending random suffix.
 
         while (file_exists($uploadDirectory . "/" . $unique . $ext)) {
             $suffix += rand(1, 999);
-            $unique = $base.'-'.$suffix;
+            $unique = $safe.'-'.$suffix;
         }
 
         $result =  $uploadDirectory . "/" . $unique . $ext;
@@ -293,7 +300,9 @@ class qqFileUploader {
      * @param string $str
      */
     protected function toBytes($str) {
-        $val = trim($str);
+        $str = trim((string) $str);
+        if ($str === '') return 0;
+        $val = (float) $str; // « 2M » : partie numérique seule (avertissement PHP 8 sinon)
         $last = strtolower($str[strlen($str)-1]);
         switch($last) {
             case 'g': $val *= 1024;

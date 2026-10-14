@@ -54,8 +54,43 @@ if (!sbHasRight('medias', 'add')) {
 	sbUploadDeny('Droit "ajouter" requis sur les médias.');
 }
 
+// Jeton CSRF (même jeton de session que les formulaires de l'admin, envoyé
+// par Fine Uploader dans le corps de la requête)
+if (empty($_SESSION['sbuiadmin_csrf_token']) || !isset($_POST['sbuiadmin_csrf_token']) || !is_string($_POST['sbuiadmin_csrf_token'])
+	|| !hash_equals($_SESSION['sbuiadmin_csrf_token'], $_POST['sbuiadmin_csrf_token'])) {
+	sbUploadDeny('Jeton de sécurité invalide, rechargez la page.');
+}
+session_write_close(); // plus rien à écrire : ne bloque pas les autres requêtes
+
 // Include the uploader class
 require_once '../../server/php/qqFileUploader.php';
+
+/** Taille du réglage (« 10M », « 10MB », « 512KB »...) en octets, 0 si illisible */
+function sbUploadLimitBytes($v) {
+	if (!preg_match('/^\s*(\d+(?:[.,]\d+)?)\s*([KMGT]?)B?\s*$/i', (string) $v, $m)) return 0;
+	return (int) round((float) str_replace(',', '.', $m[1]) * pow(1024, (int) strpos('_KMGT', strtoupper($m[2] ?: '_'))));
+}
+
+/**
+ * Le contenu correspond-il à l'extension ? (un .jpg doit être une image, un
+ * .pdf un PDF...). Les images sont redimensionnées par le navigateur avant
+ * l'envoi, qui peut changer leur format : toute image reconnue est acceptée.
+ */
+function sbUploadContentMatches($file, $ext) {
+	$head = (string) @file_get_contents($file, false, null, 0, 1024);
+	switch ($ext) {
+		case 'jpg': case 'jpeg': case 'png': case 'gif': case 'webp':
+			$info = @getimagesize($file);
+			$types = array(IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF);
+			if (defined('IMAGETYPE_WEBP')) $types[] = IMAGETYPE_WEBP;
+			return $info !== false && in_array($info[2], $types, true);
+		case 'pdf':           return strpos($head, '%PDF-') !== false;
+		case 'mp4': case 'm4v': return substr($head, 4, 4) === 'ftyp';
+		case 'zip':           return strncmp($head, "PK\x03\x04", 4) === 0 || strncmp($head, "PK\x05\x06", 4) === 0;
+		case 'gz':            return strncmp($head, "\x1f\x8b", 2) === 0;
+	}
+	return true;
+}
 
 
 // -----------------------------------------------------------------------
@@ -124,8 +159,25 @@ if (empty($sbfiles_medias_exts_allowed)) {
 }
 $uploader->allowedExtensions = $sbfiles_medias_exts_allowed;
 
-// Specify max file size in bytes.
-//$uploader->sizeLimit = 10 * 1024 * 1024;
+// Taille max. : celle de la Configuration, appliquée ici aussi (Fine Uploader
+// ne la contrôlait que dans le navigateur), sans dépasser celle de PHP
+$sb_upload_limit = sbUploadLimitBytes(_AM_MEDIAS_SIZE_LIMIT);
+if ($sb_upload_limit > 0 && $sb_upload_limit < $uploader->sizeLimit) $uploader->sizeLimit = $sb_upload_limit;
+
+// Envoi en plusieurs morceaux non pris en charge (dossier chunks absent) :
+// refusé d'emblée, il échappait au contrôle du contenu et de la taille totale
+if (isset($_REQUEST['qqtotalparts']) && (int) $_REQUEST['qqtotalparts'] > 1) {
+	sbUploadDeny('Envoi en plusieurs morceaux non pris en charge.');
+}
+
+// Contenu réel du fichier reçu
+$sb_upload_ext = strtolower(pathinfo($sb_upload_name, PATHINFO_EXTENSION));
+if (!isset($_FILES['qqfile']['tmp_name']) || !is_uploaded_file($_FILES['qqfile']['tmp_name'])) {
+	sbUploadDeny('Aucun fichier reçu.');
+}
+if (!sbUploadContentMatches($_FILES['qqfile']['tmp_name'], $sb_upload_ext)) {
+	sbUploadDeny('Le contenu du fichier ne correspond pas à son extension (.' . $sb_upload_ext . ').');
+}
 
 // Specify the input name set in the javascript.
 $uploader->inputName = 'qqfile';

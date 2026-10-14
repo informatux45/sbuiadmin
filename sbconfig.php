@@ -166,8 +166,8 @@ defined('_AM_DB_PORT')   OR define('_AM_DB_PORT',   $_db_port);
 defined('_AM_DB_NAME')   OR define('_AM_DB_NAME',   $_sb_db['name']);
 defined('_AM_DB_USER')   OR define('_AM_DB_USER',   $_sb_db['user']);
 defined('_AM_DB_PWD')    OR define('_AM_DB_PWD',    $_sb_db['password']);
-defined('_AM_MEDIAS_DIR') OR define('_AM_MEDIAS_DIR', sbSetting('medias_dir'));
-defined('_AM_MEDIAS_URL') OR define('_AM_MEDIAS_URL', sbSetting('medias_url'));
+defined('_AM_MEDIAS_DIR') OR define('_AM_MEDIAS_DIR', sbMediasDir()); // toujours upload/ (SBADMIN/inc/sbuiadmin-settings.php)
+defined('_AM_MEDIAS_URL') OR define('_AM_MEDIAS_URL', sbMediasUrl());
 defined('_AM_DB_PREFIX')  OR define('_AM_DB_PREFIX',  $_sb_db['prefix']);
 
 // ------------------------

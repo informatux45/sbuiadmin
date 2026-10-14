@@ -658,6 +658,33 @@ function sbSetting($name, $default = '') {
 	return isset($GLOBALS['sb_settings'][$name]) ? trim((string) $GLOBALS['sb_settings'][$name]) : $default;
 }
 
+/**
+ * Dossier des médias : TOUJOURS upload/ à la racine du site, plus réglable
+ * (ni à l'installation, ni dans Configuration). Ailleurs, les fichiers
+ * perdaient la protection de upload/.htaccess et la suppression des médias
+ * pouvait viser d'autres fichiers du site. Chemin relatif au dossier
+ * d'administration, comme l'ancien réglage medias_dir.
+ */
+function sbMediasDir() {
+	return '../upload';
+}
+
+/** URL des médias : URL du site + upload/ (ancien réglage medias_url si site_url est vide) */
+function sbMediasUrl($site_url = null) {
+	$site = trim((string) ($site_url ?? sbSetting('site_url')));
+	// Toujours terminée par « / » : les médias sont enregistrés par leur seul nom
+	// de fichier et collés directement à cette URL (URL . 'photo.jpg')
+	$url = $site === '' ? sbSetting('medias_url') : rtrim($site, '/') . '/upload';
+	return $url === '' ? '' : rtrim($url, '/') . '/';
+}
+
+/** Ancien dossier des médias différent de upload/ (site antérieur à la 4.26) : message, ou '' */
+function sbMediasLegacyNotice() {
+	$dir = rtrim(str_replace('\\', '/', sbSetting('medias_dir', '../upload')), '/');
+	if (in_array($dir, array('', '../upload', './../upload'), true)) return '';
+	return "L'ancien dossier des médias « " . $dir . " » n'est plus utilisé : les médias sont désormais toujours dans upload/ à la racine du site. Déplacez-y vos fichiers (et corrigez les liens qui y pointent), puis enregistrez cette page.";
+}
+
 /** Réglage booléen ("1") */
 function sbSettingBool($name) {
 	return sbSetting($name) === '1';

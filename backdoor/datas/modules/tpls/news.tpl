@@ -278,7 +278,7 @@
 													<b>{$news.image}</b>
 													</p>
 													<p><i>LIEN IMAGE</i><br>
-													<b>{$smarty.const._AM_MEDIAS_URL}/{$news.image}</b>
+													<b>{$smarty.const._AM_MEDIAS_URL}{$news.image}</b>
 													</p>
 													<p><i>DATE (US)</i><br>
 													<b>{$news.date}</b>
@@ -309,7 +309,7 @@
 													<b>{$item.image}</b>
 													</p>
 													<p><i>LIEN IMAGE</i><br>
-													<b>{$smarty.const._AM_MEDIAS_URL}/{$item.image}</b>
+													<b>{$smarty.const._AM_MEDIAS_URL}{$item.image}</b>
 													</p>
 													<p><i>DATE (US)</i><br>
 													<b>{$item.date}</b>

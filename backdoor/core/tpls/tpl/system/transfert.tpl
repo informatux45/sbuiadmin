@@ -92,26 +92,26 @@
 	{foreach $medias_all as $sbmedia}
 		
 		{if isset($smarty.get.editor) && $smarty.get.editor == 'ck'}
-			<p class="sbmedia" target="_parent" onclick="sbTransfertCkeditor('{$sb_transfert_medias_url}/{$sbmedia|@sbFileRealname}')">
+			<p class="sbmedia" target="_parent" onclick="sbTransfertCkeditor('{$sb_transfert_medias_url|escape:'javascript'|escape}/{$sbmedia|@sbFileRealname|escape:'javascript'|escape}')">
 		{elseif isset($smarty.get.editor) && $smarty.get.editor == 'tiny'}
-			<p class="sbmedia" target="_parent" onclick='sbTransfertTiny("{$sbmedia}","{$sb_transfert_id}","{$smarty.const._AM_MEDIAS_URL}")'>
+			<p class="sbmedia" target="_parent" onclick='sbTransfertTiny("{$sbmedia|escape:'javascript'|escape}","{$sb_transfert_id}","{$smarty.const._AM_MEDIAS_URL|escape:'javascript'|escape}")'>
 		{else}
-			<p class="sbmedia" target="_parent" onclick='sbTransfert("{$sbmedia}","{$sb_transfert_id}")'>
+			<p class="sbmedia" target="_parent" onclick='sbTransfert("{$sbmedia|escape:'javascript'|escape}","{$sb_transfert_id}")'>
 		{/if}
 
 			{* Display thumbnail on the fly OR in the cache if exist and if it's an image ;-) *}
 			{if $sbmedia|@sbGetIfIsImg}
-				<img src="thumb.php?src={$sbmedia}&size=x84" title="{$sbmedia|@sbFilename|@sbRewriteTags}" />
+				<img src="thumb.php?src={$sbmedia|escape:'url'}&amp;size=x84" title="{$sbmedia|@sbFilename|@sbRewriteTags|escape}" />
 			{else}
 				{insert name=sbFileOtherImg assign=other f=$sbmedia}
 				<span class="{"`$other`-o"|sbFaClass} fa-fw sbmedia-other"></span>
 			{/if}
 			
 			{* Display File name truncate *}
-			<span>{$sbmedia|@sbFilename|@sbRewriteTags|truncate:20:'..':true}</span>
+			<span>{$sbmedia|@sbFilename|@sbRewriteTags|truncate:20:'..':true|escape}</span>
 			
 			{* Display File real name truncate *}
-			<span class="sbmedia-realname">{$sbmedia|@sbFileRealname|truncate:20:'..':true}</span>
+			<span class="sbmedia-realname">{$sbmedia|@sbFileRealname|truncate:20:'..':true|escape}</span>
 			
 			{* Display File size *}
 			<span class="sbmedia-weight">{$sbmedia|@sbDisplayMediaSize}</span>
@@ -138,12 +138,16 @@
 	<link href="inc/js/upload/fine-uploader-gallery.min.css" media="screen" rel="stylesheet" type="text/css" />
 	<script src="inc/js/upload/jquery.fine-uploader.min.js"></script>
 	<script>
+	// Jeton CSRF vérifié par sbUploadServer.php (pas de littéral objet ici : Smarty)
+	var sbUploadParams = new Object();
+	sbUploadParams.sbuiadmin_csrf_token = '{$sb_csrf_token|escape:'javascript'}';
 	$(document).ready(function() {
 		// Create an instance of Fine Uploader and bind to the DOM/template
 		$('#fine-uploader-gallery').fineUploader({
 			template: 'qq-template-gallery',
 			request: {
-				endpoint: 'server/php/sbUploadServer.php{if $sb_transfert_subdir}?subdir={$sb_transfert_subdir|escape:'url'}{/if}'
+				endpoint: 'server/php/sbUploadServer.php{if $sb_transfert_subdir}?subdir={$sb_transfert_subdir|escape:'url'}{/if}',
+				params: sbUploadParams
 			},
 			scaling: {
 				sendOriginal: false,

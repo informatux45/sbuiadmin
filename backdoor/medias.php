@@ -131,11 +131,6 @@ $sbsmarty->assign('media_ini_get_post_max_size', sbIniGet('post_max_size'));
 $sbsmarty->assign('media_ini_get_upload_max_filesize', sbIniGet('upload_max_filesize'));
 $sbsmarty->assign('media_ini_get_file_uploads', sbIniGet('file_uploads'));
 
-// --- ASSIGN Infos Uploads
-$sbtimestamp = time();
-$sbsmarty->assign('sbtimestamp', $sbtimestamp);
-$sbsmarty->assign('sbtoken', md5('unique_salt' . $sbtimestamp));
-
 // ---------------------------------------------------
 // ---------------------------------------------------
 // IMPORTANT: Don't remove these lines

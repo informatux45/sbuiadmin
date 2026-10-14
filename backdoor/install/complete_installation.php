@@ -93,8 +93,6 @@
 		
 		$settings_customer_name     = isset($_SESSION['settings_customer_name']) ? stripslashes($_SESSION['settings_customer_name']) : '';
 		$settings_customer_url 	    = isset($_SESSION['settings_customer_url']) ? $_SESSION['settings_customer_url'] : '';
-		$settings_url_upload 	    = isset($_SESSION['settings_url_upload']) ? $_SESSION['settings_url_upload'] : '';
-		$settings_path_upload       = isset($_SESSION['settings_path_upload']) ? stripslashes($_SESSION['settings_path_upload']) : '';
 		
 		$password_encryption = isset($_SESSION['password_encryption']) ? $_SESSION['password_encryption'] : EI_PASSWORD_ENCRYPTION_TYPE;
 		
@@ -208,14 +206,14 @@
 										$sb_install_settings = array(
 											'customer_name'         => $_SESSION['settings_customer_name'],
 											'administrators'        => ($sb_set_admin && $admin_username !== '') ? $admin_username : 'admin',
-											'medias_dir'            => $_SESSION['settings_path_upload'],
+											'medias_dir'            => sbMediasDir(), // toujours upload/
 											'upload_size_limit'     => '2MB',
 											'modules'               => '',
 											'debug_admin'           => '0',
 											'debug_form'            => '0',
 											'debug_smarty_admin'    => '0',
 											'upload_exts'           => 'jpg,jpeg,png,gif,webp,pdf,mp4',
-											'medias_url'            => $_SESSION['settings_url_upload'],
+											'medias_url'            => sbMediasUrl($_SESSION['settings_customer_url']),
 											'upload_item_limit'     => '20',
 											'site_url'              => $_SESSION['settings_customer_url'],
 											'sandbox'               => '1',

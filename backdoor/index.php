@@ -443,6 +443,8 @@ $sbsmarty->assign('sb_url_customer', $sb_url_customer);
 // --- Sandbox Activation (option globale ET droit "voir" de l'utilisateur -
 // ce lien est codé en dur dans main_menu.tpl, hors boucle de sbGetMenuModule())
 $sbsmarty->assign('sb_sandbox', (sbSetting('sandbox') == 1 && sbHasRight('sandbox', 'view')) ? 1 : 0);
+// Jeton CSRF pour les envois hors formulaire (Fine Uploader -> server/php/sbUploadServer.php)
+$sbsmarty->assign('sb_csrf_token', sbCsrfToken());
 // --- CMS Activation
 $sbsmarty->assign('sb_cms', sbSetting('cms'));
 

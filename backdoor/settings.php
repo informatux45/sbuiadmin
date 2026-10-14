@@ -115,14 +115,14 @@ switch($action) {
 			$sb_new_settings = array(
 				'customer_name'         => $sb_text('customer_name'),
 				'administrators'        => $sb_text('administrators'),
-				'medias_dir'            => $sb_text('diruploads'),
+				'medias_dir'            => sbMediasDir(), // fixe : upload/
 				'upload_size_limit'     => $sb_text('upload_max'),
 				'modules'               => $sb_text('modules'),
 				'debug_admin'           => $sb_on('debug_general'),
 				'debug_form'            => $sb_on('debug_form'),
 				'debug_smarty_admin'    => $sb_on('debug_smarty'),
 				'upload_exts'           => $sb_text('upload_exts'),
-				'medias_url'            => $sb_text('urluploads'),
+				'medias_url'            => sbMediasUrl($sb_text('url_customer')), // déduite de l'URL du site
 				'upload_item_limit'     => $sb_text('upload_limit'),
 				'site_url'              => $sb_text('url_customer'),
 				'sandbox'               => $sb_on('sandbox'),
@@ -233,14 +233,14 @@ switch($action) {
 		// --- Initialisation
 		$sb_config_customer_name       = sbSetting('customer_name');
 		$sb_config_administrators      = sbSetting('administrators');
-		$sb_config_diruploads          = sbSetting('medias_dir');
+		$sb_config_diruploads          = 'upload/'; // fixe (sbMediasDir())
 		$sb_config_upload_max          = sbSetting('upload_size_limit');
 		$sb_config_modules             = sbSetting('modules');
 		$sb_config_debug_general       = sbSetting('debug_admin');
 		$sb_config_debug_form          = sbSetting('debug_form');
 		$sb_config_debug_smarty        = sbSetting('debug_smarty_admin');
 		$sb_config_upload_exts         = sbSetting('upload_exts');
-		$sb_config_urluploads          = sbSetting('medias_url');
+		$sb_config_urluploads          = sbMediasUrl();
 		$sb_config_upload_limit        = sbSetting('upload_item_limit');
 		$sb_config_url_customer        = sbSetting('site_url');
 		$sb_config_sandbox             = sbSetting('sandbox');
@@ -275,7 +275,7 @@ switch($action) {
 		$sbform->openForm(array('action' => "$formAction", 'name' => "$formName", 'id' => "$formName", 'reloadpage' => "$formAction", 'submitpage' => "$formAction"));
 		// --- Add inputs and more
 		$sbform->addInput('text', 'Nom du client', array ('name' => 'customer_name', 'value' => "$sb_config_customer_name", 'placeholder' => "Nom de votre client"), true, false, "Visible dans la barre d'administration");
-		$sbform->addInput('text', 'URL du site client', array ('name' => 'url_customer', 'value' => "$sb_config_url_customer", 'placeholder' => "URL du site de votre client (http://...)"), true, false, "Ajoute un lien sur le nom de votre client (header)");
+		$sbform->addInput('text', 'URL du site client', array ('name' => 'url_customer', 'value' => "$sb_config_url_customer", 'placeholder' => "URL du site de votre client (http://...)"), true, false, "Adresse publique du site (lien sur le nom du client, URL des médias : <code>…/upload/</code>)");
 		$sbform->addBreak('Les administrateurs');
 		$sbform->addInput('text', 'Administrateurs', array ('name' => 'administrators', 'value' => "$sb_config_administrators", 'placeholder' => "Nom des administrateurs"), true, false, "Login des admins séparés par des virgules sans espace");
 		$sbform->addBreak('Base de données');
@@ -302,8 +302,13 @@ switch($action) {
 		$sb_db_html .= "</div>";
 		$sbform->addAnything($sb_db_html);
 		$sbform->addBreak('Configuration médias');
-		$sbform->addInput('text', 'Répertoire d\'upload', array ('name' => 'diruploads', 'value' => "$sb_config_diruploads", 'placeholder' => "Répertoire de l'upload"), true, false, "ex:  <strong>../votre_repertoire</strong>  -  s'il se trouve juste en dessous de l'arborescence du répertoire d'administration<br>Chemin relatif (obligatoirement), pas d'absolu !!! - Ne pas mettre le  <span style='color: red;'>/</span>  à la fin");
-		$sbform->addInput('text', 'URL d\'upload', array ('name' => 'urluploads', 'value' => "$sb_config_urluploads", 'placeholder' => "URL de l'upload (http://...)"), true, false, "Ne pas mettre le  <span style='color: red;'>/</span>  à la fin");
+		// Dossier et URL des médias : plus réglables (upload/ à la racine du site, URL déduite)
+		$sb_medias_html = "<div class='field'><p>Dossier des médias : <code>upload/</code> à la racine du site (fixe, protégé par <code>upload/.htaccess</code>)<br>"
+			. "URL des médias : <code>" . htmlspecialchars($sb_config_urluploads, ENT_QUOTES, 'UTF-8') . "</code> (déduite de l'URL du site)</p>";
+		if (($sb_medias_notice = sbMediasLegacyNotice()) !== '') {
+			$sb_medias_html .= "<p style='color: red;'>" . htmlspecialchars($sb_medias_notice, ENT_QUOTES, 'UTF-8') . "</p>";
+		}
+		$sbform->addAnything($sb_medias_html . "</div>");
 		$sbform->addInput('text', 'Taille max. autorisée pour l\'upload des médias (client)', array ('name' => 'upload_max', 'value' => "$sb_config_upload_max", 'placeholder' => "Répertoire de l'upload"), true, false, "Usage : 10KB, 10.5KB, 2MB, 2.5MB, 1GB, 1TB");
 		// Upload exts Allowed
 		$sbform->addInput('text', 'Extensions autorisées', array ('name' => 'upload_exts', 'value' => "$sb_config_upload_exts", 'placeholder' => "Extensions autorisées"), true, false, "Extensions autorisées à l'upload dans votre administration, séparées par des virgules.<br>Seules celles-ci sont acceptées : <b>" . implode(", ", $sbfiles_medias_exts_safe) . "</b> (les autres sont ignorées pour sécurité)");

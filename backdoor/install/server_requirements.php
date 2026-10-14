@@ -256,6 +256,9 @@
 		$validations['cache_file_dir_2'] = array(true, '../datas/cache/medias/', is_writable('../datas/cache/medias/'), lang_key('writable'), lang_key('no_writable'));
 		$validations['cache_file_dir_3'] = array(true, '../datas/cache/tpls_c/', is_writable('../datas/cache/tpls_c/'), lang_key('writable'), lang_key('no_writable'));
 		$validations['cache_file_dir_4'] = array(true, './installer/', is_writable('./installer/'), lang_key('writable'), lang_key('no_writable'));
+		// Médias : toujours upload/ à la racine du site (plus réglable), protégé par son .htaccess
+		$validations['upload_dir'] = array(true, '../../upload/ (médias)', is_dir('../../upload/') && is_writable('../../upload/'), lang_key('writable'), lang_key('no_writable'));
+		$validations['upload_htaccess'] = array(true, '../../upload/.htaccess (aucun script exécuté dans les médias)', is_file('../../upload/.htaccess'), 'OK', 'absent');
 	}
 
 	// --- Header INC

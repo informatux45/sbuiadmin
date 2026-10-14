@@ -434,6 +434,12 @@ if (!function_exists("sbCleanPageBuilderContent")) {
 		// utile côté front) - même nettoyage que cleanRow().
 		$cleaned = str_replace(array(' ui-sortable', 'ui-sortable '), '', $cleaned);
 
+		// Images enregistrées avant la 4.26 avec « upload//fichier »
+		// (pagebuilder.js ajoutait un « / » à une URL qui en avait déjà un)
+		if (defined('_AM_MEDIAS_URL') && _AM_MEDIAS_URL !== '') {
+			$cleaned = str_replace(rtrim(_AM_MEDIAS_URL, '/') . '//', rtrim(_AM_MEDIAS_URL, '/') . '/', $cleaned);
+		}
+
 		return sbRenamePageBuilderClasses($cleaned);
 	}
 }

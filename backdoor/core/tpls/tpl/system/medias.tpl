@@ -161,15 +161,15 @@
 							<div style="overflow:hidden;padding-top:10px">
 							{foreach $medias_all as $sbmedia}
 								{if $sbtranfer_media == true}
-									<p class="sbmedia" target="_parent" onclick='transfert("{$sbmedia}","{$sbid}")'>
+									<p class="sbmedia" target="_parent" onclick='transfert("{$sbmedia|escape:'javascript'|escape}","{$sbid}")'>
 								{else}
 									<p class="sbmedia">
 								{/if}
 								
 								{* Display thumbnail on the fly OR in the cache if exist and if it's an image ;-) *}
 								{if $sbmedia|@sbGetIfIsImg}
-									<a class="sbmedia-display" href="{$sbmedia}" rel="facebox">
-										<img src="thumb.php?src={$sbmedia}&size=x84" title="{$sbmedia|@sbFilename|@sbRewriteTags}" />
+									<a class="sbmedia-display" href="{$sbmedia|escape}" rel="facebox">
+										<img src="thumb.php?src={$sbmedia|escape:'url'}&amp;size=x84" title="{$sbmedia|@sbFilename|@sbRewriteTags|escape}" />
 									</a>
 								{else}
 									{insert name=sbFileOtherImg assign=other f=$sbmedia}
@@ -177,10 +177,10 @@
 								{/if}
 								
 								{* Display File name truncate *}
-								<span>{$sbmedia|@sbFilename|@sbRewriteTags|truncate:20:'..':true}</span>
+								<span>{$sbmedia|@sbFilename|@sbRewriteTags|truncate:20:'..':true|escape}</span>
 								
 								{* Display File real name truncate *}
-								<span class="sbmedia-realname">{$sbmedia|@sbFileRealname|truncate:20:'..':true}</span>
+								<span class="sbmedia-realname">{$sbmedia|@sbFileRealname|truncate:20:'..':true|escape}</span>
 								
 								{* Display File size *}
 								<span class="sbmedia-weight">{$sbmedia|@sbDisplayMediaSize}</span>

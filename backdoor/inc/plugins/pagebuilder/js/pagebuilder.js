@@ -1448,7 +1448,7 @@ $(function () {
             // existant à l'ouverture des réglages, ou mutation non liée à
             // une sélection média).
             if (filename && filename.indexOf('://') === -1 && filename.indexOf(window.sbMediasUrl) === -1) {
-                target.value = window.sbMediasUrl + '/' + filename;
+                target.value = window.sbMediasUrl.replace(/\/+$/, '') + '/' + filename;
             }
         });
     }).observe(document.body, { childList: true, subtree: true });

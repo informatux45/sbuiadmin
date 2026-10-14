@@ -45,7 +45,7 @@ function shortcode_sbnews_item($param = '') {
 			$item_html .= '<div class="sbnews">';
 			$item_html .= '<div class="sbnews-div-l">';
 			$item_html .= '<a class="" href="' . $url . '">';
-			$item_html .= '<img src="' . _AM_MEDIAS_URL . '/' . $item_info['image'] . '" alt="' . $title . '" style="width: 100%;">';
+			$item_html .= '<img src="' . _AM_MEDIAS_URL . $item_info['image'] . '" alt="' . $title . '" style="width: 100%;">';
 			$item_html .= '</a>';
 			$item_html .= '</div>';
 			$item_html .= '<div class="sbnews-div-r">';
@@ -119,7 +119,7 @@ function shortcode_sbnews_latest($param = '') {
 			$item_html .= '<div class="sbnews">';
 			$item_html .= '<div class="sbnews-div-l">';
 			$item_html .= '<a class="" href="' . $url . '">';
-			$item_html .= '<img src="' . _AM_MEDIAS_URL . '/' . $item_info['image'] . '" alt="' . $title . '" style="width: 100%;">';
+			$item_html .= '<img src="' . _AM_MEDIAS_URL . $item_info['image'] . '" alt="' . $title . '" style="width: 100%;">';
 			$item_html .= '</a>';
 			$item_html .= '</div>';
 			$item_html .= '<div class="sbnews-div-r">';

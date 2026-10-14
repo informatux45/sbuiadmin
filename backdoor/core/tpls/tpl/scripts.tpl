@@ -81,12 +81,16 @@
 	<script src="inc/js/upload/jquery.fine-uploader.min.js"></script>
 	{*<script src="inc/js/upload/iframe.xss.response.js"></script>*}
 	<script>
+	// Jeton CSRF vérifié par sbUploadServer.php (pas de littéral objet ici : Smarty)
+	var sbUploadParams = new Object();
+	sbUploadParams.sbuiadmin_csrf_token = '{$sb_csrf_token|escape:'javascript'}';
 	$(document).ready(function() {
 		// Create an instance of Fine Uploader and bind to the DOM/template
         $('#fine-uploader-gallery').fineUploader({
             template: 'qq-template-gallery',
 			request: {
-				endpoint: 'server/php/sbUploadServer.php'
+				endpoint: 'server/php/sbUploadServer.php',
+				params: sbUploadParams
 			},
 			scaling: {
 				sendOriginal: false,
