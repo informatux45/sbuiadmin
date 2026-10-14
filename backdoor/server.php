@@ -1,7 +1,8 @@
 <?php
 /**
  * Admin Startbootstrap
- * Manage CACHE (Admin / Front)
+ * Configuration > Serveur : relevés adaptés au type d'hébergement
+ * (mutualisé, VPS, dédié), détecté ou forcé par le réglage hosting_type.
  *
  * @link http://dev.informatux.com/
  *
@@ -19,16 +20,17 @@ defined('SBUIADMIN_PATH') or die('Are you crazy!');
 // Include Config CMS
 // -----------------------
 include_once('../sbconfig.php');
+require_once(SBUIADMIN_PATH . '/inc/sbuiadmin-server.php');
 
 // -----------------------
 // Module URL
 // -----------------------
-$module_page = 'cache';
+$module_page = 'server';
 $sbsmarty->assign('module_page', $module_page);
 // -----------------------
 $module_url = _AM_SITE_PROTOCOL . SBUIADMIN_URL . SBUIADMIN_BASE . '?p=' . $module_page;
 $sbsmarty->assign('module_url', $module_url);
- 
+
 // -----------------------
 // Message status
 // -----------------------
@@ -41,112 +43,95 @@ $sb_msg_valid = false;
 // ---------------------------------------------------
 // ---------------------------------------------------
 
+$sb_srv_root = realpath(SB_PATH) ?: SB_PATH;
+
 // --------------------------------
-// Initialize Form
+// --- AJAX : relevés rafraîchis par la page (disque, RAM, charge, réseau)
 // --------------------------------
-$formName        = "edit_form";
-$formType        = "edit";
-$btn_add_edit    = "Vider tous les caches";
-$legend_add_edit = "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
-
-$action = $_GET['op'];
-switch($action) {
-
-	default:
-	case "cache":
-		// --------------------------------
-		// --- Tableau des caches
-		// --------------------------------
-		$all_url_caches = ['ADMIN Core'      => _AM_SITE_URL . 'datas/cache/core' 
-						  ,'ADMIN Medias'    => _AM_SITE_URL . 'datas/cache/medias'
-						  ,'ADMIN Templates' => _AM_SITE_URL . 'datas/cache/tpls_c'
-						  ,'FRONT Core'      => SB_URL . 'datas/cache/core' 
-						  ,'FRONT Medias'    => SB_URL . 'datas/cache/medias'
-						  ,'FRONT Templates' => SB_URL . 'datas/cache/tpls_c'
-						  ];
-		$all_dir_caches = [_AM_SITE_DIR . 'datas/cache/core' 
-						  ,_AM_SITE_DIR . 'datas/cache/medias'
-						  ,_AM_SITE_DIR . 'datas/cache/tpls_c'
-						  ,SB_PATH . 'datas/cache/core' 
-						  ,SB_PATH . 'datas/cache/medias'
-						  ,SB_PATH . 'datas/cache/tpls_c'
-						  ];		
-
-		// --------------------------------
-		// --- Control form submit --------
-		// --------------------------------
-		if ($_POST['form_submit']) {
-			
-			// --- CLEAN CACHES
-			$clean_cache = 0;
-			for($i = 0; $i < count($all_dir_caches); $i++) {
-				$clean = array_map('unlink', glob("$all_dir_caches[$i]/*"));
-				if (!$clean) $clean_cache++;
-			}
-			
-			if ($clean_cache) {
-				// --- Message SUCCES
-				$sb_msg_valid = 'Caches nettoyés avec succès';
-			} else {
-				// --- Message ERROR
-				$sb_msg_error = 'Clean Cache Error!';
-			}
-			
-		}
-		
-		// --------------------------------		
-		// --- Define variables
-		$formAction = $module_url;
-		// --- Form construct
-		$sbform->openForm(array('action' => "$formAction", 'name' => "$formName", 'id' => "$formName", 'reloadpage' => "$formAction", 'submitpage' => "$formAction"));
-		// --- Add inputs and more
-		// --------------------------------
-		// Listes des caches FRONT / ADMIN
-		// --------------------------------
-		$sbform->addAnything(sbListDirectories($all_url_caches));
-		// --------------------------------
-		// --- Hiddens / Buttons
-		// --------------------------------	
-		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => "$formName"));
-		$sbform->addInput('submit', '', array('value' => "$btn_add_edit"));
-		// --------------------------------	
-		// --- Close Form
-		// --------------------------------	
-		$sbform->closeForm();
-		// --------------------------------
-	break;
-
+if (isset($_GET['ajax']) && $_GET['ajax'] == 'live') {
+	header('Content-Type: application/json');
+	echo json_encode(sbServerLive($sb_srv_root));
+	exit;
 }
 
-function sbListDirectories($array) {
-	$html_directories = '<div class="panel-body">
-							<p class="red">Tous ces répertoires seront vidés.</p>
-							<div class="table-responsive">
-								<table class="table table-bordered table-striped">
-									<thead>
-										<tr>
-											<th></th>
-											<th>
-												Liste des répertoires
-											</th>
-										</tr>
-									</thead>
-									<tbody>';
-	foreach($array as $k => $v) {
-		$html_directories .= '<tr>';
-		$html_directories .= '<th>' . $k . '</th>';
-		$html_directories .= '<td>' . $v . '</td>';
-		$html_directories .= '</tr>';
+// --------------------------------
+// --- AJAX : place prise par le site (parcours des dossiers, borné)
+// --------------------------------
+if (isset($_GET['ajax']) && $_GET['ajax'] == 'sizes') {
+	$sb_srv_media = realpath(_AM_MEDIAS_DIR);
+	$sb_srv_dirs  = array('Site complet' => $sb_srv_root);
+	if ($sb_srv_media) $sb_srv_dirs['Médias'] = $sb_srv_media;
+	$sb_srv_dirs['Caches (front)']  = SB_PATH . 'datas/cache';
+	$sb_srv_dirs['Caches (admin)']  = _AM_SITE_DIR . 'datas/cache';
+	$sb_srv_dirs['Journaux']        = _AM_SITE_DIR . 'logs';
+	$sb_srv_sizes = array();
+	foreach (sbServerSite($sb_srv_dirs) as $s) {
+		$sb_srv_sizes[] = array('label' => $s['label'], 'size' => $s['size'], 'partial' => $s['partial']);
 	}
-	
-	$html_directories .= '
-									</tbody>
-								</table>
-							</div>
-						</div>';
-	
-	return $html_directories;
+	header('Content-Type: application/json');
+	echo json_encode($sb_srv_sizes);
+	exit;
 }
+
+// --------------------------------
+// --- Réglage : type d'hébergement (auto ou forcé)
+// --------------------------------
+$sb_srv_types = sbServerHostingTypes();
+if (isset($_POST['form_submit']) && $_POST['form_submit'] == 'server_form') {
+	$sb_srv_new = (string) ($_POST['hosting_type'] ?? 'auto');
+	if (!array_key_exists($sb_srv_new, $sb_srv_types)) $sb_srv_new = 'auto';
+	if (sbSettingsSave(array('hosting_type' => $sb_srv_new))) {
+		$GLOBALS['sb_settings']['hosting_type'] = $sb_srv_new;
+		$sb_msg_valid = "Type d'hébergement enregistré";
+	} else {
+		$sb_msg_error = "Enregistrement impossible";
+	}
+}
+
+$sb_srv_setting  = sbSetting('hosting_type', 'auto');
+$sb_srv_probe    = sbServerProbe($sb_srv_root);
+$sb_srv_detected = sbServerDetectHosting($sb_srv_probe);
+$sb_srv_type     = sbServerHostingType($sb_srv_setting, $sb_srv_detected);
+
+// Relevés de la machine que open_basedir empêche de lire (VPS / dédié)
+$sb_srv_blocked = array();
+if ($sb_srv_probe['open_basedir'] !== '') {
+	foreach (sbServerProcPaths() as $f) if (!sbServerReadable($f)) $sb_srv_blocked[] = $f;
+}
+
+$sbsmarty->assign('sb_srv', array(
+	'types'     => $sb_srv_types,
+	'setting'   => $sb_srv_setting,
+	'type'      => $sb_srv_type,
+	'type_name' => $sb_srv_types[$sb_srv_type],
+	'detected'  => $sb_srv_detected + array('name' => $sb_srv_types[$sb_srv_detected['type']]),
+	'probe'     => $sb_srv_probe,
+	'basedir'   => array_values(array_filter(explode(PATH_SEPARATOR, $sb_srv_probe['open_basedir']))),
+	'blocked'   => $sb_srv_blocked,
+	'net_blocked' => in_array('/proc/net/dev', $sb_srv_blocked, true),
+	'php'       => sbServerPhp(),
+	'db'        => sbServerDb($sbsql),
+	'live'      => json_encode(sbServerLive($sb_srv_root)),
+	'js_v'      => @filemtime(_AM_SITE_DIR . 'assets/adminator/server.js'),
+));
+
+// --------------------------------
+// --- Formulaire du réglage
+// --------------------------------
+$sbform->openForm(array('action' => $module_url, 'name' => 'server_form', 'id' => 'server_form', 'reloadpage' => $module_url, 'submitpage' => $module_url));
+$sbform->openSelect("Type d'hébergement", array('id' => 'hosting_type', 'name' => 'hosting_type'));
+$sb_srv_opt = array('value' => 'auto');
+if (!array_key_exists($sb_srv_setting, $sb_srv_types)) $sb_srv_opt['selected'] = '';
+$sbform->addOption('Automatique (détecté : ' . $sb_srv_types[$sb_srv_detected['type']] . ')', $sb_srv_opt);
+foreach ($sb_srv_types as $k => $v) {
+	$sb_srv_opt = array('value' => $k);
+	if ($k === $sb_srv_setting) $sb_srv_opt['selected'] = '';
+	$sbform->addOption($v, $sb_srv_opt);
+}
+$sbform->closeSelect();
+$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => 'server_form'));
+$sbform->addInput('submit', '', array('value' => 'Enregistrer'));
+$sbform->closeForm();
 
 // ---------------------------------------------------
 // ---------------------------------------------------
@@ -156,9 +141,7 @@ function sbListDirectories($array) {
 // ----------------------------------------
 // ASSIGN Page TITLE - Modify this |
 // ----------------------------------------
-$sbsmarty->assign('page_title', 'Cache');
-// --- Legend ADD or EDIT
-$sbsmarty->assign('legend_add_edit', sprintf((string) ($legend_add_edit ?? ''), $sbsanitize->displayText($action, 'UTF-8', 0, 1)));
+$sbsmarty->assign('page_title', 'Serveur');
 
 // ----------------------
 // ASSIGN Message status

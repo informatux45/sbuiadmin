@@ -13,7 +13,7 @@
 	{assign var="sh_sub" value="Durée de vie et paramètres des sessions utilisateur."}
 {elseif $smarty.get.p == 'server'}
 	{assign var="sh_title" value="Serveur"}
-	{assign var="sh_sub" value="Informations serveur en temps réel (PHP, base de données, extensions)."}
+	{assign var="sh_sub" value="Ressources et limites du serveur, selon le type d'hébergement (mutualisé, VPS, dédié)."}
 {elseif $smarty.get.p == 'cache'}
 	{assign var="sh_title" value="Cache"}
 	{assign var="sh_sub" value="Vider les caches FRONT et ADMIN du site."}

@@ -929,3 +929,19 @@ p.sbmedia > span.sbmedia-other {
 }
 .pw-toggle:hover, .pw-toggle:focus-visible { color: var(--primary); }
 .pw-toggle svg { fill: none; height: 18px; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; width: 18px; }
+
+/* Configuration > Serveur (server.tpl) */
+.sbsrv-table th { width: 34%; text-align: left; vertical-align: top; color: var(--t-muted); font-weight: 500; }
+.sbsrv-table .badge { margin: 0 4px 4px 0; }
+.sbsrv-muted, .sbsrv-refresh { color: var(--t-muted); }
+.sbsrv-refresh { font-size: 12px; margin: -8px 0 0; }
+.sbsrv-kpis .kpi-value { font-size: 22px; }
+.sbsrv-kpis .sv-radial { grid-template-columns: 72px 1fr; gap: 14px; }
+.sbsrv-radial { transition: stroke-dashoffset .8s cubic-bezier(.2,.7,.2,1); }
+.sbsrv-cpu-chart { height: 240px; }
+.sbsrv-cpu-chart svg { display: block; overflow: visible; }
+.sbsrv-cpu-chart .grid-line { stroke: var(--border-soft); stroke-width: 1; }
+.sbsrv-cpu-chart .axis { fill: var(--t-light); font-size: 11px; font-family: JetBrains Mono, monospace; }
+.sbsrv-cpu-chart .limit { stroke: var(--danger); stroke-width: 1; stroke-dasharray: 4 4; }
+.sbsrv-cpu-chart .empty { fill: var(--t-muted); font-size: 13px; }
+.sbsrv-kpis .kpi-pill:empty { display: none; }

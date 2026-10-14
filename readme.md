@@ -69,6 +69,10 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
+**4.25**
+- Configuration > Server rebuilt: shared / VPS / dedicated detected (or forced), disk ring, live CPU load chart, "not detected" instead of zeros
+- Container load read from /proc/loadavg (not the host); old status iframe and Chart.js removed
+
 **4.24**
 - Font Awesome 7 Free served locally (themes, admin, editor, icon picker), old icon names still accepted
 - Blocked IPs and front anti-flood active again, 403 redirect fixed; local Chart.js 4.5.1

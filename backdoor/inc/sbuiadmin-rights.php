@@ -215,12 +215,17 @@ function sbClassifyAction($module) {
 		return 'view';
 	}
 
-	// Cas particulier : cache.php/server.php n'ont qu'un seul "case" (default
-	// ET "cache" regroupés) - op=cache ne distingue donc jamais "afficher la
-	// page" de "vider les caches" : c'est la soumission POST du formulaire
-	// (unlink() des fichiers) qui fait la différence, pas la valeur de op.
-	if ($module == 'cache' || $module == 'server') {
+	// Cas particulier : cache.php n'a qu'un seul "case" (default ET "cache"
+	// regroupés) - op=cache ne distingue donc jamais "afficher la page" de
+	// "vider les caches" : c'est la soumission POST du formulaire (unlink()
+	// des fichiers) qui fait la différence, pas la valeur de op.
+	if ($module == 'cache') {
 		return ($_SERVER['REQUEST_METHOD'] === 'POST') ? 'delete' : 'view';
+	}
+
+	// server.php : seul le POST enregistre un réglage (type d'hébergement)
+	if ($module == 'server') {
+		return ($_SERVER['REQUEST_METHOD'] === 'POST') ? 'edit' : 'view';
 	}
 
 	// Cas particulier : theme.php n'utilise ni a= ni op=, l'activation d'un

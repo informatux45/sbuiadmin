@@ -134,6 +134,8 @@ function sbSettingsDefaults() {
 		// Double authentification par e-mail : activée à la main dans
 		// Configuration, après un code de test reçu (inc/sbuiadmin-2fa.php)
 		'twofa_enabled'         => '0',
+		// Configuration > Serveur : auto, shared, vps ou dedicated
+		'hosting_type'          => 'auto',
 	);
 }
 
