@@ -69,6 +69,9 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
+**4.27**
+- Media folder and URL now set by the updated core, so sites keeping an older sbconfig.php need no manual change
+
 **4.26**
 - Media uploads hardened: safe file names (duplicates included), content must match the extension, size limit enforced server-side, CSRF token
 - Media folder fixed to upload/ (no longer set at install or in Configuration), media URL derived from the site URL; no more double slashes

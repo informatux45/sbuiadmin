@@ -766,3 +766,9 @@ $GLOBALS['sb_settings'] = sbSettingsLoad();
 // Thème du site (en base depuis la 4.14, avant dans inc/admin/theme.txt).
 // Défini ici, avant sbconfig.php : la base l'emporte sur l'ancien fichier.
 defined('SBTHEME') or define('SBTHEME', sbSettingsTheme());
+
+// Dossier et URL des médias (4.26) : définis ici, avant sbconfig.php, que la
+// mise à jour ne remplace jamais (fichier propre au site) - ses anciennes
+// lignes, qui lisaient medias_dir / medias_url, n'ont alors plus d'effet.
+defined('_AM_MEDIAS_DIR') or define('_AM_MEDIAS_DIR', sbMediasDir());
+defined('_AM_MEDIAS_URL') or define('_AM_MEDIAS_URL', sbMediasUrl());
