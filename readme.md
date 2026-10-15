@@ -69,6 +69,11 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
+**4.28**
+- Text conversion no longer drops strings with characters outside Latin-1 (euro, curly quotes, emoji)
+- Maintenance page: local fonts linked, social icons no longer doubled on desktop
+- Form class: no more PHP 8 "Undefined variable" warnings
+
 **4.27**
 - Media folder and URL now set by the updated core, so sites keeping an older sbconfig.php need no manual change
 

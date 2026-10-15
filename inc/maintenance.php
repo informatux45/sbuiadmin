@@ -106,6 +106,7 @@ function sbMaintenancePage() {
 <link href="<?php echo $assets; ?>css/bootstrap.min.css" rel="stylesheet">
 <link href="<?php echo $assets; ?>css/responsive.css" rel="stylesheet">
 <link href="<?php echo SB_URL; ?>assets/fontawesome/css/all.min.css?v=7.3.1" rel="stylesheet">
+<link href="<?php echo $assets; ?>css/sbfonts.css" rel="stylesheet">
 <style>
 main[role="main-wrapper-iamge"],main[role="main-wrapper-iamge"] > .over-bg-color{background-image:url(<?php echo htmlspecialchars($image, ENT_QUOTES, 'UTF-8'); ?>);background-size:cover;background-position:50% 0;background-repeat:no-repeat;width:100%;height:100%;position:fixed}
 main[role="main-wrapper-iamge"] > .over-bg-color{background-color:rgba(255,255,255,0.5);background-image:none;padding:0}
@@ -181,7 +182,7 @@ main[role="video-container"]{position:relative;z-index:6}
 <?php if ($type == 'image') { ?></div><?php } ?>
 </main>
 <script src="<?php echo $assets; ?>js/jquery.min.js"></script>
-<script src="<?php echo $assets; ?>js/nav-custom.js"></script>
+<script src="<?php echo $assets; ?>js/nav-custom.js?v=4.28"></script>
 <script src="<?php echo $assets; ?>js/bootstrap.min.js"></script>
 <?php if ($launch) { ?>
 <script>

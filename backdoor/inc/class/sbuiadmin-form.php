@@ -296,6 +296,8 @@ class form extends sanitize {
 	* @return html code
 	*/
 	public function addInput ($elem, $label = '', $arrArgs = array (), $isRequired = false, $options = false, $helpDsc = '') {
+		// PHP 8 : variables lues avant toute affectation selon les options
+		$chaineTemp = $labelFor = $labelInputGroup = $labelInputGroup2 = $id = $photo = $exts = $transfert = $limitfiles = ''; $addany = $onclickFunction = false;
 		if (!array_key_exists ($elem, $this -> inputArr)) {
 			throw new Exception ($elem . ' n\'est pas un élément valide');
 		}
@@ -483,6 +485,7 @@ class form extends sanitize {
 	* @return html code
 	*/
 	public function addRadio ($label, $tabRadio, $arrArgs = array (), $isRequired = false, $separator = '&nbsp;', $helpDsc = '') {
+		$chaineTemp = $chaineValue = '';
 		$elem = 'radio';
 		if (!array_key_exists ($elem, $this -> inputArr)) {
 			throw new Exception ($elem . ' n\'est pas un élément valide');
@@ -554,6 +557,7 @@ class form extends sanitize {
 	* @return html code
 	*/
 	public function addRadioYN ($label = '', $isRequired = false, $arrArgs = array (), $yes = 'OUI', $no = 'NON', $helpDsc = '', $separator = '&nbsp;&nbsp;&nbsp;') {
+		$chaineTemp = '';
 		$elem = 'radio';
 		if (!array_key_exists ($elem, $this -> inputArr)) {
 			throw new Exception ($elem . ' n\'est pas un élément valide');
@@ -628,6 +632,7 @@ class form extends sanitize {
 	* @return html code
 	*/
 	public function addCheckbox ($label, $tabCheck, $arrArgs = array (), $isRequired = false, $separator = '&nbsp;', $helpDsc = '') {
+		$chaineTemp = '';
 		$elem = 'checkbox';
 		if (!array_key_exists ($elem, $this -> inputArr)) {
 			throw new Exception ($elem . ' ' . UIADMIN_SYS_DEBUG_FORM_ERROR_INPUT);
@@ -685,6 +690,7 @@ class form extends sanitize {
 	* @return html code
 	*/
 	public function addTextarea ($label, $txt, $arrArgs = array (), $isRequired = false, $helpDsc = '') {
+		$chaineTemp = $valid = '';
 		$cpt = count ($this -> formElementArr);
 		$this -> formElementArr[$cpt]['textarea']['innerHTML'] = $txt;
 		$arrTemp = array_merge ($this -> eventArr, $this -> commonArr, $this -> textareaArr);
@@ -780,6 +786,7 @@ class form extends sanitize {
 	* @return html code
 	*/
 	public function openSelect ($label = '', $arrArgs = array (), $isRequired = false) {
+		$chaineTemp = $chaineClasses = '';
 		$cpt = count ($this -> formElementArr);
 		$this -> formElementArr[$cpt]['select'] = array ();
 		$arrTemp = array_merge ($this -> eventArr, $this -> commonArr, $this -> selectArr);
@@ -872,6 +879,7 @@ class form extends sanitize {
 	* @return html code
 	*/
 	public function addDate ($label = '', $arrArgs = array (), $isRequired = false, $localization = 'fr', $helpDsc = '') {
+		$chaineTemp = $dateId = '';
 		$elem = 'text';
 		if (!array_key_exists ($elem, $this -> inputArr)) {
 			throw new Exception ($elem . ' n\'est pas un élément valide');
@@ -959,6 +967,7 @@ class form extends sanitize {
 	* @return html code
 	*/
 	public function addTagify($label = '', $arrArgs = array (), $isRequired = false, $helpDsc = '') {
+		$chaineTemp = '';
 		$elem = 'text';
 		if (!array_key_exists ($elem, $this -> inputArr)) {
 			throw new Exception ($elem . ' n\'est pas un élément valide');
@@ -1083,6 +1092,7 @@ class form extends sanitize {
 	* @return html code
 	*/
 	public function addTagifyWhitelist($label = '', $whitelist = array (), $arrArgs = array (), $isRequired = false, $helpDsc = '') {
+		$chaineTemp = '';
 		$elem = 'text';
 		if (!array_key_exists ($elem, $this -> inputArr)) {
 			throw new Exception ($elem . ' n\'est pas un élément valide');
@@ -1173,6 +1183,7 @@ class form extends sanitize {
 	* @return html code
 	*/
 	public function addCountry ($label = '', $arrArgs = array (), $isRequired = false, $helpDsc = '') {
+		$chaineTemp = '';
 		$chaineTemp .= $this -> openSelect ($label, $arrArgs, $isRequired, $helpDsc);
 
 		// Extract all the countries (options html)
@@ -1208,6 +1219,7 @@ class form extends sanitize {
 	* @return html code (editor CKEditor)
 	*/
 	public function addTextareaHtml ($label, $txt, $arrArgs = array (), $isRequired = false, $toolbar = 'full', $width = '100%', $height = '200px', $helpDsc = '') {
+		$chaineTemp = '';
 		$cpt = count ($this -> formElementArr);
 		$this -> formElementArr[$cpt]['textarea']['innerHTML'] = $txt;
 		$arrTemp = array_merge ($this -> eventArr, $this -> commonArr, $this -> textareaArr);
@@ -2443,6 +2455,7 @@ EOT;
 	* @return html code
 	*/
 	public function addColor ($label = '', $arrArgs = array (), $isRequired = false, $helpDsc = '') {
+		$chaineTemp = '';
 		$elem = 'text';
 		if (!array_key_exists ($elem, $this -> inputArr)) {
 			throw new Exception ($elem . ' n\'est pas un élément valide');
@@ -2532,6 +2545,7 @@ EOT;
 	* @return html code
 	*/
 	public function addIconFA ($label = '', $arrArgs = array (), $isRequired = false, $helpDsc = '') {
+		$chaineTemp = '';
 		$elem = 'text';
 		if (!array_key_exists ($elem, $this -> inputArr)) {
 			throw new Exception ($elem . ' n\'est pas un élément valide');

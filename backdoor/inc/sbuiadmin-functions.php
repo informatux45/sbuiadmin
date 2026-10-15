@@ -81,14 +81,14 @@ if (!function_exists("sbGa4Id")) {
 if (!function_exists("sb_utf8_encode")) {
    function sb_utf8_encode($string, $from_encoding = 'ISO-8859-1', $to_encoding = 'UTF-8') {
       // mb_convert_encoding($string, 'ISO-8859-1', 'UTF-8');
-      return iconv($from_encoding, $to_encoding, (string) $string);
+      return (string) @iconv($from_encoding, $to_encoding . '//TRANSLIT//IGNORE', (string) $string);
    }
 }
 
 if (!function_exists("sb_utf8_decode")) {
    function sb_utf8_decode($string, $from_encoding = 'UTF-8', $to_encoding = 'ISO-8859-1') {
       // mb_convert_encoding($string, 'ISO-8859-1', 'UTF-8');
-      return iconv($from_encoding, $to_encoding, (string) $string);
+      return (string) @iconv($from_encoding, $to_encoding . '//TRANSLIT//IGNORE', (string) $string);
    }
 }
 /* =========================================== */

@@ -66,7 +66,7 @@ function navShowHide()
 {
 	if($(window).width()>767)
 	{
-		$('.nav').children('ul').css('display','block');
+		$('.nav').children('ul').not('.mobile-social').css('display','block');
 	}
 	else
 	{
