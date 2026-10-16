@@ -23,7 +23,7 @@ class page extends Smarty {
 	/**
 	* Format Header Module Page
 	* @param  string  $modulePage
-	* @return string
+	* @return void
 	*/
 	public function getHeader($modulePage) {
 

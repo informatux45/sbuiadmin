@@ -50,10 +50,11 @@ if (!function_exists("sbIllegalCharacter")) {
 	function sbIllegalCharacter($string) {
 		$illegal_caracters = array('À','Á','Â','Ã','Ä','Å','à','á','â','ã','ä','å','Ò','Ó','Ô','Õ','Ö','Ø','ò','ó','ô','õ','ö','ø','È','É','Ê','Ë','è','é','ê','ë','Ç','ç','Ì','Í','Î','Ï','ì','í','î','ï','Ù','Ú','Û','Ü','ù','ú','û','ü','ÿ','Ñ','ñ','&','~','"','#','{','}','(',')','[',']','-','_','`','/','^','¨','@','°','+','=','$','£','¤','%','*','µ','?',',',';','.',':','!','§','n','”','“','¢','»','ł','|','ß','ð','đ','ŋ','ħ','j','ĸ','ł','µ','þ','œ','→','↓','←','ŧ','¶','€','«','æ','¬','¹');
 	
-		if (strpos($string, $illegal_caracters) === true)
-			return true;
-		else
-			return false;
+		// strpos() avec une liste : erreur fatale en PHP 8 (toujours false avant)
+		foreach ($illegal_caracters as $c) {
+			if (strpos((string) $string, $c) !== false) return true;
+		}
+		return false;
 	}
 }
 
@@ -128,7 +129,7 @@ if (!function_exists("sbGetCurrentUrl")) {
  */
 if (!function_exists("sbGetCurrentUrlWithoutArgs")) {
 	function sbGetCurrentUrlWithoutArgs() {
-		$request_url = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
+		$request_url = (string) parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 		// Check last string character
 		if (substr($request_url, -1) == '/')
 			return $request_url;
@@ -234,7 +235,7 @@ if (!function_exists("sbRewriteUrl")) {
 /**
 * Get Stats Script
 * @param	string	sb_pages_title	Page title
-* @return code (include stats script)
+* @return void
 */
 function sbGetStats($sb_pages_title) {
 	$nom_page = $sb_pages_title;
@@ -248,7 +249,7 @@ function sbGetStats($sb_pages_title) {
 /**
  * Get Shortcode for page
  * @param	string	$string
- * @return html content
+ * @return string html content
  */
 if (!function_exists("sbGetShortcode")) {
 	function sbGetShortcode($string, $smarty = false) {
@@ -470,7 +471,7 @@ if (!function_exists("sbRenamePageBuilderClasses")) {
 
 /**
 * Get SEO Meta Keywords / Description
-* @return html
+* @return string html
 */
 if (!function_exists("sbGetSeo")) {
 	function sbGetSeo($text = '', $key = '') {
@@ -685,7 +686,7 @@ if (!function_exists("insert_sbGetMenuCms")) {
 * @param	string	o2	Template Smarty 2
 * @param	string	o3	Template Smarty 3
 * @param	string	o4	Template Smarty 4
-* @return html display (Smarty)
+* @return string html display (Smarty)
 */
 if (!function_exists("insert_sbGetContentCms")) {
 	function insert_sbGetContentCms($param) {
@@ -718,7 +719,7 @@ if (!function_exists("insert_sbGetContentCms")) {
 
 /**
 * Get CMS headers from SQL
-* @return html
+* @return string html
 */
 if (!function_exists("insert_sbGetHeaders")) {
 	function insert_sbGetHeaders() {
@@ -870,7 +871,7 @@ if (!function_exists("sbPluginEnabled")) {
 
 /**
 * Get CMS footer plugins
-* @return html
+* @return string html
 */
 if (!function_exists("insert_sbGetPlugins")) {
 	function insert_sbGetPlugins() {
@@ -979,7 +980,7 @@ if (!function_exists("insert_sbGetFonts")) {
 /**
 * Get CMS Configuration
 * @param	string	id	Config ID to display
-* @return html
+* @return string html
 */
 if (!function_exists("insert_sbGetConfig")) {
 	function insert_sbGetConfig($param) {
@@ -1004,7 +1005,7 @@ if (!function_exists("insert_sbGetConfig")) {
 * @param	string	col		SQL column for SELECT
 * @param	string	tbl		SQL Table
 * @param	string	cond	SQL condition
-* @return html
+* @return string html
 */
 if (!function_exists("insert_sbGetNumRows")) {
 	function insert_sbGetNumRows($param) {
@@ -1140,7 +1141,7 @@ if (!function_exists("insert_sbGetFile")) {
 /**
  * Get one Shortcode for page (smarty code)
  * @param	string	$string
- * @return html content
+ * @return string html content
  */
 if (!function_exists("insert_sbDoShortcode")) {
 	function insert_sbDoShortcode($shortcode) {
@@ -1266,7 +1267,7 @@ if (!function_exists("insert_sbGetMobileDetect")) {
 
 /**
  * Get SEO All Metas From Administration
- * @return html
+ * @return string html
  */
 if (!function_exists("insert_sbGetSeoMetas")) {
 	function insert_sbGetSeoMetas() {

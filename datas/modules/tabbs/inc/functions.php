@@ -40,10 +40,6 @@ function shortcode_sbtabbs($param = '') {
 
 	// --- Check if news exists
 	if ($tabbs) {
-		// --- Initialization
-		$title      = $sbsanitize->displayText($sbsanitize->displayLang($item_info['title'], $_SESSION['lang']), 'UTF-8');
-		$desc_short = $sbsanitize->displayText($sbsanitize->displayLang($item_info['desc_short'], $_SESSION['lang']), 'UTF-8');
-		$title_url  = $sbsanitize->stripTags(strtolower(sbRewriteString($title)));
 		// --- Construct HTML
 		$item_html .= '<link href="' . SB_MODULES_URL . 'tabbs/inc/responsive-tabs.css" rel="stylesheet" />';
 		$item_html .= '<script type="text/javascript" src="' . SB_MODULES_URL . 'tabbs/inc/responsiveTabs.js"></script>';

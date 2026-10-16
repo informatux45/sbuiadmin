@@ -112,8 +112,8 @@ $path = parse_url($src);
 if (isset($path['scheme'])) {
     $base = parse_url('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
     if (preg_replace('/^www\./i', '', $base['host']) == preg_replace('/^www\./i', '', $path['host'])) {
-        $base = explode('/', preg_replace('/\/+/', '/', $base['path']));
-        $path = explode('/', preg_replace('/\/+/', '/', $path['path']));
+        $base = explode('/', preg_replace('/\/+/', '/', $base['path'] ?? ''));
+        $path = explode('/', preg_replace('/\/+/', '/', $path['path'] ?? ''));
         $temp = $path;
         $part = count($base);
         foreach ($base as $k => $v) {
@@ -317,7 +317,7 @@ if (!file_exists($file_temp)) {
     }
     $x = strpos($align, 'l') !== false ? 0 : (strpos($align, 'r') !== false ? $w - $w1 : ($w - $w1) / 2);
     $y = strpos($align, 't') !== false ? 0 : (strpos($align, 'b') !== false ? $h - $h1 : ($h - $h1) / 2);
-    $im = imagecreatetruecolor($w, $h);
+    $im = imagecreatetruecolor((int) $w, (int) $h); // flottant tronqué : déprécié en PHP 8.1
     $bg = imagecolorallocate($im, 255, 255, 255);
     imagefill($im, 0, 0, $bg);
     switch ($type) {
@@ -345,7 +345,7 @@ if (!file_exists($file_temp)) {
             imagefill($im, 0, 0, imagecolorallocatealpha($im, 0, 0, 0, 127));
             imagesavealpha($im, true);
             imagealphablending($im, false);
-            imagecopyresampled($im, $oi, $x, $y, 0, 0, $w1, $h1, $w0, $h0);
+            imagecopyresampled($im, $oi, (int) $x, (int) $y, 0, 0, (int) $w1, (int) $h1, (int) $w0, (int) $h0);
             if ($sharpen && version_compare(PHP_VERSION, '5.1.0', '>=')) {
                 $fix = imagecolorat($im, 0, 0);
                 imageconvolution($im, $matrix, $divisor, 0);

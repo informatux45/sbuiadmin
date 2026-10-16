@@ -95,7 +95,7 @@ class medias {
         if(isset($args[1])){
             if(gettype($args[1]) == "array"){self::$ext_filter = array_map('strtolower', $args[1]);}
             else
-            if(gettype($args[1]) == "string"){self::$ext_filter[] = strtolower($args[1]);}
+            if(gettype($args[1]) == "string"){self::$ext_filter = array(strtolower($args[1]));}
         }
 
         // Grab path(s)

@@ -135,7 +135,10 @@ function sb_get_server_url() {
 	  }
    }
    if (!strpos($server_url, ':')) {
-	  if ( ($this->_isHttps() && $_SERVER['SERVER_PORT']!=443) || (!$this->_isHttps() && $_SERVER['SERVER_PORT']!=80)
+	  // $this->_isHttps() hors d'une classe : erreur fatale en PHP 8
+	  $https = !empty($_SERVER['HTTPS']) && strtolower((string) $_SERVER['HTTPS']) !== 'off';
+	  $port  = (int) ($_SERVER['SERVER_PORT'] ?? 0);
+	  if ($port && (($https && $port != 443) || (!$https && $port != 80))
 	  ) {
 		 $server_url .= ':';
 		 $server_url .= $_SERVER['SERVER_PORT'];
@@ -170,7 +173,7 @@ function get2DArrayFromCsv($file,$delimiter) {
 
    if (($handle = fopen($file, "r")) !== FALSE) {
 	   $i = 0;
-	   while (($lineArray = fgetcsv($handle, 4000, $delimiter)) !== FALSE) {
+	   while (($lineArray = fgetcsv($handle, 4000, $delimiter, '"', '\\')) !== FALSE) {
 		   for ($j=0; $j<count($lineArray); $j++) {
 			   $data2DArray[$i][$j] = $lineArray[$j];
 		   }
@@ -674,7 +677,7 @@ function sbConvertDate($date, $format = 'ISO') {
 }
 
 function sbGetLastPartOfUrl($url) {
-	return basename(parse_url($url, PHP_URL_PATH));
+	return basename((string) parse_url($url, PHP_URL_PATH));
 }
 
 function sbDisplayLang($string, $lang = "fr") {
@@ -719,7 +722,7 @@ function sbTruncate($string, $max = 20, $replacement = '') {
 /**
 * Get CMS Configuration
 * @param	string	config	Config name to return
-* @return html
+* @return string html
 */
 function sbGetConfig($config, $langdefault = 'fr') {
 	global $sbsanitize, $sbsql;
@@ -1203,7 +1206,7 @@ function sbGetLastLoginsWidgetValue($limit = 10) {
 
 /**
  * Construct Module Menu (Out of System)
- * @param string $type main / admin
+ * @param string $param main / admin
  * @return String menu Admin
  */
 function sbGetMenuModule($param = '') {
@@ -1415,11 +1418,10 @@ function sbGetUserGroup($username) {
 
 /**
  * Get Array Multidimensional ordered by column
- * @param array $array (ex: $sbfiles)
- * @param columns array (ex: 'time')
- * @param sort (SORT_DESC, SORT_ASC)
+ * Arguments (variables) : the array (ex: $sbfiles), then pairs
+ * column (ex: 'time') / sort (SORT_DESC, SORT_ASC)
  * Example sbArrayOrderby($sbfiles_new, 'time', SORT_DESC, 'file', SORT_ASC)
- * @return Array Ordered
+ * @return array Ordered
  */
 function sbArrayOrderby() {
     $args = func_get_args();

@@ -217,6 +217,12 @@ class form extends sanitize {
 							   ,'value' => ''
 							   ,'rel' => ''
 							   );
+	// openFieldset(), addLegend(), addP(), addLabel() : non déclarées,
+	// array_merge(null) = erreur fatale en PHP 8
+	private $fieldsetArr      = array ();
+	private $legendArr        = array ();
+	private $pArr             = array ();
+	private $labelArr         = array ();
 	private $optgroupArr      = array ('label' => ''
 									  ,'disabled' => ''
 									  );
@@ -238,7 +244,7 @@ class form extends sanitize {
 	
 	/**
 	* Construct form (header)
-	* @return html code
+	* @return void
 	*/
 	public function openForm ($arrArgs = array ()) {
 		foreach ($this -> formArr as $clef => $val) {
@@ -293,7 +299,7 @@ class form extends sanitize {
 	/**
 	* Construct form (body)
 	* add a form element (input)
-	* @return html code
+	* @return void
 	*/
 	public function addInput ($elem, $label = '', $arrArgs = array (), $isRequired = false, $options = false, $helpDsc = '') {
 		// PHP 8 : variables lues avant toute affectation selon les options
@@ -482,7 +488,7 @@ class form extends sanitize {
 	/**
 	* Construct form (body)
 	* add a form element (input radio)
-	* @return html code
+	* @return void
 	*/
 	public function addRadio ($label, $tabRadio, $arrArgs = array (), $isRequired = false, $separator = '&nbsp;', $helpDsc = '') {
 		$chaineTemp = $chaineValue = '';
@@ -554,7 +560,7 @@ class form extends sanitize {
 	/**
 	* Construct form (body)
 	* add a form element (input radio)
-	* @return html code
+	* @return void
 	*/
 	public function addRadioYN ($label = '', $isRequired = false, $arrArgs = array (), $yes = 'OUI', $no = 'NON', $helpDsc = '', $separator = '&nbsp;&nbsp;&nbsp;') {
 		$chaineTemp = '';
@@ -629,7 +635,7 @@ class form extends sanitize {
 	/**
 	* Construct form (body)
 	* add a form element (checkbox)
-	* @return html code
+	* @return void
 	*/
 	public function addCheckbox ($label, $tabCheck, $arrArgs = array (), $isRequired = false, $separator = '&nbsp;', $helpDsc = '') {
 		$chaineTemp = '';
@@ -687,7 +693,7 @@ class form extends sanitize {
 	/**
 	* Construct form (body)
 	* add a form element (textarea)
-	* @return html code
+	* @return void
 	*/
 	public function addTextarea ($label, $txt, $arrArgs = array (), $isRequired = false, $helpDsc = '') {
 		$chaineTemp = $valid = '';
@@ -739,7 +745,7 @@ class form extends sanitize {
 	/**
 	* Construct form (body)
 	* add a form element (sortable)
-	* @return html code
+	* @return void
 	*/
 	public function addSortable ($options_sort, $helpDsc = '', $extra = false, $lang = 'fr', $encode = "UTF-8") {		
 		$cpt = count ($this -> formElementArr);
@@ -747,7 +753,7 @@ class form extends sanitize {
 		$arrTemp = array_merge ($this -> eventArr, $this -> commonArr, $this -> optionArr);
 
 		// Show the label for the element
-		$chaineTemp .= '<div class="form-group">';
+		$chaineTemp = '<div class="form-group">';
 		
 		// If help
 		if ($helpDsc != '')
@@ -783,7 +789,7 @@ class form extends sanitize {
 	/**
 	* Construct form (body)
 	* add a form element (select)
-	* @return html code
+	* @return void
 	*/
 	public function openSelect ($label = '', $arrArgs = array (), $isRequired = false) {
 		$chaineTemp = $chaineClasses = '';
@@ -824,7 +830,7 @@ class form extends sanitize {
 	/**
 	* Construct form (body)
 	* add a form element (close select)
-	* @return html code
+	* @return void
 	*/
 	public function closeSelect ($helpDsc = '') {
 		$cpt = count ($this -> formElementArr);
@@ -846,7 +852,7 @@ class form extends sanitize {
 	/**
 	* Construct form (body)
 	* add a option to a form element (select)
-	* @return html code
+	* @return void
 	*/
 	public function addOption ($txt, $arrArgs = array ()) {
 		$cpt = count ($this -> formElementArr);
@@ -876,7 +882,7 @@ class form extends sanitize {
 	/**
 	* Construct form (body)
 	* add a form element (input date select)
-	* @return html code
+	* @return void
 	*/
 	public function addDate ($label = '', $arrArgs = array (), $isRequired = false, $localization = 'fr', $helpDsc = '') {
 		$chaineTemp = $dateId = '';
@@ -964,7 +970,7 @@ class form extends sanitize {
 	/**
 	* Construct form (body)
 	* add a form element (input tags with drag & drop)
-	* @return html code
+	* @return void
 	*/
 	public function addTagify($label = '', $arrArgs = array (), $isRequired = false, $helpDsc = '') {
 		$chaineTemp = '';
@@ -1089,7 +1095,7 @@ class form extends sanitize {
 	* Valeur pré-remplie/soumise au même format JSON que addTagify()
 	* (tableau d'objets {value: "cle_stable"}), lisible par
 	* sbGetTagifyDatas() côté serveur sans changement.
-	* @return html code
+	* @return void
 	*/
 	public function addTagifyWhitelist($label = '', $whitelist = array (), $arrArgs = array (), $isRequired = false, $helpDsc = '') {
 		$chaineTemp = '';
@@ -1180,7 +1186,7 @@ class form extends sanitize {
 	/**
 	* Construct form (body)
 	* add a form element (country select)
-	* @return html code
+	* @return void
 	*/
 	public function addCountry ($label = '', $arrArgs = array (), $isRequired = false, $helpDsc = '') {
 		$chaineTemp = '';
@@ -1216,7 +1222,7 @@ class form extends sanitize {
 	/**
 	* Construct form (body)
 	* add a form element (textarea with editor wysiwyg)
-	* @return html code (editor CKEditor)
+	* @return void
 	*/
 	public function addTextareaHtml ($label, $txt, $arrArgs = array (), $isRequired = false, $toolbar = 'full', $width = '100%', $height = '200px', $helpDsc = '') {
 		$chaineTemp = '';
@@ -1342,7 +1348,7 @@ class form extends sanitize {
 	/**
 	* Construct form (body)
 	* add a form element (Html Editor - Page Builder)
-	* @return Page Builder
+	* @return void
 	*/
 	public function addPageBuilder ($label = '', $src = '', $arrArgs = array (), $isRequired = false, $toolbar = 'full', $helpDsc = '') {
 		$chaineTemp = ''; // PHP 8 : complétée par .= plus bas
@@ -2453,7 +2459,7 @@ EOT;
 	/**
 	* Construct form (body)
 	* add a form element (input)
-	* @return html code
+	* @return void
 	*/
 	public function addColor ($label = '', $arrArgs = array (), $isRequired = false, $helpDsc = '') {
 		$chaineTemp = '';
@@ -2543,7 +2549,7 @@ EOT;
 	* chargé globalement comme peek.js/modal.js). La valeur stockée/soumise
 	* est la classe Font Awesome 7 complète (ex: "fa-solid fa-comments") ;
 	* un ancien nom FA4 déjà en base ("comments") reste accepté (sbFaClass()).
-	* @return html code
+	* @return void
 	*/
 	public function addIconFA ($label = '', $arrArgs = array (), $isRequired = false, $helpDsc = '') {
 		$chaineTemp = '';
@@ -2603,7 +2609,7 @@ EOT;
 	/**
 	* Construct form (body)
 	* add a break to the form (line with title)
-	* @return html code (string)
+	* @return void
 	*/
 	public function addBreak ($title, $align = 'left') {
 		$cpt = count ($this -> formElementArr);
@@ -2623,7 +2629,7 @@ EOT;
 	/**
 	* Construct form (body)
 	* add a * for form fields required
-	* @return html code (string)
+	* @return string html code (string)
 	*/
 	public function isRequired ($fieldRequired, $label, $labelFor = '', $colorRequired = 'red', $labelInputGroup = '', $labelInputGroupStyle = '', $isTextPrefix = false) {
 
@@ -2658,7 +2664,7 @@ EOT;
 	/**
 	* Construct form (body)
 	* show the entire form
-	* @return html code
+	* @return string html code
 	*/
 	public function __toString () {
 		$chaineTemp = $this -> formBuffer['open'];
@@ -2707,7 +2713,7 @@ EOT;
 	* Construct form (method)
 	* free up resources and create a new form
 	* form any previously created and not displayed will be lost
-	* @return empty array
+	* @return void
 	*/
 	public function freeForm () {
 		$this -> formBuffer       = array ();
@@ -2831,7 +2837,7 @@ EOT;
 	/**
 	* Construct form (body)
 	* add a option to a form element (optgroup)
-	* @return html code
+	* @return void
 	*/
 	public function openOptgroup ($label, $arrArgs = array ()) {
 	  $cpt = count ($this -> formElementArr);
@@ -2854,7 +2860,7 @@ EOT;
 	/**
 	* Construct form (body)
 	* add a option to a form element (close optgroup)
-	* @return html code
+	* @return void
 	*/
 	public function closeOptgroup () {
 	  $cpt = count ($this -> formElementArr);

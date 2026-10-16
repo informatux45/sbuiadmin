@@ -116,13 +116,13 @@ class account extends sql {
 	/**
 	 * Check if user captcha is correct if is activated
 	 *
-	 * @param	string	$email 		User email
+	 * @param	string	$password 	User password
 	 * @param	string	$captcha 	Captcha result
 	 *
 	 * @return bool
 	 */
     public function checkUser($password, $captcha) {
-        if (isset($_SESSION['sbaccount_user_email']) || $_SESSION['sbaccount_user_email'] != '') {
+        if (isset($_SESSION['sbaccount_user_email'])) { // "|| != ''" lisait la clé absente
             if (!$this->login($_SESSION['sbaccount_user_email'], $password)) {
                 return false;
             } else {
@@ -223,7 +223,7 @@ class account extends sql {
 	/**
 	 * Get User Infos
 	 *
-	 * @param	string	$email 	User email
+	 * @param	int	$gid 	Group ID
 	 * @param	string	$field	Field from SQL table
 	 *
 	 * @return array / string
@@ -321,7 +321,7 @@ class account extends sql {
 	* @param	string	$type		Type of error
 	* @param	bool	$success	Success
 	* 
-	* @return HTML
+	* @return void
 	*/
 	public function socialGetErrorSession($session, $type, $success = false) {
 		// Initialization
@@ -358,11 +358,10 @@ class account extends sql {
 	/**
 	* Update Session
 	*
-	* @param	string	$sbuiadmin_type		Error Type
-	* @param	string	$sbuiadmin_event	Error message
-	* @param	string	$sbuiadmin_user		client OR email
+	* @param	string	$email		User email
+	* @param	string	$password	User password
 	* 
-	* @return bool
+	* @return void
 	*/
 	public function updateUserSession($email, $password) {
 		$_SESSION['sbaccount_user_email']    = $email;
@@ -707,7 +706,7 @@ class account extends sql {
 	/**
 	* Format email Default Value
 	* $datas : Array for replace in body email
-	* @return Formatted email
+	* @return string Formatted email
 	*/
 	private function formatEmail($return_text, $datas) {
 		# Url confirm email

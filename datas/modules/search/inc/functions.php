@@ -98,7 +98,8 @@ if (!function_exists("sbSearchTable")) {
 */
 if (!function_exists("sbSearchTerms")) {
 	function sbSearchTerms($query) {
-		$query = trim(preg_replace('/\s+/u', ' ', (string)$query));
+		// UTF-8 invalide : preg_replace /u renvoie null (trim(null) refusé en PHP 9)
+		$query = trim(preg_replace('/\s+/u', ' ', (string)$query) ?? '');
 		if ($query === '') return array();
 
 		$terms = array();
@@ -427,7 +428,7 @@ if (!function_exists("sbSearchPlainText")) {
 		$text = preg_replace('#<\s*/?\s*(br|p|div|li|ul|ol|dl|dt|dd|td|th|tr|table|thead|tbody|tfoot|h[1-6]|section|article|aside|header|footer|nav|figure|figcaption|blockquote|cite|pre|hr)\b[^>]*>#i', ' ', $text);
 
 		$text = strip_tags($text);
-		$text = preg_replace('/\s+/u', ' ', $text);
+		$text = preg_replace('/\s+/u', ' ', $text) ?? preg_replace('/\s+/', ' ', $text);
 
 		return trim($text);
 	}

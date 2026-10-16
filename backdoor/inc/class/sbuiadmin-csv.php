@@ -49,12 +49,11 @@ class csv extends sanitize {
         $this->parse_header = $parse_header;
         $this->delimiter    = $delimiter;
         $this->length       = $length;
-        $this->lines        = $lines;
 		
 		// Check if file exists
 		if ($this->fp !== false) {
 			if ($this->parse_header) {
-			   $this->header = fgetcsv($this->fp, $this->length, $this->delimiter);
+			   $this->header = fgetcsv($this->fp, $this->length, $this->delimiter, '"', '\\');
 			}
 		} else {
 			return false;
@@ -98,7 +97,7 @@ class csv extends sanitize {
 				$line_count = -1; // so loop limit is ignored
 			}
 				
-			while ($line_count < $max_lines && ($row = fgetcsv($this->fp, $this->length, $this->delimiter)) !== FALSE) {
+			while ($line_count < $max_lines && ($row = fgetcsv($this->fp, $this->length, $this->delimiter, '"', '\\')) !== FALSE) {
 				if ($this->parse_header) {
 					foreach ($this->header as $i => $heading_i) {
 						$row_new[$heading_i] = $row[$i];
@@ -123,11 +122,11 @@ class csv extends sanitize {
 		if ($this->fp !== false) {
 			
 			$id   = fopen($this->file, "r");
-			$data = fgetcsv($id, filesize($this->file)); /* This will get us the main column names */
+			$data = fgetcsv($id, filesize($this->file), ',', '"', '\\'); /* This will get us the main column names */
 		
 			if (!$this->mappings) $this->mappings = $data;
 		
-			while ($data = fgetcsv($id, filesize($this->file))) {
+			while ($data = fgetcsv($id, filesize($this->file), ',', '"', '\\')) {
 				if ($data[0]) {
 					foreach($data as $key => $value) {
 						// Check if $value must be converted
@@ -251,7 +250,7 @@ class csv extends sanitize {
 				foreach ($grouped as $key => $value) {
 					$params = array_merge([ $value ], array_slice($args, 2, func_num_args()));
 					//$grouped[$key] = call_user_func_array('array_group_by', $params);
-					$grouped[$key] = call_user_func_array($this->group_by, $params);
+					$grouped[$key] = call_user_func_array(array($this, 'group_by'), $params);
 				}
 			}
 

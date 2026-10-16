@@ -87,7 +87,7 @@ class sanitize extends sql {
 	*/
 	private function stripslashes_deep($value) {
 		$value = is_array($value) ?
-					array_map('stripslashes_deep', $value) :
+					array_map(array($this, 'stripslashes_deep'), $value) :
 					$this->stripSlashesGPC($value);
 	
 		return $value;
@@ -107,7 +107,8 @@ class sanitize extends sql {
 
 	/**
 	* Convert all applicable characters to HTML entities
-	* @param  strings $text, $encode
+	* @param  string $text
+	* @param  string $encode
 	* @return string
 	*
 	*				Supported charsets
@@ -136,7 +137,8 @@ class sanitize extends sql {
 
 	/**
 	* Convert all HTML entities to their applicable characters
-	* @param  strings $text, $encode
+	* @param  string $text
+	* @param  string $encode
 	* @return string
 	*
 	*				Supported charsets
@@ -166,7 +168,6 @@ class sanitize extends sql {
 	/**
 	* Convert special characters to HTML entities
 	* @param   string  $text           string being converted
-	* @param   int     $quote_style
 	* @param   string  $charset        character set used in conversion
 	* @param   bool    $double_encode
 	* @return    string
@@ -289,17 +290,19 @@ class sanitize extends sql {
 	* @return string $text The purified text
 	*/
 	public function stopXSS($text) {
-		$text = (string) $text; // null refusé par les fonctions de chaîne en PHP 9
+		// null refusé par les fonctions de chaîne en PHP 9 ; une liste reste une
+		// liste (le transtypage (string) la changeait en "Array")
 		if (!is_array($text)) {
+			$text = (string) $text;
 			$text = preg_replace("/\(\)/si", "", $text);
 			$text = strip_tags($text);
 			$text = str_replace(array("\"",">","<","\\"), "", $text);
 		} else {
 			foreach($text as $k=>$t) {
 				if (is_array($t)) {
-					StopXSS($t);
+					$text[$k] = $this->stopXSS($t);
 				} else {
-					$t = preg_replace("/\(\)/si", "", $t);
+					$t = preg_replace("/\(\)/si", "", (string) $t);
 					$t = strip_tags($t);
 					$t = str_replace(array("\"",">","<","\\"), "", $t);
 					$text[$k] = $t;
@@ -313,10 +316,13 @@ class sanitize extends sql {
 	/**
 	* Filters textarea form data in DB for display
 	* @param   string  $text
-	* @param   bool    $html   allow html?
-	* @param   bool    $smiley allow smileys?
-	* @param   bool    $br     convert linebreaks?
-	* @param   bool    $xss    allow filtering XSS scripts?
+	* @param   string  $encode          charset
+	* @param   int     $entities        convert to HTML entities?
+	* @param   int     $decode_entities decode HTML entities?
+	* @param   int     $html            allow html?
+	* @param   int     $br              convert linebreaks?
+	* @param   int     $clickable       make links clickable?
+	* @param   int     $xss             allow filtering XSS scripts?
 	* @return  string
 	**/
 	public function displayText($text, $encode = 'UTF-8', $entities = 0, $decode_entities = 1, $html = 0, $br = 0, $clickable = 0, $xss = 1) {
@@ -360,7 +366,7 @@ class sanitize extends sql {
 	
 	/**
 	* Filters textarea form data in DB for display
-	* @param   string  $text
+	* @param   string  $string
 	* @param   string  $lang   string to search
 	* @return  string
 	*

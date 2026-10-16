@@ -153,7 +153,7 @@ class panier extends sql {
 	/**
 	 * Remove product from cart
 	 *
-	 * @param 	string	$ref 	Product Reference
+	 * @param 	string	$reference 	Product Reference
 	 *
 	 * @return void
 	 */
@@ -169,9 +169,9 @@ class panier extends sql {
 	/**
 	 * Check if product reference exists in cart
 	 *
-	 * @param 	string	$ref 	Product Reference
+	 * @param 	string	$reference 	Product Reference
 	 *
-	 * @return void
+	 * @return bool
 	 */
 	public function check($reference) {
 		global $sbsanitize;
@@ -180,9 +180,8 @@ class panier extends sql {
 			foreach($_SESSION["cart"] as $k => $v) {
 					if ($reference == $k) return true;
 			}
-		} else {
-			return false;
 		}
+		return false;
 	}
 	
 	/**
@@ -367,9 +366,8 @@ class panier extends sql {
 					return $v['ekado'];
 				}
 			}
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	/**
@@ -394,7 +392,7 @@ class panier extends sql {
 	/**
 	 * Get value from discount SESSION
 	 *
-	 * @return array (object)
+	 * @return object
 	 */
 	public function getPromo() {
 		return (object) [
@@ -412,7 +410,7 @@ class panier extends sql {
 	/**
 	 * Get value from transport SESSION
 	 *
-	 * @return array (object)
+	 * @return object
 	 */
 	public function getTransport() {
 		return (object) [
@@ -736,8 +734,6 @@ class panier extends sql {
 	/**
 	 * Get Client Shipping Address
 	 *
-	 * @param
-	 *
 	 * @return string (Shipping Adress)
 	 */
 	public function getClientShipping($user_info) {
@@ -813,6 +809,7 @@ class panier extends sql {
 		$cart_total_less_discount  = 0;
 		$cart_total_discount       = 0;
 		$cart_total_with_transport = 0;
+		$order_email               = '';
 		// -------------------------------
 		// --- Order infos
 		// -------------------------------

@@ -28,6 +28,7 @@ class sql extends Smarty {
     var $debug      = NULL;
     var $result_id  = false;
     var $query      = "";
+    var $records    = array(); // lu par numrows() sans requête : count(null) = erreur en PHP 8
 
     private function connect() {
         // Point 9 (compat PHP 8.4) : MYSQLI_REPORT_ERROR|STRICT fait lever
