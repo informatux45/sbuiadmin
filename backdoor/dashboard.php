@@ -99,23 +99,13 @@ $sb_system_options = array(
 
 // Lien admin par défaut associé à chaque table connue (préremplissage JS du
 // champ "Lien" au choix de la table, voir dashboard-widget-form.js) - pas de
-// métadonnée en base reliant une table SQL à sa page d'admin, uniquement
-// les modules du cœur SBUIADMIN sont couverts ici ; une table inconnue
-// (module tiers, table "Tableaux" custom...) laisse simplement le champ vide.
+// métadonnée en base reliant une table SQL à sa page d'admin : tables du core
+// ici, celles des modules installés viennent de leur module.php ('tables') ;
+// une table inconnue (table "Tableaux" custom...) laisse le champ vide.
 $sb_table_links = array(
 	'sb_sandbox'      => 'index.php?p=sandbox',
-	'sb_faq'          => 'index.php?p=faq',
-	'sb_faq_category' => 'index.php?p=faq&a=category',
-	'sb_news'         => 'index.php?p=news',
-	'sb_news_category'=> 'index.php?p=news&a=category',
-	'sb_slider'       => 'index.php?p=slider',
-	'sb_slider_photos'=> 'index.php?p=slider',
-	'sb_tabbs'        => 'index.php?p=tabbs',
-	'sb_tabbs_tab'    => 'index.php?p=tabbs&a=alltabs',
-	'sb_table'        => 'index.php?p=table',
 	'sb_pages'        => 'index.php?p=pages',
 	'sb_blocs'        => 'index.php?p=blocs',
-	'sb_contact'      => 'index.php?p=contact',
 	'sb_menu'         => 'index.php?p=menu',
 	'sb_users'        => 'index.php?p=users',
 	'sb_messages'     => 'index.php?p=messages',
@@ -128,22 +118,9 @@ $sb_table_links = array(
 // table "Tableaux" custom...) affiche simplement son nom SQL tel quel.
 $sb_table_titles = array(
 	'sb_sandbox'            => 'Sandbox (démo)',
-	'sb_faq'                => 'FAQ',
-	'sb_faq_category'       => 'Catégories FAQ',
-	'sb_news'               => 'Actualités',
-	'sb_news_category'      => 'Catégories actualités',
-	'sb_news_settings'      => 'Paramètres actualités',
-	'sb_slider'             => 'Sliders',
-	'sb_slider_photos'      => 'Photos des sliders',
-	'sb_tabbs'              => 'Tabbs',
-	'sb_tabbs_tab'          => 'Onglets',
-	'sb_table'              => 'Tableaux',
-	'sb_table_datas'        => 'Données des tableaux',
-	'sb_table_structure'    => 'Structure des tableaux',
 	'sb_pages'              => 'Pages',
 	'sb_blocs'              => 'Blocs',
 	'sb_blocs_sort'         => 'Ordre des blocs',
-	'sb_contact'            => 'Formulaires de contact',
 	'sb_menu'               => 'Menus',
 	'sb_users'              => 'Utilisateurs',
 	'sb_users_rights'       => 'Droits utilisateurs',
@@ -158,8 +135,15 @@ $sb_table_titles = array(
 	'sb_blocked_history'    => 'Historique des IP bloquées',
 	'sb_sessions'           => 'Sessions',
 );
+foreach (sbModulesCollect('tables') as $sb_tname => $sb_tinfo) {
+	if (!empty($sb_tinfo['link']))  $sb_table_links[$sb_tname]  = $sb_tinfo['link'];
+	if (!empty($sb_tinfo['title'])) $sb_table_titles[$sb_tname] = $sb_tinfo['title'];
+}
+unset($sb_tname, $sb_tinfo);
 
-$action = $_GET['a'];
+$action = $_GET['a'] ?? '';
+// PHP 8 : variables lues par certaines branches seulement
+$query_2 = '';
 switch ($action) {
 	case "del":
 	case "up":
@@ -167,7 +151,7 @@ switch ($action) {
 	default:
 		// Action DELETE
 		if ($action == 'del') {
-			$get_id  = intval($_GET['id']);
+			$get_id  = intval($_GET['id'] ?? 0);
 			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
 			$request = $sbsql->query($query_2);
 
@@ -180,7 +164,7 @@ switch ($action) {
 		// Réordonnancement simple : échange de position avec le voisin
 		// immédiat (pas de glisser-déposer, juste ↑/↓ sur chaque ligne).
 		if ($action == 'up' || $action == 'down') {
-			$get_id  = intval($_GET['id']);
+			$get_id  = intval($_GET['id'] ?? 0);
 			$current = $sbsql->assoc($sbsql->query("SELECT id, position FROM $table WHERE id = '$get_id'"));
 
 			if ($current) {
@@ -234,7 +218,7 @@ switch ($action) {
 		// --------------------------------
 		$id              = ($action == 'edit' && isset($_GET['id'])) ? intval($_GET['id']) : 0;
 		$formName        = ($action == 'add') ? "add_form" : "edit_form";
-		$formType        = ($action == 'add' || $_POST['form_submit'] == 'add_form') ? "add" : "edit";
+		$formType        = ($action == 'add' || ($_POST['form_submit'] ?? '') == 'add_form') ? "add" : "edit";
 		$btn_add_edit    = ($action == 'add') ? "Ajouter" : "Modifier";
 		$legend_add_edit = ($action == 'add') ? "Ajouter un widget" : "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 
@@ -247,37 +231,37 @@ switch ($action) {
 		// --- Control form submit --------
 		// --------------------------------
 		$query = '';
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id           = intval($_POST['id']);
-			$type         = in_array($_POST['type'], array('table', 'system', 'weather', 'html', 'text', 'rss', 'iframe', 'logs', 'logaccess')) ? $_POST['type'] : 'table';
-			$table_name   = $sbsanitize->displayText($_POST['table_name'], 'UTF-8', 1, 0);
-			$value_column = $sbsanitize->displayText($_POST['value_column'], 'UTF-8', 1, 0);
-			$date_column  = $sbsanitize->displayText($_POST['date_column'], 'UTF-8', 1, 0);
-			$widget_key   = $sbsanitize->displayText($_POST['widget_key'], 'UTF-8', 1, 0);
-			$city_input   = $sbsanitize->displayText($_POST['city'], 'UTF-8', 1, 0);
+			$id           = intval($_POST['id'] ?? 0);
+			$type         = in_array($_POST['type'] ?? null, array('table', 'system', 'weather', 'html', 'text', 'rss', 'iframe', 'logs', 'logaccess')) ? ($_POST['type'] ?? '') : 'table';
+			$table_name   = $sbsanitize->displayText($_POST['table_name'] ?? '', 'UTF-8', 1, 0);
+			$value_column = $sbsanitize->displayText($_POST['value_column'] ?? '', 'UTF-8', 1, 0);
+			$date_column  = $sbsanitize->displayText($_POST['date_column'] ?? '', 'UTF-8', 1, 0);
+			$widget_key   = $sbsanitize->displayText($_POST['widget_key'] ?? '', 'UTF-8', 1, 0);
+			$city_input   = $sbsanitize->displayText($_POST['city'] ?? '', 'UTF-8', 1, 0);
 			// content_html (widget "html") et content_text (widget "text",
 			// CKEditor) alimentent la même colonne "content" en base - seul
 			// le champ pertinent pour $type est non vide côté formulaire.
-			$content_html = $sbsanitize->displayText($_POST['content_html'], 'UTF-8', 1, 0);
-			$content_text = $sbsanitize->displayText($_POST['content_text'], 'UTF-8', 1, 0);
+			$content_html = $sbsanitize->displayText($_POST['content_html'] ?? '', 'UTF-8', 1, 0);
+			$content_text = $sbsanitize->displayText($_POST['content_text'] ?? '', 'UTF-8', 1, 0);
 			// rss/iframe/logs réutilisent "location" (URL ou nom de fichier
 			// selon le type) et "value_column" (nombre d'éléments/lignes) -
 			// pas de nouvelle colonne, mêmes colonnes que "weather"/"table"
 			// mais avec un sens différent selon $type.
-			$rss_url      = $sbsanitize->displayText($_POST['rss_url'], 'UTF-8', 1, 0);
-			$rss_count    = $sbsanitize->displayText($_POST['rss_count'], 'UTF-8', 1, 0);
-			$iframe_url   = $sbsanitize->displayText($_POST['iframe_url'], 'UTF-8', 1, 0);
-			$log_filename    = $sbsanitize->displayText($_POST['log_filename'], 'UTF-8', 1, 0);
-			$log_lines       = $sbsanitize->displayText($_POST['log_lines'], 'UTF-8', 1, 0);
-			$logaccess_count = $sbsanitize->displayText($_POST['logaccess_count'], 'UTF-8', 1, 0);
-			$widget_title    = $sbsanitize->displayText($_POST['widget_title'], 'UTF-8', 1, 0);
-			$link         = $sbsanitize->displayText($_POST['link'], 'UTF-8', 1, 0);
-			$icon         = $sbsanitize->displayText($_POST['icon'], 'UTF-8', 1, 0);
-			$color        = $sbsanitize->displayText($_POST['color'], 'UTF-8', 1, 0);
-			$show_chart   = $sbsanitize->displayText($_POST['show_chart'], 'UTF-8', 1, 0);
-			$active       = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$rss_url      = $sbsanitize->displayText($_POST['rss_url'] ?? '', 'UTF-8', 1, 0);
+			$rss_count    = $sbsanitize->displayText($_POST['rss_count'] ?? '', 'UTF-8', 1, 0);
+			$iframe_url   = $sbsanitize->displayText($_POST['iframe_url'] ?? '', 'UTF-8', 1, 0);
+			$log_filename    = $sbsanitize->displayText($_POST['log_filename'] ?? '', 'UTF-8', 1, 0);
+			$log_lines       = $sbsanitize->displayText($_POST['log_lines'] ?? '', 'UTF-8', 1, 0);
+			$logaccess_count = $sbsanitize->displayText($_POST['logaccess_count'] ?? '', 'UTF-8', 1, 0);
+			$widget_title    = $sbsanitize->displayText($_POST['widget_title'] ?? '', 'UTF-8', 1, 0);
+			$link         = $sbsanitize->displayText($_POST['link'] ?? '', 'UTF-8', 1, 0);
+			$icon         = $sbsanitize->displayText($_POST['icon'] ?? '', 'UTF-8', 1, 0);
+			$color        = $sbsanitize->displayText($_POST['color'] ?? '', 'UTF-8', 1, 0);
+			$show_chart   = $sbsanitize->displayText($_POST['show_chart'] ?? '', 'UTF-8', 1, 0);
+			$active       = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 
 			// Normalisation : les radios "show_chart" sont désactivées côté
 			// JS tant qu'aucune colonne date n'est choisie (voir
@@ -478,9 +462,9 @@ switch ($action) {
 			$color = 'primary'; $show_chart = '0'; $active = '1';
 		}
 		// --------------------------------
-		if ($formType == 'edit' && !$_POST['form_submit']) {
+		if ($formType == 'edit' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
-			$id       = intval($_GET['id']);
+			$id       = intval($_GET['id'] ?? 0);
 			$query_1  = "SELECT * FROM $table WHERE id = $id";
 			$requestQ = $sbsql->query($query_1);
 			$assoc    = $sbsql->assoc($requestQ);

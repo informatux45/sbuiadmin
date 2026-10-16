@@ -81,12 +81,13 @@ define('_CMS_GLOBAL_PAGE_NOT_FOUND',				"Page not found, sorry!");
 // ------------------------------------------------------------------
 //               Get ALL Language Files Module
 // ------------------------------------------------------------------
+// --- Modules chargés uniquement (core, installés, maison : voir
+// --- sbModulesLoadable()) et seulement s'ils ont une langue
 $sb_path_language_file = dirname(__DIR__) . DIRECTORY_SEPARATOR .  'modules';
-$sb_path_dir           = new DirectoryIterator($sb_path_language_file);
-foreach ($sb_path_dir as $fileinfo) {
-    if (!$fileinfo->isDot()) {
-		include_once($sb_path_language_file . DIRECTORY_SEPARATOR . $fileinfo->getFilename() . DIRECTORY_SEPARATOR . 'lang' . DIRECTORY_SEPARATOR . $sb_this_file);
-    }
+foreach (sbModulesLoadable() as $sb_module_name) {
+	$sb_module_lang = $sb_path_language_file . DIRECTORY_SEPARATOR . $sb_module_name . DIRECTORY_SEPARATOR . 'lang' . DIRECTORY_SEPARATOR . $sb_this_file;
+	if (is_file($sb_module_lang)) include_once($sb_module_lang);
 }
+unset($sb_module_name, $sb_module_lang);
 
 ?>

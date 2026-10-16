@@ -23,9 +23,9 @@ $module['author']      = "BooBoo";
 // -------------------------------------------------
 // --- Tables SQL
 // -------------------------------------------------
-$module['tables']['tabss']     = _AM_DB_PREFIX . "sb_tabbs";
-$module['tables']['tabbstab']  = _AM_DB_PREFIX . "sb_tabbs_tab";
-$module['tables']['tabbssett'] = _AM_DB_PREFIX . "sb_tabbs_settings";
+$module['tables']['table']       = _AM_DB_PREFIX . "sb_table";
+$module['tables']['tabledatas']  = _AM_DB_PREFIX . "sb_table_datas";
+$module['tables']['tablestruct'] = _AM_DB_PREFIX . "sb_table_structure";
 // -------------------------------------------------
 
 ?>

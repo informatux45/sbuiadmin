@@ -49,13 +49,15 @@ $table       = _AM_DB_PREFIX . "sb_slider";
 $table_photo = _AM_DB_PREFIX . "sb_slider_photos";
 $text        = "Slider";
 
-$action = $_GET['a'];
+$action = $_GET['a'] ?? '';
+// PHP 8 : variables lues par certaines branches seulement
+$btn_add_edit = $formName = $id = $query = $query_2 = $query_5 = $sid = $title = ''; $toSort = [];
 switch($action) {
 	case "del":
 	default:
 		// Action DELETE
 		if ($action == 'del') {
-			$get_id  = intval($_GET['id']);
+			$get_id  = intval($_GET['id'] ?? 0);
 			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
 			$request = $sbsql->query($query_2);
 			
@@ -94,7 +96,7 @@ switch($action) {
 	case "photo":
 		// Action DELETE photo
 		if ($action == 'delphoto') {
-			$get_id  = intval($_GET['id']);
+			$get_id  = intval($_GET['id'] ?? 0);
 			$query_5 = "DELETE FROM $table_photo WHERE id = '$get_id'";
 			$request = $sbsql->query($query_5);
 			
@@ -105,7 +107,7 @@ switch($action) {
 		}
 
 		// Initialisation
-		$sid = $_GET['sid'];
+		$sid = $_GET['sid'] ?? '';
 		$sb_table_header = array('Tri', 'Photo', 'Name', 'Actions');
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		
@@ -135,37 +137,37 @@ switch($action) {
 		// Initialize Form
 		// --------------------------------
 		$formName        = ($action == 'add') ? "add_form" : "edit_form";
-		$formType        = ($action == 'add' || $_POST['form_submit'] == 'add_form') ? "add" : "edit";
+		$formType        = ($action == 'add' || ($_POST['form_submit'] ?? '') == 'add_form') ? "add" : "edit";
 		$btn_add_edit    = ($action == 'add') ? "Ajouter" : "Modifier";
 		$legend_add_edit = ($action == 'add') ? "Ajouter un " . strtolower($text) : "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id                  = intval($_POST['id']);
-			$title               = $sbsanitize->displayText($_POST['title'], 'UTF-8', 1, 0);
-			$responsive          = $sbsanitize->displayText($_POST['responsive'], 'UTF-8', 1, 0);
-			$jquery              = $sbsanitize->displayText($_POST['jquery'], 'UTF-8', 1, 0);
-			$auto                = $sbsanitize->displayText($_POST['auto'], 'UTF-8', 1, 0);
-			$pause               = $sbsanitize->displayText($_POST['pause'], 'UTF-8', 1, 0);
-			$speed               = $sbsanitize->displayText($_POST['speed'], 'UTF-8', 1, 0);
-			$randomstart         = $sbsanitize->displayText($_POST['randomstart'], 'UTF-8', 1, 0);
-			$mode                = $sbsanitize->displayText($_POST['mode'], 'UTF-8', 1, 0);
-			$preloadimages       = $sbsanitize->displayText($_POST['preloadimages'], 'UTF-8', 1, 0);
-			$controls            = $sbsanitize->displayText($_POST['controls'], 'UTF-8', 1, 0);
-			$autocontrols        = $sbsanitize->displayText($_POST['autocontrols'], 'UTF-8', 1, 0);
-			$autohover           = $sbsanitize->displayText($_POST['autohover'], 'UTF-8', 1, 0);
-			$captions            = $sbsanitize->displayText($_POST['captions'], 'UTF-8', 1, 0);
-			$adaptiveheight      = $sbsanitize->displayText($_POST['adaptiveheight'], 'UTF-8', 1, 0);
-			$adaptiveheightspeed = $sbsanitize->displayText($_POST['adaptiveheightspeed'], 'UTF-8', 1, 0);
-			$slidemargin         = $sbsanitize->displayText($_POST['slidemargin'], 'UTF-8', 1, 0);
-			$video               = $sbsanitize->displayText($_POST['video'], 'UTF-8', 1, 0);
-			$usecss              = $sbsanitize->displayText($_POST['usecss'], 'UTF-8', 1, 0);
-			$pager               = $sbsanitize->displayText($_POST['pager'], 'UTF-8', 1, 0);
-			$pagertype           = $sbsanitize->displayText($_POST['pagertype'], 'UTF-8', 1, 0);
-			$active              = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$id                  = intval($_POST['id'] ?? 0);
+			$title               = $sbsanitize->displayText($_POST['title'] ?? '', 'UTF-8', 1, 0);
+			$responsive          = $sbsanitize->displayText($_POST['responsive'] ?? '', 'UTF-8', 1, 0);
+			$jquery              = $sbsanitize->displayText($_POST['jquery'] ?? '', 'UTF-8', 1, 0);
+			$auto                = $sbsanitize->displayText($_POST['auto'] ?? '', 'UTF-8', 1, 0);
+			$pause               = $sbsanitize->displayText($_POST['pause'] ?? '', 'UTF-8', 1, 0);
+			$speed               = $sbsanitize->displayText($_POST['speed'] ?? '', 'UTF-8', 1, 0);
+			$randomstart         = $sbsanitize->displayText($_POST['randomstart'] ?? '', 'UTF-8', 1, 0);
+			$mode                = $sbsanitize->displayText($_POST['mode'] ?? '', 'UTF-8', 1, 0);
+			$preloadimages       = $sbsanitize->displayText($_POST['preloadimages'] ?? '', 'UTF-8', 1, 0);
+			$controls            = $sbsanitize->displayText($_POST['controls'] ?? '', 'UTF-8', 1, 0);
+			$autocontrols        = $sbsanitize->displayText($_POST['autocontrols'] ?? '', 'UTF-8', 1, 0);
+			$autohover           = $sbsanitize->displayText($_POST['autohover'] ?? '', 'UTF-8', 1, 0);
+			$captions            = $sbsanitize->displayText($_POST['captions'] ?? '', 'UTF-8', 1, 0);
+			$adaptiveheight      = $sbsanitize->displayText($_POST['adaptiveheight'] ?? '', 'UTF-8', 1, 0);
+			$adaptiveheightspeed = $sbsanitize->displayText($_POST['adaptiveheightspeed'] ?? '', 'UTF-8', 1, 0);
+			$slidemargin         = $sbsanitize->displayText($_POST['slidemargin'] ?? '', 'UTF-8', 1, 0);
+			$video               = $sbsanitize->displayText($_POST['video'] ?? '', 'UTF-8', 1, 0);
+			$usecss              = $sbsanitize->displayText($_POST['usecss'] ?? '', 'UTF-8', 1, 0);
+			$pager               = $sbsanitize->displayText($_POST['pager'] ?? '', 'UTF-8', 1, 0);
+			$pagertype           = $sbsanitize->displayText($_POST['pagertype'] ?? '', 'UTF-8', 1, 0);
+			$active              = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 
 	
 			// ADD or EDIT
@@ -231,9 +233,9 @@ switch($action) {
 			$title = $jquery = $responsive = $auto = $pause = $speed = $randomstart = $mode = $preloadimages = $controls = $autocontrols = $autohover = $captions = $adaptiveheight = $adaptiveheightspeed = $slidemargin = $video = $usecss = $pager = $pagertype = $active = '';
 		}
 		// --------------------------------
-		if ($formType == 'edit' && !$_POST['form_submit']) {
+		if ($formType == 'edit' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
-			$id                  = intval($_GET['id']);
+			$id                  = intval($_GET['id'] ?? 0);
 			$query_1             = "SELECT * FROM $table WHERE id = $id";
 			$requestQ            = $sbsql->query($query_1);
 			$assoc               = $sbsql->assoc($requestQ);
@@ -428,22 +430,22 @@ switch($action) {
 		// Initialize Form
 		// --------------------------------
 		$formName        = ($action == 'photoadd') ? "add_form" : "edit_form";
-		$formType        = ($action == 'photoadd' || $_POST['form_submit'] == 'add_form') ? "photoadd" : "photoedit";
+		$formType        = ($action == 'photoadd' || ($_POST['form_submit'] ?? '') == 'add_form') ? "photoadd" : "photoedit";
 		$btn_add_edit    = ($action == 'photoadd') ? "Ajouter" : "Modifier";
 		$legend_add_edit = ($action == 'photoadd') ? "Ajouter une photo / vidéo" : "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id     = intval($_POST['id']);
-			$sid    = intval($_POST['sid']);
-			$title  = $sbsanitize->displayText($_POST['title'], 'UTF-8', 1, 0);
-			$photo  = $sbsanitize->displayText($_POST['photo'], 'UTF-8', 1, 0);
-			$video  = $sbsanitize->displayText($_POST['video'], 'UTF-8', 1, 0);
-			$type   = $sbsanitize->displayText($_POST['type'], 'UTF-8', 1, 0);
-			$active = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$id     = intval($_POST['id'] ?? 0);
+			$sid    = intval($_POST['sid'] ?? 0);
+			$title  = $sbsanitize->displayText($_POST['title'] ?? '', 'UTF-8', 1, 0);
+			$photo  = $sbsanitize->displayText($_POST['photo'] ?? '', 'UTF-8', 1, 0);
+			$video  = $sbsanitize->displayText($_POST['video'] ?? '', 'UTF-8', 1, 0);
+			$type   = $sbsanitize->displayText($_POST['type'] ?? '', 'UTF-8', 1, 0);
+			$active = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 			$media  = ($type == 'video') ? $video : $photo;
 
 	
@@ -494,9 +496,9 @@ switch($action) {
 			$title = $photo = $video = $type = $active = '';
 		}
 		// --------------------------------
-		if ($formType == 'photoedit' && !$_POST['form_submit']) {
+		if ($formType == 'photoedit' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
-			$id       = intval($_GET['id']);
+			$id       = intval($_GET['id'] ?? 0);
 			$query_1  = "SELECT * FROM $table_photo WHERE id = $id";
 			$requestQ = $sbsql->query($query_1);
 			$assoc    = $sbsql->assoc($requestQ);
@@ -595,13 +597,13 @@ switch($action) {
 		$btn_add_edit    = "Valider";
 		$legend_add_edit = "Trier les photos";
 		// --------------------------------
-		if ($_POST['drag']) {
+		if (!empty($_POST['drag'])) {
 			// --------------------------------
 			// --- Control form submit --------
 			// --------------------------------
 			// --- (array) : count() sur une valeur non-tableau (drag=foo) leve une
 			// --- TypeError fatale sous PHP 8.
-			$sb_toSort = (array)$_POST['drag'];
+			$sb_toSort = (array)($_POST['drag'] ?? []);
 			
 			// reorganizes the order of elements
 			$sql_error = 0;
@@ -629,7 +631,7 @@ switch($action) {
 		}
 		
 		// --- Recuperation des donnees
-		$sid        = intval($_GET['sid']);
+		$sid        = intval($_GET['sid'] ?? 0);
 		$query_3    = "SELECT * FROM $table_photo WHERE sid = '$sid' ORDER BY sort ASC";
 		$requestQ   = $sbsql->query($query_3);
 		$sort_array = $sbsql->toarray($requestQ);

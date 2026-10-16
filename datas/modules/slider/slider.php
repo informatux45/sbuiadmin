@@ -22,7 +22,7 @@ include_once( SB_MODULES_DIR . MODFILE . DIRECTORY_SEPARATOR . 'common.php' );
 global $modpage, $sbsmarty, $sbsanitize, $sbsql, $sbpage;
 
 # Define TPL to show (view)
-$id       = $sbsanitize->stopXSS($_GET['id']);
+$id       = $sbsanitize->stopXSS($_GET['id'] ?? '');
 $template = 'index';
 # Assign template main
 $modpage['template_main'] = MODFILE . '_' . $template . '.tpl';
@@ -38,7 +38,6 @@ $assoc   = $sbsql->assoc($request);
 $sb_slider_title   = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']);
 $sb_slider_content = $sbsanitize->displayLang(sb_utf8_encode($assoc['content']), $_SESSION['lang']);
 $sb_slider_active  = $assoc['active'];
-$sbsmarty->assign('sb_pages_content', $sb_pages_content);
 
 if ($sb_slider_active) {
 	// --------------------------

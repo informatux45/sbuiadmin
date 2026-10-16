@@ -34,7 +34,7 @@
 	}
 
 	function setButtons(disabled) {
-		root.querySelectorAll('[data-upd-action]').forEach(function (b) { b.disabled = disabled; });
+		root.querySelectorAll('[data-upd-action], [data-mod-action]').forEach(function (b) { b.disabled = disabled; });
 	}
 
 	function progress(done, total, text) {
@@ -64,6 +64,8 @@
 		}
 		html += list('Fichiers modifiés localement, qui seront remplacés', p.modified);
 		html += list('Fichiers propres au site modifiés dans la nouvelle version (non touchés : à reporter à la main si besoin)', p.protected_changed);
+		if (p.modules_skipped) html += '<p style="margin-top:10px;color:var(--t-muted)">' + p.modules_skipped + ' fichier(s) de modules laissé(s) de côté : les modules se mettent à jour dans la carte « Modules ».</p>';
+		html += list('Modules avec une version plus récente (à mettre à jour ensuite, carte « Modules »)', p.modules_newer);
 		$('sbupd-plan').innerHTML = html;
 		show('sbupd-confirm-wrap', p.unchecked || (p.modified && p.modified.length > 0));
 		if (p.unchecked && !(p.modified && p.modified.length)) {
@@ -107,6 +109,87 @@
 			error(e.message);
 		});
 	}
+
+	// ---------------------------------------------------------------
+	// Modules : plan (rien n'est écrit), puis confirmation + mot de passe
+	// ---------------------------------------------------------------
+	var modCurrent = null;
+	var modLabels = { download: 'Télécharger', update: 'Mettre à jour', install: 'Installer', uninstall: 'Désinstaller', 'delete': 'Supprimer les fichiers de' };
+
+	function modPanel(p) {
+		modCurrent = p;
+		$('sbmod-panel-title').textContent = modLabels[p.op] + ' le module ' + p.title + (p.version ? ' (' + p.version + ')' : '');
+		var html = '';
+		if (p.op === 'download' || p.op === 'update') {
+			html += '<p>Archive vérifiée (signature de la version, empreinte de l\'archive et de chaque fichier) : <strong>' + p.write + '</strong> fichier(s) à écrire, <strong>' + p['delete'] + '</strong> à retirer.</p>';
+			if (p.op === 'download') html += '<p style="color:var(--t-muted)">Le module sera présent mais pas installé : rien ne change sur le site avant « Installer ».</p>';
+		} else if (p.op === 'install') {
+			html += '<p>Tables créées : <strong>' + (p.tables_new.length ? esc(p.tables_new.join(', ')) : 'aucune') + '</strong>. Le module sera activé : menu, droits, pages et codes courts.</p>';
+		} else if (p.op === 'uninstall') {
+			html += '<p>Le module sera désactivé : menu, droits, pages et codes courts disparaissent du site et de l\'administration. Ses fichiers restent sur le disque.</p>';
+			if (p.tables.length) html += '<p style="color:var(--t-muted)">Tables : ' + esc(p.tables.join(', ')) + '.</p>';
+		} else {
+			html += '<p><strong>' + p.files + '</strong> fichier(s) supprimé(s) du disque (une sauvegarde chiffrée est gardée).</p>';
+		}
+		(p.notes || []).forEach(function (n) { html += '<p style="color:var(--warning)">' + esc(n) + '</p>'; });
+		if (p.unchecked) html += '<p style="color:var(--warning)">Impossible de savoir si les fichiers de ce module ont été modifiés localement (module non livré par cette page jusqu\'ici).</p>';
+		html += list('Fichiers modifiés localement', p.modified);
+		$('sbmod-panel-body').innerHTML = html;
+		var needConfirm = p.unchecked || (p.modified && p.modified.length > 0);
+		show('sbmod-confirm-wrap', needConfirm);
+		$('sbmod-confirm').checked = false;
+		$('sbmod-confirm-label').textContent = (p.op === 'delete')
+			? 'Je confirme la suppression de ces fichiers (gardés dans la sauvegarde).'
+			: 'Je sais que ces fichiers seront remplacés (leur version actuelle est gardée dans la sauvegarde).';
+		show('sbmod-drop-wrap', p.op === 'uninstall' && p.tables && p.tables.length > 0);
+		$('sbmod-drop').checked = false;
+		$('sbmod-run').textContent = modLabels[p.op].replace(' de', '');
+		show('sbmod-panel', true);
+		var el = $('sbmod-panel'); if (el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+	}
+
+	root.addEventListener('click', function (ev) {
+		var btn = ev.target.closest('[data-mod-action]');
+		if (!btn || busy) return;
+		var action = btn.getAttribute('data-mod-action');
+		show('sbupd-error', false);
+		if (action === 'check') {
+			setButtons(true);
+			busy = true;
+			post('modcheck').then(function () { location.reload(); }).catch(function (e) { error(e.message); });
+		} else if (action === 'plan') {
+			var op = btn.getAttribute('data-op');
+			setButtons(true);
+			busy = true;
+			show('sbmod-panel', false);
+			progress(0, 1, (op === 'download' || op === 'update') ? 'Téléchargement et vérification du module…' : 'Préparation…');
+			post('modplan', { module: btn.getAttribute('data-mod'), op: op }).then(function (p) {
+				busy = false;
+				setButtons(false);
+				show('sbupd-progress', false);
+				modPanel(p);
+			}).catch(function (e) { show('sbupd-progress', false); error(e.message); });
+		} else if (action === 'close') {
+			show('sbmod-panel', false);
+			modCurrent = null;
+		} else if (action === 'run' && modCurrent) {
+			var need = modCurrent.unchecked || (modCurrent.modified && modCurrent.modified.length);
+			if (need && !$('sbmod-confirm').checked) { error('Cochez la case de confirmation.'); return; }
+			var pw = $('sbmod-password').value;
+			if (!pw) { error('Saisissez votre mot de passe pour confirmer.'); return; }
+			$('sbmod-password').value = '';
+			setButtons(true);
+			busy = true;
+			progress(0, 1, modLabels[modCurrent.op] + ' le module ' + modCurrent.title + '…');
+			post('modrun', { module: modCurrent.name, op: modCurrent.op, password: pw, confirm: need ? '1' : '', drop_data: $('sbmod-drop').checked ? '1' : '' }).then(function (r) {
+				busy = false;
+				progress(1, 1, r.step);
+				$('sbupd-step-text').innerHTML = esc(r.step) + ' — <a href="index.php?p=update">recharger la page</a>';
+				show('sbmod-panel', false);
+				if (typeof sbToast === 'function') sbToast(r.step, 'success');
+			}).catch(function (e) { show('sbupd-progress', false); error(e.message); });
+		}
+	});
 
 	root.addEventListener('click', function (ev) {
 		var btn = ev.target.closest('[data-upd-action]');

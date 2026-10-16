@@ -623,6 +623,34 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_gallery_photos` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `sb_modules`
+-- (modules installés : voir backdoor/inc/sbuiadmin-modules.php)
+--
+
+DROP TABLE IF EXISTS `<DB_PREFIX>sb_modules`;
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_modules` (
+  `name` varchar(32) NOT NULL,
+  `version` varchar(20) NOT NULL,
+  `db_version` varchar(20) NOT NULL DEFAULT '',
+  `installed_at` datetime NOT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `<DB_PREFIX>sb_modules` (`name`, `version`, `db_version`, `installed_at`) VALUES
+('boutique', '1.0.0', '1.0.0', NOW()),
+('contact', '1.0.0', '1.0.0', NOW()),
+('download', '1.0.0', '1.0.0', NOW()),
+('faq', '1.0.0', '1.0.0', NOW()),
+('gallery', '1.0.0', '1.0.0', NOW()),
+('news', '1.0.0', '1.0.0', NOW()),
+('slider', '1.0.0', '1.0.0', NOW()),
+('tabbs', '1.0.0', '1.0.0', NOW()),
+('table', '1.0.0', '1.0.0', NOW());
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `sb_messages`
 --
 

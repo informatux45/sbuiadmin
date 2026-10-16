@@ -50,13 +50,15 @@ $table_category = _AM_DB_PREFIX . "sb_news_category";
 $table_settings = _AM_DB_PREFIX . "sb_news_settings";
 $text           = "Article";
 
-$action = $_GET['a'];
+$action = $_GET['a'] ?? '';
+// PHP 8 : variables lues par certaines branches seulement
+$breadcrumb = $btn_add_edit = $catid = $catid_module_show = $comments = $comments_user = $content = $desc_full_en = $desc_short_en = $formName = $id = $item_per_page = $module_show = $module_show_masonry = $module_start = $news_next_prev = $other_news = $other_news_per_page = $other_news_title = $other_news_type = $query = $query_2 = $query_5 = $query_article = $subtitle_en = $subtitle_fr = $theme_view_cat = $theme_view_list = $theme_view_single = $title_en = $title_fr = $title_h1 = $title_h2 = ''; $toSort = [];
 switch($action) {
 	case "del":
 	default:
 		// Action DELETE
 		if ($action == 'del') {
-			$get_id  = intval($_GET['id']);
+			$get_id  = intval($_GET['id'] ?? 0);
 			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
 			$request = $sbsql->query($query_2);
 			
@@ -116,7 +118,7 @@ switch($action) {
 	case "category":
 		// Action DELETE category
 		if ($action == 'categorydel') {
-			$get_id   = intval($_GET['id']);
+			$get_id   = intval($_GET['id'] ?? 0);
 			// -------------------------------------
 			// --- Check if News article in CATEGORY
 			$query_article   = "SELECT * FROM $table WHERE catid = $get_id";
@@ -166,51 +168,51 @@ switch($action) {
 		// Initialize Form
 		// --------------------------------
 		$formName        = ($action == 'add') ? "add_form" : "edit_form";
-		$formType        = ($action == 'add' || $_POST['form_submit'] == 'add_form') ? "add" : "edit";
+		$formType        = ($action == 'add' || ($_POST['form_submit'] ?? '') == 'add_form') ? "add" : "edit";
 		$btn_add_edit    = ($action == 'add') ? "Ajouter" : "Modifier";
 		$legend_add_edit = ($action == 'add') ? "Ajouter un " . strtolower($text) : "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id                = intval($_POST['id']);
+			$id                = intval($_POST['id'] ?? 0);
 			$catid             = '';
-			foreach($_POST['catid'] as $val) { $catid .= "$val|"; }
+			foreach(($_POST['catid'] ?? []) as $val) { $catid .= "$val|"; }
 			$catid             = rtrim($catid, '|');
 			// --- Titre
-			$title_fr          = $sbsanitize->displayText($_POST['title_fr'], 'UTF-8', 1, 0);
+			$title_fr          = $sbsanitize->displayText($_POST['title_fr'] ?? '', 'UTF-8', 1, 0);
 			$title             = "[fr]".$title_fr."[/fr]";
 			if ($getMultilang) {
-				$title_en      = $sbsanitize->displayText($_POST['title_en'], 'UTF-8', 1, 0);
+				$title_en      = $sbsanitize->displayText($_POST['title_en'] ?? '', 'UTF-8', 1, 0);
 				$title        .= "[en]".$title_en."[/en]";				
 			}
 			// --- Sous Titre
-			$subtitle_fr          = $sbsanitize->displayText($_POST['subtitle_fr'], 'UTF-8', 1, 0);
+			$subtitle_fr          = $sbsanitize->displayText($_POST['subtitle_fr'] ?? '', 'UTF-8', 1, 0);
 			$subtitle             = "[fr]".$subtitle_fr."[/fr]";
 			if ($getMultilang) {
-				$subtitle_en      = $sbsanitize->displayText($_POST['subtitle_en'], 'UTF-8', 1, 0);
+				$subtitle_en      = $sbsanitize->displayText($_POST['subtitle_en'] ?? '', 'UTF-8', 1, 0);
 				$subtitle        .= "[en]".$subtitle_en."[/en]";				
 			}
 			// --- Desc Short
-			$desc_short_fr     = $sbsanitize->displayText($_POST['desc_short_fr'], 'UTF-8', 1, 0);
+			$desc_short_fr     = $sbsanitize->displayText($_POST['desc_short_fr'] ?? '', 'UTF-8', 1, 0);
 			$desc_short        = "[fr]".$desc_short_fr."[/fr]";
 			if ($getMultilang) {
-				$desc_short_en = $sbsanitize->displayText($_POST['desc_short_en'], 'UTF-8', 1, 0);
+				$desc_short_en = $sbsanitize->displayText($_POST['desc_short_en'] ?? '', 'UTF-8', 1, 0);
 				$desc_short   .= "[en]".$desc_short_en."[/en]";				
 			}
 			// --- Desc Full
-			$desc_full_fr      = $sbsanitize->displayText($_POST['desc_full_fr'], 'UTF-8', 1, 0);
+			$desc_full_fr      = $sbsanitize->displayText($_POST['desc_full_fr'] ?? '', 'UTF-8', 1, 0);
 			$desc_full         = "[fr]".$desc_full_fr."[/fr]";
 			if ($getMultilang) {
-				$desc_full_en  = $sbsanitize->displayText($_POST['desc_full_en'], 'UTF-8', 1, 0);
+				$desc_full_en  = $sbsanitize->displayText($_POST['desc_full_en'] ?? '', 'UTF-8', 1, 0);
 				$desc_full    .= "[en]".$desc_full_en."[/en]";
 			}
-			list($day, $month, $year) = explode("/", trim($_POST['date']));
+			list($day, $month, $year) = explode("/", trim($_POST['date'] ?? ''));
 			$date              = $sbsanitize->displayText($year.'-'.$month.'-'.$day, 'UTF-8', 1, 0);
-			$photo             = $sbsanitize->displayText($_POST['photo'], 'UTF-8', 1, 0);
-			$active            = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$photo             = $sbsanitize->displayText($_POST['photo'] ?? '', 'UTF-8', 1, 0);
+			$active            = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 
 	
 			// ADD or EDIT
@@ -273,9 +275,9 @@ switch($action) {
 			$catid = $title_fr = $desc_short_fr = $desc_full_fr = $title_en = $desc_short_en = $desc_full_en = $photo = $date = $active = '';
 		}
 		// --------------------------------
-		if ($formType == 'edit' && !$_POST['form_submit']) {
+		if ($formType == 'edit' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
-			$id            = intval($_GET['id']);
+			$id            = intval($_GET['id'] ?? 0);
 			$query_1       = "SELECT * FROM $table WHERE id = $id";
 			$requestQ      = $sbsql->query($query_1);
 			$assoc         = $sbsql->assoc($requestQ);
@@ -389,32 +391,32 @@ switch($action) {
 		// Initialize Form
 		// --------------------------------
 		$formName        = ($action == 'categoryadd') ? "add_form" : "edit_form";
-		$formType        = ($action == 'categoryadd' || $_POST['form_submit'] == 'add_form') ? "categoryadd" : "categoryedit";
+		$formType        = ($action == 'categoryadd' || ($_POST['form_submit'] ?? '') == 'add_form') ? "categoryadd" : "categoryedit";
 		$btn_add_edit    = ($action == 'categoryadd') ? "Ajouter" : "Modifier";
 		$legend_add_edit = ($action == 'categoryadd') ? "Ajouter une catégorie" : "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id         = intval($_POST['id']);
+			$id         = intval($_POST['id'] ?? 0);
 			// --- Titre
-			$title_fr     = $sbsanitize->displayText($_POST['title_fr'], 'UTF-8', 1, 0);
+			$title_fr     = $sbsanitize->displayText($_POST['title_fr'] ?? '', 'UTF-8', 1, 0);
 			$title        = "[fr]".$title_fr."[/fr]";
 			if ($getMultilang) {
-				$title_en = $sbsanitize->displayText($_POST['title_en'], 'UTF-8', 1, 0);
+				$title_en = $sbsanitize->displayText($_POST['title_en'] ?? '', 'UTF-8', 1, 0);
 				$title   .= "[en]".$title_en."[/en]";				
 			}
 			// --- Sous Titre
-			$subtitle_fr  = $sbsanitize->displayText($_POST['subtitle_fr'], 'UTF-8', 1, 0);
+			$subtitle_fr  = $sbsanitize->displayText($_POST['subtitle_fr'] ?? '', 'UTF-8', 1, 0);
 			$subtitle     = "[fr]".$subtitle_fr."[/fr]";
 			if ($getMultilang) {
-				$subtitle_en = $sbsanitize->displayText($_POST['subtitle_en'], 'UTF-8', 1, 0);
+				$subtitle_en = $sbsanitize->displayText($_POST['subtitle_en'] ?? '', 'UTF-8', 1, 0);
 				$subtitle   .= "[en]".$subtitle_en."[/en]";				
 			}
-			$photo      = $sbsanitize->displayText($_POST['photo'], 'UTF-8', 1, 0);
-			$active     = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$photo      = $sbsanitize->displayText($_POST['photo'] ?? '', 'UTF-8', 1, 0);
+			$active     = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 
 			// ADD or EDIT
 			if ($formType == 'categoryadd') {
@@ -462,9 +464,9 @@ switch($action) {
 			$title_fr = $subtitle_fr = $photo = $active = '';
 		}
 		// --------------------------------
-		if ($formType == 'categoryedit' && !$_POST['form_submit']) {
+		if ($formType == 'categoryedit' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
-			$id          = intval($_GET['id']);
+			$id          = intval($_GET['id'] ?? 0);
 			$query_1     = "SELECT * FROM $table_category WHERE id = $id";
 			$requestQ    = $sbsql->query($query_1);
 			$assoc       = $sbsql->assoc($requestQ);
@@ -532,13 +534,13 @@ switch($action) {
 		$btn_add_edit    = "Valider";
 		$legend_add_edit = "Trier les catégories";
 		// --------------------------------
-		if ($_POST['drag']) {
+		if (!empty($_POST['drag'])) {
 			// --------------------------------
 			// --- Control form submit --------
 			// --------------------------------
 			// --- (array) : count() sur une valeur non-tableau (drag=foo) leve une
 			// --- TypeError fatale sous PHP 8.
-			$sb_toSort = (array)$_POST['drag'];
+			$sb_toSort = (array)($_POST['drag'] ?? []);
 			
 			// reorganizes the order of elements
 			$sql_error = 0;
@@ -566,7 +568,7 @@ switch($action) {
 		}
 		
 		// --- Recuperation des donnees
-		$sid           = intval($_GET['sid']);
+		$sid           = intval($_GET['sid'] ?? 0);
 		$query_3       = "SELECT * FROM $table_category ORDER BY sort ASC";
 		$requestQ      = $sbsql->query($query_3);
 		$sort_array    = $sbsql->toarray($requestQ);
@@ -609,10 +611,10 @@ switch($action) {
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id      = intval($_POST['id']);
+			$id      = intval($_POST['id'] ?? 0);
 			// --- Pas de decodage d'entites ici : code_hidden porte deja la
 			// --- valeur exacte de l'editeur ACE (le navigateur a decode les
 			// --- entites du div#code au rendu). Un htmlEntitiesDecode de plus
@@ -674,9 +676,9 @@ switch($action) {
 		}
 		
 		// --------------------------------
-		if (!$_POST['form_submit'] && !$_POST['id']) {
+		if (empty($_POST['form_submit']) && empty($_POST['id'])) {
 			// --- Get Cat ID
-			$catid = intval($_GET['id']);
+			$catid = intval($_GET['id'] ?? 0);
 			// --- Recuperation des donnees
 			$query_1   = "SELECT title, $action FROM $table_category WHERE id = '$catid'";
 			$requestQ  = $sbsql->query($query_1);
@@ -691,7 +693,7 @@ switch($action) {
 			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);						
 		} else {
 			// --- Get Cat ID
-			$catid = intval($_GET['id']);
+			$catid = intval($_GET['id'] ?? 0);
 			// --- Recuperation des donnees
 			$query_1   = "SELECT title, $action FROM $table_category WHERE id = '$catid'";
 			$requestQ  = $sbsql->query($query_1);
@@ -741,29 +743,29 @@ switch($action) {
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id                  = intval($_POST['id']);
+			$id                  = intval($_POST['id'] ?? 0);
 			$catid               = '';
-			foreach($_POST['catid'] as $val) { $catid .= "$val|"; }
+			foreach(($_POST['catid'] ?? []) as $val) { $catid .= "$val|"; }
 			$catid               = rtrim($catid, '|');
-			$catid_module_show   = intval($_POST['catid_module_show']);
-			$item_per_page       = intval($_POST['item_per_page']);
-			$module_start        = intval($_POST['module_start']);
-			$breadcrumb          = intval($_POST['breadcrumb']);
-			$title_h1            = intval($_POST['title_h1']);
-			$title_h2            = intval($_POST['title_h2']);
-			$theme_view_cat      = $sbsanitize->displayText($_POST['theme_view_cat']);
-			$theme_view_list     = $sbsanitize->displayText($_POST['theme_view_list']);
-			$theme_view_single   = $sbsanitize->displayText($_POST['theme_view_single']);
-			$other_news          = intval($_POST['other_news']);
-			$other_news_per_page = intval($_POST['other_news_per_page']);
-			$other_news_title    = $sbsanitize->displayText($_POST['other_news_title']);
-			$other_news_type     = $sbsanitize->displayText($_POST['other_news_type']);
-			$news_next_prev      = $sbsanitize->displayText($_POST['news_next_prev']);
-			$comments            = $sbsanitize->displayText($_POST['comments']);
-			$comments_user       = $sbsanitize->displayText($_POST['comments_user']);
+			$catid_module_show   = intval($_POST['catid_module_show'] ?? 0);
+			$item_per_page       = intval($_POST['item_per_page'] ?? 0);
+			$module_start        = intval($_POST['module_start'] ?? 0);
+			$breadcrumb          = intval($_POST['breadcrumb'] ?? 0);
+			$title_h1            = intval($_POST['title_h1'] ?? 0);
+			$title_h2            = intval($_POST['title_h2'] ?? 0);
+			$theme_view_cat      = $sbsanitize->displayText($_POST['theme_view_cat'] ?? '');
+			$theme_view_list     = $sbsanitize->displayText($_POST['theme_view_list'] ?? '');
+			$theme_view_single   = $sbsanitize->displayText($_POST['theme_view_single'] ?? '');
+			$other_news          = intval($_POST['other_news'] ?? 0);
+			$other_news_per_page = intval($_POST['other_news_per_page'] ?? 0);
+			$other_news_title    = $sbsanitize->displayText($_POST['other_news_title'] ?? '');
+			$other_news_type     = $sbsanitize->displayText($_POST['other_news_type'] ?? '');
+			$news_next_prev      = $sbsanitize->displayText($_POST['news_next_prev'] ?? '');
+			$comments            = $sbsanitize->displayText($_POST['comments'] ?? '');
+			$comments_user       = $sbsanitize->displayText($_POST['comments_user'] ?? '');
 			
 			// EDIT
 			if ($formType == 'settings' && $id > 0) {
@@ -806,7 +808,7 @@ switch($action) {
 		}
 		
 		// --------------------------------
-		if ($formType == 'settings' && !$_POST['form_submit']) {
+		if ($formType == 'settings' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
 			$query_1              = "SELECT * FROM $table_settings WHERE id = $id";
 			$requestQ             = $sbsql->query($query_1);
@@ -1029,16 +1031,16 @@ switch($action) {
 		$formType        = "settingscategory";
 		$btn_add_edit    = "Modifier";
 		$legend_add_edit = "Modifier les paramètres de la catégorie &quot;<span style=\"color: red;\">%s</span>&quot;";
-		$id              = intval($_GET['id']);
+		$id              = intval($_GET['id'] ?? 0);
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id                  = intval($_POST['id']);
-			$module_show         = $sbsanitize->displayText($_POST['module_show'], 'UTF-8', 1, 0);
-			$module_show_masonry = intval($_POST['module_show_masonry']);
+			$id                  = intval($_POST['id'] ?? 0);
+			$module_show         = $sbsanitize->displayText($_POST['module_show'] ?? '', 'UTF-8', 1, 0);
+			$module_show_masonry = intval($_POST['module_show_masonry'] ?? 0);
 			
 			// EDIT
 			if ($formType == 'settingscategory' && $id > 0) {
@@ -1066,7 +1068,7 @@ switch($action) {
 		}
 		
 		// --------------------------------
-		if ($formType == 'settingscategory' && !$_POST['form_submit']) {
+		if ($formType == 'settingscategory' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
 			$query_1             = "SELECT * FROM $table_category WHERE id = $id";
 			$requestQ            = $sbsql->query($query_1);
@@ -1079,7 +1081,7 @@ switch($action) {
 			// --- Debug SQL
 			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1 . "\n" . 'Form Type = '.$formType);						
 		} else {
-			$title_fr = $_POST['title_fr'];
+			$title_fr = $_POST['title_fr'] ?? '';
 		}
 		
 		// --------------------------------		
@@ -1113,7 +1115,7 @@ switch($action) {
 		// --------------------------------	
 		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => "$formName"));
 		$sbform->addInput('hidden', '', array('name' => 'id', 'value' => "$id"));
-		if (!$_POST['form_submit']) $sbform->addInput('hidden', '', array('name' => 'title_fr', 'value' => "$title_fr"));
+		if (empty($_POST['form_submit'])) $sbform->addInput('hidden', '', array('name' => 'title_fr', 'value' => "$title_fr"));
 		$sbform->addInput('submit', '', array('value' => "$btn_add_edit"));
 		$sbform->addInput('reset', '', array('value' => "Reset"));
 		// --------------------------------	

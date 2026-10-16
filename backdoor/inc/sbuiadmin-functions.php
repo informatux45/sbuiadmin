@@ -65,6 +65,9 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
+// Registre des modules (aussi chargé par sbuiadmin-config.php côté admin)
+require_once __DIR__ . '/sbuiadmin-modules.php';
+
 /** Identifiant Google Analytics 4 (G-XXXXXXXXXX), '' si invalide
  * Même fonction dans inc/functions.php (front) et
  * backdoor/inc/sbuiadmin-functions.php (admin).
@@ -234,14 +237,12 @@ if (!function_exists("sbGetPageBuilderModulesList")) {
    // porte le contenu principal (pas les champs secondaires type "Intro").
    // Utilisé à la fois par le réglage (settings.php, whitelist Tagify) et
    // par sbModuleUsesPageBuilder() (vérification côté chaque module).
+   // Champs des modules installés : 'pagebuilder' de leur module.php.
    function sbGetPageBuilderModulesList() {
-      return array(
+      return array_merge(array(
           'pages.content_fr'  => 'Pages – Contenu'
-         ,'news.desc_full_fr' => 'Actualités – Article'
-         ,'tabbs.content_fr'  => 'Tabbs – Contenu'
-         ,'faq.response'      => 'FAQ – Réponse'
          ,'blocs.content_fr'  => 'Blocs – Contenu'
-      );
+      ), sbModulesCollect('pagebuilder'));
    }
 }
 
@@ -777,21 +778,15 @@ function sbMailer() {
  * @return array module list
  */
 function sbGetModulesPage() {
-	$dir = SB_MODULES_DIR;
-	$result_modules_dir = array();	 
-	$modules_dir = scandir($dir);
-	foreach ($modules_dir as $key => $value) {
-	   // --- "download" et "gallery" sont exclus : ces deux modules n'ont pas
-	   // --- de front (ils ne servent qu'a poser des shortcodes dans un
-	   // --- contenu). Les proposer ici laissait choisir un module de page qui
-	   // --- n'affiche rien - gallery n'a meme plus de controleur front, la
-	   // --- page retombait donc sur le 404 du theme.
-	   if (!in_array($value, array(".","..","pages","slider","tabbs","table","download","gallery"))) {
-		  if (is_dir($dir . DIRECTORY_SEPARATOR . $value)) {
-			 $result_modules_dir[] = $value;
-		  }
-	   }
+	// --- Core (search, user) + modules installés déclarés 'page_module' dans
+	// --- leur module.php : ceux qui n'ont pas de contrôleur de page (download,
+	// --- gallery, faq... qui ne servent qu'à poser des shortcodes) ne sont
+	// --- pas proposés - la page retombait sinon sur le 404 du thème.
+	$result_modules_dir = array('search', 'user');
+	foreach (sbModulesActive() as $name => $m) {
+		if (!empty($m['page_module'])) $result_modules_dir[] = $name;
 	}
+	sort($result_modules_dir, SORT_STRING);
 	return $result_modules_dir;
 }
 

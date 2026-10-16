@@ -50,7 +50,9 @@ $formType        = "edit";
 $btn_add_edit    = "Modifier";
 $legend_add_edit = "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 
-$action = ($_GET['op'] == '') ? 'headerfooter' : $_GET['op'];
+$action = (($_GET['op'] ?? '') == '') ? 'headerfooter' : ($_GET['op'] ?? '');
+// PHP 8 : variables lues par certaines branches seulement
+$content = $id = $query = ''; $cs = [];
 switch($action) {
 
 	case "css":
@@ -58,11 +60,11 @@ switch($action) {
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id      = intval($_POST['id']);
-			$content = $sbsanitize->displayText($_POST['code_hidden'], 'UTF-8', 1, 0);
+			$id      = intval($_POST['id'] ?? 0);
+			$content = $sbsanitize->displayText($_POST['code_hidden'] ?? '', 'UTF-8', 1, 0);
 			
 			// --- EDIT
 			if ($id > 0) {
@@ -90,7 +92,7 @@ switch($action) {
 		}
 		
 		// --------------------------------
-		if ($formType == 'edit' && !$_POST['form_submit'] && !$_POST['id']) {
+		if ($formType == 'edit' && empty($_POST['form_submit']) && empty($_POST['id'])) {
 			// --- Recuperation des donnees
 			$query_1   = "SELECT * FROM $table WHERE config = '$action'";
 			$requestQ  = $sbsql->query($query_1);
@@ -132,21 +134,21 @@ switch($action) {
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
 			// --- Content Header
-			$content_header_fr = $sbsanitize->displayText($_POST['header_fr'], 'UTF-8', 1, 0);
+			$content_header_fr = $sbsanitize->displayText($_POST['header_fr'] ?? '', 'UTF-8', 1, 0);
 			$content_header    = "[fr]".$content_header_fr."[/fr]";
 			if ($getMultilang) {
-				$content_header_en = $sbsanitize->displayText($_POST['header_en'], 'UTF-8', 1, 0);				
+				$content_header_en = $sbsanitize->displayText($_POST['header_en'] ?? '', 'UTF-8', 1, 0);				
 				$content_header   .= "[en]".$content_header_en."[/en]";
 			}
 			// --- Content Footer
-			$content_footer_fr = $sbsanitize->displayText($_POST['footer_fr'], 'UTF-8', 1, 0);
+			$content_footer_fr = $sbsanitize->displayText($_POST['footer_fr'] ?? '', 'UTF-8', 1, 0);
 			$content_footer    = "[fr]".$content_footer_fr."[/fr]";
 			if ($getMultilang) {
-				$content_footer_en = $sbsanitize->displayText($_POST['footer_en'], 'UTF-8', 1, 0);				
+				$content_footer_en = $sbsanitize->displayText($_POST['footer_en'] ?? '', 'UTF-8', 1, 0);				
 				$content_footer   .= "[en]".$content_footer_en."[/en]";
 			}
 			
@@ -223,24 +225,24 @@ switch($action) {
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$coming_soon_url         = $sbsanitize->displayText($_POST['coming_soon_url'], 'UTF-8', 1, 0);
-			$coming_soon_title       = $sbsanitize->displayText($_POST['coming_soon_title'], 'UTF-8', 1, 0);
-			$coming_soon_title2      = $sbsanitize->displayText($_POST['coming_soon_title2'], 'UTF-8', 1, 0);
-			$coming_soon_text        = $sbsanitize->displayText($_POST['coming_soon_text'], 'UTF-8', 1, 0);
-			$coming_soon_tel         = $sbsanitize->displayText($_POST['coming_soon_tel'], 'UTF-8', 1, 0);
-			$coming_soon_address     = $sbsanitize->displayText($_POST['coming_soon_address'], 'UTF-8', 1, 0);
-			$coming_soon_email       = $sbsanitize->displayText($_POST['coming_soon_email'], 'UTF-8', 1, 0);
-			$coming_soon_facebook    = $sbsanitize->displayText($_POST['coming_soon_facebook'], 'UTF-8', 1, 0);
-			$coming_soon_twitter     = $sbsanitize->displayText($_POST['coming_soon_twitter'], 'UTF-8', 1, 0);	 
-			$coming_soon_youtube     = $sbsanitize->displayText($_POST['coming_soon_youtube'], 'UTF-8', 1, 0);
-			$coming_soon_type        = $sbsanitize->displayText($_POST['coming_soon_type'], 'UTF-8', 1, 0);
-			$coming_soon_image       = $sbsanitize->displayText($_POST['coming_soon_image'], 'UTF-8', 1, 0);
-			$coming_soon_video       = $sbsanitize->displayText($_POST['coming_soon_video'], 'UTF-8', 1, 0);
-			$coming_soon_dark        = ($_POST['coming_soon_dark'] === "on") ? '1' : '0';
-			$coming_soon_date        = $sbsanitize->displayText($_POST['coming_soon_date'], 'UTF-8', 1, 0);
+			$coming_soon_url         = $sbsanitize->displayText($_POST['coming_soon_url'] ?? '', 'UTF-8', 1, 0);
+			$coming_soon_title       = $sbsanitize->displayText($_POST['coming_soon_title'] ?? '', 'UTF-8', 1, 0);
+			$coming_soon_title2      = $sbsanitize->displayText($_POST['coming_soon_title2'] ?? '', 'UTF-8', 1, 0);
+			$coming_soon_text        = $sbsanitize->displayText($_POST['coming_soon_text'] ?? '', 'UTF-8', 1, 0);
+			$coming_soon_tel         = $sbsanitize->displayText($_POST['coming_soon_tel'] ?? '', 'UTF-8', 1, 0);
+			$coming_soon_address     = $sbsanitize->displayText($_POST['coming_soon_address'] ?? '', 'UTF-8', 1, 0);
+			$coming_soon_email       = $sbsanitize->displayText($_POST['coming_soon_email'] ?? '', 'UTF-8', 1, 0);
+			$coming_soon_facebook    = $sbsanitize->displayText($_POST['coming_soon_facebook'] ?? '', 'UTF-8', 1, 0);
+			$coming_soon_twitter     = $sbsanitize->displayText($_POST['coming_soon_twitter'] ?? '', 'UTF-8', 1, 0);	 
+			$coming_soon_youtube     = $sbsanitize->displayText($_POST['coming_soon_youtube'] ?? '', 'UTF-8', 1, 0);
+			$coming_soon_type        = $sbsanitize->displayText($_POST['coming_soon_type'] ?? '', 'UTF-8', 1, 0);
+			$coming_soon_image       = $sbsanitize->displayText($_POST['coming_soon_image'] ?? '', 'UTF-8', 1, 0);
+			$coming_soon_video       = $sbsanitize->displayText($_POST['coming_soon_video'] ?? '', 'UTF-8', 1, 0);
+			$coming_soon_dark        = (($_POST['coming_soon_dark'] ?? null) === "on") ? '1' : '0';
+			$coming_soon_date        = $sbsanitize->displayText($_POST['coming_soon_date'] ?? '', 'UTF-8', 1, 0);
 			$coming_soon_countdown   = (isset($_POST['coming_soon_countdown']) && $_POST['coming_soon_countdown'] === "on") ? '1' : '0';
 			$coming_soon_type        = in_array($coming_soon_type, array('image', 'video'), true) ? $coming_soon_type : 'image';
 			
@@ -418,10 +420,10 @@ switch($action) {
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$active = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$active = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 			
 			// --- EDIT
 			// UPDATE DATAS
@@ -483,12 +485,12 @@ switch($action) {
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$plugins  = ($_POST['jquery'] === "on") ? "jquery|" : "";
-			$plugins .= ($_POST['lightbox'] === "on") ? "lightbox|" : "";
-			$plugins .= ($_POST['checkboxcss'] === "on") ? "checkboxcss|" : "";
+			$plugins  = (($_POST['jquery'] ?? null) === "on") ? "jquery|" : "";
+			$plugins .= (($_POST['lightbox'] ?? null) === "on") ? "lightbox|" : "";
+			$plugins .= (($_POST['checkboxcss'] ?? null) === "on") ? "checkboxcss|" : "";
 			foreach (array('cookieconsent', 'backtotop', 'aos', 'highlightjs') as $sb_plugin_new) {
 				$plugins .= (isset($_POST[$sb_plugin_new]) && $_POST[$sb_plugin_new] === "on") ? $sb_plugin_new . "|" : "";
 			}
@@ -528,7 +530,7 @@ switch($action) {
 		// --------------------------------
 
 		// --- Debug SQL
-		if (_AM_SITE_DEBUG && !$_POST['form_submit']) $sbsmarty->assign('sbdebugsql', $query . "\n" . 'Form Type = '.$formType);						
+		if (_AM_SITE_DEBUG && empty($_POST['form_submit'])) $sbsmarty->assign('sbdebugsql', $query . "\n" . 'Form Type = '.$formType);						
 		
 		// --------------------------------		
 		// --- Define variables
@@ -622,17 +624,17 @@ switch($action) {
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$seo_keywords                 = $sbsanitize->displayText($_POST['seo_keywords'], 'UTF-8', 1, 0);
-			$seo_description              = $sbsanitize->displayText($_POST['seo_description'], 'UTF-8', 1, 0);
-			$seo_robots                   = $sbsanitize->displayText($_POST['seo_robots'], 'UTF-8', 1, 0);
-			$seo_rating                   = $sbsanitize->displayText($_POST['seo_rating'], 'UTF-8', 1, 0);
-			$seo_author                   = $sbsanitize->displayText($_POST['seo_author'], 'UTF-8', 1, 0);
-			$seo_copyright                = $sbsanitize->displayText($_POST['seo_copyright'], 'UTF-8', 1, 0);
-			$seo_generator                = $sbsanitize->displayText($_POST['seo_generator'], 'UTF-8', 1, 0);
-			$seo_google_site_verification = $sbsanitize->displayText($_POST['seo_google_site_verification'], 'UTF-8', 1, 0);
+			$seo_keywords                 = $sbsanitize->displayText($_POST['seo_keywords'] ?? '', 'UTF-8', 1, 0);
+			$seo_description              = $sbsanitize->displayText($_POST['seo_description'] ?? '', 'UTF-8', 1, 0);
+			$seo_robots                   = $sbsanitize->displayText($_POST['seo_robots'] ?? '', 'UTF-8', 1, 0);
+			$seo_rating                   = $sbsanitize->displayText($_POST['seo_rating'] ?? '', 'UTF-8', 1, 0);
+			$seo_author                   = $sbsanitize->displayText($_POST['seo_author'] ?? '', 'UTF-8', 1, 0);
+			$seo_copyright                = $sbsanitize->displayText($_POST['seo_copyright'] ?? '', 'UTF-8', 1, 0);
+			$seo_generator                = $sbsanitize->displayText($_POST['seo_generator'] ?? '', 'UTF-8', 1, 0);
+			$seo_google_site_verification = $sbsanitize->displayText($_POST['seo_google_site_verification'] ?? '', 'UTF-8', 1, 0);
 			// GA4 : identifiant G-XXXXXXXXXX seulement (Universal Analytics UA- arrêté par Google)
 			$seo_google_analytics         = sbGa4Id($_POST['seo_google_analytics'] ?? '');
 			$ga_refused                   = $seo_google_analytics === '' && trim((string) ($_POST['seo_google_analytics'] ?? '')) !== '';
@@ -687,7 +689,7 @@ switch($action) {
 		}
 		
 		// --- Debug SQL
-		if (_AM_SITE_DEBUG && !$_POST['form_submit']) $sbsmarty->assign('sbdebugsql', $query . "\n" . 'Form Type = '.$formType);						
+		if (_AM_SITE_DEBUG && empty($_POST['form_submit'])) $sbsmarty->assign('sbdebugsql', $query . "\n" . 'Form Type = '.$formType);						
 		
 		// --------------------------------		
 		// --- Define variables

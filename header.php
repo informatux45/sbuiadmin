@@ -106,18 +106,16 @@ if (!function_exists('sbSiteInstalled') || sbSiteInstalled()) {
 	}
 }
 
-// ------------------------ 
-// Get ALL functions Files Module CMS
-// ------------------------ 
-$sb_path_functions_file = SB_MODULES_DIR;
-$sb_path_functions_dir  = new DirectoryIterator($sb_path_functions_file);
-foreach ($sb_path_functions_dir as $fileinfo) {
-    if (!$fileinfo->isDot()) {
-		$functions_path = $sb_path_functions_file . $fileinfo->getFilename() . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'functions.php';
-		if (file_exists($functions_path))
-			include_once($functions_path);
-    }
+// ------------------------
+// Functions Files Module CMS : un module présent mais non installé n'est
+// pas chargé, ses codes courts s'affichent vides (voir sbGetShortcode())
+// ------------------------
+foreach (sbModulesLoadable() as $sb_module_name) {
+	$functions_path = SB_MODULES_DIR . $sb_module_name . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'functions.php';
+	if (file_exists($functions_path))
+		include_once($functions_path);
 }
+unset($sb_module_name);
 
 // ------------------------
 // Modificateurs Smarty (fonctions PHP déclarées, voir sbSmartyRegisterModifiers())

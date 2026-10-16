@@ -143,9 +143,9 @@ class panier extends sql {
 			// initialize SESSION
 			$this->cartEmpty();
 			// Loop all products
-			foreach($_POST['reference'] as $key => $value) {
+			foreach(($_POST['reference'] ?? []) as $key => $value) {
 				// --- Add product by REFERENCE / QUANTITY in SESSION (cart)
-				$this->add( $_POST['reference'][$key], $_POST['quantity'][$key], $_POST['ekado'][$key] );
+				$this->add( $_POST['reference'][$key] ?? '', $_POST['quantity'][$key] ?? null, $_POST['ekado'][$key] ?? null );
 			}	
 		}
 	}
@@ -235,6 +235,7 @@ class panier extends sql {
 			// -----------------------------
 			// Switch DISCOUNT TYPE
 			// -----------------------------
+			$is_valid = false;
 			switch($result['type']) {
 				case "1": // Remise sur un produit
 					// -----------------------------
@@ -481,6 +482,8 @@ class panier extends sql {
 	 */
 	public function calculatePromo($total_price_ttc, $float = false, $total = false) {
 		// Switch Calculation with TYPE of Discount (code)
+		$discount       = 0;
+		$total_discount = $total_price_ttc;
 		switch( $this->getPromo()->code ) {
 			case "1": // Remise sur un produit
 			case "2": // Remise sur le panier
@@ -601,6 +604,7 @@ class panier extends sql {
 		// --------------------
 		// Transport
 		// --------------------
+		$transport_price_T = 0;
 		switch($this->getTransport()->type) {
 			case "forfait":
 				$transport_price_T = $this->getTransport()->forfait_price_float;

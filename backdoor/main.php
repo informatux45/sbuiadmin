@@ -101,19 +101,6 @@ $module_menu['menu']['group'] = "user"; // user OR admin
 // -----------------------------------------------------
 
 // -----------------------
-// Menu NEWS
-// -----------------------
-$module_menu['news']['main']  = SBUIADMIN_MENU_NEWS;
-$module_menu['news']['icon']  = "rss";
-$module_menu['news']['group'] = "user"; // user OR admin
-$module_menu['news']['li'][0]['title'] = SBUIADMIN_MENU_NEWS_ALL;
-$module_menu['news']['li'][0]['link']  = "index.php?p=news";
-$module_menu['news']['li'][1]['title'] = SBUIADMIN_MENU_NEWS_CATEGORIES;
-$module_menu['news']['li'][1]['link']  = "index.php?p=news&a=category";
-$module_menu['news']['li'][2]['title'] = SBUIADMIN_MENU_NEWS_SETTINGS;
-$module_menu['news']['li'][2]['link']  = "index.php?p=news&a=settings";
-
-// -----------------------
 // Menu PAGES
 // -----------------------
 $module_menu['pages']['main']  = SBUIADMIN_MENU_PAGES;
@@ -125,81 +112,19 @@ $module_menu['pages']['li'][1]['title'] = SBUIADMIN_MENU_PAGES_BLOCS;
 $module_menu['pages']['li'][1]['link']  = "index.php?p=blocs";
 
 // -----------------------
-// Menu CONTACT (Forms)
+// Menus des modules installés : datas/modules/<nom>/admin/menu.php
+// (voir inc/sbuiadmin-modules.php) - un module présent mais non installé
+// n'a pas d'entrée, il disparaît donc du menu et de la matrice de droits
 // -----------------------
-$module_menu['contact']['main']  = SBUIADMIN_MENU_CONTACT;
-$module_menu['contact']['icon']  = "envelope";
-$module_menu['contact']['group'] = "user"; // user OR admin
-$module_menu['contact']['li'][0]['title'] = SBUIADMIN_MENU_CONTACT_ALL;
-$module_menu['contact']['li'][0]['link']  = "index.php?p=contact";
-$module_menu['contact']['li'][1]['title'] = SBUIADMIN_MENU_CONTACT_SETTINGS;
-$module_menu['contact']['li'][1]['link']  = "index.php?p=contact&a=settings";
-
-// -----------------------
-// Menu SLIDER
-// -----------------------
-$module_menu['slider']['main']  = SBUIADMIN_MENU_SLIDERS;
-$module_menu['slider']['icon']  = "sliders";
-$module_menu['slider']['group'] = "user"; // user OR admin
-
-// -----------------------
-// Menu TABBS
-// -----------------------
-$module_menu['tabbs']['main']  = SBUIADMIN_MENU_TABBS;
-$module_menu['tabbs']['icon']  = "list-alt";
-$module_menu['tabbs']['group'] = "user"; // user OR admin
-$module_menu['tabbs']['li'][0]['title'] = SBUIADMIN_MENU_TABBS_ALL;
-$module_menu['tabbs']['li'][0]['link']  = "index.php?p=tabbs";
-$module_menu['tabbs']['li'][1]['title'] = SBUIADMIN_MENU_TABBS_ONGLETS;
-$module_menu['tabbs']['li'][1]['link']  = "index.php?p=tabbs&a=alltabs";
-
-// -----------------------
-// Menu TABLE
-// -----------------------
-$module_menu['table']['main']  = SBUIADMIN_MENU_TABLES;
-$module_menu['table']['icon']  = "table";
-$module_menu['table']['group'] = "user"; // user OR admin
-
-// -----------------------
-// Menu FAQ
-// -----------------------
-$module_menu['faq']['main']  = SBUIADMIN_MENU_FAQ;
-$module_menu['faq']['icon']  = "question-circle";
-$module_menu['faq']['group'] = "user"; // user OR admin
-$module_menu['faq']['li'][0]['title'] = SBUIADMIN_MENU_FAQ_ALL;
-$module_menu['faq']['li'][0]['link']  = "index.php?p=faq";
-$module_menu['faq']['li'][1]['title'] = SBUIADMIN_MENU_FAQ_CATEGORIES;
-$module_menu['faq']['li'][1]['link']  = "index.php?p=faq&a=category";
-
-// -----------------------
-// Menu TELECHARGEMENTS
-// -----------------------
-$module_menu['download']['main']  = SBUIADMIN_MENU_DOWNLOAD;
-$module_menu['download']['icon']  = "download";
-$module_menu['download']['group'] = "user"; // user OR admin
-
-// -----------------------
-// Menu GALERIES
-// -----------------------
-$module_menu['gallery']['main']  = SBUIADMIN_MENU_GALLERY;
-$module_menu['gallery']['icon']  = "picture-o";
-$module_menu['gallery']['group'] = "user"; // user OR admin
-$module_menu['gallery']['li'][0]['title'] = SBUIADMIN_MENU_GALLERY_ALL;
-$module_menu['gallery']['li'][0]['link']  = "index.php?p=gallery";
-$module_menu['gallery']['li'][1]['title'] = SBUIADMIN_MENU_GALLERY_PHOTOS;
-$module_menu['gallery']['li'][1]['link']  = "index.php?p=gallery&a=photo";
-
-// -----------------------
-// Menu Boutique
-// -----------------------
-$module_menu['boutique']['main']  = SBUIADMIN_MENU_BOUTIQUE;
-$module_menu['boutique']['icon']  = "shopping-cart";
-$module_menu['boutique']['group'] = "user"; // user OR admin
-$module_menu['boutique']['li'][0]['title'] = SBUIADMIN_MENU_BOUTIQUE_PRODUCTS;
-$module_menu['boutique']['li'][0]['link']  = "index.php?p=boutique";
-$module_menu['boutique']['li'][1]['title'] = SBUIADMIN_MENU_BOUTIQUE_CATEGORIES;
-$module_menu['boutique']['li'][1]['link']  = "index.php?p=boutique&a=category";
-$module_menu['boutique']['li'][2]['title'] = SBUIADMIN_MENU_BOUTIQUE_SETTINGS;
-$module_menu['boutique']['li'][2]['link']  = "index.php?p=boutique&a=settings";
+foreach (array_keys(sbModulesActive()) as $sb_module_name) {
+	$sb_module_file = sbModuleAdminFile($sb_module_name, 'menu.php');
+	if ($sb_module_file === null) continue;
+	$sb_module_entry = include $sb_module_file;
+	if (!is_array($sb_module_entry)) continue;
+	// Icône : celle de module.php (aussi affichée dans la carte Modules)
+	if (empty($sb_module_entry['icon'])) $sb_module_entry['icon'] = sbModuleMeta($sb_module_name)['icon'];
+	$module_menu[$sb_module_name] = $sb_module_entry;
+}
+unset($sb_module_name, $sb_module_file, $sb_module_entry);
 
 ?>

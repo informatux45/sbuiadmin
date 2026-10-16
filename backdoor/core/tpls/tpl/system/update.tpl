@@ -56,7 +56,7 @@
 						<div class="alert info" style="margin-top:12px"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span><div class="body">
 							Une sauvegarde chiffrée des fichiers remplacés et de la base de données est faite automatiquement : en cas d'échec, le retour à la version actuelle est automatique, et la mise à jour peut ensuite être annulée (une fois) depuis cette page.
 							Pendant la copie, le site et l'administration affichent « mise à jour en cours ».
-							Jamais touchés : <code>upload/</code>, <code>.htaccess</code>, <code>sbconfig.php</code>, <code>inc/cmscustom.php</code>, réglages, caches, installeur.
+							Jamais touchés : <code>upload/</code>, <code>.htaccess</code>, <code>sbconfig.php</code>, <code>inc/cmscustom.php</code>, réglages, caches, installeur, et les modules (mis à jour dans la carte « Modules »).
 						</div></div>
 
 						<div id="sbupd-step1" style="margin-top:16px">
@@ -86,6 +86,83 @@
 					<div class="card-body"><p><strong>SBUIADMIN est à jour.</strong></p></div>
 				</section>
 				{/if}
+
+				{* --- Modules : mis à jour séparément du core --- *}
+				{literal}<style>.sbmod-ico{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--primary-soft);color:var(--primary);font-size:16px}</style>{/literal}
+				<section class="col-12 card" id="sbmod">
+					<div class="card-head">
+						<div class="card-title-wrap">
+							<h2 class="card-title">Modules</h2>
+						</div>
+						<button type="button" class="btn btn--outline-primary btn--sm" data-mod-action="check"{if !$sb_upd_ready} disabled{/if}>Vérifier les modules</button>
+					</div>
+					<div class="card-body">
+						<p style="color:var(--t-muted)">Chaque module a sa version et se met à jour indépendamment du core. Dernière vérification : {$sb_mod_checked}{if $sb_mod_cache.core_version} (version publiée {$sb_mod_cache.core_version|escape}){/if}.
+						{if $sb_mod_cache.error}<br><span style="color:var(--danger)">Dernière vérification en échec : {$sb_mod_cache.error|escape}</span>{/if}</p>
+						<table class="table">
+							<thead><tr><th style="width:52px"></th><th>Module</th><th>Description</th><th>Version</th><th>Publiée</th><th>État</th><th>Actions</th></tr></thead>
+							<tbody>
+							{foreach $sb_mod_catalog as $mod}
+								<tr>
+									<td><span class="sbmod-ico"><i class="{$mod.icon|sbFaClass} fa-fw"></i></span></td>
+									<td><strong>{$mod.title|escape}</strong><br><code style="font-size:11px">{$mod.name|escape}</code></td>
+									<td style="max-width:420px">{$mod.description|escape}</td>
+									<td>{if $mod.local}{$mod.local|escape}{else}—{/if}</td>
+									<td>{if $mod.remote}{$mod.remote|escape}{if !$mod.remote_ok}<br><small style="color:var(--warning)">core {$mod.requires|escape} requis</small>{/if}{else}—{/if}</td>
+									<td>
+										{if $mod.state == 'absent'}<span class="badge info">Sur GitHub</span>
+										{elseif $mod.state == 'present'}<span class="badge warning">Non installé</span>
+										{elseif $mod.state == 'outdated'}<span class="badge warning">Mise à jour disponible</span>
+										{else}<span class="badge success">Installé</span>{/if}
+										{if $mod.present && !$mod.local_ok}<br><small style="color:var(--warning)">core {$mod.local_requires|escape} requis</small>{/if}
+									</td>
+									<td style="white-space:nowrap">
+										{foreach $mod.actions as $op}
+											<button type="button" class="btn btn--sm {if $op == 'uninstall' || $op == 'delete'}btn--ghost{else}btn--outline-primary{/if}" data-mod-action="plan" data-mod="{$mod.name|escape}" data-op="{$op|escape}"{if !$sb_upd_ready && ($op == 'download' || $op == 'update')} disabled{/if}>
+												{if $op == 'download'}Télécharger{elseif $op == 'update'}Mettre à jour{elseif $op == 'install'}Installer{elseif $op == 'uninstall'}Désinstaller{else}Supprimer les fichiers{/if}
+											</button>
+										{/foreach}
+										{foreach $mod.blocked as $op => $why}
+											<span data-tooltip="{$why|escape}"><button type="button" class="btn btn--sm btn--outline-primary" disabled>{if $op == 'download'}Télécharger{elseif $op == 'update'}Mettre à jour{else}Installer{/if}</button></span>
+										{/foreach}
+										{if isset($mod.blocked.install)}<br><small style="color:var(--warning);white-space:normal">{$mod.blocked.install|escape}</small>{/if}
+									</td>
+								</tr>
+							{foreachelse}
+								<tr><td colspan="7" style="color:var(--t-muted)">Aucun module : cliquez sur « Vérifier les modules » pour lire ceux publiés sur GitHub.</td></tr>
+							{/foreach}
+							</tbody>
+						</table>
+
+						<div id="sbmod-panel" style="display:none;margin-top:16px;padding:16px;border:1px solid var(--border);border-radius:10px">
+							<h3 id="sbmod-panel-title" style="margin:0 0 8px"></h3>
+							<div id="sbmod-panel-body"></div>
+							<label class="check" id="sbmod-confirm-wrap" style="margin-top:10px;display:none">
+								<input type="checkbox" id="sbmod-confirm"> <span class="box"></span>
+								<span id="sbmod-confirm-label"></span>
+							</label>
+							<label class="check" id="sbmod-drop-wrap" style="margin-top:10px;display:none">
+								<input type="checkbox" id="sbmod-drop"> <span class="box"></span>
+								<span>Supprimer aussi les données (tables du module) — une sauvegarde chiffrée de la base est faite avant.</span>
+							</label>
+							<div class="field" style="margin-top:12px;max-width:340px">
+								<label class="field-label" for="sbmod-password">Votre mot de passe (confirmation)</label>
+								<input class="input" type="password" id="sbmod-password" autocomplete="current-password">
+							</div>
+							<div style="margin-top:12px">
+								<button type="button" class="btn btn--primary" data-mod-action="run" id="sbmod-run">Confirmer</button>
+								<button type="button" class="btn btn--ghost" data-mod-action="close">Annuler</button>
+							</div>
+						</div>
+						<div class="alert primary" style="margin-top:12px"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span><div class="body">
+							<strong>Télécharger</strong> met les fichiers sur le disque sans rien activer ;<br>
+							<strong>Installer</strong> crée les tables et active le module (menu, droits, pages, codes courts) ;<br>
+							<strong>Désinstaller</strong> le désactive (données gardées sauf demande) ;<br>
+							<strong>Supprimer</strong> les fichiers n'est possible qu'une fois le module désinstallé.<br>
+							Chaque opération est précédée d'une sauvegarde chiffrée et annulée automatiquement en cas d'échec.
+						</div></div>
+					</div>
+				</section>
 
 				{* --- Progression (mise à jour ou retour arrière) --- *}
 				<section class="col-12 card" id="sbupd-progress" style="display:none">
@@ -185,6 +262,6 @@
 			</div>
 			<!-- /.grid -->
 
-		<script src="{$smarty.const._AM_SITE_URL}assets/sbupdate.js?v={$smarty.const._AM_START_VERSION}"></script>
+		<script src="{$smarty.const._AM_SITE_URL}assets/sbupdate.js?v={$sb_upd_js_ver}"></script>
 
 	{include file='sb_footer.tpl' page='false' pagef='false'}

@@ -33,25 +33,11 @@
  * (voir/ajouter/modifier/supprimer indépendants du reste du module).
  * Contrairement à sbGetRightsModules(), cette liste n'est PAS auto-découverte
  * (rien dans le code ne signale "cette action forme une sous-section") : un
- * nouveau module qui veut ce découpage doit ajouter son entrée ici à la main.
+ * module la déclare dans son module.php ('rights' => 'submodules').
  * @return array [module => [action => ['key' => sous-clé, 'label' => libellé]]]
  */
 function sbGetRightsSubmodules() {
-	return array(
-		'faq'       => array(
-			'category' => 'Catégories', 'categorydel' => 'Catégories', 'categoryadd' => 'Catégories', 'categoryedit' => 'Catégories',
-		),
-		'boutique'  => array(
-			'category' => 'Catégories', 'categorydel' => 'Catégories', 'categoryadd' => 'Catégories', 'categoryedit' => 'Catégories',
-			'settings' => 'Paramètres',
-		),
-		'news'      => array(
-			'category' => 'Catégories', 'categorydel' => 'Catégories', 'categoryadd' => 'Catégories', 'categoryedit' => 'Catégories',
-			'settings' => 'Paramètres', 'settingscategory' => 'Paramètres',
-		),
-		'contact'   => array(
-			'settings' => 'Paramètres',
-		),
+	$list = array(
 		'users'     => array(
 			'blockedip' => 'IPs bloquées', 'delblockedip' => 'IPs bloquées',
 			'blockedipsettings' => 'Paramètres IPs bloquées',
@@ -63,15 +49,6 @@ function sbGetRightsSubmodules() {
 			// pouvoir masquer ce lien dans le menu comme n'importe quel autre.
 			'samples' => 'Thème sample',
 		),
-		'tabbs'     => array(
-			'deltab' => 'Onglets', 'alltabs' => 'Onglets', 'tabadd' => 'Onglets', 'tabedit' => 'Onglets',
-		),
-		'gallery'   => array(
-			// "photo" en premier : c'est la clé canonique de la ligne (voir
-			// sbGetEffectiveModuleKey). "sort" trie les photos d'une galerie,
-			// pas les galeries elles-memes - il appartient donc a cette section.
-			'photo' => 'Photos / vidéos', 'photoadd' => 'Photos / vidéos', 'photoedit' => 'Photos / vidéos', 'delphoto' => 'Photos / vidéos', 'sort' => 'Photos / vidéos',
-		),
 		'cmsconfig' => array(
 			'headerfooter' => 'En-tête/Pied de page',
 			'css'          => 'CSS',
@@ -82,6 +59,11 @@ function sbGetRightsSubmodules() {
 			'seo'          => 'SEO',
 		),
 	);
+	// Modules installés : 'rights' => 'submodules' de leur module.php
+	foreach (sbModulesActive() as $name => $m) {
+		if (!empty($m['rights']['submodules'])) $list[$name] = $m['rights']['submodules'];
+	}
+	return $list;
 }
 
 /**
@@ -279,19 +261,14 @@ function sbClassifyAction($module) {
 
 	$overrides = array(
 		'users'     => array('blockedipsettings' => 'edit', 'blockedip' => 'view'),
-		'contact'   => array('settings' => 'edit'),
-		'news'      => array('settings' => 'edit', 'settingscategory' => 'edit', 'tpl_list' => 'edit', 'tpl_single' => 'edit', 'sort' => 'edit'),
-		'faq'       => array('sort' => 'edit', 'category' => 'view'),
-		'boutique'  => array('sort' => 'edit', 'category' => 'view', 'settings' => 'edit'),
-		'slider'    => array('sort' => 'edit', 'photo' => 'view'),
-		'gallery'   => array('sort' => 'edit', 'photo' => 'view'),
-		'tabbs'     => array('sort' => 'edit', 'alltabs' => 'view'),
-		'table'     => array('sortstructure' => 'edit', 'sortdatas' => 'edit'),
 		'menu'      => array('sort' => 'edit'),
 		'blocs'     => array('sort' => 'edit', 'sortmod' => 'edit'),
 		'sandbox'   => array('sort' => 'edit'),
 		'cmsconfig' => array('headerfooter' => 'edit', 'css' => 'edit', 'javascript' => 'edit', 'comingsoon' => 'edit', 'multilang' => 'edit', 'plugins' => 'edit', 'seo' => 'edit'),
 	);
+	// Modules installés : 'rights' => 'actions' de leur module.php
+	$meta = sbModuleActive($module) ? sbModuleMeta($module) : null;
+	if (!empty($meta['rights']['actions'])) $overrides[$module] = $meta['rights']['actions'];
 	if (isset($overrides[$module][$action])) {
 		$classified = $overrides[$module][$action];
 		// La plupart de ces pages (paramètres, tri, sous-pages CMS Config...)

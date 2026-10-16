@@ -47,7 +47,9 @@ $sb_msg_valid = false;
 // Write your own code after these lines
 // ---------------------------------------------------
 // ---------------------------------------------------
-$action = $_GET['a'];
+$action = $_GET['a'] ?? '';
+// PHP 8 : variables lues par certaines branches seulement
+$content = '';
 switch($action) {
 	default:
 		// --------------------------------
@@ -60,11 +62,11 @@ switch($action) {
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$active      = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
-			$form_config = $_POST['form_config'];
+			$active      = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
+			$form_config = $_POST['form_config'] ?? '';
 			// --- EDIT
 			// UPDATE / INSERT DATAS
 			if ($form_config == 'toolbarck')
@@ -96,7 +98,7 @@ switch($action) {
 		// --------------------------------
 
 		// --- Debug SQL
-		if (_AM_SITE_DEBUG && !$_POST['form_submit']) $sbsmarty->assign('sbdebugsql', $query . "\n" . 'Form Type = '.$formType);
+		if (_AM_SITE_DEBUG && empty($_POST['form_submit'])) $sbsmarty->assign('sbdebugsql', $query . "\n" . 'Form Type = '.$formType);
 
 		// --------------------------------		
 		// --- Define variables

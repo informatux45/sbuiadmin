@@ -36,10 +36,10 @@ $sbsmarty->assign('sbnews_options', $news_options);
 // --- Check start index or categories
 // --- 0: Categories list
 // --- 1: Categories (catids)
-if ($news_options['module_start'] && (!$_GET['op'])) {
+if ($news_options['module_start'] && (empty($_GET['op']))) {
 	$_GET['op'] = 'categories';
 	$_GET['id'] = $news_options['catid'];
-} elseif (!$news_options['module_start'] && (!$_GET['op'])) {
+} elseif (!$news_options['module_start'] && (empty($_GET['op']))) {
 	$_GET['op'] = false;
 	$_GET['id'] = false;
 }
@@ -50,12 +50,13 @@ $news_per_page = $news_options['item_per_page'];
 
 # -------------------------
 # Define TPL to show (view)
-if (!$_GET['op'] && !$_GET['id']) {
+if (empty($_GET['op']) && empty($_GET['id'])) {
 	$op       = 'index';
+	$id       = 0;
 	$template = 'index';
 } else {
-	$op       = $sbsanitize->addSlashes($_GET['op']);
-	$id       = intval($_GET['id']);
+	$op       = $sbsanitize->addSlashes($_GET['op'] ?? '');
+	$id       = intval($_GET['id'] ?? 0);
 	$template = 'display_'.$op;
 }
 $module['template_main'] = MODULEFILE . '_' . $template . '.tpl';

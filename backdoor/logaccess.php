@@ -39,13 +39,15 @@ $sb_msg_valid = false;
 $table       = _AM_DB_PREFIX . "sb_logaccess";
 $text        = "Log";
 
-$action = $_GET['a'];
+$action = $_GET['a'] ?? '';
+// PHP 8 : variables lues par certaines branches seulement
+$query_2 = '';
 switch($action) {
 	case "del":
 	default:
 		// Action DELETE
 		if ($action == 'del') {
-			$get_id   = intval($_GET['id']);
+			$get_id   = intval($_GET['id'] ?? 0);
 			$query_2  = "DELETE FROM $table WHERE id = '$get_id'";
 			$request  = $sbsql->query($query_2);
 			

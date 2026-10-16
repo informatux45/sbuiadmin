@@ -42,7 +42,7 @@ $sb_msg_valid = false;
 global $sbfiles_medias_dirs_allowed, $sbfiles_medias_exts_allowed, $sbfiles_medias_exts_refused, $sbfiles_medias_exts_safe;
 
 // Get ID of the input for DOM Inject
-$sbid = intval($_GET['id']);
+$sbid = intval($_GET['id'] ?? 0);
 
 // -----------------------
 // Remove a media from the list

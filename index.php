@@ -178,8 +178,16 @@ $sb_smarty_cache_id = md5($sb_get_page . '|' . ($_SERVER['REQUEST_URI'] ?? ''));
 
 // --------------------------------
 // --- Search for safe page
+// --- Les pages d'un module (news, download, shop...) ne sont servies que
+// --- s'il est installé, qu'elles figurent ou non dans sbconfig.php
 // --------------------------------
-if (in_array($sb_get_page, $sb_safe_pages_cms) || in_array($sb_get_page, $sb_safe_modules_cms ?? [])) {
+$sb_module_pages = array_merge(sbModuleRoutes(false), array_keys(sbModulesPresent()));
+$sb_front_pages  = array_merge(
+	array_diff($sb_safe_pages_cms, $sb_module_pages),
+	sbModuleRoutes(true),
+	array_filter($sb_safe_modules_cms ?? [], function ($m) { return sbModuleMeta($m) === null || sbModuleActive($m); })
+);
+if (in_array($sb_get_page, $sb_front_pages)) {
 	
 	// ---------------------------------------
 	// --- Assign modules / pages paths
@@ -241,11 +249,10 @@ if (in_array($sb_get_page, $sb_safe_pages_cms) || in_array($sb_get_page, $sb_saf
 		// Check if a module is choosen by the created page
 		// Or the config file (SBCONFIG)
 		// ---------------------------------------
-		if ((isset($modpage['module_main']) && $modpage['module_main'] != '') || (SBMODULEINDEX)) {
-			// -----------------------------------
-			// --- Define module to load
-			// -----------------------------------
-			$get_module_view = ($modpage['module_main'] != '') ? $modpage['module_main'] : SBMODULEINDEX;
+		$get_module_view = (isset($modpage['module_main']) && $modpage['module_main'] != '') ? $modpage['module_main'] : SBMODULEINDEX;
+		// --- Module de la page non installé : la page s'affiche sans lui
+		if ($get_module_view && sbModuleMeta($get_module_view) !== null && !sbModuleActive($get_module_view)) $get_module_view = false;
+		if ($get_module_view) {
 			// -----------------------------------
 			// Include Module File
 			// -----------------------------------

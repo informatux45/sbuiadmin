@@ -52,23 +52,23 @@ $table           = _AM_DB_PREFIX . "sb_config";
 // --------------------------------
 // --- Control form submit --------
 // --------------------------------
-if ($_POST['form_submit']) {
+if (!empty($_POST['form_submit'])) {
 
 	// Injection des données
-	$theme_infos_tel         = $sbsanitize->displayText($_POST['theme_infos_tel'], 'UTF-8', 1, 0);
-	$theme_infos_address     = $sbsanitize->displayText($_POST['theme_infos_address'], 'UTF-8', 1, 0);
-	$theme_infos_email       = $sbsanitize->displayText($_POST['theme_infos_email'], 'UTF-8', 1, 0);
-	$theme_infos_facebook    = $sbsanitize->displayText($_POST['theme_infos_facebook'], 'UTF-8', 1, 0);
-	$theme_infos_twitter     = $sbsanitize->displayText($_POST['theme_infos_twitter'], 'UTF-8', 1, 0);	 
-	$theme_infos_google_plus = $sbsanitize->displayText($_POST['theme_infos_google_plus'], 'UTF-8', 1, 0);
-	$theme_infos_pinterest   = $sbsanitize->displayText($_POST['theme_infos_pinterest'], 'UTF-8', 1, 0);
-	$theme_infos_instagram   = $sbsanitize->displayText($_POST['theme_infos_instagram'], 'UTF-8', 1, 0);
-	$theme_infos_skype       = $sbsanitize->displayText($_POST['theme_infos_skype'], 'UTF-8', 1, 0);
-	$theme_infos_viadeo      = $sbsanitize->displayText($_POST['theme_infos_viadeo'], 'UTF-8', 1, 0);
-	$theme_infos_linkedin    = $sbsanitize->displayText($_POST['theme_infos_linkedin'], 'UTF-8', 1, 0);
-	$theme_infos_vimeo       = $sbsanitize->displayText($_POST['theme_infos_vimeo'], 'UTF-8', 1, 0);
-	$theme_infos_youtube     = $sbsanitize->displayText($_POST['theme_infos_youtube'], 'UTF-8', 1, 0);
-	$theme_infos_github      = $sbsanitize->displayText($_POST['theme_infos_github'], 'UTF-8', 1, 0);
+	$theme_infos_tel         = $sbsanitize->displayText($_POST['theme_infos_tel'] ?? '', 'UTF-8', 1, 0);
+	$theme_infos_address     = $sbsanitize->displayText($_POST['theme_infos_address'] ?? '', 'UTF-8', 1, 0);
+	$theme_infos_email       = $sbsanitize->displayText($_POST['theme_infos_email'] ?? '', 'UTF-8', 1, 0);
+	$theme_infos_facebook    = $sbsanitize->displayText($_POST['theme_infos_facebook'] ?? '', 'UTF-8', 1, 0);
+	$theme_infos_twitter     = $sbsanitize->displayText($_POST['theme_infos_twitter'] ?? '', 'UTF-8', 1, 0);	 
+	$theme_infos_google_plus = $sbsanitize->displayText($_POST['theme_infos_google_plus'] ?? '', 'UTF-8', 1, 0);
+	$theme_infos_pinterest   = $sbsanitize->displayText($_POST['theme_infos_pinterest'] ?? '', 'UTF-8', 1, 0);
+	$theme_infos_instagram   = $sbsanitize->displayText($_POST['theme_infos_instagram'] ?? '', 'UTF-8', 1, 0);
+	$theme_infos_skype       = $sbsanitize->displayText($_POST['theme_infos_skype'] ?? '', 'UTF-8', 1, 0);
+	$theme_infos_viadeo      = $sbsanitize->displayText($_POST['theme_infos_viadeo'] ?? '', 'UTF-8', 1, 0);
+	$theme_infos_linkedin    = $sbsanitize->displayText($_POST['theme_infos_linkedin'] ?? '', 'UTF-8', 1, 0);
+	$theme_infos_vimeo       = $sbsanitize->displayText($_POST['theme_infos_vimeo'] ?? '', 'UTF-8', 1, 0);
+	$theme_infos_youtube     = $sbsanitize->displayText($_POST['theme_infos_youtube'] ?? '', 'UTF-8', 1, 0);
+	$theme_infos_github      = $sbsanitize->displayText($_POST['theme_infos_github'] ?? '', 'UTF-8', 1, 0);
 	
 	// --- EDIT
 	// UPDATE DATAS
@@ -133,6 +133,7 @@ $query = "SELECT config, content FROM $table WHERE config = 'theme_infos_tel'
 $request = $sbsql->query($query);
 $assoc   = $sbsql->toarray($request);
 // --------------------------------
+$cs = [];
 foreach($assoc as $row) {
 	$cs[$row['config']] = sb_utf8_encode($row['content']);
 }
@@ -229,7 +230,7 @@ $sbsmarty->assign('sb_theme_view', trim($sb_theme_view));
 // ----------------------
 $sbsmarty->assign('page_title', 'Infos de votre thème');
 // --- Legend ADD or EDIT
-$sbsmarty->assign('legend_add_edit', sprintf((string) ($legend_add_edit ?? ''), $sbsanitize->displayText($action, 'UTF-8', 0, 1)));
+$sbsmarty->assign('legend_add_edit', sprintf((string) ($legend_add_edit ?? ''), $sbsanitize->displayText($action ?? '', 'UTF-8', 0, 1)));
 // --- Second submit Button
 $sbsmarty->assign('sb_form_id', $formName);
 $sbsmarty->assign('sb_form_submit_value', $btn_add_edit);

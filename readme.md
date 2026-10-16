@@ -69,6 +69,11 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
+**4.29**
+- Modules (news, contact, faq, gallery, download, slider, tabbs, table, shop) are now separate from the core, each with its own version
+- New "Modules" card in Configuration > Update: download, install, uninstall, delete files
+- PHP 8: no more undefined index warnings in modules
+
 **4.28**
 - Text conversion no longer drops strings with characters outside Latin-1 (euro, curly quotes, emoji)
 - Maintenance page: local fonts linked, social icons no longer doubled on desktop

@@ -194,18 +194,9 @@ if (!function_exists("sbRewriteUrl")) {
 			$type = false;
 			// --- Switch value
 			$switch_element = $elements[0];
-			// --- Get / Check modules List
-			$dir = SB_MODULES_DIR;
-			$result_modules_dir = array();	 
-			$modules_dir = scandir($dir);
-			foreach ($modules_dir as $key => $value) {
-				if (!in_array($value,array(".","..","pages","contact","search"))) {
-					if (is_dir($dir . DIRECTORY_SEPARATOR . $value)) {
-						if ($switch_element == $value)
-							$type = 'module';
-					}
-				}
-			}
+			// --- Module servi par l'URL (voir sbModulesRewriteNames()),
+			// --- sinon identifiant de page
+			if (in_array($switch_element, sbModulesRewriteNames(), true)) $type = 'module';
 			// --- Switch array elements
 			switch($switch_element) {
 				default:
@@ -289,6 +280,9 @@ if (!function_exists("sbGetShortcode")) {
 				if (function_exists($function_name)) {
 					// --- Replace SHORTCODE By Function HTML Return
 					$string = str_replace($shortcode[$i], $function_name($param), $string);
+				} else {
+					// --- Module non installé (ou code inconnu) : rien au visiteur
+					$string = str_replace($shortcode[$i], '', $string);
 				}
 			}
 			return $string;

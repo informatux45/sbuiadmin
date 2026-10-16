@@ -30,6 +30,7 @@ if ($sbuiadmin_user_type != 'admin') {
 }
 
 require_once SBUIADMIN_PATH . '/inc/' . SBUIADMIN_ID . '-update.php';
+require_once SBUIADMIN_PATH . '/inc/' . SBUIADMIN_ID . '-update-modules.php';
 if (empty($_SESSION['sbupd_token'])) $_SESSION['sbupd_token'] = bin2hex(random_bytes(16));
 
 // ---------------------------------------------------------------
@@ -52,12 +53,12 @@ if ($sb_is_ajax) {
 		$_SESSION['sbupd_state'] = sbUpdStateFile();
 		// Mise à jour et retour arrière : mot de passe redemandé (une session
 		// volée ou un poste resté ouvert ne suffit pas), tentatives comptées
-		if ($sb_action === 'run' || $sb_action === 'rollback') {
+		if ($sb_action === 'run' || $sb_action === 'rollback' || $sb_action === 'modrun') {
 			$sb_user = (string) $_SESSION['sbuiadmin_user_name'];
 			if (sbLoginLocked($sb_user)) throw new RuntimeException('Trop de tentatives échouées : réessayez dans quelques minutes');
 			if (!$sbusers->login($sb_user, (string) ($_POST['password'] ?? ''))) {
 				sbLoginFailed($sb_user);
-				sbUpdLog('Mot de passe refusé avant ' . ($sb_action === 'run' ? 'une mise à jour' : 'un retour arrière'), $sb_user);
+				sbUpdLog('Mot de passe refusé avant ' . ($sb_action === 'run' ? 'une mise à jour' : ($sb_action === 'modrun' ? 'une opération sur un module' : 'un retour arrière')), $sb_user);
 				throw new RuntimeException('Mot de passe incorrect');
 			}
 		}
@@ -84,6 +85,20 @@ if ($sb_is_ajax) {
 			case 'cancel':
 				sbUpdCancel();
 				$out = array('status' => 'cancelled');
+				break;
+			// --- Modules (voir inc/sbuiadmin-update-modules.php)
+			case 'modcheck':
+				$out = sbModCatalogRefresh();
+				break;
+			case 'modplan':
+				$out = sbModPlan((string) ($_POST['module'] ?? ''), (string) ($_POST['op'] ?? ''));
+				break;
+			case 'modrun':
+				$sb_mod = (string) ($_POST['module'] ?? '');
+				$sb_op  = (string) ($_POST['op'] ?? '');
+				$sb_opt = array('confirm' => !empty($_POST['confirm']), 'drop_data' => !empty($_POST['drop_data']));
+				session_write_close();
+				$out = sbModRun($sb_mod, $sb_op, $sb_opt);
 				break;
 			default:
 				throw new RuntimeException('Action inconnue');
@@ -122,6 +137,14 @@ try {
 	$sb_msg_error = $e->getMessage();
 }
 $sb_upd_history = json_decode(sbSetting('update_history'), true);
+// --- Modules : catalogue (dernière vérification) et état local
+$sb_mod_catalog = array();
+$sb_mod_cache = sbModCatalogCache();
+try {
+	$sb_mod_catalog = sbModCatalog();
+} catch (Throwable $e) {
+	$sb_msg_error = $e->getMessage();
+}
 
 $sbsmarty->assign('sb_upd_state', $sb_upd_state);
 $sbsmarty->assign('sb_upd_available', sbUpdIsAvailable($sb_upd_state));
@@ -136,6 +159,11 @@ $sbsmarty->assign('sb_upd_rollback', $sb_upd_rollback);
 $sbsmarty->assign('sb_upd_db_version', sbSetting('db_version'));
 $sbsmarty->assign('sb_upd_history', is_array($sb_upd_history) ? $sb_upd_history : array());
 $sbsmarty->assign('sb_upd_token', $_SESSION['sbupd_token']);
+// Date du fichier : le .htaccess garde les .js une heure en cache
+$sbsmarty->assign('sb_upd_js_ver', (string) @filemtime(SBUIADMIN_PATH . '/assets/sbupdate.js'));
+$sbsmarty->assign('sb_mod_catalog', $sb_mod_catalog);
+$sbsmarty->assign('sb_mod_cache', $sb_mod_cache);
+$sbsmarty->assign('sb_mod_checked', $sb_mod_cache['checked'] ? date('d/m/Y H:i', $sb_mod_cache['checked']) : 'jamais');
 // 0 après une mise à jour ou un retour arrière : nouvelle vérification forcée
 $sbsmarty->assign('sb_upd_last_check', $sb_upd_state['last_check'] ? date('d/m/Y H:i', $sb_upd_state['last_check']) : (is_array($sb_upd_history) && $sb_upd_history ? 'à refaire (après la dernière opération)' : 'jamais'));
 $sbsmarty->assign('sb_upd_ready', class_exists('ZipArchive') && function_exists('curl_init') && function_exists('sodium_crypto_sign_verify_detached'));

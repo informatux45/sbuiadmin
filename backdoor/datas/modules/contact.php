@@ -50,13 +50,15 @@ $table_cmsconfig = _AM_DB_PREFIX . "sb_config";
 $text        = "Formulaire de contact";
 $text_s      = "Formulaires de contact";
 
-$action = $_GET['a'];
+$action = $_GET['a'] ?? '';
+// PHP 8 : variables lues par certaines branches seulement
+$btn_add_edit = $formName = $id = $query = $queryP = $queryS = $query_2 = $subject_en = $title = '';
 switch($action) {
 	case "del":
 	default:
 		// Action DELETE
 		if ($action == 'del') {
-			$get_id  = intval($_GET['id']);
+			$get_id  = intval($_GET['id'] ?? 0);
 			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
 			$request = $sbsql->query($query_2);
 			
@@ -95,28 +97,28 @@ switch($action) {
 		// Initialize Form
 		// --------------------------------
 		$formName        = ($action == 'add') ? "add_form" : "edit_form";
-		$formType        = ($action == 'add' || $_POST['form_submit'] == 'add_form') ? "add" : "edit";
+		$formType        = ($action == 'add' || ($_POST['form_submit'] ?? '') == 'add_form') ? "add" : "edit";
 		$btn_add_edit    = ($action == 'add') ? "Ajouter" : "Modifier";
 		$legend_add_edit = ($action == 'add') ? "Ajouter un " . strtolower($text) : "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id          = intval($_POST['id']);
-			$title       = $sbsanitize->displayText($_POST['title'], 'UTF-8', 1, 0);
-			$senders     = $sbsanitize->displayText($_POST['senders'], 'UTF-8', 1, 0);
-			$recipients  = $sbsanitize->displayText($_POST['recipients'], 'UTF-8', 1, 0);
+			$id          = intval($_POST['id'] ?? 0);
+			$title       = $sbsanitize->displayText($_POST['title'] ?? '', 'UTF-8', 1, 0);
+			$senders     = $sbsanitize->displayText($_POST['senders'] ?? '', 'UTF-8', 1, 0);
+			$recipients  = $sbsanitize->displayText($_POST['recipients'] ?? '', 'UTF-8', 1, 0);
 			// --- Email subject
-			$subject_fr = $sbsanitize->displayText($_POST['subject_fr'], 'UTF-8', 1, 0);
+			$subject_fr = $sbsanitize->displayText($_POST['subject_fr'] ?? '', 'UTF-8', 1, 0);
 			$subject    = "[fr]".$subject_fr."[/fr]";
 			if ($getMultilang) {
-				$subject_en = $sbsanitize->displayText($_POST['subject_en'], 'UTF-8', 1, 0);				
+				$subject_en = $sbsanitize->displayText($_POST['subject_en'] ?? '', 'UTF-8', 1, 0);				
 				$subject   .= "[en]".$subject_en."[/en]";
 			}
-			$contactform = $sbsanitize->displayText($_POST['contactform'], 'UTF-8', 1, 0);
-			$active      = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$contactform = $sbsanitize->displayText($_POST['contactform'] ?? '', 'UTF-8', 1, 0);
+			$active      = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 
 	
 			// ADD or EDIT
@@ -166,9 +168,9 @@ switch($action) {
 			$title = $recipients = $subject = $subject_fr = $subject_en = $contactform = $active = '';
 		}
 		// --------------------------------
-		if ($formType == 'edit' && !$_POST['form_submit']) {
+		if ($formType == 'edit' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
-			$id          = intval($_GET['id']);
+			$id          = intval($_GET['id'] ?? 0);
 			$query_1     = "SELECT * FROM $table WHERE id = $id";
 			$requestQ    = $sbsql->query($query_1);
 			$assoc       = $sbsql->assoc($requestQ);
@@ -246,28 +248,28 @@ switch($action) {
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$email_to         = $sbsanitize->displayText($_POST['email_to'], 'UTF-8', 1, 0);
+			$email_to         = $sbsanitize->displayText($_POST['email_to'] ?? '', 'UTF-8', 1, 0);
 			// --- Email subject
-			$email_subject_fr = $sbsanitize->displayText($_POST['email_subject_fr'], 'UTF-8', 1, 0);
+			$email_subject_fr = $sbsanitize->displayText($_POST['email_subject_fr'] ?? '', 'UTF-8', 1, 0);
 			$email_subject    = "[fr]".$email_subject_fr."[/fr]";
 			if ($getMultilang) {
-				$email_subject_en = $sbsanitize->displayText($_POST['email_subject_en'], 'UTF-8', 1, 0);				
+				$email_subject_en = $sbsanitize->displayText($_POST['email_subject_en'] ?? '', 'UTF-8', 1, 0);				
 				$email_subject   .= "[en]".$email_subject_en."[/en]";
 			}
 			// Secrets : chiffrés en base (inc/sbuiadmin-settings.php), jamais
 			// renvoyés au navigateur. Champ laissé vide = valeur inchangée.
 
-			$email_smtp          = $sbsanitize->displayText($_POST['email_smtp'], 'UTF-8', 1, 0);
-			$email_smtp_host     = $sbsanitize->displayText($_POST['email_smtp_host'], 'UTF-8', 1, 0);
-			$email_smtp_auth     = $sbsanitize->displayText($_POST['email_smtp_auth'], 'UTF-8', 1, 0);
-			$email_smtp_port     = $sbsanitize->displayText($_POST['email_smtp_port'], 'UTF-8', 1, 0);
-			$email_smtp_username = $sbsanitize->displayText($_POST['email_smtp_username'], 'UTF-8', 1, 0);
-			$email_smtp_password = $sbsql->escape_string(sbSecretSeal(trim((string) $_POST['email_smtp_password'])));
-			$email_smtp_secure   = $sbsanitize->displayText($_POST['email_smtp_secure'], 'UTF-8', 1, 0);
-			$email_smtp_debug    = $sbsanitize->displayText($_POST['email_smtp_debug'], 'UTF-8', 1, 0);
+			$email_smtp          = $sbsanitize->displayText($_POST['email_smtp'] ?? '', 'UTF-8', 1, 0);
+			$email_smtp_host     = $sbsanitize->displayText($_POST['email_smtp_host'] ?? '', 'UTF-8', 1, 0);
+			$email_smtp_auth     = $sbsanitize->displayText($_POST['email_smtp_auth'] ?? '', 'UTF-8', 1, 0);
+			$email_smtp_port     = $sbsanitize->displayText($_POST['email_smtp_port'] ?? '', 'UTF-8', 1, 0);
+			$email_smtp_username = $sbsanitize->displayText($_POST['email_smtp_username'] ?? '', 'UTF-8', 1, 0);
+			$email_smtp_password = $sbsql->escape_string(sbSecretSeal(trim((string) ($_POST['email_smtp_password'] ?? ''))));
+			$email_smtp_secure   = $sbsanitize->displayText($_POST['email_smtp_secure'] ?? '', 'UTF-8', 1, 0);
+			$email_smtp_debug    = $sbsanitize->displayText($_POST['email_smtp_debug'] ?? '', 'UTF-8', 1, 0);
 			
 			// --- EDIT
 			// UPDATE DATAS

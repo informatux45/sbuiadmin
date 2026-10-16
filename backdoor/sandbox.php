@@ -187,13 +187,15 @@ EOT;
 
 $table = _AM_DB_PREFIX ."sb_sandbox";
 
-$action = $_GET['a'];
+$action = $_GET['a'] ?? '';
+// PHP 8 : variables lues par certaines branches seulement
+$active = $id = $query = $query_2 = $type_checked = ''; $toSort = [];
 switch($action) {
 	case "del":
 	default:
 		// Action DELETE
 		if ($action == 'del') {
-			$get_id   = intval($_GET['id']);
+			$get_id   = intval($_GET['id'] ?? 0);
 			$query_2  = "DELETE FROM $table WHERE id = '$get_id'";
 			$request  = $sbsql->query($query_2);
 			
@@ -232,13 +234,13 @@ switch($action) {
 		// Initialize Form
 		// --------------------------------
 		$formName        = ($action == 'add') ? "add_form" : "edit_form";
-		$formType        = ($action == 'add' || $_POST['form_submit'] == 'add_form') ? "add" : "edit";
+		$formType        = ($action == 'add' || ($_POST['form_submit'] ?? '') == 'add_form') ? "add" : "edit";
 		$btn_add_edit    = ($action == 'add') ? "Ajouter" : "Modifier";
 		$legend_add_edit = ($action == 'add') ? "Ajouter un enregistrement" : "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données - un champ par type de widget démontré
 			// sur cette page (voir le formulaire plus bas), aligné sur les
@@ -247,31 +249,31 @@ switch($action) {
 			// qu'aucun champ du formulaire n'envoie jamais, et écrivait
 			// dans des colonnes qui n'existaient plus dans la table :
 			// toute soumission plantait avant d'atteindre la base).
-			$id              = intval($_POST['id']);
-			$active          = ($_POST['active'] == '1') ? '1' : '0';
-			$yourname        = $sbsanitize->displayText($_POST['yourname'], 'UTF-8', 1, 0);
-			$montant         = $sbsanitize->displayText($_POST['montant'], 'UTF-8', 1, 0);
-			$seo_url         = $sbsanitize->displayText($_POST['seo_url'], 'UTF-8', 1, 0);
-			$country         = $sbsanitize->displayText($_POST['country'], 'UTF-8', 1, 0);
-			$dob             = $sbsanitize->displayText($_POST['dob'], 'UTF-8', 1, 0);
-			$color           = $sbsanitize->displayText($_POST['color'], 'UTF-8', 1, 0);
-			$tags            = sbGetTagifyDatas($_POST['tags']); // Tags
-			$pdf             = $sbsanitize->displayText($_POST['pdf'], 'UTF-8', 1, 0);
-			$photo           = $sbsanitize->displayText($_POST['photo'], 'UTF-8', 1, 0);
-			$video           = $sbsanitize->displayText($_POST['video'], 'UTF-8', 1, 0);
+			$id              = intval($_POST['id'] ?? 0);
+			$active          = (($_POST['active'] ?? '') == '1') ? '1' : '0';
+			$yourname        = $sbsanitize->displayText($_POST['yourname'] ?? '', 'UTF-8', 1, 0);
+			$montant         = $sbsanitize->displayText($_POST['montant'] ?? '', 'UTF-8', 1, 0);
+			$seo_url         = $sbsanitize->displayText($_POST['seo_url'] ?? '', 'UTF-8', 1, 0);
+			$country         = $sbsanitize->displayText($_POST['country'] ?? '', 'UTF-8', 1, 0);
+			$dob             = $sbsanitize->displayText($_POST['dob'] ?? '', 'UTF-8', 1, 0);
+			$color           = $sbsanitize->displayText($_POST['color'] ?? '', 'UTF-8', 1, 0);
+			$tags            = sbGetTagifyDatas($_POST['tags'] ?? ''); // Tags
+			$pdf             = $sbsanitize->displayText($_POST['pdf'] ?? '', 'UTF-8', 1, 0);
+			$photo           = $sbsanitize->displayText($_POST['photo'] ?? '', 'UTF-8', 1, 0);
+			$video           = $sbsanitize->displayText($_POST['video'] ?? '', 'UTF-8', 1, 0);
 			$option_one      = isset($_POST['option_one']) ? '1' : '0';
 			$option_two      = isset($_POST['option_two']) ? '1' : '0';
 			$option_three    = isset($_POST['option_three']) ? '1' : '0';
-			$type            = in_array($_POST['type'], array('1', '2', '3')) ? $_POST['type'] : '';
-			$selection_table       = $sbsanitize->displayText($_POST['selection'], 'UTF-8', 1, 0);
-			$comment         = $sbsanitize->displayText($_POST['comment'], 'UTF-8', 1, 0);
-			$comment_ckeditor1 = $sbsanitize->displayText($_POST['comment_editor1'], 'UTF-8', 1, 0);
-			$comment_ckeditor2 = $sbsanitize->displayText($_POST['comment_editor2'], 'UTF-8', 1, 0);
-			$comment_ckeditor3 = $sbsanitize->displayText($_POST['comment_editor3'], 'UTF-8', 1, 0);
+			$type            = in_array($_POST['type'] ?? null, array('1', '2', '3')) ? ($_POST['type'] ?? '') : '';
+			$selection_table       = $sbsanitize->displayText($_POST['selection'] ?? '', 'UTF-8', 1, 0);
+			$comment         = $sbsanitize->displayText($_POST['comment'] ?? '', 'UTF-8', 1, 0);
+			$comment_ckeditor1 = $sbsanitize->displayText($_POST['comment_editor1'] ?? '', 'UTF-8', 1, 0);
+			$comment_ckeditor2 = $sbsanitize->displayText($_POST['comment_editor2'] ?? '', 'UTF-8', 1, 0);
+			$comment_ckeditor3 = $sbsanitize->displayText($_POST['comment_editor3'] ?? '', 'UTF-8', 1, 0);
 			// Page Builder : voir addPageBuilder()/pagebuilder.js - le
 			// champ réel synchronisé à la soumission (data-pagebuilder-
 			// target), pas la version "démo" codée en dur.
-			$page_builder_content = $sbsanitize->displayText($_POST['page_builder_content'], 'UTF-8', 1, 0);
+			$page_builder_content = $sbsanitize->displayText($_POST['page_builder_content'] ?? '', 'UTF-8', 1, 0);
 
 			if (!$tags) $tags = '';
 
@@ -377,9 +379,9 @@ switch($action) {
 			$active = $option_one = $option_two = $option_three = '0';
 		}
 		// --------------------------------
-		if ($formType == 'edit' && !$_POST['form_submit']) {
+		if ($formType == 'edit' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
-			$id                = intval($_GET['id']);
+			$id                = intval($_GET['id'] ?? 0);
 			$query_1           = "SELECT * FROM $table WHERE id = $id";
 			$requestQ          = $sbsql->query($query_1);
 			$assoc             = $sbsql->assoc($requestQ);
@@ -603,13 +605,13 @@ switch($action) {
 		$btn_add_edit    = "Valider";
 		$legend_add_edit = "Trier les enregistrements";
 		// --------------------------------
-		if ($_POST['drag']) {
+		if (!empty($_POST['drag'])) {
 			// --------------------------------
 			// --- Control form submit --------
 			// --------------------------------
 			// --- (array) : count() sur une valeur non-tableau (drag=foo) leve une
 			// --- TypeError fatale sous PHP 8.
-			$sb_toSort = (array)$_POST['drag'];
+			$sb_toSort = (array)($_POST['drag'] ?? []);
 			
 			// reorganizes the order of elements
 			$sql_error = 0;
@@ -636,7 +638,7 @@ switch($action) {
 		}
 		
 		// --- Recuperation des donnees
-		$id            = intval($_GET['id']);
+		$id            = intval($_GET['id'] ?? 0);
 		$query_3       = "SELECT * FROM $table WHERE active = '1' ORDER BY sort ASC";
 		$requestQ      = $sbsql->query($query_3);
 		$sort_array    = $sbsql->toarray($requestQ);

@@ -56,13 +56,15 @@ $table_pages = _AM_DB_PREFIX . "sb_pages";
 $table_sort  = _AM_DB_PREFIX . "sb_blocs_sort";
 $text        = "bloc";
 
-$action = $_GET['a'];
+$action = $_GET['a'] ?? '';
+// PHP 8 : variables lues par certaines branches seulement
+$active = $btn_add_edit = $content_en = $content_fr = $formName = $id = $module = $name = $page = $query = $query_2 = $title_en = $title_fr = ''; $toSort = [];
 switch($action) {
 	case "del":
 	default:
 		// Action DELETE
 		if ($action == 'del') {
-			$get_id   = intval($_GET['id']);
+			$get_id   = intval($_GET['id'] ?? 0);
 			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
 			$request  = $sbsql->query($query_2);
 			
@@ -114,39 +116,39 @@ switch($action) {
 		// Initialize Form
 		// --------------------------------
 		$formName        = ($action == 'add') ? "add_form" : "edit_form";
-		$formType        = ($action == 'add' || $_POST['form_submit'] == 'add_form') ? "add" : "edit";
+		$formType        = ($action == 'add' || ($_POST['form_submit'] ?? '') == 'add_form') ? "add" : "edit";
 		$btn_add_edit    = ($action == 'add') ? "Ajouter" : "Modifier";
 		$legend_add_edit = ($action == 'add') ? "Ajouter un $text" : "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id       = intval($_POST['id']);
-			foreach($_POST['pages'] as $val) { $page .= "$val|"; }
+			$id       = intval($_POST['id'] ?? 0);
+			foreach(($_POST['pages'] ?? []) as $val) { $page .= "$val|"; }
 			$pages    = rtrim($page, '|');
-			foreach($_POST['modules'] as $val) { $module .= "$val|"; }
+			foreach(($_POST['modules'] ?? []) as $val) { $module .= "$val|"; }
 			$modules    = rtrim($module, '|');
-			$name     = $sbsanitize->displayText($_POST['name'], 'UTF-8', 1, 0);
+			$name     = $sbsanitize->displayText($_POST['name'] ?? '', 'UTF-8', 1, 0);
 			// --- Titre
-			$title_fr = $sbsanitize->displayText($_POST['title_fr'], 'UTF-8', 1, 0);
+			$title_fr = $sbsanitize->displayText($_POST['title_fr'] ?? '', 'UTF-8', 1, 0);
 			$title    = "[fr]".$title_fr."[/fr]";
 			if ($getMultilang) {
-				$title_en = $sbsanitize->displayText($_POST['title_en'], 'UTF-8', 1, 0);
+				$title_en = $sbsanitize->displayText($_POST['title_en'] ?? '', 'UTF-8', 1, 0);
 				$title   .= "[en]".$title_en."[/en]";				
 			}
 			// --- Titre
-			$content_fr = $sbsanitize->displayText($_POST['content_fr'], 'UTF-8', 1, 0);
+			$content_fr = $sbsanitize->displayText($_POST['content_fr'] ?? '', 'UTF-8', 1, 0);
 			$content    = "[fr]".$content_fr."[/fr]";
 			if ($getMultilang) {
-				$content_en = $sbsanitize->displayText($_POST['content_en'], 'UTF-8', 1, 0);
+				$content_en = $sbsanitize->displayText($_POST['content_en'] ?? '', 'UTF-8', 1, 0);
 				$content   .= "[en]".$content_en."[/en]";
 			}
 			// ---------
-			$various_view = $sbsanitize->displayText($_POST['various_view'], 'UTF-8', 1, 0);
-			$position     = $sbsanitize->displayText($_POST['position'], 'UTF-8', 1, 0);
-			$active       = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$various_view = $sbsanitize->displayText($_POST['various_view'] ?? '', 'UTF-8', 1, 0);
+			$position     = $sbsanitize->displayText($_POST['position'] ?? '', 'UTF-8', 1, 0);
+			$active       = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 			
 			// ADD or EDIT
 			if ($formType == 'add') {
@@ -163,7 +165,7 @@ switch($action) {
 					// --- Ajouter les blocs dans leurs pages respectives ---
 					// ------------------------------------------------------
 					$bloc_id = $sbsql->lastinsertid();
-					foreach($_POST['pages'] as $page_id) {
+					foreach(($_POST['pages'] ?? []) as $page_id) {
 						$query_bloc_sort  = "INSERT INTO $table_sort (page_id,bloc_id,sort) VALUES ('$page_id','$bloc_id','0')";
 						$result_bloc_sort = $sbsql->query($query_bloc_sort);
 					}
@@ -204,12 +206,12 @@ switch($action) {
 					$query_bloc_delete   = "DELETE FROM $table_sort WHERE bloc_id = '$id'";
 					$request_bloc_delete = $sbsql->query($query_bloc_delete);
 					// --- Pages sort
-					foreach($_POST['pages'] as $page_id) {
+					foreach(($_POST['pages'] ?? []) as $page_id) {
 						$query_bloc_sort  = "INSERT INTO $table_sort (page_id,bloc_id,sort) VALUES ('$page_id','$bloc_id','0')";
 						$result_bloc_sort = $sbsql->query($query_bloc_sort);
 					}
 					// --- Modules sort
-					foreach($_POST['modules'] as $module_id) {
+					foreach(($_POST['modules'] ?? []) as $module_id) {
 						$query_bloc_sort_mod  = "INSERT INTO $table_sort (module_id,bloc_id,sort) VALUES ('$module_id','$bloc_id','0')";
 						$result_bloc_sort_mod = $sbsql->query($query_bloc_sort_mod);
 					}
@@ -245,9 +247,9 @@ switch($action) {
 			$pages = $modules = $name_fr = $name_en = $title_fr = $title_en = $content = $various_view = $active = '';
 		}
 		// --------------------------------
-		if ($formType == 'edit' && !$_POST['form_submit']) {
+		if ($formType == 'edit' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
-			$id           = intval($_GET['id']);
+			$id           = intval($_GET['id'] ?? 0);
 			$query_1      = "SELECT * FROM $table WHERE id = $id";
 			$requestQ     = $sbsql->query($query_1);
 			$assoc        = $sbsql->assoc($requestQ);
@@ -398,15 +400,15 @@ switch($action) {
 		$formType        = "sort";
 		$btn_add_edit    = "Valider";
 		$legend_add_edit = "Trier les " . strtolower($text) . 's de pages';
-		$selected_page   = intval($_GET['pid']);
+		$selected_page   = intval($_GET['pid'] ?? 0);
 		// --------------------------------
-		if ($_POST['drag']) {
+		if (!empty($_POST['drag'])) {
 			// --------------------------------
 			// --- Control form submit --------
 			// --------------------------------
 			// --- (array) : count() sur une valeur non-tableau (drag=foo) leve une
 			// --- TypeError fatale sous PHP 8.
-			$sb_toSort = (array)$_POST['drag'];
+			$sb_toSort = (array)($_POST['drag'] ?? []);
 			
 			// reorganizes the order of elements
 			$sql_error = 0;
@@ -434,7 +436,7 @@ switch($action) {
 		}
 		
 		// --- Recuperation des donnees
-		$id            = intval($_GET['id']);
+		$id            = intval($_GET['id'] ?? 0);
 		$query_3       = "SELECT t1.*, t2.name AS blocname
 						  FROM $table_sort AS t1
 						  LEFT JOIN $table AS t2 ON (t1.bloc_id = t2.id)
@@ -474,15 +476,15 @@ switch($action) {
 		$formType        = "sortmod";
 		$btn_add_edit    = "Valider";
 		$legend_add_edit = "Trier les " . strtolower($text) . 's de modules';
-		$selected_page   = $_GET['pid'];
+		$selected_page   = $_GET['pid'] ?? '';
 		// --------------------------------
-		if ($_POST['drag']) {
+		if (!empty($_POST['drag'])) {
 			// --------------------------------
 			// --- Control form submit --------
 			// --------------------------------
 			// --- (array) : count() sur une valeur non-tableau (drag=foo) leve une
 			// --- TypeError fatale sous PHP 8.
-			$sb_toSort = (array)$_POST['drag'];
+			$sb_toSort = (array)($_POST['drag'] ?? []);
 			
 			// reorganizes the order of elements
 			$sql_error = 0;
@@ -510,7 +512,7 @@ switch($action) {
 		}
 		
 		// --- Recuperation des donnees
-		$id            = intval($_GET['id']);
+		$id            = intval($_GET['id'] ?? 0);
 		$query_3      = "SELECT t1.*, t2.name AS blocname
 						  FROM $table_sort AS t1
 						  LEFT JOIN $table AS t2 ON (t1.bloc_id = t2.id)

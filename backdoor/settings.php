@@ -91,7 +91,7 @@ global $sbfiles_medias_exts_safe;
 // Write your own code after these lines
 // ---------------------------------------------------
 // ---------------------------------------------------
-$action = $_GET['a'];
+$action = $_GET['a'] ?? '';
 switch($action) {
 	default:
 		// --------------------------------
@@ -105,7 +105,7 @@ switch($action) {
 		// --- Control form submit --------
 		// --------------------------------
 		$sb_twofa_user = (string)$_SESSION['sbuiadmin_user_name'];
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Réglages en base (inc/sbuiadmin-settings.php). Les accès à la
 			// base ne se modifient plus ici (sbdbconfig.php) ; l'anti-flood
@@ -164,7 +164,7 @@ switch($action) {
 			// soumis par le navigateur : on garde alors la valeur enregistrée.
 			if (!sbGetConfig('multilang')) {
 				// sbGetTagifyDatas() retourne false si vide
-				$sb_pagebuilder_modules = sbGetTagifyDatas($_POST['pagebuilder_modules']);
+				$sb_pagebuilder_modules = sbGetTagifyDatas($_POST['pagebuilder_modules'] ?? '');
 				$sb_new_settings['pagebuilder_modules'] = ($sb_pagebuilder_modules !== false ? $sb_pagebuilder_modules : '');
 			}
 
@@ -218,7 +218,7 @@ switch($action) {
 					if ($sb_twofa_err !== '') $sb_msg_error = $sb_twofa_err;
 					// --- Répercute la taille max. d'upload sur les limites PHP serveur
 					// (.htaccess pour mod_php, .user.ini pour PHP-FPM/CGI)
-					$sb_upload_max_bytes = sbToByteSize($sbsanitize->displayText($_POST['upload_max'], 'UTF-8', 1, 0));
+					$sb_upload_max_bytes = sbToByteSize($sbsanitize->displayText($_POST['upload_max'] ?? '', 'UTF-8', 1, 0));
 					if ($sb_upload_max_bytes) {
 						sbSyncUploadLimits($sb_upload_max_bytes);
 					}

@@ -48,13 +48,15 @@ $getMultilang = (sbGetConfig('multilang')) ? sbGetConfig('multilang') : false;
 $table = _AM_DB_PREFIX . "sb_download";
 $text  = "Telechargement";
 
-$action = $_GET['a'];
+$action = $_GET['a'] ?? '';
+// PHP 8 : variables lues par certaines branches seulement
+$btn_add_edit = $description_en = $formName = $id = $query = $query_2 = $title_en = $title_fr = '';
 switch($action) {
 	case "del":
 	default:
 		// Action DELETE
 		if ($action == 'del') {
-			$get_id  = intval($_GET['id']);
+			$get_id  = intval($_GET['id'] ?? 0);
 			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
 			$request = $sbsql->query($query_2);
 			
@@ -112,33 +114,33 @@ switch($action) {
 		// Initialize Form
 		// --------------------------------
 		$formName        = ($action == 'add') ? "add_form" : "edit_form";
-		$formType        = ($action == 'add' || $_POST['form_submit'] == 'add_form') ? "add" : "edit";
+		$formType        = ($action == 'add' || ($_POST['form_submit'] ?? '') == 'add_form') ? "add" : "edit";
 		$btn_add_edit    = ($action == 'add') ? "Ajouter" : "Modifier";
 		$legend_add_edit = ($action == 'add') ? "Ajouter un " . strtolower($text) : "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id             = intval($_POST['id']);
+			$id             = intval($_POST['id'] ?? 0);
 			// --- Titre
-			$title_fr       = $sbsanitize->displayText($_POST['title_fr'], 'UTF-8', 1, 0);
+			$title_fr       = $sbsanitize->displayText($_POST['title_fr'] ?? '', 'UTF-8', 1, 0);
 			$title          = "[fr]".$title_fr."[/fr]";
 			if ($getMultilang) {
-				$title_en   = $sbsanitize->displayText($_POST['title_en'], 'UTF-8', 1, 0);
+				$title_en   = $sbsanitize->displayText($_POST['title_en'] ?? '', 'UTF-8', 1, 0);
 				$title     .= "[en]".$title_en."[/en]";				
 			}
 			// --- Desc Full
-			$description_fr = $sbsanitize->displayText($_POST['description_fr'], 'UTF-8', 1, 0);
+			$description_fr = $sbsanitize->displayText($_POST['description_fr'] ?? '', 'UTF-8', 1, 0);
 			$description    = "[fr]".$description_fr."[/fr]";
 			if ($getMultilang) {
-				$description_en = $sbsanitize->displayText($_POST['description_en'], 'UTF-8', 1, 0);
+				$description_en = $sbsanitize->displayText($_POST['description_en'] ?? '', 'UTF-8', 1, 0);
 				$description   .= "[en]".$description_en."[/en]";				
 			}
-			$size           = $sbsanitize->displayText($_POST['size'], 'UTF-8', 1, 0);
-			$filename       = $sbsanitize->displayText($_POST['filename'], 'UTF-8', 1, 0);
-			$active         = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$size           = $sbsanitize->displayText($_POST['size'] ?? '', 'UTF-8', 1, 0);
+			$filename       = $sbsanitize->displayText($_POST['filename'] ?? '', 'UTF-8', 1, 0);
+			$active         = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 
 	
 			// ADD or EDIT
@@ -189,9 +191,9 @@ switch($action) {
 			$title_fr = $description_fr = $title_en = $description_en = $filename = $downloaded = $size = $active = '';
 		}
 		// --------------------------------
-		if ($formType == 'edit' && !$_POST['form_submit']) {
+		if ($formType == 'edit' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
-			$id             = intval($_GET['id']);
+			$id             = intval($_GET['id'] ?? 0);
 			$query_1        = "SELECT * FROM $table WHERE id = $id";
 			$requestQ       = $sbsql->query($query_1);
 			$assoc          = $sbsql->assoc($requestQ);

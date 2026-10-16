@@ -61,8 +61,8 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == 'unread') {
 // --- (polling "temps réel" pendant qu'un fil est ouvert)
 // --------------------------------
 if (isset($_GET['ajax']) && $_GET['ajax'] == 'thread') {
-	$sb_with  = intval($_GET['with']);
-	$sb_since = intval($_GET['since']);
+	$sb_with  = intval($_GET['with'] ?? 0);
+	$sb_since = intval($_GET['since'] ?? 0);
 	$sb_thread_rows = array();
 
 	if ($sb_with > 0) {
@@ -95,7 +95,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == 'thread') {
 // --- AJAX : envoi d'un message
 // --------------------------------
 if (isset($_GET['ajax']) && $_GET['ajax'] == 'send' && $_SERVER['REQUEST_METHOD'] == 'POST') {
-	$sb_with  = intval($_GET['with']);
+	$sb_with  = intval($_GET['with'] ?? 0);
 	$sb_body  = $sbsanitize->displayText(file_get_contents('php://input'), 'UTF-8', 0, 1);
 	$sb_body  = trim($sb_body);
 

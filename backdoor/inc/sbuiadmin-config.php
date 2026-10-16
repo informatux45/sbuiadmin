@@ -24,6 +24,8 @@ require_once(__DIR__ . '/sbuiadmin-settings.php');
 // --- Anti-robot ALTCHA et blocage des tentatives de connexion
 require_once(__DIR__ . '/sbuiadmin-altcha.php');
 require_once(__DIR__ . '/sbuiadmin-loginlock.php');
+// --- Registre des modules (datas/modules/<nom>/module.php, table sb_modules)
+require_once(__DIR__ . '/sbuiadmin-modules.php');
 // Ancien tableau positionnel, pour le code tiers qui le lirait encore
 $sb_settings_config = sbSettingsLegacyArray();
 // ----------------------------------------
@@ -32,9 +34,14 @@ $sb_settings_config = sbSettingsLegacyArray();
 
 // ------------------------------------------
 // --- Defined Safe Pages
-$sb_safe_pages = ['index','sandbox','settings','cache','server','dashboard','theme','themeinfos','session','users','logaccess','menu','pages','blocs','medias','transfert','cmsconfig','slider','news','contact','tabbs','toggle','download','gallery','gmaps','table','toolbarck','faq','messages','profile','boutique','update'];
+// --- (core, puis modules installés : un module présent mais non installé
+// --- n'est pas joignable, même s'il figure dans le réglage « Modules »)
+$sb_safe_pages = array_merge(['index','sandbox','settings','cache','server','dashboard','theme','themeinfos','session','users','logaccess','menu','pages','blocs','medias','transfert','cmsconfig','toggle','gmaps','toolbarck','messages','profile','update'], array_keys(sbModulesActive()));
 // --- Defined Safe Modules
-$sb_safe_modules = explode(",", sbSetting('modules'));
+$sb_safe_modules = array_values(array_filter(explode(",", sbSetting('modules')), function ($m) {
+	$m = trim($m);
+	return sbModuleMeta($m) === null || sbModuleActive($m);
+}));
 // ------------------------------------------
 // --- Debug
 defined('_AM_SITE_DEBUG') OR define('_AM_SITE_DEBUG', (sbSetting('debug_admin') == 1) ? true : false);

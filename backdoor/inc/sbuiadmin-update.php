@@ -38,11 +38,13 @@ defined('SBUIADMIN_PATH') or die('Are you crazy!');
 if (defined('SBUIADMIN_UPDATE_LOADED')) return;
 define('SBUIADMIN_UPDATE_LOADED', true);
 require_once __DIR__ . '/sbuiadmin-update-db.php';
+require_once __DIR__ . '/sbuiadmin-modules.php';
 
 defined('SB_UPD_REPO')        or define('SB_UPD_REPO', 'informatux45/sbuiadmin');
 // Clé publique de signature des versions (la même que sbuiadmin_netinstall.php)
 defined('SB_UPD_PUBLIC_KEY')  or define('SB_UPD_PUBLIC_KEY', 'MFcedhT1D+i3Ej3abNnOs6Mz4EjIIPo7hwc0azE/uoY=');
 defined('SB_UPD_MANIFEST')    or define('SB_UPD_MANIFEST', 'sbuiadmin-release.json');
+defined('SB_UPD_MODULES_INDEX') or define('SB_UPD_MODULES_INDEX', 'sbuiadmin-modules.json');
 defined('SB_UPD_ROOT')        or define('SB_UPD_ROOT', 'sbuiadmin/');
 defined('SB_UPD_INTERVAL')    or define('SB_UPD_INTERVAL', 86400);   // vérification : 1 fois / 24 h
 defined('SB_UPD_MAX_ZIP')     or define('SB_UPD_MAX_ZIP', 64 * 1024 * 1024);
@@ -170,6 +172,50 @@ function sbUpdFetchFileList(array $m, array $assets, $timeout = 60) {
 		if (!is_string($path) || !preg_match('/^[0-9a-f]{64}$/', (string) $hash) || !sbUpdSafeRel($path)) throw new RuntimeException('Liste des fichiers : entrée refusée ' . $path);
 	}
 	return $list['files'];
+}
+
+/** Chemins qu'un module peut livrer (en plus de son dossier datas/modules/<nom>/) */
+function sbModAllowedPath($name, $rel) {
+	if (!sbModuleValidName($name) || !sbUpdSafeRel($rel) || sbUpdIsProtected($rel)) return false;
+	if (strpos($rel, 'datas/modules/' . $name . '/') === 0) return true;
+	if ($rel === 'backdoor/datas/modules/' . $name . '.php' || $rel === 'backdoor/datas/modules/tpls/' . $name . '.tpl') return true;
+	return (bool) preg_match('#^backdoor/img/[A-Za-z0-9_./-]+\.(png|jpe?g|gif|svg|webp)$#', $rel)
+		|| (bool) preg_match('#^backdoor/inc/class/sbuiadmin-[a-z0-9_-]+\.php$#', $rel);
+}
+
+/**
+ * Index des modules d'une version, vérifié (empreinte du manifeste signé).
+ * @return array|null nom => entrée, null si la version n'en a pas
+ */
+function sbUpdFetchModulesIndex(array $m, array $assets, $timeout = 60) {
+	if (empty($m['modules_index'])) return null;
+	if ($m['modules_index'] !== SB_UPD_MODULES_INDEX || !preg_match('/^[0-9a-f]{64}$/', (string) ($m['modules_index_sha256'] ?? ''))) throw new RuntimeException('Index des modules du manifeste invalide');
+	if (!isset($assets[SB_UPD_MODULES_INDEX])) throw new RuntimeException('Index des modules absent de la version publiée');
+	$raw = sbUpdGet($assets[SB_UPD_MODULES_INDEX], 8 * 1024 * 1024, null, $timeout);
+	if (!hash_equals($m['modules_index_sha256'], hash('sha256', $raw))) throw new RuntimeException('Index des modules non conforme au manifeste signé');
+	$idx = json_decode($raw, true);
+	if (!is_array($idx) || ($idx['core_version'] ?? '') !== $m['version'] || !is_array($idx['modules'] ?? null)) throw new RuntimeException('Index des modules invalide');
+	$owner = array();
+	foreach ($idx['modules'] as $name => $e) {
+		if (!sbModuleValidName($name) || in_array($name, sbModuleCore(), true) || !is_array($e)
+			|| !preg_match('/^\d+\.\d+\.\d+$/', (string) ($e['version'] ?? ''))
+			|| !preg_match('/^\d+\.\d+(\.\d+)?$/', (string) ($e['requires_core'] ?? ''))
+			|| ($e['file'] ?? '') !== 'sbuiadmin-module-' . $name . '-' . $e['version'] . '.zip'
+			|| !is_int($e['size'] ?? null) || $e['size'] <= 0 || $e['size'] > SB_UPD_MAX_ZIP
+			|| !preg_match('/^[0-9a-f]{64}$/', (string) ($e['sha256'] ?? ''))
+			|| !is_array($e['files'] ?? null) || !$e['files']) {
+			throw new RuntimeException('Index des modules : entrée refusée ' . $name);
+		}
+		foreach ($e['files'] as $rel => $hash) {
+			if (!is_string($rel) || !sbModAllowedPath($name, $rel) || !preg_match('/^[0-9a-f]{64}$/', (string) $hash)) throw new RuntimeException('Index des modules : fichier refusé pour ' . $name . ' : ' . $rel);
+			if (isset($owner[$rel])) throw new RuntimeException('Index des modules : ' . $rel . ' livré par deux modules');
+			$owner[$rel] = $name;
+		}
+		$idx['modules'][$name]['title']       = mb_substr((string) ($e['title'] ?? $name), 0, 80);
+		$idx['modules'][$name]['icon']        = preg_match('/^[a-z0-9][a-z0-9 -]{0,59}$/', (string) ($e['icon'] ?? '')) ? $e['icon'] : 'puzzle-piece';
+		$idx['modules'][$name]['description'] = mb_substr((string) ($e['description'] ?? ''), 0, 500);
+	}
+	return $idx['modules'];
 }
 
 /** Chemin relatif sûr (pas de .., d'absolu, d'antislash, de NUL ni de :) */
@@ -345,6 +391,42 @@ function sbUpdSelfTest() {
 	return ($code === 200 && trim((string) $body) === $value) ? 'exposed' : 'protected';
 }
 
+/**
+ * Fichiers appartenant aux modules : ceux des index donnés et ceux des
+ * modules présents sur le disque (module.php : 'files', plus leur dossier).
+ * @return array ['files' => chemin => true, 'dirs' => noms de modules]
+ */
+function sbUpdModuleFiles(array $indexes) {
+	$files = $dirs = array();
+	foreach ($indexes as $idx) {
+		foreach ((array) $idx as $name => $e) {
+			$dirs[$name] = true;
+			foreach (array_keys((array) ($e['files'] ?? array())) as $rel) $files[$rel] = true;
+		}
+	}
+	foreach (sbModulesPresent(true) as $name => $meta) {
+		$dirs[$name] = true;
+		foreach ((array) $meta['files'] as $rel) if (is_string($rel) && sbModAllowedPath($name, $rel)) $files[$rel] = true;
+	}
+	foreach (sbModuleCore() as $core) unset($dirs[$core]);
+	return array('files' => $files, 'dirs' => $dirs);
+}
+
+function sbUpdIsModuleFile($rel, array $owned) {
+	if (isset($owned['files'][$rel])) return true;
+	return (bool) preg_match('#^datas/modules/([a-z][a-z0-9_]{1,31})/#', $rel, $mm) && isset($owned['dirs'][$mm[1]]);
+}
+
+/** Modules présents dont la nouvelle version publie une version plus récente */
+function sbUpdModulesNewer($idx) {
+	$out = array();
+	foreach ((array) $idx as $name => $e) {
+		$local = sbModuleMeta($name);
+		if ($local && version_compare($e['version'], $local['version'], '>')) $out[] = $name . ' ' . $local['version'] . ' → ' . $e['version'];
+	}
+	return $out;
+}
+
 /** Fichiers propres au site : jamais écrits ni supprimés (chemins de l'archive) */
 function sbUpdIsProtected($rel) {
 	static $exact = array(
@@ -440,6 +522,14 @@ function sbUpdPrepare() {
 	}
 	if ($oldList === null && $oldNote === '') $oldNote = 'la version ' . $installed . ' n\'a pas de liste signée des fichiers';
 
+	// 2 bis. Fichiers des modules : jamais touchés par la mise à jour du core
+	// (onglet Modules), d'après l'index de la nouvelle version, celui de la
+	// version installée et les modules présents sur le disque
+	$newIdx = sbUpdFetchModulesIndex($m, $assets);
+	$oldIdx = null;
+	if ($newIdx !== null && isset($om, $oassets)) { try { $oldIdx = sbUpdFetchModulesIndex($om, $oassets); } catch (Throwable $e) { $oldIdx = null; } }
+	$owned = ($newIdx !== null) ? sbUpdModuleFiles(array($newIdx, (array) $oldIdx)) : null;
+
 	// 3. Contrôle de chaque entrée de l'archive et plan de copie
 	$zip = new ZipArchive();
 	if ($zip->open($zipPath, ZipArchive::RDONLY) !== true) throw new RuntimeException('Archive illisible');
@@ -449,6 +539,7 @@ function sbUpdPrepare() {
 	$seen  = array();
 	$total = 0;
 	$protectedChanged = array();
+	$skippedModules = 0;
 	for ($i = 0; $i < $zip->numFiles; $i++) {
 		$st = $zip->statIndex($i);
 		$name = (string) $st['name'];
@@ -464,6 +555,7 @@ function sbUpdPrepare() {
 		if (substr($rel, -1) === '/') continue; // dossiers créés à la volée
 		if (!isset($newList[$rel])) throw new RuntimeException('Fichier absent de la liste signée : ' . $rel);
 		$seen[$rel] = true;
+		if ($owned !== null && sbUpdIsModuleFile($rel, $owned)) { $skippedModules++; continue; }
 		if (sbUpdIsProtected($rel)) {
 			// Fichier propre au site, non écrit : signaler s'il change dans la nouvelle version
 			if ($oldList !== null && isset($oldList[$rel]) && $oldList[$rel] !== $newList[$rel]) $protectedChanged[] = $rel;
@@ -484,7 +576,7 @@ function sbUpdPrepare() {
 	$delete   = array();
 	if ($oldList !== null) {
 		foreach ($oldList as $rel => $hash) {
-			if (sbUpdIsProtected($rel)) continue;
+			if (sbUpdIsProtected($rel) || ($owned !== null && sbUpdIsModuleFile($rel, $owned))) continue;
 			$local = sbUpdHashFile($root . sbUpdTargetRel($rel));
 			if ($local === null) continue;
 			if ($local !== $hash) {
@@ -521,6 +613,8 @@ function sbUpdPrepare() {
 		'unchecked' => ($oldList === null),
 		'check_note' => $oldNote,
 		'protected_changed' => $protectedChanged,
+		'modules_skipped' => $skippedModules,
+		'modules_newer' => sbUpdModulesNewer($newIdx),
 		'new_list'  => $newList,
 		'db_from'   => $dbFrom,
 		'migrations' => $migrations,
@@ -577,6 +671,8 @@ function sbUpdSummary(array $job) {
 		'unchecked' => $job['unchecked'],
 		'check_note' => $job['check_note'],
 		'protected_changed' => $job['protected_changed'],
+		'modules_skipped' => $job['modules_skipped'] ?? 0,
+		'modules_newer' => $job['modules_newer'] ?? array(),
 		'migrations' => $job['migrations'] ?? array(),
 		'done'      => $job['done'],
 		'total'     => count($job['write']),

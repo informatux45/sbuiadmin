@@ -49,13 +49,15 @@ $table     = _AM_DB_PREFIX . "sb_tabbs";
 $table_tab = _AM_DB_PREFIX . "sb_tabbs_tab";
 $text      = "Tabbs";
 
-$action = $_GET['a'];
+$action = $_GET['a'] ?? '';
+// PHP 8 : variables lues par certaines branches seulement
+$content_en = $id = $name = $query = $query_2 = $query_7 = $title_en = ''; $toSort = [];
 switch($action) {
 	case "del":
 	default:
 		// Action DELETE tabbs
 		if ($action == 'del') {
-			$get_id   = intval($_GET['id']);
+			$get_id   = intval($_GET['id'] ?? 0);
 			// -------------------------------------
 			// --- Check if tab in TABBS
 			$query_tab   = "SELECT * FROM $table_tab WHERE tid = $get_id";
@@ -102,7 +104,7 @@ switch($action) {
 	case "alltabs":
 		// Action DELETE
 		if ($action == 'deltab') {
-			$get_id   = intval($_GET['id']);
+			$get_id   = intval($_GET['id'] ?? 0);
 			$query_7  = "DELETE FROM $table_tab WHERE id = '$get_id'";
 			$request  = $sbsql->query($query_7);
 			
@@ -143,18 +145,18 @@ switch($action) {
 		// Initialize Form
 		// --------------------------------
 		$formName        = ($action == 'add') ? "add_form" : "edit_form";
-		$formType        = ($action == 'add' || $_POST['form_submit'] == 'add_form') ? "add" : "edit";
+		$formType        = ($action == 'add' || ($_POST['form_submit'] ?? '') == 'add_form') ? "add" : "edit";
 		$btn_add_edit    = ($action == 'add') ? "Ajouter" : "Modifier";
 		$legend_add_edit = ($action == 'add') ? "Ajouter un " . strtolower($text) : "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id     = intval($_POST['id']);
-			$name   = $sbsanitize->displayText($_POST['name'], 'UTF-8', 1, 0);
-			$active = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$id     = intval($_POST['id'] ?? 0);
+			$name   = $sbsanitize->displayText($_POST['name'] ?? '', 'UTF-8', 1, 0);
+			$active = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 
 	
 			// ADD or EDIT
@@ -201,9 +203,9 @@ switch($action) {
 			$name = $active = '';
 		}
 		// --------------------------------
-		if ($formType == 'edit' && !$_POST['form_submit']) {
+		if ($formType == 'edit' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
-			$id       = intval($_GET['id']);
+			$id       = intval($_GET['id'] ?? 0);
 			$query_1  = "SELECT * FROM $table WHERE id = $id";
 			$requestQ = $sbsql->query($query_1);
 			$assoc    = $sbsql->assoc($requestQ);
@@ -248,32 +250,32 @@ switch($action) {
 		// Initialize Form
 		// --------------------------------
 		$formName        = ($action == 'tabadd') ? "add_form" : "edit_form";
-		$formType        = ($action == 'tabadd' || $_POST['form_submit'] == 'add_form') ? "tabadd" : "tabedit";
+		$formType        = ($action == 'tabadd' || ($_POST['form_submit'] ?? '') == 'add_form') ? "tabadd" : "tabedit";
 		$btn_add_edit    = ($action == 'tabadd') ? "Ajouter" : "Modifier";
 		$legend_add_edit = ($action == 'tabadd') ? "Ajouter un onglet" : "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id           = intval($_POST['id']);
-			$tid          = intval($_POST['tid']);
+			$id           = intval($_POST['id'] ?? 0);
+			$tid          = intval($_POST['tid'] ?? 0);
 			// --- Titre
-			$title_fr     = $sbsanitize->displayText($_POST['title_fr'], 'UTF-8', 1, 0);
+			$title_fr     = $sbsanitize->displayText($_POST['title_fr'] ?? '', 'UTF-8', 1, 0);
 			$title        = "[fr]".$title_fr."[/fr]";
 			if ($getMultilang) {
-				$title_en = $sbsanitize->displayText($_POST['title_en'], 'UTF-8', 1, 0);
+				$title_en = $sbsanitize->displayText($_POST['title_en'] ?? '', 'UTF-8', 1, 0);
 				$title   .= "[en]".$title_en."[/en]";				
 			}
 			// --- Content
-			$content_fr   = $sbsanitize->displayText($_POST['content_fr'], 'UTF-8', 1, 0);
+			$content_fr   = $sbsanitize->displayText($_POST['content_fr'] ?? '', 'UTF-8', 1, 0);
 			$content      = "[fr]".$content_fr."[/fr]";
 			if ($getMultilang) {
-				$content_en = $sbsanitize->displayText($_POST['content_en'], 'UTF-8', 1, 0);
+				$content_en = $sbsanitize->displayText($_POST['content_en'] ?? '', 'UTF-8', 1, 0);
 				$content   .= "[en]".$content_en."[/en]";
 			}
-			$active       = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$active       = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 
 			// ADD or EDIT
 			if ($formType == 'tabadd') {
@@ -331,9 +333,9 @@ switch($action) {
 			$tid = $title_fr = $content_fr = $title_en = $content_en = $photo = $active = '';
 		}
 		// --------------------------------
-		if ($formType == 'tabedit' && !$_POST['form_submit']) {
+		if ($formType == 'tabedit' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
-			$id         = intval($_GET['id']);
+			$id         = intval($_GET['id'] ?? 0);
 			$query_1   = "SELECT * FROM $table_tab WHERE id = $id";
 			$requestQ   = $sbsql->query($query_1);
 			$assoc      = $sbsql->assoc($requestQ);
@@ -353,7 +355,7 @@ switch($action) {
 			// --- Debug SQL
 			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_1	 . "\n" . 'Form Type = '.$formType);						
 		} else {
-			$name = $sbsanitize->displayLang(sb_utf8_encode($_POST['title_fr'])); // Legende
+			$name = $sbsanitize->displayLang(sb_utf8_encode($_POST['title_fr'] ?? '')); // Legende
 		}
 		
 		// --------------------------------		
@@ -420,13 +422,13 @@ switch($action) {
 		$btn_add_edit    = "Valider";
 		$legend_add_edit = "Trier les onglets";
 		// --------------------------------
-		if ($_POST['drag']) {
+		if (!empty($_POST['drag'])) {
 			// --------------------------------
 			// --- Control form submit --------
 			// --------------------------------
 			// --- (array) : count() sur une valeur non-tableau (drag=foo) leve une
 			// --- TypeError fatale sous PHP 8.
-			$sb_toSort = (array)$_POST['drag'];
+			$sb_toSort = (array)($_POST['drag'] ?? []);
 			
 			// reorganizes the order of elements
 			$sql_error = 0;
@@ -454,7 +456,7 @@ switch($action) {
 		}
 		
 		// --- Recuperation des donnees
-		$tid           = intval($_GET['tid']);
+		$tid           = intval($_GET['tid'] ?? 0);
 		$query_3       = "SELECT * FROM $table_tab WHERE tid = '$tid' ORDER BY sort ASC";
 		$requestQ      = $sbsql->query($query_3);
 		$sort_array    = $sbsql->toarray($requestQ);

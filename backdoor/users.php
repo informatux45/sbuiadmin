@@ -41,7 +41,9 @@ $table_blockedip = _AM_DB_PREFIX . "sb_blocked_ip";
 $text  = "Utilisateur";
 $sbsmarty->assign('sb_form_submit_value', 'Modifier');
 
-$action = $_GET['a'];
+$action = $_GET['a'] ?? '';
+// PHP 8 : variables lues par certaines branches seulement
+$avatar = $centres_interet = $fonction = $id = $infos_complementaires = $nom = $prenom = $profession = $query = $query_2 = $telephone = $username = '';
 // Compte modifié ou supprimé : l'alerte « admin/admin » (index.php) sera
 // recalculée au prochain affichage du tableau de bord
 if (!empty($_POST) || $action == 'del') unset($_SESSION['sb_warning_admin_default']);
@@ -50,7 +52,7 @@ switch($action) {
 	default:
 		// Action DELETE
 		if ($action == 'del') {
-			$get_id   = intval($_GET['id']);
+			$get_id   = intval($_GET['id'] ?? 0);
 			$query_2  = "DELETE FROM $table WHERE id = '$get_id'";
 			$request  = $sbsql->query($query_2);
 			
@@ -89,23 +91,23 @@ switch($action) {
 		// Initialize Form
 		// --------------------------------
 		$formName        = ($action == 'add') ? "add_form" : "edit_form";
-		$formType        = ($action == 'add' || $_POST['form_submit'] == 'add_form') ? "add" : "edit";
+		$formType        = ($action == 'add' || ($_POST['form_submit'] ?? '') == 'add_form') ? "add" : "edit";
 		$btn_add_edit    = ($action == 'add') ? "Ajouter" : "Modifier";
 		$legend_add_edit = ($action == 'add') ? "Ajouter un " . strtolower($text) : "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id       = intval($_POST['id']);
-			$username = $sbsanitize->displayText($_POST['sbusername'], 'UTF-8', 1, 0);
+			$id       = intval($_POST['id'] ?? 0);
+			$username = $sbsanitize->displayText($_POST['sbusername'] ?? '', 'UTF-8', 1, 0);
 			// Valeur BRUTE : seul son hash est stocké. displayText() (entités
 			// HTML) donnait un hash de "&amp;" quand login() vérifie "&" -
 			// tout mot de passe avec & < > ' " ou accent ne marchait jamais.
 			$password = isset($_POST['sbpassword']) ? (string)$_POST['sbpassword'] : '';
-			$email    = $sbsanitize->displayText($_POST['email'], 'UTF-8', 1, 0);
-			$active   = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$email    = $sbsanitize->displayText($_POST['email'] ?? '', 'UTF-8', 1, 0);
+			$active   = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 
 			// Libre-service : sans "modifier" sur users, chacun peut quand même
 			// changer SON PROPRE mot de passe (voir sbClassifyAction()) - mais
@@ -121,14 +123,14 @@ switch($action) {
 			// n'est qu'un nom de fichier choisi/déjà présent dans ce dossier,
 			// pas un upload natif géré ici.
 			if (!$self_password_only) {
-				$prenom                = $sbsql->escape_string($sbsanitize->displayText($_POST['prenom'], 'UTF-8', 1, 0));
-				$nom                   = $sbsql->escape_string($sbsanitize->displayText($_POST['nom'], 'UTF-8', 1, 0));
-				$telephone             = $sbsql->escape_string($sbsanitize->displayText($_POST['telephone'], 'UTF-8', 1, 0));
-				$fonction              = $sbsql->escape_string($sbsanitize->displayText($_POST['fonction'], 'UTF-8', 1, 0));
-				$profession            = $sbsql->escape_string($sbsanitize->displayText($_POST['profession'], 'UTF-8', 1, 0));
-				$centres_interet       = $sbsql->escape_string($sbsanitize->displayText($_POST['centres_interet'], 'UTF-8', 1, 0));
-				$infos_complementaires = $sbsql->escape_string($sbsanitize->displayText($_POST['infos_complementaires'], 'UTF-8', 1, 0));
-				$avatar                = $sbsql->escape_string($sbsanitize->displayText($_POST['avatar'], 'UTF-8', 1, 0));
+				$prenom                = $sbsql->escape_string($sbsanitize->displayText($_POST['prenom'] ?? '', 'UTF-8', 1, 0));
+				$nom                   = $sbsql->escape_string($sbsanitize->displayText($_POST['nom'] ?? '', 'UTF-8', 1, 0));
+				$telephone             = $sbsql->escape_string($sbsanitize->displayText($_POST['telephone'] ?? '', 'UTF-8', 1, 0));
+				$fonction              = $sbsql->escape_string($sbsanitize->displayText($_POST['fonction'] ?? '', 'UTF-8', 1, 0));
+				$profession            = $sbsql->escape_string($sbsanitize->displayText($_POST['profession'] ?? '', 'UTF-8', 1, 0));
+				$centres_interet       = $sbsql->escape_string($sbsanitize->displayText($_POST['centres_interet'] ?? '', 'UTF-8', 1, 0));
+				$infos_complementaires = $sbsql->escape_string($sbsanitize->displayText($_POST['infos_complementaires'] ?? '', 'UTF-8', 1, 0));
+				$avatar                = $sbsql->escape_string($sbsanitize->displayText($_POST['avatar'] ?? '', 'UTF-8', 1, 0));
 			}
 
 			// ADD or EDIT
@@ -242,9 +244,9 @@ switch($action) {
 			$prenom = $nom = $telephone = $fonction = $profession = $centres_interet = $infos_complementaires = $avatar = '';
 		}
 		// --------------------------------
-		if ($formType == 'edit' && !$_POST['form_submit']) {
+		if ($formType == 'edit' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
-			$id       = intval($_GET['id']);
+			$id       = intval($_GET['id'] ?? 0);
 			$query_1  = "SELECT * FROM $table WHERE id = $id";
 			$requestQ = $sbsql->query($query_1);
 			$assoc    = $sbsql->assoc($requestQ);
@@ -346,10 +348,10 @@ switch($action) {
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id = intval($_POST['id']);
+			$id = intval($_POST['id'] ?? 0);
 
 			// EDIT (droits granulaires par module, voir inc/sbuiadmin-rights.php)
 			if ($formType == 'menu' && $id > 0) {
@@ -377,9 +379,9 @@ switch($action) {
 		}
 		
 		// --------------------------------
-		if ($formType == 'menu' && !$_POST['form_submit']) {
+		if ($formType == 'menu' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
-			$id       = intval($_GET['id']);
+			$id       = intval($_GET['id'] ?? 0);
 			$query_1  = "SELECT * FROM $table WHERE id = $id";
 			$requestQ = $sbsql->query($query_1);
 			$assoc    = $sbsql->assoc($requestQ);
@@ -439,7 +441,7 @@ switch($action) {
 	case "blockedip":
 		// Action DELETE
 		if ($action == 'delblockedip') {
-			$get_id   = intval($_GET['id']);
+			$get_id   = intval($_GET['id'] ?? 0);
 			$query_2  = "DELETE FROM $table_blockedip WHERE id = '$get_id'";
 			$request  = $sbsql->query($query_2);
 			
@@ -485,12 +487,12 @@ switch($action) {
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 			// Réglages en base (inc/sbuiadmin-settings.php)
 			$result_edit = sbSettingsSave(array(
 				'flood_enabled'     => (isset($_POST['flood_enabled']) && $_POST['flood_enabled'] === "on") ? '1' : '0',
-				'flood_expiration'  => $sbsanitize->displayText($_POST['flood_expiration'], 'UTF-8', 1, 0),
-				'flood_login_delay' => $sbsanitize->displayText($_POST['flood_login_delay'], 'UTF-8', 1, 0),
+				'flood_expiration'  => $sbsanitize->displayText($_POST['flood_expiration'] ?? '', 'UTF-8', 1, 0),
+				'flood_login_delay' => $sbsanitize->displayText($_POST['flood_login_delay'] ?? '', 'UTF-8', 1, 0),
 			));
 
 			if ($result_edit) {

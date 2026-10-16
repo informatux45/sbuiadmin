@@ -49,13 +49,15 @@ $table       = _AM_DB_PREFIX . "sb_gallery";
 $table_photo = _AM_DB_PREFIX . "sb_gallery_photos";
 $text        = "Galerie";
 
-$action = $_GET['a'];
+$action = $_GET['a'] ?? '';
+// PHP 8 : variables lues par certaines branches seulement
+$btn_add_edit = $css = $formName = $gid = $id = $javascript = $query = $query_2 = $query_5 = $template = $title = ''; $toSort = [];
 switch($action) {
 	case "del":
 	default:
 		// Action DELETE
 		if ($action == 'del') {
-			$get_id  = intval($_GET['id']);
+			$get_id  = intval($_GET['id'] ?? 0);
 			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
 			$request = $sbsql->query($query_2);
 			
@@ -94,7 +96,7 @@ switch($action) {
 	case "photo":
 		// Action DELETE photo
 		if ($action == 'delphoto') {
-			$get_id  = intval($_GET['id']);
+			$get_id  = intval($_GET['id'] ?? 0);
 			$query_5 = "DELETE FROM $table_photo WHERE id = '$get_id'";
 			$request = $sbsql->query($query_5);
 			
@@ -136,21 +138,21 @@ switch($action) {
 		// Initialize Form
 		// --------------------------------
 		$formName        = ($action == 'add') ? "add_form" : "edit_form";
-		$formType        = ($action == 'add' || $_POST['form_submit'] == 'add_form') ? "add" : "edit";
+		$formType        = ($action == 'add' || ($_POST['form_submit'] ?? '') == 'add_form') ? "add" : "edit";
 		$btn_add_edit    = ($action == 'add') ? "Ajouter" : "Modifier";
 		$legend_add_edit = ($action == 'add') ? "Ajouter un " . strtolower($text) : "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id         = intval($_POST['id']);
-			$title      = $sbsanitize->displayText($_POST['title'], 'UTF-8', 1, 0);
-			$css        = $sbsanitize->displayText($_POST['css_hidden'], 'UTF-8', 1, 0);
-			$javascript = $sbsanitize->displayText($_POST['javascript_hidden'], 'UTF-8', 1, 0);
-			$template   = $sbsanitize->displayText($_POST['template_hidden'], 'UTF-8', 1, 0);
-			$active     = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$id         = intval($_POST['id'] ?? 0);
+			$title      = $sbsanitize->displayText($_POST['title'] ?? '', 'UTF-8', 1, 0);
+			$css        = $sbsanitize->displayText($_POST['css_hidden'] ?? '', 'UTF-8', 1, 0);
+			$javascript = $sbsanitize->displayText($_POST['javascript_hidden'] ?? '', 'UTF-8', 1, 0);
+			$template   = $sbsanitize->displayText($_POST['template_hidden'] ?? '', 'UTF-8', 1, 0);
+			$active     = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 
 			// --------------------------------------------------------
 			// GARDE-FOU : css / javascript / template sont recopiés dans
@@ -223,9 +225,9 @@ switch($action) {
 			$title = $active = '';
 		}
 		// --------------------------------
-		if ($formType == 'edit' && !$_POST['form_submit']) {
+		if ($formType == 'edit' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
-			$id         = intval($_GET['id']);
+			$id         = intval($_GET['id'] ?? 0);
 			$query_1    = "SELECT * FROM $table WHERE id = $id";
 			$requestQ   = $sbsql->query($query_1);
 			$assoc      = $sbsql->assoc($requestQ);
@@ -290,22 +292,22 @@ switch($action) {
 		// Initialize Form
 		// --------------------------------
 		$formName        = ($action == 'photoadd') ? "add_form" : "edit_form";
-		$formType        = ($action == 'photoadd' || $_POST['form_submit'] == 'add_form') ? "photoadd" : "photoedit";
+		$formType        = ($action == 'photoadd' || ($_POST['form_submit'] ?? '') == 'add_form') ? "photoadd" : "photoedit";
 		$btn_add_edit    = ($action == 'photoadd') ? "Ajouter" : "Modifier";
 		$legend_add_edit = ($action == 'photoadd') ? "Ajouter une photo / vidéo" : "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id     = intval($_POST['id']);
-			$gid    = intval($_POST['gid']);
-			$title  = $sbsanitize->displayText($_POST['title'], 'UTF-8', 1, 0);
-			$photo  = $sbsanitize->displayText($_POST['photo'], 'UTF-8', 1, 0);
-			$video  = $sbsanitize->displayText($_POST['video'], 'UTF-8', 1, 0);
-			$type   = $sbsanitize->displayText($_POST['type'], 'UTF-8', 1, 0);
-			$active = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$id     = intval($_POST['id'] ?? 0);
+			$gid    = intval($_POST['gid'] ?? 0);
+			$title  = $sbsanitize->displayText($_POST['title'] ?? '', 'UTF-8', 1, 0);
+			$photo  = $sbsanitize->displayText($_POST['photo'] ?? '', 'UTF-8', 1, 0);
+			$video  = $sbsanitize->displayText($_POST['video'] ?? '', 'UTF-8', 1, 0);
+			$type   = $sbsanitize->displayText($_POST['type'] ?? '', 'UTF-8', 1, 0);
+			$active = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 			$media  = ($type == 'video') ? $video : $photo;
 
 	
@@ -356,9 +358,9 @@ switch($action) {
 			$title = $photo = $video = $type = $active = '';
 		}
 		// --------------------------------
-		if ($formType == 'photoedit' && !$_POST['form_submit']) {
+		if ($formType == 'photoedit' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
-			$id       = intval($_GET['id']);
+			$id       = intval($_GET['id'] ?? 0);
 			$query_1  = "SELECT * FROM $table_photo WHERE id = $id";
 			$requestQ = $sbsql->query($query_1);
 			$assoc    = $sbsql->assoc($requestQ);
@@ -457,13 +459,13 @@ switch($action) {
 		$btn_add_edit    = "Valider";
 		$legend_add_edit = "Trier les photos";
 		// --------------------------------
-		if ($_POST['drag']) {
+		if (!empty($_POST['drag'])) {
 			// --------------------------------
 			// --- Control form submit --------
 			// --------------------------------
 			// --- (array) : count() sur une valeur non-tableau (drag=foo) leve une
 			// --- TypeError fatale sous PHP 8.
-			$sb_toSort = (array)$_POST['drag'];
+			$sb_toSort = (array)($_POST['drag'] ?? []);
 			
 			// reorganizes the order of elements
 			$sql_error = 0;
@@ -491,7 +493,7 @@ switch($action) {
 		}
 		
 		// --- Recuperation des donnees
-		$gid        = intval($_GET['gid']);
+		$gid        = intval($_GET['gid'] ?? 0);
 		$query_3    = "SELECT * FROM $table_photo WHERE gid = '$gid' ORDER BY sort ASC";
 		$requestQ   = $sbsql->query($query_3);
 		$sort_array = $sbsql->toarray($requestQ);

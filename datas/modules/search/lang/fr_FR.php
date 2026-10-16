@@ -27,13 +27,8 @@ define('_CMS_SEARCH_SEEIN',			'Vu dans&nbsp;:');
 define('_CMS_SEARCH_PREVIOUS',		'Précédent');
 define('_CMS_SEARCH_NEXT',			'Suivant');
 
-// --- Libelles des sources (colonne "type" du resultat)
+// --- Libelles des sources (colonne "type" du resultat) ; ceux des
+// --- modules sont dans leur module.php ('search')
 define('_CMS_SEARCH_SRC_PAGES',		'Page');
-define('_CMS_SEARCH_SRC_NEWS',		'Actualité');
-define('_CMS_SEARCH_SRC_CONTACT',	'Formulaire');
-define('_CMS_SEARCH_SRC_TABLE',		'Tableau');
-define('_CMS_SEARCH_SRC_TABBS',		'Onglets');
-define('_CMS_SEARCH_SRC_DOWNLOAD',	'Téléchargement');
-define('_CMS_SEARCH_SRC_GALLERY',	'Galerie');
 
 ?>

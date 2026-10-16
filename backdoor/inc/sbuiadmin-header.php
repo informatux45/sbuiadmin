@@ -75,6 +75,8 @@ require(SBUIADMIN_PATH . '/inc/debug/kint.phar');
 // ADMIN Lang
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 sb_global_include(_AM_SITE_LANG_DIR . _AM_SITE_LANG . '.php');
+// --- Modules installés : datas/modules/<nom>/admin/lang/
+sbModulesLoadAdminLang(_AM_SITE_LANG);
 
 // ------------------------------------------------------
 // --- Smarty Class

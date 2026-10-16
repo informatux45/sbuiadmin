@@ -45,13 +45,15 @@ $table_cat  = _AM_DB_PREFIX . "sb_faq_category";
 $text       = "FAQ";
 $text_s     = "FAQs";
 
-$action = $_GET['a'];
+$action = $_GET['a'] ?? '';
+// PHP 8 : variables lues par certaines branches seulement
+$btn_add_edit = $formName = $id = $query = $query_2 = $query_5 = ''; $toSort = [];
 switch($action) {
 	case "del":
 	default:
 		// Action DELETE
 		if ($action == 'del') {
-			$get_id   = intval($_GET['id']);
+			$get_id   = intval($_GET['id'] ?? 0);
 			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
 			$request  = $sbsql->query($query_2);
 
@@ -93,20 +95,20 @@ switch($action) {
 		// Initialize Form
 		// --------------------------------
 		$formName        = ($action == 'add') ? "add_form" : "edit_form";
-		$formType        = ($action == 'add' || $_POST['form_submit'] == 'add_form') ? "add" : "edit";
+		$formType        = ($action == 'add' || ($_POST['form_submit'] ?? '') == 'add_form') ? "add" : "edit";
 		$btn_add_edit    = ($action == 'add') ? "Ajouter" : "Modifier";
 		$legend_add_edit = ($action == 'add') ? "Ajouter une question" : "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id       = intval($_POST['id']);
-			$question = $sbsanitize->displayText($_POST['question'], 'UTF-8', 1, 0); // Question
-			$response = $sbsanitize->displayText($_POST['response'], 'UTF-8', 1, 0); // Reponse
-			$category = $sbsanitize->displayText($_POST['category'], 'UTF-8', 1, 0); // Categorie
-			$active   = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$id       = intval($_POST['id'] ?? 0);
+			$question = $sbsanitize->displayText($_POST['question'] ?? '', 'UTF-8', 1, 0); // Question
+			$response = $sbsanitize->displayText($_POST['response'] ?? '', 'UTF-8', 1, 0); // Reponse
+			$category = $sbsanitize->displayText($_POST['category'] ?? '', 'UTF-8', 1, 0); // Categorie
+			$active   = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 
 			// ADD or EDIT
 			if ($formType == 'add') {
@@ -165,9 +167,9 @@ switch($action) {
 			$category = $question = $response = $active = '';
 		}
 		// --------------------------------
-		if ($formType == 'edit' && !$_POST['form_submit']) {
+		if ($formType == 'edit' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
-			$id          = intval($_GET['id']);
+			$id          = intval($_GET['id'] ?? 0);
 			$query_1     = "SELECT * FROM $table WHERE id = $id";
 			$requestQ    = $sbsql->query($query_1);
 			$assoc       = $sbsql->assoc($requestQ);
@@ -241,13 +243,13 @@ switch($action) {
 		$btn_add_edit    = "Valider";
 		$legend_add_edit = "Trier les questions";
 		// --------------------------------
-		if ($_POST['drag']) {
+		if (!empty($_POST['drag'])) {
 			// --------------------------------
 			// --- Control form submit --------
 			// --------------------------------
 			// --- (array) : count() sur une valeur non-tableau (drag=foo) leve une
 			// --- TypeError fatale sous PHP 8.
-			$sb_toSort = (array)$_POST['drag'];
+			$sb_toSort = (array)($_POST['drag'] ?? []);
 
 			// reorganizes the order of elements
 			$sql_error = 0;
@@ -307,7 +309,7 @@ switch($action) {
 	case "category":
 		// Action DELETE category
 		if ($action == 'categorydel') {
-			$get_id   = intval($_GET['id']);
+			$get_id   = intval($_GET['id'] ?? 0);
 			// -------------------------------------
 			// --- Check if question uses this category
 			$query_faq   = "SELECT id FROM $table WHERE category = $get_id";
@@ -356,18 +358,18 @@ switch($action) {
 		// Initialize Form
 		// --------------------------------
 		$formName        = ($action == 'categoryadd') ? "add_form" : "edit_form";
-		$formType        = ($action == 'categoryadd' || $_POST['form_submit'] == 'add_form') ? "categoryadd" : "categoryedit";
+		$formType        = ($action == 'categoryadd' || ($_POST['form_submit'] ?? '') == 'add_form') ? "categoryadd" : "categoryedit";
 		$btn_add_edit    = ($action == 'categoryadd') ? "Ajouter" : "Modifier";
 		$legend_add_edit = ($action == 'categoryadd') ? "Ajouter une catégorie" : "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id     = intval($_POST['id']);
-			$name   = $sbsanitize->displayText($_POST['name'], 'UTF-8', 1, 0);
-			$active = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$id     = intval($_POST['id'] ?? 0);
+			$name   = $sbsanitize->displayText($_POST['name'] ?? '', 'UTF-8', 1, 0);
+			$active = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 
 			// ADD or EDIT
 			if ($formType == 'categoryadd') {
@@ -411,9 +413,9 @@ switch($action) {
 			$name = $active = '';
 		}
 		// --------------------------------
-		if ($formType == 'categoryedit' && !$_POST['form_submit']) {
+		if ($formType == 'categoryedit' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
-			$id       = intval($_GET['id']);
+			$id       = intval($_GET['id'] ?? 0);
 			$query_1  = "SELECT * FROM $table_cat WHERE id = $id";
 			$requestQ = $sbsql->query($query_1);
 			$assoc    = $sbsql->assoc($requestQ);

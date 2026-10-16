@@ -29,11 +29,5 @@ define('_CMS_SEARCH_NEXT',			'Next');
 
 // --- Source labels (result "type" column)
 define('_CMS_SEARCH_SRC_PAGES',		'Page');
-define('_CMS_SEARCH_SRC_NEWS',		'News');
-define('_CMS_SEARCH_SRC_CONTACT',	'Form');
-define('_CMS_SEARCH_SRC_TABLE',		'Table');
-define('_CMS_SEARCH_SRC_TABBS',		'Tabs');
-define('_CMS_SEARCH_SRC_DOWNLOAD',	'Download');
-define('_CMS_SEARCH_SRC_GALLERY',	'Gallery');
 
 ?>

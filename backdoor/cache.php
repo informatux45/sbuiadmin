@@ -49,7 +49,7 @@ $formType        = "edit";
 $btn_add_edit    = "Vider tous les caches";
 $legend_add_edit = "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 
-$action = $_GET['op'];
+$action = $_GET['op'] ?? '';
 switch($action) {
 
 	default:
@@ -75,7 +75,7 @@ switch($action) {
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 			
 			// --- CLEAN CACHES
 			$clean_cache = 0;

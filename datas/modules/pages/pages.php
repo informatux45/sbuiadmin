@@ -86,7 +86,7 @@ if ($sb_pages_active) {
 	// --------------------------
 	// --- Assign Page Head if exists
 	// --------------------------
-	if ($assoc['headpage'])
+	if ($assoc['headpage'] && sbModuleActive('slider'))
 		$sbsmarty->assign('sb_page_headpage', $assoc['headpage']);
 	
 	// --------------------------

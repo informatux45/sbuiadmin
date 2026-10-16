@@ -62,6 +62,7 @@ $module['tables']['contact'] = "sb_contact";
 # Global email settings
 # --------------------------------------------------
 // --- SQL Request (all config)
+$email_to = $subject = '';
 $query   = "SELECT config, content FROM {$module['tables']['config']} WHERE config = 'email_to' OR config = 'email_subject'";
 $request = $sbsql->query($query);
 $result  = $sbsql->toarray($request);
@@ -77,8 +78,8 @@ foreach($result as $val) {
 # --------------------------------------------------
 # Define TPL to show (view)
 # --------------------------------------------------
-$op       = $sbsanitize->addSlashes($_REQUEST['op']);
-$id       = intval($_REQUEST['id']);
+$op       = $sbsanitize->addSlashes($_REQUEST['op'] ?? '');
+$id       = intval($_REQUEST['id'] ?? 0);
 $template = 'index';
 # TPL View MAIN
 //$module['template_main'] = MODULEFILE . '_' . $template . '.tpl';
@@ -97,10 +98,11 @@ if ($sbsanitize->displayLang(sb_utf8_encode($result_contact['subject'])) != '') 
 // --------------------------
 // --- Switch with Op GET
 // --------------------------
-$op = $_GET['op'];
+$op = $_GET['op'] ?? '';
 switch($op) {
 	default: // Show form
 		
+		$name = $email = '';
 		// --- Check if form is submitted
 		if(isset($_POST['submitform']) && !empty($_POST['submitform'])) {
 			// --- Anti-robot ALTCHA (une seule API : inc/sbuiadmin-altcha.php)

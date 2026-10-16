@@ -116,6 +116,10 @@ function sbSettingsDefaults() {
 		'update_last_error'     => '',
 		'update_history'        => '',
 		'update_dir_token'      => '',
+		// Modules (inc/sbuiadmin-update-modules.php) : catalogue publié,
+		// version de base des modules désinstallés avec leurs données gardées
+		'modules_catalog'       => '',
+		'modules_kept'          => '',
 		'db_version'            => '',
 		'maintenance'           => '0',
 		'debug_front'           => '0',

@@ -148,9 +148,10 @@ defined('SBSITESUBDIRECTORY') OR define('SBSITESUBDIRECTORY', trim((string) pars
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 // ------------------------
-// --- Defined Safe Pages
+// --- Defined Safe Pages (core ; les pages des modules installés - news,
+// --- download, shop... - sont ajoutées par index.php, voir module.php)
 // ------------------------
-$sb_safe_pages_cms = ['index', 'user', 'news', 'pages', 'shop', 'account', 'download', 'gallery', 'search'];
+$sb_safe_pages_cms = ['index', 'user', 'pages', 'search'];
 
 // ------------------------
 // --- Database

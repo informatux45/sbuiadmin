@@ -73,41 +73,10 @@ defined('SBUIADMIN_MENU_CMSCONFIG_PLUGINS') or define("SBUIADMIN_MENU_CMSCONFIG_
 defined('SBUIADMIN_MENU_CMSCONFIG_SEO') or define("SBUIADMIN_MENU_CMSCONFIG_SEO", "SEO");
 // *** Menu
 defined('SBUIADMIN_MENU_MENU') or define("SBUIADMIN_MENU_MENU", "Menu");
-// ** Actualites
-defined('SBUIADMIN_MENU_NEWS') or define("SBUIADMIN_MENU_NEWS", "Actualités");
-defined('SBUIADMIN_MENU_NEWS_ALL') or define("SBUIADMIN_MENU_NEWS_ALL", "Tous les articles");
-defined('SBUIADMIN_MENU_NEWS_CATEGORIES') or define("SBUIADMIN_MENU_NEWS_CATEGORIES", "Toutes les catégories");
-defined('SBUIADMIN_MENU_NEWS_SETTINGS') or define("SBUIADMIN_MENU_NEWS_SETTINGS", "Paramètres");
 // ** Pages
 defined('SBUIADMIN_MENU_PAGES') or define("SBUIADMIN_MENU_PAGES", "Pages");
 defined('SBUIADMIN_MENU_PAGES_ALL') or define("SBUIADMIN_MENU_PAGES_ALL", "Toutes les pages");
 defined('SBUIADMIN_MENU_PAGES_BLOCS') or define("SBUIADMIN_MENU_PAGES_BLOCS", "Tous les blocs");
-// *** Contact
-defined('SBUIADMIN_MENU_CONTACT') or define("SBUIADMIN_MENU_CONTACT", "Contact");
-defined('SBUIADMIN_MENU_CONTACT_ALL') or define("SBUIADMIN_MENU_CONTACT_ALL", "Tous les formulaires");
-defined('SBUIADMIN_MENU_CONTACT_SETTINGS') or define("SBUIADMIN_MENU_CONTACT_SETTINGS", "Paramètres");
-// ** Sliders
-defined('SBUIADMIN_MENU_SLIDERS') or define("SBUIADMIN_MENU_SLIDERS", "Sliders");
-// ** Tabbs
-defined('SBUIADMIN_MENU_TABBS') or define("SBUIADMIN_MENU_TABBS", "Tabbs");
-defined('SBUIADMIN_MENU_TABBS_ALL') or define("SBUIADMIN_MENU_TABBS_ALL", "Tous les tabbs");
-defined('SBUIADMIN_MENU_TABBS_ONGLETS') or define("SBUIADMIN_MENU_TABBS_ONGLETS", "Tous les onglets");
-// ** Tableaux
-defined('SBUIADMIN_MENU_TABLES') or define("SBUIADMIN_MENU_TABLES", "Tableaux");
-// ** FAQ
-defined('SBUIADMIN_MENU_FAQ') or define("SBUIADMIN_MENU_FAQ", "FAQ");
-defined('SBUIADMIN_MENU_FAQ_ALL') or define("SBUIADMIN_MENU_FAQ_ALL", "Questions");
-defined('SBUIADMIN_MENU_FAQ_CATEGORIES') or define("SBUIADMIN_MENU_FAQ_CATEGORIES", "Catégories");
-// ** Telechargements
-defined('SBUIADMIN_MENU_DOWNLOAD') or define("SBUIADMIN_MENU_DOWNLOAD", "Téléchargements");
-// ** Galeries
-defined('SBUIADMIN_MENU_GALLERY') or define("SBUIADMIN_MENU_GALLERY", "Galeries");
-defined('SBUIADMIN_MENU_GALLERY_ALL') or define("SBUIADMIN_MENU_GALLERY_ALL", "Toutes les galeries");
-defined('SBUIADMIN_MENU_GALLERY_PHOTOS') or define("SBUIADMIN_MENU_GALLERY_PHOTOS", "Photos / vidéos");
-// ** Boutique
-defined('SBUIADMIN_MENU_BOUTIQUE') or define("SBUIADMIN_MENU_BOUTIQUE", "Boutique");
-defined('SBUIADMIN_MENU_BOUTIQUE_PRODUCTS') or define("SBUIADMIN_MENU_BOUTIQUE_PRODUCTS", "Produits");
-defined('SBUIADMIN_MENU_BOUTIQUE_CATEGORIES') or define("SBUIADMIN_MENU_BOUTIQUE_CATEGORIES", "Catégories");
-defined('SBUIADMIN_MENU_BOUTIQUE_SETTINGS') or define("SBUIADMIN_MENU_BOUTIQUE_SETTINGS", "Paramètres");
+// ** Menus des modules : datas/modules/<nom>/admin/lang/french.php
 
 ?>

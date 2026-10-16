@@ -50,13 +50,15 @@ $text_s        = "Produits";
 // taux hors de cette liste reste saisissable à la main (champ texte).
 $sb_tva_taux_courants = ['20', '10', '5.5', '2.1', '0'];
 
-$action = $_GET['a'];
+$action = $_GET['a'] ?? '';
+// PHP 8 : variables lues par certaines branches seulement
+$btn_add_edit = $formName = $id = $query = $query_2 = $query_5 = ''; $toSort = [];
 switch($action) {
 	case "del":
 	default:
 		// Action DELETE
 		if ($action == 'del') {
-			$get_id   = intval($_GET['id']);
+			$get_id   = intval($_GET['id'] ?? 0);
 			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
 			$request  = $sbsql->query($query_2);
 
@@ -98,29 +100,29 @@ switch($action) {
 		// Initialize Form
 		// --------------------------------
 		$formName        = ($action == 'add') ? "add_form" : "edit_form";
-		$formType        = ($action == 'add' || $_POST['form_submit'] == 'add_form') ? "add" : "edit";
+		$formType        = ($action == 'add' || ($_POST['form_submit'] ?? '') == 'add_form') ? "add" : "edit";
 		$btn_add_edit    = ($action == 'add') ? "Ajouter" : "Modifier";
 		$legend_add_edit = ($action == 'add') ? "Ajouter un produit" : "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id                  = intval($_POST['id']);
-			$catid               = intval($_POST['catid']);
-			$reference           = $sbsanitize->displayText($_POST['reference'], 'UTF-8', 1, 0);
-			$title               = $sbsanitize->displayText($_POST['title'], 'UTF-8', 1, 0);
-			$description_short   = $sbsanitize->displayText($_POST['description_short'], 'UTF-8', 1, 0);
-			$description         = $sbsanitize->displayText($_POST['description'], 'UTF-8', 1, 0);
-			$photo               = $sbsanitize->displayText($_POST['photo'], 'UTF-8', 1, 0);
-			$price               = str_replace(',', '.', $sbsanitize->displayText($_POST['price'], 'UTF-8', 1, 0));
-			$priceht             = str_replace(',', '.', $sbsanitize->displayText($_POST['priceht'], 'UTF-8', 1, 0));
-			$poids               = str_replace(',', '.', $sbsanitize->displayText($_POST['poids'], 'UTF-8', 1, 0));
-			$allow_physical      = $sbsanitize->displayText($_POST['allow_physical'], 'UTF-8', 1, 0);
-			$allow_dematerialise = $sbsanitize->displayText($_POST['allow_dematerialise'], 'UTF-8', 1, 0);
-			$tva_assujetti       = $sbsanitize->displayText($_POST['tva_assujetti'], 'UTF-8', 1, 0);
-			$active              = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$id                  = intval($_POST['id'] ?? 0);
+			$catid               = intval($_POST['catid'] ?? 0);
+			$reference           = $sbsanitize->displayText($_POST['reference'] ?? '', 'UTF-8', 1, 0);
+			$title               = $sbsanitize->displayText($_POST['title'] ?? '', 'UTF-8', 1, 0);
+			$description_short   = $sbsanitize->displayText($_POST['description_short'] ?? '', 'UTF-8', 1, 0);
+			$description         = $sbsanitize->displayText($_POST['description'] ?? '', 'UTF-8', 1, 0);
+			$photo               = $sbsanitize->displayText($_POST['photo'] ?? '', 'UTF-8', 1, 0);
+			$price               = str_replace(',', '.', $sbsanitize->displayText($_POST['price'] ?? '', 'UTF-8', 1, 0));
+			$priceht             = str_replace(',', '.', $sbsanitize->displayText($_POST['priceht'] ?? '', 'UTF-8', 1, 0));
+			$poids               = str_replace(',', '.', $sbsanitize->displayText($_POST['poids'] ?? '', 'UTF-8', 1, 0));
+			$allow_physical      = $sbsanitize->displayText($_POST['allow_physical'] ?? '', 'UTF-8', 1, 0);
+			$allow_dematerialise = $sbsanitize->displayText($_POST['allow_dematerialise'] ?? '', 'UTF-8', 1, 0);
+			$tva_assujetti       = $sbsanitize->displayText($_POST['tva_assujetti'] ?? '', 'UTF-8', 1, 0);
+			$active              = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 
 			// --- Ventilation TVA (0 à 3 taux : certaines formes de société -
 			// franchise en base - sont dispensées de TVA, le produit peut donc
@@ -223,9 +225,9 @@ switch($action) {
 			$tva_data = [];
 		}
 		// --------------------------------
-		if ($formType == 'edit' && !$_POST['form_submit']) {
+		if ($formType == 'edit' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
-			$id                  = intval($_GET['id']);
+			$id                  = intval($_GET['id'] ?? 0);
 			$query_1             = "SELECT * FROM $table WHERE id = $id";
 			$requestQ            = $sbsql->query($query_1);
 			$assoc               = $sbsql->assoc($requestQ);
@@ -345,13 +347,13 @@ switch($action) {
 		$btn_add_edit    = "Valider";
 		$legend_add_edit = "Trier les produits";
 		// --------------------------------
-		if ($_POST['drag']) {
+		if (!empty($_POST['drag'])) {
 			// --------------------------------
 			// --- Control form submit --------
 			// --------------------------------
 			// --- (array) : count() sur une valeur non-tableau (drag=foo) leve une
 			// --- TypeError fatale sous PHP 8.
-			$sb_toSort = (array)$_POST['drag'];
+			$sb_toSort = (array)($_POST['drag'] ?? []);
 
 			// reorganizes the order of elements
 			$sql_error = 0;
@@ -411,7 +413,7 @@ switch($action) {
 	case "category":
 		// Action DELETE category
 		if ($action == 'categorydel') {
-			$get_id   = intval($_GET['id']);
+			$get_id   = intval($_GET['id'] ?? 0);
 			// -------------------------------------
 			// --- Check if product uses this category
 			$query_prod   = "SELECT id FROM $table WHERE catid = $get_id";
@@ -460,20 +462,20 @@ switch($action) {
 		// Initialize Form
 		// --------------------------------
 		$formName        = ($action == 'categoryadd') ? "add_form" : "edit_form";
-		$formType        = ($action == 'categoryadd' || $_POST['form_submit'] == 'add_form') ? "categoryadd" : "categoryedit";
+		$formType        = ($action == 'categoryadd' || ($_POST['form_submit'] ?? '') == 'add_form') ? "categoryadd" : "categoryedit";
 		$btn_add_edit    = ($action == 'categoryadd') ? "Ajouter" : "Modifier";
 		$legend_add_edit = ($action == 'categoryadd') ? "Ajouter une catégorie" : "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id          = intval($_POST['id']);
-			$title       = $sbsanitize->displayText($_POST['title'], 'UTF-8', 1, 0);
-			$description = $sbsanitize->displayText($_POST['description'], 'UTF-8', 1, 0);
-			$photo       = $sbsanitize->displayText($_POST['photo'], 'UTF-8', 1, 0);
-			$active      = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$id          = intval($_POST['id'] ?? 0);
+			$title       = $sbsanitize->displayText($_POST['title'] ?? '', 'UTF-8', 1, 0);
+			$description = $sbsanitize->displayText($_POST['description'] ?? '', 'UTF-8', 1, 0);
+			$photo       = $sbsanitize->displayText($_POST['photo'] ?? '', 'UTF-8', 1, 0);
+			$active      = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 
 			// ADD or EDIT
 			if ($formType == 'categoryadd') {
@@ -519,9 +521,9 @@ switch($action) {
 			$title = $description = $photo = $active = '';
 		}
 		// --------------------------------
-		if ($formType == 'categoryedit' && !$_POST['form_submit']) {
+		if ($formType == 'categoryedit' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
-			$id          = intval($_GET['id']);
+			$id          = intval($_GET['id'] ?? 0);
 			$query_1     = "SELECT * FROM $table_cat WHERE id = $id";
 			$requestQ    = $sbsql->query($query_1);
 			$assoc       = $sbsql->assoc($requestQ);
@@ -572,20 +574,20 @@ switch($action) {
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$is_tva               = $sbsanitize->displayText($_POST['is_tva'], 'UTF-8', 1, 0);
-			$currency              = $sbsanitize->displayText($_POST['currency'], 'UTF-8', 1, 0);
-			$currency_text         = $sbsanitize->displayText($_POST['currency_text'], 'UTF-8', 1, 0);
-			$currency_position     = $sbsanitize->displayText($_POST['currency_position'], 'UTF-8', 1, 0);
-			$n_decimals            = intval($_POST['n_decimals']);
-			$per_page              = intval($_POST['per_page']);
-			$invoice_prefix        = $sbsanitize->displayText($_POST['invoice_prefix'], 'UTF-8', 1, 0);
-			$unique_code_root      = $sbsanitize->displayText($_POST['unique_code_root'], 'UTF-8', 1, 0);
-			$unique_code_key       = $sbsanitize->displayText($_POST['unique_code_key'], 'UTF-8', 1, 0);
-			$unique_code_pattern   = $sbsanitize->displayText($_POST['unique_code_pattern'], 'UTF-8', 1, 0);
-			$unique_code_length    = intval($_POST['unique_code_length']);
+			$is_tva               = $sbsanitize->displayText($_POST['is_tva'] ?? '', 'UTF-8', 1, 0);
+			$currency              = $sbsanitize->displayText($_POST['currency'] ?? '', 'UTF-8', 1, 0);
+			$currency_text         = $sbsanitize->displayText($_POST['currency_text'] ?? '', 'UTF-8', 1, 0);
+			$currency_position     = $sbsanitize->displayText($_POST['currency_position'] ?? '', 'UTF-8', 1, 0);
+			$n_decimals            = intval($_POST['n_decimals'] ?? 0);
+			$per_page              = intval($_POST['per_page'] ?? 0);
+			$invoice_prefix        = $sbsanitize->displayText($_POST['invoice_prefix'] ?? '', 'UTF-8', 1, 0);
+			$unique_code_root      = $sbsanitize->displayText($_POST['unique_code_root'] ?? '', 'UTF-8', 1, 0);
+			$unique_code_key       = $sbsanitize->displayText($_POST['unique_code_key'] ?? '', 'UTF-8', 1, 0);
+			$unique_code_pattern   = $sbsanitize->displayText($_POST['unique_code_pattern'] ?? '', 'UTF-8', 1, 0);
+			$unique_code_length    = intval($_POST['unique_code_length'] ?? 0);
 
 			// UPDATE DATAS (ligne unique, id=1)
 			$query = "UPDATE $table_config SET is_tva = '$is_tva'

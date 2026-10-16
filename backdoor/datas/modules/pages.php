@@ -55,13 +55,15 @@ $table        = _AM_DB_PREFIX . "sb_pages";
 $table_sort   = _AM_DB_PREFIX . "sb_blocs_sort";
 $table_slider = _AM_DB_PREFIX . "sb_slider";
 
-$action = $_GET['a'];
+$action = $_GET['a'] ?? '';
+// PHP 8 : variables lues par certaines branches seulement
+$btn_add_edit = $content_en = $cs = $formName = $id = $menu_en = $model = $photo = $query = $query_2 = $src = $title_en = $title_fr = '';
 switch($action) {
 	case "del":
 	default:
 		// Action DELETE
 		if ($action == 'del') {
-			$get_id   = intval($_GET['id']);
+			$get_id   = intval($_GET['id'] ?? 0);
 			$query_2  = "DELETE FROM $table WHERE id = '$get_id'";
 			$request  = $sbsql->query($query_2);
 			
@@ -100,40 +102,40 @@ switch($action) {
 		// Initialize Form
 		// --------------------------------
 		$formName        = ($action == 'add') ? "add_form" : "edit_form";
-		$formType        = ($action == 'add' || $_POST['form_submit'] == 'add_form') ? "add" : "edit";
+		$formType        = ($action == 'add' || ($_POST['form_submit'] ?? '') == 'add_form') ? "add" : "edit";
 		$btn_add_edit    = ($action == 'add') ? "Ajouter" : "Modifier";
 		$legend_add_edit = ($action == 'add') ? "Ajouter une page" : "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id              = intval($_POST['id']);
+			$id              = intval($_POST['id'] ?? 0);
 			// --- Menu
-			$menu_fr         = $sbsanitize->displayText($_POST['menu_fr'], 'UTF-8', 1, 0);
+			$menu_fr         = $sbsanitize->displayText($_POST['menu_fr'] ?? '', 'UTF-8', 1, 0);
 			$menu            = "[fr]".$menu_fr."[/fr]";			
 			if ($getMultilang) {
-				$menu_en = $sbsanitize->displayText($_POST['menu_en'], 'UTF-8', 1, 0);				
+				$menu_en = $sbsanitize->displayText($_POST['menu_en'] ?? '', 'UTF-8', 1, 0);				
 				$menu   .= "[en]".$menu_en."[/en]";
 			}
 			// --- Titre
-			$title_fr        = $sbsanitize->displayText($_POST['title_fr'], 'UTF-8', 1, 0);
+			$title_fr        = $sbsanitize->displayText($_POST['title_fr'] ?? '', 'UTF-8', 1, 0);
 			$title           = "[fr]".$title_fr."[/fr]";
 			if ($getMultilang) {
-				$title_en = $sbsanitize->displayText($_POST['title_en'], 'UTF-8', 1, 0);
+				$title_en = $sbsanitize->displayText($_POST['title_en'] ?? '', 'UTF-8', 1, 0);
 				$title   .= "[en]".$title_en."[/en]";				
 			}
 			// --- Content
-			$content_fr      = $sbsanitize->displayText($_POST['content_fr'], 'UTF-8', 1, 0);
+			$content_fr      = $sbsanitize->displayText($_POST['content_fr'] ?? '', 'UTF-8', 1, 0);
 			$content         = "[fr]".$content_fr."[/fr]";
 			if ($getMultilang) {
-				$content_en = $sbsanitize->displayText($_POST['content_en'], 'UTF-8', 1, 0);
+				$content_en = $sbsanitize->displayText($_POST['content_en'] ?? '', 'UTF-8', 1, 0);
 				$content   .= "[en]".$content_en."[/en]";
 			}
-			$seo_url         = $sbsanitize->displayText($_POST['seo_url'], 'UTF-8', 1, 0);
+			$seo_url         = $sbsanitize->displayText($_POST['seo_url'] ?? '', 'UTF-8', 1, 0);
 			if (trim($seo_url) != '') {
-				$seo_url = trim(strtolower($sbsanitize->rewriteString($_POST['seo_url'])));
+				$seo_url = trim(strtolower($sbsanitize->rewriteString($_POST['seo_url'] ?? '')));
 			} else {
 				// Check if seo url is homepage
 				if (strtolower($sbsanitize->rewriteString($title_fr)) == 'accueil' ||
@@ -143,14 +145,14 @@ switch($action) {
 				else
 					$seo_url = strtolower($sbsanitize->rewriteString($title_fr));
 			}
-			$seo_keywords    = $sbsanitize->displayText($_POST['seo_keywords'], 'UTF-8', 1, 0);
-			$seo_description = $sbsanitize->displayText($_POST['seo_description'], 'UTF-8', 1, 0);
-			$theme_view      = $sbsanitize->displayText($_POST['theme_view'], 'UTF-8', 1, 0);
-			$module_view     = $sbsanitize->displayText($_POST['module_view'], 'UTF-8', 1, 0);
-			$various_view    = $sbsanitize->displayText($_POST['various_view'], 'UTF-8', 1, 0);
-			$headpage        = $sbsanitize->displayText($_POST['headpage'], 'UTF-8', 1, 0);
-			$photo           = $sbsanitize->displayText($_POST['photo'], 'UTF-8', 1, 0);
-			$active          = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$seo_keywords    = $sbsanitize->displayText($_POST['seo_keywords'] ?? '', 'UTF-8', 1, 0);
+			$seo_description = $sbsanitize->displayText($_POST['seo_description'] ?? '', 'UTF-8', 1, 0);
+			$theme_view      = $sbsanitize->displayText($_POST['theme_view'] ?? '', 'UTF-8', 1, 0);
+			$module_view     = $sbsanitize->displayText($_POST['module_view'] ?? '', 'UTF-8', 1, 0);
+			$various_view    = $sbsanitize->displayText($_POST['various_view'] ?? '', 'UTF-8', 1, 0);
+			$headpage        = $sbsanitize->displayText($_POST['headpage'] ?? '', 'UTF-8', 1, 0);
+			$photo           = $sbsanitize->displayText($_POST['photo'] ?? '', 'UTF-8', 1, 0);
+			$active          = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 			$url_custom      = '';
 	
 			// ADD or EDIT
@@ -217,9 +219,9 @@ switch($action) {
 			$menu_fr = $menu_en = $title_fr = $title_en = $content_fr = $content_en = $seo_url = $seo_keywords = $seo_description = $active = $theme_view = $headpage = $module_view = $various_view = '';
 		}
 		// --------------------------------
-		if ($formType == 'edit' && !$_POST['form_submit']) {
+		if ($formType == 'edit' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
-			$id              = intval($_GET['id']);
+			$id              = intval($_GET['id'] ?? 0);
 			$query_1         = "SELECT * FROM $table WHERE id = $id";
 			$requestQ        = $sbsql->query($query_1);
 			$assoc           = $sbsql->assoc($requestQ);
@@ -252,8 +254,8 @@ switch($action) {
 		// --------------------------------
 		// --- Include Theme Config
 		include_once(SB_THEME_DIR . 'config.php');
-		// --- Assign theme headpage
-		if (!empty($theme['headpage'])) {
+		// --- Assign theme headpage (sliders : uniquement si le module est installé)
+		if (!empty($theme['headpage']) && sbModuleActive('slider')) {
 			$query_slider   = "SELECT * FROM $table_slider WHERE active = '1' ORDER BY title ASC";
 			$request_slider = $sbsql->query($query_slider);
 			$slider_array   = $sbsql->toarray($request_slider);
@@ -382,25 +384,25 @@ switch($action) {
 		// Initialize Form
 		// --------------------------------
 		$formName        = ($action == 'addcustom') ? "add_form" : "edit_form";
-		$formType        = ($action == 'addcustom' || $_POST['form_submit'] == 'add_form') ? "addcustom" : "editcustom";
+		$formType        = ($action == 'addcustom' || ($_POST['form_submit'] ?? '') == 'add_form') ? "addcustom" : "editcustom";
 		$btn_add_edit    = ($action == 'addcustom') ? "Ajouter" : "Modifier";
 		$legend_add_edit = ($action == 'addcustom') ? "Ajouter une page (Custom)" : "Modifier &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo; (Custom)";
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id          = intval($_POST['id']);
+			$id          = intval($_POST['id'] ?? 0);
 			// --- Menu
-			$menu_fr     = $sbsanitize->displayText($_POST['menu_fr'], 'UTF-8', 1, 0);
+			$menu_fr     = $sbsanitize->displayText($_POST['menu_fr'] ?? '', 'UTF-8', 1, 0);
 			$menu        = "[fr]".$menu_fr."[/fr]";			
 			if ($getMultilang) {
-				$menu_en = $sbsanitize->displayText($_POST['menu_en'], 'UTF-8', 1, 0);				
+				$menu_en = $sbsanitize->displayText($_POST['menu_en'] ?? '', 'UTF-8', 1, 0);				
 				$menu   .= "[en]".$menu_en."[/en]";
 			}
-			$url_custom  = $sbsanitize->displayText($_POST['url_custom'], 'UTF-8', 1, 0);
-			$active      = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$url_custom  = $sbsanitize->displayText($_POST['url_custom'] ?? '', 'UTF-8', 1, 0);
+			$active      = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 	
 			// ADD or EDIT
 			if ($formType == 'addcustom') {
@@ -448,9 +450,9 @@ switch($action) {
 			$menu_fr = $menu_en = $url_custom = $active = '';
 		}
 		// --------------------------------
-		if ($formType == 'editcustom' && !$_POST['form_submit']) {
+		if ($formType == 'editcustom' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
-			$id              = intval($_GET['id']);
+			$id              = intval($_GET['id'] ?? 0);
 			$query_1         = "SELECT * FROM $table WHERE id = $id";
 			$requestQ        = $sbsql->query($query_1);
 			$assoc           = $sbsql->assoc($requestQ);

@@ -16,6 +16,7 @@ if (!defined('SB_PATH')) {
 /* -------------------------------
  * Available functions :
  * -------------------------------
+ * sbSearchProviders
  * sbSearchTable
  * sbSearchTerms
  * sbSearchAccentMap
@@ -29,7 +30,6 @@ if (!defined('SB_PATH')) {
  * sbSearchDecoded
  * sbSearchPlainText
  * sbSearchMatches
- * sbSearchTableCells
  * sbSearchEscape
  * sbSearchRanges
  * sbSearchHighlight
@@ -47,6 +47,31 @@ defined('SB_SEARCH_MIN_LENGTH') OR define('SB_SEARCH_MIN_LENGTH', 3);
 // --- Longueur de l'extrait affiche sous chaque resultat
 defined('SB_SEARCH_EXCERPT')    OR define('SB_SEARCH_EXCERPT', 220);
 
+
+/**
+* Sources de recherche des modules installes : datas/modules/<nom>/inc/search.php
+* (fonctions sbSearchSource_<nom>() et, s'il heberge des shortcodes,
+* sbSearchHosts_<nom>()), declarees par la cle 'search' de leur module.php.
+* @return	array	nom => ['label' => libelle de la source, 'order' => rang], triees
+*/
+if (!function_exists("sbSearchProviders")) {
+	function sbSearchProviders() {
+		static $list = null;
+		if ($list !== null) return $list;
+		$list = array();
+		$lang = (isset($_SESSION['lang']) && $_SESSION['lang'] != '') ? $_SESSION['lang'] : 'fr';
+		foreach (sbModulesActive() as $name => $m) {
+			if (empty($m['search'])) continue;
+			$file = SB_MODULES_DIR . $name . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'search.php';
+			if (!is_file($file)) continue;
+			include_once($file);
+			$label = isset($m['search'][$lang]) ? $m['search'][$lang] : (isset($m['search']['fr']) ? $m['search']['fr'] : $m['title']);
+			$list[$name] = array('label' => $label, 'order' => isset($m['search']['order']) ? intval($m['search']['order']) : 100);
+		}
+		uasort($list, function($a, $b) { return $a['order'] - $b['order']; });
+		return $list;
+	}
+}
 
 /**
 * Nom complet d'une table du CMS.
@@ -441,31 +466,6 @@ if (!function_exists("sbSearchMatches")) {
 }
 
 /**
-* Valeurs d'une ligne de tableau (module Table).
-*
-* sb_table_datas.content ne contient pas du texte mais du JSON produit par
-* l'administration : {"0":{"i":"<champ>","v":"<valeur>"}, ...}. Sans ce
-* decodage, l'extrait affiche au visiteur serait le JSON brut, accolades et
-* noms de champs compris.
-* @param	string	$json
-* @return	string	valeurs concatenees, ou la chaine d'origine si ce n'est
-*					pas du JSON exploitable
-*/
-if (!function_exists("sbSearchTableCells")) {
-	function sbSearchTableCells($json) {
-		$decoded = json_decode((string)$json, true);
-		if (!is_array($decoded)) return (string)$json;
-
-		$values = array();
-		foreach ($decoded as $cell) {
-			if (is_array($cell) && isset($cell['v']) && trim((string)$cell['v']) !== '') $values[] = $cell['v'];
-		}
-
-		return (empty($values)) ? '' : implode(' - ', $values);
-	}
-}
-
-/**
 * Echappement HTML COMPLET, pour l'affichage d'un resultat de recherche.
 *
 * On n'utilise volontairement PAS $sbsanitize->htmlSpecialChars() : cette
@@ -598,10 +598,10 @@ if (!function_exists("sbSearchExcerpt")) {
 * recherche portant sur ces modules n'a donc pas d'URL naturelle - on
 * retrouve ici le contenu qui l'affiche reellement.
 *
-* Sources scannees : pages, actualites, onglets (Tabbs) et blocs de contenu.
-* Un seul balayage par table (les shortcodes sont rares), puis analyse en PHP :
-* c'est 4 requetes au total quel que soit le nombre de resultats, la ou une
-* resolution resultat par resultat en couterait 4 par resultat.
+* Sources scannees : pages, modules installes qui en hebergent (actualites,
+* onglets...) et blocs de contenu. Un seul balayage par table (les shortcodes
+* sont rares), puis analyse en PHP : quelques requetes au total quel que soit
+* le nombre de resultats, au lieu de plusieurs par resultat.
 *
 * @return	array	['sbgallery' => [12 => ['url' => ..., 'label' => ...]], ...]
 */
@@ -614,8 +614,6 @@ if (!function_exists("sbSearchHostIndex")) {
 		$index = array();
 
 		$t_pages    = sbSearchTable('sb_pages');
-		$t_news     = sbSearchTable('sb_news');
-		$t_tabbstab = sbSearchTable('sb_tabbs_tab');
 		$t_blocs    = sbSearchTable('sb_blocs');
 
 		$lang = (isset($_SESSION['lang']) && $_SESSION['lang'] != '') ? $_SESSION['lang'] : 'fr';
@@ -650,37 +648,12 @@ if (!function_exists("sbSearchHostIndex")) {
 		}
 
 		// --------------------------
-		// --- Actualites
+		// --- Modules installes qui hebergent des shortcodes (actualites,
+		// --- onglets...) : sbSearchHosts_<nom>() de leur inc/search.php
 		// --------------------------
-		$query   = "SELECT id, title, desc_short, desc_full
-					FROM {$t_news}
-					WHERE active = '1' AND (desc_full LIKE '%[CS %' OR desc_short LIKE '%[CS %')";
-		$request = $sbsql->query($query);
-		$rows    = $sbsql->toarray($request);
-		if ($rows) {
-			foreach ($rows as $row) {
-				$url   = sbSearchNewsUrl($row['id'], $row['title']);
-				$label = $sbsanitize->displayText($sbsanitize->displayLang($row['title'], $lang), 'UTF-8');
-				$collect($row['desc_full'] . ' ' . $row['desc_short'], $url, $label);
-			}
-		}
-
-		// --------------------------
-		// --- Onglets (Tabbs) : deux sauts. Le contenu d'un onglet peut porter
-		// --- un shortcode, mais l'onglet lui-meme n'a pas d'URL - il s'affiche
-		// --- via [CS name=sbtabbs id=<groupe>], dont l'hote est deja indexe
-		// --- ci-dessus. On resout donc l'onglet vers l'hote de son groupe.
-		// --------------------------
-		$query   = "SELECT tid, content
-					FROM {$t_tabbstab}
-					WHERE active = '1' AND content LIKE '%[CS %'";
-		$request = $sbsql->query($query);
-		$rows    = $sbsql->toarray($request);
-		if ($rows) {
-			foreach ($rows as $row) {
-				$host = isset($index['sbtabbs'][intval($row['tid'])]) ? $index['sbtabbs'][intval($row['tid'])] : false;
-				if ($host) $collect($row['content'], $host['url'], $host['label']);
-			}
+		foreach (array_keys(sbSearchProviders()) as $provider) {
+			$hosts = 'sbSearchHosts_' . $provider;
+			if (function_exists($hosts)) $hosts($collect, $index);
 		}
 
 		// --------------------------
@@ -736,25 +709,6 @@ if (!function_exists("sbSearchPageLabel")) {
 		if (trim($label) == '') $label = sbSearchTitle($row['menu']);
 
 		return $label;
-	}
-}
-
-/**
-* URL publique d'un article (meme construction que shortcode_sbnews_item()).
-* @param	int		$id
-* @param	string	$title	titre brut de la base
-* @return	string
-*/
-if (!function_exists("sbSearchNewsUrl")) {
-	function sbSearchNewsUrl($id, $title) {
-		global $sbsanitize;
-
-		$lang      = (isset($_SESSION['lang']) && $_SESSION['lang'] != '') ? $_SESSION['lang'] : 'fr';
-		$id        = intval($id);
-		$clean     = $sbsanitize->displayText($sbsanitize->displayLang($title, $lang), 'UTF-8');
-		$title_url = $sbsanitize->stripTags(strtolower(sbRewriteString($clean)));
-
-		return sbGetSeoUrl("index.php?p=news&op=article&id=$id", "news/article/$id/$title_url", false);
 	}
 }
 

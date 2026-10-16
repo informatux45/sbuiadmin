@@ -36,8 +36,12 @@ Chaque site a son sbdbconfig.php (sbdbconfig-<dossier>.php pour les suivants).
 - Sauvegardes : SBUIADMIN_BACKUP_DIR ou 'backup_dir' (sbdbconfig.php),
   sinon à côté de sbdbconfig.php, sinon backdoor/datas/updates/.
   Perdre sbdbconfig.php rend les sauvegardes illisibles.
+- Modules (carte « Modules ») : mis à jour séparément du core ; Télécharger,
+  Installer, Désinstaller (données gardées sauf demande), Supprimer les fichiers.
 
 ### Migrations de la base (développeurs)
 - backdoor/inc/migrations/<version>.php, modèle dans inc/sbuiadmin-update-db.php
 - Idempotentes (méthodes SbMigration), avec une partie 'down' si possible.
 - Supprimer en deux versions : N n'utilise plus, N+1 supprime.
+- Module : datas/modules/<nom>/module.php (version, core minimal),
+  install.php (tables), migrations/<version>.php.

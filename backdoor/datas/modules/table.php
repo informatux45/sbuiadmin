@@ -50,13 +50,15 @@ $table_structure = _AM_DB_PREFIX . "sb_table_structure";
 $table_datas     = _AM_DB_PREFIX . "sb_table_datas";
 $text            = "Tableau";
 
-$action = $_GET['a'];
+$action = $_GET['a'] ?? '';
+// PHP 8 : variables lues par certaines branches seulement
+$id = $query = $query_2 = $tabname = $type = ''; $structure_datas = $toSort = [];
 switch($action) {
 	case "del":
 	default:
 		// Action DELETE table
 		if ($action == 'del') {
-			$get_id  = intval($_GET['id']);
+			$get_id  = intval($_GET['id'] ?? 0);
 			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
 			$request = $sbsql->query($query_2);
 			// --- Supression de la structure
@@ -101,19 +103,19 @@ switch($action) {
 		// Initialize Form
 		// --------------------------------
 		$formName        = ($action == 'add') ? "add_form" : "edit_form";
-		$formType        = ($action == 'add' || $_POST['form_submit'] == 'add_form') ? "add" : "edit";
+		$formType        = ($action == 'add' || ($_POST['form_submit'] ?? '') == 'add_form') ? "add" : "edit";
 		$btn_add_edit    = ($action == 'add') ? "Ajouter" : "Modifier";
 		$legend_add_edit = ($action == 'add') ? "Ajouter un " . strtolower($text) : "Modifier le " . strtolower($text);
 		// --------------------------------
 		// --- Control form submit --------
 		// --------------------------------
-		if ($_POST['form_submit']) {
+		if (!empty($_POST['form_submit'])) {
 
 			// Injection des données
-			$id     = intval($_POST['id']);
-			$name   = $sbsanitize->displayText($_POST['name'], 'UTF-8', 1, 0);
-			$type   = $sbsanitize->displayText($_POST['type'], 'UTF-8', 1, 0);
-			$active = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$id     = intval($_POST['id'] ?? 0);
+			$name   = $sbsanitize->displayText($_POST['name'] ?? '', 'UTF-8', 1, 0);
+			$type   = $sbsanitize->displayText($_POST['type'] ?? '', 'UTF-8', 1, 0);
+			$active = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 	
 			// ADD or EDIT
 			if ($formType == 'add') {
@@ -160,9 +162,9 @@ switch($action) {
 			$name = $active = '';
 		}
 		// --------------------------------
-		if ($formType == 'edit' && !$_POST['form_submit']) {
+		if ($formType == 'edit' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
-			$id       = intval($_GET['id']);
+			$id       = intval($_GET['id'] ?? 0);
 			$query_1  = "SELECT * FROM $table WHERE id = $id";
 			$requestQ = $sbsql->query($query_1);
 			$assoc    = $sbsql->assoc($requestQ);
@@ -220,7 +222,7 @@ switch($action) {
 	case "delfield":
 		// Action DELETE Fields table (structure)
 		if ($action == 'delfield') {
-			$get_id  = intval($_GET['id']);
+			$get_id  = intval($_GET['id'] ?? 0);
 			$query_2 = "DELETE FROM $table_structure WHERE id = '$get_id'";
 			$request = $sbsql->query($query_2);
 			
@@ -240,7 +242,7 @@ switch($action) {
 		$btn_add_edit    = (isset($_GET['id']) && $_GET['id'] > 0 && $action != 'delfield') ? "Modifier" : "Ajouter";
 		$legend_add_edit = "Ajouter / Modifier les colonnes du ".strtolower($text)." &laquo;&nbsp;<span style='color: red;'>%s</span>&nbsp;&raquo;";
 		// Contents table
-		$tid             = intval($_GET['tid']); // Table ID
+		$tid             = intval($_GET['tid'] ?? 0); // Table ID
 		$query_table     = "SELECT * FROM $table WHERE id = '$tid'";
 		$request_table   = $sbsql->query($query_table);
 		$result_table    = $sbsql->object($request_table);
@@ -250,11 +252,11 @@ switch($action) {
 		if (isset($_POST['form_submit'])) {
 
 			// Injection des données
-			$id           = intval($_POST['id']);
-			$title        = $sbsanitize->displayText($_POST['title'], 'UTF-8', 1, 0);
-			$field_type   = $sbsanitize->displayText($_POST['field_type'], 'UTF-8', 1, 0);
-			$field_target = $sbsanitize->displayText($_POST['field_target'], 'UTF-8', 1, 0);
-			$active       = $sbsanitize->displayText($_POST['active'], 'UTF-8', 1, 0);
+			$id           = intval($_POST['id'] ?? 0);
+			$title        = $sbsanitize->displayText($_POST['title'] ?? '', 'UTF-8', 1, 0);
+			$field_type   = $sbsanitize->displayText($_POST['field_type'] ?? '', 'UTF-8', 1, 0);
+			$field_target = $sbsanitize->displayText($_POST['field_target'] ?? '', 'UTF-8', 1, 0);
+			$active       = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 
 			// ADD or EDIT
 			if ($formType == 'editfield' && !$id) {
@@ -321,7 +323,7 @@ switch($action) {
 		
 		// --------------------------------		
 		// --- Define variables
-		$formAction = $module_url . "&a=" . $formType . "&tid=" . intval($_GET['tid']);
+		$formAction = $module_url . "&a=" . $formType . "&tid=" . intval($_GET['tid'] ?? 0);
 		// --- Form construct
 		$sbform->openForm(array('action' => "$formAction", 'name' => "$formName", 'id' => "$formName", 'reloadpage' => "$formAction", 'submitpage' => "$formAction"));
 		// --- Add inputs and more
@@ -361,7 +363,7 @@ switch($action) {
 		// --- Hiddens / Buttons
 		// --------------------------------	
 		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => "$formName"));
-		$sbform->addInput('hidden', '', array('name' => 'tid', 'value' => $_GET['tid']));
+		$sbform->addInput('hidden', '', array('name' => 'tid', 'value' => ($_GET['tid'] ?? '')));
 		if ($formType == 'editfield' && $id > 0 && $action != 'delfield') $sbform->addInput('hidden', '', array('name' => 'id', 'value' => "$id"));
 		$sbform->addInput('submit', '', array('value' => "$btn_add_edit"));
 		$sbform->addInput('reset', '', array('value' => "Reset"));
@@ -378,7 +380,7 @@ switch($action) {
 		$sb_table_header = ['Tri', 'Titre', 'Type', 'Target', 'Actions'];
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		// --------------------------------
-		$query_structure   = "SELECT * FROM $table_structure WHERE tid = '" . intval($_GET['tid']) . "' ORDER BY sort ASC";
+		$query_structure   = "SELECT * FROM $table_structure WHERE tid = '" . intval($_GET['tid'] ?? 0) . "' ORDER BY sort ASC";
 		$request_structure = $sbsql->query($query_structure);
 		$result_structure  = $sbsql->toarray($request_structure);
 		
@@ -394,7 +396,7 @@ switch($action) {
 	case "deldatas":
 		// Action DELETE Fields table (structure)
 		if ($action == 'deldatas') {
-			$get_id  = intval($_GET['id']);
+			$get_id  = intval($_GET['id'] ?? 0);
 			$query_2 = "DELETE FROM $table_datas WHERE id = '$get_id'";
 			$request = $sbsql->query($query_2);
 			
@@ -414,7 +416,7 @@ switch($action) {
 		$btn_add_edit    = (isset($_GET['id']) && $_GET['id'] > 0 && $action != 'deldatas') ? "Modifier" : "Ajouter";
 		$legend_add_edit = "Ajouter / Modifier les données du $text (<span style='color: red;'>%s</span>)";
 		// Contents table
-		$tid             = intval($_GET['tid']); // Table ID
+		$tid             = intval($_GET['tid'] ?? 0); // Table ID
 		$query_table     = "SELECT * FROM $table WHERE id = '$tid'";
 		$request_table   = $sbsql->query($query_table);
 		$result_table    = $sbsql->object($request_table);
@@ -516,20 +518,20 @@ switch($action) {
 		
 		// --------------------------------		
 		// --- Define variables
-		$formAction = $module_url . "&a=" . $formType . "&tid=" . intval($_GET['tid']);
+		$formAction = $module_url . "&a=" . $formType . "&tid=" . intval($_GET['tid'] ?? 0);
 		// --- Form construct
 		$sbform->openForm(array('action' => "$formAction", 'name' => "$formName", 'id' => "$formName", 'reloadpage' => "$formAction", 'submitpage' => "$formAction"));
 		// --- Add inputs and more
-		$query_structure   = "SELECT * FROM $table_structure WHERE tid = '".intval($_GET['tid'])."' ORDER BY sort ASC";
+		$query_structure   = "SELECT * FROM $table_structure WHERE tid = '".intval($_GET['tid'] ?? 0)."' ORDER BY sort ASC";
 		$request_structure = $sbsql->query($query_structure);
 		$result_structure  = $sbsql->toarray($request_structure);
 
-		if (!$_POST['form_submit'] && $_GET['id']) $structure_datas = sbTableEditdatas($result_structure, intval($_GET['id']));
+		if (empty($_POST['form_submit']) && !empty($_GET['id'])) $structure_datas = sbTableEditdatas($result_structure, intval($_GET['id'] ?? 0));
 		
 		foreach($result_structure as $key => $val) {
 			$title   = $sbsanitize->displayLang($val['title']);
 			$input   = $sbsanitize->rewriteString($sbsanitize->displayLang($val['title']), true);
-			$value   = (!$_POST['form_submit'] && $_GET['id']) ? $structure_datas[$input] : "";
+			$value   = (empty($_POST['form_submit']) && !empty($_GET['id'])) ? $structure_datas[$input] : "";
 			$active  = ($val['active']) ? "" : "<strong style='color: red;'>Ce champs ne sera pas affiché sur votre site car il est désactivé !</strong>";
 			$style   = ($val['active']) ? "" : "background-color: yellow;";
 			// Switch to form type
@@ -567,7 +569,7 @@ switch($action) {
 		// --- Hiddens / Buttons
 		// --------------------------------	
 		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => "$formName"));
-		$sbform->addInput('hidden', '', array('name' => 'tid', 'value' => $_GET['tid']));
+		$sbform->addInput('hidden', '', array('name' => 'tid', 'value' => ($_GET['tid'] ?? '')));
 		if ($formType == 'editdatas' && $id > 0 && $action != 'deldatas') $sbform->addInput('hidden', '', array('name' => 'id', 'value' => "$id"));
 		$sbform->addInput('submit', '', array('value' => "$btn_add_edit"));
 		$sbform->addInput('reset', '', array('value' => "Reset"));
@@ -590,7 +592,7 @@ switch($action) {
 		// --------------------------------
 		// --- SQL Request (DATAS)
 		// --------------------------------
-		$query_datas   = "SELECT * FROM $table_datas WHERE tid = '" . intval($_GET['tid']) . "' ORDER BY sort ASC";
+		$query_datas   = "SELECT * FROM $table_datas WHERE tid = '" . intval($_GET['tid'] ?? 0) . "' ORDER BY sort ASC";
 		$request_datas = $sbsql->query($query_datas);
 		$result_datas  = $sbsql->toarray($request_datas);
 		// --------------------------------
@@ -598,7 +600,7 @@ switch($action) {
 		// --------------------------------
 		// --- SQL Request
 		//$query_structure   = "SELECT * FROM $table_structure WHERE tid = '$tid' AND active = 1 ORDER BY sort ASC";
-		$query_structure   = "SELECT * FROM $table_structure WHERE tid = '" . intval($_GET['tid']) . "' ORDER BY sort ASC";
+		$query_structure   = "SELECT * FROM $table_structure WHERE tid = '" . intval($_GET['tid'] ?? 0) . "' ORDER BY sort ASC";
 		$request_structure = $sbsql->query($query_structure);
 		$result_structure  = $sbsql->toarray($request_structure);
 		$sbsmarty->assign('structure', $result_structure);
@@ -616,7 +618,7 @@ switch($action) {
 		// --------------------------------
 		// Initialize Form SORT
 		// --------------------------------
-		$tid             = intval($_GET['tid']);
+		$tid             = intval($_GET['tid'] ?? 0);
 		$query_1         = "SELECT name FROM $table WHERE id = '$tid'";
 		$request_tblname = $sbsql->query($query_1);
 		$table_infos     = $sbsql->object($request_tblname);
@@ -625,13 +627,13 @@ switch($action) {
 		$btn_add_edit    = "Valider le tri des colonnes";
 		$legend_add_edit = sprintf("Trier les colonnes du tableau &laquo; <span style='color: red;'>%s</span> &raquo;", $table_infos->name);
 		// --------------------------------
-		if ($_POST['drag']) {
+		if (!empty($_POST['drag'])) {
 			// --------------------------------
 			// --- Control form submit --------
 			// --------------------------------
 			// --- (array) : count() sur une valeur non-tableau (drag=foo) leve une
 			// --- TypeError fatale sous PHP 8.
-			$sb_toSort = (array)$_POST['drag'];
+			$sb_toSort = (array)($_POST['drag'] ?? []);
 			
 			// reorganizes the order of elements
 			$sql_error = 0;
@@ -693,7 +695,7 @@ switch($action) {
 		// --------------------------------
 		// Initialize Form SORT
 		// --------------------------------
-		$tid             = intval($_GET['tid']);
+		$tid             = intval($_GET['tid'] ?? 0);
 		$query_1         = "SELECT name FROM $table WHERE id = '$tid'";
 		$request_tblname = $sbsql->query($query_1);
 		$table_infos     = $sbsql->object($request_tblname);
@@ -702,13 +704,13 @@ switch($action) {
 		$btn_add_edit    = "Valider le tri des données";
 		$legend_add_edit = sprintf("Trier les données du tableau &laquo; <span style='color: red;'>%s</span> &raquo;", $table_infos->name);
 		// --------------------------------
-		if ($_POST['drag']) {
+		if (!empty($_POST['drag'])) {
 			// --------------------------------
 			// --- Control form submit --------
 			// --------------------------------
 			// --- (array) : count() sur une valeur non-tableau (drag=foo) leve une
 			// --- TypeError fatale sous PHP 8.
-			$sb_toSort = (array)$_POST['drag'];
+			$sb_toSort = (array)($_POST['drag'] ?? []);
 			
 			// reorganizes the order of elements
 			$sql_error = 0;
@@ -797,6 +799,7 @@ function sbTableEditdatas($structure, $id) {
 		$columns[] = $sbsanitize->rewriteString($sbsanitize->displayLang($col['title']), true);
 	}
 	
+	$data_arr = [];
 	for($i = 0; $i < count($columns); $i++) {
 		// Get the right value if column is unknown 
 		$data_arr[$i] = ' ';
