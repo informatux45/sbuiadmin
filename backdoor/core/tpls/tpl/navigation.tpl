@@ -53,9 +53,9 @@
 
 				{if $sbuiadmin_user_type == 'admin'}
 				<div class="dd-wrap">
-					<button class="icon-btn" data-dropdown aria-label="Mises à jour" data-tip="Mises à jour"{if $sbuiadmin_upgrade_core} style="color:var(--warning)"{/if}>
+					<button class="icon-btn" data-dropdown aria-label="Mises à jour" data-tip="Mises à jour"{if $sbuiadmin_upgrade_count} style="color:var(--warning)"{/if}>
 						<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
-						{if $sbuiadmin_upgrade_core}<span class="count warning">!</span>{/if}
+						{if $sbuiadmin_upgrade_count}<span class="count warning">{$sbuiadmin_upgrade_count}</span>{/if}
 					</button>
 					<div class="dd-menu" role="menu">
 						<div class="dd-head"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg> Mises à jour</div>
@@ -66,6 +66,14 @@
 									<div class="dd-time">Version actuelle {$smarty.const._AM_START_VERSION}</div>
 								</div>
 							</a>
+							{foreach $sbuiadmin_upgrade_modules as $sb_um}
+							<a class="dd-item" href="index.php?p=update#sbmod">
+								<div class="dd-body">
+									<div class="dd-text"><strong>Module {$sb_um.title|escape} {$sb_um.to|escape}</strong></div>
+									<div class="dd-time">Version actuelle {$sb_um.from|escape}</div>
+								</div>
+							</a>
+							{/foreach}
 						</div>
 					</div>
 				</div>

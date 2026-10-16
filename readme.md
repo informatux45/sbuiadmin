@@ -69,6 +69,10 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
+**4.30**
+- Fixed: updating from 4.28 or earlier stopped on the 4.29 database migration (it was rolled back automatically)
+- Update page: version and status side by side, green when up to date; the update icon now counts core and module updates
+
 **4.29**
 - Modules (news, contact, faq, gallery, download, slider, tabbs, table, shop) are now separate from the core, each with its own version
 - New "Modules" card in Configuration > Update: download, install, uninstall, delete files

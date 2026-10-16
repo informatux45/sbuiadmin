@@ -43,7 +43,10 @@ if ($sb_is_ajax) {
 	try {
 		if ($sb_action === 'autocheck') {
 			// Tableau de bord : au plus une vérification par 24 h
+			$sb_due = sbUpdCheckDue();
 			$st = sbUpdCheck(false);
+			// Même rythme pour les modules (compteur de l'icône Mises à jour)
+			if ($sb_due) sbModCatalogRefresh();
 			echo json_encode(array('available' => sbUpdIsAvailable($st), 'version' => $st['latest']['version'] ?? '', 'current' => $st['current']));
 			exit;
 		}

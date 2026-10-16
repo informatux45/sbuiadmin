@@ -20,7 +20,7 @@
 				{/if}
 
 				{* --- Versions --- *}
-				<section class="col-12 card">
+				<section class="col-6 card">
 					<div class="card-head">
 						<div class="card-title-wrap">
 							<h2 class="card-title">Version de SBUIADMIN</h2>
@@ -42,10 +42,10 @@
 
 				{if $sb_upd_available}
 				{* --- Mise à jour disponible --- *}
-				<section class="col-12 card" id="sbupd-card">
+				<section class="col-6 card" id="sbupd-card" style="background:var(--warning-soft);border:1px solid var(--warning)">
 					<div class="card-head">
 						<div class="card-title-wrap">
-							<h2 class="card-title">SBUIADMIN {$sb_upd_state.latest.version|escape} est disponible</h2>
+							<h2 class="card-title" style="color:var(--warning);display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" style="flex:none"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>SBUIADMIN {$sb_upd_state.latest.version|escape} est disponible</h2>
 						</div>
 					</div>
 					<div class="card-body">
@@ -82,8 +82,13 @@
 					</div>
 				</section>
 				{else}
-				<section class="col-12 card">
-					<div class="card-body"><p><strong>SBUIADMIN est à jour.</strong></p></div>
+				<section class="col-6 card" style="background:var(--success-soft);border:1px solid var(--success)">
+					<div class="card-head">
+						<div class="card-title-wrap">
+							<h2 class="card-title" style="color:var(--success);display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" style="flex:none"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>SBUIADMIN est à jour</h2>
+						</div>
+					</div>
+					<div class="card-body"><p>Aucune version plus récente que la {$sb_upd_state.current|escape} n'est publiée.<br>Les modules se mettent à jour séparément, dans la carte « Modules ».</p></div>
 				</section>
 				{/if}
 
@@ -97,7 +102,7 @@
 						<button type="button" class="btn btn--outline-primary btn--sm" data-mod-action="check"{if !$sb_upd_ready} disabled{/if}>Vérifier les modules</button>
 					</div>
 					<div class="card-body">
-						<p style="color:var(--t-muted)">Chaque module a sa version et se met à jour indépendamment du core. Dernière vérification : {$sb_mod_checked}{if $sb_mod_cache.core_version} (version publiée {$sb_mod_cache.core_version|escape}){/if}.
+						<p style="color:var(--t-muted)">Chaque module a sa version et se met à jour indépendamment du core.<br>Dernière vérification : {$sb_mod_checked}{if $sb_mod_cache.core_version} (version publiée {$sb_mod_cache.core_version|escape}){/if}.
 						{if $sb_mod_cache.error}<br><span style="color:var(--danger)">Dernière vérification en échec : {$sb_mod_cache.error|escape}</span>{/if}</p>
 						<table class="table">
 							<thead><tr><th style="width:52px"></th><th>Module</th><th>Description</th><th>Version</th><th>Publiée</th><th>État</th><th>Actions</th></tr></thead>
@@ -205,7 +210,7 @@
 							<button type="button" class="btn btn--outline-primary" style="margin-top:10px" data-upd-action="rollback" data-backup="{$sb_upd_rollback.name|escape}" data-version="{$sb_upd_rollback.from|escape}" data-needs-dump="{if $sb_upd_rollback.needs_dump}1{else}0{/if}">Revenir à la version {$sb_upd_rollback.from|escape}</button>
 							<p style="color:var(--t-muted);margin-top:10px">Un seul cran : seule la dernière mise à jour peut être annulée. Fichiers remplacés ou retirés remis, fichiers ajoutés supprimés.</p>
 						{else}
-							<p style="color:var(--t-muted)">Aucune mise à jour à annuler. Seule la dernière mise à jour faite depuis cette page peut être annulée, une seule fois.</p>
+							<p style="color:var(--t-muted)">Aucune mise à jour à annuler.<br>Seule la dernière mise à jour faite depuis cette page peut être annulée, une seule fois.</p>
 						{/if}
 					</div>
 				</section>
@@ -229,7 +234,7 @@
 								<p style="color:var(--warning)">Auto-test impossible : vérifiez que ce dossier n'est pas accessible par le web.</p>
 							{/if}
 						{/if}
-						<p style="color:var(--t-muted)">Sauvegardes chiffrées (libsodium, clé de sbdbconfig.php), droits 600, une seule gardée. Mot de passe redemandé avant toute mise à jour ou retour arrière ; chaque opération est notée dans le journal des connexions. Ces sauvegardes servent à annuler une mise à jour, pas à remplacer les sauvegardes externes du serveur.</p>
+						<p style="color:var(--t-muted)">Sauvegardes chiffrées (libsodium, clé de sbdbconfig.php), droits 600, une seule gardée.<br>Mot de passe redemandé avant toute mise à jour ou retour arrière ; chaque opération est notée dans le journal des connexions.<br>Ces sauvegardes servent à annuler une mise à jour, pas à remplacer les sauvegardes externes du serveur.</p>
 					</div>
 				</section>
 

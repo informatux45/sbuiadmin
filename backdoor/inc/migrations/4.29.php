@@ -7,9 +7,15 @@
  * présents au passage de la migration sont inscrits : le site reste
  * identique. Retour : la table supprimée, tout module présent redevient
  * chargé, comme en 4.28.
+ *
+ * Depuis l'admin, une migration est exécutée par le code de la version
+ * PRÉCÉDENTE (déjà en mémoire) : le registre des modules, nouveau en 4.29,
+ * n'y est pas chargé. Il l'est ici, depuis le disque (copié avant les
+ * migrations).
  */
 
 defined('SBUIADMIN_PATH') or die('Are you crazy!');
+require_once SBUIADMIN_PATH . '/inc/sbuiadmin-modules.php';
 
 return array(
 	'description' => 'registre des modules installés',

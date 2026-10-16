@@ -114,7 +114,19 @@ $sbsmarty->assign('bridge_css_version', @filemtime(SBUIADMIN_PATH . '/assets/adm
 $sb_update_latest = json_decode(sbSetting('update_latest'), true);
 $sbsmarty->assign('sbuiadmin_upgrade_core', (is_array($sb_update_latest) && version_compare((string) ($sb_update_latest['version'] ?? '0'), _AM_START_VERSION, '>')) ? $sb_update_latest['version'] : false);
 $sbsmarty->assign('sb_update_check_due', (time() - (int) sbSetting('update_last_check', '0')) >= 86400);
-unset($sb_update_latest);
+// Modules ayant une version plus récente (dernier catalogue enregistré, voir
+// inc/sbuiadmin-update-modules.php) : compteur de l'icône Mises à jour
+$sb_update_modules = array();
+$sb_update_catalog = json_decode(sbSetting('modules_catalog'), true);
+foreach ((array) ($sb_update_catalog['modules'] ?? array()) as $sb_um_name => $sb_um) {
+	$sb_um_local = sbModuleMeta($sb_um_name);
+	if ($sb_um_local && is_array($sb_um) && version_compare((string) ($sb_um['version'] ?? '0'), $sb_um_local['version'], '>')) {
+		$sb_update_modules[] = array('title' => $sb_um_local['title'], 'from' => $sb_um_local['version'], 'to' => (string) $sb_um['version']);
+	}
+}
+$sbsmarty->assign('sbuiadmin_upgrade_modules', $sb_update_modules);
+$sbsmarty->assign('sbuiadmin_upgrade_count', count($sb_update_modules) + ((is_array($sb_update_latest) && version_compare((string) ($sb_update_latest['version'] ?? '0'), _AM_START_VERSION, '>')) ? 1 : 0));
+unset($sb_update_latest, $sb_update_modules, $sb_update_catalog, $sb_um_name, $sb_um, $sb_um_local);
 // ------------------
 
 // ------------------
