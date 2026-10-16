@@ -1,37 +1,92 @@
-# [SBUIADMIN](https://github.com/informatux45/sbuiadmin/)
-- CMS SBootstrap Admin Responsive
-- Contributors: [informatux45](https://github.com/informatux45)
-- Stable version: 4.13
-- License: [GPLv3](http://www.gnu.org/licenses/gpl-3.0.html "GNU General Public License v3")
+<p align="center">
+  <a href="https://github.com/informatux45/sbuiadmin/">
+    <img src="backdoor/img/sbuiadmin-logo-big.png" alt="SBUIADMIN" width="140">
+  </a>
+</p>
+
+<h1 align="center">SBUIADMIN</h1>
+
+<p align="center">
+  <strong>A lightweight, secure and modular PHP CMS</strong><br>
+  Bootstrap front themes · Adminator administration · signed updates
+</p>
+
+<p align="center">
+  <a href="https://github.com/informatux45/sbuiadmin/releases/latest"><img src="https://img.shields.io/github/v/release/informatux45/sbuiadmin?display_name=tag&logo=github&style=flat-square&label=stable" alt="Stable version"></a>
+  <a href="https://github.com/informatux45/sbuiadmin/commits/master"><img src="https://img.shields.io/github/last-commit/informatux45/sbuiadmin?style=flat-square" alt="Last commit"></a>
+  <br>
+  <img src="https://img.shields.io/badge/PHP-8.4%20%7C%208.5-777BB4?logo=php&logoColor=white&style=flat-square" alt="PHP 8.4 | 8.5">
+  <img src="https://img.shields.io/badge/MySQL-5.7%2B-4479A1?logo=mysql&logoColor=white&style=flat-square" alt="MySQL 5.7+">
+  <img src="https://img.shields.io/badge/MariaDB-10.3%2B-003545?logo=mariadb&logoColor=white&style=flat-square" alt="MariaDB 10.3+">
+  <img src="https://img.shields.io/badge/releases-signed%20Ed25519-2ea44f?logo=letsencrypt&logoColor=white&style=flat-square" alt="Signed releases (Ed25519)">
+  <a href="http://www.gnu.org/licenses/gpl-3.0.html"><img src="https://img.shields.io/badge/license-GPLv3-blue?style=flat-square" alt="License GPLv3"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/informatux45/sbuiadmin/releases/latest"><strong>Download</strong></a> ·
+  <a href="#-installation"><strong>Installation</strong></a> ·
+  <a href="#-features"><strong>Features</strong></a> ·
+  <a href="#-changelog"><strong>Changelog</strong></a>
+</p>
+
+> [!NOTE]
+> Install SBUIADMIN with the single file `sbuiadmin_netinstall.php` from the [latest release](https://github.com/informatux45/sbuiadmin/releases/latest): it downloads the release, checks its signature and every file, then starts the installation wizard. Once installed, the core and each module are updated from the administration (**System › Updates**).
 
 ---
 
-### Specifications
+## ✨ Features
 
-Ready | Features
---- | ---
-*✓* | PHP 8.4+ (PHP 8.5 ready) / MySQL 5.7+ / MariaDB 10.3+
-*✓* | HTML 5 / CSS 3
-*✓* | Bootstrap (front themes), Adminator administration theme (dark mode)
-*✓* | Online installer (installation key, server requirements check), signed net install and admin updates with rollback
-*✓* | Responsive design (front / administration)
-*✓* | 5 themes included
-*✓* | User management (per-module rights), two-factor authentication by email
-*✓* | ALTCHA anti-bot (self-hosted, no Google), temporary lockout after failed logins
-*✓* | Settings stored in database, secrets encrypted, database credentials outside the web root
-*✓* | Rewrite URLs
-*✓* | Multilanguage
-*✓* | Modules (Articles, Pages, Slider, Contact forms, Tables, Tabs, FAQ, Downloads, Galleries, Search)
-*✓* | Content blocks, Page Builder
-*✓* | Additional HTML content (Smarty ready)
-*✓* | Renamable and standalone administration directory
-*✓* | Developers (Smarty templates, Sandbox, Kint debug, Modules, ...)
-*✓* | Linux / Apache servers (recommended)
+<details>
+  <summary>🧩 <strong>Modular</strong> — install, update, uninstall each module on its own</summary>
 
+> Articles, Pages, Slider, Contact forms, Tables, Tabs, FAQ, Downloads, Galleries, Search, and a Shop back office. Each module has its own version, can be installed from GitHub, updated, uninstalled (data kept or removed) and rolled back, independently of the core.
+</details>
+
+<details>
+  <summary>🔐 <strong>Secure by design</strong> — 2FA, ALTCHA, encrypted secrets</summary>
+
+> Two-factor authentication by email, ALTCHA anti-bot (self-hosted, no Google), temporary lockout after failed logins, per-module user rights, CSRF protection, settings stored in database with encrypted secrets, database credentials outside the web root, renamable administration directory.
+</details>
+
+<details>
+  <summary>🔄 <strong>Signed updates</strong> — net install and one-click updates with rollback</summary>
+
+> Every release is signed (Ed25519) and every file is checked (SHA-256) before anything is written. Core and modules update from the administration, with a database backup and a rollback; a database left behind its files is detected and upgraded on demand.
+</details>
+
+<details>
+  <summary>🎨 <strong>Themes</strong> — 5 responsive front themes, Adminator administration</summary>
+
+> HTML 5 / CSS 3, Bootstrap front themes, Adminator administration theme with dark mode, responsive design on both sides.
+</details>
+
+<details>
+  <summary>🧱 <strong>Content</strong> — Page Builder, content blocks, shortcodes</summary>
+
+> Page Builder (drag and drop blocks: text, image, gallery, accordion, tabs, quote, icon…), content blocks, shortcodes, additional HTML content (Smarty ready), rewrite URLs.
+</details>
+
+<details>
+  <summary>🌐 <strong>Multilanguage</strong></summary>
+
+> Content and interface in several languages.
+</details>
+
+<details>
+  <summary>🛠️ <strong>For developers</strong> — Smarty, sandbox, PHP 9 ready</summary>
+
+> Smarty templates, sandbox page, Kint debug, module registry (`module.php`), PHP audit log for PHP upgrades. Code kept free of PHP 8.x deprecations, ready for PHP 9.
+</details>
+
+<details>
+  <summary>⚙️ <strong>Requirements</strong></summary>
+
+> PHP 8.4+ (PHP 8.5 ready) · MySQL 5.7+ / MariaDB 10.3+ · Linux / Apache servers (recommended).
+</details>
 
 ---
 
-### Installation
+## 🚀 Installation
 
 **Net install (recommended)**
 1. Upload `sbuiadmin_netinstall.php` **alone** to the (empty) folder of your future site, then open it in your browser.
@@ -53,21 +108,7 @@ Installing in a sub-folder: see `help.txt`.
 
 ---
 
-### Screenshots
-
-![A theme (front)](https://informatux.ddns.net:744/home/tools/demo_github/sbuiadmin-theme-2.jpg "A theme (front)")
-
-![A theme (front)](https://informatux.ddns.net:744/home/tools/demo_github/sbuiadmin-theme-1.jpg "A theme (front)")
-
-![Administration login](https://informatux.ddns.net:744/home/tools/demo_github/sbuiadmin-login-1.jpg "Administration login")
-
-![Administration](https://informatux.ddns.net:744/home/tools/demo_github/sbuiadmin-admin-2.jpg "Administration")
-
-[More screenshots...](https://informatux.ddns.net:744/home/tools/demo_img/ "SBUIADMIN Screenshots")
-
----
-
-### Changelog
+## 📝 Changelog
 
 **4.37**
 - PHP 8 / PHP 9 readiness: fatal errors and deprecations fixed (sanitize, forms, CSV, media, thumbnails, search), wrong docblocks corrected; Shop and Tabs modules 1.0.1
@@ -77,6 +118,9 @@ Installing in a sub-folder: see `help.txt`.
 
 **4.35**
 - Update page: Reload button fixed, clearer module messages (module name, plurals), better spacing in the Modules table
+
+<details>
+  <summary><strong>Older versions</strong></summary>
 
 **4.34**
 - Modules: Cancel button to undo the last operation (update, uninstall, removal, install); backups limited to the module tables
@@ -229,5 +273,20 @@ Installing in a sub-folder: see `help.txt`.
 **1.00**
 - First version.
 
+</details>
 
+---
 
+## 🤝 Contributing & support
+
+- Found a bug or have an idea? Open an [issue](https://github.com/informatux45/sbuiadmin/issues).
+- Pull requests are welcome: please keep the code free of PHP 8.x deprecations (PHP 9 ready) and describe how you tested it.
+
+> [!IMPORTANT]
+> Please do not report security vulnerabilities in public issues: contact the maintainer privately through [GitHub](https://github.com/informatux45) first.
+
+---
+
+<p align="center">
+  Made by <a href="https://github.com/informatux45">informatux45</a> · <a href="http://www.gnu.org/licenses/gpl-3.0.html">GPLv3</a>
+</p>
