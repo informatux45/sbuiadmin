@@ -15,7 +15,7 @@ return array(
 	'title'         => 'Boutique',
 	'icon'          => 'shopping-cart', // Font Awesome (menu, carte Modules)
 	'description'   => "Boutique en ligne : produits, catégories, commandes, paiements, transport, remises et export comptable.",
-	'version'       => '1.0.0',
+	'version'       => '1.0.1',
 	'requires_core' => '4.29',
 	'author'        => 'INFORMATUX',
 	'routes'        => array('shop', 'account'),

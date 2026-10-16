@@ -638,7 +638,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_modules` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `<DB_PREFIX>sb_modules` (`name`, `version`, `db_version`, `installed_at`) VALUES
-('boutique', '1.0.0', '1.0.0', NOW()),
+('boutique', '1.0.1', '1.0.1', NOW()),
 ('contact', '1.0.0', '1.0.0', NOW()),
 ('download', '1.0.0', '1.0.0', NOW()),
 ('faq', '1.0.0', '1.0.0', NOW()),
