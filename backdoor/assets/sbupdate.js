@@ -26,6 +26,44 @@
 			.then(function (j) { if (j && j.error) throw new Error(j.error); return j; });
 	}
 
+	// Progression et erreurs affichées là où l'action a lieu : carte de la
+	// mise à jour, carte du retour arrière, ou ligne du module concerné
+	function place(container, atTop) {
+		if (!container) return;
+		['sbupd-progress', 'sbupd-error'].forEach(function (id) {
+			var el = $(id);
+			if (!el) return;
+			el.className = '';
+			el.style.marginTop = '12px';
+			if (atTop) container.insertBefore(el, container.firstChild); else container.appendChild(el);
+		});
+	}
+	function placeFor(btn, atTop) {
+		var section = btn.closest('section');
+		place(section ? (section.querySelector('.card-body') || section) : null, atTop);
+	}
+	// Ligne glissée sous le module : panneau, progression, erreurs
+	function modSlot(btn) {
+		var tr = btn.closest('tr');
+		var slot = $('sbmod-slot');
+		if (!slot) {
+			slot = document.createElement('tr');
+			slot.id = 'sbmod-slot';
+			var td = document.createElement('td');
+			td.colSpan = 7;
+			td.style.background = 'var(--bg-muted)';
+			slot.appendChild(td);
+		}
+		tr.parentNode.insertBefore(slot, tr.nextSibling);
+		slot.style.display = '';
+		var td0 = slot.firstChild;
+		var panel = $('sbmod-panel');
+		panel.style.marginTop = '0';
+		td0.appendChild(panel);
+		place(td0, false);
+		return td0;
+	}
+
 	function error(msg) {
 		$('sbupd-error-text').textContent = msg;
 		show('sbupd-error', true);
@@ -178,14 +216,16 @@
 		var action = btn.getAttribute('data-mod-action');
 		show('sbupd-error', false);
 		if (action === 'check') {
+			placeFor(btn, true);
 			setButtons(true);
 			busy = true;
 			post('modcheck').then(function () { location.reload(); }).catch(function (e) { error(e.message); });
 		} else if (action === 'plan') {
 			var op = btn.getAttribute('data-op');
+			show('sbmod-panel', false);
+			modSlot(btn);
 			setButtons(true);
 			busy = true;
-			show('sbmod-panel', false);
 			progress(0, 1, (op === 'update' || op === 'install') ? 'Vérification du module…' : 'Préparation…');
 			post('modplan', { module: btn.getAttribute('data-mod'), op: op }).then(function (p) {
 				busy = false;
@@ -195,6 +235,8 @@
 			}).catch(function (e) { show('sbupd-progress', false); error(e.message); });
 		} else if (action === 'close') {
 			show('sbmod-panel', false);
+			show('sbupd-progress', false);
+			if ($('sbmod-slot')) $('sbmod-slot').style.display = 'none';
 			modCurrent = null;
 		} else if (action === 'run' && modCurrent) {
 			var need = modCurrent.op !== 'uninstall' && (modCurrent.unchecked || (modCurrent.modified && modCurrent.modified.length));
@@ -221,6 +263,7 @@
 		if (!btn || busy) return;
 		var action = btn.getAttribute('data-upd-action');
 		show('sbupd-error', false);
+		placeFor(btn, false);
 
 		if (action === 'check') {
 			setButtons(true);

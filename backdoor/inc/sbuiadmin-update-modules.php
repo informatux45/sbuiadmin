@@ -448,14 +448,39 @@ function sbModFilePlan(array $new, $old) {
 	return array('write' => $write, 'delete' => $delete, 'modified' => array_values(array_unique($modified)));
 }
 
-/** Plan de suppression des fichiers d'un module non installé */
+/**
+ * Liste officielle des fichiers d'un module : celle livrée par cette page,
+ * sinon celle de l'index publié si la version installée est la publiée
+ * (module arrivé avec le core), alors gardée ; null si introuvable.
+ */
+function sbModOfficialList($name) {
+	$old = sbModStoredList($name);
+	if ($old !== null) return $old;
+	$local = sbModuleMeta($name);
+	if (!$local) return null;
+	try {
+		list(, , $idx) = sbModFetchLatest(15);
+	} catch (Throwable $e) {
+		return null;
+	}
+	if (!isset($idx[$name]) || $idx[$name]['version'] !== $local['version']) return null;
+	sbModStoreList($name, $local['version'], $idx[$name]['files']);
+	return $idx[$name]['files'];
+}
+
+/**
+ * Fichiers d'un module présent et ceux modifiés sur le site (comparés à la
+ * liste officielle) ; sans liste : non vérifiables, aucun déclaré modifié
+ */
 function sbModDeletePlan($name) {
 	$root = sbUpdSiteRoot() . '/';
-	$old = sbModStoredList($name);
+	$old = sbModOfficialList($name);
 	$files = sbModLocalFiles($name);
 	$modified = array();
-	foreach ($files as $rel) {
-		if ($old === null || !isset($old[$rel]) || $old[$rel] !== sbUpdHashFile($root . sbUpdTargetRel($rel))) $modified[] = $rel;
+	if ($old !== null) {
+		foreach ($files as $rel) {
+			if (!isset($old[$rel]) || $old[$rel] !== sbUpdHashFile($root . sbUpdTargetRel($rel))) $modified[] = $rel;
+		}
 	}
 	return array('files' => $files, 'modified' => $modified, 'unchecked' => $old === null);
 }
@@ -509,7 +534,7 @@ function sbModPlan($name, $op) {
 	$plan = array('name' => $name, 'op' => $op, 'title' => $row['title'], 'modified' => array(), 'unchecked' => false, 'notes' => array());
 	if ($op === 'update' || ($op === 'install' && !$row['present'])) {
 		$dl = sbModDownload($name);
-		$old = sbModStoredList($name);
+		$old = $row['present'] ? sbModOfficialList($name) : sbModStoredList($name);
 		$fp = sbModFilePlan($dl['entry']['files'], $old);
 		$plan['version'] = $dl['entry']['version'];
 		$plan['write'] = count($fp['write']);

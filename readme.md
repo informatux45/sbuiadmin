@@ -69,6 +69,10 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
+**4.32**
+- Update page: progress and errors now show where the action happens (update card, module row)
+- Stray system files removed (.DS_Store, Thumbs.db, .orig); module files no longer reported as modified when they are not
+
 **4.31**
 - Modules card simplified: Install (downloads the module if needed), Update, Uninstall
 - Uninstall can now remove the whole module (data, tables, files), listing what will be lost before confirming

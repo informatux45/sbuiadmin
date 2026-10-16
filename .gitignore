@@ -55,3 +55,11 @@ backdoor/inc/admin/php-audit.log
 
 # Verrou de mise a jour (backdoor/inc/sbuiadmin-update.php)
 .sbuiadmin-update.lock
+# Fichiers parasites (macOS, Windows, fusions)
+.DS_Store
+._*
+__MACOSX/
+Thumbs.db
+desktop.ini
+*.orig
+*.rej
