@@ -16,6 +16,8 @@
 	function $(id) { return document.getElementById(id); }
 	function show(id, on) { var el = $(id); if (el) el.style.display = on ? '' : 'none'; }
 	function nb(n, word, plural) { return '<strong>' + n + '</strong> ' + (n > 1 ? (plural || word + 's') : word); }
+	// Adresse qui change à chaque fois : un simple « #ancre » ne recharge pas la page
+	function reloadUrl(anchor) { return 'index.php?p=update&r=' + Date.now() + (anchor ? '#' + anchor : ''); }
 	function esc(s) { var d = document.createElement('div'); d.textContent = String(s); return d.innerHTML; }
 
 	function post(action, extra) {
@@ -52,7 +54,7 @@
 			slot.id = 'sbmod-slot';
 			var td = document.createElement('td');
 			td.colSpan = 7;
-			td.style.background = 'var(--bg-muted)';
+			td.style.padding = '4px 0 16px';
 			slot.appendChild(td);
 		}
 		tr.parentNode.insertBefore(slot, tr.nextSibling);
@@ -80,7 +82,7 @@
 		$('sbmod-panel-body').innerHTML = '<div class="alert ' + (ok ? 'success' : 'danger') + '"><span class="ico"><svg viewBox="0 0 24 24">'
 			+ (ok ? '<circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/>' : '<circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/>')
 			+ '</svg></span><div class="body">' + esc(text) + '</div></div><div style="margin-top:12px">'
-			+ (ok ? '<a class="btn btn--primary" href="index.php?p=update#sbmod">Recharger la page</a> ' : '')
+			+ (ok ? '<a class="btn btn--primary" href="' + reloadUrl('sbmod') + '">Recharger la page</a> ' : '')
 			+ '<button type="button" class="btn btn--ghost" data-mod-action="close">Fermer</button></div>';
 		modForm(false);
 		show('sbmod-panel', true);
@@ -132,7 +134,7 @@
 		show('sbupd-progress', true);
 		show('sbupd-busy', false);
 		show('sbupd-bar', false);
-		$('sbupd-step-text').innerHTML = '<div class="alert success" style="text-align:left"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg></span><div class="body">' + esc(text) + '</div></div><div style="margin-top:12px;text-align:left"><a class="btn btn--primary" href="index.php?p=update">Recharger la page</a></div>';
+		$('sbupd-step-text').innerHTML = '<div class="alert success" style="text-align:left"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg></span><div class="body">' + esc(text) + '</div></div><div style="margin-top:12px;text-align:left"><a class="btn btn--primary" href="' + reloadUrl('') + '">Recharger la page</a></div>';
 	}
 	// Bouton « Vérifier » : petit cercle pendant l'appel à GitHub
 	function btnBusy(btn, text) { btn.setAttribute('data-label', btn.innerHTML); btn.innerHTML = '<span class="sbbtn-spin"></span>' + esc(text); }

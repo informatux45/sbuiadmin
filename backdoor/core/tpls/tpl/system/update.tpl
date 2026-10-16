@@ -93,7 +93,7 @@
 				{/if}
 
 				{* --- Modules : mis à jour séparément du core --- *}
-				{literal}<style>.sbmod-busy{display:flex;flex-direction:column;align-items:center;gap:10px;padding:22px 12px;text-align:center}.sbmod-busy strong{font-size:15px;color:var(--primary)}.sbmod-busy small{color:var(--t-muted)}.sbbtn-spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sbmodspin .8s linear infinite;vertical-align:-2px;margin-right:6px}.sbmod-spin{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:sbmodspin .8s linear infinite}@keyframes sbmodspin{to{transform:rotate(360deg)}}.sbmod-ico{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--primary-soft);color:var(--primary);font-size:16px}</style>{/literal}
+				{literal}<style>.sbmod-table td:nth-child(3),.sbmod-table th:nth-child(3){padding-right:40px}.sbmod-table td:nth-child(4),.sbmod-table td:nth-child(5),.sbmod-table th:nth-child(4),.sbmod-table th:nth-child(5){white-space:nowrap;padding-right:24px}.sbmod-busy{display:flex;flex-direction:column;align-items:center;gap:10px;padding:22px 12px;text-align:center}.sbmod-busy strong{font-size:15px;color:var(--primary)}.sbmod-busy small{color:var(--t-muted)}.sbbtn-spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sbmodspin .8s linear infinite;vertical-align:-2px;margin-right:6px}.sbmod-spin{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:sbmodspin .8s linear infinite}@keyframes sbmodspin{to{transform:rotate(360deg)}}.sbmod-ico{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--primary-soft);color:var(--primary);font-size:16px}</style>{/literal}
 				<section class="col-12 card" id="sbmod">
 					<div class="card-head">
 						<div class="card-title-wrap">
@@ -104,7 +104,7 @@
 					<div class="card-body">
 						<p style="color:var(--t-muted)">Chaque module a sa version et se met à jour indépendamment du core.<br>Dernière vérification : {$sb_mod_checked}{if $sb_mod_cache.core_version} (version publiée {$sb_mod_cache.core_version|escape}){/if}.
 						{if $sb_mod_cache.error}<br><span style="color:var(--danger)">Dernière vérification en échec : {$sb_mod_cache.error|escape}</span>{/if}</p>
-						<table class="table">
+						<table class="table sbmod-table">
 							<thead><tr><th style="width:52px"></th><th>Module</th><th>Description</th><th>Version</th><th>Publiée</th><th>État</th><th>Actions</th></tr></thead>
 							<tbody>
 							{foreach $sb_mod_catalog as $mod}

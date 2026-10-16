@@ -204,6 +204,16 @@ function sbModUnlock($fh) {
 	if ($fh) { flock($fh, LOCK_UN); fclose($fh); }
 }
 
+/** « Module Tableaux » (nom affiché) pour les messages */
+function sbModLabel($name) {
+	return 'Module ' . (sbModuleMeta($name)['title'] ?? $name);
+}
+
+/** « 1 fichier », « 2 fichiers » (pluriel accordé) */
+function sbModN($n, $one, $many) {
+	return (int) $n . ' ' . ((int) $n > 1 ? $many : $one);
+}
+
 /** Tables du module (noms complets), d'après son module.php */
 function sbModScope($name) {
 	$out = array();
@@ -737,20 +747,20 @@ function sbModRun($name, $op, array $opt = array()) {
 					try { sbModRunDelete($name, true); } catch (Throwable $e2) { }
 					throw $e;
 				}
-				$out['step'] = 'Module ' . $name . ' ' . $dl['to'] . ' téléchargé (' . $dl['files'] . ' fichier(s)) et installé' . substr($out['step'], strpos($out['step'], ' installé') + strlen(' installé'));
+				$out['step'] = sbModLabel($name) . ' ' . $dl['to'] . ' téléchargé (' . sbModN($dl['files'], 'fichier', 'fichiers') . ') et installé' . substr($out['step'], strpos($out['step'], ' installé') + strlen(' installé'));
 				$out['files'] = $dl['files'];
 				break;
 			default:
 				$out = sbModRunUninstall($name, !empty($opt['remove']));
 		}
 	} catch (Throwable $e) {
-		sbUpdLog('Module ' . $name . ' : ' . $op . ' en échec (' . $e->getMessage() . ')', $user);
+		sbUpdLog(sbModLabel($name) . ' : ' . $op . ' en échec (' . $e->getMessage() . ')', $user);
 		throw $e;
 	} finally {
 		sbModUnlock($lock);
 	}
 	sbUpdHistory(array('from' => $out['from'] ?? '', 'to' => $out['to'] ?? '', 'user' => $user, 'write' => array_fill(0, (int) ($out['files'] ?? 0), 1)), 'module ' . $name . ' : ' . $out['label']);
-	sbUpdLog('Module ' . $name . ' : ' . $out['step'], $user);
+	sbUpdLog(sbModLabel($name) . ' : ' . $out['step'], $user);
 	sbModulesPresent(true);
 	sbModulesInstalled(true);
 	return array('status' => 'done', 'step' => $out['step']);
@@ -817,9 +827,9 @@ function sbModRunFiles($name, $op, array $row, $confirm) {
 	}
 	@unlink($dl['zip']);
 	$step = ($op === 'download')
-		? 'téléchargé en ' . $v . ' (' . count($fp['write']) . ' fichier(s)) : il reste à l\'installer'
-		: 'mis à jour ' . $fromVersion . ' → ' . $v . ' (' . count($fp['write']) . ' fichier(s) écrit(s), ' . count($fp['delete']) . ' retiré(s)' . ($migrations ? ', ' . count($migrations) . ' migration(s)' : '') . ')';
-	return array('step' => 'Module ' . $name . ' ' . $step, 'label' => ($op === 'download' ? 'téléchargé ' : 'mis à jour ') . $v, 'from' => $fromVersion, 'to' => $v, 'files' => count($fp['write']));
+		? 'téléchargé en ' . $v . ' (' . sbModN(count($fp['write']), 'fichier', 'fichiers') . ') : il reste à l\'installer'
+		: 'mis à jour ' . $fromVersion . ' → ' . $v . ' (' . sbModN(count($fp['write']), 'fichier écrit', 'fichiers écrits') . ', ' . sbModN(count($fp['delete']), 'retiré', 'retirés') . ($migrations ? ', ' . sbModN(count($migrations), 'migration', 'migrations') : '') . ')';
+	return array('step' => sbModLabel($name) . ' ' . $step, 'label' => ($op === 'download' ? 'téléchargé ' : 'mis à jour ') . $v, 'from' => $fromVersion, 'to' => $v, 'files' => count($fp['write']));
 }
 
 /** Installer : tables (install.php), migrations des tables gardées, inscription */
@@ -853,7 +863,7 @@ function sbModRunInstall($name, array $row, $wasAbsent = false) {
 	sbModKeepBackup($name, $plain, array('op' => 'install', 'label' => 'l\'installation ' . $meta['version'], 'db' => true, 'files' => 0, 'before_absent' => (bool) $wasAbsent,
 		'after' => array('installed' => true, 'version' => $meta['version']), 'complete' => true));
 	sbUpdClearCaches();
-	$step = 'Module ' . $name . ' ' . $meta['version'] . ' installé (' . count($created) . ' table(s) créée(s)' . ($kept ? ', ' . count($kept) . ' gardée(s)' : '') . ($migrations ? ', ' . count($migrations) . ' migration(s)' : '') . ')';
+	$step = sbModLabel($name) . ' ' . $meta['version'] . ' installé (' . sbModN(count($created), 'table créée', 'tables créées') . ($kept ? ', ' . sbModN(count($kept), 'gardée', 'gardées') : '') . ($migrations ? ', ' . sbModN(count($migrations), 'migration', 'migrations') : '') . ')';
 	return array('step' => $step, 'label' => 'installé ' . $meta['version'], 'to' => $meta['version']);
 }
 
@@ -874,7 +884,7 @@ function sbModRunUninstall($name, $remove) {
 		sbModKeepBackup($name, $plain, array('op' => 'uninstall', 'label' => 'la désinstallation', 'db' => false, 'files' => 0,
 			'after' => array('installed' => false, 'version' => (string) (sbModuleMeta($name)['version'] ?? '')), 'complete' => true));
 		sbUpdClearCaches();
-		$step = 'Module ' . $name . ' désinstallé, données et fichiers gardés' . ($tables ? ' (' . count($tables) . ' table(s))' : '');
+		$step = sbModLabel($name) . ' désinstallé, données et fichiers gardés' . ($tables ? ' (' . sbModN(count($tables), 'table', 'tables') . ')' : '');
 		return array('step' => $step, 'label' => 'désinstallé', 'from' => $row['version']);
 	}
 	$dp = sbModDeletePlan($name);
@@ -905,7 +915,7 @@ function sbModRunUninstall($name, $remove) {
 	sbModKeepBackup($name, $plain, array('op' => 'remove', 'label' => 'la suppression du module', 'db' => true, 'files' => count($targets),
 		'after' => array('installed' => false, 'version' => ''), 'complete' => true));
 	sbUpdClearCaches();
-	$step = 'Module ' . $name . ' supprimé : ' . count($tables) . ' table(s) et ' . count($targets) . ' fichier(s) retirés (sauvegarde chiffrée gardée)';
+	$step = sbModLabel($name) . ' supprimé : ' . sbModN(count($tables), 'table', 'tables') . ' et ' . sbModN(count($targets), 'fichier', 'fichiers') . ' retirés (sauvegarde chiffrée gardée)';
 	return array('step' => $step, 'label' => 'supprimé (données, tables, fichiers)', 'from' => $row['version'], 'files' => count($targets));
 }
 
@@ -922,7 +932,7 @@ function sbModRunRollback($name) {
 	if (!empty($rb['before_absent'])) {
 		sbModRunUninstall($name, true);
 		sbModDeleteBackups($name);
-		return array('step' => 'Module ' . $name . ' : ' . $label . ' annulée, module retiré', 'label' => 'annulation de ' . $label);
+		return array('step' => sbModLabel($name) . ' : ' . $label . ' annulée, module retiré', 'label' => 'annulation de ' . $label);
 	}
 	$plain = sbModWorkDir() . '/tmp-rollback-' . bin2hex(random_bytes(4)) . '.zip';
 	sbUpdDecryptFile($rb['file'], $plain);
@@ -932,7 +942,7 @@ function sbModRunRollback($name) {
 		@unlink($plain);
 	}
 	sbModDeleteBackups($name);
-	return array('step' => 'Module ' . $name . ' : ' . $label . ' annulée' . (!empty($rb['db']) ? ' (tables remises à leur état du ' . date('d/m/Y H:i', strtotime($rb['date'] ?? 'now')) . ')' : ''), 'label' => 'annulation de ' . $label);
+	return array('step' => sbModLabel($name) . ' : ' . $label . ' annulée' . (!empty($rb['db']) ? ' (tables remises à leur état du ' . date('d/m/Y H:i', strtotime($rb['date'] ?? 'now')) . ')' : ''), 'label' => 'annulation de ' . $label);
 }
 
 /** Supprimer les fichiers d'un module non installé (retour arrière d'une installation) */
@@ -959,7 +969,7 @@ function sbModRunDelete($name, $confirm) {
 	@unlink(sbModWorkDir() . '/' . $name . '.json');
 	sbModKeepBackup($name, $plain);
 	sbUpdClearCaches();
-	return array('step' => 'Module ' . $name . ' supprimé du disque (' . count($targets) . ' fichier(s), sauvegarde chiffrée gardée)', 'label' => 'fichiers supprimés', 'from' => $version, 'files' => count($targets));
+	return array('step' => sbModLabel($name) . ' supprimé du disque (' . sbModN(count($targets), 'fichier', 'fichiers') . ', sauvegarde chiffrée gardée)', 'label' => 'fichiers supprimés', 'from' => $version, 'files' => count($targets));
 }
 
 ?>

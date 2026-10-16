@@ -69,6 +69,9 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
+**4.35**
+- Update page: Reload button fixed, clearer module messages (module name, plurals), better spacing in the Modules table
+
 **4.34**
 - Modules: Cancel button to undo the last operation (update, uninstall, removal, install); backups limited to the module tables
 - Update page: progress spinner and results where the action happens; module files are downloaded once
