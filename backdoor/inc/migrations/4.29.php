@@ -15,7 +15,7 @@
  */
 
 defined('SBUIADMIN_PATH') or die('Are you crazy!');
-require_once SBUIADMIN_PATH . '/inc/sbuiadmin-modules.php';
+if (!function_exists('sbModulesPresent')) require_once SBUIADMIN_PATH . '/inc/sbuiadmin-modules.php';
 
 return array(
 	'description' => 'registre des modules installés',

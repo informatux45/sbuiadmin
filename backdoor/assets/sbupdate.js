@@ -114,39 +114,63 @@
 	// Modules : plan (rien n'est écrit), puis confirmation + mot de passe
 	// ---------------------------------------------------------------
 	var modCurrent = null;
-	var modLabels = { download: 'Télécharger', update: 'Mettre à jour', install: 'Installer', uninstall: 'Désinstaller', 'delete': 'Supprimer les fichiers de' };
+	var modLabels = { update: 'Mettre à jour', install: 'Installer', uninstall: 'Désinstaller' };
+
+	// « Supprimer le module » (désinstallation) : ce qui sera perdu, d'après le site
+	function modRemoveInfo(p) {
+		var html = '<p><strong>Seront supprimés définitivement du serveur (une sauvegarde chiffrée est faite avant) :</strong></p><ul>';
+		var tables = Object.keys(p.rows || {});
+		if (tables.length) {
+			html += '<li>Données : ' + tables.map(function (t) { return esc(t) + ' (' + p.rows[t] + ' ligne' + (p.rows[t] > 1 ? 's' : '') + ')'; }).join(', ') + ' — tables SQL supprimées</li>';
+		} else {
+			html += '<li>Aucune table en base</li>';
+		}
+		html += '<li>Fichiers : ' + p.files + ' fichier(s) du module</li>';
+		if (p.uses && p.uses.length) html += '<li>Codes courts encore utilisés, qui s\'afficheront vides : ' + esc(p.uses.join(', ')) + '</li>';
+		html += '</ul>';
+		if (p.modified && p.modified.length) html += list('Fichiers modifiés sur le site, supprimés aussi', p.modified);
+		else if (p.unchecked) html += '<p>Les fichiers n\'ont pas pu être comparés à la version publiée (cliquez sur « Vérifier les modules » pour le permettre) : d\'éventuelles modifications faites sur le site seront supprimées aussi.</p>';
+		html += '<p>Le module redeviendra disponible sur GitHub : « Installer » le remettra, sans ces données.</p>';
+		return html;
+	}
 
 	function modPanel(p) {
 		modCurrent = p;
 		$('sbmod-panel-title').textContent = modLabels[p.op] + ' le module ' + p.title + (p.version ? ' (' + p.version + ')' : '');
 		var html = '';
-		if (p.op === 'download' || p.op === 'update') {
-			html += '<p>Archive vérifiée (signature de la version, empreinte de l\'archive et de chaque fichier) : <strong>' + p.write + '</strong> fichier(s) à écrire, <strong>' + p['delete'] + '</strong> à retirer.</p>';
-			if (p.op === 'download') html += '<p style="color:var(--t-muted)">Le module sera présent mais pas installé : rien ne change sur le site avant « Installer ».</p>';
-		} else if (p.op === 'install') {
-			html += '<p>Tables créées : <strong>' + (p.tables_new.length ? esc(p.tables_new.join(', ')) : 'aucune') + '</strong>. Le module sera activé : menu, droits, pages et codes courts.</p>';
+		if (p.op === 'update' || (p.op === 'install' && p.download)) {
+			html += '<p>Archive vérifiée (signature de la version, empreinte de l\'archive et de chaque fichier) : <strong>' + p.write + '</strong> fichier(s) à écrire' + (p.op === 'update' ? ', <strong>' + p['delete'] + '</strong> à retirer' : ', téléchargés depuis GitHub') + '.</p>';
+		}
+		if (p.op === 'install') {
+			html += '<p>Tables créées : <strong>' + (p.tables_new && p.tables_new.length ? esc(p.tables_new.join(', ')) : 'aucune') + '</strong>. Le module sera activé : menu, droits, pages et codes courts.</p>';
 		} else if (p.op === 'uninstall') {
-			html += '<p>Le module sera désactivé : menu, droits, pages et codes courts disparaissent du site et de l\'administration. Ses fichiers restent sur le disque.</p>';
-			if (p.tables.length) html += '<p style="color:var(--t-muted)">Tables : ' + esc(p.tables.join(', ')) + '.</p>';
-		} else {
-			html += '<p><strong>' + p.files + '</strong> fichier(s) supprimé(s) du disque (une sauvegarde chiffrée est gardée).</p>';
+			html += '<p>Le module sera désactivé : menu, droits, pages et codes courts disparaissent du site et de l\'administration. Ses données et ses fichiers sont gardés, « Installer » le remettra tel quel.</p>';
 		}
 		(p.notes || []).forEach(function (n) { html += '<p style="color:var(--warning)">' + esc(n) + '</p>'; });
-		if (p.unchecked) html += '<p style="color:var(--warning)">Impossible de savoir si les fichiers de ce module ont été modifiés localement (module non livré par cette page jusqu\'ici).</p>';
-		html += list('Fichiers modifiés localement', p.modified);
+		if (p.op !== 'uninstall') {
+			if (p.unchecked) html += '<p style="color:var(--warning)">Impossible de savoir si les fichiers de ce module ont été modifiés localement.</p>';
+			html += list('Fichiers modifiés localement', p.modified);
+		}
 		$('sbmod-panel-body').innerHTML = html;
-		var needConfirm = p.unchecked || (p.modified && p.modified.length > 0);
+		var needConfirm = p.op !== 'uninstall' && (p.unchecked || (p.modified && p.modified.length > 0));
 		show('sbmod-confirm-wrap', needConfirm);
 		$('sbmod-confirm').checked = false;
-		$('sbmod-confirm-label').textContent = (p.op === 'delete')
-			? 'Je confirme la suppression de ces fichiers (gardés dans la sauvegarde).'
-			: 'Je sais que ces fichiers seront remplacés (leur version actuelle est gardée dans la sauvegarde).';
-		show('sbmod-drop-wrap', p.op === 'uninstall' && p.tables && p.tables.length > 0);
-		$('sbmod-drop').checked = false;
-		$('sbmod-run').textContent = modLabels[p.op].replace(' de', '');
+		$('sbmod-confirm-label').textContent = 'Je sais que ces fichiers seront remplacés (leur version actuelle est gardée dans la sauvegarde).';
+		show('sbmod-remove-wrap', p.op === 'uninstall');
+		$('sbmod-remove').checked = false;
+		$('sbmod-remove-body').innerHTML = p.op === 'uninstall' ? modRemoveInfo(p) : '';
+		show('sbmod-remove-info', false);
+		$('sbmod-run').textContent = modLabels[p.op];
 		show('sbmod-panel', true);
 		var el = $('sbmod-panel'); if (el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 	}
+
+	var removeBox = $('sbmod-remove');
+	if (removeBox) removeBox.addEventListener('change', function () {
+		show('sbmod-remove-info', removeBox.checked);
+		$('sbmod-run').textContent = removeBox.checked ? 'Supprimer le module' : 'Désinstaller';
+		$('sbmod-run').className = removeBox.checked ? 'btn btn--danger' : 'btn btn--primary';
+	});
 
 	root.addEventListener('click', function (ev) {
 		var btn = ev.target.closest('[data-mod-action]');
@@ -162,7 +186,7 @@
 			setButtons(true);
 			busy = true;
 			show('sbmod-panel', false);
-			progress(0, 1, (op === 'download' || op === 'update') ? 'Téléchargement et vérification du module…' : 'Préparation…');
+			progress(0, 1, (op === 'update' || op === 'install') ? 'Vérification du module…' : 'Préparation…');
 			post('modplan', { module: btn.getAttribute('data-mod'), op: op }).then(function (p) {
 				busy = false;
 				setButtons(false);
@@ -173,15 +197,16 @@
 			show('sbmod-panel', false);
 			modCurrent = null;
 		} else if (action === 'run' && modCurrent) {
-			var need = modCurrent.unchecked || (modCurrent.modified && modCurrent.modified.length);
+			var need = modCurrent.op !== 'uninstall' && (modCurrent.unchecked || (modCurrent.modified && modCurrent.modified.length));
+			var remove = modCurrent.op === 'uninstall' && $('sbmod-remove').checked;
 			if (need && !$('sbmod-confirm').checked) { error('Cochez la case de confirmation.'); return; }
 			var pw = $('sbmod-password').value;
 			if (!pw) { error('Saisissez votre mot de passe pour confirmer.'); return; }
 			$('sbmod-password').value = '';
 			setButtons(true);
 			busy = true;
-			progress(0, 1, modLabels[modCurrent.op] + ' le module ' + modCurrent.title + '…');
-			post('modrun', { module: modCurrent.name, op: modCurrent.op, password: pw, confirm: need ? '1' : '', drop_data: $('sbmod-drop').checked ? '1' : '' }).then(function (r) {
+			progress(0, 1, (remove ? 'Suppression du module ' : modLabels[modCurrent.op] + ' le module ') + modCurrent.title + '…');
+			post('modrun', { module: modCurrent.name, op: modCurrent.op, password: pw, confirm: need ? '1' : '', remove: remove ? '1' : '' }).then(function (r) {
 				busy = false;
 				progress(1, 1, r.step);
 				$('sbupd-step-text').innerHTML = esc(r.step) + ' — <a href="index.php?p=update">recharger la page</a>';

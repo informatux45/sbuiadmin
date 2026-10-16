@@ -99,7 +99,7 @@ if ($sb_is_ajax) {
 			case 'modrun':
 				$sb_mod = (string) ($_POST['module'] ?? '');
 				$sb_op  = (string) ($_POST['op'] ?? '');
-				$sb_opt = array('confirm' => !empty($_POST['confirm']), 'drop_data' => !empty($_POST['drop_data']));
+				$sb_opt = array('confirm' => !empty($_POST['confirm']), 'remove' => !empty($_POST['remove']));
 				session_write_close();
 				$out = sbModRun($sb_mod, $sb_op, $sb_opt);
 				break;

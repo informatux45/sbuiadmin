@@ -123,12 +123,12 @@
 									</td>
 									<td style="white-space:nowrap">
 										{foreach $mod.actions as $op}
-											<button type="button" class="btn btn--sm {if $op == 'uninstall' || $op == 'delete'}btn--ghost{else}btn--outline-primary{/if}" data-mod-action="plan" data-mod="{$mod.name|escape}" data-op="{$op|escape}"{if !$sb_upd_ready && ($op == 'download' || $op == 'update')} disabled{/if}>
-												{if $op == 'download'}Télécharger{elseif $op == 'update'}Mettre à jour{elseif $op == 'install'}Installer{elseif $op == 'uninstall'}Désinstaller{else}Supprimer les fichiers{/if}
+											<button type="button" class="btn btn--sm {if $op == 'uninstall'}btn--ghost{else}btn--outline-primary{/if}" data-mod-action="plan" data-mod="{$mod.name|escape}" data-op="{$op|escape}"{if !$sb_upd_ready && ($op == 'update' || !$mod.present)} disabled{/if}>
+												{if $op == 'update'}Mettre à jour{elseif $op == 'install'}Installer{else}Désinstaller{/if}
 											</button>
 										{/foreach}
 										{foreach $mod.blocked as $op => $why}
-											<span data-tooltip="{$why|escape}"><button type="button" class="btn btn--sm btn--outline-primary" disabled>{if $op == 'download'}Télécharger{elseif $op == 'update'}Mettre à jour{else}Installer{/if}</button></span>
+											<span data-tooltip="{$why|escape}"><button type="button" class="btn btn--sm btn--outline-primary" disabled>{if $op == 'update'}Mettre à jour{else}Installer{/if}</button></span>
 										{/foreach}
 										{if isset($mod.blocked.install)}<br><small style="color:var(--warning);white-space:normal">{$mod.blocked.install|escape}</small>{/if}
 									</td>
@@ -146,10 +146,17 @@
 								<input type="checkbox" id="sbmod-confirm"> <span class="box"></span>
 								<span id="sbmod-confirm-label"></span>
 							</label>
-							<label class="check" id="sbmod-drop-wrap" style="margin-top:10px;display:none">
-								<input type="checkbox" id="sbmod-drop"> <span class="box"></span>
-								<span>Supprimer aussi les données (tables du module) — une sauvegarde chiffrée de la base est faite avant.</span>
-							</label>
+							<div id="sbmod-remove-wrap" style="margin-top:12px;display:none">
+								<label class="check">
+									<input type="checkbox" id="sbmod-remove"> <span class="box"></span>
+									<span><strong>Supprimer le module</strong></span>
+								</label>
+								<div style="display:flex;gap:8px;align-items:flex-start;margin-top:6px;color:var(--warning)">
+									<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="flex:none;margin-top:1px"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+									<span>Supprime aussi ses données, ses tables SQL et ses fichiers du serveur (sauvegarde chiffrée faite avant). Il pourra être réinstallé depuis GitHub, sans ses données.</span>
+								</div>
+								<div id="sbmod-remove-info" class="alert warning" style="display:none;margin-top:10px"><span class="ico"><svg viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg></span><div class="body" id="sbmod-remove-body"></div></div>
+							</div>
 							<div class="field" style="margin-top:12px;max-width:340px">
 								<label class="field-label" for="sbmod-password">Votre mot de passe (confirmation)</label>
 								<input class="input" type="password" id="sbmod-password" autocomplete="current-password">
@@ -160,10 +167,10 @@
 							</div>
 						</div>
 						<div class="alert primary" style="margin-top:12px"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span><div class="body">
-							<strong>Télécharger</strong> met les fichiers sur le disque sans rien activer ;<br>
-							<strong>Installer</strong> crée les tables et active le module (menu, droits, pages, codes courts) ;<br>
-							<strong>Désinstaller</strong> le désactive (données gardées sauf demande) ;<br>
-							<strong>Supprimer</strong> les fichiers n'est possible qu'une fois le module désinstallé.<br>
+							<strong>Installer</strong> télécharge le module depuis GitHub s'il n'est pas sur le serveur, crée ses tables et l'active (menu, droits, pages, codes courts) ;<br>
+							<strong>Mettre à jour</strong> remplace ses fichiers par la version publiée et met sa base à niveau ;<br>
+							<strong>Désinstaller</strong> le désactive en gardant ses données et ses fichiers ;<br>
+							<strong>Supprimer le module</strong> (case de la désinstallation) retire aussi ses données, ses tables et ses fichiers du serveur.<br>
 							Chaque opération est précédée d'une sauvegarde chiffrée et annulée automatiquement en cas d'échec.
 						</div></div>
 					</div>

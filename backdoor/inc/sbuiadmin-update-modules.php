@@ -116,6 +116,10 @@ function sbModCatalogRefresh() {
 		$cache['core_version'] = $m['version'];
 		foreach ($idx as $name => $e) {
 			$cache['modules'][$name] = array('title' => $e['title'], 'icon' => $e['icon'], 'description' => $e['description'], 'version' => $e['version'], 'requires_core' => $e['requires_core'], 'size' => $e['size']);
+			// Module arrivé avec le core (archive complète) : la liste officielle
+			// de sa version permet ensuite de repérer ses fichiers modifiés
+			$local = sbModuleMeta($name);
+			if ($local && $local['version'] === $e['version'] && sbModStoredList($name) === null) sbModStoreList($name, $e['version'], $e['files']);
 		}
 	} catch (Throwable $e) {
 		$old = sbModCatalogCache();
@@ -157,17 +161,21 @@ function sbModCatalog() {
 		$row['remote_ok']  = $remote && version_compare($core, $remote['requires_core'], '>=');
 		$row['local_ok']   = $local && version_compare($core, $local['requires_core'], '>=');
 		$row['newer']      = $remote && $local && version_compare($remote['version'], $local['version'], '>');
+		// Deux cas : installé (Mettre à jour, Désinstaller), sinon Installer
+		// (téléchargé d'abord s'il est absent). Opération impossible pour
+		// l'instant : bouton grisé avec la raison
 		$row['actions']    = array();
-		// Opérations impossibles pour l'instant : bouton grisé avec la raison
 		$row['blocked']    = array();
-		if (!$local && $remote && $row['remote_ok']) $row['actions'][] = 'download';
-		elseif (!$local && $remote) $row['blocked']['download'] = 'Demande le core ' . $remote['requires_core'] . ' (installé : ' . $core . ')';
-		if ($row['newer'] && $row['remote_ok']) $row['actions'][] = 'update';
-		elseif ($row['newer']) $row['blocked']['update'] = 'La version ' . $remote['version'] . ' demande le core ' . $remote['requires_core'] . ' (installé : ' . $core . ')';
-		if ($local && !$row['installed'] && $row['local_ok']) $row['actions'][] = 'install';
-		elseif ($local && !$row['installed']) $row['blocked']['install'] = 'Demande le core ' . $local['requires_core'] . ' (installé : ' . $core . ') : mettez d\'abord SBUIADMIN à jour';
-		if ($local && $row['installed']) $row['actions'][] = 'uninstall';
-		if ($local && !$row['installed']) $row['actions'][] = 'delete';
+		$why = function ($req) use ($core) { return 'Demande le core ' . $req . ' (installé : ' . $core . ') : mettez d\'abord SBUIADMIN à jour'; };
+		if ($local && $row['installed']) {
+			if ($row['newer'] && $row['remote_ok']) $row['actions'][] = 'update';
+			elseif ($row['newer']) $row['blocked']['update'] = 'La version ' . $remote['version'] . ' ' . lcfirst($why($remote['requires_core']));
+			$row['actions'][] = 'uninstall';
+		} elseif ($local) {
+			if ($row['local_ok']) $row['actions'][] = 'install'; else $row['blocked']['install'] = $why($local['requires_core']);
+		} elseif ($remote) {
+			if ($row['remote_ok']) $row['actions'][] = 'install'; else $row['blocked']['install'] = $why($remote['requires_core']);
+		}
 		if (!$local) $row['state'] = 'absent';
 		elseif (!$row['installed']) $row['state'] = 'present';
 		elseif ($row['newer']) $row['state'] = 'outdated';
@@ -459,68 +467,87 @@ function sbModDeletePlan($name) {
 /** Contrôles communs : module connu, opération possible */
 function sbModCheck($name, $op) {
 	if (!sbModuleValidName($name) || in_array($name, sbModuleCore(), true)) throw new RuntimeException('Module refusé');
-	if (!in_array($op, array('download', 'update', 'install', 'uninstall', 'delete'), true)) throw new RuntimeException('Opération inconnue');
+	if (!in_array($op, array('install', 'update', 'uninstall'), true)) throw new RuntimeException('Opération inconnue');
 	$cat = sbModCatalog();
 	if (!isset($cat[$name])) throw new RuntimeException('Module inconnu : ' . $name);
-	if ($op !== 'download' && $op !== 'update' && !in_array($op, $cat[$name]['actions'], true)) {
+	if (!in_array($op, $cat[$name]['actions'], true)) {
 		throw new RuntimeException('Opération impossible pour ' . $name . ' dans son état actuel');
 	}
 	return $cat[$name];
 }
 
+/** Lignes de chaque table du module présente en base */
+function sbModTableRows($name) {
+	$db = sbUpdDb();
+	$out = array();
+	foreach (sbModExistingTables($name) as $t) {
+		$r = $db->query('SELECT COUNT(*) FROM `' . sbUpdDbPrefix() . $t . '`');
+		$out[$t] = $r ? (int) $r->fetch_row()[0] : 0;
+	}
+	return $out;
+}
+
+/** Tables déclarées par le module.php contenu dans une archive téléchargée */
+function sbModZipTables($zipPath, $name) {
+	$z = new ZipArchive();
+	if ($z->open($zipPath, ZipArchive::RDONLY) !== true) return array();
+	$src = $z->getFromName(SB_UPD_ROOT . 'datas/modules/' . $name . '/module.php');
+	$z->close();
+	if ($src === false) return array();
+	$tmp = sbModWorkDir() . '/tmp-meta-' . bin2hex(random_bytes(4)) . '.php';
+	file_put_contents($tmp, $src);
+	try { $meta = include $tmp; } finally { @unlink($tmp); }
+	return is_array($meta) ? array_keys((array) ($meta['tables'] ?? array())) : array();
+}
+
 /**
- * Ce que ferait l'opération (rien n'est écrit). Pour download et update,
- * l'archive est téléchargée et vérifiée.
+ * Ce que ferait l'opération (rien n'est écrit). Installer un module absent
+ * et Mettre à jour téléchargent et vérifient l'archive.
  */
 function sbModPlan($name, $op) {
 	$row = sbModCheck($name, $op);
 	$plan = array('name' => $name, 'op' => $op, 'title' => $row['title'], 'modified' => array(), 'unchecked' => false, 'notes' => array());
-	switch ($op) {
-		case 'download':
-		case 'update':
-			if ($op === 'download' && $row['present']) throw new RuntimeException('Le module ' . $name . ' est déjà présent');
-			if ($op === 'update' && !$row['present']) throw new RuntimeException('Le module ' . $name . ' n\'est pas présent');
-			$dl = sbModDownload($name);
-			$old = sbModStoredList($name);
-			$fp = sbModFilePlan($dl['entry']['files'], $old);
-			@unlink($dl['zip']);
-			$plan['version'] = $dl['entry']['version'];
-			$plan['write'] = count($fp['write']);
-			$plan['delete'] = count($fp['delete']);
-			$plan['modified'] = $fp['modified'];
-			$plan['unchecked'] = ($op === 'update' && $old === null);
-			if ($op === 'update' && $row['installed']) {
-				// Les migrations de la nouvelle version ne sont connues qu'après la copie
-				$plan['notes'][] = 'Base de données sauvegardée avant la mise à jour (migrations éventuelles du module appliquées ensuite).';
-			}
-			break;
-		case 'install':
+	if ($op === 'update' || ($op === 'install' && !$row['present'])) {
+		$dl = sbModDownload($name);
+		$old = sbModStoredList($name);
+		$fp = sbModFilePlan($dl['entry']['files'], $old);
+		$plan['version'] = $dl['entry']['version'];
+		$plan['write'] = count($fp['write']);
+		$plan['delete'] = count($fp['delete']);
+		$plan['modified'] = $fp['modified'];
+		$plan['unchecked'] = ($op === 'update' && $old === null);
+		$plan['download'] = ($op === 'install');
+		if ($op === 'install') $plan['tables_new'] = sbModZipTables($dl['zip'], $name);
+		@unlink($dl['zip']);
+		if ($op === 'update' && $row['installed']) $plan['notes'][] = 'Base de données sauvegardée avant la mise à jour (migrations éventuelles du module appliquées ensuite).';
+	}
+	if ($op === 'install') {
+		$existing = array();
+		if ($row['present']) {
 			$existing = sbModExistingTables($name);
-			$all = array_keys((array) (sbModuleMeta($name)['tables'] ?? array()));
-			$plan['tables_new'] = array_values(array_diff($all, $existing));
-			$plan['tables_kept'] = $existing;
-			if ($existing) $plan['notes'][] = 'Tables déjà présentes (données gardées) : ' . implode(', ', $existing) . '.';
-			break;
-		case 'uninstall':
-			$plan['tables'] = sbModExistingTables($name);
-			$plan['uses'] = sbModShortcodeUses($name);
-			if (!$row['local_ok']) $plan['notes'][] = 'Attention : ce module demande le core ' . $row['local_requires'] . ' (installé : ' . sbUpdInstalledVersion() . '). Une fois désinstallé, il ne pourra être réinstallé qu\'après la mise à jour de SBUIADMIN.';
-			if ($plan['uses']) $plan['notes'][] = 'Codes courts du module encore utilisés (ils s\'afficheront vides) : ' . implode(', ', $plan['uses']) . '.';
-			break;
-		case 'delete':
-			$dp = sbModDeletePlan($name);
-			$plan['files'] = count($dp['files']);
-			$plan['modified'] = $dp['modified'];
-			$plan['unchecked'] = $dp['unchecked'];
-			if (sbModExistingTables($name)) $plan['notes'][] = 'Les tables du module restent en base (supprimez-les en désinstallant avec « supprimer les données »).';
-			break;
+			$plan['tables_new'] = array_values(array_diff(array_keys((array) (sbModuleMeta($name)['tables'] ?? array())), $existing));
+		}
+		$plan['tables_kept'] = $existing;
+		if ($existing) $plan['notes'][] = 'Tables déjà présentes (données gardées) : ' . implode(', ', $existing) . '.';
+	}
+	if ($op === 'uninstall') {
+		// Ce que supprimerait « Supprimer le module » (affiché si la case est cochée)
+		$dp = sbModDeletePlan($name);
+		$plan['rows'] = sbModTableRows($name);
+		$plan['uses'] = sbModShortcodeUses($name);
+		$plan['files'] = count($dp['files']);
+		$plan['modified'] = $dp['modified'];
+		$plan['unchecked'] = $dp['unchecked'];
+		if (!$row['local_ok']) $plan['notes'][] = 'Attention : ce module demande le core ' . $row['local_requires'] . ' (installé : ' . sbUpdInstalledVersion() . '). Une fois désinstallé, il ne pourra être réinstallé qu\'après la mise à jour de SBUIADMIN.';
+		if ($plan['uses']) $plan['notes'][] = 'Codes courts du module encore utilisés (ils s\'afficheront vides) : ' . implode(', ', $plan['uses']) . '.';
 	}
 	return $plan;
 }
 
 /**
  * Exécute une opération sur un module.
- * @param array $opt confirm (fichiers modifiés localement), drop_data (désinstallation)
+ * @param array $opt confirm (fichiers modifiés localement), remove (désinstallation :
+ *                   « Supprimer le module » = données, tables et fichiers)
  * @return array résumé (step : texte)
  */
 function sbModRun($name, $op, array $opt = array()) {
@@ -532,18 +559,29 @@ function sbModRun($name, $op, array $opt = array()) {
 	$lock = sbModLock();
 	try {
 		switch ($op) {
-			case 'download':
 			case 'update':
-				$out = sbModRunFiles($name, $op, $row, $confirm);
+				$out = sbModRunFiles($name, 'update', $row, $confirm);
 				break;
 			case 'install':
-				$out = sbModRunInstall($name, $row);
-				break;
-			case 'uninstall':
-				$out = sbModRunUninstall($name, !empty($opt['drop_data']));
+				if ($row['present']) {
+					$out = sbModRunInstall($name, $row);
+					break;
+				}
+				// Absent : téléchargé, puis installé ; installation en échec =
+				// fichiers téléchargés retirés, le module redevient absent
+				$dl = sbModRunFiles($name, 'download', $row, $confirm);
+				sbModulesPresent(true);
+				try {
+					$out = sbModRunInstall($name, sbModCatalog()[$name]);
+				} catch (Throwable $e) {
+					try { sbModRunDelete($name, true); } catch (Throwable $e2) { }
+					throw $e;
+				}
+				$out['step'] = 'Module ' . $name . ' ' . $dl['to'] . ' téléchargé (' . $dl['files'] . ' fichier(s)) et installé' . substr($out['step'], strpos($out['step'], ' installé') + strlen(' installé'));
+				$out['files'] = $dl['files'];
 				break;
 			default:
-				$out = sbModRunDelete($name, $confirm);
+				$out = sbModRunUninstall($name, !empty($opt['remove']));
 		}
 	} catch (Throwable $e) {
 		sbUpdLog('Module ' . $name . ' : ' . $op . ' en échec (' . $e->getMessage() . ')', $user);
@@ -558,7 +596,7 @@ function sbModRun($name, $op, array $opt = array()) {
 	return array('status' => 'done', 'step' => $out['step']);
 }
 
-/** Télécharger (module absent) ou mettre à jour (module présent) */
+/** Télécharger (module absent, avant Installer) ou mettre à jour (module présent) */
 function sbModRunFiles($name, $op, array $row, $confirm) {
 	if ($op === 'download' && $row['present']) throw new RuntimeException('Le module ' . $name . ' est déjà présent');
 	if ($op === 'update' && !$row['present']) throw new RuntimeException('Le module ' . $name . ' n\'est pas présent');
@@ -654,33 +692,55 @@ function sbModRunInstall($name, array $row) {
 	return array('step' => $step, 'label' => 'installé ' . $meta['version'], 'to' => $meta['version']);
 }
 
-/** Désinstaller : retiré du registre ; tables gardées sauf $dropData (après sauvegarde) */
-function sbModRunUninstall($name, $dropData) {
+/**
+ * Désinstaller : retiré du registre, données et fichiers gardés ; avec
+ * $remove (« Supprimer le module ») : sauvegarde chiffrée de la base et des
+ * fichiers, puis tables et fichiers supprimés (le module redevient absent).
+ */
+function sbModRunUninstall($name, $remove) {
 	$row = sbModRow($name);
 	if (!$row) throw new RuntimeException('Module non installé');
 	$db = sbUpdDb();
 	$tables = sbModExistingTables($name);
-	$plain = null;
-	if ($dropData && $tables) {
-		$plain = sbModBackup($name, array(), array(), true);
-		foreach ($tables as $t) {
-			if (!$db->query('DROP TABLE IF EXISTS `' . sbUpdDbPrefix() . $t . '`')) {
-				$err = $db->error;
-				try { sbModRestore($plain); } catch (Throwable $e2) { }
-				@unlink($plain);
-				throw new RuntimeException('Suppression de la table ' . $t . ' impossible (' . $err . ') : base remise, module toujours installé');
-			}
-		}
+	if (!$remove) {
+		if (!$db->query('DELETE FROM ' . sbModTable() . " WHERE `name` = '" . $db->real_escape_string($name) . "'")) throw new RuntimeException('Registre des modules : ' . $db->error);
+		sbModKept($name, $tables ? (string) $row['db_version'] : '');
+		sbUpdClearCaches();
+		$step = 'Module ' . $name . ' désinstallé, données et fichiers gardés' . ($tables ? ' (' . count($tables) . ' table(s))' : '');
+		return array('step' => $step, 'label' => 'désinstallé', 'from' => $row['version']);
 	}
-	if (!$db->query('DELETE FROM ' . sbModTable() . " WHERE `name` = '" . $db->real_escape_string($name) . "'")) throw new RuntimeException('Registre des modules : ' . $db->error);
-	sbModKept($name, ($dropData || !$tables) ? '' : (string) $row['db_version']);
-	if ($plain) sbModKeepBackup($name, $plain);
+	$dp = sbModDeletePlan($name);
+	$plain = sbModBackup($name, $dp['files'], array(), true);
+	$root = sbUpdSiteRoot() . '/';
+	$targets = array();
+	try {
+		foreach ($tables as $t) {
+			if (!$db->query('DROP TABLE IF EXISTS `' . sbUpdDbPrefix() . $t . '`')) throw new RuntimeException('Suppression de la table ' . $t . ' impossible (' . $db->error . ')');
+		}
+		if (!$db->query('DELETE FROM ' . sbModTable() . " WHERE `name` = '" . $db->real_escape_string($name) . "'")) throw new RuntimeException('Registre des modules : ' . $db->error);
+		foreach ($dp['files'] as $rel) {
+			$t = sbUpdTargetRel($rel);
+			if (is_file($root . $t) && !@unlink($root . $t)) throw new RuntimeException('Suppression impossible : ' . $t);
+			$targets[] = $t;
+		}
+	} catch (Throwable $e) {
+		// Base (tables et registre) puis fichiers remis : module toujours installé
+		try { sbModRestore($plain); @unlink($plain); $msg = ' : base et fichiers remis, module toujours installé'; }
+		catch (Throwable $e2) { sbModKeepBackup($name, $plain); $msg = ' ET remise en échec (' . $e2->getMessage() . ') : sauvegarde gardée dans le dossier de travail'; }
+		sbModulesInstalled(true);
+		throw new RuntimeException($e->getMessage() . $msg);
+	}
+	sbModPruneDirs($targets);
+	@rmdir(sbModulesDir() . $name);
+	@unlink(sbModWorkDir() . '/' . $name . '.json');
+	sbModKept($name, '');
+	sbModKeepBackup($name, $plain);
 	sbUpdClearCaches();
-	$step = 'Module ' . $name . ' désinstallé' . ($tables ? ($dropData ? ', ' . count($tables) . ' table(s) supprimée(s) (sauvegarde chiffrée gardée)' : ', données gardées (' . count($tables) . ' table(s))') : '');
-	return array('step' => $step, 'label' => 'désinstallé' . ($dropData ? ', données supprimées' : ''), 'from' => $row['version']);
+	$step = 'Module ' . $name . ' supprimé : ' . count($tables) . ' table(s) et ' . count($targets) . ' fichier(s) retirés (sauvegarde chiffrée gardée)';
+	return array('step' => $step, 'label' => 'supprimé (données, tables, fichiers)', 'from' => $row['version'], 'files' => count($targets));
 }
 
-/** Supprimer les fichiers d'un module non installé */
+/** Supprimer les fichiers d'un module non installé (retour arrière d'une installation) */
 function sbModRunDelete($name, $confirm) {
 	if (sbModRow($name)) throw new RuntimeException('Désinstallez d\'abord le module');
 	$dp = sbModDeletePlan($name);

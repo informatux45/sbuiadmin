@@ -69,6 +69,10 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
+**4.31**
+- Modules card simplified: Install (downloads the module if needed), Update, Uninstall
+- Uninstall can now remove the whole module (data, tables, files), listing what will be lost before confirming
+
 **4.30**
 - Fixed: updating from 4.28 or earlier stopped on the 4.29 database migration (it was rolled back automatically)
 - Update page: version and status side by side, green when up to date; the update icon now counts core and module updates
