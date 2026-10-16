@@ -654,16 +654,16 @@ class form extends sanitize {
 				$chaineTemp .= $clef.'="'.$val.'" ';
 			}
 
-			if ($tabCheck[$i]['value'])
+			if (!empty($tabCheck[$i]['value']))
 				$chaineTemp .= 'value="' .$tabCheck[$i]['value'].'" ';
 
 			if ($i == count($tabCheck)-1 && $isRequired == true)
 				$chaineTemp .= 'required="true" bname="' . $label . '"';
 
-			if ($tabCheck[$i]['checked'] && $tabCheck[$i]['checked'] == '1')
+			if (($tabCheck[$i]['checked'] ?? '') == '1')
 				$chaineTemp .= 'checked="checked" ';
 
-			if ($tabCheck[$i]['disabled'] && $tabCheck[$i]['disabled'] == 'disabled')
+			if (($tabCheck[$i]['disabled'] ?? '') == 'disabled')
 				$chaineTemp .= 'disabled="" ';
 
 			$chaineTemp .= '/> <span class="box"></span>';
@@ -1345,6 +1345,7 @@ class form extends sanitize {
 	* @return Page Builder
 	*/
 	public function addPageBuilder ($label = '', $src = '', $arrArgs = array (), $isRequired = false, $toolbar = 'full', $helpDsc = '') {
+		$chaineTemp = ''; // PHP 8 : complétée par .= plus bas
 		// $cpt était absent ici (même famille de bug que addCountry(), voir
 		// project_sbuiadmin_sandbox_pagebuilder_quirks) - la méthode
 		// n'enregistrait jamais sa place dans formElementArr, donc le champ

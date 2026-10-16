@@ -643,7 +643,7 @@ INSERT INTO `<DB_PREFIX>sb_modules` (`name`, `version`, `db_version`, `installed
 ('download', '1.0.0', '1.0.0', NOW()),
 ('faq', '1.0.0', '1.0.0', NOW()),
 ('gallery', '1.0.0', '1.0.0', NOW()),
-('news', '1.0.0', '1.0.0', NOW()),
+('news', '1.0.1', '1.0.1', NOW()),
 ('slider', '1.0.0', '1.0.0', NOW()),
 ('tabbs', '1.0.0', '1.0.0', NOW()),
 ('table', '1.0.1', '1.0.1', NOW());

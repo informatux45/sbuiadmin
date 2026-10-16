@@ -69,6 +69,10 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
+**4.33**
+- PHP 8: no more warnings on the site and in the administration (templates, pages, news, logout, forms)
+- Dashboard: the widget form title is shown again
+
 **4.32**
 - Update page: progress and errors now show where the action happens (update card, module row)
 - Stray system files removed (.DS_Store, Thumbs.db, .orig); module files no longer reported as modified when they are not

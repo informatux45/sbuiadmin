@@ -992,7 +992,8 @@ if (!function_exists("insert_sbGetConfig")) {
 		$request = $sbsql->query($query);
 		$result  = $sbsql->object($request);
 		
-		$config_info = $sbsanitize->displayText($sbsanitize->displayLang($result->content, $_SESSION['lang']));
+		// Réglage absent : vide (PHP 8 : pas de lecture sur null)
+		$config_info = $sbsanitize->displayText($sbsanitize->displayLang($result ? $result->content : '', $_SESSION['lang'] ?? 'fr'));
 		
 		return sbGetShortcode($config_info);
 	}
@@ -1332,9 +1333,9 @@ if (!function_exists("insert_sbGetThemeOption")) {
 		$option_num  = (isset($param['n'])) ? $param['n'] : '';
 		# Get option string
 		if (!empty($option_num))
-			$option_string = $theme[$option_name][$option_num];
+			$option_string = $theme[$option_name][$option_num] ?? '';
 		else
-			$option_string = $theme[$option_name];
+			$option_string = $theme[$option_name] ?? '';
 		return sbGetShortcode($option_string);
 	}
 }

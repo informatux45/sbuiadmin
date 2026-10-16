@@ -83,6 +83,9 @@ sbModulesLoadAdminLang(_AM_SITE_LANG);
 // ------------------------------------------------------
 sb_global_include(_AM_SMARTY_DIR . 'Smarty.class.php');
 $sbsmarty = new Smarty();
+// PHP 8 : variable de gabarit non assignée, clé absente, propriété sur null =
+// valeur vide, comme sous PHP 7 (Smarty 4.3+ ; les autres erreurs passent)
+$sbsmarty->muteUndefinedOrNullWarnings();
 
 // ----------------------
 // CLASSES by array

@@ -667,6 +667,9 @@ switch ($action) {
 		// --- Bouton "Actions" de la colonne droite (shared-panel-actions.tpl)
 		$sbsmarty->assign('sb_form_id', $formName);
 		$sbsmarty->assign('sb_form_submit_value', $btn_add_edit);
+		// Titre du formulaire (jamais transmis jusqu'ici : carte sans titre).
+		// Le gabarit le décode (unescape) : aucune balise venue du titre saisi
+		$sbsmarty->assign('legend_add_edit', ($action == 'add') ? $legend_add_edit : sprintf($legend_add_edit, strip_tags(html_entity_decode((string) ($widget_title ?? ''), ENT_QUOTES, 'UTF-8'))));
 
 		// --- Mapping table -> colonnes pour la cascade des <select> côté JS
 		// (assets/adminator/dashboard-widget-form.js), pas d'aller-retour AJAX.

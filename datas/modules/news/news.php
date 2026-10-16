@@ -136,7 +136,8 @@ switch($op) {
 		$catid_module_show = $news_options['catid_module_show'];
 		$queryN   = "SELECT * FROM {$module['tables']['newscat']} WHERE id = '$catid_module_show'";
 		$requestN = $sbsql->query($queryN);
-		$assoc   = $sbsql->assoc($requestN);
+		// Rubrique absente : réglages vides (PHP 8 : pas de lecture sur null)
+		$assoc   = $sbsql->assoc($requestN) ?: array('tpl_list' => '', 'module_show' => '', 'module_show_masonry' => '');
 		// --- Infos
 		$sb_news_title = _CMS_NEWS_ALLNEWS;
 		// --- Assign news title
@@ -184,7 +185,8 @@ switch($op) {
 		// --------------------------
 		$queryN   = "SELECT * FROM {$module['tables']['newscat']} WHERE id = '$id'";
 		$requestN = $sbsql->query($queryN);
-		$assoc   = $sbsql->assoc($requestN);
+		// Rubrique absente : réglages vides (PHP 8 : pas de lecture sur null)
+		$assoc   = $sbsql->assoc($requestN) ?: array('tpl_list' => '', 'module_show' => '', 'module_show_masonry' => '');
 		// --- Infos
 		//$sb_news_title = _CMS_NEWS_NEWS . ' ' . $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']);
 		$sb_news_title = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']);

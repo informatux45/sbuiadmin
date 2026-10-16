@@ -206,7 +206,8 @@ if (in_array($sb_get_page, $sb_front_pages)) {
 	// ---------------------------------------
 	// --- Include PAGES Module (everytime)
 	// ---------------------------------------
-	$include_page_path = include_once($sb_call_path);
+	// Fichier absent (page d'un module sans contrôleur, ex. gallery) : 404
+	$include_page_path = is_file($sb_call_path) ? include_once($sb_call_path) : false;
 
 	// ---------------------------------------
 	// Check if display is possible

@@ -26,9 +26,9 @@
 
 function smarty_function_seo($params, &$smarty) {
 
-	$seo_url    = $params['rewrite'];
-	$normal_url = $params['url'];
-	$encode_url = $params['encode'];
+	$seo_url    = $params['rewrite'] ?? '';
+	$normal_url = $params['url'] ?? '';
+	$encode_url = $params['encode'] ?? '';
 	$base_url   = SB_URL;
 
 	if (SBREWRITEURL === true) {

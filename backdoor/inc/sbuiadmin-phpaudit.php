@@ -33,6 +33,11 @@ set_error_handler(function ($errno, $errstr, $errfile, $errline) {
 		E_WARNING => 'WARNING', E_USER_WARNING => 'USER_WARNING',
 		E_NOTICE => 'NOTICE', E_USER_NOTICE => 'USER_NOTICE',
 	);
+	// Erreur masquée volontairement (@ : sous PHP 8, error_reporting() ne vaut
+	// plus que les erreurs fatales) : pas un défaut à relever. Le site peut
+	// tourner avec error_reporting(0) : ce cas-là reste relevé.
+	$fatal = E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
+	if (error_reporting() === $fatal) return false;
 	$key = $errfile . ':' . $errline . ':' . $errstr;
 	if (!isset($GLOBALS['sb_phpaudit'][$key])) {
 		$GLOBALS['sb_phpaudit'][$key] = (isset($types[$errno]) ? $types[$errno] : $errno) . "\t" . $errfile . ':' . $errline . "\t" . $errstr;

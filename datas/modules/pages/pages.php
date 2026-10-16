@@ -33,10 +33,11 @@ $modpage['template_main'] = MODFILE . '_' . $template . '.tpl';
 // stopXSS() ne retire PAS l'apostrophe : ce n'est pas une protection SQL.
 $query   = "SELECT * FROM {$modpage['tables']['pages']} WHERE seo_url = '" . $sbsql->escape_string($id) . "'";
 $request = $sbsql->query($query);
-$assoc   = $sbsql->assoc($request);
+// Page introuvable : valeurs vides (PHP 8 : pas de lecture sur null)
+$assoc   = $sbsql->assoc($request) ?: array('title' => '', 'content' => '', 'active' => 0);
 // --- Assign Array
-$sb_pages_title   = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']);
-$sb_pages_content = $sbsanitize->displayLang(sb_utf8_encode($assoc['content']), $_SESSION['lang']);
+$sb_pages_title   = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang'] ?? 'fr');
+$sb_pages_content = $sbsanitize->displayLang(sb_utf8_encode($assoc['content']), $_SESSION['lang'] ?? 'fr');
 $sb_pages_active  = $assoc['active'];
 
 if ($sb_pages_active) {

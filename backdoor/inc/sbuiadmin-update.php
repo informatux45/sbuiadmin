@@ -471,6 +471,7 @@ function sbUpdStateFile() {
 	return sbUpdWorkDir() . '/state.json';
 }
 function sbUpdLoadJob() {
+	if (!is_file(sbUpdStateFile())) return null;
 	$j = @json_decode((string) @file_get_contents(sbUpdStateFile()), true);
 	return is_array($j) ? $j : null;
 }
