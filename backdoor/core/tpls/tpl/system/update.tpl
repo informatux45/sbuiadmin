@@ -29,6 +29,18 @@
 					</div>
 					<div class="card-body">
 						<p>Version installée : <strong>{$sb_upd_state.current|escape}</strong> — schéma de la base : <strong>{$sb_upd_db_version|escape}</strong></p>
+						{if $sb_upd_db_pending.migrations}
+						<div class="alert warning" style="margin:4px 0 14px"><span class="ico"><svg viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg></span><div class="body">
+							<strong>Base de données à mettre à niveau</strong><br>
+							Les fichiers sont en {$sb_upd_db_pending.to|escape} mais la base en est restée au schéma {$sb_upd_db_pending.from|escape} (fichiers mis à jour hors de cette page : FTP, copie…).<br>
+							Migration{if $sb_upd_db_pending.many}s{/if} en attente : <strong>{$sb_upd_db_pending.list|escape}</strong>. La base est sauvegardée avant, et remise telle quelle si une migration échoue.
+							<div class="field" style="margin-top:10px;max-width:340px">
+								<label class="field-label" for="sbupd-db-password">Votre mot de passe (confirmation)</label>
+								<input class="input" type="password" id="sbupd-db-password" autocomplete="current-password">
+							</div>
+							<button type="button" class="btn btn--primary" style="margin-top:10px" data-upd-action="dbupgrade">Mettre la base à niveau</button>
+						</div></div>
+						{/if}
 						{if $sb_upd_state.latest}
 							<p>Dernière version publiée : <strong>{$sb_upd_state.latest.version|escape}</strong>
 							{if $sb_upd_state.latest.url} — <a href="{$sb_upd_state.latest.url|escape}" target="_blank" rel="noopener">voir sur GitHub</a>{/if}</p>
@@ -93,7 +105,7 @@
 				{/if}
 
 				{* --- Modules : mis à jour séparément du core --- *}
-				{literal}<style>.sbmod-table td:nth-child(3),.sbmod-table th:nth-child(3){padding-right:40px}.sbmod-table td:nth-child(4),.sbmod-table td:nth-child(5),.sbmod-table th:nth-child(4),.sbmod-table th:nth-child(5){white-space:nowrap;padding-right:24px}.sbmod-busy{display:flex;flex-direction:column;align-items:center;gap:10px;padding:22px 12px;text-align:center}.sbmod-busy strong{font-size:15px;color:var(--primary)}.sbmod-busy small{color:var(--t-muted)}.sbbtn-spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sbmodspin .8s linear infinite;vertical-align:-2px;margin-right:6px}.sbmod-spin{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:sbmodspin .8s linear infinite}@keyframes sbmodspin{to{transform:rotate(360deg)}}.sbmod-ico{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--primary-soft);color:var(--primary);font-size:16px}</style>{/literal}
+				{literal}<style>.sbmod-table th:nth-child(n+4){text-align:center}.sbmod-table tr:not(#sbmod-slot) td:nth-child(4),.sbmod-table tr:not(#sbmod-slot) td:nth-child(5),.sbmod-table tr:not(#sbmod-slot) td:nth-child(6){text-align:center}.table tbody tr#sbmod-slot:hover td{background:transparent}#sbmod-panel{background:var(--bg-muted)}.sbmod-table td:nth-child(3),.sbmod-table th:nth-child(3){padding-right:40px}.sbmod-table td:nth-child(4),.sbmod-table td:nth-child(5),.sbmod-table th:nth-child(4),.sbmod-table th:nth-child(5){white-space:nowrap;padding-right:24px}.sbmod-busy{display:flex;flex-direction:column;align-items:center;gap:10px;padding:22px 12px;text-align:center}.sbmod-busy strong{font-size:15px;color:var(--primary)}.sbmod-busy small{color:var(--t-muted)}.sbbtn-spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sbmodspin .8s linear infinite;vertical-align:-2px;margin-right:6px}.sbmod-spin{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:sbmodspin .8s linear infinite}@keyframes sbmodspin{to{transform:rotate(360deg)}}.sbmod-ico{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--primary-soft);color:var(--primary);font-size:16px}</style>{/literal}
 				<section class="col-12 card" id="sbmod">
 					<div class="card-head">
 						<div class="card-title-wrap">

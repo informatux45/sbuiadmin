@@ -69,6 +69,9 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
+**4.36**
+- Update page: database left behind the files (FTP copy…) detected, upgraded on demand with a backup restored on failure; Modules table centred
+
 **4.35**
 - Update page: Reload button fixed, clearer module messages (module name, plurals), better spacing in the Modules table
 

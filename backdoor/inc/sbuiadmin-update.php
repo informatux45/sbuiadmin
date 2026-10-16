@@ -1072,6 +1072,68 @@ function sbUpdRollback($name, $acceptDataLoss = false) {
 	return array('status' => 'restored', 'done' => $job['done'], 'total' => $job['total'], 'step' => $job['step']);
 }
 
+// -----------------------------------------------------------------------
+// Base en retard sur les fichiers (mise à jour hors de cette page : FTP,
+// copie à la main...) : migrations en attente, passées à la demande
+// -----------------------------------------------------------------------
+
+/** @return array from (schéma de la base), to (version installée), migrations en attente */
+function sbUpdDbPending() {
+	$from = sbUpdDbVersion();
+	$to   = sbUpdInstalledVersion();
+	return array('from' => $from, 'to' => $to, 'migrations' => array_keys(sbUpdPendingMigrations($from, $to)));
+}
+
+/**
+ * Passe les migrations en attente : sauvegarde de toute la base d'abord,
+ * site en maintenance pendant les migrations, base remise depuis la
+ * sauvegarde si l'une échoue. La sauvegarde est gardée chiffrée (une seule).
+ * @return array résumé (step : texte)
+ */
+function sbUpdDbUpgrade() {
+	ignore_user_abort(true);
+	@set_time_limit(0);
+	$job = sbUpdLoadJob();
+	if ($job && in_array($job['status'], array('running', 'restoring', 'rollback'), true) && !sbUpdStale($job)) throw new RuntimeException('Une mise à jour est en cours');
+	$p = sbUpdDbPending();
+	$pending = sbUpdPendingMigrations($p['from'], $p['to']);
+	if (!$pending) throw new RuntimeException('La base de données est déjà à jour');
+	sbUpdBackupKey();
+	$db     = sbUpdDb();
+	$prefix = sbUpdDbPrefix();
+	$work   = sbUpdWorkDir();
+	$user   = isset($_SESSION['sbuiadmin_user_name']) ? (string) $_SESSION['sbuiadmin_user_name'] : '';
+	$stamp  = date('Ymd-His') . '-' . bin2hex(random_bytes(4));
+	$dump   = $work . '/tmp-db-' . $stamp . '.sql';
+	$enc    = $work . '/dbupgrade-' . $stamp . '.sql.enc';
+	sbUpdDbDump($db, $prefix, $dump);
+	sbUpdLock(true);
+	try {
+		$done = sbUpdMigrateUp($db, $prefix, $pending);
+	} catch (Throwable $e) {
+		try {
+			sbUpdDbRestore($db, $prefix, $dump);
+			$msg = ' : base remise dans son état d\'avant';
+		} catch (Throwable $e2) {
+			sbUpdEncryptFile($dump, $enc);
+			$msg = ' ET remise en échec (' . $e2->getMessage() . ') : sauvegarde chiffrée gardée (' . basename($enc) . ')';
+		}
+		@unlink($dump);
+		sbUpdLock(false);
+		sbUpdLog('Mise à niveau de la base en échec (' . $e->getMessage() . ')' . $msg, $user);
+		throw new RuntimeException('Mise à niveau de la base en échec (' . $e->getMessage() . ')' . $msg);
+	}
+	sbUpdLock(false);
+	foreach ((array) @glob($work . '/dbupgrade-*.sql.enc') as $old) @unlink($old);
+	sbUpdEncryptFile($dump, $enc);
+	@unlink($dump);
+	$last = end($done);
+	sbUpdHistory(array('from' => $p['from'], 'to' => $last, 'user' => $user, 'migrations_applied' => $done), 'mise à niveau de la base');
+	$step = 'Base de données mise à niveau : ' . count($done) . ' migration' . (count($done) > 1 ? 's' : '') . ' (' . implode(', ', $done) . '), schéma ' . $p['from'] . ' → ' . $last . ' (sauvegarde chiffrée de la base gardée)';
+	sbUpdLog($step, $user);
+	return array('status' => 'done', 'step' => $step);
+}
+
 /** Opération abandonnée (navigateur fermé...) depuis plus que la durée du verrou ? */
 function sbUpdStale(array $job) {
 	return !empty($job['started']) && (time() - $job['started']) > SB_UPD_LOCK_TTL;

@@ -358,6 +358,18 @@
 			if (!pw) { error('Saisissez votre mot de passe pour confirmer.'); return; }
 			$('sbupd-password').value = '';
 			longAction('run', { confirm: needConfirm ? '1' : '', password: pw }, 'Mise à jour terminée');
+		} else if (action === 'dbupgrade') {
+			var dpw = $('sbupd-db-password').value;
+			if (!dpw) { error('Saisissez votre mot de passe pour confirmer.'); return; }
+			$('sbupd-db-password').value = '';
+			setButtons(true);
+			busy = true;
+			coreBusy('Mise à niveau de la base en cours…', 'Sauvegarde de la base, puis migrations ; le site affiche « mise à jour en cours », ne fermez pas la page');
+			post('dbupgrade', { password: dpw }).then(function (r) {
+				busy = false;
+				coreResult(r.step);
+				if (typeof sbToast === 'function') sbToast(r.step, 'success');
+			}).catch(function (e) { error(e.message); });
 		} else if (action === 'cancel') {
 			post('cancel').then(function () { location.reload(); }).catch(function (e) { error(e.message); });
 		} else if (action === 'rollback') {

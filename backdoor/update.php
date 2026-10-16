@@ -56,12 +56,12 @@ if ($sb_is_ajax) {
 		$_SESSION['sbupd_state'] = sbUpdStateFile();
 		// Mise à jour et retour arrière : mot de passe redemandé (une session
 		// volée ou un poste resté ouvert ne suffit pas), tentatives comptées
-		if ($sb_action === 'run' || $sb_action === 'rollback' || $sb_action === 'modrun') {
+		if ($sb_action === 'run' || $sb_action === 'rollback' || $sb_action === 'modrun' || $sb_action === 'dbupgrade') {
 			$sb_user = (string) $_SESSION['sbuiadmin_user_name'];
 			if (sbLoginLocked($sb_user)) throw new RuntimeException('Trop de tentatives échouées : réessayez dans quelques minutes');
 			if (!$sbusers->login($sb_user, (string) ($_POST['password'] ?? ''))) {
 				sbLoginFailed($sb_user);
-				sbUpdLog('Mot de passe refusé avant ' . ($sb_action === 'run' ? 'une mise à jour' : ($sb_action === 'modrun' ? 'une opération sur un module' : 'un retour arrière')), $sb_user);
+				sbUpdLog('Mot de passe refusé avant ' . ($sb_action === 'run' ? 'une mise à jour' : ($sb_action === 'modrun' ? 'une opération sur un module' : ($sb_action === 'dbupgrade' ? 'une mise à niveau de la base' : 'un retour arrière'))), $sb_user);
 				throw new RuntimeException('Mot de passe incorrect');
 			}
 		}
@@ -88,6 +88,11 @@ if ($sb_is_ajax) {
 			case 'cancel':
 				sbUpdCancel();
 				$out = array('status' => 'cancelled');
+				break;
+			// --- Base en retard sur les fichiers : migrations en attente
+			case 'dbupgrade':
+				session_write_close();
+				$out = sbUpdDbUpgrade();
 				break;
 			// --- Modules (voir inc/sbuiadmin-update-modules.php)
 			case 'modcheck':
@@ -122,6 +127,7 @@ $sb_upd_job      = null;
 $sb_upd_storage  = null;
 $sb_upd_selftest = '';
 $sb_upd_rollback = null;
+$sb_upd_db_pending = array('migrations' => array());
 try {
 	$sb_upd_storage = sbUpdStorageInfo();
 	$sb_upd_selftest = sbUpdSelfTest();
@@ -136,6 +142,9 @@ try {
 		$sb_upd_rollback['migrations_str'] = implode(', ', (array) ($sb_upd_rollback['migrations'] ?? array()));
 	}
 	sbUpdDbVersion(); // initialise db_version si absente
+	$sb_upd_db_pending = sbUpdDbPending();
+	$sb_upd_db_pending['list'] = implode(', ', $sb_upd_db_pending['migrations']);
+	$sb_upd_db_pending['many'] = count($sb_upd_db_pending['migrations']) > 1;
 } catch (Throwable $e) {
 	$sb_msg_error = $e->getMessage();
 }
@@ -160,6 +169,7 @@ $sbsmarty->assign('sb_upd_storage', $sb_upd_storage);
 $sbsmarty->assign('sb_upd_selftest', $sb_upd_selftest);
 $sbsmarty->assign('sb_upd_rollback', $sb_upd_rollback);
 $sbsmarty->assign('sb_upd_db_version', sbSetting('db_version'));
+$sbsmarty->assign('sb_upd_db_pending', $sb_upd_db_pending);
 $sbsmarty->assign('sb_upd_history', is_array($sb_upd_history) ? $sb_upd_history : array());
 $sbsmarty->assign('sb_upd_token', $_SESSION['sbupd_token']);
 // Date du fichier : le .htaccess garde les .js une heure en cache
