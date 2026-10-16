@@ -176,6 +176,10 @@ function sbModCatalog() {
 		} elseif ($remote) {
 			if ($row['remote_ok']) $row['actions'][] = 'install'; else $row['blocked']['install'] = $why($remote['requires_core']);
 		}
+		// Dernière opération annulable (sauvegarde gardée, rien n'a bougé depuis)
+		$rb = sbModRollbackInfo($name);
+		$row['rollback'] = $rb ? array('label' => $rb['label'] ?? 'la dernière opération', 'date' => date('d/m/Y H:i', strtotime($rb['date'] ?? 'now'))) : null;
+		if ($rb) $row['actions'][] = 'rollback';
 		if (!$local) $row['state'] = 'absent';
 		elseif (!$row['installed']) $row['state'] = 'present';
 		elseif ($row['newer']) $row['state'] = 'outdated';
@@ -200,9 +204,21 @@ function sbModUnlock($fh) {
 	if ($fh) { flock($fh, LOCK_UN); fclose($fh); }
 }
 
+/** Tables du module (noms complets), d'après son module.php */
+function sbModScope($name) {
+	$out = array();
+	foreach (array_keys((array) (sbModuleMeta($name)['tables'] ?? array())) as $t) {
+		if (preg_match('/^[A-Za-z0-9_]+$/', $t)) $out[] = sbUpdDbPrefix() . $t;
+	}
+	return $out;
+}
+
 /**
- * Sauvegarde EN CLAIR (chiffrée ensuite) des fichiers touchés et, si $withDb,
- * de la base. @return string chemin du zip en clair
+ * Sauvegarde EN CLAIR (chiffrée ensuite) : fichiers touchés, fichiers
+ * ajoutés (à retirer au retour), état du module avant l'opération (ligne du
+ * registre, liste livrée, version de base gardée) et, si $withDb, ses tables
+ * SEULEMENT (périmètre limité : le reste de la base n'est jamais touché).
+ * @return string chemin du zip en clair
  */
 function sbModBackup($name, array $touched, array $added, $withDb) {
 	$root  = sbUpdSiteRoot() . '/';
@@ -217,10 +233,17 @@ function sbModBackup($name, array $touched, array $added, $withDb) {
 	$dump = null;
 	if ($withDb) {
 		$dump = sbModWorkDir() . '/tmp-' . $stamp . '.sql';
-		sbUpdDbDump(sbUpdDb(), sbUpdDbPrefix(), $dump);
+		sbUpdDbDump(sbUpdDb(), sbUpdDbPrefix(), $dump, sbModScope($name));
 		$z->addFile($dump, SB_UPD_DB_ENTRY);
 	}
-	$z->addFromString(SB_UPD_ROLLBACK_META, json_encode(array('module' => $name, 'date' => date('c'), 'added' => array_values(array_map('sbUpdTargetRel', $added)), 'db' => (bool) $withDb), JSON_UNESCAPED_SLASHES));
+	$installed = sbModulesInstalled(true);
+	$before = array(
+		'row'     => $installed[$name] ?? null,
+		'stored'  => sbModStoredList($name),
+		'kept'    => sbModKept($name),
+		'version' => sbModuleMeta($name)['version'] ?? '',
+	);
+	$z->addFromString(SB_UPD_ROLLBACK_META, json_encode(array('module' => $name, 'date' => date('c'), 'added' => array_values(array_map('sbUpdTargetRel', $added)), 'db' => (bool) $withDb, 'before' => $before), JSON_UNESCAPED_SLASHES));
 	$closed = $z->close();
 	if ($dump) @unlink($dump);
 	if (!$closed) { @unlink($plain); throw new RuntimeException('Sauvegarde impossible à écrire'); }
@@ -228,14 +251,51 @@ function sbModBackup($name, array $touched, array $added, $withDb) {
 	return $plain;
 }
 
-/** Garde la sauvegarde chiffrée (une seule par module) */
-function sbModKeepBackup($name, $plain) {
-	foreach ((array) @glob(sbModWorkDir() . '/backup-' . $name . '-*.zip.enc') as $old) @unlink($old);
-	sbUpdEncryptFile($plain, sbModWorkDir() . '/backup-' . $name . '-' . date('Ymd-His') . '.zip.enc');
-	@unlink($plain);
+/** Sauvegardes chiffrées d'un module (plus récente d'abord) */
+function sbModBackups($name) {
+	$list = (array) @glob(sbModWorkDir() . '/backup-' . $name . '-*.zip.enc');
+	usort($list, function ($a, $b) { return strcmp(basename($b), basename($a)); });
+	return $list;
 }
 
-/** Remet les fichiers (et la base si sauvegardée) depuis une sauvegarde en clair */
+function sbModDeleteBackups($name) {
+	foreach (sbModBackups($name) as $f) { @unlink($f); @unlink(substr($f, 0, -strlen('.zip.enc')) . '.json'); }
+}
+
+/**
+ * Garde la sauvegarde chiffrée (une seule par module), avec à côté ce qu'il
+ * faut pour proposer de l'annuler ($info : op, label, after = état attendu
+ * pour que l'annulation reste possible, complete).
+ */
+function sbModKeepBackup($name, $plain, array $info = array()) {
+	sbModDeleteBackups($name);
+	$base = sbModWorkDir() . '/backup-' . $name . '-' . date('Ymd-His');
+	sbUpdEncryptFile($plain, $base . '.zip.enc');
+	@unlink($plain);
+	$info += array('module' => $name, 'date' => date('c'), 'complete' => false);
+	@file_put_contents($base . '.json', json_encode($info, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), LOCK_EX);
+	@chmod($base . '.json', 0600);
+}
+
+/** Remet l'état du module d'avant l'opération : registre, liste livrée, base gardée */
+function sbModRestoreState($name, array $before) {
+	$db = sbUpdDb();
+	$t = sbModTable();
+	$q = function ($v) use ($db) { return "'" . $db->real_escape_string((string) $v) . "'"; };
+	$db->query("DELETE FROM $t WHERE `name` = " . $q($name));
+	if (is_array($before['row'] ?? null)) {
+		$r = $before['row'];
+		$ok = $db->query("INSERT INTO $t (`name`, `version`, `db_version`, `installed_at`, `updated_at`) VALUES (" . $q($name) . ', ' . $q($r['version'] ?? '') . ', ' . $q($r['db_version'] ?? '') . ', '
+			. (empty($r['installed_at']) ? 'NOW()' : $q($r['installed_at'])) . ', ' . (empty($r['updated_at']) ? 'NULL' : $q($r['updated_at'])) . ')');
+		if (!$ok) throw new RuntimeException('Registre des modules : ' . $db->error);
+	}
+	if (is_array($before['stored'] ?? null)) sbModStoreList($name, (string) ($before['version'] ?? ''), $before['stored']);
+	else @unlink(sbModWorkDir() . '/' . $name . '.json');
+	sbModKept($name, (string) ($before['kept'] ?? ''));
+	sbModulesInstalled(true);
+}
+
+/** Remet base (tables du module), fichiers et état depuis une sauvegarde en clair */
 function sbModRestore($plain) {
 	$root = sbUpdSiteRoot() . '/';
 	$z = new ZipArchive();
@@ -259,13 +319,34 @@ function sbModRestore($plain) {
 			$data = $z->getFromIndex($i);
 			sbUpdWriteFile($root . $n, $data, hash('sha256', (string) $data), $n);
 		}
+		$gone = array();
 		foreach ((array) ($meta['added'] ?? array()) as $t) {
-			if (is_string($t) && sbUpdSafeRel($t) && !sbUpdIsProtected(sbUpdArchiveRel($t)) && is_file($root . $t) && !is_link($root . $t)) @unlink($root . $t);
+			if (is_string($t) && sbUpdSafeRel($t) && !sbUpdIsProtected(sbUpdArchiveRel($t)) && is_file($root . $t) && !is_link($root . $t)) { @unlink($root . $t); $gone[] = $t; }
 		}
+		sbModPruneDirs($gone);
+		if (is_array($meta['before'] ?? null) && !empty($meta['module'])) sbModRestoreState($meta['module'], $meta['before']);
 	} finally {
 		$z->close();
 		sbUpdClearCaches();
+		sbModulesPresent(true);
 	}
+}
+
+/**
+ * Dernière opération annulable : sauvegarde complète, et module toujours
+ * dans l'état qu'elle a laissé (sinon l'annuler écraserait ce qui a suivi).
+ * @return array|null infos de la sauvegarde (op, label, date, db...)
+ */
+function sbModRollbackInfo($name) {
+	$b = sbModBackups($name);
+	if (!$b) return null;
+	$info = json_decode((string) @file_get_contents(substr($b[0], 0, -strlen('.zip.enc')) . '.json'), true);
+	if (!is_array($info) || empty($info['complete']) || !is_array($info['after'] ?? null)) return null;
+	$installed = sbModulesInstalled();
+	$now = array('installed' => is_array($installed) && isset($installed[$name]), 'version' => sbModuleMeta($name)['version'] ?? '');
+	if ($now['installed'] !== (bool) $info['after']['installed'] || $now['version'] !== (string) $info['after']['version']) return null;
+	$info['file'] = $b[0];
+	return $info;
 }
 
 /** Retire les dossiers vides laissés par des fichiers supprimés */
@@ -397,7 +478,11 @@ function sbModDownload($name) {
 	if (!version_compare(sbUpdInstalledVersion(), $e['requires_core'], '>=')) throw new RuntimeException('Le module ' . $name . ' ' . $e['version'] . ' demande le core ' . $e['requires_core'] . ' : mettez d\'abord SBUIADMIN à jour');
 	if (!isset($assets[$e['file']])) throw new RuntimeException('Archive ' . $e['file'] . ' absente de la version publiée');
 	$zipPath = sbModWorkDir() . '/' . $e['file'];
-	sbUpdGet($assets[$e['file']], $e['size'], $zipPath, 300);
+	// Archives abandonnées (préparation sans suite) : retirées après un jour
+	foreach ((array) @glob(sbModWorkDir() . '/sbuiadmin-module-*.zip') as $old) if (is_file($old) && filemtime($old) < time() - 86400) @unlink($old);
+	// Déjà téléchargée par la préparation et toujours conforme à l'index signé : réutilisée
+	$reuse = is_file($zipPath) && filesize($zipPath) === $e['size'] && hash_equals($e['sha256'], hash_file('sha256', $zipPath));
+	if (!$reuse) sbUpdGet($assets[$e['file']], $e['size'], $zipPath, 300);
 	if (filesize($zipPath) !== $e['size'] || !hash_equals($e['sha256'], hash_file('sha256', $zipPath))) {
 		@unlink($zipPath);
 		throw new RuntimeException('L\'archive du module ne correspond pas à l\'index signé');
@@ -458,14 +543,47 @@ function sbModOfficialList($name) {
 	if ($old !== null) return $old;
 	$local = sbModuleMeta($name);
 	if (!$local) return null;
+	$files = sbModFindPublishedList($name, $local['version']);
+	if ($files === null) return null;
+	sbModStoreList($name, $local['version'], $files);
+	return $files;
+}
+
+/**
+ * Liste des fichiers d'une version de module, cherchée dans les versions
+ * publiées (la plus récente d'abord, manifeste signé vérifié pour chacune) ;
+ * arrêt à la première version sans index des modules (antérieure à 4.29).
+ * @return array|null chemin => sha256
+ */
+function sbModFindPublishedList($name, $version, $max = 15) {
 	try {
-		list(, , $idx) = sbModFetchLatest(15);
+		$rels = json_decode(sbUpdGet('https://api.github.com/repos/' . SB_UPD_REPO . '/releases?per_page=' . (int) $max, 2 * 1024 * 1024, null, 20), true);
 	} catch (Throwable $e) {
 		return null;
 	}
-	if (!isset($idx[$name]) || $idx[$name]['version'] !== $local['version']) return null;
-	sbModStoreList($name, $local['version'], $idx[$name]['files']);
-	return $idx[$name]['files'];
+	foreach ((array) $rels as $rel) {
+		$tag = (string) ($rel['tag_name'] ?? '');
+		if (!preg_match('/^v\d+\.\d+(\.\d+)?$/', $tag) || !empty($rel['draft']) || !empty($rel['prerelease'])) continue;
+		// Fichiers joints lus dans la liste elle-même : un seul appel à l'API
+		// GitHub (limitée à 60 par heure sans authentification), le reste en
+		// téléchargements ; manifeste signé vérifié comme pour toute version
+		$assets = array();
+		foreach ((array) ($rel['assets'] ?? array()) as $a) {
+			if (isset($a['name'], $a['browser_download_url']) && sbUpdAllowedUrl($a['browser_download_url'])) $assets[$a['name']] = $a['browser_download_url'];
+		}
+		if (!isset($assets[SB_UPD_MANIFEST], $assets[SB_UPD_MANIFEST . '.sig'])) continue;
+		try {
+			$m = sbUpdVerifyManifest(sbUpdGet($assets[SB_UPD_MANIFEST], 64 * 1024, null, 20), sbUpdGet($assets[SB_UPD_MANIFEST . '.sig'], 4096, null, 20));
+			if (($m['tag'] ?? '') !== $tag) continue;
+			$idx = sbUpdFetchModulesIndex($m, $assets, 20);
+		} catch (Throwable $e) {
+			continue;
+		}
+		if ($idx === null) break;
+		if (isset($idx[$name]) && $idx[$name]['version'] === $version) return $idx[$name]['files'];
+		if (isset($idx[$name]) && version_compare($idx[$name]['version'], $version, '<')) break;
+	}
+	return null;
 }
 
 /**
@@ -492,7 +610,7 @@ function sbModDeletePlan($name) {
 /** Contrôles communs : module connu, opération possible */
 function sbModCheck($name, $op) {
 	if (!sbModuleValidName($name) || in_array($name, sbModuleCore(), true)) throw new RuntimeException('Module refusé');
-	if (!in_array($op, array('install', 'update', 'uninstall'), true)) throw new RuntimeException('Opération inconnue');
+	if (!in_array($op, array('install', 'update', 'uninstall', 'rollback'), true)) throw new RuntimeException('Opération inconnue');
 	$cat = sbModCatalog();
 	if (!isset($cat[$name])) throw new RuntimeException('Module inconnu : ' . $name);
 	if (!in_array($op, $cat[$name]['actions'], true)) {
@@ -531,7 +649,8 @@ function sbModZipTables($zipPath, $name) {
  */
 function sbModPlan($name, $op) {
 	$row = sbModCheck($name, $op);
-	$plan = array('name' => $name, 'op' => $op, 'title' => $row['title'], 'modified' => array(), 'unchecked' => false, 'notes' => array());
+	// notes : avertissements (orange) ; info : simples informations (gris)
+	$plan = array('name' => $name, 'op' => $op, 'title' => $row['title'], 'modified' => array(), 'unchecked' => false, 'notes' => array(), 'info' => array());
 	if ($op === 'update' || ($op === 'install' && !$row['present'])) {
 		$dl = sbModDownload($name);
 		$old = $row['present'] ? sbModOfficialList($name) : sbModStoredList($name);
@@ -543,8 +662,8 @@ function sbModPlan($name, $op) {
 		$plan['unchecked'] = ($op === 'update' && $old === null);
 		$plan['download'] = ($op === 'install');
 		if ($op === 'install') $plan['tables_new'] = sbModZipTables($dl['zip'], $name);
-		@unlink($dl['zip']);
-		if ($op === 'update' && $row['installed']) $plan['notes'][] = 'Base de données sauvegardée avant la mise à jour (migrations éventuelles du module appliquées ensuite).';
+		// Archive gardée : l'exécution la réutilise si elle est toujours conforme
+		if ($op === 'update' && $row['installed']) $plan['info'][] = 'Base de données sauvegardée avant la mise à jour (migrations éventuelles du module appliquées ensuite).';
 	}
 	if ($op === 'install') {
 		$existing = array();
@@ -553,7 +672,19 @@ function sbModPlan($name, $op) {
 			$plan['tables_new'] = array_values(array_diff(array_keys((array) (sbModuleMeta($name)['tables'] ?? array())), $existing));
 		}
 		$plan['tables_kept'] = $existing;
-		if ($existing) $plan['notes'][] = 'Tables déjà présentes (données gardées) : ' . implode(', ', $existing) . '.';
+		if ($existing) $plan['info'][] = 'Tables déjà présentes (données gardées) : ' . implode(', ', $existing) . '.';
+	}
+	if ($op === 'rollback') {
+		$rb = sbModRollbackInfo($name);
+		if (!$rb) throw new RuntimeException('Rien à annuler pour ce module');
+		$plan['label'] = $rb['label'] ?? 'la dernière opération';
+		$plan['date'] = date('d/m/Y H:i', strtotime($rb['date'] ?? 'now'));
+		if (!empty($rb['before_absent'])) {
+			$plan['info'][] = 'Le module, installé depuis GitHub, sera retiré : ses tables et ses fichiers supprimés (sauvegarde chiffrée faite avant).';
+		} else {
+			if (!empty($rb['db'])) $plan['notes'][] = 'Les tables du module reviennent à leur état du ' . $plan['date'] . ' : ce qui y a été saisi depuis sera perdu.';
+			if (!empty($rb['files'])) $plan['info'][] = 'Les fichiers du module reviennent à leur état d\'avant (' . (int) $rb['files'] . ' concerné' . ((int) $rb['files'] > 1 ? 's' : '') . ').';
+		}
 	}
 	if ($op === 'uninstall') {
 		// Ce que supprimerait « Supprimer le module » (affiché si la case est cochée)
@@ -587,17 +718,21 @@ function sbModRun($name, $op, array $opt = array()) {
 			case 'update':
 				$out = sbModRunFiles($name, 'update', $row, $confirm);
 				break;
+			case 'rollback':
+				$out = sbModRunRollback($name);
+				break;
 			case 'install':
 				if ($row['present']) {
 					$out = sbModRunInstall($name, $row);
 					break;
 				}
 				// Absent : téléchargé, puis installé ; installation en échec =
-				// fichiers téléchargés retirés, le module redevient absent
+				// fichiers téléchargés retirés, le module redevient absent ;
+				// annulée plus tard = module retiré (il était absent)
 				$dl = sbModRunFiles($name, 'download', $row, $confirm);
 				sbModulesPresent(true);
 				try {
-					$out = sbModRunInstall($name, sbModCatalog()[$name]);
+					$out = sbModRunInstall($name, sbModCatalog()[$name], true);
 				} catch (Throwable $e) {
 					try { sbModRunDelete($name, true); } catch (Throwable $e2) { }
 					throw $e;
@@ -627,10 +762,10 @@ function sbModRunFiles($name, $op, array $row, $confirm) {
 	if ($op === 'update' && !$row['present']) throw new RuntimeException('Le module ' . $name . ' n\'est pas présent');
 	$dl = sbModDownload($name);
 	$new = $dl['entry']['files'];
-	$old = sbModStoredList($name);
+	$old = $row['present'] ? sbModOfficialList($name) : sbModStoredList($name);
 	$fp = sbModFilePlan($new, $old);
 	if (($fp['modified'] || ($op === 'update' && $old === null)) && !$confirm) {
-		@unlink($dl['zip']);
+		// Archive gardée : le nouvel essai, confirmé, la réutilise
 		throw new RuntimeException('Confirmez le remplacement des fichiers modifiés localement');
 	}
 	$installed = $row['installed'];
@@ -641,6 +776,7 @@ function sbModRunFiles($name, $op, array $row, $confirm) {
 	foreach ($fp['write'] as $rel) if (!is_file($root . sbUpdTargetRel($rel))) $added[] = $rel;
 	$plain = sbModBackup($name, array_merge($fp['write'], $fp['delete']), $added, $installed);
 	$migrations = array();
+	$v = $dl['entry']['version'];
 	try {
 		$z = new ZipArchive();
 		if ($z->open($dl['zip'], ZipArchive::RDONLY) !== true) throw new RuntimeException('Archive du module illisible');
@@ -662,7 +798,6 @@ function sbModRunFiles($name, $op, array $row, $confirm) {
 	} catch (Throwable $e) {
 		try {
 			sbModRestore($plain);
-			if ($installed && $dbRow) sbModSaveRow($name, $dbRow['version'], $dbRow['db_version'], false);
 			$msg = $e->getMessage() . ' : retour automatique effectué, module inchangé';
 		} catch (Throwable $e2) {
 			$msg = $e->getMessage() . ' ET retour automatique en échec (' . $e2->getMessage() . ') : sauvegarde gardée dans le dossier de travail';
@@ -673,10 +808,14 @@ function sbModRunFiles($name, $op, array $row, $confirm) {
 		@unlink($dl['zip']);
 		throw new RuntimeException($msg);
 	}
-	sbModStoreList($name, $dl['entry']['version'], $new);
-	sbModKeepBackup($name, $plain);
+	sbModStoreList($name, $v, $new);
+	if ($op === 'update') {
+		sbModKeepBackup($name, $plain, array('op' => 'update', 'label' => 'la mise à jour ' . $fromVersion . ' → ' . $v, 'db' => $installed, 'files' => count($fp['write']) + count($fp['delete']),
+			'after' => array('installed' => $installed, 'version' => $v), 'complete' => true));
+	} else {
+		@unlink($plain); // téléchargement avant installation : l'annulation retirera le module
+	}
 	@unlink($dl['zip']);
-	$v = $dl['entry']['version'];
 	$step = ($op === 'download')
 		? 'téléchargé en ' . $v . ' (' . count($fp['write']) . ' fichier(s)) : il reste à l\'installer'
 		: 'mis à jour ' . $fromVersion . ' → ' . $v . ' (' . count($fp['write']) . ' fichier(s) écrit(s), ' . count($fp['delete']) . ' retiré(s)' . ($migrations ? ', ' . count($migrations) . ' migration(s)' : '') . ')';
@@ -684,14 +823,16 @@ function sbModRunFiles($name, $op, array $row, $confirm) {
 }
 
 /** Installer : tables (install.php), migrations des tables gardées, inscription */
-function sbModRunInstall($name, array $row) {
+function sbModRunInstall($name, array $row, $wasAbsent = false) {
 	$meta = sbModuleMeta($name);
 	if (!version_compare(sbUpdInstalledVersion(), $meta['requires_core'], '>=')) throw new RuntimeException('Le module demande le core ' . $meta['requires_core']);
 	if (sbModRow($name)) throw new RuntimeException('Module déjà installé');
 	$db = sbUpdDb();
 	$kept = sbModExistingTables($name);
 	$keptDb = sbModKept($name);
-	$plain = $kept ? sbModBackup($name, array(), array(), true) : null;
+	// Périmètre = tables du module : au retour, celles créées ici sont
+	// retirées et celles gardées remises telles quelles
+	$plain = sbModBackup($name, array(), array(), true);
 	try {
 		$created = array();
 		$file = sbModulesDir() . $name . '/install.php';
@@ -705,13 +846,12 @@ function sbModRunInstall($name, array $row) {
 		sbModSaveRow($name, $meta['version'], $meta['version'], true);
 		sbModKept($name, '');
 	} catch (Throwable $e) {
-		// Tables créées ici retirées ; tables gardées remises depuis la sauvegarde
-		foreach ($created ?? array() as $t) $db->query('DROP TABLE IF EXISTS `' . $t . '`');
-		if ($plain) { try { sbModRestore($plain); } catch (Throwable $e2) { sbModKeepBackup($name, $plain); $plain = null; } }
-		if ($plain) @unlink($plain);
+		// Tables créées ici retirées, tables gardées remises, registre remis
+		try { sbModRestore($plain); @unlink($plain); } catch (Throwable $e2) { sbModKeepBackup($name, $plain); }
 		throw new RuntimeException($e->getMessage() . ' : installation annulée');
 	}
-	if ($plain) sbModKeepBackup($name, $plain);
+	sbModKeepBackup($name, $plain, array('op' => 'install', 'label' => 'l\'installation ' . $meta['version'], 'db' => true, 'files' => 0, 'before_absent' => (bool) $wasAbsent,
+		'after' => array('installed' => true, 'version' => $meta['version']), 'complete' => true));
 	sbUpdClearCaches();
 	$step = 'Module ' . $name . ' ' . $meta['version'] . ' installé (' . count($created) . ' table(s) créée(s)' . ($kept ? ', ' . count($kept) . ' gardée(s)' : '') . ($migrations ? ', ' . count($migrations) . ' migration(s)' : '') . ')';
 	return array('step' => $step, 'label' => 'installé ' . $meta['version'], 'to' => $meta['version']);
@@ -728,8 +868,11 @@ function sbModRunUninstall($name, $remove) {
 	$db = sbUpdDb();
 	$tables = sbModExistingTables($name);
 	if (!$remove) {
-		if (!$db->query('DELETE FROM ' . sbModTable() . " WHERE `name` = '" . $db->real_escape_string($name) . "'")) throw new RuntimeException('Registre des modules : ' . $db->error);
+		$plain = sbModBackup($name, array(), array(), false);
+		if (!$db->query('DELETE FROM ' . sbModTable() . " WHERE `name` = '" . $db->real_escape_string($name) . "'")) { @unlink($plain); throw new RuntimeException('Registre des modules : ' . $db->error); }
 		sbModKept($name, $tables ? (string) $row['db_version'] : '');
+		sbModKeepBackup($name, $plain, array('op' => 'uninstall', 'label' => 'la désinstallation', 'db' => false, 'files' => 0,
+			'after' => array('installed' => false, 'version' => (string) (sbModuleMeta($name)['version'] ?? '')), 'complete' => true));
 		sbUpdClearCaches();
 		$step = 'Module ' . $name . ' désinstallé, données et fichiers gardés' . ($tables ? ' (' . count($tables) . ' table(s))' : '');
 		return array('step' => $step, 'label' => 'désinstallé', 'from' => $row['version']);
@@ -759,10 +902,37 @@ function sbModRunUninstall($name, $remove) {
 	@rmdir(sbModulesDir() . $name);
 	@unlink(sbModWorkDir() . '/' . $name . '.json');
 	sbModKept($name, '');
-	sbModKeepBackup($name, $plain);
+	sbModKeepBackup($name, $plain, array('op' => 'remove', 'label' => 'la suppression du module', 'db' => true, 'files' => count($targets),
+		'after' => array('installed' => false, 'version' => ''), 'complete' => true));
 	sbUpdClearCaches();
 	$step = 'Module ' . $name . ' supprimé : ' . count($tables) . ' table(s) et ' . count($targets) . ' fichier(s) retirés (sauvegarde chiffrée gardée)';
 	return array('step' => $step, 'label' => 'supprimé (données, tables, fichiers)', 'from' => $row['version'], 'files' => count($targets));
+}
+
+/**
+ * Annuler la dernière opération d'un module : base (tables du module),
+ * fichiers et état remis depuis sa sauvegarde ; une installation depuis
+ * GitHub (module absent avant) est annulée en retirant le module. Un seul
+ * cran : la sauvegarde est ensuite supprimée.
+ */
+function sbModRunRollback($name) {
+	$rb = sbModRollbackInfo($name);
+	if (!$rb) throw new RuntimeException('Rien à annuler pour ce module');
+	$label = $rb['label'] ?? 'la dernière opération';
+	if (!empty($rb['before_absent'])) {
+		sbModRunUninstall($name, true);
+		sbModDeleteBackups($name);
+		return array('step' => 'Module ' . $name . ' : ' . $label . ' annulée, module retiré', 'label' => 'annulation de ' . $label);
+	}
+	$plain = sbModWorkDir() . '/tmp-rollback-' . bin2hex(random_bytes(4)) . '.zip';
+	sbUpdDecryptFile($rb['file'], $plain);
+	try {
+		sbModRestore($plain);
+	} finally {
+		@unlink($plain);
+	}
+	sbModDeleteBackups($name);
+	return array('step' => 'Module ' . $name . ' : ' . $label . ' annulée' . (!empty($rb['db']) ? ' (tables remises à leur état du ' . date('d/m/Y H:i', strtotime($rb['date'] ?? 'now')) . ')' : ''), 'label' => 'annulation de ' . $label);
 }
 
 /** Supprimer les fichiers d'un module non installé (retour arrière d'une installation) */

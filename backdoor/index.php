@@ -557,6 +557,13 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 
 				$sb_dashboard_schema  = sbGetDbSchema();
 				$sb_dashboard_widgets = array();
+				// Tables des modules présents mais non installés : leurs
+				// widgets sont masqués (données gardées, module désactivé,
+				// sa page d'admin n'est plus accessible)
+				$sb_dashboard_off = array();
+				foreach (sbModulesPresent() as $sb_mod_name => $sb_mod_meta) {
+					if (!sbModuleActive($sb_mod_name)) foreach (array_keys((array) $sb_mod_meta['tables']) as $sb_mod_t) $sb_dashboard_off[$sb_mod_t] = true;
+				}
 
 				foreach ($sb_dashboard_widgets_rows as $sb_widget) {
 					$sb_widget_type = isset($sb_widget['type']) ? $sb_widget['type'] : 'table';
@@ -671,7 +678,8 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 					// silencieusement ce widget plutôt que d'exécuter du SQL
 					// sur un identifiant fantôme.
 					if (!isset($sb_dashboard_schema[$sb_widget['table_name']])
-						|| !array_key_exists($sb_widget['value_column'], $sb_dashboard_schema[$sb_widget['table_name']])) {
+						|| !array_key_exists($sb_widget['value_column'], $sb_dashboard_schema[$sb_widget['table_name']])
+						|| isset($sb_dashboard_off[$sb_widget['table_name']])) {
 						continue;
 					}
 

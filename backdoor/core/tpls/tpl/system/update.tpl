@@ -93,7 +93,7 @@
 				{/if}
 
 				{* --- Modules : mis à jour séparément du core --- *}
-				{literal}<style>.sbmod-ico{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--primary-soft);color:var(--primary);font-size:16px}</style>{/literal}
+				{literal}<style>.sbmod-busy{display:flex;flex-direction:column;align-items:center;gap:10px;padding:22px 12px;text-align:center}.sbmod-busy strong{font-size:15px;color:var(--primary)}.sbmod-busy small{color:var(--t-muted)}.sbbtn-spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sbmodspin .8s linear infinite;vertical-align:-2px;margin-right:6px}.sbmod-spin{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:sbmodspin .8s linear infinite}@keyframes sbmodspin{to{transform:rotate(360deg)}}.sbmod-ico{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--primary-soft);color:var(--primary);font-size:16px}</style>{/literal}
 				<section class="col-12 card" id="sbmod">
 					<div class="card-head">
 						<div class="card-title-wrap">
@@ -123,8 +123,8 @@
 									</td>
 									<td style="white-space:nowrap">
 										{foreach $mod.actions as $op}
-											<button type="button" class="btn btn--sm {if $op == 'uninstall'}btn--ghost{else}btn--outline-primary{/if}" data-mod-action="plan" data-mod="{$mod.name|escape}" data-op="{$op|escape}"{if !$sb_upd_ready && ($op == 'update' || !$mod.present)} disabled{/if}>
-												{if $op == 'update'}Mettre à jour{elseif $op == 'install'}Installer{else}Désinstaller{/if}
+											<button type="button" class="btn btn--sm {if $op == 'uninstall' || $op == 'rollback'}btn--ghost{else}btn--outline-primary{/if}" data-mod-action="plan" data-mod="{$mod.name|escape}" data-op="{$op|escape}"{if $op == 'rollback'} data-tooltip="Annuler {$mod.rollback.label|escape} du {$mod.rollback.date|escape}"{/if}{if !$sb_upd_ready && ($op == 'update' || !$mod.present)} disabled{/if}>
+												{if $op == 'update'}Mettre à jour{elseif $op == 'install'}Installer{elseif $op == 'uninstall'}Désinstaller{else}Annuler{/if}
 											</button>
 										{/foreach}
 										{foreach $mod.blocked as $op => $why}
@@ -157,6 +157,7 @@
 								</div>
 								<div id="sbmod-remove-info" class="alert warning" style="display:none;margin-top:10px"><span class="ico"><svg viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg></span><div class="body" id="sbmod-remove-body"></div></div>
 							</div>
+							<div id="sbmod-form">
 							<div class="field" style="margin-top:12px;max-width:340px">
 								<label class="field-label" for="sbmod-password">Votre mot de passe (confirmation)</label>
 								<input class="input" type="password" id="sbmod-password" autocomplete="current-password">
@@ -165,13 +166,14 @@
 								<button type="button" class="btn btn--primary" data-mod-action="run" id="sbmod-run">Confirmer</button>
 								<button type="button" class="btn btn--ghost" data-mod-action="close">Annuler</button>
 							</div>
+							</div>
 						</div>
 						<div class="alert primary" style="margin-top:12px"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span><div class="body">
 							<strong>Installer</strong> télécharge le module depuis GitHub s'il n'est pas sur le serveur, crée ses tables et l'active (menu, droits, pages, codes courts) ;<br>
 							<strong>Mettre à jour</strong> remplace ses fichiers par la version publiée et met sa base à niveau ;<br>
 							<strong>Désinstaller</strong> le désactive en gardant ses données et ses fichiers ;<br>
 							<strong>Supprimer le module</strong> (case de la désinstallation) retire aussi ses données, ses tables et ses fichiers du serveur.<br>
-							Chaque opération est précédée d'une sauvegarde chiffrée et annulée automatiquement en cas d'échec.
+							Chaque opération est précédée d'une sauvegarde chiffrée (fichiers et tables du module) et annulée automatiquement en cas d'échec ; « <strong>Annuler</strong> » sur la ligne du module revient sur la dernière opération, tant que rien n'a bougé depuis.
 						</div></div>
 					</div>
 				</section>
@@ -179,10 +181,12 @@
 				{* --- Progression (mise à jour ou retour arrière) --- *}
 				<section class="col-12 card" id="sbupd-progress" style="display:none">
 					<div class="card-body">
-						<div style="height:10px;background:var(--bg-muted);border-radius:99px;overflow:hidden">
+						{* Attente (cercle animé) tant que l'avancement n'est pas chiffré *}
+						<div id="sbupd-busy" class="sbmod-busy" style="display:none"><div class="sbmod-spin" role="status" aria-label="En cours"></div><strong id="sbupd-busy-text"></strong><small id="sbupd-busy-sub"></small></div>
+						<div id="sbupd-bar" style="height:10px;background:var(--bg-muted);border-radius:99px;overflow:hidden">
 							<div id="sbupd-bar-fill" style="height:100%;width:0;background:var(--primary);transition:width .3s"></div>
 						</div>
-						<p id="sbupd-step-text" style="margin-top:8px"></p>
+						<p id="sbupd-step-text" style="margin-top:8px;text-align:center"></p>
 					</div>
 				</section>
 

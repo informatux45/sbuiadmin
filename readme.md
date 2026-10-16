@@ -69,6 +69,10 @@ Installing in a sub-folder: see `help.txt`.
 
 ### Changelog
 
+**4.34**
+- Modules: Cancel button to undo the last operation (update, uninstall, removal, install); backups limited to the module tables
+- Update page: progress spinner and results where the action happens; module files are downloaded once
+
 **4.33**
 - PHP 8: no more warnings on the site and in the administration (templates, pages, news, logout, forms)
 - Dashboard: the widget form title is shown again

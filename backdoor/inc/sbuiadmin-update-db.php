@@ -245,14 +245,19 @@ function sbUpdDbSize(mysqli $db, $prefix) {
 /**
  * Écrit la sauvegarde SQL (en clair) dans $file : en-tête JSON (tables),
  * puis une instruction par bloc (séparateur SB_UPD_DUMP_SEP).
+ * $only : périmètre limité (noms complets, ex. tables d'un module) ; la
+ * restauration ne touchera alors qu'à ces tables (en-tête 'scope').
  * @return array tables sauvegardées
  */
-function sbUpdDbDump(mysqli $db, $prefix, $file) {
+function sbUpdDbDump(mysqli $db, $prefix, $file, ?array $only = null) {
 	$tables = sbUpdDbTables($db, $prefix);
+	if ($only !== null) $tables = array_values(array_intersect($tables, $only));
 	$fh = fopen($file, 'wb');
 	if (!$fh) throw new RuntimeException('Sauvegarde SQL impossible à créer');
 	@chmod($file, 0600);
-	fwrite($fh, '-- ' . json_encode(array('sbupd_dump' => 1, 'date' => date('c'), 'prefix' => $prefix, 'tables' => $tables)) . SB_UPD_DUMP_SEP);
+	$head = array('sbupd_dump' => 1, 'date' => date('c'), 'prefix' => $prefix, 'tables' => $tables);
+	if ($only !== null) $head['scope'] = array_values($only);
+	fwrite($fh, '-- ' . json_encode($head) . SB_UPD_DUMP_SEP);
 	foreach ($tables as $t) {
 		$c = $db->query('SHOW CREATE TABLE `' . str_replace('`', '``', $t) . '`');
 		if ($c === false) throw new RuntimeException('Structure illisible : ' . $t);
@@ -295,7 +300,9 @@ function sbUpdDbDump(mysqli $db, $prefix, $file) {
 
 /**
  * Remet la base dans l'état de la sauvegarde : tables recréées et
- * remplies, tables du CMS apparues depuis supprimées.
+ * remplies, tables du CMS apparues depuis supprimées. Sauvegarde à
+ * périmètre limité ('scope') : seules les tables de ce périmètre sont
+ * concernées, le reste de la base n'est jamais touché.
  */
 function sbUpdDbRestore(mysqli $db, $prefix, $file) {
 	$fh = fopen($file, 'rb');
@@ -312,8 +319,10 @@ function sbUpdDbRestore(mysqli $db, $prefix, $file) {
 				if ($header === null) {
 					$header = json_decode(substr($stmt, 3), true);
 					if (!is_array($header) || empty($header['sbupd_dump']) || ($header['prefix'] ?? null) !== $prefix) throw new RuntimeException('Sauvegarde SQL non reconnue');
-					// Tables du CMS créées depuis la sauvegarde : supprimées
-					foreach (array_diff(sbUpdDbTables($db, $prefix), $header['tables']) as $extra) {
+					// Tables (du périmètre) créées depuis la sauvegarde : supprimées
+					$current = sbUpdDbTables($db, $prefix);
+					if (isset($header['scope'])) $current = array_intersect($current, (array) $header['scope']);
+					foreach (array_diff($current, $header['tables']) as $extra) {
 						if ($db->query('DROP TABLE IF EXISTS `' . str_replace('`', '``', $extra) . '`') === false) throw new RuntimeException('Suppression impossible : ' . $extra);
 					}
 					continue;
