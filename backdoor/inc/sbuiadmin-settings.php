@@ -140,6 +140,13 @@ function sbSettingsDefaults() {
 		'twofa_enabled'         => '0',
 		// Configuration > Serveur : auto, shared, vps ou dedicated
 		'hosting_type'          => 'auto',
+		// Page de connexion de l'administration (4.46, sbLoginBranding()) :
+		// couleurs du dégradé (vide = thème), version affichée, logo carré
+		// choisi dans les médias (vide = logo SBUIADMIN)
+		'login_color_start'     => '',
+		'login_color_end'       => '',
+		'login_show_version'    => '1',
+		'login_logo'            => '',
 	);
 }
 
@@ -744,6 +751,39 @@ function sbSettingsTheme() {
 	$legacy = @file(__DIR__ . '/admin/theme.txt', FILE_IGNORE_NEW_LINES);
 	if ($legacy && sbThemeIsValid(trim($legacy[0]))) return trim($legacy[0]);
 	return 'saxo';
+}
+
+/** Couleur « #rrggbb » (minuscules), ou '' si invalide */
+function sbColorHex($value) {
+	$value = strtolower(trim((string) $value));
+	return preg_match('/^#[0-9a-f]{6}$/', $value) ? $value : '';
+}
+
+/**
+ * Logo de la page de connexion : chemin relatif à upload/ d'une image
+ * existante (dossier des médias, sans « .. »), ou '' (logo SBUIADMIN).
+ */
+function sbLoginLogoPath($path) {
+	$path = ltrim(str_replace('\\', '/', trim((string) $path)), '/');
+	if ($path === '' || strpos($path, '..') !== false || !preg_match('/\.(png|jpe?g|gif|webp|svg)$/i', $path)) return '';
+	return is_file(dirname(__DIR__) . '/' . sbMediasDir() . '/' . $path) ? $path : '';
+}
+
+/**
+ * Page de connexion (login.tpl, login2fa.tpl) : style du bloc de gauche
+ * (dégradé, couleur absente = celle du thème), URL du logo ('' = logo
+ * SBUIADMIN), version affichée ou non.
+ * @return array ['aside_style' => string, 'logo' => string, 'version' => bool]
+ */
+function sbLoginBranding() {
+	$start = sbColorHex(sbSetting('login_color_start'));
+	$end   = sbColorHex(sbSetting('login_color_end'));
+	$logo  = sbLoginLogoPath(sbSetting('login_logo'));
+	return array(
+		'aside_style' => ($start !== '' || $end !== '') ? 'background:linear-gradient(135deg,' . ($start ?: 'var(--primary)') . ',' . ($end ?: 'var(--purple)') . ')' : '',
+		'logo'        => $logo !== '' ? sbMediasUrl() . implode('/', array_map('rawurlencode', explode('/', $logo))) : '',
+		'version'     => sbSetting('login_show_version', '1') !== '0',
+	);
 }
 
 /**

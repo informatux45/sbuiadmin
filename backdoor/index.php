@@ -129,6 +129,8 @@ $sbsmarty->assign('sb_toast_duration', sbSetting('toast_duration', '7') ?: 7);
 // ----------------------
 // --- Anti-robot ALTCHA (inc/sbuiadmin-altcha.php) : widget du formulaire
 $sbsmarty->assign('sb_altcha_widget', _AM_ALTCHA_LOGIN ? sbAltchaWidget() : '');
+// --- Page de connexion : dégradé, logo, version (Configuration > Admin Login)
+$sbsmarty->assign('sb_login', sbLoginBranding());
 
 // --- Random background
 $sbsmarty->assign('sb_random_bg', rand(1, 10));

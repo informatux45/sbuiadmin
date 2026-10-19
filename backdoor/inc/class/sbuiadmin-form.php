@@ -2462,13 +2462,16 @@ EOT;
 	* @return void
 	*/
 	public function addColor ($label = '', $arrArgs = array (), $isRequired = false, $helpDsc = '') {
+		// Sélecteur natif du navigateur (l'ancien plugin jQuery ColorPicker
+		// n'était plus chargé) : pastille + valeur « #rrggbb » éditable,
+		// synchronisées ; seul le champ texte est envoyé (vide autorisé).
 		$chaineTemp = '';
 		$elem = 'text';
 		if (!array_key_exists ($elem, $this -> inputArr)) {
 			throw new Exception ($elem . ' n\'est pas un élément valide');
 		}
 
-		if (!array_key_exists ('name', $arrArgs) && $elem !== 'submit' && $elem !== 'reset') {
+		if (!array_key_exists ('name', $arrArgs)) {
 			$arrArgs['name'] = 'default';
 		}
 
@@ -2485,52 +2488,22 @@ EOT;
 		// Show the label for the element
 		$chaineTemp .= $this -> isRequired ($isRequired, $label);
 
-		// Show the form element
-		$chaineTemp .= '<input class="input" type="'.$elem.'" ';
+		// Pastille : valeur du champ, sinon le placeholder s'il est une couleur
+		$hex = function ($v) { $v = strtolower(trim((string) $v)); return preg_match('/^#[0-9a-f]{6}$/', $v) ? $v : ''; };
+		$swatch = $hex($arrArgs['value'] ?? '') ?: ($hex($arrArgs['placeholder'] ?? '') ?: '#000000');
 
+		$chaineTemp .= '<div class="sb-color" style="display:flex;gap:8px;align-items:center">';
+		$chaineTemp .= '<input type="color" value="' . $swatch . '" aria-label="' . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . '" style="width:42px;height:36px;padding:2px;border:1px solid var(--border);border-radius:6px;background:var(--bg-card);cursor:pointer;flex:none" oninput="this.nextElementSibling.value=this.value">';
+		$chaineTemp .= '<input class="input" type="' . $elem . '" maxlength="7" ';
 		foreach ($this -> formElementArr[$cpt][$elem] as $clef => $val) {
-			if ($clef == 'id')
-				$nameColorP = $val;
-			$chaineTemp .= $clef.'="'.$val.'" ';
+			$chaineTemp .= $clef . '="' . $val . '" ';
 		}
-		
-		if (!isset($nameColorP)) {
-			$validNameColorP = 'Color' . time();
-			$chaineTemp     .= 'id = "' . $validNameColorP . '" ';
-		} else {
-			$validNameColorP = $nameColorP;
-		}
-
-		$chaineRequired = ($isRequired == true) ? ' required="true" bname="' . $label . '" ' : '';
-		$chaineTemp    .= $chaineRequired;
-		//$chaineTemp .= ($isRequired == true) ? 'class="required"' : '';
-
-		$chaineTemp .= '/>';
-		
-		$chaineTemp .= '<script type="text/javascript">
-				$(\'#' . $validNameColorP . '\').ColorPicker({
-					onSubmit: function(hsb, hex, rgb) {
-						$(\'#' . $validNameColorP . '\').val(\'#\' + hex);
-					},
-					onBeforeShow: function () {
-						$(this).ColorPickerSetColor(this.value);
-					},
-					onHide: function (colpkr) {
-						$(colpkr).fadeOut(500);
-						return false;
-					},
-					onShow: function (colpkr) {
-						$(colpkr).fadeIn(500);
-						return false;
-					}
-				})
-				.bind(\'keyup\', function(){
-					$(this).ColorPickerSetColor(this.value);
-					});
-				</script>';
+		$chaineTemp .= ($isRequired == true) ? ' required="true" bname="' . $label . '" ' : '';
+		$chaineTemp .= 'oninput="if(/^#[0-9a-f]{6}$/i.test(this.value))this.previousElementSibling.value=this.value" />';
+		$chaineTemp .= '</div>';
 
 		$chaineTemp .= '</div>';
-		
+
 		// If help
 		if ($helpDsc != '')
 			$chaineTemp .= '<p class="help-block">' . $helpDsc . '</p>';

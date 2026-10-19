@@ -112,6 +112,7 @@ switch($action) {
 			// est enregistré par users.php (blockedipsettings).
 			$sb_text = function ($k) use ($sbsanitize) { return $sbsanitize->displayText(isset($_POST[$k]) ? $_POST[$k] : '', 'UTF-8', 1, 0); };
 			$sb_on   = function ($k) { return (isset($_POST[$k]) && $_POST[$k] === "on") ? '1' : '0'; };
+			$sb_raw  = function ($k) { return is_string($_POST[$k] ?? null) ? trim($_POST[$k]) : ''; };
 			$sb_new_settings = array(
 				'customer_name'         => $sb_text('customer_name'),
 				'administrators'        => $sb_text('administrators'),
@@ -146,7 +147,15 @@ switch($action) {
 				'smarty_cache_lifetime' => $sb_text('smarty_caching_time'),
 				'medias_per_page'       => $sb_text('medias_per_page'),
 				'toast_duration'        => $sb_text('toast_duration'),
+				// Page de connexion (sbLoginBranding()) : valeur invalide = défaut
+				'login_color_start'     => sbColorHex($sb_raw('login_color_start')),
+				'login_color_end'       => sbColorHex($sb_raw('login_color_end')),
+				'login_show_version'    => $sb_on('login_show_version'),
+				'login_logo'            => sbLoginLogoPath($sb_raw('login_logo')),
 			);
+			if ($sb_raw('login_logo') !== '' && $sb_new_settings['login_logo'] === '') {
+				$sb_msg_error = "Logo de la page de connexion : choisissez une image des médias (png, jpg, gif, webp ou svg). Logo SBUIADMIN gardé.";
+			}
 			// Clés HMAC d'ALTCHA (chiffrées en base, jamais renvoyées au
 			// navigateur) : champ laissé vide = valeur inchangée ; case
 			// « régénérer » = deux nouvelles clés tirées au sort (les défis en
@@ -278,6 +287,18 @@ switch($action) {
 		$sbform->addInput('text', 'URL du site client', array ('name' => 'url_customer', 'value' => "$sb_config_url_customer", 'placeholder' => "URL du site de votre client (http://...)"), true, false, "Adresse publique du site (lien sur le nom du client, URL des médias : <code>…/upload/</code>)");
 		$sbform->addBreak('Les administrateurs');
 		$sbform->addInput('text', 'Administrateurs', array ('name' => 'administrators', 'value' => "$sb_config_administrators", 'placeholder' => "Nom des administrateurs"), true, false, "Login des admins séparés par des virgules sans espace");
+		$sbform->addBreak('Admin Login');
+		// Page de connexion de l'administration (sbLoginBranding())
+		$sbform->openRow(2);
+		$sbform->addColor('Dégradé : première couleur', array('id' => 'login_color_start', 'name' => 'login_color_start', 'value' => htmlspecialchars(sbSetting('login_color_start'), ENT_QUOTES, 'UTF-8'), 'placeholder' => '#2563eb'), false, "Bloc de gauche de la page de connexion. Vide : couleur du thème.");
+		$sbform->addColor('Dégradé : deuxième couleur', array('id' => 'login_color_end', 'name' => 'login_color_end', 'value' => htmlspecialchars(sbSetting('login_color_end'), ENT_QUOTES, 'UTF-8'), 'placeholder' => '#8b5cf6'), false, "Vide : couleur du thème.");
+		$sbform->closeRow();
+		$tab_check_login_version = array();
+		$tab_check_login_version[0]['text']    = 'Afficher';
+		$tab_check_login_version[0]['name']    = 'login_show_version';
+		$tab_check_login_version[0]['checked'] = sbSetting('login_show_version', '1') !== '0' ? '1' : '0';
+		$sbform->addCheckbox('Version de SBUIADMIN', $tab_check_login_version, '', false, '<br />', "Pied du bloc de gauche : « &copy; " . date('Y') . " SBUIADMIN v" . _AM_START_VERSION . " » si coché, « &copy; " . date('Y') . " » sinon.");
+		$sbform->addInput('text', 'Logo', array('id' => 'login_logo', 'name' => 'login_logo', 'value' => htmlspecialchars(sbSetting('login_logo'), ENT_QUOTES, 'UTF-8'), 'placeholder' => 'Logo SBUIADMIN', 'medias' => '', 'icon' => 'photo', 'extension' => 'png,jpg,jpeg,gif,webp,svg', 'style' => 'width: 100% !important'), false, false, "Image carrée choisie dans les médias (affichée en 36 &times; 36 px). Vide : logo SBUIADMIN.");
 		$sbform->addBreak('Base de données');
 		// Accès base : sbdbconfig.php (ou variables d'environnement), plus
 		// modifiables ni affichés ici.

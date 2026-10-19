@@ -7,9 +7,9 @@
 	{* ---------------- End Headers --------------- *}
 
 	<div class="auth-shell">
-		<aside class="auth-aside">
+		<aside class="auth-aside"{if $sb_login.aside_style} style="{$sb_login.aside_style|escape}"{/if}>
 			<div class="auth-brand">
-				<div class="logo"><img src="{$smarty.const._AM_SITE_URL}img/icon-sbuiadmin-w.png" alt="{$smarty.const._AM_SITE_CUSTOMER_NAME}" style="max-width: 32px; max-height: 32px;"></div>
+				{if $sb_login.logo}<div class="logo" style="overflow:hidden;padding:0"><img src="{$sb_login.logo|escape}" alt="{$smarty.const._AM_SITE_CUSTOMER_NAME|escape}" style="width:100%;height:100%;object-fit:cover"></div>{else}<div class="logo"><img src="{$smarty.const._AM_SITE_URL}img/icon-sbuiadmin-w.png" alt="{$smarty.const._AM_SITE_CUSTOMER_NAME}" style="max-width: 32px; max-height: 32px;"></div>{/if}
 				<div class="name">{$smarty.const._AM_SITE_CUSTOMER_NAME}</div>
 			</div>
 			<div class="auth-aside-body">
@@ -17,7 +17,7 @@
 				<h1>Gérez votre site en toute simplicité.</h1>
 				<p>Contenus, utilisateurs, médias et paramètres&nbsp;: tout votre back-office SBUIADMIN au même endroit.</p>
 			</div>
-			<div class="auth-aside-footer"><span>&copy; {$smarty.now|date_format:"%Y"}</span> <span>SBUIADMIN v{$smarty.const._AM_START_VERSION}</span></div>
+			<div class="auth-aside-footer"><span>&copy; {$smarty.now|date_format:"%Y"}</span>{if $sb_login.version} <span>SBUIADMIN v{$smarty.const._AM_START_VERSION}</span>{/if}</div>
 		</aside>
 
 		<main class="auth-main">

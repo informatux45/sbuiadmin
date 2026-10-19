@@ -176,7 +176,11 @@ INSERT INTO `<DB_PREFIX>sb_config` (`id`, `config`, `content`) VALUES
 (59, 'email_smtp_password', ''),
 (60, 'email_smtp_secure', ''),
 (61, 'email_smtp_debug', '0'),
-(62, 'coming-soon-github', '1');
+(62, 'coming-soon-github', '1'),
+(63, 'login_color_start', ''),
+(64, 'login_color_end', ''),
+(65, 'login_show_version', '1'),
+(66, 'login_logo', '');
 
 -- --------------------------------------------------------
 
@@ -1662,7 +1666,7 @@ ALTER TABLE `<DB_PREFIX>sb_blocs_sort`
 -- AUTO_INCREMENT for table `sb_config`
 --
 ALTER TABLE `<DB_PREFIX>sb_config`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
 --
 -- AUTO_INCREMENT for table `sb_dashboard_widgets`
 --
