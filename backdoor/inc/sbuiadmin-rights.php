@@ -152,21 +152,26 @@ function sbGetRightsModules() {
  * @param string|null $action
  * @return string
  */
+/**
+ * Action de la requête, lue dans LE paramètre que le contrôleur utilise :
+ * op= pour cmsconfig et cache (seuls à router dessus), a= pour tous les
+ * autres. Lire op= partout laissait « ?p=faq&a=del&op=x » être classé
+ * « voir » alors que faq.php supprime (point 38).
+ * @param string $module
+ * @return string
+ */
+function sbRightsActionParam($module) {
+	$name = in_array($module, array('cmsconfig', 'cache'), true) ? 'op' : 'a';
+	return is_string($_GET[$name] ?? null) ? $_GET[$name] : '';
+}
+
 function sbGetEffectiveModuleKey($module, $action = null) {
 	$submodules = sbGetRightsSubmodules();
 	if (!isset($submodules[$module])) return $module;
 
 	if ($action === null) {
-		// op= avant a= : cmsconfig est le seul module qui route sur op=, et son
-		// URL de soumission contient EN PLUS un a=edit vestige (jamais lu par le
-		// switch interne de cmsconfig.php, qui ne regarde que op=) - si a= passe
-		// en premier, cmsconfig&a=edit&op=headerfooter résout "edit" au lieu de
-		// "headerfooter" et retombe sur la ligne du module parent au lieu de la
-		// sous-section. Aucun autre module n'utilise op=, donc cet ordre ne
-		// change rien pour eux.
-		$action = '';
-		if (isset($_GET['op'])) $action = $_GET['op'];
-		elseif (isset($_GET['a'])) $action = $_GET['a'];
+		// cmsconfig&a=edit&op=headerfooter : op= (le a=edit est un vestige)
+		$action = sbRightsActionParam($module);
 	}
 	$action = trim((string)$action);
 
@@ -249,13 +254,8 @@ function sbClassifyAction($module) {
 		if ($target_id > 0 && $target_id == sbGetCurrentUserId()) return 'view';
 	}
 
-	// op= avant a= : l'URL de soumission de cmsconfig contient un a=edit
-	// vestige EN PLUS de op=headerfooter/css/... (voir sbGetEffectiveModuleKey) -
-	// a= passerait devant et résoudrait "edit" au lieu de la vraie sous-page.
-	$action = '';
-	if (isset($_GET['op'])) $action = $_GET['op'];
-	elseif (isset($_GET['a'])) $action = $_GET['a'];
-	$action = trim((string)$action);
+	// Le paramètre que lit le contrôleur (voir sbRightsActionParam())
+	$action = trim(sbRightsActionParam($module));
 
 	if ($action == '') return 'view';
 
@@ -294,14 +294,44 @@ function sbClassifyAction($module) {
  * Lit la ligne sb_users_rights de $key pour $user_id et vérifie $action.
  * "Voir" est la porte d'entrée de CETTE ligne : désactivé, plus aucune
  * action (add/edit/delete) n'y est accessible même si cochée par ailleurs.
- * Absence de ligne = accès complet par défaut (comportement d'avant
- * restriction explicite - évite de bloquer tout le monde tant que l'admin
- * n'a rien configuré).
+ * Absence de ligne = droit par défaut (sbRightsDefault()) : tout pour un
+ * administrateur, les modules seulement pour les autres comptes.
  * @param string $key module ou "module:sous-section"
  * @param string $action 'view'|'add'|'edit'|'delete'
  * @param int $user_id
  * @return bool
  */
+/**
+ * Compte administrateur (réglage « administrators ») ?
+ * @param int $user_id
+ * @return bool
+ */
+function sbRightsUserIsAdmin($user_id) {
+	global $sbsql;
+	static $cache = array();
+	$user_id = intval($user_id);
+	if (isset($cache[$user_id])) return $cache[$user_id];
+	$admins = array_filter(array_map('trim', explode(',', function_exists('sbSetting') ? (string) sbSetting('administrators') : '')));
+	$row = $sbsql->assoc($sbsql->query('SELECT username FROM ' . _AM_DB_PREFIX . 'sb_users WHERE id = ' . $user_id));
+	return $cache[$user_id] = ($row && in_array(trim((string) $row['username']), $admins, true));
+}
+
+/**
+ * Droit par défaut quand la matrice n'a pas de ligne pour $key : tout pour
+ * un administrateur ; pour les autres comptes, les modules (contrôleurs de
+ * datas/modules/) seulement, le système et la configuration étant refusés
+ * tant qu'ils n'ont pas été cochés (point 38, choix de Patrice).
+ * @param string $key module ou "module:sous-section"
+ * @param int $user_id
+ * @return bool
+ */
+function sbRightsDefault($key, $user_id) {
+	if (sbRightsUserIsAdmin($user_id)) return true;
+	$page = explode(':', (string) $key)[0];
+	if ($page === 'index' || $page === 'profile') return true; // tableau de bord et fiche personnelle
+	return preg_match('/^[a-z][a-z0-9_]*$/', $page) && is_file(SBUIADMIN_PATH . '/datas/modules/' . $page . '.php');
+}
+
 function sbCheckRightRow($key, $action, $user_id) {
 	global $sbsql;
 
@@ -311,7 +341,7 @@ function sbCheckRightRow($key, $action, $user_id) {
 	$request = $sbsql->query($query);
 	$row     = $sbsql->assoc($request);
 
-	if (!$row) return true;
+	if (!$row) return sbRightsDefault($key, $user_id);
 	if ($row['can_view'] != 1) return false;
 	if ($action == 'view') return true;
 
@@ -489,12 +519,13 @@ function sbGetRightsMatrix($user_id) {
 
 	$matrix = array();
 	foreach ($modules as $key => $label) {
+		$def = sbRightsDefault($key, $user_id) ? 1 : 0; // pas de ligne : droit par défaut
 		$matrix[$key] = array(
 			'label'      => $label,
-			'can_view'   => isset($existing[$key]) ? intval($existing[$key]['can_view'])   : 1,
-			'can_add'    => isset($existing[$key]) ? intval($existing[$key]['can_add'])    : 1,
-			'can_edit'   => isset($existing[$key]) ? intval($existing[$key]['can_edit'])   : 1,
-			'can_delete' => isset($existing[$key]) ? intval($existing[$key]['can_delete']) : 1,
+			'can_view'   => isset($existing[$key]) ? intval($existing[$key]['can_view'])   : $def,
+			'can_add'    => isset($existing[$key]) ? intval($existing[$key]['can_add'])    : $def,
+			'can_edit'   => isset($existing[$key]) ? intval($existing[$key]['can_edit'])   : $def,
+			'can_delete' => isset($existing[$key]) ? intval($existing[$key]['can_delete']) : $def,
 		);
 	}
 

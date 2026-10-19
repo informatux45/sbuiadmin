@@ -179,7 +179,7 @@ switch($action) {
 			// Injection des données
 			$id                = intval($_POST['id'] ?? 0);
 			$catid             = '';
-			foreach(($_POST['catid'] ?? []) as $val) { $catid .= "$val|"; }
+			foreach((array)($_POST['catid'] ?? []) as $val) { $catid .= intval($val) . "|"; }
 			$catid             = rtrim($catid, '|');
 			// --- Titre
 			$title_fr          = $sbsanitize->displayText($_POST['title_fr'] ?? '', 'UTF-8', 1, 0);
@@ -748,7 +748,7 @@ switch($action) {
 			// Injection des données
 			$id                  = intval($_POST['id'] ?? 0);
 			$catid               = '';
-			foreach(($_POST['catid'] ?? []) as $val) { $catid .= "$val|"; }
+			foreach((array)($_POST['catid'] ?? []) as $val) { $catid .= intval($val) . "|"; }
 			$catid               = rtrim($catid, '|');
 			$catid_module_show   = intval($_POST['catid_module_show'] ?? 0);
 			$item_per_page       = intval($_POST['item_per_page'] ?? 0);

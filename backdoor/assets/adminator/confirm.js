@@ -69,6 +69,17 @@
 	// qui n'ont pas de <a href> à intercepter en déclaratif via data-confirm.
 	window.sbShowConfirm = showConfirm;
 
+	// Jeton CSRF (window.sbCsrfToken, scripts.tpl) ajouté aux liens du site :
+	// le routeur l'exige pour toute suppression en GET (point 38)
+	function withCsrfToken(href) {
+		if (!window.sbCsrfToken) return href;
+		var url;
+		try { url = new URL(href, window.location.href); } catch (err) { return href; }
+		if (url.origin !== window.location.origin || url.searchParams.has('t')) return href;
+		url.searchParams.set('t', window.sbCsrfToken);
+		return url.toString();
+	}
+
 	document.addEventListener('click', function (e) {
 		var el = e.target.closest('[data-confirm]');
 		if (!el) return;
@@ -81,7 +92,7 @@
 		showConfirm(message, okLabel, cancelLabel).then(function (ok) {
 			if (!ok) return;
 			var href = el.getAttribute('href');
-			if (href) window.location.href = href;
+			if (href) window.location.href = withCsrfToken(href);
 		});
 	});
 })();

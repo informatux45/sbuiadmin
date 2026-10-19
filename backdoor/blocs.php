@@ -126,9 +126,9 @@ switch($action) {
 
 			// Injection des données
 			$id       = intval($_POST['id'] ?? 0);
-			foreach(($_POST['pages'] ?? []) as $val) { $page .= "$val|"; }
+			foreach((array)($_POST['pages'] ?? []) as $val) { $page .= intval($val) . "|"; }
 			$pages    = rtrim($page, '|');
-			foreach(($_POST['modules'] ?? []) as $val) { $module .= "$val|"; }
+			foreach((array)($_POST['modules'] ?? []) as $val) { $module .= intval($val) . "|"; }
 			$modules    = rtrim($module, '|');
 			$name     = $sbsanitize->displayText($_POST['name'] ?? '', 'UTF-8', 1, 0);
 			// --- Titre
@@ -165,7 +165,7 @@ switch($action) {
 					// --- Ajouter les blocs dans leurs pages respectives ---
 					// ------------------------------------------------------
 					$bloc_id = $sbsql->lastinsertid();
-					foreach(($_POST['pages'] ?? []) as $page_id) {
+					foreach(array_map('intval', (array)($_POST['pages'] ?? [])) as $page_id) {
 						$query_bloc_sort  = "INSERT INTO $table_sort (page_id,bloc_id,sort) VALUES ('$page_id','$bloc_id','0')";
 						$result_bloc_sort = $sbsql->query($query_bloc_sort);
 					}
@@ -206,12 +206,12 @@ switch($action) {
 					$query_bloc_delete   = "DELETE FROM $table_sort WHERE bloc_id = '$id'";
 					$request_bloc_delete = $sbsql->query($query_bloc_delete);
 					// --- Pages sort
-					foreach(($_POST['pages'] ?? []) as $page_id) {
+					foreach(array_map('intval', (array)($_POST['pages'] ?? [])) as $page_id) {
 						$query_bloc_sort  = "INSERT INTO $table_sort (page_id,bloc_id,sort) VALUES ('$page_id','$bloc_id','0')";
 						$result_bloc_sort = $sbsql->query($query_bloc_sort);
 					}
 					// --- Modules sort
-					foreach(($_POST['modules'] ?? []) as $module_id) {
+					foreach(array_map('intval', (array)($_POST['modules'] ?? [])) as $module_id) {
 						$query_bloc_sort_mod  = "INSERT INTO $table_sort (module_id,bloc_id,sort) VALUES ('$module_id','$bloc_id','0')";
 						$result_bloc_sort_mod = $sbsql->query($query_bloc_sort_mod);
 					}

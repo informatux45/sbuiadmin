@@ -1,3 +1,5 @@
+    <!-- Jeton CSRF : ajouté par confirm.js aux liens de suppression (data-confirm) -->
+    <script>window.sbCsrfToken = '{$sb_csrf_token|escape:'javascript'}';</script>
     <!-- Adminator theme JS bundle -->
     <script defer src="assets/adminator/runtime.js"></script>
     <script defer src="assets/adminator/vendor-fullcalendar.js"></script>

@@ -1086,8 +1086,22 @@ function sbGeocodeCity($city) {
  * @return array|false [['title'=>.., 'link'=>.., 'date'=>..], ...] ou false
  */
 function sbGetRssWidgetValue($url, $limit = 5) {
+    // Flux lu par le serveur : adresses publiques seulement (sinon le widget
+    // servait à interroger le réseau interne, point 38) ; l'IP vérifiée est
+    // celle utilisée (CURLOPT_RESOLVE), pas de redirection suivie
+    $parts = parse_url((string) $url);
+    $host  = (string) ($parts['host'] ?? '');
+    $port  = (int) ($parts['port'] ?? ((strtolower((string) ($parts['scheme'] ?? '')) === 'https') ? 443 : 80));
+    if (!in_array(strtolower((string) ($parts['scheme'] ?? '')), array('http', 'https'), true) || $host === '') return false;
+    $ip = filter_var(trim($host, '[]'), FILTER_VALIDATE_IP) ? trim($host, '[]') : gethostbyname($host);
+    if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) return false;
+
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
+    if (defined('CURLOPT_PROTOCOLS_STR')) curl_setopt($curl, CURLOPT_PROTOCOLS_STR, 'http,https');
+    else curl_setopt($curl, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, false);
+    if (!filter_var(trim($host, '[]'), FILTER_VALIDATE_IP)) curl_setopt($curl, CURLOPT_RESOLVE, array($host . ':' . $port . ':' . $ip));
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_TIMEOUT, 5);
     curl_setopt($curl, CURLOPT_USERAGENT, 'SBUIADMIN Dashboard Widget');
@@ -1570,18 +1584,18 @@ if (!function_exists("insert_sbExplodeJson")) {
                foreach($row as $k => $v) {
                   if ($k == 'languages') {
                      foreach($v[0] as $ke => $va) {
-                        $client_info .= $ke . ' : ' . $va . '<br>';
+                        $client_info .= htmlspecialchars($ke . ' : ' . $va, ENT_QUOTES, 'UTF-8') . '<br>';
                      }
                   } else {
-                     $client_info .= $k . ' : ' . $v . '<br>';
+                     $client_info .= htmlspecialchars($k . ' : ' . (is_scalar($v) ? $v : json_encode($v)), ENT_QUOTES, 'UTF-8') . '<br>';
                   }
                }
             } else {
-               $client_info .= $key . ' : ' . $row . '<br>';
+               $client_info .= htmlspecialchars($key . ' : ' . (is_scalar($row) ? $row : json_encode($row)), ENT_QUOTES, 'UTF-8') . '<br>';
             }
          }
       } else {
-         $client_info = $param['json'];
+         $client_info = htmlspecialchars((string) $param['json'], ENT_QUOTES, 'UTF-8');
       }
 		return $client_info;
 	}

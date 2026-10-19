@@ -99,7 +99,7 @@ switch($action) {
 			$id     = intval($_POST['id'] ?? 0);
 			$name   = $sbsanitize->displayText($_POST['name'] ?? '', 'UTF-8', 1, 0);
 			$tag    = $sbsanitize->displayText($_POST['tag'] ?? '', 'UTF-8', 1, 0);
-			foreach(($_POST['pages'] ?? []) as $val) { $page .= "$val|"; }
+			foreach((array)($_POST['pages'] ?? []) as $val) { $page .= intval($val) . "|"; }
 			$pages  = rtrim($page, '|');
 			$active = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
 			

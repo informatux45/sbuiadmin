@@ -332,8 +332,10 @@ class sanitize extends sql {
 		$text = $this->sTrim($text);
 	
 		if ($entities != 0) {
-			// Convert all applicable characters to HTML entities
-			$text = $this->htmlEntities($text, $encode);
+			// Convert all applicable characters to HTML entities ; l'antislash
+			// aussi : laissé tel quel, en fin de champ il neutralisait le
+			// guillemet fermant des requêtes à plusieurs champs (point 38)
+			$text = str_replace('\\', '&#92;', $this->htmlEntities($text, $encode));
 		}
 
 		if ($decode_entities != 0) {

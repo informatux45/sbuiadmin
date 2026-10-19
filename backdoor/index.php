@@ -491,11 +491,28 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 	// --- Control if PHP file exists
 	$controlIfPhpFileExists = $sb_path_file_sys_mod.$sb_get_page.".php";
 	if (file_exists($controlIfPhpFileExists) && $sb_get_page != 'index') {
+		// Pages réservées aux administrateurs : refusées AVANT d'exécuter le
+		// contrôleur (le 404 affiché plus bas arrivait après : un compte non
+		// administrateur pouvait enregistrer la configuration, point 38)
+		if (in_array($sb_get_page, $sb_admin_pages) && $sbuiadmin_user_type != 'admin') {
+			http_response_code(404);
+			$sbsmarty->display("404.tpl");
+			exit;
+		}
 		// --- Droits granulaires (voir/ajouter/modifier/supprimer) : vérifié
 		// AVANT d'exécuter le contrôleur du module, pour bloquer l'accès
 		// direct par URL (connaître index.php?p=faq ne suffisait jusqu'ici
 		// qu'à contourner le masquage cosmétique du menu). Voir inc/sbuiadmin-rights.php.
 		if (!sbHasRight($sb_get_page)) {
+			$sbsmarty->display("403.tpl");
+			exit;
+		}
+
+		// Suppression par lien (GET) : jeton CSRF exigé (&t=, ajouté par
+		// confirm.js), sinon un lien piégé ouvert par un administrateur
+		// connecté supprimait à sa place (point 38)
+		if ($_SERVER['REQUEST_METHOD'] === 'GET' && sbClassifyAction($sb_get_page) === 'delete'
+			&& (empty($_SESSION['sbuiadmin_csrf_token']) || !is_string($_GET['t'] ?? null) || !hash_equals($_SESSION['sbuiadmin_csrf_token'], $_GET['t']))) {
 			$sbsmarty->display("403.tpl");
 			exit;
 		}
