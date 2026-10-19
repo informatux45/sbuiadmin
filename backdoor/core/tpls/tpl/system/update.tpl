@@ -125,7 +125,7 @@
 									<td><strong>{$mod.title|escape}</strong><br><code style="font-size:11px">{$mod.name|escape}</code></td>
 									<td style="max-width:420px">{$mod.description|escape}</td>
 									<td>{if $mod.local}{$mod.local|escape}{else}—{/if}</td>
-									<td>{if $mod.remote}{$mod.remote|escape}{if !$mod.remote_ok}<br><small style="color:var(--warning)">core {$mod.requires|escape} requis</small>{/if}{else}—{/if}</td>
+									<td>{if $mod.site}<small title="Module propre au site : jamais installé ni mis à jour depuis GitHub">propre au site</small>{elseif $mod.remote}{$mod.remote|escape}{if !$mod.remote_ok}<br><small style="color:var(--warning)">core {$mod.requires|escape} requis</small>{/if}{else}—{/if}</td>
 									<td>
 										{if $mod.state == 'absent'}<span class="badge info">Sur GitHub</span>
 										{elseif $mod.state == 'present'}<span class="badge warning">Non installé</span>

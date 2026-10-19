@@ -1,6 +1,6 @@
 <?php
 /**
- * Module boutique : schéma de ses tables, pour l'installer seul (onglet
+ * Module store (boutique) : schéma de ses tables, pour l'installer seul (onglet
  * Modules de Configuration > Mise à jour). Une table déjà présente (données
  * gardées à la désinstallation) n'est pas recréée ; ses migrations
  * (migrations/<version>.php) la mettent ensuite à niveau.
@@ -15,14 +15,14 @@ defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
 return array(
 	'sql' => <<<'SQL'
-CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_accounting_export` (
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_store_accounting_export` (
   `id` int(11) NOT NULL,
   `plugin_id` varchar(50) NOT NULL,
   `active` tinyint(1) NOT NULL DEFAULT 0,
   `config` text NOT NULL COMMENT 'JSON propre au plugin'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_accounting_log` (
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_store_accounting_log` (
   `id` int(11) NOT NULL,
   `oid` int(11) NOT NULL,
   `plugin_id` varchar(50) NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_accounting_log` (
   `sent_at` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_category` (
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_store_category` (
   `id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
   `description` text NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_category` (
   `active` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_config` (
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_store_config` (
   `id` int(11) NOT NULL,
   `is_tva` tinyint(1) NOT NULL DEFAULT 1,
   `currency` varchar(10) NOT NULL DEFAULT 'EUR',
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_config` (
   `unique_code_length` int(11) NOT NULL DEFAULT 16
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_discount` (
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_store_discount` (
   `id` int(11) NOT NULL,
   `code` varchar(50) NOT NULL,
   `plugin_id` varchar(50) NOT NULL,
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_discount` (
   `description` varchar(255) NOT NULL DEFAULT ''
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_email` (
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_store_email` (
   `id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `subject_customer` varchar(255) NOT NULL DEFAULT '',
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_email` (
   `body_admin` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_order` (
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_store_order` (
   `id` int(11) NOT NULL,
   `client_uid` varchar(50) NOT NULL DEFAULT '',
   `client_name` varchar(255) NOT NULL DEFAULT '',
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_order` (
   `comment` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_order_detail` (
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_store_order_detail` (
   `id` int(11) NOT NULL,
   `oid` int(11) NOT NULL,
   `pid` int(11) NOT NULL,
@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_order_detail` (
   `gift_package` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_payment` (
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_store_payment` (
   `id` int(11) NOT NULL,
   `plugin_id` varchar(50) NOT NULL,
   `title` varchar(255) NOT NULL,
@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_payment` (
   `config` text NOT NULL COMMENT 'JSON clés API'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_product` (
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_store_product` (
   `id` int(11) NOT NULL,
   `catid` int(11) NOT NULL DEFAULT 0,
   `reference` varchar(100) NOT NULL DEFAULT '',
@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_product` (
   `sort` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_transport` (
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_store_transport` (
   `id` int(11) NOT NULL,
   `plugin_id` varchar(50) NOT NULL,
   `title` varchar(255) NOT NULL,
@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_transport` (
   `config` text NOT NULL COMMENT 'JSON propre au plugin'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_unique` (
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_store_unique` (
   `id` int(11) NOT NULL,
   `order_detail_id` int(11) NOT NULL,
   `pid` int(11) NOT NULL,
@@ -170,91 +170,91 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_shop_unique` (
   `expires_at` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-ALTER TABLE `<DB_PREFIX>sb_shop_accounting_export`
+ALTER TABLE `<DB_PREFIX>sb_store_accounting_export`
   ADD PRIMARY KEY (`id`),
   ADD KEY `plugin_id` (`plugin_id`);
 
-ALTER TABLE `<DB_PREFIX>sb_shop_accounting_log`
+ALTER TABLE `<DB_PREFIX>sb_store_accounting_log`
   ADD PRIMARY KEY (`id`),
   ADD KEY `oid` (`oid`),
   ADD KEY `plugin_id` (`plugin_id`);
 
-ALTER TABLE `<DB_PREFIX>sb_shop_category`
+ALTER TABLE `<DB_PREFIX>sb_store_category`
   ADD PRIMARY KEY (`id`);
 
-ALTER TABLE `<DB_PREFIX>sb_shop_config`
+ALTER TABLE `<DB_PREFIX>sb_store_config`
   ADD PRIMARY KEY (`id`);
 
-ALTER TABLE `<DB_PREFIX>sb_shop_discount`
+ALTER TABLE `<DB_PREFIX>sb_store_discount`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `code` (`code`);
 
-ALTER TABLE `<DB_PREFIX>sb_shop_email`
+ALTER TABLE `<DB_PREFIX>sb_store_email`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `name` (`name`);
 
-ALTER TABLE `<DB_PREFIX>sb_shop_order`
+ALTER TABLE `<DB_PREFIX>sb_store_order`
   ADD PRIMARY KEY (`id`),
   ADD KEY `client_uid` (`client_uid`);
 
-ALTER TABLE `<DB_PREFIX>sb_shop_order_detail`
+ALTER TABLE `<DB_PREFIX>sb_store_order_detail`
   ADD PRIMARY KEY (`id`),
   ADD KEY `oid` (`oid`),
   ADD KEY `pid` (`pid`);
 
-ALTER TABLE `<DB_PREFIX>sb_shop_payment`
+ALTER TABLE `<DB_PREFIX>sb_store_payment`
   ADD PRIMARY KEY (`id`),
   ADD KEY `plugin_id` (`plugin_id`);
 
-ALTER TABLE `<DB_PREFIX>sb_shop_product`
+ALTER TABLE `<DB_PREFIX>sb_store_product`
   ADD PRIMARY KEY (`id`),
   ADD KEY `catid` (`catid`),
   ADD KEY `reference` (`reference`);
 
-ALTER TABLE `<DB_PREFIX>sb_shop_transport`
+ALTER TABLE `<DB_PREFIX>sb_store_transport`
   ADD PRIMARY KEY (`id`),
   ADD KEY `plugin_id` (`plugin_id`);
 
-ALTER TABLE `<DB_PREFIX>sb_shop_unique`
+ALTER TABLE `<DB_PREFIX>sb_store_unique`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `code` (`code`),
   ADD KEY `order_detail_id` (`order_detail_id`),
   ADD KEY `pid` (`pid`);
 
-ALTER TABLE `<DB_PREFIX>sb_shop_accounting_export`
+ALTER TABLE `<DB_PREFIX>sb_store_accounting_export`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `<DB_PREFIX>sb_shop_accounting_log`
+ALTER TABLE `<DB_PREFIX>sb_store_accounting_log`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `<DB_PREFIX>sb_shop_category`
+ALTER TABLE `<DB_PREFIX>sb_store_category`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `<DB_PREFIX>sb_shop_config`
+ALTER TABLE `<DB_PREFIX>sb_store_config`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `<DB_PREFIX>sb_shop_discount`
+ALTER TABLE `<DB_PREFIX>sb_store_discount`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `<DB_PREFIX>sb_shop_email`
+ALTER TABLE `<DB_PREFIX>sb_store_email`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `<DB_PREFIX>sb_shop_order`
+ALTER TABLE `<DB_PREFIX>sb_store_order`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `<DB_PREFIX>sb_shop_order_detail`
+ALTER TABLE `<DB_PREFIX>sb_store_order_detail`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `<DB_PREFIX>sb_shop_payment`
+ALTER TABLE `<DB_PREFIX>sb_store_payment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `<DB_PREFIX>sb_shop_product`
+ALTER TABLE `<DB_PREFIX>sb_store_product`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `<DB_PREFIX>sb_shop_transport`
+ALTER TABLE `<DB_PREFIX>sb_store_transport`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `<DB_PREFIX>sb_shop_unique`
+ALTER TABLE `<DB_PREFIX>sb_store_unique`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 SQL
 );

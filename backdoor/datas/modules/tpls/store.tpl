@@ -23,9 +23,9 @@
 							<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
 						</button>
 						<div class="dd-menu" role="menu" style="min-width:220px">
-							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=boutique">Tous les produits</a>
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=store">Tous les produits</a>
 							<div class="dd-divider"></div>
-							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=boutique&a=add">+1 produit</a>
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=store&a=add">+1 produit</a>
 						</div>
 					</div>
 					<div class="dd-wrap">
@@ -34,17 +34,17 @@
 							<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
 						</button>
 						<div class="dd-menu" role="menu" style="min-width:220px">
-							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=boutique&a=category">Toutes les catégories</a>
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=store&a=category">Toutes les catégories</a>
 							<div class="dd-divider"></div>
-							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=boutique&a=categoryadd">+1 catégorie</a>
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=store&a=categoryadd">+1 catégorie</a>
 						</div>
 					</div>
 					{if isset($all) && (!isset($smarty.get.a) || $smarty.get.a == '' || $smarty.get.a == 'del')}
-						<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=boutique&a=sort'">
+						<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=store&a=sort'">
 							Trier les produits
 						</button>
 					{/if}
-					<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=boutique&a=settings'">
+					<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=store&a=settings'">
 						Paramètres
 					</button>
 				</div>
@@ -63,12 +63,12 @@
 								<div class="data-toolbar-left">
 									<div class="input-icon" style="flex:1;max-width:320px">
 										<span class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
-										<input class="input" type="search" placeholder="Rechercher..." data-datatable-search="dataTables-boutique">
+										<input class="input" type="search" placeholder="Rechercher..." data-datatable-search="dataTables-store">
 									</div>
 								</div>
 							</div>
 							<div style="overflow-x:auto">
-                                <table class="data-table" id="dataTables-boutique" data-datatable>
+                                <table class="data-table" id="dataTables-store" data-datatable>
                                     <thead>
                                         <tr>
                                             {foreach from=$sb_table_header item=header}
@@ -111,7 +111,7 @@
                                     </tbody>
                                 </table>
                             </div>
-							<div class="data-foot" data-datatable-foot="dataTables-boutique">
+							<div class="data-foot" data-datatable-foot="dataTables-store">
 								<div class="data-foot-info" data-foot-info></div>
 								<div class="pager"></div>
 							</div>
@@ -131,12 +131,12 @@
 								<div class="data-toolbar-left">
 									<div class="input-icon" style="flex:1;max-width:320px">
 										<span class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
-										<input class="input" type="search" placeholder="Rechercher..." data-datatable-search="dataTables-boutiquecategories">
+										<input class="input" type="search" placeholder="Rechercher..." data-datatable-search="dataTables-storecategories">
 									</div>
 								</div>
 							</div>
 							<div style="overflow-x:auto">
-                                <table class="data-table" id="dataTables-boutiquecategories" data-datatable>
+                                <table class="data-table" id="dataTables-storecategories" data-datatable>
                                     <thead>
                                         <tr>
                                             {foreach from=$sb_table_header item=header}
@@ -175,7 +175,7 @@
                                     </tbody>
                                 </table>
                             </div>
-							<div class="data-foot" data-datatable-foot="dataTables-boutiquecategories">
+							<div class="data-foot" data-datatable-foot="dataTables-storecategories">
 								<div class="data-foot-info" data-foot-info></div>
 								<div class="pager"></div>
 							</div>

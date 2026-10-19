@@ -110,17 +110,20 @@ Installing in a sub-folder: see `help.txt`.
 
 ## 📝 Changelog
 
+**4.40**
+- Shop module renamed "store" 2.0.0 (sb_store_* tables, no routes): an installed official "boutique" is taken over on install, a site's own shop is never touched; 'origin' => 'site' marker for site-specific modules (never installed or updated from GitHub)
+
 **4.39**
 - Security audit (part 1): public maintenance access code replaced by a random one, unused AJAX endpoints removed, CSRF token on sitemap generation, thumbnail cache capped, direct-access guards restored
 
 **4.38**
 - Contact module 1.1.0: received messages kept and listed per form (retention setting, 12 months by default), unread count shown in the side menu, several recipients, real error shown on send failure
 
-**4.37**
-- PHP 8 / PHP 9 readiness: fatal errors and deprecations fixed (sanitize, forms, CSV, media, thumbnails, search), wrong docblocks corrected; Shop and Tabs modules 1.0.1
-
 <details>
   <summary><strong>Older versions</strong></summary>
+
+**4.37**
+- PHP 8 / PHP 9 readiness: fatal errors and deprecations fixed (sanitize, forms, CSV, media, thumbnails, search), wrong docblocks corrected; Shop and Tabs modules 1.0.1
 
 **4.36**
 - Update page: database left behind the files (FTP copy…) detected, upgraded on demand with a backup restored on failure; Modules table centred

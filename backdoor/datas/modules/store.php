@@ -23,7 +23,7 @@ include_once('../sbconfig.php');
 // -----------------------
 // Module URL
 // -----------------------
-$module_page = 'boutique';
+$module_page = 'store';
 $sbsmarty->assign('module_page', $module_page);
 // -----------------------
 $module_url = _AM_SITE_PROTOCOL . SBUIADMIN_URL . SBUIADMIN_BASE . '?p=' . $module_page;
@@ -40,9 +40,9 @@ $sb_msg_valid = false;
 // Write your own code after these lines
 // ---------------------------------------------------
 // ---------------------------------------------------
-$table         = _AM_DB_PREFIX . "sb_shop_product";
-$table_cat     = _AM_DB_PREFIX . "sb_shop_category";
-$table_config  = _AM_DB_PREFIX . "sb_shop_config";
+$table         = _AM_DB_PREFIX . "sb_store_product";
+$table_cat     = _AM_DB_PREFIX . "sb_store_category";
+$table_config  = _AM_DB_PREFIX . "sb_store_config";
 $text          = "Produit";
 $text_s        = "Produits";
 

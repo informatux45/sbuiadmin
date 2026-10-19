@@ -46,3 +46,5 @@ Chaque site a son sbdbconfig.php (sbdbconfig-<dossier>.php pour les suivants).
 - Supprimer en deux versions : N n'utilise plus, N+1 supprime.
 - Module : datas/modules/<nom>/module.php (version, core minimal),
   install.php (tables), migrations/<version>.php.
+- Module propre à un site : 'origin' => 'site' dans module.php (jamais
+  installé ni mis à jour depuis GitHub, fichiers hors mise à jour du core).

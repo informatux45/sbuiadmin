@@ -119,7 +119,7 @@ function sbModCatalogRefresh() {
 			// Module arrivé avec le core (archive complète) : la liste officielle
 			// de sa version permet ensuite de repérer ses fichiers modifiés
 			$local = sbModuleMeta($name);
-			if ($local && $local['version'] === $e['version'] && sbModStoredList($name) === null) sbModStoreList($name, $e['version'], $e['files']);
+			if ($local && $local['origin'] !== 'site' && $local['version'] === $e['version'] && sbModStoredList($name) === null) sbModStoreList($name, $e['version'], $e['files']);
 		}
 	} catch (Throwable $e) {
 		$old = sbModCatalogCache();
@@ -142,10 +142,20 @@ function sbModCatalog() {
 	$installed = sbModulesInstalled(true);
 	$names = array_unique(array_merge(array_keys($cache['modules']), array_keys(sbModulesPresent())));
 	sort($names, SORT_STRING);
+	// Modules remplacés par un module présent (store remplace boutique) :
+	// plus proposés depuis GitHub, sinon l'ancien revient à côté du nouveau
+	$replaced = array();
+	foreach (sbModulesPresent() as $pm) {
+		$old = (string) ($pm['replaces']['module'] ?? '');
+		if ($old !== '') $replaced[$old] = true;
+	}
 	$out = array();
 	foreach ($names as $name) {
+		if (isset($replaced[$name]) && !sbModuleMeta($name)) continue;
 		$local  = sbModuleMeta($name);
-		$remote = $cache['modules'][$name] ?? null;
+		// Module propre au site : jamais rapproché du module publié du même nom
+		$site   = $local && $local['origin'] === 'site';
+		$remote = $site ? null : ($cache['modules'][$name] ?? null);
 		$row = array(
 			'name'        => $name,
 			'title'       => $local['title'] ?? ($remote['title'] ?? $name),
@@ -157,6 +167,7 @@ function sbModCatalog() {
 			'remote'      => $remote['version'] ?? '',
 			'requires'    => $remote['requires_core'] ?? ($local['requires_core'] ?? ''),
 			'local_requires' => $local['requires_core'] ?? '',
+			'site'        => $site,
 		);
 		$row['remote_ok']  = $remote && version_compare($core, $remote['requires_core'], '>=');
 		$row['local_ok']   = $local && version_compare($core, $local['requires_core'], '>=');
@@ -544,15 +555,17 @@ function sbModFilePlan(array $new, $old) {
 }
 
 /**
- * Liste officielle des fichiers d'un module : celle livrée par cette page,
- * sinon celle de l'index publié si la version installée est la publiée
- * (module arrivé avec le core), alors gardée ; null si introuvable.
+ * Liste officielle des fichiers d'un module : celle livrée par cette page
+ * si elle est de la version présente, sinon celle de l'index publié pour
+ * cette version (module arrivé avec le core, ou changé hors de cette page :
+ * FTP, git), alors gardée ; null si introuvable.
  */
 function sbModOfficialList($name) {
-	$old = sbModStoredList($name);
-	if ($old !== null) return $old;
+	if (sbModuleIsSite($name)) return null; // module du site : aucune liste publiée ne le concerne
 	$local = sbModuleMeta($name);
 	if (!$local) return null;
+	$j = json_decode((string) @file_get_contents(sbModWorkDir() . '/' . $name . '.json'), true);
+	if (is_array($j) && is_array($j['files'] ?? null) && (string) ($j['version'] ?? '') === $local['version']) return $j['files'];
 	$files = sbModFindPublishedList($name, $local['version']);
 	if ($files === null) return null;
 	sbModStoreList($name, $local['version'], $files);
@@ -640,8 +653,8 @@ function sbModTableRows($name) {
 	return $out;
 }
 
-/** Tables déclarées par le module.php contenu dans une archive téléchargée */
-function sbModZipTables($zipPath, $name) {
+/** module.php contenu dans une archive téléchargée (tableau vide si absent) */
+function sbModZipMeta($zipPath, $name) {
 	$z = new ZipArchive();
 	if ($z->open($zipPath, ZipArchive::RDONLY) !== true) return array();
 	$src = $z->getFromName(SB_UPD_ROOT . 'datas/modules/' . $name . '/module.php');
@@ -650,7 +663,12 @@ function sbModZipTables($zipPath, $name) {
 	$tmp = sbModWorkDir() . '/tmp-meta-' . bin2hex(random_bytes(4)) . '.php';
 	file_put_contents($tmp, $src);
 	try { $meta = include $tmp; } finally { @unlink($tmp); }
-	return is_array($meta) ? array_keys((array) ($meta['tables'] ?? array())) : array();
+	return is_array($meta) ? $meta : array();
+}
+
+/** Tables déclarées par le module.php contenu dans une archive téléchargée */
+function sbModZipTables($zipPath, $name) {
+	return array_keys((array) (sbModZipMeta($zipPath, $name)['tables'] ?? array()));
 }
 
 /**
@@ -671,7 +689,11 @@ function sbModPlan($name, $op) {
 		$plan['modified'] = $fp['modified'];
 		$plan['unchecked'] = ($op === 'update' && $old === null);
 		$plan['download'] = ($op === 'install');
-		if ($op === 'install') $plan['tables_new'] = sbModZipTables($dl['zip'], $name);
+		if ($op === 'install') {
+			$zmeta = sbModZipMeta($dl['zip'], $name);
+			$plan['tables_new'] = array_keys((array) ($zmeta['tables'] ?? array()));
+			$plan['replaces'] = is_array($zmeta['replaces'] ?? null) ? $zmeta['replaces'] : array();
+		}
 		// Archive gardée : l'exécution la réutilise si elle est toujours conforme
 		if ($op === 'update' && $row['installed']) $plan['info'][] = 'Base de données sauvegardée avant la mise à jour (migrations éventuelles du module appliquées ensuite).';
 	}
@@ -683,6 +705,16 @@ function sbModPlan($name, $op) {
 		}
 		$plan['tables_kept'] = $existing;
 		if ($existing) $plan['info'][] = 'Tables déjà présentes (données gardées) : ' . implode(', ', $existing) . '.';
+		// Reprise d'un ancien module renommé (store remplace boutique)
+		try {
+			$ti = sbModReplaceInfo($name, $row['present'] ? null : ($plan['replaces'] ?? array()));
+			if ($ti) $plan['tables_new'] = array_values(array_diff($plan['tables_new'], array_values($ti['tables']))); // reprises, pas créées
+			if ($ti) $plan['notes'][] = 'Reprise de « ' . $ti['meta']['title'] . ' » ' . $ti['meta']['version'] . ' (module ' . $ti['old'] . ') : ses données sont gardées ('
+				. sbModN(count($ti['tables']), 'table renommée', 'tables renommées') . ', droits repris), ses fichiers retirés ; sauvegarde chiffrée faite avant. L\'annulation de l\'installation ne sera pas proposée.';
+		} catch (Throwable $e) {
+			$plan['notes'][] = $e->getMessage();
+		}
+		unset($plan['replaces']);
 	}
 	if ($op === 'rollback') {
 		$rb = sbModRollbackInfo($name);
@@ -769,6 +801,7 @@ function sbModRun($name, $op, array $opt = array()) {
 /** Télécharger (module absent, avant Installer) ou mettre à jour (module présent) */
 function sbModRunFiles($name, $op, array $row, $confirm) {
 	if ($op === 'download' && $row['present']) throw new RuntimeException('Le module ' . $name . ' est déjà présent');
+	if (sbModuleIsSite($name)) throw new RuntimeException('Le module ' . $name . ' est propre au site : rien à télécharger depuis GitHub');
 	if ($op === 'update' && !$row['present']) throw new RuntimeException('Le module ' . $name . ' n\'est pas présent');
 	$dl = sbModDownload($name);
 	$new = $dl['entry']['files'];
@@ -832,6 +865,102 @@ function sbModRunFiles($name, $op, array $row, $confirm) {
 	return array('step' => sbModLabel($name) . ' ' . $step, 'label' => ($op === 'download' ? 'téléchargé ' : 'mis à jour ') . $v, 'from' => $fromVersion, 'to' => $v, 'files' => count($fp['write']));
 }
 
+/**
+ * Reprise d'un module renommé ('replaces' dans module.php, ex. store qui
+ * remplace boutique) : seulement si l'ancien est installé, se déclare
+ * officiel (auteur attendu, pas 'origin' => 'site') et que CHACUN de ses
+ * fichiers est celui de la liste publiée. Un module du même nom propre au
+ * site (autre auteur, marqué site, sans module.php) n'est jamais touché :
+ * le nouveau s'installe alors à côté, tables neuves.
+ * @return array|null ['old', 'meta', 'tables' (ancienne => nouvelle, présentes), 'files']
+ * @throws RuntimeException ancien module officiel modifié ou invérifiable
+ */
+function sbModReplaceInfo($name, ?array $r = null) {
+	if ($r === null) $r = sbModuleMeta($name)['replaces'] ?? array();
+	$old = (string) ($r['module'] ?? '');
+	if (!sbModuleValidName($old) || $old === $name || in_array($old, sbModuleCore(), true)) return null;
+	$installed = sbModulesInstalled(true);
+	if (!is_array($installed) || !isset($installed[$old])) return null;
+	$om = sbModuleMeta($old);
+	if (!$om || $om['origin'] === 'site' || $om['author'] !== (string) ($r['author'] ?? '')) return null;
+	$label = sbModLabel($old) . ' ' . $om['version'];
+	$list = sbModOfficialList($old);
+	if ($list === null) throw new RuntimeException($label . ' : liste officielle de ses fichiers introuvable (GitHub injoignable ?), reprise impossible à vérifier. Réessayez plus tard');
+	$root = sbUpdSiteRoot() . '/';
+	$files = sbModLocalFiles($old);
+	foreach ($files as $rel) {
+		if (!isset($list[$rel]) || $list[$rel] !== sbUpdHashFile($root . sbUpdTargetRel($rel))) {
+			throw new RuntimeException($label . ' modifié sur ce site (' . $rel . ') : reprise refusée. Si c\'est la boutique propre au site, ajoutez \'origin\' => \'site\' dans son module.php');
+		}
+	}
+	$db = sbUpdDb();
+	$pre = sbUpdDbPrefix();
+	$exists = function ($t) use ($db) { $q = $db->query("SHOW TABLES LIKE '" . $db->real_escape_string($t) . "'"); return $q && $q->num_rows > 0; };
+	$tables = array();
+	foreach ((array) ($r['tables'] ?? array()) as $from => $to) {
+		if (!preg_match('/^[A-Za-z0-9_]+$/', (string) $from) || !preg_match('/^[A-Za-z0-9_]+$/', (string) $to)) throw new RuntimeException('Tables de reprise invalides');
+		if (!$exists($pre . $from)) continue;
+		if ($exists($pre . $to)) throw new RuntimeException('Table ' . $pre . $to . ' déjà présente : reprise de ' . $label . ' impossible');
+		$tables[$from] = $to;
+	}
+	return array('old' => $old, 'meta' => $om, 'tables' => $tables, 'files' => $files);
+}
+
+/**
+ * Exécute la reprise (sauvegarde de l'ancien module faite par l'appelant) :
+ * tables renommées, droits et réglage « modules » repris, ancien module
+ * retiré du registre et du disque.
+ * @return array ce qu'il faut pour revenir en arrière (sbModTakeoverUndo)
+ */
+function sbModTakeover($name, array $info) {
+	$db = sbUpdDb();
+	$pre = sbUpdDbPrefix();
+	$old = $info['old'];
+	$q = function ($v) use ($db) { return "'" . $db->real_escape_string((string) $v) . "'"; };
+	$undo = array('tables' => array(), 'rights' => false, 'modules' => null);
+	foreach ($info['tables'] as $from => $to) {
+		if (!$db->query('RENAME TABLE `' . $pre . $from . '` TO `' . $pre . $to . '`')) throw new RuntimeException('Renommage de ' . $pre . $from . ' impossible : ' . $db->error);
+		$undo['tables'][$to] = $from;
+	}
+	// Droits : « boutique » et « boutique:xxx » deviennent « store », « store:xxx »
+	$rt = $pre . 'sb_users_rights';
+	$r = $db->query("SHOW TABLES LIKE " . $q($rt));
+	if ($r && $r->num_rows > 0) {
+		if (!$db->query("UPDATE `$rt` SET `module` = CONCAT(" . $q($name) . ", SUBSTRING(`module`, " . (strlen($old) + 1) . ")) WHERE `module` = " . $q($old) . " OR `module` LIKE " . $q($old . ':%'))) throw new RuntimeException('Droits : ' . $db->error);
+		$undo['rights'] = true;
+	}
+	// Réglage « modules » (modules autorisés de l'admin)
+	$ct = $pre . 'sb_config';
+	$r = $db->query("SELECT `content` FROM `$ct` WHERE `config` = 'modules'");
+	$row = $r ? $r->fetch_row() : null;
+	if ($row) {
+		$list = array_map('trim', explode(',', (string) $row[0]));
+		if (in_array($old, $list, true)) {
+			$undo['modules'] = (string) $row[0];
+			$list = array_values(array_unique(array_map(function ($m) use ($old, $name) { return $m === $old ? $name : $m; }, $list)));
+			if (!$db->query("UPDATE `$ct` SET `content` = " . $q(implode(',', $list)) . " WHERE `config` = 'modules'")) throw new RuntimeException('Réglage modules : ' . $db->error);
+		}
+	}
+	if (!$db->query('DELETE FROM `' . str_replace('`', '', sbModTable()) . '` WHERE `name` = ' . $q($old))) throw new RuntimeException('Registre des modules : ' . $db->error);
+	$root = sbUpdSiteRoot() . '/';
+	$targets = array();
+	foreach ($info['files'] as $rel) { @unlink($root . sbUpdTargetRel($rel)); $targets[] = sbUpdTargetRel($rel); }
+	sbModPruneDirs($targets);
+	@unlink(sbModWorkDir() . '/' . $old . '.json');
+	sbModulesPresent(true);
+	sbModulesInstalled(true);
+	return $undo;
+}
+
+/** Défait la partie de la reprise que la sauvegarde de l'ancien module ne couvre pas */
+function sbModTakeoverUndo($name, $old, array $undo) {
+	$db = sbUpdDb();
+	$pre = sbUpdDbPrefix();
+	$q = function ($v) use ($db) { return "'" . $db->real_escape_string((string) $v) . "'"; };
+	if (!empty($undo['rights'])) $db->query('UPDATE `' . $pre . 'sb_users_rights` SET `module` = CONCAT(' . $q($old) . ', SUBSTRING(`module`, ' . (strlen($name) + 1) . ')) WHERE `module` = ' . $q($name) . ' OR `module` LIKE ' . $q($name . ':%'));
+	if ($undo['modules'] !== null) $db->query('UPDATE `' . $pre . "sb_config` SET `content` = " . $q($undo['modules']) . " WHERE `config` = 'modules'");
+}
+
 /** Installer : tables (install.php), migrations des tables gardées, inscription */
 function sbModRunInstall($name, array $row, $wasAbsent = false) {
 	$meta = sbModuleMeta($name);
@@ -840,10 +969,15 @@ function sbModRunInstall($name, array $row, $wasAbsent = false) {
 	$db = sbUpdDb();
 	$kept = sbModExistingTables($name);
 	$keptDb = sbModKept($name);
+	// Reprise d'un ancien module (renommé) : contrôlée AVANT toute écriture
+	$takeover = sbModReplaceInfo($name);
 	// Périmètre = tables du module : au retour, celles créées ici sont
 	// retirées et celles gardées remises telles quelles
 	$plain = sbModBackup($name, array(), array(), true);
+	$oplain = $takeover ? sbModBackup($takeover['old'], $takeover['files'], array(), true) : null;
+	$undo = null;
 	try {
+		if ($takeover) $undo = sbModTakeover($name, $takeover);
 		$created = array();
 		$file = sbModulesDir() . $name . '/install.php';
 		if (is_file($file)) {
@@ -856,14 +990,29 @@ function sbModRunInstall($name, array $row, $wasAbsent = false) {
 		sbModSaveRow($name, $meta['version'], $meta['version'], true);
 		sbModKept($name, '');
 	} catch (Throwable $e) {
-		// Tables créées ici retirées, tables gardées remises, registre remis
-		try { sbModRestore($plain); @unlink($plain); } catch (Throwable $e2) { sbModKeepBackup($name, $plain); }
-		throw new RuntimeException($e->getMessage() . ' : installation annulée');
+		// Tables créées ici retirées, tables gardées remises, registre remis ;
+		// reprise : ancien module remis (tables, fichiers, registre), droits
+		$msg = $e->getMessage() . ' : installation annulée';
+		try { sbModRestore($plain); @unlink($plain); } catch (Throwable $e2) { sbModKeepBackup($name, $plain); $msg .= ' (retour en échec : sauvegarde gardée)'; }
+		if ($oplain) {
+			try {
+				sbModRestore($oplain);
+				if ($undo) sbModTakeoverUndo($name, $takeover['old'], $undo);
+				@unlink($oplain);
+			} catch (Throwable $e3) {
+				sbModKeepBackup($takeover['old'], $oplain);
+				$msg .= ' (module ' . $takeover['old'] . ' non remis : sauvegarde chiffrée gardée)';
+			}
+		}
+		throw new RuntimeException($msg);
 	}
+	// Reprise : sauvegarde de l'ancien module gardée (chiffrée) ; l'annulation
+	// de l'installation n'est pas proposée (elle retirerait les données reprises)
+	if ($oplain) sbModKeepBackup($takeover['old'], $oplain, array('op' => 'replaced', 'label' => 'la reprise par ' . $name . ' ' . $meta['version'], 'db' => true, 'files' => count($takeover['files']), 'complete' => false));
 	sbModKeepBackup($name, $plain, array('op' => 'install', 'label' => 'l\'installation ' . $meta['version'], 'db' => true, 'files' => 0, 'before_absent' => (bool) $wasAbsent,
-		'after' => array('installed' => true, 'version' => $meta['version']), 'complete' => true));
+		'after' => array('installed' => true, 'version' => $meta['version']), 'complete' => !$takeover));
 	sbUpdClearCaches();
-	$step = sbModLabel($name) . ' ' . $meta['version'] . ' installé (' . sbModN(count($created), 'table créée', 'tables créées') . ($kept ? ', ' . sbModN(count($kept), 'gardée', 'gardées') : '') . ($migrations ? ', ' . sbModN(count($migrations), 'migration', 'migrations') : '') . ')';
+	$step = sbModLabel($name) . ' ' . $meta['version'] . ' installé (' . ($takeover ? 'reprise de ' . $takeover['meta']['title'] . ' ' . $takeover['meta']['version'] . ' : ' . sbModN(count($takeover['tables']), 'table renommée', 'tables renommées') . ', ' : '') . sbModN(count($created), 'table créée', 'tables créées') . ($kept ? ', ' . sbModN(count($kept), 'gardée', 'gardées') : '') . ($migrations ? ', ' . sbModN(count($migrations), 'migration', 'migrations') : '') . ')';
 	return array('step' => $step, 'label' => 'installé ' . $meta['version'], 'to' => $meta['version']);
 }
 

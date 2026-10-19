@@ -422,7 +422,7 @@ function sbUpdModulesNewer($idx) {
 	$out = array();
 	foreach ((array) $idx as $name => $e) {
 		$local = sbModuleMeta($name);
-		if ($local && version_compare($e['version'], $local['version'], '>')) $out[] = $name . ' ' . $local['version'] . ' → ' . $e['version'];
+		if ($local && $local['origin'] !== 'site' && version_compare($e['version'], $local['version'], '>')) $out[] = $name . ' ' . $local['version'] . ' → ' . $e['version'];
 	}
 	return $out;
 }

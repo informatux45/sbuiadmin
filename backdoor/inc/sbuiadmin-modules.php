@@ -13,6 +13,10 @@
  *  - présent       : fichiers sur le disque, non installé (jamais chargé)
  *  - installé      : ligne dans sb_modules, chargé par le site et l'admin
  *
+ * 'origin' => 'site' dans module.php : module propre au site, jamais
+ * rapproché d'un module publié sur GitHub du même nom (ni installé ni mis
+ * à jour depuis GitHub), ses fichiers restent hors de la mise à jour du core.
+ *
  * pages, user et search font partie du core : toujours chargés, sans
  * module.php. Tant que la table sb_modules n'existe pas (migration 4.29 non
  * passée), tout module présent est considéré comme installé.
@@ -56,8 +60,15 @@ function sbModuleLoadMeta($name) {
 		'title' => $name, 'icon' => 'puzzle-piece', 'description' => '', 'author' => '', 'requires_core' => '0',
 		'routes' => array(), 'page_module' => false, 'shortcodes' => array(), 'tables' => array(),
 		'files' => array(), 'rights' => array(), 'pagebuilder' => array(), 'search' => array(),
+		'origin' => '', 'replaces' => array(),
 	);
+	$m['origin'] = ($m['origin'] === 'site') ? 'site' : '';
 	return $m;
+}
+
+/** Module propre au site ('origin' => 'site') : ignoré par le catalogue GitHub */
+function sbModuleIsSite($name) {
+	return (sbModuleMeta($name)['origin'] ?? '') === 'site';
 }
 
 /**
