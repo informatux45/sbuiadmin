@@ -606,10 +606,26 @@ function sbCsrfToken() {
  * @return bool
  */
 function sbCheckCsrfToken() {
-	if (empty($_SESSION['sbuiadmin_csrf_token']) || empty($_POST['sbuiadmin_csrf_token']) || !is_string($_POST['sbuiadmin_csrf_token'])) {
+	// Champ du formulaire, sinon en-tête X-SB-CSRF (requêtes AJAX, csrf.js)
+	$given = $_POST['sbuiadmin_csrf_token'] ?? ($_SERVER['HTTP_X_SB_CSRF'] ?? null);
+	if (empty($_SESSION['sbuiadmin_csrf_token']) || !is_string($given) || $given === '') {
 		return false;
 	}
-	return hash_equals($_SESSION['sbuiadmin_csrf_token'], $_POST['sbuiadmin_csrf_token']);
+	return hash_equals($_SESSION['sbuiadmin_csrf_token'], $given);
+}
+
+/**
+ * Actions GET sensibles déclarées par les modules installés ('csrf_get' de
+ * leur module.php) : le routeur leur exige le jeton comme aux suppressions.
+ * @return array module => [actions]
+ */
+function sbCsrfGetActions() {
+	$out = array();
+	foreach (sbModulesActive() as $name => $meta) {
+		$list = array_values(array_filter((array) ($meta['csrf_get'] ?? array()), function ($a) { return is_string($a) && preg_match('/^[A-Za-z0-9_]{1,64}$/', $a); }));
+		if ($list) $out[$name] = $list;
+	}
+	return $out;
 }
 
 ?>

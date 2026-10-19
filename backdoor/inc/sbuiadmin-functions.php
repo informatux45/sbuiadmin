@@ -620,18 +620,46 @@ if (!function_exists('sbForbiddenRedirect')) {
 // Font Awesome 7 : sbFaClass() (classes d'une icône, anciens noms FA4 acceptés)
 require_once __DIR__ . '/../../inc/sbfontawesome.php';
 
+/**
+ * Fonctions utilisables comme modificateurs dans les gabarits (Smarty 4
+ * signale toute fonction non déclarée). Fonctions PHP : null passé en ''
+ * (déprécié en 8.1, refusé en PHP 9). Un module ajoute les siennes avec
+ * 'modifiers' => array('maFonction') dans son module.php : enregistrées par
+ * fermeture, elles peuvent être définies plus tard (inc/functions.php).
+ */
 function sbSmartyRegisterModifiers($smarty) {
-	$modifiers = array(
-		// PHP
+	$php = array(
 		'sprintf', 'strtoupper', 'ucfirst',
-		// SBUIADMIN
+		'addslashes', 'basename', 'html_entity_decode', 'json_decode', 'md5', 'str_pad', 'urlencode',
+	);
+	$modifiers = array(
 		'sbCleanPageBuilderContent', 'sbDisplayMediaMime', 'sbFaClass', 'sbDisplayMediaSize', 'sbFilename',
 		'sbFileRealname', 'sbGetFileDocData', 'sbGetGravatar', 'sbGetIfIsImg', 'sbGetInfoImg',
 		'sbGetUserAvatar', 'sbGetUserGroup', 'sbModifiedFileTime', 'sbRewriteTags', 'sbToByteSize',
+		'sb_utf8_decode',
 	);
+	$add = function ($name, $callable) use ($smarty) {
+		if (!isset($smarty->registered_plugins[Smarty::PLUGIN_MODIFIER][$name])) $smarty->registerPlugin(Smarty::PLUGIN_MODIFIER, $name, $callable);
+	};
+	foreach ($php as $name) {
+		$add($name, function (...$args) use ($name) {
+			if (array_key_exists(0, $args) && $args[0] === null) $args[0] = '';
+			return $name(...$args);
+		});
+	}
 	foreach ($modifiers as $name) {
-		if (function_exists($name) && !isset($smarty->registered_plugins[Smarty::PLUGIN_MODIFIER][$name])) {
-			$smarty->registerPlugin(Smarty::PLUGIN_MODIFIER, $name, $name);
+		if (function_exists($name)) $add($name, $name);
+	}
+	// Modules installés (officiels ou propres au site)
+	if (function_exists('sbModulesActive')) {
+		foreach (sbModulesActive() as $meta) {
+			foreach ((array) ($meta['modifiers'] ?? array()) as $name) {
+				if (!is_string($name) || !preg_match('/^[A-Za-z_][A-Za-z0-9_]{0,63}$/', $name)) continue;
+				$add($name, function (...$args) use ($name) {
+					if (!function_exists($name)) return $args[0] ?? '';
+					return $name(...$args);
+				});
+			}
 		}
 	}
 }
@@ -673,6 +701,14 @@ function sbConvertDate($date, $format = 'ISO') {
 		case "FRH": return sb_strftime("%e %B %Y", strtotime($date)); break;
 		// Year (AAAA)
 		case "YEAR": return sb_strftime("%Y", strtotime($date)); break;
+		// AAMMJJ
+		case "US1": return sb_strftime("%y%m%d", strtotime($date)); break;
+		// MM.AA
+		case "FRM": return sb_strftime("%m.%y", strtotime($date)); break;
+		// Jour JJ mois AAAA (lisible)
+		case "FRH2": return sb_strftime("%A %e %B %Y", strtotime($date)); break;
+		// Mois (MM)
+		case "MONTH": return sb_strftime("%m", strtotime($date)); break;
 	}
 }
 

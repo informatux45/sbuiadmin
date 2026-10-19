@@ -48,3 +48,8 @@ Chaque site a son sbdbconfig.php (sbdbconfig-<dossier>.php pour les suivants).
   install.php (tables), migrations/<version>.php.
 - Module propre à un site : 'origin' => 'site' dans module.php (jamais
   installé ni mis à jour depuis GitHub, fichiers hors mise à jour du core).
+- 'csrf_get' => array('duplicate', ...) : actions GET sensibles du module
+  (jeton exigé, ajouté aux liens par csrf.js). Tout POST de l'admin exige
+  le jeton (ajouté automatiquement aux formulaires, fetch et jQuery).
+- 'modifiers' => array('maFonction', ...) : fonctions utilisables dans les
+  gabarits Smarty (peuvent être définies dans inc/functions.php).

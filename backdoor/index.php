@@ -448,6 +448,8 @@ $sbsmarty->assign('sb_url_customer', $sb_url_customer);
 $sbsmarty->assign('sb_sandbox', (sbSetting('sandbox') == 1 && sbHasRight('sandbox', 'view')) ? 1 : 0);
 // Jeton CSRF pour les envois hors formulaire (Fine Uploader -> server/php/sbUploadServer.php)
 $sbsmarty->assign('sb_csrf_token', sbCsrfToken());
+// Actions GET sensibles des modules (csrf.js leur ajoute le jeton)
+$sbsmarty->assign('sb_csrf_get_json', json_encode(sbCsrfGetActions()));
 // --- CMS Activation
 $sbsmarty->assign('sb_cms', sbSetting('cms'));
 
@@ -515,7 +517,9 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 		// Suppression par lien (GET) : jeton CSRF exigé (&t=, ajouté par
 		// confirm.js), sinon un lien piégé ouvert par un administrateur
 		// connecté supprimait à sa place (point 38)
-		if ($_SERVER['REQUEST_METHOD'] === 'GET' && sbClassifyAction($sb_get_page) === 'delete'
+		$sb_csrf_get = sbCsrfGetActions();
+		if ($_SERVER['REQUEST_METHOD'] === 'GET'
+			&& (sbClassifyAction($sb_get_page) === 'delete' || in_array(sbRightsActionParam($sb_get_page), $sb_csrf_get[$sb_get_page] ?? array(), true))
 			&& (empty($_SESSION['sbuiadmin_csrf_token']) || !is_string($_GET['t'] ?? null) || !hash_equals($_SESSION['sbuiadmin_csrf_token'], $_GET['t']))) {
 			http_response_code(403);
 			$sbsmarty->display("403.tpl");
@@ -531,7 +535,9 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 		// endpoints AJAX qui ne passent pas par cette classe (ex: messages).
 		// Les formulaires de tri (glisser-deposer, champ drag[]) n'envoient
 		// pas form_submit : ils sont couverts par leur propre champ.
-		if ($_SERVER['REQUEST_METHOD'] === 'POST' && ((isset($_POST['form_submit']) && $_POST['form_submit'] != '') || isset($_POST['drag'])) && !sbCheckCsrfToken()) {
+		// Depuis la 4.44 : TOUT POST (formulaires, AJAX : champ ou en-tête
+		// X-SB-CSRF, ajoutés par assets/adminator/csrf.js)
+		if ($_SERVER['REQUEST_METHOD'] === 'POST' && !sbCheckCsrfToken()) {
 			http_response_code(403);
 			$sbsmarty->display("403.tpl");
 			exit;

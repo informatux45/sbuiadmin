@@ -60,7 +60,7 @@ function sbModuleLoadMeta($name) {
 		'title' => $name, 'icon' => 'puzzle-piece', 'description' => '', 'author' => '', 'requires_core' => '0',
 		'routes' => array(), 'page_module' => false, 'shortcodes' => array(), 'tables' => array(),
 		'files' => array(), 'rights' => array(), 'pagebuilder' => array(), 'search' => array(),
-		'origin' => '', 'replaces' => array(),
+		'origin' => '', 'replaces' => array(), 'modifiers' => array(), 'csrf_get' => array(),
 	);
 	$m['origin'] = ($m['origin'] === 'site') ? 'site' : '';
 	return $m;
