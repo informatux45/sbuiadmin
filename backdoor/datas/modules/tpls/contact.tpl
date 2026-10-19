@@ -14,7 +14,7 @@
 				<div class="hero-text">
 					<span class="eyebrow">Contact</span>
 					<h1 class="hero-title">Contact</h1>
-					<p class="hero-sub">Gérez vos formulaires de contact et leurs champs.</p>
+					<p class="hero-sub">Gérez vos formulaires de contact, leurs champs et les messages reçus.</p>
 				</div>
 				<div class="hero-actions">
 					<div class="dd-wrap">
@@ -26,6 +26,8 @@
 							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=contact">Tous les formulaires</a>
 							<div class="dd-divider"></div>
 							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=contact&a=add">+1 formulaire</a>
+							<div class="dd-divider"></div>
+							<a class="dd-menu-item" href="{$smarty.const._AM_SITE_URL}index.php?p=contact&a=messages&id=0">Messages de la page Contact{if isset($page_messages) && $page_messages.unread} ({$page_messages.unread} non lu{if $page_messages.unread > 1}s{/if}){/if}</a>
 						</div>
 					</div>
 					<a class="btn btn--outline-primary" href="{$smarty.const._AM_SITE_URL}index.php?p=contact&a=settings">Paramètres</a>
@@ -71,6 +73,9 @@
 															<span class="btn--icon" style="color:{if $contact.active}var(--success){else}var(--danger){/if}" data-tooltip="Statut {if $contact.active}visible{else}non visible{/if}">
 																<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
 															</span>
+															<a class="btn--icon" href="{$module_url}&a=messages&id={$contact.id}" data-tooltip="Messages ({$contact.messages.total}{if $contact.messages.unread}, {$contact.messages.unread} non lu{if $contact.messages.unread > 1}s{/if}{/if})"{if $contact.messages.unread} style="color:var(--primary)"{/if}>
+																<svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+															</a>
 															<a class="btn--icon" href="{$module_url}&a=edit&id={$contact.id}" data-tooltip="Modifier">
 																<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"/></svg>
 															</a>
@@ -93,7 +98,94 @@
                 </section>
 				{/if}
 
-				{if !$all && $smarty.get.a && ($smarty.get.a != 'contact' || $smarty.get.a != 'settings') }
+				{assign var=sbact value=$smarty.get.a|default:''}
+				{if $sbact == 'messages' || $sbact == 'messagedel'}
+                <section class="col-12 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<h2 class="card-title">Messages reçus : {$form_title|escape}</h2>
+						</div>
+						<a class="btn btn--outline-primary btn--sm" href="{$module_url}">Tous les formulaires</a>
+                    </div>
+							<p class="help-block">Messages enregistrés à chaque envoi, même si le mail n'est pas parti. {if $retention}Supprimés automatiquement après {$retention} mois{else}Conservés sans limite{/if} (<a href="{$module_url}&a=settings">Paramètres</a>).</p>
+                            <div class="data-toolbar">
+								<div class="data-toolbar-left">
+									<div class="input-icon" style="flex:1;max-width:320px">
+										<span class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+										<input class="input" type="search" placeholder="Rechercher..." data-datatable-search="dataTables-messages">
+									</div>
+								</div>
+							</div>
+							<div style="overflow-x:auto">
+                                <table class="data-table" id="dataTables-messages" data-datatable>
+                                    <thead>
+                                        <tr>
+                                            {foreach from=$sb_table_header item=header}
+												<th{if $header@last} data-sort="false"{/if}>
+													{$header}{if !$header@last} <span class="sort"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>{/if}
+												</th>
+											{/foreach}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+										{foreach from=$messages item=msg}
+											<tr class="data-row"{if !$msg.is_read} style="font-weight:600"{/if}>
+												<td data-sort-value="{$msg.created_at|escape}">{$msg.created_at|date_format:"%d/%m/%Y %H:%M"}</td>
+												<td>{$msg.name|escape}</td>
+												<td>{$msg.email|escape}</td>
+												<td>{if $msg.sent}<span class="badge success">envoyé</span>{else}<span class="badge danger" data-tooltip="{$msg.error|escape}">échec</span>{/if}</td>
+												<td>
+													<div class="data-cell-actions">
+														<a class="btn--icon" href="{$module_url}&a=message&id={$msg.id}" data-tooltip="Lire">
+															<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+														</a>
+														<a class="btn--icon" data-confirm="Sûr de vouloir supprimer ce message ?" href="{$module_url}&a=messagedel&id={$form_id}&mid={$msg.id}" data-tooltip="Supprimer">
+															<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
+														</a>
+													</div>
+												</td>
+											</tr>
+										{/foreach}
+                                    </tbody>
+                                </table>
+                            </div>
+							<div class="data-foot" data-datatable-foot="dataTables-messages">
+								<div class="data-foot-info" data-foot-info></div>
+								<div class="pager"></div>
+							</div>
+                </section>
+				{/if}
+
+				{if $sbact == 'message' && $message}
+                <section class="col-12 card">
+                    <div class="card-head">
+						<div class="card-title-wrap">
+							<h2 class="card-title">Message du {$message.created_at|date_format:"%d/%m/%Y à %H:%M"} ({$form_title|escape})</h2>
+						</div>
+						<a class="btn btn--outline-primary btn--sm" href="{$module_url}&a=messages&id={$message.form_id}">Retour aux messages</a>
+                    </div>
+							<table class="data-table">
+								<tbody>
+									{foreach from=$message.fields key=field item=value}
+									<tr>
+										<th style="width:200px;white-space:nowrap">{$field|replace:'-':' '|escape}</th>
+										<td>{$value|escape|nl2br}</td>
+									</tr>
+									{/foreach}
+									<tr>
+										<th>Envoi</th>
+										<td>{if $message.sent}<span class="badge success">envoyé</span> à {$message.recipients|escape}{else}<span class="badge danger">échec</span> {$message.error|escape}{/if}</td>
+									</tr>
+								</tbody>
+							</table>
+							<p style="margin-top:12px">
+								<a class="btn btn--primary btn--sm" href="mailto:{$message.email|escape}">Répondre</a>
+								<a class="btn btn--danger btn--sm" data-confirm="Sûr de vouloir supprimer ce message ?" href="{$module_url}&a=messagedel&id={$message.form_id}&mid={$message.id}">Supprimer</a>
+							</p>
+                </section>
+				{/if}
+
+				{if !$all && $sbact && $sbact != 'messages' && $sbact != 'messagedel' && $sbact != 'message'}
                 <section class="col-8 card">
                     <div class="card-head">
 						<div class="card-title-wrap">

@@ -23,8 +23,8 @@ function shortcode_sbcontactajax($param = '') {
 	global $sbsanitize, $sbsql;
 
 	// --- Initialization
-	$id        = (isset($param['id']) && intval($param['id']) > 0) ? intval($param['id']) : intval($_GET['id']);
-	$class     = $param['class'];
+	$id        = (isset($param['id']) && intval($param['id']) > 0) ? intval($param['id']) : intval($_GET['id'] ?? 0);
+	$class     = $param['class'] ?? '';
 	$form_html = '';
 	$sendmail  = false;
 	// --- Tables
@@ -47,6 +47,7 @@ function shortcode_sbcontactajax($param = '') {
 			# ################################################
 			# Global email settings
 			# SQL Request (all config)
+			$email_to = $subject = '';
 			$query   = "SELECT config, content FROM {$module['tables']['config']} WHERE config = 'email_to' OR config = 'email_subject'";
 			$request = $sbsql->query($query);
 			$result  = $sbsql->toarray($request);
@@ -175,8 +176,8 @@ function shortcode_sbcontact($param = '') {
 	global $sbsanitize, $sbsql;
 
 	// --- Initialization
-	$id        = intval($param['id']);
-	$class     = $param['class'];
+	$id        = intval($param['id'] ?? 0);
+	$class     = $param['class'] ?? '';
 	$formname  = (isset($param['form'])) ? trim($param['form']) : false;
 	$form_html = '';
 	$sendmail  = false;
@@ -200,6 +201,7 @@ function shortcode_sbcontact($param = '') {
 			# ################################################
 			# Global email settings
 			# SQL Request (all config)
+			$email_to = $subject = '';
 			$query   = "SELECT config, content FROM {$module['tables']['config']} WHERE config = 'email_to' OR config = 'email_subject'";
 			$request = $sbsql->query($query);
 			$result  = $sbsql->toarray($request);
@@ -219,43 +221,16 @@ function shortcode_sbcontact($param = '') {
 			if ($sbsanitize->displayLang(sb_utf8_encode($result_contact['subject'])) != '') $subject = $sbsanitize->displayLang(sb_utf8_encode($result_contact['subject']));
 			# ################################################
 			# Check if form is submitted
+			$errMsg = $succMsg = '';
 			if(isset($_POST['submitform']) && !empty($_POST['submitform'])) {
 				// --- Anti-robot ALTCHA (une seule API : inc/sbuiadmin-altcha.php)
 				if (sbAltchaVerify()) {
-					// --- PHPMailer (UTF-8 + SMTP, voir sbMailer())
-					$PHPMailer = sbMailer();
-					// --- Initialization
-					$htmlContent = '<h1>' . $subject . ' (' . _AM_SITE_TITLE . ')</h1>';
-					// --- Get Contact form submission $_POST
-					foreach($_POST as $k => $v) {
-						if ($k == 'name')  $name  = $v;
-						if ($k == 'email') $email = $v;
-						// --- Increase html content
-						if ($k != SB_ALTCHA_FIELD && $k != 'submitform' && $k != 'go')
-							$htmlContent .= '<p><b>'.$k.' :</b> '.$sbsanitize->nl2Br($v).'</p>';
+					$errMsg = sbContactSend($id, $email_to, $subject, $subject . ' (' . _AM_SITE_TITLE . ')', array('submitform', 'go'));
+					if ($errMsg === '') {
+						$succMsg = _CMS_CONTACT_FORM_SUCCESS;
+						// --- Empty form fields
+						$sendmail = true;
 					}
-					// --- Email Construct
-					// --- Expéditeur = le site (le SMTP n'accepte que son domaine vérifié),
-					// --- réponse = le visiteur
-					@$PHPMailer->setFrom(SBFROMEMAIL, "$name");
-					@$PHPMailer->addReplyTo($email, "$name");
-					@$PHPMailer->ClearAllRecipients();
-					@$PHPMailer->AddAddress($email_to, "$email_to");
-					@$PHPMailer->Subject  = $sbsanitize->displayText($subject, 'UTF-8');
-					@$PHPMailer->AltBody  = "To view the message, please use an HTML compatible email viewer!"; // optional, comment out and test
-					@$PHPMailer->MsgHTML($sbsanitize->displayText($htmlContent, 'UTF-8'));
-					@$PHPMailer->IsHTML(true);
-					
-					// --- Send email
-					$status = $PHPMailer->Send();
-					if (!$status) error_log('Contact : envoi en échec : ' . $PHPMailer->ErrorInfo);
-					@$PHPMailer->ClearAddresses();
-					@$PHPMailer->ClearAttachments();
-					
-					$succMsg = _CMS_CONTACT_FORM_SUCCESS;
-					// --- Empty form fields
-					$sendmail = true;
-					
 				} else {
 					$errMsg = ($GLOBALS['sb_altcha_error'] == 'missing') ? _CMS_CONTACT_FORM_ERROR_CAPTCHA_EMPTY : _CMS_CONTACT_FORM_ERROR_CAPTCHA;
 				}
@@ -271,7 +246,7 @@ function shortcode_sbcontact($param = '') {
 			$form_name  = ($formname) ? 'name="'.$formname.'" id="'.$formname.'" ' : '';
 			$form_class = ($class) ? ' class="'.$class.'"' : '';
 			$form_html .= '<a name="form_'.$id.'"></a>';
-			$form_html .= '<form '.$form_name.'action="http' . (($_SERVER['HTTPS'] == 'on') ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'].'#form_' . $id . '" method="post"'.$form_class.'>';
+			$form_html .= '<form '.$form_name.'action="http' . ((($_SERVER['HTTPS'] ?? '') == 'on') ? 's' : '') . '://' . htmlspecialchars($_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], ENT_QUOTES, 'UTF-8') . '#form_' . $id . '" method="post"'.$form_class.'>';
 			// --- Error / Success Message
 			//$form_html .= '<div class="usermessagea">';
 			if ($errMsg) {
@@ -337,9 +312,11 @@ function sbGetContactFormElements($string, $publickey = '', $sendmail = false) {
 		if (!empty($result)) {
 			// --- Get the result	
 			for($i = 0; $i < count($result); $i++) {
+				// --- Attributs propres à chaque champ (ceux du précédent ne sont pas repris)
+				$param = array();
 				for($j = 0; $j < count($result[$i]); $j++) {
 					// --- List all keys => values
-					list($key, $value) = explode("=", $result[$i][$j]);
+					list($key, $value) = array_pad(explode("=", $result[$i][$j], 2), 2, '');
 					// --- Assign keys
 					$param[$key] = $value;
 				}
@@ -391,7 +368,7 @@ function sbContactFormConstructElement($param, $type = '', $publickey = '', $sen
 					$input_html .= ' ' . $key . '="' . $val . '"';
 				}
 			}
-			$input_html .= ($keyname && !$sendmail) ? 'value="' . $_POST[$keyname] . '"' : 'value=""';
+			$input_html .= ' value="' . (($keyname && !$sendmail) ? sbContactPosted($keyname) : '') . '"';
 			$input_html .= ' type="'.$type.'"';
 			$input_html .= ($required) ? ' required>' : '>';
 		break;
@@ -410,7 +387,7 @@ function sbContactFormConstructElement($param, $type = '', $publickey = '', $sen
 					$input_html .= ' ' . $key . '="' . $val . '"';
 				}
 			}
-			$input_html .= ($keyname && !$sendmail) ? 'value="' . $_POST[$keyname] . '"' : 'value=""';
+			$input_html .= ' value="' . (($keyname && !$sendmail) ? sbContactPosted($keyname) : '') . '"';
 			$input_html .= ' type="'.$type.'"';
 			$input_html .= ($required) ? ' required>' : '>';
 		break;
@@ -427,7 +404,7 @@ function sbContactFormConstructElement($param, $type = '', $publickey = '', $sen
 				}
 			}
 			$input_html .= ($required) ? ' required>' : '>';
-			$input_html .= ($keyname && !$sendmail) ? $_POST[$keyname] : '';
+			$input_html .= ($keyname && !$sendmail) ? sbContactPosted($keyname) : '';
 			$input_html .= '</textarea>';
 		break;
 	
@@ -445,8 +422,9 @@ function sbContactFormConstructElement($param, $type = '', $publickey = '', $sen
 			}
 			$input_html .= '>';
 			// --- Construct OPTIONS / VALUE
+			$options_array = $options_array ?? array();
 			for($o = 0; $o < count($options_array); $o++) {
-				$input_html .= '<option value="' . $value_array[$o] . '">';
+				$input_html .= '<option value="' . ($value_array[$o] ?? '') . '">';
 				$input_html .= $options_array[$o];
 				$input_html .= '</option>';
 			}
@@ -471,6 +449,118 @@ function sbContactFormConstructElement($param, $type = '', $publickey = '', $sen
 	}
 
 	return $input_html;
+}
+
+
+/**
+ * Valeur saisie par le visiteur, échappée pour être réaffichée dans le formulaire
+ * @param string $name nom du champ
+ * @return string
+ */
+function sbContactPosted($name) {
+	$v = $_POST[$name] ?? '';
+	return htmlspecialchars(is_array($v) ? '' : (string) $v, ENT_QUOTES, 'UTF-8');
+}
+
+/**
+ * Adresses d'une liste « Email(s) » (séparées par , ou ;), les invalides
+ * écartées (et notées dans le journal d'erreurs PHP)
+ * @param string $list
+ * @return array adresses valides, sans doublon
+ */
+function sbContactRecipients($list) {
+	$valid = array();
+	foreach (preg_split('/[,;]+/', html_entity_decode((string) $list, ENT_QUOTES, 'UTF-8')) as $address) {
+		$address = trim($address);
+		if ($address === '') continue;
+		if (filter_var($address, FILTER_VALIDATE_EMAIL)) $valid[strtolower($address)] ??= $address;
+		else error_log('Contact : destinataire invalide écarté : ' . $address);
+	}
+	return array_values($valid);
+}
+
+/**
+ * Envoi d'un formulaire de contact : le message est enregistré
+ * (sb_contact_messages, même si le mail échoue) puis envoyé aux destinataires.
+ * @param int    $form_id  formulaire (0 = page Contact du module)
+ * @param string $email_to destinataires (séparés par , ou ;)
+ * @param string $subject  sujet du mail
+ * @param string $title    titre en tête du mail
+ * @param array  $skip     champs techniques à ne pas transmettre
+ * @return string '' si envoyé, sinon le message d'erreur pour le visiteur
+ */
+function sbContactSend($form_id, $email_to, $subject, $title, array $skip = array()) {
+	global $sbsanitize;
+
+	$skip[] = SB_ALTCHA_FIELD;
+	$fields = array();
+	foreach ($_POST as $k => $v) {
+		if (in_array((string) $k, $skip, true)) continue;
+		$fields[(string) $k] = is_array($v) ? implode(', ', array_map('strval', $v)) : trim((string) $v);
+	}
+	$name  = trim(str_replace(array("\r", "\n"), ' ', $fields['name'] ?? ''));
+	$email = $fields['email'] ?? '';
+	if (!filter_var($email, FILTER_VALIDATE_EMAIL)) return _CMS_CONTACT_FORM_ERROR_EMAIL;
+
+	$subject    = $sbsanitize->displayText($subject, 'UTF-8');
+	$recipients = sbContactRecipients($email_to);
+	$mail       = sbMailer();
+	$error      = '';
+	if (!$recipients) {
+		$error = 'aucun destinataire valide';
+	} elseif (!$mail) {
+		$error = 'PHPMailer absent (vendor/)';
+	} else {
+		$e    = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8', false); };
+		$html = '<h1>' . $e($sbsanitize->displayText($title, 'UTF-8')) . "</h1>\n";
+		foreach ($fields as $k => $v) $html .= '<p><b>' . $e(str_replace('-', ' ', $k)) . ' :</b> ' . nl2br($e($v)) . "</p>\n";
+		// --- Expéditeur = le site (le SMTP n'accepte que son domaine vérifié),
+		// --- réponse = le visiteur
+		if (!$mail->setFrom(SBFROMEMAIL, $name)) {
+			$error = $mail->ErrorInfo;
+		} else {
+			$mail->addReplyTo($email, $name);
+			foreach ($recipients as $to) $mail->addAddress($to);
+			$mail->Subject = $subject;
+			$mail->msgHTML($html);
+			if (!$mail->send()) $error = $mail->ErrorInfo;
+		}
+	}
+
+	sbContactSaveMessage($form_id, $name, $email, $fields, implode(', ', $recipients), $error);
+	if ($error === '') return '';
+	error_log('Contact : envoi en échec : ' . $error);
+	return _CMS_CONTACT_FORM_ERROR_SEND;
+}
+
+/** Durée de conservation des messages, en mois (0 = sans limite) */
+function sbContactRetention() {
+	global $sbsql;
+	$row = $sbsql->assoc($sbsql->query("SELECT content FROM " . _AM_DB_PREFIX . "sb_config WHERE config = 'contact_retention'"));
+	return $row ? max(0, (int) $row['content']) : 12;
+}
+
+/** Supprime les messages plus anciens que la durée de conservation */
+function sbContactPurgeMessages() {
+	global $sbsql;
+	$months = sbContactRetention();
+	if ($months > 0) $sbsql->query("DELETE FROM " . _AM_DB_PREFIX . "sb_contact_messages WHERE created_at < DATE_SUB(NOW(), INTERVAL $months MONTH)");
+}
+
+/** Enregistre un message reçu ($error : '' si le mail est parti) */
+function sbContactSaveMessage($form_id, $name, $email, array $fields, $recipients, $error) {
+	global $sbsql;
+	sbContactPurgeMessages();
+	$q = function ($v, $max = 0) use ($sbsql) {
+		$v = (string) $v;
+		if ($max) $v = mb_substr($v, 0, $max, 'UTF-8');
+		return "'" . $sbsql->escape_string($v) . "'";
+	};
+	$json = json_encode($fields, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+	$sql  = "INSERT INTO " . _AM_DB_PREFIX . "sb_contact_messages (form_id, created_at, name, email, fields, recipients, sent, error)"
+		. " VALUES (" . (int) $form_id . ", NOW(), " . $q($name, 255) . ", " . $q($email, 255) . ", " . $q($json) . ", " . $q($recipients) . ", "
+		. ($error === '' ? 1 : 0) . ", " . $q($error, 255) . ")";
+	if (!$sbsql->query($sql)) error_log('Contact : message non enregistré : ' . $sbsql->error);
 }
 
 

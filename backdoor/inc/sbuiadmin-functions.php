@@ -1286,6 +1286,12 @@ function sbGetMenuModule($param = '') {
 					}
 
 					if ($show_module) {
+						// Bulle rouge posée par le module (menu.php : 'badge' => nombre, 'badge_title' => infobulle)
+						$badge_count = (int) ($module_menu[$module_name]['badge'] ?? 0);
+						$badge_html  = ($badge_count > 0)
+							? '<span class="nav-badge nav-count"' . (!empty($module_menu[$module_name]['badge_title']) ? ' title="' . htmlspecialchars($module_menu[$module_name]['badge_title'], ENT_QUOTES, 'UTF-8') . '"' : '') . '>' . ($badge_count > 99 ? '99+' : $badge_count) . '</span>'
+							: '';
+
 						// Init Current URL
 						$request_url = 'http' . (($_SERVER['HTTPS'] == 'on') ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
@@ -1329,7 +1335,7 @@ function sbGetMenuModule($param = '') {
 							$is_current_section = ($collapse_in != '') ? ' is-current' : '';
 							$ret_module_menu .= '<div class="nav-item-group' . $collapse_in . '" data-nav-group id="' . $module_name . '">';
 							$ret_module_menu .= '<a class="nav-link' . $is_current_section . '" href="javascript:void(0)" data-nav-toggle>';
-							$ret_module_menu .= '<i class="' . sbFaClass($module_menu[$module_name]['icon']) . ' fa-fw"></i><span>'. $module_menu[$module_name]['main'] . '</span>';
+							$ret_module_menu .= '<i class="' . sbFaClass($module_menu[$module_name]['icon']) . ' fa-fw"></i><span>'. $module_menu[$module_name]['main'] . '</span>' . $badge_html;
 							$ret_module_menu .= '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 18 6-6-6-6"/></svg>';
 							$ret_module_menu .= '</a>';
 							$ret_module_menu .= '<div class="nav-submenu">';
@@ -1383,7 +1389,7 @@ function sbGetMenuModule($param = '') {
 						} else {
 							// Flat item, no submenu
 							$ret_module_menu .= '<a class="nav-link' . $class_active . '" id="' . $module_name . '" href="index.php?p=' . $module_name . '">';
-							$ret_module_menu .= '<i class="' . sbFaClass($module_menu[$module_name]['icon']) . ' fa-fw"></i><span>'. $module_menu[$module_name]['main'] . '</span>';
+							$ret_module_menu .= '<i class="' . sbFaClass($module_menu[$module_name]['icon']) . ' fa-fw"></i><span>'. $module_menu[$module_name]['main'] . '</span>' . $badge_html;
 							$ret_module_menu .= '</a>';
 						}
 					}

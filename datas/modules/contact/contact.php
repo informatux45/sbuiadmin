@@ -33,7 +33,7 @@ $module['author']      = "BooBoo";
 // -------------------------------------------------
 // --- Tables SQL
 // -------------------------------------------------
-$module['tables']['config']  = "sb_config";
+$module['tables']['config']  = _AM_DB_PREFIX . "sb_config";
 $module['tables']['contact'] = "sb_contact";
 // -------------------------------------------------
 
@@ -79,39 +79,12 @@ switch($op) {
 		if(isset($_POST['submit']) && !empty($_POST['submit'])) {
 			// --- Anti-robot ALTCHA (une seule API : inc/sbuiadmin-altcha.php)
 			if (sbAltchaVerify()) {
-				// --- PHPMailer (UTF-8 + SMTP, voir sbMailer())
-				$PHPMailer = sbMailer();
-				// --- Initialization
-				$htmlContent = '<h1>Contact site ' . _AM_SITE_TITLE . '</h1>';
-				// --- Get Contact form submission $_POST
-				foreach($_POST as $k => $v) {
-					if ($k == 'name')  $name  = $v;
-					if ($k == 'email') $email = $v;
-					// --- Increase html content
-					if ($k != SB_ALTCHA_FIELD && $k != 'submit') $htmlContent .= '<p><b>'.str_replace("-", " ", $k).' :</b> '.$sbsanitize->nl2Br($v).'</p>';
+				$errMsg = sbContactSend(0, $email_to, $subject, 'Contact site ' . _AM_SITE_TITLE, array('submit'));
+				if ($errMsg === '') {
+					$succMsg = _CMS_CONTACT_FORM_SUCCESS;
+					// --- Empty form fields
+					$sbsmarty->assign('sendmailok', 'ok');
 				}
-				// --- Email Construct
-				// --- Expéditeur = le site (le SMTP n'accepte que son domaine vérifié),
-				// --- réponse = le visiteur
-				@$PHPMailer->setFrom(SBFROMEMAIL, "$name");
-				@$PHPMailer->addReplyTo($email, "$name");
-				@$PHPMailer->ClearAllRecipients();
-				@$PHPMailer->AddAddress($email_to, "$email_to");
-				@$PHPMailer->Subject  = $sbsanitize->displayText($subject, 'UTF-8');
-				@$PHPMailer->AltBody  = "To view the message, please use an HTML compatible email viewer!"; // optional, comment out and test
-				@$PHPMailer->MsgHTML($sbsanitize->displayText($htmlContent, 'UTF-8'));
-				@$PHPMailer->IsHTML(true);
-
-				// --- Send email
-				$status = $PHPMailer->Send();
-				if (!$status) error_log('Contact : envoi en échec : ' . $PHPMailer->ErrorInfo);
-				@$PHPMailer->ClearAddresses();
-				@$PHPMailer->ClearAttachments();
-				
-				$succMsg = _CMS_CONTACT_FORM_SUCCESS;
-				// --- Empty form fields
-				$sbsmarty->assign('sendmailok', 'ok');
-				
 			} else {
 				$errMsg = ($GLOBALS['sb_altcha_error'] == 'missing') ? _CMS_CONTACT_FORM_ERROR_CAPTCHA_EMPTY : _CMS_CONTACT_FORM_ERROR_CAPTCHA;
 			}

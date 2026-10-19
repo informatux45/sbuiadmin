@@ -110,6 +110,9 @@ Installing in a sub-folder: see `help.txt`.
 
 ## 📝 Changelog
 
+**4.38**
+- Contact module 1.1.0: received messages kept and listed per form (retention setting, 12 months by default), unread count shown in the side menu, several recipients, real error shown on send failure
+
 **4.37**
 - PHP 8 / PHP 9 readiness: fatal errors and deprecations fixed (sanitize, forms, CSV, media, thumbnails, search), wrong docblocks corrected; Shop and Tabs modules 1.0.1
 

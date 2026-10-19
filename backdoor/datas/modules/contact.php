@@ -47,6 +47,18 @@ $getMultilang = (sbGetConfig('multilang')) ? sbGetConfig('multilang') : false;
 // ---------------------------------------------------
 $table           = _AM_DB_PREFIX . "sb_contact";
 $table_cmsconfig = _AM_DB_PREFIX . "sb_config"; 
+$table_messages  = _AM_DB_PREFIX . "sb_contact_messages";
+
+// Bulle du menu de gauche (messages non lus) : le menu est construit avant ce
+// contrôleur, il est reconstruit ici quand un message est lu ou supprimé
+$sbContactRefreshBadge = function () use ($sbsql, $sbsmarty, $table_messages) {
+	if (!isset($GLOBALS['module_menu']['contact'])) return;
+	$row = $sbsql->assoc($sbsql->query("SELECT COUNT(*) AS n FROM $table_messages WHERE is_read = 0"));
+	$n   = $row ? (int) $row['n'] : 0;
+	$GLOBALS['module_menu']['contact']['badge']       = $n;
+	$GLOBALS['module_menu']['contact']['badge_title'] = $n . ' message' . ($n > 1 ? 's' : '') . ' non lu' . ($n > 1 ? 's' : '');
+	$sbsmarty->assign('sb_main_menu', sbGetMenuModule('main'));
+};
 $text        = "Formulaire de contact";
 $text_s      = "Formulaires de contact";
 
@@ -77,8 +89,15 @@ switch($action) {
 		$request2 = $sbsql->query($query);
 		$result2  = $sbsql->toarray($request2);
 		
+		// Messages reçus par formulaire (total, non lus)
+		$counts   = array();
+		$requestM = $sbsql->query("SELECT form_id, COUNT(*) AS total, SUM(is_read = 0) AS unread FROM $table_messages GROUP BY form_id");
+		foreach ((array) $sbsql->toarray($requestM) as $row) $counts[(int) $row['form_id']] = array('total' => (int) $row['total'], 'unread' => (int) $row['unread']);
+		foreach ((array) $result2 as $k => $row) $result2[$k]['messages'] = $counts[(int) $row['id']] ?? array('total' => 0, 'unread' => 0);
+
 		$sbsmarty->assign('all', true);
 		$sbsmarty->assign('allcontact', $result2);
+		$sbsmarty->assign('page_messages', $counts[0] ?? array('total' => 0, 'unread' => 0));
 
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) {
@@ -239,6 +258,61 @@ switch($action) {
 		// --------------------------------
 	break;
 
+	case "messagedel":
+	case "messages":
+		// --- Messages reçus d'un formulaire (id = formulaire, 0 = page Contact)
+		include_once(SB_MODULES_DIR . 'contact' . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'functions.php');
+		$form_id = intval($_GET['id'] ?? 0);
+		if ($action == 'messagedel') {
+			$msg_id  = intval($_GET['mid'] ?? 0);
+			$query_2 = "DELETE FROM $table_messages WHERE id = $msg_id AND form_id = $form_id";
+			if ($sbsql->query($query_2)) {
+				$sb_msg_valid = 'Message supprimé avec succès';
+				$sbContactRefreshBadge();
+			}
+			else
+				$sb_msg_error = 'Error: Write Error (DEL)!';
+		}
+		sbContactPurgeMessages();
+
+		$form_title = 'Page Contact';
+		if ($form_id > 0) {
+			$assoc      = $sbsql->assoc($sbsql->query("SELECT title FROM $table WHERE id = $form_id"));
+			$form_title = $assoc ? $sbsanitize->displayLang(sb_utf8_encode($assoc['title'])) : 'Formulaire supprimé';
+		}
+
+		$query    = "SELECT id, created_at, name, email, sent, error, is_read FROM $table_messages WHERE form_id = $form_id ORDER BY created_at DESC";
+		$messages = $sbsql->toarray($sbsql->query($query));
+		if ($messages === false) $sb_msg_error = "Table des messages absente : mettez le module Contact à jour (Configuration &gt; Mise à jour).";
+
+		$sbsmarty->assign('sb_table_header', array('Date', 'Nom', 'Email', 'Envoi', 'Actions'));
+		$sbsmarty->assign('messages', (array) $messages);
+		$sbsmarty->assign('form_id', $form_id);
+		$sbsmarty->assign('form_title', $form_title);
+		$sbsmarty->assign('retention', sbContactRetention());
+
+		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query . ($query_2 ? "\n" . 'DEL: ' . $query_2 : ''));
+	break;
+
+	case "message":
+		// --- Un message (id = message), marqué lu à l'ouverture
+		$msg_id  = intval($_GET['id'] ?? 0);
+		$message = $sbsql->assoc($sbsql->query("SELECT * FROM $table_messages WHERE id = $msg_id"));
+		if ($message) {
+			if (!$message['is_read'] && $sbsql->query("UPDATE $table_messages SET is_read = 1 WHERE id = $msg_id")) $sbContactRefreshBadge();
+			$message['fields'] = json_decode((string) $message['fields'], true) ?: array();
+			$form_title = 'Page Contact';
+			if ($message['form_id'] > 0) {
+				$assoc      = $sbsql->assoc($sbsql->query("SELECT title FROM $table WHERE id = " . (int) $message['form_id']));
+				$form_title = $assoc ? $sbsanitize->displayLang(sb_utf8_encode($assoc['title'])) : 'Formulaire supprimé';
+			}
+			$sbsmarty->assign('form_title', $form_title);
+		} else {
+			$sb_msg_error = 'Message introuvable (supprimé ou purgé)';
+		}
+		$sbsmarty->assign('message', $message);
+	break;
+
 	case "settings":
 		// --- Initialization
 		$formName        = "editcontact_form";
@@ -270,6 +344,7 @@ switch($action) {
 			$email_smtp_password = $sbsql->escape_string(sbSecretSeal(trim((string) ($_POST['email_smtp_password'] ?? ''))));
 			$email_smtp_secure   = $sbsanitize->displayText($_POST['email_smtp_secure'] ?? '', 'UTF-8', 1, 0);
 			$email_smtp_debug    = $sbsanitize->displayText($_POST['email_smtp_debug'] ?? '', 'UTF-8', 1, 0);
+			$contact_retention   = max(0, intval($_POST['contact_retention'] ?? 12));
 			
 			// --- EDIT
 			// UPDATE DATAS
@@ -284,6 +359,10 @@ switch($action) {
 			$query_email_smtp_password = "UPDATE $table_cmsconfig SET content = '$email_smtp_password' WHERE config = 'email_smtp_password'";
 			$query_email_smtp_secure   = "UPDATE $table_cmsconfig SET content = '$email_smtp_secure' WHERE config = 'email_smtp_secure'";
 			$query_email_smtp_debug    = "UPDATE $table_cmsconfig SET content = '$email_smtp_debug' WHERE config = 'email_smtp_debug'";
+			// Réglage du module (absent des installations d'avant 1.1.0)
+			$query_contact_retention   = ($sbsql->assoc($sbsql->query("SELECT id FROM $table_cmsconfig WHERE config = 'contact_retention'")))
+				? "UPDATE $table_cmsconfig SET content = '$contact_retention' WHERE config = 'contact_retention'"
+				: "INSERT INTO $table_cmsconfig (config, content) VALUES ('contact_retention', '$contact_retention')";
 			
 			$result_edit_email_to         = $sbsql->query($query_email_to);
 			$result_edit_email_subject    = $sbsql->query($query_email_subject);
@@ -296,8 +375,9 @@ switch($action) {
 			$result_edit_email_smtp_password = ($email_smtp_password === '') ? true : $sbsql->query($query_email_smtp_password);
 			$result_edit_email_smtp_secure   = $sbsql->query($query_email_smtp_secure);
 			$result_edit_email_smtp_debug    = $sbsql->query($query_email_smtp_debug);
+			$result_edit_contact_retention   = $sbsql->query($query_contact_retention);
 			
-			if ($result_edit_email_to && $result_edit_email_subject && $result_edit_email_smtp && $result_edit_email_smtp_host && $result_edit_email_smtp_auth && $result_edit_email_smtp_port && $result_edit_email_smtp_username && $result_edit_email_smtp_password && $result_edit_email_smtp_secure && $result_edit_email_smtp_debug) {
+			if ($result_edit_email_to && $result_edit_email_subject && $result_edit_email_smtp && $result_edit_email_smtp_host && $result_edit_email_smtp_auth && $result_edit_email_smtp_port && $result_edit_email_smtp_username && $result_edit_email_smtp_password && $result_edit_email_smtp_secure && $result_edit_email_smtp_debug && $result_edit_contact_retention) {
 				// --- Message SUCCES
 				$sb_msg_valid = 'Configuration EMAIL modifiée avec succès';
 			} else {
@@ -350,6 +430,11 @@ switch($action) {
 		if ($getMultilang) {
 			$sbform->addInput('text', 'Sujet (EN)', array ('name' => 'email_subject_en', 'value' => $sbsanitize->displayLang(sb_utf8_encode($assocA['content']), 'en'), 'placeholder' => "Email(s)", 'icon' => 'pencil'), false, false, "Sujet (EN) principal de vos formulaires (si un formulaire possède un sujet, celui-ci sera utilisé en priorité)");
 		}
+		// --------------------------------
+		// Conservation des messages reçus
+		// --------------------------------
+		include_once(SB_MODULES_DIR . 'contact' . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'functions.php');
+		$sbform->addInput('text', 'Conservation des messages (mois)', array('name' => 'contact_retention', 'value' => sbContactRetention(), 'maxlength' => '3', 'style' => 'width: 100px;'), false, false, "Les messages reçus plus anciens sont supprimés automatiquement. 0 = conservés sans limite.");
 		// --------------------------------
 		// SMTP configuration
 		// --------------------------------

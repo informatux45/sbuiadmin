@@ -945,3 +945,6 @@ p.sbmedia > span.sbmedia-other {
 .sbsrv-cpu-chart .limit { stroke: var(--danger); stroke-width: 1; stroke-dasharray: 4 4; }
 .sbsrv-cpu-chart .empty { fill: var(--t-muted); font-size: 13px; }
 .sbsrv-kpis .kpi-pill:empty { display: none; }
+
+/* Bulle du menu de gauche posée par un module (menu.php : 'badge'), ex. messages non lus du Contact */
+.nav-badge.nav-count { background: #dc2626; color: #fff; font-size: 10px; min-width: 18px; text-align: center; }

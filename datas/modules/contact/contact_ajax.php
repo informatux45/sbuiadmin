@@ -54,7 +54,7 @@ include_once( SB_MODULES_DIR . MODULEFILE . DIRECTORY_SEPARATOR . 'inc' . DIRECT
 // ---------------------------
 // Tables SQL
 // ---------------------------
-$module['tables']['config']  = "sb_config";
+$module['tables']['config']  = _AM_DB_PREFIX . "sb_config";
 $module['tables']['contact'] = "sb_contact";
 // -------------------------------------------------
 
@@ -88,9 +88,15 @@ $template = 'index';
 # Settings for email settings (if exists)
 # SQL Request
 # --------------------------------------------------
-$query_contact   = "SELECT recipients, subject FROM {$module['tables']['contact']} WHERE id = '$id'";
+$query_contact   = "SELECT recipients, subject, active FROM " . _AM_DB_PREFIX . $module['tables']['contact'] . " WHERE id = '$id'";
 $request_contact = $sbsql->query($query_contact);
 $result_contact  = $sbsql->assoc($request_contact);
+// --- Formulaire inexistant ou désactivé : rien n'est envoyé ni enregistré
+if (!$result_contact || !$result_contact['active']) {
+	http_response_code(404);
+	echo '<div class="box error-ajax-msg"><i class="fa-solid fa-xmark red response-ajax-msg" aria-hidden="true"></i> ' . (!$result_contact ? _CMS_CONTACT_FORM_NOTFOUND : _CMS_CONTACT_FORM_INACTIVE) . '</div>';
+	exit;
+}
 if ($result_contact['recipients'] != '') $email_to = $sbsanitize->sTrim($result_contact['recipients']);
 if ($sbsanitize->displayLang(sb_utf8_encode($result_contact['subject'])) != '') $subject = $sbsanitize->displayLang(sb_utf8_encode($result_contact['subject']));
 # --------------------------------------------------
@@ -107,36 +113,14 @@ switch($op) {
 		if(isset($_POST['submitform']) && !empty($_POST['submitform'])) {
 			// --- Anti-robot ALTCHA (une seule API : inc/sbuiadmin-altcha.php)
 			if (sbAltchaVerify()) {
-				// --- PHPMailer (UTF-8 + SMTP, voir sbMailer())
-				$PHPMailer = sbMailer();
-				// --- Initialization
-				$htmlContent = '<h1>Contact site ' . _AM_SITE_TITLE . '</h1>';
-				// --- Get Contact form submission $_POST
-				foreach($_POST as $k => $v) {
-					if ($k == 'name')  $name  = $v;
-					if ($k == 'email') $email = $v;
-					// --- Increase html content
-					if ($k != SB_ALTCHA_FIELD && $k != 'submit') $htmlContent .= '<p><b>'.str_replace("-", " ", $k).' :</b> '.$sbsanitize->nl2Br($v).'</p>';
+				$errMsg = sbContactSend($id, $email_to, $subject, 'Contact site ' . _AM_SITE_TITLE, array('submitform', 'submit'));
+				if ($errMsg === '') {
+					echo '<div class="box success-ajax-msg"><i class="fa-solid fa-check green response-ajax-msg" aria-hidden="true"></i> ' . _CMS_CONTACT_FORM_SUCCESS . '</div>';
+				} else {
+					// --- Erreur : le formulaire n'est pas vidé (voir .fail() de shortcode_sbcontactajax)
+					http_response_code(422);
+					echo '<div class="box error-ajax-msg"><i class="fa-solid fa-xmark red response-ajax-msg" aria-hidden="true"></i> ' . $errMsg . '</div>';
 				}
-				// --- Email Construct
-				// --- Expéditeur = le site (le SMTP n'accepte que son domaine vérifié),
-				// --- réponse = le visiteur
-				@$PHPMailer->setFrom(SBFROMEMAIL, "$name");
-				@$PHPMailer->addReplyTo($email, "$name");
-				@$PHPMailer->ClearAllRecipients();
-				@$PHPMailer->AddAddress($email_to, "$email_to");
-				@$PHPMailer->Subject  = $sbsanitize->displayText($subject, 'UTF-8');
-				@$PHPMailer->AltBody  = "To view the message, please use an HTML compatible email viewer!"; // optional, comment out and test
-				@$PHPMailer->MsgHTML($sbsanitize->displayText($htmlContent, 'UTF-8'));
-				@$PHPMailer->IsHTML(true);
-				
-				// --- Send email
-				$status = $PHPMailer->Send();
-				if (!$status) error_log('Contact : envoi en échec : ' . $PHPMailer->ErrorInfo);
-				@$PHPMailer->ClearAddresses();
-				@$PHPMailer->ClearAttachments();
-				
-				echo '<div class="box success-ajax-msg"><i class="fa-solid fa-check green response-ajax-msg" aria-hidden="true"></i> ' . _CMS_CONTACT_FORM_SUCCESS . '</div>';
 
 			} else {
 				echo '<div class="box error-ajax-msg"><i class="fa-solid fa-xmark red response-ajax-msg" aria-hidden="true"></i> ' . (($GLOBALS['sb_altcha_error'] == 'missing') ? _CMS_CONTACT_FORM_ERROR_CAPTCHA_EMPTY : _CMS_CONTACT_FORM_ERROR_CAPTCHA) . '</div>';
