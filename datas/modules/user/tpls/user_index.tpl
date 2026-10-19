@@ -76,7 +76,7 @@
 	{else}
 		Profil de l'utilisateur ({$smarty.session.sbuiadmin_user_name})
 		<br>
-		<a href="{seo url="index.php?lang=`$smarty.session.lang`&p=user&ac=logout" rewrite="user/?ac=logout"}">
+		<a href="{seo url="index.php?lang=`$smarty.session.lang`&p=user&ac=logout&t=`$sb_logout_token`" rewrite="user/?ac=logout&t=`$sb_logout_token`"}">
 			Deconnexion
 		</a>
 	{/if}

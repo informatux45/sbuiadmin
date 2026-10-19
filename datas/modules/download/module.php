@@ -15,7 +15,7 @@ return array(
 	'title'         => 'Téléchargements',
 	'icon'          => 'download', // Font Awesome (menu, carte Modules)
 	'description'   => "Boutons de téléchargement de fichiers, avec compteur et lien protégé par clé, à insérer dans un contenu par code court.",
-	'version'       => '1.0.0',
+	'version'       => '1.0.1',
 	'requires_core' => '4.29',
 	'author'        => 'INFORMATUX',
 	'routes'        => array('download'),

@@ -14,6 +14,18 @@ if (!defined('SB_PATH')) {
 }
 
 /**
+ * Jeton de la déconnexion (même jeton de session que l'administration) :
+ * sans lui, un lien piégé déconnectait le visiteur (point 38)
+ * @return string
+ */
+if (!function_exists('sbUserLogoutToken')) {
+	function sbUserLogoutToken() {
+		if (empty($_SESSION['sbuiadmin_csrf_token']) || !is_string($_SESSION['sbuiadmin_csrf_token'])) $_SESSION['sbuiadmin_csrf_token'] = bin2hex(random_bytes(32));
+		return $_SESSION['sbuiadmin_csrf_token'];
+	}
+}
+
+/**
  * Get USER MENU
  * icontext		int			$param icontext
  * name			string		$param name (function name after 'shortcode_')
@@ -37,7 +49,7 @@ function shortcode_sbuser($param = '') {
 	// --- Initialization URL
 	$login_url   = (SBREWRITEURL === true) ? SB_URL . 'user' : SB_URL . 'index.php?p=user';
 	$admin_url   = SB_ADMIN_URL;
-	$logout_url  = (SBREWRITEURL === true) ? SB_URL . 'user/?ac=logout' : SB_URL . 'index.php?p=user&ac=logout';
+	$logout_url  = ((SBREWRITEURL === true) ? SB_URL . 'user/?ac=logout' : SB_URL . 'index.php?p=user&ac=logout') . '&t=' . sbUserLogoutToken();
 	$login_text  = (isset($_SESSION['sbuiadmin_user_name']) && $_SESSION['sbuiadmin_user_name'] != '') ? _CMS_USER_ICON_TEXT_PROFILE : _CMS_USER_ICON_TEXT_LOGIN;
 	$admin_text  = _CMS_USER_ICON_TEXT_ADMIN;
 	$logout_text = _CMS_USER_ICON_TEXT_LOGOUT;

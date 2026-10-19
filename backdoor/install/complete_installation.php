@@ -142,8 +142,11 @@
 						$error_mg[] = $alert_min_version_db;
 					}else{
 						// read sql dump file
-						$sql_dump = file_get_contents($sql_dump_file);
-						if($sql_dump != ''){
+						// Site déjà installé : le dump (DROP TABLE...) n'est jamais rejoué
+						$sql_dump = file_exists(__DIR__ . '/installer/installer.lock') ? '' : file_get_contents($sql_dump_file);
+						if (file_exists(__DIR__ . '/installer/installer.lock')) {
+							$error_mg[] = 'SBUIADMIN est déjà installé : installation refusée.';
+						}else if($sql_dump != ''){
 							if(false == ($db_error = apphp_db_install($sql_dump_file))){
 								if(EI_MODE != 'debug') $error_mg[] = lang_key('error_sql_executing');								
 							}else{

@@ -110,17 +110,20 @@ Installing in a sub-folder: see `help.txt`.
 
 ## 📝 Changelog
 
+**4.42**
+- Security audit (part 3): installer closed once installed, escaped URL values in the Volton 404 page, fixed template choice in News and User, logout links require the session token, HTTP 403 for access denied, single install dump, front language kept across pages, clean download file names; News 1.0.3, Downloads 1.0.1
+
 **4.41**
 - Security audit (part 2): admin-only pages refused before running, per-action rights read from the controller's own parameter, CSRF token on delete links, SQL escaping hardened (backslash, multi-select ids), non-admin accounts get modules only by default (Media to be granted); News module 1.0.2
 
 **4.40**
 - Shop module renamed "store" 2.0.0 (sb_store_* tables, no routes): an installed official "boutique" is taken over on install, a site's own shop is never touched; 'origin' => 'site' marker for site-specific modules (never installed or updated from GitHub)
 
-**4.39**
-- Security audit (part 1): public maintenance access code replaced by a random one, unused AJAX endpoints removed, CSRF token on sitemap generation, thumbnail cache capped, direct-access guards restored
-
 <details>
   <summary><strong>Older versions</strong></summary>
+
+**4.39**
+- Security audit (part 1): public maintenance access code replaced by a random one, unused AJAX endpoints removed, CSRF token on sitemap generation, thumbnail cache capped, direct-access guards restored
 
 **4.38**
 - Contact module 1.1.0: received messages kept and listed per form (retention setting, 12 months by default), unread count shown in the side menu, several recipients, real error shown on send failure

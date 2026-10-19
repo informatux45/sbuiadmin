@@ -37,7 +37,8 @@ if (!isset($_GET['op'])) {
 } else {
 	$op       = $sbsanitize->addSlashes($_GET['op'] ?? '');
 	$id       = intval($_GET['id'] ?? 0);
-	$template = 'display_'.$op;
+	// Aucun gabarit display_* : op= ne choisit jamais le gabarit (point 38)
+	$template = 'index';
 }
 $module['template_main'] = MODULEFILE . '_' . $template . '.tpl';
 
@@ -111,7 +112,7 @@ switch($op) {
 		// --------------------------
 		// --- Logout
 		// --------------------------
-		if (isset($_GET['ac']) && $_GET['ac'] == 'logout') {
+		if (isset($_GET['ac']) && $_GET['ac'] == 'logout' && is_string($_GET['t'] ?? null) && hash_equals(sbUserLogoutToken(), $_GET['t'])) {
 			// ------------------
 			// --- Logout required
 			// ------------------
@@ -124,7 +125,9 @@ switch($op) {
 			session_destroy();
 			setcookie(session_name(),'',0,'/');
 			header("Location: " . SB_URL);
+			exit;
 		}
+		$sbsmarty->assign('sb_logout_token', sbUserLogoutToken());
 
 		// --------------------------
 		// --- Assign Title Page

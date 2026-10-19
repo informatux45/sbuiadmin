@@ -351,7 +351,10 @@ if (!isset($_SESSION['sbuiadmin_user_name']) || $_SESSION['sbuiadmin_user_name']
 	$sbsmarty->display('system/login.tpl');
 	exit;
 }
-if (isset($_GET['ac']) && $_GET['ac'] == 'logout') {
+// Jeton CSRF : aussi pour la page du code 2FA et le lien de déconnexion
+$sbsmarty->assign('sb_csrf_token', sbCsrfToken());
+// Déconnexion : jeton exigé (un lien piégé ne déconnecte plus, point 38)
+if (isset($_GET['ac']) && $_GET['ac'] == 'logout' && is_string($_GET['t'] ?? null) && hash_equals(sbCsrfToken(), $_GET['t'])) {
 	// ------------------
 	// --- Logout required
 	// ------------------
@@ -504,6 +507,7 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 		// direct par URL (connaître index.php?p=faq ne suffisait jusqu'ici
 		// qu'à contourner le masquage cosmétique du menu). Voir inc/sbuiadmin-rights.php.
 		if (!sbHasRight($sb_get_page)) {
+			http_response_code(403);
 			$sbsmarty->display("403.tpl");
 			exit;
 		}
@@ -513,6 +517,7 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 		// connecté supprimait à sa place (point 38)
 		if ($_SERVER['REQUEST_METHOD'] === 'GET' && sbClassifyAction($sb_get_page) === 'delete'
 			&& (empty($_SESSION['sbuiadmin_csrf_token']) || !is_string($_GET['t'] ?? null) || !hash_equals($_SESSION['sbuiadmin_csrf_token'], $_GET['t']))) {
+			http_response_code(403);
 			$sbsmarty->display("403.tpl");
 			exit;
 		}
@@ -527,6 +532,7 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 		// Les formulaires de tri (glisser-deposer, champ drag[]) n'envoient
 		// pas form_submit : ils sont couverts par leur propre champ.
 		if ($_SERVER['REQUEST_METHOD'] === 'POST' && ((isset($_POST['form_submit']) && $_POST['form_submit'] != '') || isset($_POST['drag'])) && !sbCheckCsrfToken()) {
+			http_response_code(403);
 			$sbsmarty->display("403.tpl");
 			exit;
 		}

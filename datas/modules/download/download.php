@@ -69,7 +69,10 @@ if ($key !== '' && preg_match('/^[A-Za-z0-9]+$/', $key)) {
 			while (ob_get_level() > 0) ob_end_clean();
 
 			header('Content-Type: application/octet-stream');
-			header('Content-Disposition: attachment; filename="' . $file_name . '"');
+			// Nom sans guillemet, antislash ni caractère de contrôle (en-tête
+			// cassé sinon) ; filename* garde les accents (RFC 6266)
+			$file_ascii = preg_replace('/[\x00-\x1F\x7F"\\\\]+/', '_', $file_name);
+			header('Content-Disposition: attachment; filename="' . $file_ascii . '"; filename*=UTF-8\'\'' . rawurlencode($file_name));
 			header('Content-Length: ' . filesize($file_path));
 			header('X-Content-Type-Options: nosniff');
 			readfile($file_path);

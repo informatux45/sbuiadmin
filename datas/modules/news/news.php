@@ -57,7 +57,9 @@ if (empty($_GET['op']) && empty($_GET['id'])) {
 } else {
 	$op       = $sbsanitize->addSlashes($_GET['op'] ?? '');
 	$id       = intval($_GET['id'] ?? 0);
-	$template = 'display_'.$op;
+	// Gabarit choisi d'après op= : seulement ceux qui existent (point 38)
+	if (!in_array($op, array('categories', 'category', 'article'), true)) $op = 'index';
+	$template = ($op === 'index') ? 'index' : 'display_'.$op;
 }
 $module['template_main'] = MODULEFILE . '_' . $template . '.tpl';
 

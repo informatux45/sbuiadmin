@@ -8,9 +8,12 @@
  * rouvrir l'assistant (voir/modifier les identifiants de base de données,
  * créer un compte admin...) sur un site déjà en production.
  *
- * Gardé volontairement (pas supprimé, décision du client) pour permettre
- * de futures mises à niveau assistées - mais désormais réservé à un admin
- * déjà connecté au CMS. Repose sur la MÊME session PHP que backdoor/
+ * Depuis la 4.42 (point 38), une fois installer.lock posé, l'assistant est
+ * fermé à TOUS, administrateurs compris : il ne vérifiait ni la 2FA ni le
+ * mot de passe en vigueur, et relancer l'installation vide la base. Les
+ * mises à niveau passent par Configuration > Mise à jour. Seule la
+ * suppression du dossier install/ (jeton à usage unique, traitée avant ce
+ * fichier dans complete_installation.php) reste possible. Repose sur la MÊME session PHP que backdoor/
  * (session déjà démarrée par le fichier appelant avant cet include, même
  * cookie de session que le reste du site) - pas de bootstrap complet du
  * CMS ici (Smarty, connexion DB...) pour rester indépendant du reste de
@@ -106,17 +109,7 @@ if (!file_exists($sb_install_lock_file)) {
 	if (file_exists($sb_install_key_file)) @unlink($sb_install_key_file);
 }
 
-if (!$sb_install_authorized && isset($_SESSION['sbuiadmin_user_name']) && trim((string)$_SESSION['sbuiadmin_user_name']) != '') {
-	// Liste des administrateurs : réglage "administrators" (en base depuis
-	// la migration de settings.txt, voir inc/sbuiadmin-settings.php) - même
-	// convention que $sbadministrators dans inc/sbuiadmin-config.php.
-	require_once(__DIR__ . '/../inc/sbuiadmin-settings.php');
-	$sb_install_admins = array_map('trim', explode(',', sbSetting('administrators')));
-	if (in_array(trim($_SESSION['sbuiadmin_user_name']), $sb_install_admins, true)) {
-		$sb_install_authorized = true;
-	}
-}
 if (!$sb_install_authorized) {
 	http_response_code(403);
-	die('Accès refusé. Connectez-vous d\'abord à l\'administration en tant qu\'administrateur avant d\'accéder à cette page.');
+	die('SBUIADMIN est déjà installé : l\'assistant d\'installation est fermé. Supprimez le dossier install/ de l\'administration ; les mises à jour se font depuis Configuration > Mise à jour.');
 }

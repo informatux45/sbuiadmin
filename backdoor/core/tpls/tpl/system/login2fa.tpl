@@ -23,7 +23,7 @@
 
 		<main class="auth-main">
 			<div class="auth-main-top">
-				<a href="index.php?ac=logout" style="font-size:12.5px;color:var(--t-muted);display:inline-flex;align-items:center;gap:6px">
+				<a href="index.php?ac=logout&amp;t={$sb_csrf_token|escape:'url'}" style="font-size:12.5px;color:var(--t-muted);display:inline-flex;align-items:center;gap:6px">
 					<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
 					Annuler
 				</a>
@@ -62,7 +62,7 @@
 				<p style="margin-top:16px;font-size:13px;text-align:center">
 					<a href="index.php?sb2fa=resend">Renvoyer un code</a>
 					&nbsp;·&nbsp;
-					<a href="index.php?ac=logout">Annuler</a>
+					<a href="index.php?ac=logout&amp;t={$sb_csrf_token|escape:'url'}">Annuler</a>
 				</p>
 			</div>
 		</main>

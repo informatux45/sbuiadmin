@@ -36,25 +36,15 @@ ob_start();
 // ----------------------
 // SESSION Language
 // ----------------------
-$langue = $langue = (isset($_REQUEST['lang'])) ? $_REQUEST['lang'] : false;
-if (!isset($langue)) {
-	if ($_SESSION['lang'] != '') {
-		// SESSION INCHANGEE
-	} else {
-		$langue = explode(',',$_SERVER['HTTP_ACCEPT_LANGUAGE']);
-		$langue = strtolower(substr(chop($langue[0]),0,2));
-		if ($langue != "en") {
-			$langue = "fr";
-		} else {
-			$langue = "en";
-		}
-		$_SESSION['lang'] = $langue;
-	}
-} else {
-	if ($langue != "en" && $langue != "fr") {
-		$langue = "fr";
-	}
-	$_SESSION['lang'] = $langue;
+// ?lang= (fr ou en) choisit la langue, gardée ensuite en session ; sinon
+// français. Avant, isset() d'un false était toujours vrai : un ?lang=en
+// était perdu dès la page suivante (point 38). Pas de détection par le
+// navigateur : un contenu sans [en] s'afficherait brut (voir point 44).
+$langue = $_REQUEST['lang'] ?? null;
+if (is_string($langue) && $langue !== '') {
+	$_SESSION['lang'] = in_array($langue, array('en', 'fr'), true) ? $langue : 'fr';
+} elseif (!in_array($_SESSION['lang'] ?? '', array('en', 'fr'), true)) {
+	$_SESSION['lang'] = 'fr';
 }
 
 // ----------------------

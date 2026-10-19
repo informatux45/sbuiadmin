@@ -11,7 +11,7 @@
                 <div class="content-wrapper">
                 
                     <!-- ABOUT -->
-                    <div class="page-section{if $smarty.get.op} {$smarty.get.op}{/if}" id="page_{$smarty.get.id}">
+                    <div class="page-section{if $smarty.get.op|default:''} {$smarty.get.op|escape}{/if}" id="page_{$smarty.get.id|default:''|escape}">
 						<div class="row">
 							<div class="col-md-12">
 									<p class="acenter">

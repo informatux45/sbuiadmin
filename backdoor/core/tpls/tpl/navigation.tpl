@@ -146,7 +146,7 @@
 						</a>
 						{/if}
 						<div class="dd-divider"></div>
-						<a class="dd-menu-item danger" href="{$smarty.const._AM_SITE_URL}?ac=logout" title="{$smarty.const.SBUIADMIN_GLOBAL_LOGOUT}">
+						<a class="dd-menu-item danger" href="{$smarty.const._AM_SITE_URL}?ac=logout&amp;t={$sb_csrf_token|escape:'url'}" title="{$smarty.const.SBUIADMIN_GLOBAL_LOGOUT}">
 							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
 							{$smarty.const.SBUIADMIN_GLOBAL_LOGOUT}
 						</a>
