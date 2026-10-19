@@ -119,6 +119,89 @@ Installing in a sub-folder: see `help.txt`.
 **4.36**
 - Update page: database left behind the files (FTP copy…) detected, upgraded on demand with a backup restored on failure; Modules table centred
 
+<details>
+  <summary>🧩 <strong>Modular</strong> — install, update, uninstall each module on its own</summary>
+
+> Articles, Pages, Slider, Contact forms, Tables, Tabs, FAQ, Downloads, Galleries, Search, and a Shop back office. Each module has its own version, can be installed from GitHub, updated, uninstalled (data kept or removed) and rolled back, independently of the core.
+</details>
+
+<details>
+  <summary>🔐 <strong>Secure by design</strong> — 2FA, ALTCHA, encrypted secrets</summary>
+
+> Two-factor authentication by email, ALTCHA anti-bot (self-hosted, no Google), temporary lockout after failed logins, per-module user rights, CSRF protection, settings stored in database with encrypted secrets, database credentials outside the web root, renamable administration directory.
+</details>
+
+<details>
+  <summary>🔄 <strong>Signed updates</strong> — net install and one-click updates with rollback</summary>
+
+> Every release is signed (Ed25519) and every file is checked (SHA-256) before anything is written. Core and modules update from the administration, with a database backup and a rollback; a database left behind its files is detected and upgraded on demand.
+</details>
+
+<details>
+  <summary>🎨 <strong>Themes</strong> — 5 responsive front themes, Adminator administration</summary>
+
+> HTML 5 / CSS 3, Bootstrap front themes, Adminator administration theme with dark mode, responsive design on both sides.
+</details>
+
+<details>
+  <summary>🧱 <strong>Content</strong> — Page Builder, content blocks, shortcodes</summary>
+
+> Page Builder (drag and drop blocks: text, image, gallery, accordion, tabs, quote, icon…), content blocks, shortcodes, additional HTML content (Smarty ready), rewrite URLs.
+</details>
+
+<details>
+  <summary>🌐 <strong>Multilanguage</strong></summary>
+
+> Content and interface in several languages.
+</details>
+
+<details>
+  <summary>🛠️ <strong>For developers</strong> — Smarty, sandbox, PHP 9 ready</summary>
+
+> Smarty templates, sandbox page, Kint debug, module registry (`module.php`), PHP audit log for PHP upgrades. Code kept free of PHP 8.x deprecations, ready for PHP 9.
+</details>
+
+<details>
+  <summary>⚙️ <strong>Requirements</strong></summary>
+
+> PHP 8.4+ (PHP 8.5 ready) · MySQL 5.7+ / MariaDB 10.3+ · Linux / Apache servers (recommended).
+</details>
+
+---
+
+## 🚀 Installation
+
+**Net install (recommended)**
+1. Upload `sbuiadmin_netinstall.php` **alone** to the (empty) folder of your future site, then open it in your browser.
+2. Click *Install SBUIADMIN*: the latest release published on [GitHub Releases](https://github.com/informatux45/sbuiadmin/releases) is downloaded and **verified before anything is written**:
+   - HTTPS with certificate verification, GitHub hosts only;
+   - Ed25519 signature of the release manifest (the public key is embedded in `sbuiadmin_netinstall.php`, the private key is never published);
+   - exact size and SHA-256 of the archive;
+   - every archive entry is checked (no `..`, absolute path or symbolic link, nothing written outside the folder).
+
+   If any check fails, nothing is installed.
+3. The netinstall file deletes itself, then the installation wizard (`backdoor/`) takes over: database, administrator account, installation key.
+
+Net install refuses to run where SBUIADMIN is already installed: delete it from your server.
+
+**Manual install**
+Download `sbuiadmin-X.Y.zip` from a release, check its SHA-256 against `sbuiadmin-release.json`, extract it into your site folder and open `backdoor/` in your browser.
+
+Installing in a sub-folder: see `help.txt`.
+
+---
+
+## 📝 Changelog
+
+**4.38**
+- Contact module 1.1.0: received messages kept and listed per form (retention setting, 12 months by default), unread count shown in the side menu, several recipients, real error shown on send failure
+
+**4.37**
+- PHP 8 / PHP 9 readiness: fatal errors and deprecations fixed (sanitize, forms, CSV, media, thumbnails, search), wrong docblocks corrected; Shop and Tabs modules 1.0.1
+
+**4.36**
+- Update page: database left behind the files (FTP copy…) detected, upgraded on demand with a backup restored on failure; Modules table centred
+
 **4.35**
 - Update page: Reload button fixed, clearer module messages (module name, plurals), better spacing in the Modules table
 
