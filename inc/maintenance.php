@@ -135,7 +135,9 @@ main[role="video-container"]{position:relative;z-index:6}
 <?php } ?>
   <div class="container">
 	<div class="tab-content text-center">
+		<?php if ($g('coming-soon-github') !== '0'): // réglage CMS config > Maintenance ?>
 		<a target="_blank" rel="noopener" href="https://github.com/informatux45/sbuiadmin"><img style="position: absolute; top: 0; right: 0; border: 0; width: 115px; height: 115px;" src="<?php echo $assets; ?>images/sbuiadmin-fork-me-on-github-blue.png" alt="Fork me on GitHub - SBUIADMIN - INFORMATUX"></a>
+		<?php endif; ?>
 	  <section id="home" class="tab-pane fade in active">
 		<article role="countdown" class="countdown-pan">
 		  <?php if ($launch) { ?>

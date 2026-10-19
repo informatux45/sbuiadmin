@@ -244,6 +244,7 @@ switch($action) {
 			$coming_soon_dark        = (($_POST['coming_soon_dark'] ?? null) === "on") ? '1' : '0';
 			$coming_soon_date        = $sbsanitize->displayText($_POST['coming_soon_date'] ?? '', 'UTF-8', 1, 0);
 			$coming_soon_countdown   = (isset($_POST['coming_soon_countdown']) && $_POST['coming_soon_countdown'] === "on") ? '1' : '0';
+			$coming_soon_github      = (isset($_POST['coming_soon_github']) && $_POST['coming_soon_github'] === "on") ? '1' : '0';
 			$coming_soon_type        = in_array($coming_soon_type, array('image', 'video'), true) ? $coming_soon_type : 'image';
 			
 			// --- EDIT
@@ -265,6 +266,7 @@ switch($action) {
 			$query_date         = "UPDATE $table SET content = '$coming_soon_date' WHERE config = 'coming-soon-date'";
 			// Réglage ajouté en 4.17 : créé s'il manque
 			$query_countdown    = "INSERT INTO $table (config, content) VALUES ('coming-soon-countdown', '$coming_soon_countdown') ON DUPLICATE KEY UPDATE content = VALUES(content)";
+			$query_github       = "INSERT INTO $table (config, content) VALUES ('coming-soon-github', '$coming_soon_github') ON DUPLICATE KEY UPDATE content = VALUES(content)";
 			
 			$result_url         = $sbsql->query($query_url);			
 			$result_title       = $sbsql->query($query_title);
@@ -282,8 +284,9 @@ switch($action) {
 			$result_dark        = $sbsql->query($query_dark);
 			$result_date        = $sbsql->query($query_date);
 			$result_countdown   = $sbsql->query($query_countdown);
+			$result_github      = $sbsql->query($query_github);
 			
-			if ($result_url && $result_title && $result_title && $result_text && $result_tel && $result_address && $result_email && $result_facebook  && $result_twitter && $result_youtube && $result_type && $result_image && $result_video && $result_dark && $result_date && $result_countdown) {
+			if ($result_url && $result_title && $result_title && $result_text && $result_tel && $result_address && $result_email && $result_facebook  && $result_twitter && $result_youtube && $result_type && $result_image && $result_video && $result_dark && $result_date && $result_countdown && $result_github) {
 				// --- Message SUCCES
 				$sb_msg_valid = 'Page de maintenance modifiée avec succès';
 			} else {
@@ -312,6 +315,7 @@ switch($action) {
 																			 OR config = 'coming-soon-dark'
 																			 OR config = 'coming-soon-date'
 																			 OR config = 'coming-soon-countdown'
+																			 OR config = 'coming-soon-github'
 																			 ";
 		$request = $sbsql->query($query);
 		$assoc   = $sbsql->toarray($request);
@@ -356,6 +360,14 @@ switch($action) {
 		$tab_check_countdown[0]['name']    = 'coming_soon_countdown';
 		$tab_check_countdown[0]['checked'] = (($cs['coming-soon-countdown'] ?? '0') == '1') ? '1' : '0';
 		$sbform->addCheckbox('Compte à rebours', $tab_check_countdown, '', false, '<br />', "Jours, heures, minutes et secondes jusqu'à la date de lancement ci-dessous (masqué une fois la date passée).");
+		// --------------------------------
+		// Bandeau « Fork me on GitHub » (affiché si le réglage est absent)
+		// --------------------------------
+		$tab_check_github = array();
+		$tab_check_github[0]['text']    = 'Afficher';
+		$tab_check_github[0]['name']    = 'coming_soon_github';
+		$tab_check_github[0]['checked'] = (($cs['coming-soon-github'] ?? '1') == '0') ? '0' : '1';
+		$sbform->addCheckbox('Bandeau GitHub', $tab_check_github, '', false, '<br />', "Bandeau « Fork me on GitHub » en haut à droite de la page de maintenance.");
 		$sbform->addDate('Date du lancement du site (supposée)', array('id'=>'coming_soon_date', 'name'=>'coming_soon_date', 'value'=>$cs['coming-soon-date']), false);
 		// --------------------------------
 		// Titre

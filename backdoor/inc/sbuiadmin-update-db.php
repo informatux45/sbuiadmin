@@ -156,9 +156,25 @@ function sbUpdDbVersion() {
 	$v = sbSetting('db_version');
 	if (!preg_match('/^\d+\.\d+(\.\d+)?$/', $v)) {
 		$v = function_exists('sbUpdInstalledVersion') ? sbUpdInstalledVersion() : _AM_START_VERSION;
+		// Pas de version inscrite : une base sans sb_modules ni sb_users_rights
+		// est antérieure aux migrations (4.13 ou avant, fichiers remplacés à la
+		// main) ; la noter « à jour » sautait ses migrations (4.43)
+		if (sbUpdDbLooksOld()) $v = '4.13';
 		sbSettingsSave(array('db_version' => $v));
 	}
 	return $v;
+}
+
+/** Base d'avant les migrations : ni sb_modules ni sb_users_rights */
+function sbUpdDbLooksOld() {
+	$db = function_exists('sbSettingsDb') ? sbSettingsDb() : null;
+	if (!($db instanceof mysqli)) return false;
+	$prefix = function_exists('sbUpdDbPrefix') ? sbUpdDbPrefix() : (defined('_AM_DB_PREFIX') ? _AM_DB_PREFIX : '');
+	foreach (array('sb_modules', 'sb_users_rights') as $t) {
+		$r = $db->query("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '" . $db->real_escape_string($prefix . $t) . "'");
+		if ($r && (int) $r->fetch_row()[0] > 0) return false;
+	}
+	return true;
 }
 
 /**

@@ -175,7 +175,8 @@ INSERT INTO `<DB_PREFIX>sb_config` (`id`, `config`, `content`) VALUES
 (58, 'email_smtp_username', ''),
 (59, 'email_smtp_password', ''),
 (60, 'email_smtp_secure', ''),
-(61, 'email_smtp_debug', '0');
+(61, 'email_smtp_debug', '0'),
+(62, 'coming-soon-github', '1');
 
 -- --------------------------------------------------------
 
