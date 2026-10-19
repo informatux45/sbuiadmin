@@ -70,7 +70,9 @@
 	$sbsanitize = new sanitize();
 	$sbusers    = new user();
 	session_write_close();
-	if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !sbHasRight('cmsconfig', 'edit')) {
+	// Jeton CSRF : sans lui, une page piégée pouvait lancer le crawl au nom
+	// d'un administrateur connecté
+	if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !sbHasRight('cmsconfig', 'edit') || !sbCheckCsrfToken()) {
 		http_response_code(403);
 		die('Accès refusé.');
 	}

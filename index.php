@@ -109,7 +109,7 @@ if (isset($_GET['maintenance']) && $_GET['maintenance'] === 'apercu') {
 if (SBMAINTENANCE) {
 	require_once(__DIR__ . '/inc/maintenance.php');
 	$param['id'] = 'coming-soon-url';
-	$getDevUrl   = (insert_sbGetConfig($param)) ? (string) insert_sbGetConfig($param) : 'DevProgress';
+	$getDevUrl   = trim((string) insert_sbGetConfig($param)); // vide : pas d'accès par code
 	if (!sbMaintenanceBypass($getDevUrl)) {
 		sbMaintenancePage(); // termine le script
 	}

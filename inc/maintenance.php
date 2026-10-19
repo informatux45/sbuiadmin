@@ -22,7 +22,10 @@ defined('SB_PATH') or die('Are you crazy!');
  * @param string $code code d'accès (réglage coming-soon-url)
  */
 function sbMaintenanceBypass($code) {
-	if ($code !== '' && isset($_GET['d']) && hash_equals($code, (string) $_GET['d'])) {
+	// Anciennes valeurs par défaut, publiques (SQL d'installation, repli) :
+	// refusées même si la base n'est pas encore passée en 4.39
+	if (in_array($code, array('comingSoon', 'DevProgress'), true)) $code = '';
+	if ($code !== '' && isset($_GET['d']) && is_string($_GET['d']) && hash_equals($code, $_GET['d'])) {
 		$_SESSION['dev_in_progress'] = 'SBuiadminCMS';
 	}
 	if (($_SESSION['dev_in_progress'] ?? '') === 'SBuiadminCMS') return true;

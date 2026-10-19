@@ -93,6 +93,7 @@ if (!$sb_thumb_auth) {
 
 define('THUMB_CACHE',           './datas/cache/medias/');    // Path to cache directory (must be writeable)
 define('THUMB_CACHE_AGE',       86400);         // Duration of cached files in seconds
+define('THUMB_CACHE_MAX',       5000);          // Max cached files (beyond: served without caching)
 define('THUMB_BROWSER_CACHE',   true);          // Browser cache true or false
 define('SHARPEN_MIN',           12);            // Minimum sharpen value
 define('SHARPEN_MAX',           28);            // Maximum sharpen value
@@ -191,13 +192,21 @@ if (($fp = fopen(THUMB_CACHE . 'index.html', 'r')) !== false) {
 }
 
 if (THUMB_BROWSER_CACHE && (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) || isset($_SERVER['HTTP_IF_NONE_MATCH']))) {
-    if ($_SERVER['HTTP_IF_MODIFIED_SINCE'] == $file_date && $_SERVER['HTTP_IF_NONE_MATCH'] == $file_hash) {
+    if (($_SERVER['HTTP_IF_MODIFIED_SINCE'] ?? '') == $file_date && ($_SERVER['HTTP_IF_NONE_MATCH'] ?? '') == $file_hash) {
         header($_SERVER['SERVER_PROTOCOL'] . ' 304 Not Modified');
         die();
     }
 }
 
-if (!file_exists($file_temp)) {
+// Cache plein (une entrée par combinaison de paramètres : n'importe qui
+// pouvait remplir le disque) : vignette servie depuis un fichier temporaire
+$sb_thumb_nocache = false;
+if (!file_exists($file_temp) && count(glob(THUMB_CACHE . '*.img.txt') ?: array()) >= THUMB_CACHE_MAX) {
+    $sb_thumb_nocache = true;
+    $file_temp = tempnam(sys_get_temp_dir(), 'sbthumb');
+}
+
+if ($sb_thumb_nocache || !file_exists($file_temp)) {
     list($w0, $h0, $type) = getimagesize($src);
     $data = file_get_contents($src);
     if ($ignore && $type == 1) {
@@ -216,6 +225,7 @@ if (!file_exists($file_temp)) {
                 header('Expires: ' . gmdate('D, d M Y H:i:s T'));
                 header('Pragma: no-cache');
             }
+            if ($sb_thumb_nocache) @unlink($file_temp);
             die($data);
         }
     }
@@ -375,3 +385,4 @@ if (THUMB_BROWSER_CACHE) {
 }
 
 readfile($file_temp);
+if ($sb_thumb_nocache) @unlink($file_temp);

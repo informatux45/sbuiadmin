@@ -8,6 +8,8 @@
  * ©INFORMATUX.COM                 *
  * ******************************* */
 
+defined('SB_PATH') or die('Are you crazy!');
+
 // ------------------------
 // DEGUB Mode
 // ------------------------

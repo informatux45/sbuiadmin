@@ -260,6 +260,11 @@
 											// Un ancien settings.txt rempli serait re-migré par-dessus
 											// au premier chargement : on le supprime.
 											if (file_exists($settings_file)) @unlink($settings_file);
+											// Code d'accès au site en maintenance (?d=) : tiré au sort,
+											// un code commun à toutes les installations ouvrait le site
+											// à tous (voir inc/migrations/4.39.php)
+											mysqli_query(sbSettingsDb(), "UPDATE `" . sbSettingsTable() . "` SET `content` = '" . bin2hex(random_bytes(8))
+												. "' WHERE `config` = 'coming-soon-url' AND TRIM(`content`) IN ('', 'comingSoon', 'DevProgress')");
 										}
 									}
 								}

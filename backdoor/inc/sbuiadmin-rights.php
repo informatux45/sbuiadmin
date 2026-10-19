@@ -575,7 +575,7 @@ function sbCsrfToken() {
  * @return bool
  */
 function sbCheckCsrfToken() {
-	if (empty($_SESSION['sbuiadmin_csrf_token']) || empty($_POST['sbuiadmin_csrf_token'])) {
+	if (empty($_SESSION['sbuiadmin_csrf_token']) || empty($_POST['sbuiadmin_csrf_token']) || !is_string($_POST['sbuiadmin_csrf_token'])) {
 		return false;
 	}
 	return hash_equals($_SESSION['sbuiadmin_csrf_token'], $_POST['sbuiadmin_csrf_token']);

@@ -183,7 +183,7 @@
 				$.ajax({
 					method: "POST",
 					url: "{$smarty.const._AM_SITE_URL}inc/plugins/sitemap/sitemap_generator.php",
-					data: {}
+					data: 'sbuiadmin_csrf_token=' + encodeURIComponent('{$sb_csrf_token|escape:'javascript'}')
 				})
 				.fail(function() {
 					sbToast("Erreur sitemap génération !!", 'error');

@@ -125,7 +125,7 @@ INSERT INTO `<DB_PREFIX>sb_config` (`id`, `config`, `content`) VALUES
 (5, 'email_to', 'contact@votresite.fr'),
 (8, 'email_subject', 'Message de votre site'),
 (9, 'coming-soon', '1'),
-(10, 'coming-soon-url', 'comingSoon'),
+(10, 'coming-soon-url', ''),
 (11, 'coming-soon-title', 'SBUIADMIN'),
 (12, 'coming-soon-title2', '&lt;span style=&quot;font-size: 2.7em;&quot;&gt;Site en maintenance&lt;/span&gt;&lt;br&gt;Nous revenons tr&egrave;s vite&lt;br&gt;'),
 (13, 'coming-soon-text', 'We are a team of talented people with big ideas and creative minds.&lt;br /&gt; We are here to make your website a lot more effective and profitable.&lt;br /&gt; Genesis Coming Soon Template is a perfect solution to keep your visitors&lt;br /&gt; interested while preparing site for launch.&lt;br /&gt; We know what&amp;#39;s the best and we&amp;#39;re here for you.'),
