@@ -257,6 +257,11 @@
 								<p style="color:var(--warning)">Auto-test impossible : vérifiez que ce dossier n'est pas accessible par le web.</p>
 							{/if}
 						{/if}
+						{if $sb_upd_vendor_foreign}
+							<div class="alert warning"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg></span><div class="body">Dossiers de <code>vendor/</code> propres au site :
+							{foreach $sb_upd_vendor_foreign as $v}<code>{$v.name|escape}</code>{if $v.open} (ouvert au web){/if}{if !$v@last}, {/if}{/foreach}.<br>
+							<code>vendor/.htaccess</code> refuse tout au web : un fichier servi depuis ces dossiers (retour de paiement, script, image) doit être rouvert par un <code>.htaccess</code> dans son dossier (<code>Require all granted</code>).</div></div>
+						{/if}
 						<p style="color:var(--t-muted)">Sauvegardes chiffrées (libsodium, clé de sbdbconfig.php), droits 600, une seule gardée.<br>Mot de passe redemandé avant toute mise à jour ou retour arrière ; chaque opération est notée dans le journal des connexions.<br>Ces sauvegardes servent à annuler une mise à jour, pas à remplacer les sauvegardes externes du serveur.</p>
 					</div>
 				</section>

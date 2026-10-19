@@ -110,17 +110,20 @@ Installing in a sub-folder: see `help.txt`.
 
 ## 📝 Changelog
 
+**4.45**
+- Sites updated from an old version: database port/socket and ALTCHA no longer depend on the site's own sbconfig.php; the Update page lists vendor/ folders that are not part of SBUIADMIN (vendor/.htaccess blocks web access to them)
+
 **4.44**
 - CSRF token required on every admin POST, added automatically to forms, fetch and jQuery requests; modules can declare sensitive GET actions ('csrf_get') and Smarty modifiers ('modifiers'); more PHP functions usable in templates (null-safe); new date formats US1, FRM, FRH2, MONTH
 
 **4.43**
 - Database catch-up for old sites: missing core tables and columns (and those of installed modules) added from the installer schema, no data changed; a database without version and without sb_modules/sb_users_rights is now upgraded instead of being marked current; option to hide the GitHub banner on the maintenance page
 
-**4.42**
-- Security audit (part 3): installer closed once installed, escaped URL values in the Volton 404 page, fixed template choice in News and User, logout links require the session token, HTTP 403 for access denied, single install dump, front language kept across pages, clean download file names; News 1.0.3, Downloads 1.0.1
-
 <details>
   <summary><strong>Older versions</strong></summary>
+
+**4.42**
+- Security audit (part 3): installer closed once installed, escaped URL values in the Volton 404 page, fixed template choice in News and User, logout links require the session token, HTTP 403 for access denied, single install dump, front language kept across pages, clean download file names; News 1.0.3, Downloads 1.0.1
 
 **4.41**
 - Security audit (part 2): admin-only pages refused before running, per-action rights read from the controller's own parameter, CSRF token on delete links, SQL escaping hardened (backslash, multi-select ids), non-admin accounts get modules only by default (Media to be granted); News module 1.0.2

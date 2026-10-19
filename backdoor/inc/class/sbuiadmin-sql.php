@@ -16,6 +16,15 @@
 defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
 
+// sbconfig.php d'avant 2018 (propre au site, jamais remplacé par la mise à
+// jour) : ni port ni socket, lus depuis l'hôte (« hôte:port » ou « hôte:/socket »)
+if (!defined('_AM_DB_PORT') || !defined('_AM_DB_SOCKET')) {
+	$sb_db_parts = function_exists('sbDbHostParts') ? sbDbHostParts(defined('_AM_DB_HOST') ? _AM_DB_HOST : '') : array('', 3306, false);
+	defined('_AM_DB_PORT')   or define('_AM_DB_PORT',   $sb_db_parts[1]);
+	defined('_AM_DB_SOCKET') or define('_AM_DB_SOCKET', $sb_db_parts[2]);
+	unset($sb_db_parts);
+}
+
 class sql extends Smarty {
     var $host       = _AM_DB_HOST;
     var $user       = _AM_DB_USER;

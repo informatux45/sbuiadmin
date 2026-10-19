@@ -776,3 +776,10 @@ defined('SBTHEME') or define('SBTHEME', sbSettingsTheme());
 // lignes, qui lisaient medias_dir / medias_url, n'ont alors plus d'effet.
 defined('_AM_MEDIAS_DIR') or define('_AM_MEDIAS_DIR', sbMediasDir());
 defined('_AM_MEDIAS_URL') or define('_AM_MEDIAS_URL', sbMediasUrl());
+
+// ALTCHA et blocage des connexions (4.45) : chargés ici aussi, un ancien
+// sbconfig.php ne les inclut pas (altcha.php en erreur, connexion bloquée)
+foreach (array('altcha', 'loginlock') as $sb_inc) {
+	if (is_file(__DIR__ . "/sbuiadmin-$sb_inc.php")) require_once(__DIR__ . "/sbuiadmin-$sb_inc.php");
+}
+unset($sb_inc);

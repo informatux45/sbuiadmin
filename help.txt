@@ -39,6 +39,13 @@ Chaque site a son sbdbconfig.php (sbdbconfig-<dossier>.php pour les suivants).
 - Modules (carte « Modules ») : mis à jour séparément du core ; Installer
   (téléchargé si absent), Mettre à jour, Désinstaller (« Supprimer le module »
   retire aussi données, tables et fichiers).
+- sbconfig.php (propre au site) n'est jamais remplacé : le core définit ce
+  qui manque à un ancien fichier, mais tout define() doit y être précédé de
+  defined('X') or (sinon « already defined », erreur en PHP 9).
+  Après modification, vider l'opcache si rien ne change.
+- vendor/.htaccess refuse tout au web : un dossier de vendor/ propre au site
+  qui sert des fichiers (retour de paiement, scripts) doit avoir son propre
+  .htaccess (Require all granted). La page Mise à jour les signale.
 
 ### Migrations de la base (développeurs)
 - backdoor/inc/migrations/<version>.php, modèle dans inc/sbuiadmin-update-db.php

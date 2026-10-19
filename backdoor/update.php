@@ -167,6 +167,7 @@ $sbsmarty->assign('sb_upd_notes_html', nl2br($sb_upd_notes));
 $sbsmarty->assign('sb_upd_job', $sb_upd_job);
 $sbsmarty->assign('sb_upd_storage', $sb_upd_storage);
 $sbsmarty->assign('sb_upd_selftest', $sb_upd_selftest);
+$sbsmarty->assign('sb_upd_vendor_foreign', sbUpdVendorForeign());
 $sbsmarty->assign('sb_upd_rollback', $sb_upd_rollback);
 $sbsmarty->assign('sb_upd_db_version', sbSetting('db_version'));
 $sbsmarty->assign('sb_upd_db_pending', $sb_upd_db_pending);

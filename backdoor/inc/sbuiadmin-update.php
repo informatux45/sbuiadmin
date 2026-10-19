@@ -392,6 +392,23 @@ function sbUpdSelfTest() {
 }
 
 /**
+ * Dossiers de vendor/ qui ne viennent pas de SBUIADMIN : vendor/.htaccess
+ * refuse tout au web, un site qui y sert des fichiers (retour de paiement,
+ * scripts) doit les rouvrir par un .htaccess dans leur dossier.
+ * @return array [['name' => dossier, 'open' => .htaccess propre présent]]
+ */
+function sbUpdVendorForeign() {
+	$out = array();
+	$dir = sbUpdSiteRoot() . '/vendor';
+	foreach (is_dir($dir) ? (scandir($dir) ?: array()) : array() as $name) {
+		if ($name[0] === '.' || !is_dir("$dir/$name") || in_array($name, array('altcha-org', 'composer', 'phpmailer'), true)) continue;
+		$ht = (string) @file_get_contents("$dir/$name/.htaccess");
+		$out[] = array('name' => $name, 'open' => stripos($ht, 'granted') !== false || stripos($ht, 'allow from all') !== false);
+	}
+	return $out;
+}
+
+/**
  * Fichiers appartenant aux modules : ceux des index donnés et ceux des
  * modules présents sur le disque (module.php : 'files', plus leur dossier).
  * @return array ['files' => chemin => true, 'dirs' => noms de modules]
