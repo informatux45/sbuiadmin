@@ -160,17 +160,20 @@ The administration folder is named `backdoor` by default. You can rename it afte
 
 ## 📝 Changelog
 
+**4.61**
+- Page Builder: a dropped row/block no longer sometimes sticks in the middle of the canvas (leftover inline position from jQuery UI connectToSortable); inline styles are cleaned after every drop
+
 **4.60**
 - Sentinelle 1.6.0: automatic bans now count every serious attempt (even repeats collapsed in the log), slow-scan detection (too many 404s per IP), and the attacker's country in the log (CF-IPCountry header, or optional ipstack key)
 
 **4.59**
 - Sentinelle 1.5.0: file integrity check against the signed file list of the installed version (core and official modules modified or missing, added PHP files, scripts in upload/), on demand and daily, critical event and alert on any change; advisor point
 
-**4.58**
-- Sentinelle 1.4.0: request burst limit per IP (no Memcache needed), search engine bots verified by reverse DNS, automatic bans after repeated serious events (longer for repeat offenders), protection mode only; member area login failures reported to Sentinelle
-
 <details>
   <summary><strong>Older versions</strong></summary>
+
+**4.58**
+- Sentinelle 1.4.0: request burst limit per IP (no Memcache needed), search engine bots verified by reverse DNS, automatic bans after repeated serious events (longer for repeat offenders), protection mode only; member area login failures reported to Sentinelle
 
 **4.57**
 - Sentinelle 1.3.0: security advisor (PHP settings, HTTPS and security headers, exposed files such as .git or the installer, accounts, Sentinelle and update settings), each point with the fix to apply, score out of 100 and "Security score" dashboard tile

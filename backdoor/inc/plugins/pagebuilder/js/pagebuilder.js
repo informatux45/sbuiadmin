@@ -151,7 +151,27 @@ function _init() {
     $("body").css("min-height", $(window).height() - 90);
     $(".htmlpage").css("min-height", $(window).height() - 160);
     // $(".htmlpage").sortable({connectWith: ".lyrow", opacity: .35, handle: ".drag"});
-    $(".htmlpage, .htmlpage .column").sortable({connectWith: ".column", opacity: .35, handle: ".drag"});
+    // connectToSortable (jQuery UI) laisse parfois la ligne/le bloc déposé avec
+    // un position/top résiduel du glissement : l'élément se figeait là où la
+    // souris a lâché (« au milieu » du canevas) au lieu de reprendre sa place
+    // normale dans le flux. Intermittent (connectToSortable ne s'engage pas
+    // toujours - voir feedback_pagebuilder_debugging_lessons). On nettoie donc
+    // les styles en ligne résiduels après chaque dépôt.
+    function sbPbNormalizeCanvas() {
+        var $c = $(".htmlpage");
+        $c.find(".ui-sortable-placeholder").remove();
+        $c.find(".lyrow, .box").each(function () {
+            this.style.position = ''; this.style.top = ''; this.style.left = '';
+            this.style.right = ''; this.style.bottom = ''; this.style.inset = '';
+            this.style.width = ''; this.style.height = ''; this.style.opacity = ''; this.style.zIndex = '';
+        });
+    }
+    $(".htmlpage, .htmlpage .column").sortable({
+        connectWith: ".column", opacity: .35, handle: ".drag",
+        receive: function () { setTimeout(sbPbNormalizeCanvas, 0); },
+        update: function () { setTimeout(sbPbNormalizeCanvas, 0); },
+        stop: function () { setTimeout(sbPbNormalizeCanvas, 0); }
+    });
     // zIndex explicite : sans lui, le clone glissé (helper) hérite de
     // l'ordre d'empilement de son parent d'origine (la sidebar, ajoutée
     // via appendTo:"parent" par défaut) - sur une page où un panneau
@@ -199,6 +219,7 @@ function _init() {
                     $(".htmlpage .column").sortable({opacity: .35, connectWith: ".column"});
                 }
             }
+            setTimeout(sbPbNormalizeCanvas, 0);
             sbInitPageBuilderMaps();
         }});
 
@@ -235,6 +256,7 @@ function _init() {
             // Initialise Leaflet sur une éventuelle carte fraîchement
             // déposée (voir sbInitPageBuilderMaps() - sans effet sur les
             // dépôts d'autres types de blocs).
+            setTimeout(sbPbNormalizeCanvas, 0);
             sbInitPageBuilderMaps();
         }});
 
