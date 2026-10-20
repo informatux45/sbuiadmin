@@ -123,6 +123,31 @@ switch ($action) {
 		$sbsmarty->assign('sb_sentinelle_rescue_path', basename(SBUIADMIN_PATH) . '/inc/admin/sentinelle-disabled');
 		break;
 
+	case 'advisor':
+		// --------------------------------
+		// --- Conseiller sécurité (score gardé pour la tuile du dashboard)
+		// --------------------------------
+		require_once(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'advisor.php');
+		$sb_checks = sentinelle_advisor_checks();
+		$sb_score = sentinelle_advisor_score($sb_checks);
+		$sb_count = array('ok' => 0, 'warn' => 0, 'bad' => 0, 'unknown' => 0, 'info' => 0);
+		$sb_by_group = array();
+		foreach (sentinelle_advisor_groups() as $sb_g => $sb_label) $sb_by_group[$sb_g] = array('label' => $sb_label, 'checks' => array());
+		foreach ($sb_checks as $sb_ch) {
+			$sb_count[$sb_ch['status']]++;
+			$sb_by_group[$sb_ch['group']]['checks'][] = $sb_ch;
+		}
+		// À corriger d'abord : rouges puis orange
+		$sb_order = array('bad' => 0, 'warn' => 1, 'unknown' => 2, 'info' => 3, 'ok' => 4);
+		foreach ($sb_by_group as &$sb_grp) usort($sb_grp['checks'], function ($a, $b) use ($sb_order) { return $sb_order[$a['status']] <=> $sb_order[$b['status']]; });
+		unset($sb_grp);
+		sbSettingsSave(array('sentinelle_advisor' => json_encode(array('score' => $sb_score, 'date' => date('Y-m-d H:i:s')) + $sb_count)));
+		$sbsmarty->assign('sb_sentinelle_page', 'advisor');
+		$sbsmarty->assign('sb_advisor_score', $sb_score);
+		$sbsmarty->assign('sb_advisor_count', $sb_count);
+		$sbsmarty->assign('sb_advisor_groups', $sb_by_group);
+		break;
+
 	case 'bans':
 	case 'banadd':
 	case 'bandel':

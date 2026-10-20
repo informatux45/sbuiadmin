@@ -31,6 +31,8 @@
   bannir depuis le journal. Export CSV du journal. Widgets « Attaques » et
   « IP les plus actives ». Alertes par e-mail (au plus une par 15 min) et
   résumé quotidien, par le SMTP de Contact > Paramètres.
+- Conseiller (Sentinelle > Conseiller) : PHP, HTTPS et en-têtes, fichiers exposés,
+  comptes, réglages ; score sur 100 (tuile « Score de sécurité » du dashboard).
 - Bloqué par erreur : créer le fichier vide backdoor/inc/admin/sentinelle-disabled.
 - Module tiers : sbSecurityEvent('type', 'info|warning|critical', 'détail',
   'logged|blocked|banned', 'identifiant') note un événement (sans effet si

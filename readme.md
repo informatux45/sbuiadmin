@@ -160,6 +160,9 @@ The administration folder is named `backdoor` by default. You can rename it afte
 
 ## 📝 Changelog
 
+**4.57**
+- Sentinelle 1.3.0: security advisor (PHP settings, HTTPS and security headers, exposed files such as .git or the installer, accounts, Sentinelle and update settings), each point with the fix to apply, score out of 100 and "Security score" dashboard tile
+
 **4.56**
 - Sentinelle 1.2.0: banned IPs and ranges (duration or permanent, 403 in both modes, ban from the log), CSV export, dashboard widgets (attacks tile, most active IPs card), e-mail alerts (at most one per 15 min) and daily summary
 - Modules card: new "Update database" action when a module's files are newer than its registered version (files copied by hand), with encrypted backup and undo
@@ -167,11 +170,11 @@ The administration folder is named `backdoor` by default. You can rename it afte
 **4.55**
 - Sentinelle 1.1.0: attack filters (SQL injection, XSS, path traversal, file inclusion, null bytes, globals overwrite, vulnerability scanners, attack tools, dangerous uploads), each off / log only / by mode (403 in protection mode); trusted IPs, logged-in administrators, passwords and tokens are never inspected; excluded parameters
 
-**4.54**
-- New official security module Sentinelle 1.0.0 (installed with new sites, from the Modules card on existing ones): security log of refused logins, ALTCHA/2FA/CSRF failures, rights denials, blocked IPs and anti-flood bans, observation/protection mode, trusted IPs, rescue file; sbSecurityEvent() for third-party modules
-
 <details>
   <summary><strong>Older versions</strong></summary>
+
+**4.54**
+- New official security module Sentinelle 1.0.0 (installed with new sites, from the Modules card on existing ones): security log of refused logins, ALTCHA/2FA/CSRF failures, rights denials, blocked IPs and anti-flood bans, observation/protection mode, trusted IPs, rescue file; sbSecurityEvent() for third-party modules
 
 **4.53**
 - Visitor IP address: proxy headers (X-Forwarded-For, CF-Connecting-IP) are only trusted from a declared proxy (Users > Blocked IPs > Settings: none, Cloudflare or custom list); IP blocking, login lock and logs could be bypassed or misdirected by forged headers

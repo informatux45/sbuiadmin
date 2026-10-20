@@ -12,6 +12,9 @@
 					{if $sb_sentinelle_page == 'settings'}
 					<h1 class="hero-title">Réglages de Sentinelle</h1>
 					<p class="hero-sub">Mode de fonctionnement, filtres, alertes par e-mail et adresses de confiance.</p>
+					{elseif $sb_sentinelle_page == 'advisor'}
+					<h1 class="hero-title">Conseiller sécurité</h1>
+					<p class="hero-sub">Vérification de la configuration du site, point par point, avec la correction à faire.</p>
 					{elseif $sb_sentinelle_page == 'bans'}
 					<h1 class="hero-title">IP bannies</h1>
 					<p class="hero-sub">Adresses et plages refusées sur tout le site, quel que soit le mode.</p>
@@ -23,11 +26,12 @@
 				<div class="hero-actions">
 					<div class="dd-wrap">
 						<button class="btn btn--outline-primary" data-dropdown aria-label="Actions Sentinelle">
-							{if $sb_sentinelle_page == 'settings'}Réglages{elseif $sb_sentinelle_page == 'bans'}IP bannies{else}Journal de sécurité{/if}
+							{if $sb_sentinelle_page == 'settings'}Réglages{elseif $sb_sentinelle_page == 'bans'}IP bannies{elseif $sb_sentinelle_page == 'advisor'}Conseiller{else}Journal de sécurité{/if}
 							<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
 						</button>
 						<div class="dd-menu" role="menu">
 							<a class="dd-menu-item" href="{$module_url}"{if $sb_sentinelle_page == 'log'} style="color:var(--primary);font-weight:600"{/if}>Journal de sécurité</a>
+							<a class="dd-menu-item" href="{$module_url}&a=advisor"{if $sb_sentinelle_page == 'advisor'} style="color:var(--primary);font-weight:600"{/if}>Conseiller</a>
 							<a class="dd-menu-item" href="{$module_url}&a=bans"{if $sb_sentinelle_page == 'bans'} style="color:var(--primary);font-weight:600"{/if}>IP bannies</a>
 							<a class="dd-menu-item" href="{$module_url}&a=settings"{if $sb_sentinelle_page == 'settings'} style="color:var(--primary);font-weight:600"{/if}>Réglages</a>
 						</div>
@@ -66,6 +70,47 @@
 						<p class="help-block">Créez le fichier vide <code>{$sb_sentinelle_rescue_path|escape}</code> sur le serveur (FTP) : Sentinelle s'arrête aussitôt. Supprimez-le une fois votre adresse ajoutée aux IP de confiance.</p>
 					</section>
 				</div>
+			</div>
+			{elseif $sb_sentinelle_page == 'advisor'}
+			<div class="grid">
+				<section class="col-12">
+					<div class="kpi-grid">
+						<div class="kpi-card">
+							<div class="kpi-top"><div class="kpi-identity"><div class="kpi-icon {if $sb_advisor_score >= 80}success{elseif $sb_advisor_score >= 60}warning{else}danger{/if}"><i class="fa-solid fa-shield-halved"></i></div><div class="kpi-label">Score de sécurité</div></div></div>
+							<div class="kpi-value">{$sb_advisor_score}<small style="font-size:16px"> / 100</small></div>
+							<div class="kpi-compare">{if $sb_advisor_score >= 80}bonne configuration{elseif $sb_advisor_score >= 60}à améliorer{else}des points importants à corriger{/if}</div>
+						</div>
+						<div class="kpi-card">
+							<div class="kpi-top"><div class="kpi-identity"><div class="kpi-icon danger"><i class="fa-solid fa-circle-xmark"></i></div><div class="kpi-label">À corriger</div></div></div>
+							<div class="kpi-value">{$sb_advisor_count.bad}</div>
+							<div class="kpi-compare">points en rouge</div>
+						</div>
+						<div class="kpi-card">
+							<div class="kpi-top"><div class="kpi-identity"><div class="kpi-icon warning"><i class="fa-solid fa-triangle-exclamation"></i></div><div class="kpi-label">À améliorer</div></div></div>
+							<div class="kpi-value">{$sb_advisor_count.warn}</div>
+							<div class="kpi-compare">{$sb_advisor_count.ok} point(s) en ordre{if $sb_advisor_count.unknown} · {$sb_advisor_count.unknown} non vérifiable(s){/if}</div>
+						</div>
+					</div>
+				</section>
+				{foreach from=$sb_advisor_groups item=grp}
+				{if $grp.checks}
+				<section class="col-6 card">
+					<div class="card-head"><div class="card-title-wrap"><h2 class="card-title">{$grp.label|escape}</h2></div></div>
+					{foreach from=$grp.checks item=ch}
+					<div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--border-soft)">
+						<span class="badge {if $ch.status == 'ok'}success{elseif $ch.status == 'warn'}warning{elseif $ch.status == 'bad'}danger{else}info{/if}" style="flex:0 0 auto;min-width:74px;text-align:center">{if $ch.status == 'ok'}en ordre{elseif $ch.status == 'warn'}à améliorer{elseif $ch.status == 'bad'}à corriger{elseif $ch.status == 'info'}à noter{else}inconnu{/if}</span>
+						<div style="min-width:0">
+							<strong>{$ch.label|escape}</strong> <small style="color:var(--t-muted);word-break:break-word">— {$ch.value|escape}</small>
+							{if $ch.advice}<div class="help-block" style="margin-top:4px">{$ch.advice|escape}</div>{/if}
+						</div>
+					</div>
+					{/foreach}
+				</section>
+				{/if}
+				{/foreach}
+				<section class="col-12">
+					<p class="help-block">Analyse refaite à chaque ouverture de cette page. Les points « vus de l'extérieur » (en-têtes, .git, installeur) interrogent le site depuis le serveur ; s'il n'y parvient pas, ils restent « inconnu ».</p>
+				</section>
 			</div>
 			{elseif $sb_sentinelle_page == 'bans'}
 			<div class="grid">

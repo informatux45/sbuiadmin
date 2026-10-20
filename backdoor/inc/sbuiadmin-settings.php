@@ -152,6 +152,8 @@ function sbSettingsDefaults() {
 		'sentinelle_digest'     => '0',
 		'sentinelle_alert_last' => '0',
 		'sentinelle_digest_last' => '',
+		// dernier passage du conseiller (JSON : score, date, ok, warn, bad, unknown)
+		'sentinelle_advisor'    => '',
 		'toast_duration'        => '7',
 		'pagebuilder_modules'   => '',
 		'theme'                 => '',

@@ -15,6 +15,8 @@ return array(
 	'group' => 'admin', // user OR admin
 	'li'    => array(
 		array('title' => SBUIADMIN_MENU_SENTINELLE_LOG,      'link' => 'index.php?p=sentinelle'),
+		array('title' => SBUIADMIN_MENU_SENTINELLE_ADVISOR,  'link' => 'index.php?p=sentinelle&a=advisor'),
+		array('title' => SBUIADMIN_MENU_SENTINELLE_BANS,     'link' => 'index.php?p=sentinelle&a=bans'),
 		array('title' => SBUIADMIN_MENU_SENTINELLE_SETTINGS, 'link' => 'index.php?p=sentinelle&a=settings'),
 	),
 );
