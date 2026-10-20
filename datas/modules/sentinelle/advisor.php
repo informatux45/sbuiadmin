@@ -200,6 +200,17 @@ function sentinelle_advisor_checks(?array $probes = null, array $env = array()) 
 		'Ajoutez vos adresses fixes aux IP de confiance : vous ne risquez plus de vous bloquer vous-même.');
 	$add('sentinel_alerts', 'sentinel', 'Alertes par e-mail', filter_var($setting('sentinelle_alert_email'), FILTER_VALIDATE_EMAIL) && $setting('sentinelle_alert_level', 'critical') !== 'off' ? 'ok' : 'warn',
 		filter_var($setting('sentinelle_alert_email'), FILTER_VALIDATE_EMAIL) ? $setting('sentinelle_alert_email') : 'aucun destinataire', 'Indiquez un destinataire dans les Réglages : vous serez prévenu des attaques critiques.');
+	$integ = json_decode($setting('sentinelle_integrity'), true);
+	if (!is_array($integ)) {
+		$add('integrity', 'sentinel', 'Intégrité des fichiers', 'unknown', 'jamais analysée', 'Lancez l\'analyse (Sentinelle > Intégrité) : elle compare les fichiers du site à la version signée.');
+	} else {
+		$ic = (array) ($integ['counts'] ?? array());
+		$alarm = (int) ($ic['modified'] ?? 0) + (int) ($ic['added'] ?? 0) + (int) ($ic['upload'] ?? 0);
+		$old = strtotime((string) ($integ['date'] ?? '')) < time() - 7 * 86400;
+		$add('integrity', 'sentinel', 'Intégrité des fichiers', ($integ['error'] ?? '') !== '' ? 'unknown' : ($alarm ? 'bad' : ($old ? 'warn' : 'ok')),
+			($integ['error'] ?? '') !== '' ? 'analyse impossible' : ($alarm ? $alarm . ' fichier(s) à vérifier' : 'conforme') . ' (' . date('d/m/Y', strtotime((string) $integ['date'])) . ')',
+			$alarm ? 'Ouvrez Sentinelle > Intégrité : un fichier modifié ou un PHP ajouté peut être une porte dérobée. Remettez les fichiers d\'origine (mise à jour, ou archive de la version).' : 'Relancez l\'analyse (Sentinelle > Intégrité) ou activez l\'analyse quotidienne.');
+	}
 	$rate = (int) $setting('sentinelle_rate', '120'); $ab = (int) $setting('sentinelle_autoban', '10');
 	$add('sentinel_autoban', 'sentinel', 'Anti-rafales et bannissement automatique', $rate > 0 && $ab > 0 ? 'ok' : 'warn',
 		($rate > 0 ? $rate . ' requêtes/min' : 'rafales non surveillées') . ' · ' . ($ab > 0 ? 'bannissement après ' . $ab . ' événements' : 'pas de bannissement automatique'),

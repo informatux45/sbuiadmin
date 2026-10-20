@@ -12,6 +12,9 @@
 					{if $sb_sentinelle_page == 'settings'}
 					<h1 class="hero-title">Réglages de Sentinelle</h1>
 					<p class="hero-sub">Mode de fonctionnement, filtres, alertes par e-mail et adresses de confiance.</p>
+					{elseif $sb_sentinelle_page == 'integrity'}
+					<h1 class="hero-title">Intégrité des fichiers</h1>
+					<p class="hero-sub">Les fichiers du site comparés à la version signée : modifications, fichiers PHP ajoutés, scripts dans les médias.</p>
 					{elseif $sb_sentinelle_page == 'advisor'}
 					<h1 class="hero-title">Conseiller sécurité</h1>
 					<p class="hero-sub">Vérification de la configuration du site, point par point, avec la correction à faire.</p>
@@ -26,12 +29,13 @@
 				<div class="hero-actions">
 					<div class="dd-wrap">
 						<button class="btn btn--outline-primary" data-dropdown aria-label="Actions Sentinelle">
-							{if $sb_sentinelle_page == 'settings'}Réglages{elseif $sb_sentinelle_page == 'bans'}IP bannies{elseif $sb_sentinelle_page == 'advisor'}Conseiller{else}Journal de sécurité{/if}
+							{if $sb_sentinelle_page == 'settings'}Réglages{elseif $sb_sentinelle_page == 'bans'}IP bannies{elseif $sb_sentinelle_page == 'advisor'}Conseiller{elseif $sb_sentinelle_page == 'integrity'}Intégrité{else}Journal de sécurité{/if}
 							<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
 						</button>
 						<div class="dd-menu" role="menu">
 							<a class="dd-menu-item" href="{$module_url}"{if $sb_sentinelle_page == 'log'} style="color:var(--primary);font-weight:600"{/if}>Journal de sécurité</a>
 							<a class="dd-menu-item" href="{$module_url}&a=advisor"{if $sb_sentinelle_page == 'advisor'} style="color:var(--primary);font-weight:600"{/if}>Conseiller</a>
+							<a class="dd-menu-item" href="{$module_url}&a=integrity"{if $sb_sentinelle_page == 'integrity'} style="color:var(--primary);font-weight:600"{/if}>Intégrité</a>
 							<a class="dd-menu-item" href="{$module_url}&a=bans"{if $sb_sentinelle_page == 'bans'} style="color:var(--primary);font-weight:600"{/if}>IP bannies</a>
 							<a class="dd-menu-item" href="{$module_url}&a=settings"{if $sb_sentinelle_page == 'settings'} style="color:var(--primary);font-weight:600"{/if}>Réglages</a>
 						</div>
@@ -70,6 +74,37 @@
 						<p class="help-block">Créez le fichier vide <code>{$sb_sentinelle_rescue_path|escape}</code> sur le serveur (FTP) : Sentinelle s'arrête aussitôt. Supprimez-le une fois votre adresse ajoutée aux IP de confiance.</p>
 					</section>
 				</div>
+			</div>
+			{elseif $sb_sentinelle_page == 'integrity'}
+			<div class="grid">
+				<section class="col-12 card">
+					<div class="card-head"><div class="card-title-wrap"><h2 class="card-title">Dernière analyse</h2></div></div>
+					{if $sb_integrity}
+						<p>Version {$sb_integrity.version|escape}, le {$sb_integrity.date|date_format:"%d.%m.%Y à %H:%M"} : <strong>{$sb_integrity.checked}</strong> fichiers comparés à la liste signée.</p>
+						{if $sb_integrity.error}<div class="alert danger"><div class="body"><div class="title">Analyse impossible</div><p>{$sb_integrity.error|escape}</p></div></div>{/if}
+						<div class="kpi-grid" style="margin:12px 0">
+							<div class="kpi-card"><div class="kpi-top"><div class="kpi-identity"><div class="kpi-icon {if $sb_integrity.counts.modified}danger{else}success{/if}"><i class="fa-solid fa-file-pen"></i></div><div class="kpi-label">Fichiers modifiés</div></div></div><div class="kpi-value">{$sb_integrity.counts.modified}</div></div>
+							<div class="kpi-card"><div class="kpi-top"><div class="kpi-identity"><div class="kpi-icon {if $sb_integrity.counts.added}danger{else}success{/if}"><i class="fa-solid fa-file-circle-plus"></i></div><div class="kpi-label">PHP ajoutés</div></div></div><div class="kpi-value">{$sb_integrity.counts.added}</div></div>
+							<div class="kpi-card"><div class="kpi-top"><div class="kpi-identity"><div class="kpi-icon {if $sb_integrity.counts.upload}danger{else}success{/if}"><i class="fa-solid fa-photo-film"></i></div><div class="kpi-label">Scripts dans upload/</div></div></div><div class="kpi-value">{$sb_integrity.counts.upload}</div></div>
+							<div class="kpi-card"><div class="kpi-top"><div class="kpi-identity"><div class="kpi-icon {if $sb_integrity.counts.missing}warning{else}success{/if}"><i class="fa-solid fa-file-circle-question"></i></div><div class="kpi-label">Fichiers manquants</div></div></div><div class="kpi-value">{$sb_integrity.counts.missing}</div></div>
+						</div>
+						{foreach from=['modified' => 'Fichiers modifiés (contenu différent de la version signée)', 'added' => 'Fichiers PHP ajoutés (absents de la version signée)', 'upload' => 'Scripts dans les médias', 'missing' => 'Fichiers manquants'] key=k item=title}
+							{if $sb_integrity.$k}
+							<h3 style="margin-top:16px">{$title}</h3>
+							<ul style="font-family:monospace;font-size:12px;word-break:break-all">{foreach from=$sb_integrity.$k item=f}<li>{$f|escape}</li>{/foreach}</ul>
+							{if $sb_integrity.counts.$k > 100}<p class="help-block">… et {$sb_integrity.counts.$k-100} autre(s).</p>{/if}
+							{/if}
+						{/foreach}
+						{if $sb_integrity.modules}<p class="help-block">Modules non vérifiés (version différente de celle publiée avec le cœur) : {foreach from=$sb_integrity.modules item=mm name=mods}{$mm|escape}{if !$smarty.foreach.mods.last}, {/if}{/foreach}.</p>{/if}
+					{else}
+						<p>Aucune analyse pour l'instant.</p>
+					{/if}
+					<form method="post" action="{$module_url}&a=integrity" style="margin-top:16px">
+						<button class="btn btn--primary" type="submit">Analyser maintenant</button>
+						<span class="help-block" style="margin-left:8px">Analyse quotidienne automatique : {if $sb_integrity_auto}activée{else}désactivée (Réglages){/if}.</span>
+					</form>
+					<p class="help-block" style="margin-top:12px">Un fichier modifié par vous (personnalisation) apparaît aussi : vérifiez chaque ligne. Un fichier PHP ajouté ou un script dans upload/ que vous ne connaissez pas est le signe le plus courant d'un site piraté. Les fichiers propres au site (sbconfig.php, .htaccess, sbdbconfig.php...) ne sont pas comparés.</p>
+				</section>
 			</div>
 			{elseif $sb_sentinelle_page == 'advisor'}
 			<div class="grid">

@@ -160,6 +160,10 @@ function sbSettingsDefaults() {
 		'sentinelle_autoban'    => '10',
 		'sentinelle_autoban_window' => '10',
 		'sentinelle_autoban_duration' => '86400',
+		// intégrité des fichiers : dernier résumé (JSON), date, analyse quotidienne
+		'sentinelle_integrity'  => '',
+		'sentinelle_integrity_last' => '',
+		'sentinelle_integrity_auto' => '1',
 		'toast_duration'        => '7',
 		'pagebuilder_modules'   => '',
 		'theme'                 => '',

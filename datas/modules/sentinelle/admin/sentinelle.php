@@ -57,6 +57,7 @@ switch ($action) {
 			$sb_alert_email = trim(is_string($_POST['sentinelle_alert_email'] ?? null) ? $_POST['sentinelle_alert_email'] : '');
 			$sb_alert_level = in_array($_POST['sentinelle_alert_level'] ?? '', array('off', 'warning', 'critical'), true) ? $_POST['sentinelle_alert_level'] : 'critical';
 			$sb_digest = ($_POST['sentinelle_digest'] ?? '') === 'on' ? '1' : '0';
+			$sb_integrity_auto = ($_POST['sentinelle_integrity_auto'] ?? '') === 'on' ? '1' : '0';
 			$sb_rate = (int) ($_POST['sentinelle_rate'] ?? 120);
 			$sb_ab = (int) ($_POST['sentinelle_autoban'] ?? 10);
 			$sb_abw = (int) ($_POST['sentinelle_autoban_window'] ?? 10);
@@ -76,7 +77,7 @@ switch ($action) {
 			} elseif (sbSettingsSave(array('sentinelle_mode' => $sb_mode, 'sentinelle_retention' => (string) $sb_days, 'sentinelle_trusted' => implode("\n", $sb_ranges),
 				'sentinelle_rules' => implode(',', $sb_rules), 'sentinelle_exclude' => implode("\n", $sb_exclude),
 				'sentinelle_alert_email' => $sb_alert_email, 'sentinelle_alert_level' => $sb_alert_level, 'sentinelle_digest' => $sb_digest,
-				'sentinelle_rate' => (string) $sb_rate, 'sentinelle_autoban' => (string) $sb_ab, 'sentinelle_autoban_window' => (string) $sb_abw, 'sentinelle_autoban_duration' => (string) $sb_abd))) {
+				'sentinelle_integrity_auto' => $sb_integrity_auto, 'sentinelle_rate' => (string) $sb_rate, 'sentinelle_autoban' => (string) $sb_ab, 'sentinelle_autoban_window' => (string) $sb_abw, 'sentinelle_autoban_duration' => (string) $sb_abd))) {
 				$sb_msg_valid = 'Réglages de Sentinelle enregistrés';
 			} else {
 				$sb_msg_error = 'Error: Write Error (EDIT)!';
@@ -124,6 +125,9 @@ switch ($action) {
 			$sbform->addOption($sb_txt, $sb_args);
 		}
 		$sbform->closeSelect('Récidive (deux bannissements automatiques en 30 jours) : durée multipliée par 30, au plus 90 jours.');
+		// Intégrité des fichiers
+		$sbform->addBreak('Intégrité des fichiers');
+		$sbform->addCheckbox('Analyse quotidienne', array(array('text' => 'Comparer chaque jour les fichiers à la version signée', 'name' => 'sentinelle_integrity_auto', 'checked' => sbSetting('sentinelle_integrity_auto', '1') === '1' ? '1' : '0')), '', false, '<br />', "Lancée à la première visite de l'administration de la journée, après l'affichage de la page. Un écart déclenche un événement critique (et une alerte si elle est réglée).");
 		// Alertes par e-mail
 		$sbform->addBreak('Alertes par e-mail');
 		$sbform->addInput('text', 'Destinataire des alertes', array('name' => 'sentinelle_alert_email', 'value' => htmlspecialchars(sbSetting('sentinelle_alert_email')), 'placeholder' => 'securite@exemple.fr'), false, false, 'Vide : aucune alerte. Envoi par le SMTP de Contact > Paramètres.');
@@ -144,6 +148,23 @@ switch ($action) {
 		$sbsmarty->assign('sb_form_submit_value', 'Modifier');
 		$sbsmarty->assign('legend_add_edit', 'Réglages de Sentinelle');
 		$sbsmarty->assign('sb_sentinelle_rescue_path', basename(SBUIADMIN_PATH) . '/inc/admin/sentinelle-disabled');
+		break;
+
+	case 'integrity':
+		// --------------------------------
+		// --- Intégrité des fichiers (analyse à la demande : POST)
+		// --------------------------------
+		require_once(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'integrity.php');
+		if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+			@set_time_limit(120);
+			$sb_sum = sentinelle_integrity_run();
+			if ($sb_sum['error'] !== '') $sb_msg_error = 'Analyse impossible : ' . htmlspecialchars($sb_sum['error']);
+			elseif (array_sum(array_intersect_key($sb_sum['counts'], array('modified' => 1, 'added' => 1, 'upload' => 1)))) $sb_msg_error = 'Analyse terminée : des fichiers sont à vérifier';
+			else $sb_msg_valid = 'Analyse terminée : ' . (int) $sb_sum['checked'] . ' fichiers conformes à la version signée';
+		}
+		$sbsmarty->assign('sb_sentinelle_page', 'integrity');
+		$sbsmarty->assign('sb_integrity', json_decode(sbSetting('sentinelle_integrity'), true));
+		$sbsmarty->assign('sb_integrity_auto', sbSetting('sentinelle_integrity_auto', '1') === '1');
 		break;
 
 	case 'advisor':

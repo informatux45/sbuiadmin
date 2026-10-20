@@ -36,6 +36,9 @@
 - Rafales (requêtes/min par IP, compteurs dans datas/cache/sentinelle/) et
   bannissement automatique après N événements graves en M minutes (récidive :
   x30) : seulement en protection ; robots des moteurs vérifiés par DNS.
+- Intégrité (Sentinelle > Intégrité) : fichiers comparés à la liste signée de
+  la version installée (cache datas/cache/sentinelle/, signature revérifiée) ;
+  modifiés, PHP ajoutés, scripts dans upload/ ; analyse quotidienne en option.
 - Bloqué par erreur : créer le fichier vide backdoor/inc/admin/sentinelle-disabled.
 - Module tiers : sbSecurityEvent('type', 'info|warning|critical', 'détail',
   'logged|blocked|banned', 'identifiant') note un événement (sans effet si

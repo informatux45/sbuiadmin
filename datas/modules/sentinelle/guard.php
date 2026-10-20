@@ -27,6 +27,7 @@ function sentinelle_types() {
 		'dos'           => 'Rafale de requêtes',
 		'fake_bot'      => 'Faux robot',
 		'auto_ban'      => 'Bannissement automatique',
+		'integrity'     => 'Intégrité des fichiers',
 	) + sentinelle_rules();
 }
 
@@ -182,6 +183,7 @@ function sentinelle_guard($context) {
 	$context = $context === 'admin' ? 'admin' : 'front';
 	$GLOBALS['sentinelle_context'] = $context;
 	sentinelle_digest_maybe();
+	if ($context === 'admin') sentinelle_integrity_maybe();
 	if (sentinelle_is_trusted() || sentinelle_backoffice_user()) return;
 	// IP bannie (réglage délibéré : bloquée quel que soit le mode)
 	$ban = sentinelle_banned(sbClientIp());
@@ -520,6 +522,24 @@ function sentinelle_digest_maybe() {
 	if (function_exists('sbSettingsSave')) sbSettingsSave(array('sentinelle_digest_last' => $today));
 	register_shutdown_function('sentinelle_deferred', 'sentinelle_send_digest', array());
 	return true;
+}
+
+/** Analyse d'intégrité quotidienne (visite de l'administration, après la réponse) */
+function sentinelle_integrity_maybe() {
+	if (sbSetting('sentinelle_integrity_auto', '1') !== '1' || !defined('SBUIADMIN_PATH') || !is_dir((string) SBUIADMIN_PATH)) return false;
+	$today = date('Y-m-d');
+	if (sbSetting('sentinelle_integrity_last') === $today || !empty($GLOBALS['sentinelle_integrity_pending'])) return false;
+	$GLOBALS['sentinelle_integrity_pending'] = true;
+	if (function_exists('sbSettingsSave')) sbSettingsSave(array('sentinelle_integrity_last' => $today));
+	register_shutdown_function('sentinelle_deferred', 'sentinelle_integrity_deferred', array());
+	return true;
+}
+
+function sentinelle_integrity_deferred() {
+	sentinelle_finish_response();
+	@set_time_limit(120);
+	require_once __DIR__ . DIRECTORY_SEPARATOR . 'integrity.php';
+	sentinelle_integrity_run();
 }
 
 /** Événements depuis $since (gravité >= $level), les plus récents d'abord */

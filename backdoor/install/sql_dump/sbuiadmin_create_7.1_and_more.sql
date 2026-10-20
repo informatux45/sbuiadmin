@@ -719,7 +719,7 @@ INSERT INTO `<DB_PREFIX>sb_modules` (`name`, `version`, `db_version`, `installed
 ('slider', '1.0.0', '1.0.0', NOW()),
 ('tabbs', '1.0.1', '1.0.1', NOW()),
 ('table', '1.0.1', '1.0.1', NOW()),
-('sentinelle', '1.4.0', '1.4.0', NOW());
+('sentinelle', '1.5.0', '1.5.0', NOW());
 
 -- --------------------------------------------------------
 
