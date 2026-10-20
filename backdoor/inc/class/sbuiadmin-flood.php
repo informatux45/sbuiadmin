@@ -74,11 +74,9 @@ class flood extends sql {
     }
 
     public function quickIP() {
-        $ip = (empty ( $_SERVER ['HTTP_CLIENT_IP'] ) ? (empty ( $_SERVER ['HTTP_X_FORWARDED_FOR'] ) ? $_SERVER ['REMOTE_ADDR'] : $_SERVER ['HTTP_X_FORWARDED_FOR']) : $_SERVER ['HTTP_CLIENT_IP']);
-        // En-têtes choisis par le visiteur : ne garder que la première IP de
-        // la liste, et seulement si c'en est une (protège aussi l'URL ipstack).
-        $ip = trim(explode(',', $ip)[0]);
-        return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : $_SERVER ['REMOTE_ADDR'];
+        // REMOTE_ADDR ou adresse d'un proxy déclaré (inc/sbuiadmin-clientip.php)
+        $ip = function_exists('sbClientIp') ? sbClientIp() : (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+        return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : '0.0.0.0';
     }
     
     public function getUserInfosIPSTACK($user_ip) {
@@ -167,8 +165,7 @@ class flood extends sql {
     }
     
     public function insertNewIP($datas) {
-        // quickIP() lit Client-IP / X-Forwarded-For (choisis par le visiteur)
-        // et infos vient d'une API externe : tout échapper.
+        // infos vient d'une API externe : tout échapper.
         $ip = $this->escape_string($datas['ip']);
         $blockedtime = intval($datas['blockedtime']);
         $expirationtime = intval($datas['expirationtime']);

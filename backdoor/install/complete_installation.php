@@ -247,6 +247,8 @@
 											'flood_enabled'         => '0',
 											'flood_expiration'      => '86400',
 											'flood_login_delay'     => '4',
+											'proxy_mode'            => 'none',
+											'proxy_trusted'         => '',
 											'toast_duration'        => '7',
 											'pagebuilder_modules'   => '',
 											// Thème du site (ancien inc/admin/theme.txt)

@@ -15,6 +15,11 @@
 - Renommer backdoor/, puis mettre le même nom dans SBADMIN (sbconfig.php).
   Les mises à jour le conservent.
 
+### Proxy ou CDN (Cloudflare) devant le site
+- Utilisateurs > IP bloquées > Paramètres : Aucun (défaut, REMOTE_ADDR seule),
+  Cloudflare (plages intégrées) ou Autre proxy (adresses/CIDR de confiance).
+- Sans proxy déclaré, X-Forwarded-For / CF-Connecting-IP sont ignorés.
+
 ### Site dans un sous-dossier (ex. /new/)
 - Configuration > Générale > URL du site : https://exemple.fr/new/
 - .htaccess : ErrorDocument 404 /new/index.php?p=pages&id=404

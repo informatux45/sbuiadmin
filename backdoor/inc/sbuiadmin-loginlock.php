@@ -43,8 +43,9 @@ function sbLoginLockParams() {
 	);
 }
 
-/** Adresse du visiteur : REMOTE_ADDR seulement (les en-têtes X-Forwarded-For se falsifient) */
+/** Adresse du visiteur : REMOTE_ADDR, ou celle transmise par un proxy déclaré (sbClientIp) */
 function sbLoginLockIp() {
+	if (function_exists('sbClientIp')) return substr(sbClientIp(), 0, 45);
 	return isset($_SERVER['REMOTE_ADDR']) ? substr((string) $_SERVER['REMOTE_ADDR'], 0, 45) : '';
 }
 

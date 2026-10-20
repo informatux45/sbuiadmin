@@ -160,17 +160,20 @@ The administration folder is named `backdoor` by default. You can rename it afte
 
 ## 📝 Changelog
 
+**4.53**
+- Visitor IP address: proxy headers (X-Forwarded-For, CF-Connecting-IP) are only trusted from a declared proxy (Users > Blocked IPs > Settings: none, Cloudflare or custom list); IP blocking, login lock and logs could be bypassed or misdirected by forged headers
+
 **4.52**
 - Readme: Getting Started section (prerequisites, net and manual install, usage); zip extension now required by the installer; renaming the administration folder documented (help.txt, sbconfig.php)
 
 **4.51**
 - Module widgets: tiles can show a comparison line and a trend badge (favorable direction chooses the color), cards can be 4/6/8/12 columns wide (set by the widget or when adding it), scripts declared by widgets are loaded once
 
-**4.50**
-- Dashboard widgets shipped by modules: datas/modules/<name>/widgets/<key>.php (tile or card, optional .tpl, settings: text, number, select, yes/no), new "Module widget" type on the Dashboard page, hidden without the module's view right
-
 <details>
   <summary><strong>Older versions</strong></summary>
+
+**4.50**
+- Dashboard widgets shipped by modules: datas/modules/<name>/widgets/<key>.php (tile or card, optional .tpl, settings: text, number, select, yes/no), new "Module widget" type on the Dashboard page, hidden without the module's view right
 
 **4.49**
 - FAQ 1.0.1: missing ID cell in the questions table (columns were shifted); help text spacing under fields placed in an openRow() line

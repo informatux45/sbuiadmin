@@ -150,7 +150,7 @@ function sb2faCodeHtml($code, $intro) {
 	     . '<p>' . htmlspecialchars($intro) . '&nbsp;:</p>'
 	     . '<p style="font-size:28px;font-weight:bold;letter-spacing:6px;font-family:monospace;">' . $code . '</p>'
 	     . '<p>Ce code est valable ' . $minutes . '&nbsp;minutes.</p>'
-	     . '<p>Demande effectuée depuis l\'adresse IP ' . htmlspecialchars($_SERVER['REMOTE_ADDR']) . ' le ' . date('d/m/Y') . ' à ' . date('H:i') . '.<br>'
+	     . '<p>Demande effectuée depuis l\'adresse IP ' . htmlspecialchars(function_exists('sbClientIp') ? sbClientIp() : (string) $_SERVER['REMOTE_ADDR']) . ' le ' . date('d/m/Y') . ' à ' . date('H:i') . '.<br>'
 	     . 'Si vous n\'êtes pas à l\'origine de cette demande, changez immédiatement votre mot de passe et prévenez l\'administrateur du site.</p>';
 }
 
@@ -218,7 +218,7 @@ function sb2faGate() {
 	global $sbsmarty, $sbusers;
 
 	$username = (string)$_SESSION['sbuiadmin_user_name'];
-	$ip       = $_SERVER['REMOTE_ADDR'];
+	$ip       = function_exists('sbClientIp') ? sbClientIp() : (string) $_SERVER['REMOTE_ADDR'];
 	$pending  = (isset($_SESSION['sb2fa']) && $_SESSION['sb2fa']['user'] === $username) ? $_SESSION['sb2fa'] : null;
 	$error    = '';
 	$info     = '';

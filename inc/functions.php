@@ -516,18 +516,11 @@ if (!function_exists("shortcode_sbyear")) {
  */
 if (!function_exists("sbGetUserIP")) {
 	function sbGetUserIP() {
-		// Ordre inchangé (CloudFlare, Client-IP, X-Forwarded-For, REMOTE_ADDR),
-		// mais ces en-têtes sont choisis par le visiteur : seule la première IP
-		// VALIDE de chacun est retenue. Ne réécrit plus $_SERVER['REMOTE_ADDR'] :
-		// c'était la seule source fiable, et la fonction la rendait falsifiable
-		// pour tout le reste du code (logs, blocage des tentatives...).
-		foreach (array('HTTP_CF_CONNECTING_IP', 'HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR') as $header) {
-			if (!empty($_SERVER[$header])) {
-				$ip = trim(explode(',', $_SERVER[$header])[0]);
-				if (filter_var($ip, FILTER_VALIDATE_IP)) return $ip;
-			}
-		}
-		return $_SERVER['REMOTE_ADDR'];
+		// REMOTE_ADDR, ou l'adresse transmise par un proxy déclaré : les
+		// en-têtes CF-Connecting-IP / X-Forwarded-For sont choisis par le
+		// visiteur (SBADMIN/inc/sbuiadmin-clientip.php)
+		if (function_exists('sbClientIp')) return sbClientIp();
+		return (string) ($_SERVER['REMOTE_ADDR'] ?? '');
 	}
 }
 if (!function_exists("insert_sbGetUserIP")) {

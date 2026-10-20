@@ -187,7 +187,7 @@ if ( (!isset($_SESSION['sbuiadmin_user_name']) || $_SESSION['sbuiadmin_user_name
 			// --- User is no more active
 			$sbsmarty->assign('sbuiadmin_access_code', 'E4');
 			$sbuiadmin_type = 'error';
-			$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_USER_ERROR, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
+			$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_USER_ERROR, $sbuiadmin_user_name, sbLoginLockIp());
 			$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
 			// --- Destroy COOKIE (le jeton lui-même est déjà supprimé par
 			// verifyRememberToken(), à usage unique)
@@ -239,7 +239,7 @@ if (isset($_SESSION['sbuiadmin_user_name']) && $_SESSION['sbuiadmin_user_name'] 
 		// --- User is no more active
 		$sbsmarty->assign('sbuiadmin_access_code', 'E4');
 		$sbuiadmin_type = 'error';
-		$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_USER_ERROR, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
+		$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_USER_ERROR, $sbuiadmin_user_name, sbLoginLockIp());
 		$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
 		$sbsmarty->display('system/login.tpl');
 		exit;
@@ -269,7 +269,7 @@ if ((isset($_POST['username']) && $_POST['username']) && (isset($_POST['password
 	if (sbLoginLocked($sbuiadmin_user_name)) {
 		$sbsmarty->assign('sbuiadmin_access_code', 'E8');
 		$sbuiadmin_type = 'error';
-		$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_LOCKED, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
+		$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_LOCKED, $sbuiadmin_user_name, sbLoginLockIp());
 		$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
 		$sbsmarty->display('system/login.tpl');
 		exit;
@@ -279,7 +279,7 @@ if ((isset($_POST['username']) && $_POST['username']) && (isset($_POST['password
 	if (_AM_ALTCHA_LOGIN && !sbAltchaVerify()) {
 		$sbsmarty->assign('sbuiadmin_access_code', 'E1');
 		$sbuiadmin_type = 'error';
-		$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_CAPTCHA_ERROR, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]) . ' (' . $GLOBALS['sb_altcha_error'] . ')';
+		$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_CAPTCHA_ERROR, $sbuiadmin_user_name, sbLoginLockIp()) . ' (' . $GLOBALS['sb_altcha_error'] . ')';
 		$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
 		$sbsmarty->display('system/login.tpl');
 		exit;
@@ -291,7 +291,7 @@ if ((isset($_POST['username']) && $_POST['username']) && (isset($_POST['password
 			// --- User is no more active
 			$sbsmarty->assign('sbuiadmin_access_code', 'E4');
 			$sbuiadmin_type = 'error';
-			$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_USER_ERROR, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
+			$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_USER_ERROR, $sbuiadmin_user_name, sbLoginLockIp());
 			$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
 			$sbsmarty->display('system/login.tpl');
 			exit;
@@ -302,7 +302,7 @@ if ((isset($_POST['username']) && $_POST['username']) && (isset($_POST['password
 			sbLoginSucceeded($sbuiadmin_user_name);
 			// Update Access Log
 			$sbuiadmin_type = 'login';
-			$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_GRANTED, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
+			$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_GRANTED, $sbuiadmin_user_name, sbLoginLockIp());
 			$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
 			// Update LoginTime
 			$sbusers->updateAccessUserLogin($sbuiadmin_user_name, false, time());
@@ -335,7 +335,7 @@ if ((isset($_POST['username']) && $_POST['username']) && (isset($_POST['password
 		sbLoginFailed($sbuiadmin_user_name);
 		$sbsmarty->assign('sbuiadmin_access_code', 'E2');
 		$sbuiadmin_type = 'error';
-		$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_NOGRANTED, $_SERVER["REMOTE_ADDR"]);
+		$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_NOGRANTED, sbLoginLockIp());
 		$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event);
 		$sbsmarty->display('system/login.tpl');
 		exit;
@@ -348,7 +348,7 @@ if (!isset($_SESSION['sbuiadmin_user_name']) || $_SESSION['sbuiadmin_user_name']
 	// --- No session
 	$sbsmarty->assign('uiadmin_access_code', 'E3');
 	$sbuiadmin_type = 'error';
-	$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_MISSING, $_SERVER["REMOTE_ADDR"]);
+	$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_MISSING, sbLoginLockIp());
 	$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event);
 	$sbsmarty->display('system/login.tpl');
 	exit;

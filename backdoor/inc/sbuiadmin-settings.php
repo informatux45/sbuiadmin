@@ -132,6 +132,10 @@ function sbSettingsDefaults() {
 		'flood_enabled'         => '0',
 		'flood_expiration'      => '86400',
 		'flood_login_delay'     => '4',
+		// Proxy ou CDN devant le site (inc/sbuiadmin-clientip.php) : none,
+		// cloudflare ou custom, et proxys de confiance (adresses ou CIDR)
+		'proxy_mode'            => 'none',
+		'proxy_trusted'         => '',
 		'toast_duration'        => '7',
 		'pagebuilder_modules'   => '',
 		'theme'                 => '',
@@ -819,7 +823,7 @@ defined('_AM_MEDIAS_URL') or define('_AM_MEDIAS_URL', sbMediasUrl());
 
 // ALTCHA et blocage des connexions (4.45) : chargés ici aussi, un ancien
 // sbconfig.php ne les inclut pas (altcha.php en erreur, connexion bloquée)
-foreach (array('altcha', 'loginlock') as $sb_inc) {
+foreach (array('clientip', 'altcha', 'loginlock') as $sb_inc) {
 	if (is_file(__DIR__ . "/sbuiadmin-$sb_inc.php")) require_once(__DIR__ . "/sbuiadmin-$sb_inc.php");
 }
 unset($sb_inc);
