@@ -1,8 +1,8 @@
 # SBUIADMIN - Installation
 
 ### Prérequis
-- PHP 8.4+ (mysqli, sodium, openssl, curl, gd, mbstring, zip pour netinstall)
-- MySQL 5.7+ / MariaDB 10.3+, Apache + mod_rewrite
+- PHP 8.4+ (mysqli, sodium, openssl, curl, gd, mbstring, zip)
+- MySQL 5.7+ / MariaDB 10.3+, Apache + mod_rewrite + mod_headers
 
 ### Installation
 - Depuis GitHub : déposer seul sbuiadmin_netinstall.php dans le dossier
@@ -10,6 +10,10 @@
   extraction, puis l'assistant backdoor/ prend le relais.
 - Manuelle : décompresser sbuiadmin-X.Y.zip (releases GitHub), ouvrir backdoor/.
 - Clé d'installation : backdoor/install/installer/install-key.php
+
+### Renommer le dossier d'administration
+- Renommer backdoor/, puis mettre le même nom dans SBADMIN (sbconfig.php).
+  Les mises à jour le conservent.
 
 ### Site dans un sous-dossier (ex. /new/)
 - Configuration > Générale > URL du site : https://exemple.fr/new/

@@ -18,7 +18,7 @@ if (basename($_SERVER['PHP_SELF']) === 'sbconfig.php') {
 /*****************************************************************************/
 
 # Change the administrative panel folder name
-# Don't miss to change the htaccess file in administration
+# Rename the folder too; updates keep this name (see help.txt)
 defined('SBADMIN') OR define('SBADMIN', 'backdoor');
 
 # Mise à jour en cours depuis l'administration (Configuration > Mise à jour) :

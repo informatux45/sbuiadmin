@@ -24,13 +24,13 @@
 
 <p align="center">
   <a href="https://github.com/informatux45/sbuiadmin/releases/latest"><strong>Download</strong></a> ·
-  <a href="#-installation"><strong>Installation</strong></a> ·
+  <a href="#-getting-started"><strong>Getting Started</strong></a> ·
   <a href="#-features"><strong>Features</strong></a> ·
   <a href="#-changelog"><strong>Changelog</strong></a>
 </p>
 
 > [!NOTE]
-> Install SBUIADMIN with the single file `sbuiadmin_netinstall.php` from the [latest release](https://github.com/informatux45/sbuiadmin/releases/latest): it downloads the release, checks its signature and every file, then starts the installation wizard. Once installed, the core and each module are updated from the administration (**System › Updates**).
+> Install SBUIADMIN with the single file `sbuiadmin_netinstall.php` from the [latest release](https://github.com/informatux45/sbuiadmin/releases/latest): it downloads the release, checks its signature and every file, then starts the installation wizard. Once installed, the core and each module are updated from the administration (**Configuration › Mise à jour**).
 
 ---
 
@@ -86,9 +86,38 @@
 
 ---
 
-## 🚀 Installation
+## 🚀 Getting Started
 
-**Net install (recommended)**
+### Prerequisites
+
+| | Required | Recommended |
+|---|---|---|
+| **PHP** | 8.4 or later | 8.5 (tested version) |
+| **Extensions** | `mysqli`, `pdo_mysql` (installer), `session`, `json`, `mbstring`, `sodium`, `openssl`, `curl`, `gd`, `fileinfo`, `filter`, `hash`, `zip` | `exif`, `intl`, `iconv`, `dom`, `simplexml`, `mysqlnd`, `memcache`/`memcached` (login anti-flood) |
+| **Database** | MySQL 5.7+ or MariaDB 10.3+ | |
+| **Web server** | Apache with `mod_rewrite` and `mod_headers` | Apache 2.4 |
+| **php.ini** | `file_uploads = On` | `upload_max_filesize` ≥ 8M, `memory_limit` ≥ 128M, `display_errors = Off` |
+
+No Composer needed: `vendor/` is shipped in every release. The installation wizard checks all of the above before doing anything.
+
+> [!TIP]
+> The `.htaccess` files must be read: allow them in your virtual host.
+>
+> ```apache
+> <VirtualHost *:80>
+>     ServerName example.com
+>     DocumentRoot /var/www/example
+>     <Directory /var/www/example>
+>         AllowOverride All
+>         Require all granted
+>     </Directory>
+> </VirtualHost>
+> ```
+>
+> On nginx the `.htaccess` files are ignored: the equivalent rules are in `help.txt`.
+
+### Net install (recommended)
+
 1. Upload `sbuiadmin_netinstall.php` **alone** to the (empty) folder of your future site, then open it in your browser.
 2. Click *Install SBUIADMIN*: the latest release published on [GitHub Releases](https://github.com/informatux45/sbuiadmin/releases) is downloaded and **verified before anything is written**:
    - HTTPS with certificate verification, GitHub hosts only;
@@ -101,14 +130,38 @@
 
 Net install refuses to run where SBUIADMIN is already installed: delete it from your server.
 
-**Manual install**
-Download `sbuiadmin-X.Y.zip` from a release, check its SHA-256 against `sbuiadmin-release.json`, extract it into your site folder and open `backdoor/` in your browser.
+### Manual install
+
+1. Download `sbuiadmin-X.Y.zip` from a [release](https://github.com/informatux45/sbuiadmin/releases/latest) and check its SHA-256 against `sbuiadmin-release.json`.
+2. Extract it into your site folder.
+3. Make these paths writable by the web server: `upload/`, `backdoor/datas/cache/core/`, `backdoor/datas/cache/medias/`, `backdoor/datas/cache/tpls_c/`, `backdoor/install/installer/` and `backdoor/install.php`.
+4. Open `backdoor/` in your browser and follow the wizard.
+
+> [!IMPORTANT]
+> Do not install from a `git clone`: only release archives are signed and verified.
 
 Installing in a sub-folder: see `help.txt`.
+
+### Usage
+
+| URL | Purpose |
+|---|---|
+| `/` | Public site |
+| `/?lang=en` · `/?lang=fr` | Switch language (kept in session) |
+| `/backdoor/` | Administration (login, then two-factor authentication if enabled) |
+| `/backdoor/index.php?p=dashboard` | Dashboard: system widgets and widgets shipped by modules |
+| `/backdoor/index.php?p=<module>` | A module's administration (`pages`, `news`, `faq`, `users`, `menu`…) |
+| `/backdoor/index.php?p=update` | *Configuration › Mise à jour*: updates of the core and of each module (signed releases only) |
+| `/?maintenance=apercu` | Preview of the maintenance page (administrators only) |
+
+The administration folder is named `backdoor` by default. You can rename it after installation (e.g. to hide the login page): rename the folder, then set the same name in `SBADMIN` in `sbconfig.php`; updates keep it. Third-party modules live in `datas/modules/<name>/`; see `help.txt` for their structure, rights and dashboard widgets.
 
 ---
 
 ## 📝 Changelog
+
+**4.52**
+- Readme: Getting Started section (prerequisites, net and manual install, usage); zip extension now required by the installer; renaming the administration folder documented (help.txt, sbconfig.php)
 
 **4.51**
 - Module widgets: tiles can show a comparison line and a trend badge (favorable direction chooses the color), cards can be 4/6/8/12 columns wide (set by the widget or when adding it), scripts declared by widgets are loaded once
@@ -116,11 +169,11 @@ Installing in a sub-folder: see `help.txt`.
 **4.50**
 - Dashboard widgets shipped by modules: datas/modules/<name>/widgets/<key>.php (tile or card, optional .tpl, settings: text, number, select, yes/no), new "Module widget" type on the Dashboard page, hidden without the module's view right
 
-**4.49**
-- FAQ 1.0.1: missing ID cell in the questions table (columns were shifted); help text spacing under fields placed in an openRow() line
-
 <details>
   <summary><strong>Older versions</strong></summary>
+
+**4.49**
+- FAQ 1.0.1: missing ID cell in the questions table (columns were shifted); help text spacing under fields placed in an openRow() line
 
 **4.48**
 - Form class: the 'time' input type is accepted again by addInput() (HH:MM, same look as text fields); example Time field in the sandbox page (new sb_sandbox.hour column)

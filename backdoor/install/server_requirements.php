@@ -164,6 +164,7 @@
 			'fileinfo' => 'fileinfo (type réel des fichiers envoyés)',
 			'filter'   => 'filter',
 			'hash'     => 'hash',
+			'zip'      => 'Zip (installation réseau, mises à jour)',
 		) as $sb_name => $sb_label) {
 			$validations['ext_' . $sb_name] = array(true, $sb_label, $sb_ext($sb_name), lang_key('installed'), lang_key('not_installed'));
 		}
@@ -172,7 +173,6 @@
 		foreach (array(
 			'mysqlnd'  => 'mysqlnd (pilote MySQL natif)',
 			'exif'     => 'EXIF (orientation des photos)',
-			'zip'      => 'Zip (mise à jour automatique)',
 			'intl'     => 'intl (dates et tri localisés)',
 			'iconv'    => 'iconv (conversions de jeux de caractères)',
 			'dom'      => 'DOM (sitemap, Page Builder)',
