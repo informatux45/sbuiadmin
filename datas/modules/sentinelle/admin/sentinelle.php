@@ -62,7 +62,13 @@ switch ($action) {
 			$sb_ab = (int) ($_POST['sentinelle_autoban'] ?? 10);
 			$sb_abw = (int) ($_POST['sentinelle_autoban_window'] ?? 10);
 			$sb_abd = (int) ($_POST['sentinelle_autoban_duration'] ?? 86400);
-			if ($sb_rate !== 0 && ($sb_rate < 20 || $sb_rate > 10000)) {
+			$sb_404 = (int) ($_POST['sentinelle_404'] ?? 24);
+			$sb_geo = trim(is_string($_POST['sentinelle_geo_key'] ?? null) ? $_POST['sentinelle_geo_key'] : '');
+			if ($sb_404 !== 0 && ($sb_404 < 5 || $sb_404 > 100000)) {
+				$sb_msg_error = 'Balayage (404) : de 5 à 100 000 par heure (0 = inactif). Rien n\'a été enregistré.';
+			} elseif ($sb_geo !== '' && !preg_match('/^[A-Za-z0-9]{8,64}$/', $sb_geo)) {
+				$sb_msg_error = 'Clé ipstack : caractères inattendus. Rien n\'a été enregistré.';
+			} elseif ($sb_rate !== 0 && ($sb_rate < 20 || $sb_rate > 10000)) {
 				$sb_msg_error = 'Rafales : de 20 à 10 000 requêtes par minute (0 = inactif). Rien n\'a été enregistré.';
 			} elseif ($sb_ab < 0 || $sb_ab > 1000 || $sb_abw < 1 || $sb_abw > 1440 || !in_array($sb_abd, array(3600, 86400, 604800, 2592000), true)) {
 				$sb_msg_error = 'Bannissement automatique : réglages invalides. Rien n\'a été enregistré.';
@@ -77,7 +83,8 @@ switch ($action) {
 			} elseif (sbSettingsSave(array('sentinelle_mode' => $sb_mode, 'sentinelle_retention' => (string) $sb_days, 'sentinelle_trusted' => implode("\n", $sb_ranges),
 				'sentinelle_rules' => implode(',', $sb_rules), 'sentinelle_exclude' => implode("\n", $sb_exclude),
 				'sentinelle_alert_email' => $sb_alert_email, 'sentinelle_alert_level' => $sb_alert_level, 'sentinelle_digest' => $sb_digest,
-				'sentinelle_integrity_auto' => $sb_integrity_auto, 'sentinelle_rate' => (string) $sb_rate, 'sentinelle_autoban' => (string) $sb_ab, 'sentinelle_autoban_window' => (string) $sb_abw, 'sentinelle_autoban_duration' => (string) $sb_abd))) {
+				'sentinelle_integrity_auto' => $sb_integrity_auto, 'sentinelle_rate' => (string) $sb_rate, 'sentinelle_autoban' => (string) $sb_ab, 'sentinelle_autoban_window' => (string) $sb_abw, 'sentinelle_autoban_duration' => (string) $sb_abd,
+				'sentinelle_404' => (string) $sb_404, 'sentinelle_geo_key' => $sb_geo))) {
 				$sb_msg_valid = 'Réglages de Sentinelle enregistrés';
 			} else {
 				$sb_msg_error = 'Error: Write Error (EDIT)!';
@@ -125,6 +132,10 @@ switch ($action) {
 			$sbform->addOption($sb_txt, $sb_args);
 		}
 		$sbform->closeSelect('Récidive (deux bannissements automatiques en 30 jours) : durée multipliée par 30, au plus 90 jours.');
+		$sbform->addInput('text', 'Balayage de fichiers : pages introuvables (404) par IP et par heure', array('name' => 'sentinelle_404', 'value' => (string) (int) sbSetting('sentinelle_404', '24'), 'placeholder' => '24'), false, false,
+			'Au-delà : un événement « scanner » est noté (et compte pour le bannissement automatique en protection). 0 = inactif. Repère les scanners lents qui cherchent des fichiers un par un.');
+		$sbform->addInput('text', 'Clé API ipstack (pays des adresses, facultatif)', array('name' => 'sentinelle_geo_key', 'value' => htmlspecialchars(sbSetting('sentinelle_geo_key')), 'placeholder' => 'laisser vide'), false, false,
+			'Facultatif : le pays est déjà lu sans clé derrière Cloudflare (CF-IPCountry). Sinon, une clé ipstack gratuite remplit le pays des adresses (mis en cache 30 jours).');
 		// Intégrité des fichiers
 		$sbform->addBreak('Intégrité des fichiers');
 		$sbform->addCheckbox('Analyse quotidienne', array(array('text' => 'Comparer chaque jour les fichiers à la version signée', 'name' => 'sentinelle_integrity_auto', 'checked' => sbSetting('sentinelle_integrity_auto', '1') === '1' ? '1' : '0')), '', false, '<br />', "Lancée à la première visite de l'administration de la journée, après l'affichage de la page. Un écart déclenche un événement critique (et une alerte si elle est réglée).");
@@ -325,7 +336,7 @@ switch ($action) {
 		$sbsmarty->assign('sb_sentinelle_filter', $sb_filter);
 		$sbsmarty->assign('sb_sentinelle_mode', sentinelle_mode());
 		$sbsmarty->assign('sb_sentinelle_retention', sentinelle_retention());
-		$sbsmarty->assign('sb_table_header', array('Date', 'IP', 'Événement', 'Gravité', 'Action', 'Côté', 'Adresse', 'Détail', ''));
+		$sbsmarty->assign('sb_table_header', array('Date', 'IP', 'Pays', 'Événement', 'Gravité', 'Action', 'Côté', 'Adresse', 'Détail', ''));
 		break;
 }
 

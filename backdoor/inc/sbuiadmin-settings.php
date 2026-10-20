@@ -164,6 +164,10 @@ function sbSettingsDefaults() {
 		'sentinelle_integrity'  => '',
 		'sentinelle_integrity_last' => '',
 		'sentinelle_integrity_auto' => '1',
+		// balayage lent (nombre de 404 par IP et par heure, 0 = inactif) et
+		// clé API ipstack facultative pour le pays des adresses
+		'sentinelle_404'        => '24',
+		'sentinelle_geo_key'    => '',
 		'toast_duration'        => '7',
 		'pagebuilder_modules'   => '',
 		'theme'                 => '',

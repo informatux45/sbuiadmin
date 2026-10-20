@@ -15,8 +15,8 @@ return array(
 	'title'         => 'Sentinelle',
 	'icon'          => 'shield-halved', // Font Awesome (menu, carte Modules)
 	'description'   => "Sécurité du site : conseiller sécurité, intégrité des fichiers, filtres d'attaques (injection SQL, XSS, inclusion, scanners...), journal, IP bannies (dont bannissement automatique et anti-rafales), alertes par e-mail, IP de confiance, mode observation ou protection.",
-	'version'       => '1.5.0',
-	'requires_core' => '4.59',
+	'version'       => '1.6.0',
+	'requires_core' => '4.60',
 	'author'        => 'INFORMATUX',
 	'routes'        => array(),
 	'page_module'   => false,

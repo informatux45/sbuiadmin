@@ -128,6 +128,11 @@ function sentinelle_event($type, $severity = 'warning', $detail = '', $action = 
 	$ip       = substr(sbClientIp(), 0, 45);
 	$now      = date('Y-m-d H:i:s');
 
+	// Bannissement automatique : évalué AVANT le dédoublonnage du journal, pour
+	// qu'une rafale d'une même catégorie compte chaque tentative (un attaquant
+	// ne reste pas sous le seuil en répétant le même type en moins de 10 s).
+	sentinelle_autoban_maybe($ip, $type, $severity, $action);
+
 	if (!in_array($type, sentinelle_types_every(), true)) {
 		$since = date('Y-m-d H:i:s', time() - 10);
 		$stmt = mysqli_prepare($db, "SELECT id FROM `$table` WHERE ip = ? AND type = ? AND created_at >= ? LIMIT 1");
@@ -147,15 +152,15 @@ function sentinelle_event($type, $severity = 'warning', $detail = '', $action = 
 	$agent   = sentinelle_cut($_SERVER['HTTP_USER_AGENT'] ?? '', 255);
 	$user    = sentinelle_cut($user, 64);
 	$detail  = sentinelle_cut($detail, 2000);
-	$stmt = mysqli_prepare($db, "INSERT INTO `$table` (created_at, ip, type, severity, action, context, method, uri, user_agent, user, detail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+	$country = sentinelle_country($ip);
+	$stmt = mysqli_prepare($db, "INSERT INTO `$table` (created_at, ip, country, type, severity, action, context, method, uri, user_agent, user, detail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 	if (!$stmt) return false;
-	mysqli_stmt_bind_param($stmt, 'sssssssssss', $now, $ip, $type, $severity, $action, $context, $method, $uri, $agent, $user, $detail);
+	mysqli_stmt_bind_param($stmt, 'ssssssssssss', $now, $ip, $country, $type, $severity, $action, $context, $method, $uri, $agent, $user, $detail);
 	$ok = mysqli_stmt_execute($stmt);
 	mysqli_stmt_close($stmt);
 	// Purge des lignes trop anciennes, de temps en temps
 	if ($ok && mt_rand(1, 100) === 1) sentinelle_purge_old();
 	if ($ok) sentinelle_alert_maybe($severity);
-	if ($ok) sentinelle_autoban_maybe($ip, $type);
 	return $ok;
 }
 
@@ -192,6 +197,8 @@ function sentinelle_guard($context) {
 		sentinelle_event('ip_banned', 'info', 'Bannie : ' . $ban['ip_range'] . ($ban['reason'] !== '' ? ' (' . $ban['reason'] . ')' : ''), 'blocked');
 		sentinelle_block();
 	}
+	// Balayage lent : trop de 404 depuis une IP (surveillé en fin de requête)
+	if ($context === 'front') register_shutdown_function('sentinelle_404_watch', sbClientIp());
 	// Rafales de requêtes (une minute glissante par paliers)
 	$rate = (int) sbSetting('sentinelle_rate', '120');
 	if ($rate > 0) {
@@ -764,26 +771,83 @@ function sentinelle_autoban_duration($ip) {
 }
 
 /** Après un événement : bannir l'IP si elle dépasse le seuil ? */
-function sentinelle_autoban_maybe($ip, $type) {
-	$limit = (int) sbSetting('sentinelle_autoban', '10');
-	if ($limit <= 0 || sentinelle_mode() !== 'protect' || in_array($type, array('auto_ban', 'ip_banned', 'dos', 'fake_bot'), true)) return false;
-	if (!filter_var($ip, FILTER_VALIDATE_IP) || sentinelle_is_trusted($ip) || sentinelle_banned($ip)) return false;
+function sentinelle_autoban_serious($type, $severity, $action) {
+	return $action === 'blocked' || $severity === 'critical' || in_array($type, sentinelle_autoban_types(), true);
+}
+
+/** Nombre d'événements graves comptés pour $ip : compteur (chaque tentative), ou journal si le cache manque */
+function sentinelle_autoban_count($ip, $minutes) {
+	$n = sentinelle_counter('atk|' . $ip, $minutes * 60);
+	if ($n > 0) return $n;
+	// Cache indisponible : repli sur le journal (dédoublonné, donc minorant)
 	$dbt = sentinelle_db();
-	if (!$dbt) return false;
+	if (!$dbt) return 0;
 	list($db, $table) = $dbt;
-	$minutes = max(1, min(1440, (int) sbSetting('sentinelle_autoban_window', '10')));
 	$since = date('Y-m-d H:i:s', time() - $minutes * 60);
 	$in = "'" . implode("','", sentinelle_autoban_types()) . "'";
 	$stmt = mysqli_prepare($db, "SELECT COUNT(*) FROM `$table` WHERE ip = ? AND created_at >= ? AND (action = 'blocked' OR severity = 'critical' OR type IN ($in))");
-	if (!$stmt) return false;
+	if (!$stmt) return 0;
 	mysqli_stmt_bind_param($stmt, 'ss', $ip, $since);
 	mysqli_stmt_execute($stmt);
-	mysqli_stmt_bind_result($stmt, $n);
+	mysqli_stmt_bind_result($stmt, $c);
 	mysqli_stmt_fetch($stmt);
 	mysqli_stmt_close($stmt);
-	if ((int) $n < $limit) return false;
+	return (int) $c;
+}
+
+function sentinelle_autoban_maybe($ip, $type, $severity = 'warning', $action = 'logged') {
+	$limit = (int) sbSetting('sentinelle_autoban', '10');
+	if ($limit <= 0 || sentinelle_mode() !== 'protect' || in_array($type, array('auto_ban', 'ip_banned', 'dos', 'fake_bot'), true)) return false;
+	if (!sentinelle_autoban_serious($type, $severity, $action)) return false;
+	if (!filter_var($ip, FILTER_VALIDATE_IP) || sentinelle_is_trusted($ip) || sentinelle_banned($ip)) return false;
+	$minutes = max(1, min(1440, (int) sbSetting('sentinelle_autoban_window', '10')));
+	$n = sentinelle_autoban_count($ip, $minutes);
+	if ($n < $limit) return false;
 	$duration = sentinelle_autoban_duration($ip);
 	if (sentinelle_ban_add($ip, $duration, 'Automatique : ' . (int) $n . ' événements en ' . $minutes . ' min', 'auto') !== '') return false;
 	sentinelle_event('auto_ban', 'critical', 'Bannie ' . ($duration >= 86400 ? round($duration / 86400) . ' jour(s)' : round($duration / 60) . ' min') . ' après ' . (int) $n . ' événements en ' . $minutes . ' min', 'banned');
 	return true;
+}
+
+// -----------------------------------------------------------------------
+// Pays de l'adresse (pour le journal) : en-tête du CDN/proxy (gratuit,
+// instantané), sinon API ipstack si une clé est réglée (en cache 30 jours)
+// -----------------------------------------------------------------------
+
+/** Code pays ISO à 2 lettres de $ip, ou '' */
+function sentinelle_country($ip) {
+	foreach (array('HTTP_CF_IPCOUNTRY', 'GEOIP_COUNTRY_CODE', 'HTTP_X_COUNTRY_CODE', 'HTTP_X_GEO_COUNTRY') as $h) {
+		$c = strtoupper(trim((string) ($_SERVER[$h] ?? '')));
+		if (preg_match('/^[A-Z]{2}$/', $c) && !in_array($c, array('XX', 'T1'), true)) return $c;
+	}
+	if (!filter_var($ip, FILTER_VALIDATE_IP)) return '';
+	$cached = sentinelle_cache_get('geo|' . $ip, 30 * 86400);
+	if ($cached !== '') return $cached === '-' ? '' : $cached;
+	$key = sbSetting('sentinelle_geo_key');
+	if ($key === '' || !function_exists('curl_init')) return '';
+	$c = '';
+	try {
+		$ch = curl_init('https://api.ipstack.com/' . rawurlencode($ip) . '?access_key=' . rawurlencode($key) . '&fields=country_code&output=json');
+		curl_setopt_array($ch, array(CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 2, CURLOPT_CONNECTTIMEOUT => 2, CURLOPT_SSL_VERIFYPEER => true));
+		$r = json_decode((string) curl_exec($ch), true);
+		if (is_array($r) && preg_match('/^[A-Za-z]{2}$/', (string) ($r['country_code'] ?? ''))) $c = strtoupper($r['country_code']);
+	} catch (Throwable $e) {
+		$c = '';
+	}
+	sentinelle_cache_set('geo|' . $ip, $c === '' ? '-' : $c);
+	return $c;
+}
+
+/**
+ * Fin de requête : si c'est un 404, compte les 404 de l'IP sur une heure ;
+ * au seuil (sentinelle_404), un événement « scanner » est noté une fois
+ * (et le bannissement automatique s'applique en mode protection).
+ */
+function sentinelle_404_watch($ip, $code = null) {
+	$code = $code === null ? http_response_code() : $code;
+	if ($code !== 404) return;
+	$limit = (int) sbSetting('sentinelle_404', '24');
+	if ($limit <= 0 || !filter_var($ip, FILTER_VALIDATE_IP) || sentinelle_is_trusted($ip)) return;
+	$n = sentinelle_counter('404|' . $ip, 3600);
+	if ($n === $limit) sentinelle_event('scanner', 'warning', $n . ' pages introuvables (404) en une heure : balayage de fichiers', 'logged');
 }

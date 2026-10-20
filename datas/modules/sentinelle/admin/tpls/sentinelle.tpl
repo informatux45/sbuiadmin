@@ -269,6 +269,7 @@
 								<tr class="data-row">
 									<td data-sort-value="{$log.created_at|escape}">{$log.created_at|date_format:"%d.%m.%Y %H:%M:%S"}</td>
 									<td><a href="{$module_url}&ip={$log.ip|escape:'url'}&days=all">{$log.ip|escape}</a></td>
+									<td>{if $log.country}{$log.country|escape}{else}—{/if}</td>
 									<td>{$log.type_label|escape}{if $log.user} <small>({$log.user|escape})</small>{/if}</td>
 									<td><span class="badge {if $log.severity == 'critical'}danger{elseif $log.severity == 'warning'}warning{else}info{/if}">{if $log.severity == 'critical'}critique{elseif $log.severity == 'warning'}alerte{else}info{/if}</span></td>
 									<td>{if $log.action == 'banned'}IP bannie{elseif $log.action == 'blocked'}bloqué{else}noté{/if}</td>

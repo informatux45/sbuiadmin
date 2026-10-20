@@ -659,6 +659,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_sentinelle_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `created_at` datetime NOT NULL,
   `ip` varchar(45) NOT NULL DEFAULT '',
+  `country` varchar(2) NOT NULL DEFAULT '',
   `type` varchar(32) NOT NULL DEFAULT '',
   `severity` varchar(10) NOT NULL DEFAULT 'warning' COMMENT 'info, warning, critical',
   `action` varchar(10) NOT NULL DEFAULT 'logged' COMMENT 'logged, blocked, banned',
@@ -719,7 +720,7 @@ INSERT INTO `<DB_PREFIX>sb_modules` (`name`, `version`, `db_version`, `installed
 ('slider', '1.0.0', '1.0.0', NOW()),
 ('tabbs', '1.0.1', '1.0.1', NOW()),
 ('table', '1.0.1', '1.0.1', NOW()),
-('sentinelle', '1.5.0', '1.5.0', NOW());
+('sentinelle', '1.6.0', '1.6.0', NOW());
 
 -- --------------------------------------------------------
 
