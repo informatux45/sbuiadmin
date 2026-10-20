@@ -57,7 +57,15 @@ switch ($action) {
 			$sb_alert_email = trim(is_string($_POST['sentinelle_alert_email'] ?? null) ? $_POST['sentinelle_alert_email'] : '');
 			$sb_alert_level = in_array($_POST['sentinelle_alert_level'] ?? '', array('off', 'warning', 'critical'), true) ? $_POST['sentinelle_alert_level'] : 'critical';
 			$sb_digest = ($_POST['sentinelle_digest'] ?? '') === 'on' ? '1' : '0';
-			if ($sb_alert_email !== '' && !filter_var($sb_alert_email, FILTER_VALIDATE_EMAIL)) {
+			$sb_rate = (int) ($_POST['sentinelle_rate'] ?? 120);
+			$sb_ab = (int) ($_POST['sentinelle_autoban'] ?? 10);
+			$sb_abw = (int) ($_POST['sentinelle_autoban_window'] ?? 10);
+			$sb_abd = (int) ($_POST['sentinelle_autoban_duration'] ?? 86400);
+			if ($sb_rate !== 0 && ($sb_rate < 20 || $sb_rate > 10000)) {
+				$sb_msg_error = 'Rafales : de 20 à 10 000 requêtes par minute (0 = inactif). Rien n\'a été enregistré.';
+			} elseif ($sb_ab < 0 || $sb_ab > 1000 || $sb_abw < 1 || $sb_abw > 1440 || !in_array($sb_abd, array(3600, 86400, 604800, 2592000), true)) {
+				$sb_msg_error = 'Bannissement automatique : réglages invalides. Rien n\'a été enregistré.';
+			} elseif ($sb_alert_email !== '' && !filter_var($sb_alert_email, FILTER_VALIDATE_EMAIL)) {
 				$sb_msg_error = 'Alertes : adresse e-mail invalide. Rien n\'a été enregistré.';
 			} elseif ($sb_exclude_bad) {
 				$sb_msg_error = 'Paramètres exclus : nom invalide (' . htmlspecialchars(implode(', ', array_slice($sb_exclude_bad, 0, 5))) . '). Rien n\'a été enregistré.';
@@ -67,7 +75,8 @@ switch ($action) {
 				$sb_msg_error = 'Conservation du journal : de 1 à 3650 jours. Rien n\'a été enregistré.';
 			} elseif (sbSettingsSave(array('sentinelle_mode' => $sb_mode, 'sentinelle_retention' => (string) $sb_days, 'sentinelle_trusted' => implode("\n", $sb_ranges),
 				'sentinelle_rules' => implode(',', $sb_rules), 'sentinelle_exclude' => implode("\n", $sb_exclude),
-				'sentinelle_alert_email' => $sb_alert_email, 'sentinelle_alert_level' => $sb_alert_level, 'sentinelle_digest' => $sb_digest))) {
+				'sentinelle_alert_email' => $sb_alert_email, 'sentinelle_alert_level' => $sb_alert_level, 'sentinelle_digest' => $sb_digest,
+				'sentinelle_rate' => (string) $sb_rate, 'sentinelle_autoban' => (string) $sb_ab, 'sentinelle_autoban_window' => (string) $sb_abw, 'sentinelle_autoban_duration' => (string) $sb_abd))) {
 				$sb_msg_valid = 'Réglages de Sentinelle enregistrés';
 			} else {
 				$sb_msg_error = 'Error: Write Error (EDIT)!';
@@ -101,6 +110,20 @@ switch ($action) {
 		}
 		$sbform->addTextarea('Paramètres jamais inspectés', htmlspecialchars(implode("\n", array_keys(sentinelle_excluded()))), array('name' => 'sentinelle_exclude', 'rows' => '3', 'placeholder' => 'message'),
 			false, "Nom d'un champ ou d'un paramètre d'adresse par ligne (ex. un champ de formulaire qui accepte du code). Les mots de passe, jetons et secrets ne sont jamais inspectés. Les administrateurs connectés et les IP de confiance ne sont pas filtrés.");
+		// Rafales et bannissement automatique
+		$sbform->addBreak('Rafales et bannissement automatique');
+		$sbform->addInput('text', 'Requêtes par minute et par IP', array('name' => 'sentinelle_rate', 'value' => (string) (int) sbSetting('sentinelle_rate', '120'), 'placeholder' => '120'), false, false,
+			'Au-delà : rafale notée, et en protection IP bannie automatiquement. 0 = inactif. Les robots des moteurs (Google, Bing...) vérifiés par leur DNS ne sont pas comptés.');
+		$sbform->addInput('text', 'Bannir après (événements graves)', array('name' => 'sentinelle_autoban', 'value' => (string) (int) sbSetting('sentinelle_autoban', '10'), 'placeholder' => '10'), false, false,
+			'En protection : attaques bloquées, événements critiques, échecs de connexion, scanners... depuis une même IP. 0 = jamais. Les IP de confiance ne sont jamais bannies.');
+		$sbform->addInput('text', 'Sur une durée de (minutes)', array('name' => 'sentinelle_autoban_window', 'value' => (string) (int) sbSetting('sentinelle_autoban_window', '10'), 'placeholder' => '10'), false, false, '');
+		$sbform->openSelect('Durée du bannissement automatique', array('name' => 'sentinelle_autoban_duration', 'id' => 'sentinelle_autoban_duration'));
+		foreach (array('3600' => '1 heure', '86400' => '24 heures', '604800' => '7 jours', '2592000' => '30 jours') as $sb_val => $sb_txt) {
+			$sb_args = array('value' => $sb_val);
+			if (sbSetting('sentinelle_autoban_duration', '86400') === (string) $sb_val) $sb_args['selected'] = '';
+			$sbform->addOption($sb_txt, $sb_args);
+		}
+		$sbform->closeSelect('Récidive (deux bannissements automatiques en 30 jours) : durée multipliée par 30, au plus 90 jours.');
 		// Alertes par e-mail
 		$sbform->addBreak('Alertes par e-mail');
 		$sbform->addInput('text', 'Destinataire des alertes', array('name' => 'sentinelle_alert_email', 'value' => htmlspecialchars(sbSetting('sentinelle_alert_email')), 'placeholder' => 'securite@exemple.fr'), false, false, 'Vide : aucune alerte. Envoi par le SMTP de Contact > Paramètres.');

@@ -33,6 +33,9 @@
   résumé quotidien, par le SMTP de Contact > Paramètres.
 - Conseiller (Sentinelle > Conseiller) : PHP, HTTPS et en-têtes, fichiers exposés,
   comptes, réglages ; score sur 100 (tuile « Score de sécurité » du dashboard).
+- Rafales (requêtes/min par IP, compteurs dans datas/cache/sentinelle/) et
+  bannissement automatique après N événements graves en M minutes (récidive :
+  x30) : seulement en protection ; robots des moteurs vérifiés par DNS.
 - Bloqué par erreur : créer le fichier vide backdoor/inc/admin/sentinelle-disabled.
 - Module tiers : sbSecurityEvent('type', 'info|warning|critical', 'détail',
   'logged|blocked|banned', 'identifiant') note un événement (sans effet si

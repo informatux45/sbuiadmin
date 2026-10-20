@@ -14,9 +14,9 @@ return array(
 	'name'          => 'sentinelle',
 	'title'         => 'Sentinelle',
 	'icon'          => 'shield-halved', // Font Awesome (menu, carte Modules)
-	'description'   => "Sécurité du site : conseiller sécurité, filtres d'attaques (injection SQL, XSS, inclusion, scanners...), journal, IP bannies, alertes par e-mail, IP de confiance, mode observation ou protection.",
-	'version'       => '1.3.0',
-	'requires_core' => '4.57',
+	'description'   => "Sécurité du site : conseiller sécurité, filtres d'attaques (injection SQL, XSS, inclusion, scanners...), journal, IP bannies (dont bannissement automatique et anti-rafales), alertes par e-mail, IP de confiance, mode observation ou protection.",
+	'version'       => '1.4.0',
+	'requires_core' => '4.58',
 	'author'        => 'INFORMATUX',
 	'routes'        => array(),
 	'page_module'   => false,

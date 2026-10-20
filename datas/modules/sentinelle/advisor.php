@@ -200,6 +200,10 @@ function sentinelle_advisor_checks(?array $probes = null, array $env = array()) 
 		'Ajoutez vos adresses fixes aux IP de confiance : vous ne risquez plus de vous bloquer vous-même.');
 	$add('sentinel_alerts', 'sentinel', 'Alertes par e-mail', filter_var($setting('sentinelle_alert_email'), FILTER_VALIDATE_EMAIL) && $setting('sentinelle_alert_level', 'critical') !== 'off' ? 'ok' : 'warn',
 		filter_var($setting('sentinelle_alert_email'), FILTER_VALIDATE_EMAIL) ? $setting('sentinelle_alert_email') : 'aucun destinataire', 'Indiquez un destinataire dans les Réglages : vous serez prévenu des attaques critiques.');
+	$rate = (int) $setting('sentinelle_rate', '120'); $ab = (int) $setting('sentinelle_autoban', '10');
+	$add('sentinel_autoban', 'sentinel', 'Anti-rafales et bannissement automatique', $rate > 0 && $ab > 0 ? 'ok' : 'warn',
+		($rate > 0 ? $rate . ' requêtes/min' : 'rafales non surveillées') . ' · ' . ($ab > 0 ? 'bannissement après ' . $ab . ' événements' : 'pas de bannissement automatique'),
+		'Réglages > Rafales et bannissement automatique : laissez-les actifs (ils ne bannissent qu\'en mode protection).');
 	$rescue = function_exists('sbSentinelleRescueFile') && is_file(sbSentinelleRescueFile());
 	$add('sentinel_rescue', 'sentinel', 'Fichier de secours absent', $rescue ? 'bad' : 'ok', $rescue ? 'présent : Sentinelle arrêtée' : 'absent',
 		'Supprimez ' . $admin . '/inc/admin/sentinelle-disabled : Sentinelle est arrêtée tant qu\'il existe.');

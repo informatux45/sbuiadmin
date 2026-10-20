@@ -65,20 +65,22 @@ switch($op) {
 				// --- Blocage temporaire : refus sans vérifier le mot de passe
 				$sbsmarty->assign('sbuiadmin_access_code', 'E5');
 				$sbuiadmin_type = 'fronterror';
-				$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_LOCKED, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
+				$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_LOCKED, $sbuiadmin_user_name, sbLoginLockIp());
 				$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
+				if (function_exists('sbSecurityEvent')) sbSecurityEvent('login_locked', 'warning', 'Espace membre : trop d\'échecs', 'blocked', $sbuiadmin_user_name);
 			} elseif ($sb_user_altcha && !sbAltchaVerify()) {
 				// --- ALTCHA, avant toute vérification du mot de passe
 				$sbsmarty->assign('sbuiadmin_access_code', 'E1');
 				$sbuiadmin_type = 'fronterror';
-				$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_CAPTCHA_ERROR, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]) . ' (' . $GLOBALS['sb_altcha_error'] . ')';
+				$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_CAPTCHA_ERROR, $sbuiadmin_user_name, sbLoginLockIp()) . ' (' . $GLOBALS['sb_altcha_error'] . ')';
 				$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
+				if (function_exists('sbSecurityEvent')) sbSecurityEvent('captcha_failed', 'warning', 'Espace membre : ' . (string) $GLOBALS['sb_altcha_error'], 'blocked', $sbuiadmin_user_name);
 			} elseif ($sbusers->login($sbuiadmin_user_name, $sbuiadmin_user_password)) {
 				if (!$sbusers->checkUserIsActive($sbuiadmin_user_name)) {
 					// --- User is no more active
 					$sbsmarty->assign('sbuiadmin_access_code', 'E4');
 					$sbuiadmin_type = 'fronterror';
-					$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_USER_ERROR, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
+					$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_USER_ERROR, $sbuiadmin_user_name, sbLoginLockIp());
 					$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
 				} else {
 					// ------------------
@@ -87,7 +89,7 @@ switch($op) {
 					sbLoginSucceeded($sbuiadmin_user_name);
 					// Update Access Log
 					$sbuiadmin_type = 'frontlogin';
-					$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_GRANTED, $sbuiadmin_user_name, $_SERVER["REMOTE_ADDR"]);
+					$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_GRANTED, $sbuiadmin_user_name, sbLoginLockIp());
 					$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
 					// Update LoginTime
 					$sbusers->updateAccessUserLogin($sbuiadmin_user_name, false, time());
@@ -104,8 +106,9 @@ switch($op) {
 				sbLoginFailed($sbuiadmin_user_name);
 				$sbsmarty->assign('sbuiadmin_access_code', 'E2');
 				$sbuiadmin_type = 'fronterror';
-				$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_NOGRANTED, $_SERVER["REMOTE_ADDR"]);
+				$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_NOGRANTED, sbLoginLockIp());
 				$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event);
+				if (function_exists('sbSecurityEvent')) sbSecurityEvent('login_failed', 'warning', 'Espace membre : identifiant ou mot de passe incorrect', 'logged', $sbuiadmin_user_name);
 			}
 		}
 		

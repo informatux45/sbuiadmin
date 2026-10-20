@@ -154,6 +154,12 @@ function sbSettingsDefaults() {
 		'sentinelle_digest_last' => '',
 		// dernier passage du conseiller (JSON : score, date, ok, warn, bad, unknown)
 		'sentinelle_advisor'    => '',
+		// rafales (requêtes par minute et par IP, 0 = inactif) et bannissement
+		// automatique (événements graves, fenêtre en minutes, durée en secondes)
+		'sentinelle_rate'       => '120',
+		'sentinelle_autoban'    => '10',
+		'sentinelle_autoban_window' => '10',
+		'sentinelle_autoban_duration' => '86400',
 		'toast_duration'        => '7',
 		'pagebuilder_modules'   => '',
 		'theme'                 => '',

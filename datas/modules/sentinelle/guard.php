@@ -24,6 +24,9 @@ function sentinelle_types() {
 		'ip_blocked'    => 'IP bloquée',
 		'flood'         => 'Anti-flood',
 		'ip_banned'     => 'IP bannie',
+		'dos'           => 'Rafale de requêtes',
+		'fake_bot'      => 'Faux robot',
+		'auto_ban'      => 'Bannissement automatique',
 	) + sentinelle_rules();
 }
 
@@ -151,6 +154,7 @@ function sentinelle_event($type, $severity = 'warning', $detail = '', $action = 
 	// Purge des lignes trop anciennes, de temps en temps
 	if ($ok && mt_rand(1, 100) === 1) sentinelle_purge_old();
 	if ($ok) sentinelle_alert_maybe($severity);
+	if ($ok) sentinelle_autoban_maybe($ip, $type);
 	return $ok;
 }
 
@@ -185,6 +189,24 @@ function sentinelle_guard($context) {
 		sentinelle_ban_hit((int) $ban['id']);
 		sentinelle_event('ip_banned', 'info', 'Bannie : ' . $ban['ip_range'] . ($ban['reason'] !== '' ? ' (' . $ban['reason'] . ')' : ''), 'blocked');
 		sentinelle_block();
+	}
+	// Rafales de requêtes (une minute glissante par paliers)
+	$rate = (int) sbSetting('sentinelle_rate', '120');
+	if ($rate > 0) {
+		$ip = sbClientIp();
+		$bot = sentinelle_bot_check($ip, (string) ($_SERVER['HTTP_USER_AGENT'] ?? ''));
+		if ($bot === false) sentinelle_event('fake_bot', 'warning', 'Se dit robot d\'un moteur, DNS non conforme : ' . sentinelle_excerpt((string) ($_SERVER['HTTP_USER_AGENT'] ?? '')), 'logged');
+		if ($bot !== true && sentinelle_counter('rate|' . $ip, 60) > $rate) {
+			$protect = sentinelle_mode() === 'protect';
+			sentinelle_event('dos', 'warning', 'Plus de ' . $rate . ' requêtes en une minute', $protect ? 'blocked' : 'logged');
+			if ($protect) {
+				$duration = sentinelle_autoban_duration($ip);
+				if (!sentinelle_banned($ip) && sentinelle_ban_add($ip, $duration, 'Automatique : plus de ' . $rate . ' requêtes par minute', 'auto') === '') {
+					sentinelle_event('auto_ban', 'critical', 'Bannie ' . ($duration >= 86400 ? round($duration / 86400) . ' jour(s)' : round($duration / 60) . ' min') . ' : plus de ' . $rate . ' requêtes par minute', 'banned');
+				}
+				sentinelle_block();
+			}
+		}
 	}
 	$hit = sentinelle_inspect($_SERVER, $_GET, $_POST, $_COOKIE, $_FILES, $context, sentinelle_excluded());
 	if (!$hit) return;
@@ -599,4 +621,149 @@ function sentinelle_send_digest() {
 		. ($total ? '<table cellpadding="6" cellspacing="0" border="1" style="border-collapse:collapse;font-family:sans-serif;font-size:13px"><tr style="background:#f1f5f9"><th>Événement</th><th>Gravité</th><th>Nombre</th><th>IP</th></tr>' . $lines . '</table>' : '<p>Aucun événement.</p>')
 		. '<p>Bannissements en cours : ' . count(sentinelle_bans_active()) . '.</p>';
 	return sentinelle_mail('résumé du ' . date('d/m/Y', time() - 86400), $html);
+}
+
+// -----------------------------------------------------------------------
+// Compteurs (rafales, robots vérifiés) : petits fichiers dans
+// datas/cache/sentinelle/ (aucun Memcache ni APCu requis)
+// -----------------------------------------------------------------------
+
+/** Dossier des compteurs (créé au besoin, interdit au web), ou '' */
+function sentinelle_cache_dir() {
+	static $dir = null;
+	if ($dir !== null) return $dir;
+	$base = (defined('SB_PATH') ? rtrim(SB_PATH, '/\\') : dirname(SBUIADMIN_PATH)) . '/datas/cache/sentinelle';
+	if (!is_dir($base)) @mkdir($base, 0755, true);
+	if (is_dir($base) && !is_file($base . '/.htaccess')) @file_put_contents($base . '/.htaccess', "Require all denied\n");
+	$dir = (is_dir($base) && is_writable($base)) ? $base : '';
+	return $dir;
+}
+
+/**
+ * Compte un passage : nombre de passages de $key dans la tranche de $window
+ * secondes en cours (0 si le compteur est indisponible)
+ */
+function sentinelle_counter($key, $window) {
+	$dir = sentinelle_cache_dir();
+	if ($dir === '') return 0;
+	$file = $dir . '/' . sha1($key) . '.cnt';
+	$slot = intdiv(time(), max(1, (int) $window));
+	$fh = @fopen($file, 'c+');
+	if (!$fh) return 0;
+	flock($fh, LOCK_EX);
+	$data = explode(' ', trim((string) stream_get_contents($fh)));
+	$n = (count($data) === 2 && (int) $data[0] === $slot) ? (int) $data[1] + 1 : 1;
+	ftruncate($fh, 0);
+	rewind($fh);
+	fwrite($fh, $slot . ' ' . $n);
+	flock($fh, LOCK_UN);
+	fclose($fh);
+	// Ménage : compteurs de plus d'un jour, de temps en temps
+	if (mt_rand(1, 500) === 1) foreach ((array) @glob($dir . '/*.cnt') as $f) if (@filemtime($f) < time() - 86400) @unlink($f);
+	return $n;
+}
+
+/** Valeur gardée $ttl secondes ('' si absente ou périmée) */
+function sentinelle_cache_get($key, $ttl) {
+	$dir = sentinelle_cache_dir();
+	$file = $dir === '' ? '' : $dir . '/' . sha1($key) . '.val';
+	if ($file === '' || !is_file($file) || @filemtime($file) < time() - $ttl) return '';
+	return (string) @file_get_contents($file);
+}
+
+function sentinelle_cache_set($key, $value) {
+	$dir = sentinelle_cache_dir();
+	if ($dir !== '') @file_put_contents($dir . '/' . sha1($key) . '.val', (string) $value, LOCK_EX);
+}
+
+/** Robots des moteurs : motif du navigateur => domaines de leur DNS inverse */
+function sentinelle_good_bots() {
+	return array(
+		'~googlebot|google-inspectiontool|adsbot-google|mediapartners-google~i' => array('.googlebot.com', '.google.com', '.googleusercontent.com'),
+		'~bingbot|msnbot|bingpreview~i' => array('.search.msn.com'),
+		'~applebot~i' => array('.applebot.apple.com'),
+		'~duckduckbot~i' => array('.duckduckgo.com'),
+		'~yandex(bot|images)~i' => array('.yandex.ru', '.yandex.net', '.yandex.com'),
+		'~qwantify|qwantbot~i' => array('.qwant.com'),
+	);
+}
+
+/**
+ * Robot d'un moteur de recherche ?
+ * @return bool|null true : vérifié (DNS inverse puis direct), false : se dit
+ *                   robot mais le DNS ne confirme pas, null : ne se dit pas robot
+ */
+function sentinelle_bot_check($ip, $agent, ?callable $rdns = null, ?callable $fdns = null) {
+	$domains = null;
+	foreach (sentinelle_good_bots() as $re => $d) if (preg_match($re, $agent)) { $domains = $d; break; }
+	if ($domains === null || !filter_var($ip, FILTER_VALIDATE_IP)) return null;
+	$cached = sentinelle_cache_get('bot|' . $ip, 86400);
+	if ($cached !== '') return $cached === '1';
+	$rdns = $rdns ?? function ($ip) { return @gethostbyaddr($ip); };
+	$fdns = $fdns ?? function ($host) {
+		$ips = array();
+		foreach ((array) @dns_get_record($host, DNS_A | DNS_AAAA) as $r) $ips[] = $r['ip'] ?? ($r['ipv6'] ?? '');
+		return $ips;
+	};
+	$host = strtolower((string) $rdns($ip));
+	$ok = false;
+	foreach ($domains as $d) {
+		if ($host !== '' && substr($host, -strlen($d)) === $d) {
+			foreach ((array) $fdns($host) as $a) if ($a !== '' && @inet_pton($a) === @inet_pton($ip)) { $ok = true; break 2; }
+		}
+	}
+	sentinelle_cache_set('bot|' . $ip, $ok ? '1' : '0');
+	return $ok;
+}
+
+// -----------------------------------------------------------------------
+// Bannissement automatique (mode protection) : trop d'événements graves
+// depuis une IP en peu de temps ; récidive = bannissement plus long
+// -----------------------------------------------------------------------
+
+/** Types comptés pour le bannissement automatique (en plus des événements bloqués ou critiques) */
+function sentinelle_autoban_types() {
+	return array('login_failed', 'twofa_failed', 'captcha_failed', 'login_locked', 'csrf_failed', 'scanner', 'bad_agent');
+}
+
+/** Durée d'un bannissement automatique pour $ip (récidive : x30, au plus 90 jours) */
+function sentinelle_autoban_duration($ip) {
+	$base = max(60, (int) sbSetting('sentinelle_autoban_duration', '86400'));
+	$dbt = sentinelle_db();
+	if (!$dbt) return $base;
+	list($db, $table) = $dbt;
+	$since = date('Y-m-d H:i:s', time() - 30 * 86400);
+	$stmt = mysqli_prepare($db, "SELECT COUNT(*) FROM `$table` WHERE ip = ? AND type = 'auto_ban' AND created_at >= ?");
+	if (!$stmt) return $base;
+	mysqli_stmt_bind_param($stmt, 'ss', $ip, $since);
+	mysqli_stmt_execute($stmt);
+	mysqli_stmt_bind_result($stmt, $n);
+	mysqli_stmt_fetch($stmt);
+	mysqli_stmt_close($stmt);
+	return (int) $n >= 2 ? min($base * 30, 90 * 86400) : $base;
+}
+
+/** Après un événement : bannir l'IP si elle dépasse le seuil ? */
+function sentinelle_autoban_maybe($ip, $type) {
+	$limit = (int) sbSetting('sentinelle_autoban', '10');
+	if ($limit <= 0 || sentinelle_mode() !== 'protect' || in_array($type, array('auto_ban', 'ip_banned', 'dos', 'fake_bot'), true)) return false;
+	if (!filter_var($ip, FILTER_VALIDATE_IP) || sentinelle_is_trusted($ip) || sentinelle_banned($ip)) return false;
+	$dbt = sentinelle_db();
+	if (!$dbt) return false;
+	list($db, $table) = $dbt;
+	$minutes = max(1, min(1440, (int) sbSetting('sentinelle_autoban_window', '10')));
+	$since = date('Y-m-d H:i:s', time() - $minutes * 60);
+	$in = "'" . implode("','", sentinelle_autoban_types()) . "'";
+	$stmt = mysqli_prepare($db, "SELECT COUNT(*) FROM `$table` WHERE ip = ? AND created_at >= ? AND (action = 'blocked' OR severity = 'critical' OR type IN ($in))");
+	if (!$stmt) return false;
+	mysqli_stmt_bind_param($stmt, 'ss', $ip, $since);
+	mysqli_stmt_execute($stmt);
+	mysqli_stmt_bind_result($stmt, $n);
+	mysqli_stmt_fetch($stmt);
+	mysqli_stmt_close($stmt);
+	if ((int) $n < $limit) return false;
+	$duration = sentinelle_autoban_duration($ip);
+	if (sentinelle_ban_add($ip, $duration, 'Automatique : ' . (int) $n . ' événements en ' . $minutes . ' min', 'auto') !== '') return false;
+	sentinelle_event('auto_ban', 'critical', 'Bannie ' . ($duration >= 86400 ? round($duration / 86400) . ' jour(s)' : round($duration / 60) . ' min') . ' après ' . (int) $n . ' événements en ' . $minutes . ' min', 'banned');
+	return true;
 }

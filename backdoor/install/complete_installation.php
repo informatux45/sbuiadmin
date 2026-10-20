@@ -257,6 +257,8 @@
 											'sentinelle_alert_email' => '',
 											'sentinelle_alert_level' => 'critical',
 											'sentinelle_digest'     => '0',
+											'sentinelle_rate'       => '120',
+											'sentinelle_autoban'    => '10',
 											'toast_duration'        => '7',
 											'pagebuilder_modules'   => '',
 											// Thème du site (ancien inc/admin/theme.txt)
