@@ -141,6 +141,10 @@ function sbSettingsDefaults() {
 		'sentinelle_mode'       => 'observe',
 		'sentinelle_retention'  => '90',
 		'sentinelle_trusted'    => '',
+		// filtres réglés autrement que « on » (regle=off|log, séparés par des virgules)
+		// et paramètres jamais inspectés (un par ligne)
+		'sentinelle_rules'      => '',
+		'sentinelle_exclude'    => '',
 		'toast_duration'        => '7',
 		'pagebuilder_modules'   => '',
 		'theme'                 => '',

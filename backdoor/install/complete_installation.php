@@ -252,6 +252,8 @@
 											'sentinelle_mode'       => 'observe',
 											'sentinelle_retention'  => '90',
 											'sentinelle_trusted'    => '',
+											'sentinelle_rules'      => '',
+											'sentinelle_exclude'    => '',
 											'toast_duration'        => '7',
 											'pagebuilder_modules'   => '',
 											// Thème du site (ancien inc/admin/theme.txt)

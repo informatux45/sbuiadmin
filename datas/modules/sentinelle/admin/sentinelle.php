@@ -42,11 +42,26 @@ switch ($action) {
 			$sb_mode = ($_POST['sentinelle_mode'] ?? '') === 'protect' ? 'protect' : 'observe';
 			$sb_days = (int) ($_POST['sentinelle_retention'] ?? 90);
 			list($sb_ranges, $sb_bad) = sbClientIpParseTrusted(is_string($_POST['sentinelle_trusted'] ?? null) ? $_POST['sentinelle_trusted'] : '');
-			if ($sb_bad) {
+			// Filtres : off / log / on (défaut on, non enregistré)
+			$sb_rules = array();
+			foreach (array_keys(sentinelle_rules()) as $sb_rule) {
+				$sb_val = $_POST['sentinelle_rule'][$sb_rule] ?? 'on';
+				if (in_array($sb_val, array('off', 'log'), true)) $sb_rules[] = $sb_rule . '=' . $sb_val;
+			}
+			$sb_exclude = array();
+			$sb_exclude_bad = array();
+			foreach (preg_split('/[\s,;]+/', is_string($_POST['sentinelle_exclude'] ?? null) ? $_POST['sentinelle_exclude'] : '') as $sb_name) {
+				if ($sb_name === '') continue;
+				if (preg_match('/^[A-Za-z0-9_\-\[\]]{1,64}$/', $sb_name)) $sb_exclude[$sb_name] = $sb_name; else $sb_exclude_bad[] = $sb_name;
+			}
+			if ($sb_exclude_bad) {
+				$sb_msg_error = 'Paramètres exclus : nom invalide (' . htmlspecialchars(implode(', ', array_slice($sb_exclude_bad, 0, 5))) . '). Rien n\'a été enregistré.';
+			} elseif ($sb_bad) {
 				$sb_msg_error = 'IP de confiance : adresse ou plage invalide (' . htmlspecialchars(implode(', ', array_slice($sb_bad, 0, 5))) . '). Rien n\'a été enregistré.';
 			} elseif ($sb_days < 1 || $sb_days > 3650) {
 				$sb_msg_error = 'Conservation du journal : de 1 à 3650 jours. Rien n\'a été enregistré.';
-			} elseif (sbSettingsSave(array('sentinelle_mode' => $sb_mode, 'sentinelle_retention' => (string) $sb_days, 'sentinelle_trusted' => implode("\n", $sb_ranges)))) {
+			} elseif (sbSettingsSave(array('sentinelle_mode' => $sb_mode, 'sentinelle_retention' => (string) $sb_days, 'sentinelle_trusted' => implode("\n", $sb_ranges),
+				'sentinelle_rules' => implode(',', $sb_rules), 'sentinelle_exclude' => implode("\n", $sb_exclude)))) {
 				$sb_msg_valid = 'Réglages de Sentinelle enregistrés';
 			} else {
 				$sb_msg_error = 'Error: Write Error (EDIT)!';
@@ -62,6 +77,24 @@ switch ($action) {
 		$sbform->addInput('text', 'Conservation du journal (jours)', array('name' => 'sentinelle_retention', 'value' => (string) sentinelle_retention(), 'placeholder' => '90'), true, false, 'Les lignes plus anciennes sont supprimées automatiquement.');
 		$sbform->addTextarea('IP de confiance', htmlspecialchars(implode("\n", sentinelle_trusted())), array('name' => 'sentinelle_trusted', 'rows' => '4', 'placeholder' => sbClientIp()),
 			false, 'Jamais bloquées par Sentinelle (vos connexions, votre bureau). Une adresse IPv4/IPv6 ou une plage CIDR par ligne. Votre adresse actuelle : <strong>' . htmlspecialchars(sbClientIp()) . '</strong>.');
+		// Filtres d'attaques
+		$sbform->addBreak('Filtres d\'attaques');
+		$sb_rule_set = array();
+		foreach (explode(',', sbSetting('sentinelle_rules')) as $sb_pair) {
+			$sb_kv = explode('=', trim($sb_pair), 2);
+			if (count($sb_kv) === 2) $sb_rule_set[$sb_kv[0]] = $sb_kv[1];
+		}
+		foreach (sentinelle_rules() as $sb_rule => $sb_label) {
+			$sbform->openSelect($sb_label, array('name' => 'sentinelle_rule[' . $sb_rule . ']', 'id' => 'sentinelle_rule_' . $sb_rule));
+			foreach (array('on' => 'Selon le mode (bloqué en protection)', 'log' => 'Noter seulement', 'off' => 'Inactif') as $sb_val => $sb_txt) {
+				$sb_args = array('value' => $sb_val);
+				if (($sb_rule_set[$sb_rule] ?? 'on') === $sb_val) $sb_args['selected'] = '';
+				$sbform->addOption($sb_txt, $sb_args);
+			}
+			$sbform->closeSelect();
+		}
+		$sbform->addTextarea('Paramètres jamais inspectés', htmlspecialchars(implode("\n", array_keys(sentinelle_excluded()))), array('name' => 'sentinelle_exclude', 'rows' => '3', 'placeholder' => 'message'),
+			false, "Nom d'un champ ou d'un paramètre d'adresse par ligne (ex. un champ de formulaire qui accepte du code). Les mots de passe, jetons et secrets ne sont jamais inspectés. Les administrateurs connectés et les IP de confiance ne sont pas filtrés.");
 		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => $formName));
 		$sbform->addInput('reset', '', array('value' => 'Reset'));
 		$sbform->closeForm();

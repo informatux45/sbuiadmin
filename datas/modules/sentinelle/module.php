@@ -14,9 +14,9 @@ return array(
 	'name'          => 'sentinelle',
 	'title'         => 'Sentinelle',
 	'icon'          => 'shield-halved', // Font Awesome (menu, carte Modules)
-	'description'   => "Sécurité du site : journal des attaques et des accès refusés, IP de confiance, mode observation ou protection.",
-	'version'       => '1.0.0',
-	'requires_core' => '4.54',
+	'description'   => "Sécurité du site : filtres d'attaques (injection SQL, XSS, inclusion, scanners...), journal des attaques et des accès refusés, IP de confiance, mode observation ou protection.",
+	'version'       => '1.1.0',
+	'requires_core' => '4.55',
 	'author'        => 'INFORMATUX',
 	'routes'        => array(),
 	'page_module'   => false,

@@ -23,6 +23,10 @@
 ### Sentinelle (module de sécurité)
 - Journal des refus (connexion, ALTCHA, 2FA, CSRF, droits, IP bloquée,
   anti-flood), mode observation ou protection, IP de confiance.
+- Filtres (injection SQL, XSS, ../, inclusion, caractère nul, variables
+  globales, scanners, outils d'attaque, fichiers dangereux) : chacun inactif,
+  noté seulement, ou selon le mode (403 en protection). Exemptés : IP de
+  confiance, administrateurs connectés, mots de passe/jetons, paramètres exclus.
 - Bloqué par erreur : créer le fichier vide backdoor/inc/admin/sentinelle-disabled.
 - Module tiers : sbSecurityEvent('type', 'info|warning|critical', 'détail',
   'logged|blocked|banned', 'identifiant') note un événement (sans effet si
