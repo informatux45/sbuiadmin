@@ -1291,6 +1291,12 @@ function sbGetMenuModule($param = '') {
 			include_once($path_modules . 'common.php');
 			// --- Get file list (array)
 			$modules_dir = sbGetFileList(BY_EXTENSION, "php", $path_modules, true);
+			// --- Contrôleurs livrés dans le dossier du module (datas/modules/<nom>/admin/)
+			$modules_names = array_map(function ($f) { return pathinfo($f, PATHINFO_FILENAME); }, (array) $modules_dir);
+			foreach (array_keys(sbModulesActive()) as $module_own) {
+				if (!in_array($module_own, $modules_names, true) && ($module_own_file = sbModuleAdminController($module_own)) !== null) $modules_dir[] = $module_own_file;
+			}
+			unset($modules_names, $module_own, $module_own_file);
 		break;
 	}
 

@@ -494,9 +494,22 @@ $sbsmarty->assign([
 if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_modules)) {
 	// Check if module or system
 	$sb_path_file_sys_mod = (file_exists("$sb_get_page.php")) ? '' : 'datas/modules/';
-	
+
 	// --- Control if PHP file exists
 	$controlIfPhpFileExists = $sb_path_file_sys_mod.$sb_get_page.".php";
+	// Contrôleur livré dans le dossier du module (datas/modules/<nom>/admin/),
+	// prioritaire sur backdoor/datas/modules/<nom>.php ; ses gabarits
+	// (admin/tpls/) passent avant ceux de backdoor/datas/modules/tpls/,
+	// jamais avant ceux du core
+	if ($sb_path_file_sys_mod !== '' && ($sb_mod_controller = sbModuleAdminController($sb_get_page)) !== null) {
+		$controlIfPhpFileExists = $sb_mod_controller;
+		$sb_mod_tpl_dir = sbModuleAdminTplDir($sb_get_page);
+		if ($sb_mod_tpl_dir !== null) {
+			$sb_tpl_dirs = $sbsmarty->getTemplateDir();
+			$sbsmarty->setTemplateDir(array('sys' => $sb_tpl_dirs['sys'], 'own' => $sb_mod_tpl_dir) + $sb_tpl_dirs);
+		}
+		unset($sb_mod_tpl_dir, $sb_tpl_dirs);
+	}
 	if (file_exists($controlIfPhpFileExists) && $sb_get_page != 'index') {
 		// Pages réservées aux administrateurs : refusées AVANT d'exécuter le
 		// contrôleur (le 404 affiché plus bas arrivait après : un compte non

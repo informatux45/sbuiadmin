@@ -183,6 +183,23 @@ function sbModuleAdminFile($name, $file) {
 	return is_file($path) ? $path : null;
 }
 
+/**
+ * Contrôleur d'administration livré dans le dossier du module
+ * (datas/modules/<nom>/admin/<nom>.php), pour un module installé ;
+ * null sinon (repli sur backdoor/datas/modules/<nom>.php)
+ */
+function sbModuleAdminController($name) {
+	if (!sbModuleValidName($name) || in_array($name, sbModuleCore(), true) || !sbModuleActive($name)) return null;
+	return sbModuleAdminFile($name, $name . '.php');
+}
+
+/** Gabarits d'administration du module (datas/modules/<nom>/admin/tpls/), ou null */
+function sbModuleAdminTplDir($name) {
+	if (sbModuleAdminController($name) === null) return null;
+	$dir = sbModulesDir() . $name . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'tpls' . DIRECTORY_SEPARATOR;
+	return is_dir($dir) ? $dir : null;
+}
+
 /** Langue d'administration des modules installés (constantes) */
 function sbModulesLoadAdminLang($lang) {
 	foreach (array_keys(sbModulesActive()) as $name) {

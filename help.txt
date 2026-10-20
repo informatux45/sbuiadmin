@@ -53,6 +53,9 @@ Chaque site a son sbdbconfig.php (sbdbconfig-<dossier>.php pour les suivants).
 - Supprimer en deux versions : N n'utilise plus, N+1 supprime.
 - Module : datas/modules/<nom>/module.php (version, core minimal),
   install.php (tables), migrations/<version>.php.
+- Admin du module : admin/<nom>.php (contrôleur) et admin/tpls/ (gabarits),
+  prioritaires sur backdoor/datas/modules/<nom>.php et tpls/ ; mêmes
+  contrôles (droits, CSRF). Les gabarits du core passent toujours avant.
 - Module propre à un site : 'origin' => 'site' dans module.php (jamais
   installé ni mis à jour depuis GitHub, fichiers hors mise à jour du core).
 - 'csrf_get' => array('duplicate', ...) : actions GET sensibles du module

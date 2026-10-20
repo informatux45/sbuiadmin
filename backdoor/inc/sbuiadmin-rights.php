@@ -99,7 +99,7 @@ function sbGetRightsGroups() {
 		if ($page == 'index' || $page == 'profile') continue;
 
 		$is_root = file_exists(_AM_SITE_DIR . $page . '.php');
-		$path    = $is_root ? _AM_SITE_DIR . $page . '.php' : _AM_SITE_DIR . 'datas/modules/' . $page . '.php';
+		$path    = $is_root ? _AM_SITE_DIR . $page . '.php' : (sbModuleAdminController($page) ?? _AM_SITE_DIR . 'datas/modules/' . $page . '.php');
 
 		if (!file_exists($path)) continue;
 
@@ -329,7 +329,7 @@ function sbRightsDefault($key, $user_id) {
 	if (sbRightsUserIsAdmin($user_id)) return true;
 	$page = explode(':', (string) $key)[0];
 	if ($page === 'index' || $page === 'profile') return true; // tableau de bord et fiche personnelle
-	return preg_match('/^[a-z][a-z0-9_]*$/', $page) && is_file(SBUIADMIN_PATH . '/datas/modules/' . $page . '.php');
+	return preg_match('/^[a-z][a-z0-9_]*$/', $page) && (is_file(SBUIADMIN_PATH . '/datas/modules/' . $page . '.php') || sbModuleAdminController($page) !== null);
 }
 
 function sbCheckRightRow($key, $action, $user_id) {
