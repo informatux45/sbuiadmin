@@ -257,6 +257,8 @@ switch($action) {
 			$country         = $sbsanitize->displayText($_POST['country'] ?? '', 'UTF-8', 1, 0);
 			$dob             = $sbsanitize->displayText($_POST['dob'] ?? '', 'UTF-8', 1, 0);
 			$color           = $sbsanitize->displayText($_POST['color'] ?? '', 'UTF-8', 1, 0);
+			// Heure HH:MM (type time), vide sinon
+			$hour            = preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', (string) ($_POST['hour'] ?? '')) ? $_POST['hour'] : '';
 			$tags            = sbGetTagifyDatas($_POST['tags'] ?? ''); // Tags
 			$pdf             = $sbsanitize->displayText($_POST['pdf'] ?? '', 'UTF-8', 1, 0);
 			$photo           = $sbsanitize->displayText($_POST['photo'] ?? '', 'UTF-8', 1, 0);
@@ -286,6 +288,7 @@ switch($action) {
 			$country_esc           = $sbsql->escape_string($country);
 			$dob_esc               = $sbsql->escape_string($dob);
 			$color_esc             = $sbsql->escape_string($color);
+			$hour_esc              = $sbsql->escape_string($hour);
 			$tags_esc              = $sbsql->escape_string($tags);
 			$pdf_esc                = $sbsql->escape_string($pdf);
 			$photo_esc              = $sbsql->escape_string($photo);
@@ -316,12 +319,12 @@ switch($action) {
 
 			// ADD or EDIT
 			if ($formType == 'add') {
-				$query = "INSERT INTO $table (active, yourname, montant, seo_url, country, dob, color, tags, pdf, photo, video, option_one, option_two, option_three, type, selection, comment, comment_editor1, comment_editor2, comment_editor3, page_builder_content, sort)
-						  VALUES ('$active','$yourname_esc','$montant_esc','$seo_url_esc','$country_esc','$dob_esc','$color_esc','$tags_esc','$pdf_esc','$photo_esc','$video_esc','$option_one','$option_two','$option_three','$type_esc','$selection_table_esc','$comment_esc','$comment_ckeditor1_esc','$comment_ckeditor2_esc','$comment_ckeditor3_esc','$page_builder_content_esc','0')";
+				$query = "INSERT INTO $table (active, yourname, montant, seo_url, country, dob, color, hour, tags, pdf, photo, video, option_one, option_two, option_three, type, selection, comment, comment_editor1, comment_editor2, comment_editor3, page_builder_content, sort)
+						  VALUES ('$active','$yourname_esc','$montant_esc','$seo_url_esc','$country_esc','$dob_esc','$color_esc','$hour_esc','$tags_esc','$pdf_esc','$photo_esc','$video_esc','$option_one','$option_two','$option_three','$type_esc','$selection_table_esc','$comment_esc','$comment_ckeditor1_esc','$comment_ckeditor2_esc','$comment_ckeditor3_esc','$page_builder_content_esc','0')";
 				$result_add = $sbsql->query($query);
 				if ($result_add) {
 					// --- Vider les champs du formulaire
-					$yourname = $montant = $seo_url = $country = $dob = $color = $tags = $pdf = $photo = $video = $selection_table = $comment = $comment_ckeditor1 = $comment_ckeditor2 = $comment_ckeditor3 = $page_builder_content = $type = '';
+					$yourname = $montant = $seo_url = $country = $dob = $color = $hour = $tags = $pdf = $photo = $video = $selection_table = $comment = $comment_ckeditor1 = $comment_ckeditor2 = $comment_ckeditor3 = $page_builder_content = $type = '';
 					$active = $option_one = $option_two = $option_three = '0';
 					// --- Message SUCCESS
 					$sb_msg_valid = 'Enregistrement ajouté avec succès';
@@ -340,6 +343,7 @@ switch($action) {
 											 ,country = '$country_esc'
 											 ,dob = '$dob_esc'
 											 ,color = '$color_esc'
+											 ,hour = '$hour_esc'
 											 ,tags = '$tags_esc'
 											 ,pdf = '$pdf_esc'
 											 ,photo = '$photo_esc'
@@ -375,7 +379,7 @@ switch($action) {
 		} else {
 			// Si AJOUT (First time)
 			// --- Vider les champs du formulaire
-			$yourname = $montant = $seo_url = $country = $dob = $color = $tags = $pdf = $photo = $video = $selection_table = $comment = $comment_ckeditor1 = $comment_ckeditor2 = $comment_ckeditor3 = $page_builder_content = $type = '';
+			$yourname = $montant = $seo_url = $country = $dob = $color = $hour = $tags = $pdf = $photo = $video = $selection_table = $comment = $comment_ckeditor1 = $comment_ckeditor2 = $comment_ckeditor3 = $page_builder_content = $type = '';
 			$active = $option_one = $option_two = $option_three = '0';
 		}
 		// --------------------------------
@@ -392,6 +396,7 @@ switch($action) {
 			$country           = sb_utf8_encode($assoc['country']);
 			$dob               = sb_utf8_encode($assoc['dob']);
 			$color             = sb_utf8_encode($assoc['color']);
+			$hour              = (string) ($assoc['hour'] ?? '');
 			// Tagify attend son "value" initial au format JSON
 			// ([{"value":"demo"}, ...]) pour re-précharger les tags - une
 			// simple chaîne "demo,exemple" fait planter son initialisation
@@ -490,6 +495,10 @@ switch($action) {
 		// ----------------------------		
 		$sbform->addColor ('Couleur (Color PICKER)', array('id' => 'color', 'name' => 'color', 'value' => $color), false);
 		$sbform->closeRow();
+		// ----------------------------
+		// --- Input TIME (heure HH:MM)
+		// ----------------------------
+		$sbform->addInput('time', 'Heure (Input TIME)', array('id' => 'hour', 'name' => 'hour', 'value' => $hour, 'icon' => 'clock', 'style' => 'width: 150px;'), false);
 		// -----------------------------------
 		// --- Caisses
 		// -----------------------------------

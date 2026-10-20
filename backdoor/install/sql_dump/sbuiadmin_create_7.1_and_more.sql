@@ -837,6 +837,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_sandbox` (
   `country` varchar(100) NOT NULL DEFAULT '',
   `dob` varchar(20) NOT NULL DEFAULT '',
   `color` varchar(20) NOT NULL DEFAULT '',
+  `hour` varchar(5) NOT NULL DEFAULT '',
   `tags` varchar(255) NOT NULL DEFAULT '',
   `pdf` varchar(255) NOT NULL DEFAULT '',
   `photo` varchar(255) NOT NULL DEFAULT '',
