@@ -172,6 +172,11 @@ function sbModCatalog() {
 		$row['remote_ok']  = $remote && version_compare($core, $remote['requires_core'], '>=');
 		$row['local_ok']   = $local && version_compare($core, $local['requires_core'], '>=');
 		$row['newer']      = $remote && $local && version_compare($remote['version'], $local['version'], '>');
+		// Fichiers plus récents que la base (posés à la main, archive complète
+		// décompressée) : migrations du module à passer sur place
+		$dbv = ($installed !== null && isset($installed[$name])) ? (string) (($installed[$name]['db_version'] ?? '') ?: ($installed[$name]['version'] ?? '')) : '';
+		$row['db_version'] = $dbv;
+		$row['db_behind']  = $local && $row['installed'] && $dbv !== '' && version_compare($local['version'], $dbv, '>');
 		// Deux cas : installé (Mettre à jour, Désinstaller), sinon Installer
 		// (téléchargé d'abord s'il est absent). Opération impossible pour
 		// l'instant : bouton grisé avec la raison
@@ -179,6 +184,8 @@ function sbModCatalog() {
 		$row['blocked']    = array();
 		$why = function ($req) use ($core) { return 'Demande le core ' . $req . ' (installé : ' . $core . ') : mettez d\'abord SBUIADMIN à jour'; };
 		if ($local && $row['installed']) {
+			if ($row['db_behind'] && $row['local_ok']) $row['actions'][] = 'migrate';
+			elseif ($row['db_behind']) $row['blocked']['migrate'] = $why($local['requires_core']);
 			if ($row['newer'] && $row['remote_ok']) $row['actions'][] = 'update';
 			elseif ($row['newer']) $row['blocked']['update'] = 'La version ' . $remote['version'] . ' ' . lcfirst($why($remote['requires_core']));
 			$row['actions'][] = 'uninstall';
@@ -194,6 +201,7 @@ function sbModCatalog() {
 		if (!$local) $row['state'] = 'absent';
 		elseif (!$row['installed']) $row['state'] = 'present';
 		elseif ($row['newer']) $row['state'] = 'outdated';
+		elseif ($row['db_behind']) $row['state'] = 'dbbehind';
 		else $row['state'] = 'installed';
 		$out[$name] = $row;
 	}
@@ -633,7 +641,7 @@ function sbModDeletePlan($name) {
 /** Contrôles communs : module connu, opération possible */
 function sbModCheck($name, $op) {
 	if (!sbModuleValidName($name) || in_array($name, sbModuleCore(), true)) throw new RuntimeException('Module refusé');
-	if (!in_array($op, array('install', 'update', 'uninstall', 'rollback'), true)) throw new RuntimeException('Opération inconnue');
+	if (!in_array($op, array('install', 'update', 'migrate', 'uninstall', 'rollback'), true)) throw new RuntimeException('Opération inconnue');
 	$cat = sbModCatalog();
 	if (!isset($cat[$name])) throw new RuntimeException('Module inconnu : ' . $name);
 	if (!in_array($op, $cat[$name]['actions'], true)) {
@@ -716,6 +724,12 @@ function sbModPlan($name, $op) {
 		}
 		unset($plan['replaces']);
 	}
+	if ($op === 'migrate') {
+		$plan['from'] = $row['db_version'];
+		$plan['version'] = $row['local'];
+		$plan['migrations'] = array_keys(sbUpdPendingMigrations($row['db_version'], $row['local'], sbModulesDir() . $name . '/migrations'));
+		$plan['info'][] = 'Base de données du module sauvegardée avant (chiffrée), opération annulable.';
+	}
 	if ($op === 'rollback') {
 		$rb = sbModRollbackInfo($name);
 		if (!$rb) throw new RuntimeException('Rien à annuler pour ce module');
@@ -762,6 +776,9 @@ function sbModRun($name, $op, array $opt = array()) {
 				break;
 			case 'rollback':
 				$out = sbModRunRollback($name);
+				break;
+			case 'migrate':
+				$out = sbModRunMigrate($name, $row);
 				break;
 			case 'install':
 				if ($row['present']) {
@@ -962,6 +979,32 @@ function sbModTakeoverUndo($name, $old, array $undo) {
 }
 
 /** Installer : tables (install.php), migrations des tables gardées, inscription */
+/**
+ * Mettre à jour la base : fichiers du module plus récents que sa version en
+ * base (copiés sans passer par GitHub). Migrations db_version → version des
+ * fichiers, après une sauvegarde chiffrée des tables du module (annulable).
+ */
+function sbModRunMigrate($name, array $row) {
+	$meta = sbModuleMeta($name);
+	if (!$meta || !version_compare(sbUpdInstalledVersion(), $meta['requires_core'], '>=')) throw new RuntimeException('Le module demande le core ' . ($meta['requires_core'] ?? '?'));
+	$from = $row['db_version'];
+	$to = $meta['version'];
+	if ($from === '' || !version_compare($to, $from, '>')) throw new RuntimeException('Base du module déjà à jour');
+	$plain = sbModBackup($name, array(), array(), true);
+	try {
+		$done = sbModMigrate($name, $from, $to);
+		sbModSaveRow($name, $to, $to, false);
+	} catch (Throwable $e) {
+		$msg = $e->getMessage() . ' : base du module remise';
+		try { sbModRestore($plain); @unlink($plain); } catch (Throwable $e2) { sbModKeepBackup($name, $plain); $msg = $e->getMessage() . ' ET retour en échec : sauvegarde gardée'; }
+		throw new RuntimeException($msg);
+	}
+	sbModKeepBackup($name, $plain, array('op' => 'migrate', 'label' => 'la mise à jour de la base ' . $from . ' → ' . $to, 'db' => true, 'files' => 0,
+		'after' => array('installed' => true, 'version' => $to), 'complete' => true));
+	sbUpdClearCaches();
+	return array('step' => sbModLabel($name) . ' : base mise à jour ' . $from . ' → ' . $to . ' (' . sbModN(count($done), 'migration', 'migrations') . ')', 'label' => 'base mise à jour ' . $to, 'from' => $from, 'to' => $to);
+}
+
 function sbModRunInstall($name, array $row, $wasAbsent = false) {
 	$meta = sbModuleMeta($name);
 	if (!version_compare(sbUpdInstalledVersion(), $meta['requires_core'], '>=')) throw new RuntimeException('Le module demande le core ' . $meta['requires_core']);

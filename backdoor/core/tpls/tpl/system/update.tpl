@@ -130,17 +130,18 @@
 										{if $mod.state == 'absent'}<span class="badge info">Sur GitHub</span>
 										{elseif $mod.state == 'present'}<span class="badge warning">Non installé</span>
 										{elseif $mod.state == 'outdated'}<span class="badge warning">Mise à jour disponible</span>
+										{elseif $mod.state == 'dbbehind'}<span class="badge warning" data-tooltip="Fichiers en {$mod.local|escape}, base en {$mod.db_version|escape}">Base à mettre à jour</span>
 										{else}<span class="badge success">Installé</span>{/if}
 										{if $mod.present && !$mod.local_ok}<br><small style="color:var(--warning)">core {$mod.local_requires|escape} requis</small>{/if}
 									</td>
 									<td style="white-space:nowrap">
 										{foreach $mod.actions as $op}
 											<button type="button" class="btn btn--sm {if $op == 'uninstall' || $op == 'rollback'}btn--ghost{else}btn--outline-primary{/if}" data-mod-action="plan" data-mod="{$mod.name|escape}" data-op="{$op|escape}"{if $op == 'rollback'} data-tooltip="Annuler {$mod.rollback.label|escape} du {$mod.rollback.date|escape}"{/if}{if !$sb_upd_ready && ($op == 'update' || !$mod.present)} disabled{/if}>
-												{if $op == 'update'}Mettre à jour{elseif $op == 'install'}Installer{elseif $op == 'uninstall'}Désinstaller{else}Annuler{/if}
+												{if $op == 'update'}Mettre à jour{elseif $op == 'migrate'}Mettre à jour la base{elseif $op == 'install'}Installer{elseif $op == 'uninstall'}Désinstaller{else}Annuler{/if}
 											</button>
 										{/foreach}
 										{foreach $mod.blocked as $op => $why}
-											<span data-tooltip="{$why|escape}"><button type="button" class="btn btn--sm btn--outline-primary" disabled>{if $op == 'update'}Mettre à jour{else}Installer{/if}</button></span>
+											<span data-tooltip="{$why|escape}"><button type="button" class="btn btn--sm btn--outline-primary" disabled>{if $op == 'update'}Mettre à jour{elseif $op == 'migrate'}Mettre à jour la base{else}Installer{/if}</button></span>
 										{/foreach}
 										{if isset($mod.blocked.install)}<br><small style="color:var(--warning);white-space:normal">{$mod.blocked.install|escape}</small>{/if}
 									</td>

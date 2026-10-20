@@ -254,6 +254,9 @@
 											'sentinelle_trusted'    => '',
 											'sentinelle_rules'      => '',
 											'sentinelle_exclude'    => '',
+											'sentinelle_alert_email' => '',
+											'sentinelle_alert_level' => 'critical',
+											'sentinelle_digest'     => '0',
 											'toast_duration'        => '7',
 											'pagebuilder_modules'   => '',
 											// Thème du site (ancien inc/admin/theme.txt)

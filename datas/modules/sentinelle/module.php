@@ -14,21 +14,24 @@ return array(
 	'name'          => 'sentinelle',
 	'title'         => 'Sentinelle',
 	'icon'          => 'shield-halved', // Font Awesome (menu, carte Modules)
-	'description'   => "Sécurité du site : filtres d'attaques (injection SQL, XSS, inclusion, scanners...), journal des attaques et des accès refusés, IP de confiance, mode observation ou protection.",
-	'version'       => '1.1.0',
-	'requires_core' => '4.55',
+	'description'   => "Sécurité du site : filtres d'attaques (injection SQL, XSS, inclusion, scanners...), journal, IP bannies, alertes par e-mail, IP de confiance, mode observation ou protection.",
+	'version'       => '1.2.0',
+	'requires_core' => '4.56',
 	'author'        => 'INFORMATUX',
 	'routes'        => array(),
 	'page_module'   => false,
 	'shortcodes'    => array(),
 	'tables'        => array(
 		'sb_sentinelle_log' => array('title' => 'Journal de sécurité', 'link' => 'index.php?p=sentinelle'),
+		'sb_sentinelle_ban' => array('title' => 'IP bannies', 'link' => 'index.php?p=sentinelle&a=bans'),
 	),
 	'files'         => array(),
 	'rights'        => array(
-		'submodules' => array('settings' => 'Réglages', 'purge' => 'Journal'),
-		'actions'    => array('settings' => 'edit', 'purge' => 'delete'),
+		'submodules' => array('settings' => 'Réglages', 'purge' => 'Journal', 'export' => 'Journal', 'bans' => 'IP bannies', 'banadd' => 'IP bannies', 'bandel' => 'IP bannies'),
+		'actions'    => array('settings' => 'edit', 'purge' => 'delete', 'export' => 'view', 'bans' => 'view', 'banadd' => 'add', 'bandel' => 'delete'),
 	),
+	// Bannir en un clic depuis le journal (lien GET) : jeton exigé
+	'csrf_get'      => array('banadd'),
 );
 
 ?>

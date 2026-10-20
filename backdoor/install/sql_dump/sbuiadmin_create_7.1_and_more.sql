@@ -673,6 +673,25 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_sentinelle_log` (
   KEY `ip_type` (`ip`, `type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Table structure for table `sb_sentinelle_ban`
+-- (module Sentinelle : adresses et plages bannies)
+--
+
+DROP TABLE IF EXISTS `<DB_PREFIX>sb_sentinelle_ban`;
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_sentinelle_ban` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `ip_range` varchar(50) NOT NULL DEFAULT '' COMMENT 'adresse ou plage CIDR',
+  `reason` varchar(255) NOT NULL DEFAULT '',
+  `source` varchar(10) NOT NULL DEFAULT 'manual' COMMENT 'manual, auto',
+  `created_at` datetime NOT NULL,
+  `expires_at` datetime DEFAULT NULL COMMENT 'NULL : permanent',
+  `hits` int(11) NOT NULL DEFAULT 0,
+  `last_hit` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `expires_at` (`expires_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- --------------------------------------------------------
 
 --
@@ -700,7 +719,7 @@ INSERT INTO `<DB_PREFIX>sb_modules` (`name`, `version`, `db_version`, `installed
 ('slider', '1.0.0', '1.0.0', NOW()),
 ('tabbs', '1.0.1', '1.0.1', NOW()),
 ('table', '1.0.1', '1.0.1', NOW()),
-('sentinelle', '1.1.0', '1.1.0', NOW());
+('sentinelle', '1.2.0', '1.2.0', NOW());
 
 -- --------------------------------------------------------
 

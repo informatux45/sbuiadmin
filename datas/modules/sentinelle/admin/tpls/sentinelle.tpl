@@ -11,7 +11,10 @@
 					<span class="eyebrow">Sécurité</span>
 					{if $sb_sentinelle_page == 'settings'}
 					<h1 class="hero-title">Réglages de Sentinelle</h1>
-					<p class="hero-sub">Mode de fonctionnement, conservation du journal et adresses de confiance.</p>
+					<p class="hero-sub">Mode de fonctionnement, filtres, alertes par e-mail et adresses de confiance.</p>
+					{elseif $sb_sentinelle_page == 'bans'}
+					<h1 class="hero-title">IP bannies</h1>
+					<p class="hero-sub">Adresses et plages refusées sur tout le site, quel que soit le mode.</p>
 					{else}
 					<h1 class="hero-title">Sentinelle</h1>
 					<p class="hero-sub">Journal des attaques et des accès refusés, sur le site et dans l'administration.</p>
@@ -20,11 +23,12 @@
 				<div class="hero-actions">
 					<div class="dd-wrap">
 						<button class="btn btn--outline-primary" data-dropdown aria-label="Actions Sentinelle">
-							{if $sb_sentinelle_page == 'settings'}Réglages{else}Journal de sécurité{/if}
+							{if $sb_sentinelle_page == 'settings'}Réglages{elseif $sb_sentinelle_page == 'bans'}IP bannies{else}Journal de sécurité{/if}
 							<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
 						</button>
 						<div class="dd-menu" role="menu">
-							<a class="dd-menu-item" href="{$module_url}"{if $sb_sentinelle_page != 'settings'} style="color:var(--primary);font-weight:600"{/if}>Journal de sécurité</a>
+							<a class="dd-menu-item" href="{$module_url}"{if $sb_sentinelle_page == 'log'} style="color:var(--primary);font-weight:600"{/if}>Journal de sécurité</a>
+							<a class="dd-menu-item" href="{$module_url}&a=bans"{if $sb_sentinelle_page == 'bans'} style="color:var(--primary);font-weight:600"{/if}>IP bannies</a>
 							<a class="dd-menu-item" href="{$module_url}&a=settings"{if $sb_sentinelle_page == 'settings'} style="color:var(--primary);font-weight:600"{/if}>Réglages</a>
 						</div>
 					</div>
@@ -63,6 +67,45 @@
 					</section>
 				</div>
 			</div>
+			{elseif $sb_sentinelle_page == 'bans'}
+			<div class="grid">
+				<section class="col-12 card">
+					<div class="card-head"><div class="card-title-wrap"><h2 class="card-title">Bannir une adresse ou une plage</h2></div></div>
+					<form method="post" action="{$module_url}&a=banadd" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+						<div><label class="field-label">Adresse ou plage CIDR</label><input class="input" type="text" name="ip" placeholder="203.0.113.7 ou 203.0.113.0/24" required style="min-width:240px"></div>
+						<div><label class="field-label">Durée</label>
+							<select name="d" class="select">
+								{foreach from=$sb_sentinelle_durations key=k item=label}<option value="{$k}"{if $k == '86400'} selected{/if}>{$label}</option>{/foreach}
+							</select>
+						</div>
+						<div style="flex:1;min-width:200px"><label class="field-label">Motif</label><input class="input" type="text" name="reason" maxlength="255" placeholder="Robot, tentative d'intrusion..."></div>
+						<button class="btn btn--primary" type="submit">Bannir</button>
+					</form>
+					<p class="help-block" style="margin-top:14px">Une IP bannie reçoit une page 403 partout sur le site. Les IP de confiance et votre propre adresse ({$sb_sentinelle_my_ip|escape}) ne peuvent pas être bannies ; plage au plus /16 en IPv4, /32 en IPv6.</p>
+				</section>
+				<section class="col-12 card">
+					<div class="card-head"><div class="card-title-wrap"><h2 class="card-title">Bannissements</h2></div></div>
+					<div style="overflow-x:auto">
+						<table class="data-table" id="dataTables-sentinelle-bans" data-datatable data-page-size="50">
+							<thead><tr>{foreach from=$sb_table_header item=header}<th>{$header} <span class="sort"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></th>{/foreach}</tr></thead>
+							<tbody>
+								{foreach from=$sb_sentinelle_bans item=ban}
+								<tr class="data-row"{if !$ban.active} style="opacity:.55"{/if}>
+									<td><strong>{$ban.ip_range|escape}</strong>{if !$ban.active} <span class="badge info">expiré</span>{/if}</td>
+									<td>{$ban.reason|escape}</td>
+									<td>{if $ban.source == 'auto'}automatique{else}manuel{/if}</td>
+									<td data-sort-value="{$ban.created_at|escape}">{$ban.created_at|date_format:"%d.%m.%Y %H:%M"}</td>
+									<td data-sort-value="{$ban.expires_at|default:'9999'|escape}">{if $ban.expires_at}{$ban.expires_at|date_format:"%d.%m.%Y %H:%M"}{else}<span class="badge danger">permanent</span>{/if}</td>
+									<td>{$ban.hits}{if $ban.last_hit} <small>(dernière {$ban.last_hit|date_format:"%d.%m %H:%M"})</small>{/if}</td>
+									<td><a class="btn--icon" data-confirm="Lever ce bannissement ?" href="{$module_url}&a=bandel&id={$ban.id}" data-tooltip="Lever"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></a></td>
+								</tr>
+								{/foreach}
+							</tbody>
+						</table>
+					</div>
+					<div class="data-foot" data-datatable-foot="dataTables-sentinelle-bans"><div class="data-foot-info" data-foot-info></div><div class="pager"></div></div>
+				</section>
+			</div>
 			{else}
 			<div class="grid">
 				<section class="col-12">
@@ -81,6 +124,11 @@
 							<div class="kpi-top"><div class="kpi-identity"><div class="kpi-icon info"><i class="fa-solid fa-network-wired"></i></div><div class="kpi-label">Adresses IP sur 24 h</div></div></div>
 							<div class="kpi-value">{$sb_sentinelle_kpi.ips}</div>
 							<div class="kpi-compare">journal conservé {$sb_sentinelle_retention} jours</div>
+						</div>
+						<div class="kpi-card">
+							<div class="kpi-top"><div class="kpi-identity"><div class="kpi-icon purple"><i class="fa-solid fa-ban"></i></div><div class="kpi-label">IP bannies</div></div></div>
+							<div class="kpi-value">{$sb_sentinelle_bans_count}</div>
+							<div class="kpi-compare"><a href="{$module_url}&a=bans">gérer les bannissements</a></div>
 						</div>
 					</div>
 				</section>
@@ -117,6 +165,7 @@
 						<input class="input" type="text" name="ip" value="{$sb_sentinelle_filter.ip|escape}" placeholder="Adresse IP" style="max-width:180px">
 						<button class="btn btn--primary" type="submit">Filtrer</button>
 						{if $sb_sentinelle_filter.type || $sb_sentinelle_filter.severity || $sb_sentinelle_filter.ip || $sb_sentinelle_filter.days != '7'}<a class="btn btn--outline-primary" href="{$module_url}">Effacer</a>{/if}
+						<a class="btn btn--outline-primary" href="{$module_url}&a=export&type={$sb_sentinelle_filter.type|escape:'url'}&severity={$sb_sentinelle_filter.severity|escape:'url'}&ip={$sb_sentinelle_filter.ip|escape:'url'}&days={$sb_sentinelle_filter.days|escape:'url'}">Exporter (CSV)</a>
 					</form>
 					<div class="data-toolbar">
 						<div class="data-toolbar-left">
@@ -146,7 +195,10 @@
 									<td>{if $log.context == 'admin'}admin{else}site{/if}</td>
 									<td style="max-width:260px;word-break:break-all"><small>{$log.method|escape} {$log.uri|escape}</small></td>
 									<td style="max-width:300px;word-break:break-word"><small>{$log.detail|escape}</small></td>
-									<td>
+									<td style="white-space:nowrap">
+										{if $log.ip != $sb_sentinelle_my_ip}<a class="btn--icon" data-confirm="Bannir {$log.ip|escape} pendant 24 heures ?" href="{$module_url}&a=banadd&ip={$log.ip|escape:'url'}&d=86400" data-tooltip="Bannir 24 h">
+											<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/></svg>
+										</a>{/if}
 										<a class="btn--icon" data-confirm="Supprimer cette ligne du journal ?" href="{$module_url}&a=del&id={$log.id}" data-tooltip="Supprimer">
 											<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
 										</a>

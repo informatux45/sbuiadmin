@@ -54,14 +54,20 @@ switch ($action) {
 				if ($sb_name === '') continue;
 				if (preg_match('/^[A-Za-z0-9_\-\[\]]{1,64}$/', $sb_name)) $sb_exclude[$sb_name] = $sb_name; else $sb_exclude_bad[] = $sb_name;
 			}
-			if ($sb_exclude_bad) {
+			$sb_alert_email = trim(is_string($_POST['sentinelle_alert_email'] ?? null) ? $_POST['sentinelle_alert_email'] : '');
+			$sb_alert_level = in_array($_POST['sentinelle_alert_level'] ?? '', array('off', 'warning', 'critical'), true) ? $_POST['sentinelle_alert_level'] : 'critical';
+			$sb_digest = ($_POST['sentinelle_digest'] ?? '') === 'on' ? '1' : '0';
+			if ($sb_alert_email !== '' && !filter_var($sb_alert_email, FILTER_VALIDATE_EMAIL)) {
+				$sb_msg_error = 'Alertes : adresse e-mail invalide. Rien n\'a été enregistré.';
+			} elseif ($sb_exclude_bad) {
 				$sb_msg_error = 'Paramètres exclus : nom invalide (' . htmlspecialchars(implode(', ', array_slice($sb_exclude_bad, 0, 5))) . '). Rien n\'a été enregistré.';
 			} elseif ($sb_bad) {
 				$sb_msg_error = 'IP de confiance : adresse ou plage invalide (' . htmlspecialchars(implode(', ', array_slice($sb_bad, 0, 5))) . '). Rien n\'a été enregistré.';
 			} elseif ($sb_days < 1 || $sb_days > 3650) {
 				$sb_msg_error = 'Conservation du journal : de 1 à 3650 jours. Rien n\'a été enregistré.';
 			} elseif (sbSettingsSave(array('sentinelle_mode' => $sb_mode, 'sentinelle_retention' => (string) $sb_days, 'sentinelle_trusted' => implode("\n", $sb_ranges),
-				'sentinelle_rules' => implode(',', $sb_rules), 'sentinelle_exclude' => implode("\n", $sb_exclude)))) {
+				'sentinelle_rules' => implode(',', $sb_rules), 'sentinelle_exclude' => implode("\n", $sb_exclude),
+				'sentinelle_alert_email' => $sb_alert_email, 'sentinelle_alert_level' => $sb_alert_level, 'sentinelle_digest' => $sb_digest))) {
 				$sb_msg_valid = 'Réglages de Sentinelle enregistrés';
 			} else {
 				$sb_msg_error = 'Error: Write Error (EDIT)!';
@@ -95,6 +101,17 @@ switch ($action) {
 		}
 		$sbform->addTextarea('Paramètres jamais inspectés', htmlspecialchars(implode("\n", array_keys(sentinelle_excluded()))), array('name' => 'sentinelle_exclude', 'rows' => '3', 'placeholder' => 'message'),
 			false, "Nom d'un champ ou d'un paramètre d'adresse par ligne (ex. un champ de formulaire qui accepte du code). Les mots de passe, jetons et secrets ne sont jamais inspectés. Les administrateurs connectés et les IP de confiance ne sont pas filtrés.");
+		// Alertes par e-mail
+		$sbform->addBreak('Alertes par e-mail');
+		$sbform->addInput('text', 'Destinataire des alertes', array('name' => 'sentinelle_alert_email', 'value' => htmlspecialchars(sbSetting('sentinelle_alert_email')), 'placeholder' => 'securite@exemple.fr'), false, false, 'Vide : aucune alerte. Envoi par le SMTP de Contact > Paramètres.');
+		$sbform->openSelect('Alerter pour', array('name' => 'sentinelle_alert_level', 'id' => 'sentinelle_alert_level'));
+		foreach (array('critical' => 'Les événements critiques', 'warning' => 'Les alertes et événements critiques', 'off' => 'Aucune alerte immédiate') as $sb_val => $sb_txt) {
+			$sb_args = array('value' => $sb_val);
+			if (sbSetting('sentinelle_alert_level', 'critical') === $sb_val) $sb_args['selected'] = '';
+			$sbform->addOption($sb_txt, $sb_args);
+		}
+		$sbform->closeSelect('Au plus un e-mail toutes les 15 minutes, qui regroupe les événements survenus depuis le précédent.');
+		$sbform->addCheckbox('Résumé quotidien', array(array('text' => 'Recevoir chaque matin le résumé de la veille', 'name' => 'sentinelle_digest', 'checked' => sbSetting('sentinelle_digest') === '1' ? '1' : '0')), '', false, '<br />', "Envoyé à la première visite du site après 7 h.");
 		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => $formName));
 		$sbform->addInput('reset', '', array('value' => 'Reset'));
 		$sbform->closeForm();
@@ -106,8 +123,47 @@ switch ($action) {
 		$sbsmarty->assign('sb_sentinelle_rescue_path', basename(SBUIADMIN_PATH) . '/inc/admin/sentinelle-disabled');
 		break;
 
+	case 'bans':
+	case 'banadd':
+	case 'bandel':
+		// --------------------------------
+		// --- IP bannies (jeton CSRF vérifié par backdoor/index.php)
+		// --------------------------------
+		$sb_durations = array('3600' => '1 heure', '86400' => '24 heures', '604800' => '7 jours', '2592000' => '30 jours', '0' => 'Permanent');
+		if ($sb_sentinelle_ready && $action === 'banadd') {
+			$sb_src = $_SERVER['REQUEST_METHOD'] === 'POST' ? $_POST : $_GET;
+			$sb_range = is_string($sb_src['ip'] ?? null) ? trim($sb_src['ip']) : '';
+			$sb_dur = is_string($sb_src['d'] ?? null) && isset($sb_durations[$sb_src['d']]) ? (int) $sb_src['d'] : 86400;
+			$sb_reason = is_string($sb_src['reason'] ?? null) ? trim($sb_src['reason']) : 'Banni depuis le journal';
+			$sb_err = sentinelle_ban_add($sb_range, $sb_dur, $sb_reason, 'manual');
+			if ($sb_err === '') $sb_msg_valid = htmlspecialchars(sbClientIpNormalizeRange($sb_range)) . ' bannie (' . $sb_durations[(string) $sb_dur] . ')';
+			else $sb_msg_error = 'Bannissement refusé : ' . htmlspecialchars($sb_err);
+		}
+		if ($sb_sentinelle_ready && $action === 'bandel') {
+			if (sentinelle_ban_remove((int) ($_GET['id'] ?? 0))) $sb_msg_valid = 'Bannissement levé';
+			else $sb_msg_error = 'Bannissement introuvable';
+		}
+		$sb_bans = array();
+		if ($sb_sentinelle_ready) {
+			list($db, $table) = sentinelle_db('sb_sentinelle_ban');
+			$now = date('Y-m-d H:i:s');
+			$res = @mysqli_query($db, "SELECT * FROM `$table` ORDER BY (expires_at IS NULL OR expires_at > '$now') DESC, id DESC LIMIT 500");
+			while ($res && ($r = mysqli_fetch_assoc($res))) {
+				$r['active'] = $r['expires_at'] === null || $r['expires_at'] > $now;
+				$sb_bans[] = $r;
+			}
+		}
+		$sbsmarty->assign('sb_sentinelle_page', 'bans');
+		$sbsmarty->assign('sb_sentinelle_ready', $sb_sentinelle_ready);
+		$sbsmarty->assign('sb_sentinelle_bans', $sb_bans);
+		$sbsmarty->assign('sb_sentinelle_durations', $sb_durations);
+		$sbsmarty->assign('sb_sentinelle_my_ip', sbClientIp());
+		$sbsmarty->assign('sb_table_header', array('Adresse ou plage', 'Motif', 'Origine', 'Depuis', "Jusqu'au", 'Tentatives', ''));
+		break;
+
 	case 'purge':
 	case 'del':
+	case 'export':
 	default:
 		// --------------------------------
 		// --- Suppressions (jeton CSRF vérifié par backdoor/index.php)
@@ -172,7 +228,27 @@ switch ($action) {
 			$res = mysqli_query($db, "SELECT SUM(created_at >= '$d1') AS day, COUNT(*) AS week, COUNT(DISTINCT IF(created_at >= '$d1', ip, NULL)) AS ips, SUM(severity = 'critical' AND created_at >= '$d1') AS critical FROM `$table` WHERE created_at >= '$d7'");
 			if ($res && ($r = mysqli_fetch_assoc($res))) foreach ($sb_kpi as $k => $v) $sb_kpi[$k] = (int) $r[$k];
 		}
+		// Export CSV (filtres en cours), avant tout affichage
+		if ($action === 'export') {
+			while (ob_get_level() > 0) ob_end_clean();
+			header('Content-Type: text/csv; charset=UTF-8');
+			header('Content-Disposition: attachment; filename="sentinelle-' . date('Y-m-d') . '.csv"');
+			header('Cache-Control: no-store');
+			$out = fopen('php://output', 'w');
+			fwrite($out, "\xEF\xBB\xBF");
+			fputcsv($out, array('Date', 'IP', 'Type', 'Événement', 'Gravité', 'Action', 'Côté', 'Méthode', 'Adresse', 'Navigateur', 'Identifiant', 'Détail'), ';', '"', '');
+			foreach ($sb_rows as $r) {
+				$line = array($r['created_at'], $r['ip'], $r['type'], $r['type_label'], $r['severity'], $r['action'], $r['context'], $r['method'], $r['uri'], $r['user_agent'], $r['user'], $r['detail']);
+				// Une cellule commençant par = + - @ serait une formule dans un tableur
+				foreach ($line as $i => $cell) if (preg_match('/^[=+\-@\t\r]/', (string) $cell)) $line[$i] = "'" . $cell;
+				fputcsv($out, $line, ';', '"', '');
+			}
+			fclose($out);
+			exit;
+		}
 		$sbsmarty->assign('sb_sentinelle_page', 'log');
+		$sbsmarty->assign('sb_sentinelle_bans_count', count(sentinelle_bans_active()));
+		$sbsmarty->assign('sb_sentinelle_my_ip', sbClientIp());
 		$sbsmarty->assign('sb_sentinelle_ready', $sb_sentinelle_ready);
 		$sbsmarty->assign('sb_sentinelle_rows', $sb_rows);
 		$sbsmarty->assign('sb_sentinelle_kpi', $sb_kpi);

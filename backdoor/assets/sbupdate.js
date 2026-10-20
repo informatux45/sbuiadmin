@@ -209,7 +209,7 @@
 	// Modules : plan (rien n'est écrit), puis confirmation + mot de passe
 	// ---------------------------------------------------------------
 	var modCurrent = null;
-	var modLabels = { update: 'Mettre à jour', install: 'Installer', uninstall: 'Désinstaller', rollback: 'Annuler' };
+	var modLabels = { update: 'Mettre à jour', migrate: 'Mettre à jour la base', install: 'Installer', uninstall: 'Désinstaller', rollback: 'Annuler' };
 
 	// « Supprimer le module » (désinstallation) : ce qui sera perdu, d'après le site
 	function modRemoveInfo(p) {
@@ -240,6 +240,7 @@
 		if (p.op === 'update' || (p.op === 'install' && p.download)) {
 			html += '<p>Archive vérifiée (signature de la version, empreinte de l\'archive et de chaque fichier) : ' + nb(p.write, 'fichier') + ' à écrire' + (p.op === 'update' ? ', ' + nb(p['delete'], 'fichier') + ' à retirer' : ', téléchargés depuis GitHub') + '.</p>';
 		}
+		if (p.op === 'migrate') html += '<p>Les fichiers du module sont en ' + esc(p.version) + ', sa base en ' + esc(p.from) + ' : ' + (p.migrations && p.migrations.length ? nb(p.migrations.length, 'migration') + ' à appliquer (' + p.migrations.map(esc).join(', ') + ')' : 'aucune migration, la version en base est simplement mise à jour') + '.</p>';
 		if (p.op === 'install') {
 			html += '<p>Tables créées : <strong>' + (p.tables_new && p.tables_new.length ? esc(p.tables_new.join(', ')) : 'aucune') + '</strong>. Le module sera activé : menu, droits, pages et codes courts.</p>';
 		} else if (p.op === 'uninstall') {
@@ -288,7 +289,7 @@
 			var mtitle = btn.closest('tr').querySelector('td:nth-child(2) strong').textContent;
 			modSlot(btn);
 			modCurrent = null;
-			var local = (op === 'uninstall' || op === 'rollback');
+			var local = (op === 'uninstall' || op === 'rollback' || op === 'migrate');
 			modBusy((op === 'rollback' ? 'Annulation — module ' : modLabels[op] + ' le module ') + mtitle,
 				local ? 'Préparation…' : 'Vérification du module en cours…',
 				local ? 'Inventaire des données, des fichiers et de la sauvegarde du module' : 'Téléchargement depuis GitHub, contrôle de la signature et de chaque fichier');
@@ -313,7 +314,7 @@
 			$('sbmod-password').value = '';
 			setButtons(true);
 			busy = true;
-			var runText = remove ? 'Suppression du module en cours…' : ({ install: 'Installation du module en cours…', update: 'Mise à jour du module en cours…', uninstall: 'Désinstallation du module en cours…', rollback: 'Annulation en cours…' })[modCurrent.op];
+			var runText = remove ? 'Suppression du module en cours…' : ({ install: 'Installation du module en cours…', update: 'Mise à jour du module en cours…', migrate: 'Mise à jour de la base du module en cours…', uninstall: 'Désinstallation du module en cours…', rollback: 'Annulation en cours…' })[modCurrent.op];
 			modBusy($('sbmod-panel-title').textContent, runText, 'Sauvegarde chiffrée puis opération ; ne fermez pas la page');
 			post('modrun', { module: modCurrent.name, op: modCurrent.op, password: pw, confirm: need ? '1' : '', remove: remove ? '1' : '' }).then(function (r) {
 				busy = false;

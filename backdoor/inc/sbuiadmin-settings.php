@@ -145,6 +145,13 @@ function sbSettingsDefaults() {
 		// et paramètres jamais inspectés (un par ligne)
 		'sentinelle_rules'      => '',
 		'sentinelle_exclude'    => '',
+		// alertes par e-mail : destinataire, gravité minimale (off, warning,
+		// critical), résumé quotidien, dates des derniers envois
+		'sentinelle_alert_email' => '',
+		'sentinelle_alert_level' => 'critical',
+		'sentinelle_digest'     => '0',
+		'sentinelle_alert_last' => '0',
+		'sentinelle_digest_last' => '',
 		'toast_duration'        => '7',
 		'pagebuilder_modules'   => '',
 		'theme'                 => '',

@@ -32,5 +32,18 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_sentinelle_log` (
   KEY `created_at` (`created_at`),
   KEY `ip_type` (`ip`, `type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_sentinelle_ban` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `ip_range` varchar(50) NOT NULL DEFAULT '' COMMENT 'adresse ou plage CIDR',
+  `reason` varchar(255) NOT NULL DEFAULT '',
+  `source` varchar(10) NOT NULL DEFAULT 'manual' COMMENT 'manual, auto',
+  `created_at` datetime NOT NULL,
+  `expires_at` datetime DEFAULT NULL COMMENT 'NULL : permanent',
+  `hits` int(11) NOT NULL DEFAULT 0,
+  `last_hit` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `expires_at` (`expires_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 SQL
 );

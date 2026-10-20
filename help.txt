@@ -27,6 +27,10 @@
   globales, scanners, outils d'attaque, fichiers dangereux) : chacun inactif,
   noté seulement, ou selon le mode (403 en protection). Exemptés : IP de
   confiance, administrateurs connectés, mots de passe/jetons, paramètres exclus.
+- IP bannies (adresse ou plage, durée ou permanent) : 403 dans les deux modes ;
+  bannir depuis le journal. Export CSV du journal. Widgets « Attaques » et
+  « IP les plus actives ». Alertes par e-mail (au plus une par 15 min) et
+  résumé quotidien, par le SMTP de Contact > Paramètres.
 - Bloqué par erreur : créer le fichier vide backdoor/inc/admin/sentinelle-disabled.
 - Module tiers : sbSecurityEvent('type', 'info|warning|critical', 'détail',
   'logged|blocked|banned', 'identifiant') note un événement (sans effet si

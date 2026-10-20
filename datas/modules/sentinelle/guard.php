@@ -23,6 +23,7 @@ function sentinelle_types() {
 		'forbidden'     => 'Accès refusé (droits)',
 		'ip_blocked'    => 'IP bloquée',
 		'flood'         => 'Anti-flood',
+		'ip_banned'     => 'IP bannie',
 	) + sentinelle_rules();
 }
 
@@ -94,12 +95,12 @@ function sentinelle_is_trusted($ip = null) {
 	return sbClientIpIsTrusted($ip ?? sbClientIp(), sentinelle_trusted());
 }
 
-/** Connexion et nom de la table du journal, ou null */
-function sentinelle_db() {
+/** Connexion et nom de la table du journal (ou de $table), ou null */
+function sentinelle_db($table = 'sb_sentinelle_log') {
 	$db = function_exists('sbSettingsDb') ? sbSettingsDb() : null;
 	if (!($db instanceof mysqli)) return null;
 	$c = function_exists('sbDbConfig') ? sbDbConfig() : array();
-	return array($db, str_replace('`', '', (string) ($c['prefix'] ?? '') . 'sb_sentinelle_log'));
+	return array($db, str_replace('`', '', (string) ($c['prefix'] ?? '') . $table));
 }
 
 /** Texte coupé à $max caractères (UTF-8), sans caractères de contrôle */
@@ -149,6 +150,7 @@ function sentinelle_event($type, $severity = 'warning', $detail = '', $action = 
 	mysqli_stmt_close($stmt);
 	// Purge des lignes trop anciennes, de temps en temps
 	if ($ok && mt_rand(1, 100) === 1) sentinelle_purge_old();
+	if ($ok) sentinelle_alert_maybe($severity);
 	return $ok;
 }
 
@@ -175,7 +177,15 @@ function sentinelle_purge_old() {
 function sentinelle_guard($context) {
 	$context = $context === 'admin' ? 'admin' : 'front';
 	$GLOBALS['sentinelle_context'] = $context;
+	sentinelle_digest_maybe();
 	if (sentinelle_is_trusted() || sentinelle_backoffice_user()) return;
+	// IP bannie (réglage délibéré : bloquée quel que soit le mode)
+	$ban = sentinelle_banned(sbClientIp());
+	if ($ban) {
+		sentinelle_ban_hit((int) $ban['id']);
+		sentinelle_event('ip_banned', 'info', 'Bannie : ' . $ban['ip_range'] . ($ban['reason'] !== '' ? ' (' . $ban['reason'] . ')' : ''), 'blocked');
+		sentinelle_block();
+	}
 	$hit = sentinelle_inspect($_SERVER, $_GET, $_POST, $_COOKIE, $_FILES, $context, sentinelle_excluded());
 	if (!$hit) return;
 	list($rule, $severity, $detail) = $hit;
@@ -365,4 +375,228 @@ function sentinelle_inspect(array $server, array $get, array $post, array $cooki
 	$rank = array('critical' => 3, 'warning' => 2, 'info' => 1);
 	usort($found, function ($a, $b) use ($rank) { return $rank[$b[1]] <=> $rank[$a[1]]; });
 	return $found[0];
+}
+
+// -----------------------------------------------------------------------
+// Bannissements (table sb_sentinelle_ban) : adresse ou plage CIDR,
+// durée (expires_at) ou permanent (NULL)
+// -----------------------------------------------------------------------
+
+/** Bannissements en cours (lus une fois par requête) */
+function sentinelle_bans_active($reset = false) {
+	static $rows = null;
+	if ($reset) $rows = null;
+	if ($rows !== null) return $rows;
+	$rows = array();
+	$dbt = sentinelle_db('sb_sentinelle_ban');
+	if (!$dbt) return $rows;
+	list($db, $table) = $dbt;
+	$res = @mysqli_query($db, "SELECT * FROM `$table` WHERE expires_at IS NULL OR expires_at > '" . date('Y-m-d H:i:s') . "' ORDER BY id DESC");
+	while ($res && ($r = mysqli_fetch_assoc($res))) $rows[] = $r;
+	return $rows;
+}
+
+/** Bannissement qui couvre $ip, ou null */
+function sentinelle_banned($ip) {
+	foreach (sentinelle_bans_active() as $ban) {
+		if (sbClientIpInRange($ip, $ban['ip_range'])) return $ban;
+	}
+	return null;
+}
+
+/** Compte une tentative d'une IP bannie */
+function sentinelle_ban_hit($id) {
+	$dbt = sentinelle_db('sb_sentinelle_ban');
+	if (!$dbt) return;
+	list($db, $table) = $dbt;
+	$stmt = mysqli_prepare($db, "UPDATE `$table` SET hits = hits + 1, last_hit = ? WHERE id = ?");
+	if (!$stmt) return;
+	$now = date('Y-m-d H:i:s');
+	mysqli_stmt_bind_param($stmt, 'si', $now, $id);
+	mysqli_stmt_execute($stmt);
+	mysqli_stmt_close($stmt);
+}
+
+/**
+ * Bannit une adresse ou une plage (remplace un bannissement de la même plage)
+ * @param int $duration secondes, 0 = permanent
+ * @return string '' si fait, sinon le motif du refus
+ */
+function sentinelle_ban_add($range, $duration, $reason = '', $source = 'manual') {
+	$range = sbClientIpNormalizeRange($range);
+	if ($range === '') return 'Adresse ou plage invalide';
+	$parts = explode('/', $range);
+	if (isset($parts[1]) && (int) $parts[1] < (strpos($parts[0], ':') !== false ? 32 : 16)) return 'Plage trop large (au plus /16 en IPv4, /32 en IPv6)';
+	foreach (sentinelle_trusted() as $t) {
+		if (sbClientIpInRange(explode('/', $t)[0], $range) || sbClientIpInRange($parts[0], $t)) return 'Cette plage contient une IP de confiance';
+	}
+	if (sbClientIpInRange(sbClientIp(), $range) && $source === 'manual') return 'Cette plage contient votre propre adresse';
+	$dbt = sentinelle_db('sb_sentinelle_ban');
+	if (!$dbt) return 'Base indisponible';
+	list($db, $table) = $dbt;
+	$now = date('Y-m-d H:i:s');
+	$expires = (int) $duration > 0 ? date('Y-m-d H:i:s', time() + (int) $duration) : null;
+	$reason = sentinelle_cut($reason, 255);
+	$source = $source === 'auto' ? 'auto' : 'manual';
+	$stmt = mysqli_prepare($db, "DELETE FROM `$table` WHERE ip_range = ?");
+	if ($stmt) { mysqli_stmt_bind_param($stmt, 's', $range); mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt); }
+	$stmt = mysqli_prepare($db, "INSERT INTO `$table` (ip_range, reason, source, created_at, expires_at, hits) VALUES (?, ?, ?, ?, ?, 0)");
+	if (!$stmt) return 'Base indisponible';
+	mysqli_stmt_bind_param($stmt, 'sssss', $range, $reason, $source, $now, $expires);
+	$ok = mysqli_stmt_execute($stmt);
+	mysqli_stmt_close($stmt);
+	sentinelle_bans_active(true);
+	return $ok ? '' : 'Enregistrement impossible';
+}
+
+/** Lève un bannissement */
+function sentinelle_ban_remove($id) {
+	$dbt = sentinelle_db('sb_sentinelle_ban');
+	if (!$dbt) return false;
+	list($db, $table) = $dbt;
+	$stmt = mysqli_prepare($db, "DELETE FROM `$table` WHERE id = ?");
+	if (!$stmt) return false;
+	mysqli_stmt_bind_param($stmt, 'i', $id);
+	$ok = mysqli_stmt_execute($stmt) && mysqli_stmt_affected_rows($stmt) > 0;
+	mysqli_stmt_close($stmt);
+	sentinelle_bans_active(true);
+	return $ok;
+}
+
+// -----------------------------------------------------------------------
+// Alertes par e-mail : au plus une toutes les 15 minutes (événements de la
+// gravité réglée ou plus), résumé quotidien en option. Envoyées après la
+// réponse au visiteur (register_shutdown_function).
+// -----------------------------------------------------------------------
+
+/** Destinataire des alertes, ou '' */
+function sentinelle_alert_email() {
+	$to = sbSetting('sentinelle_alert_email');
+	return filter_var($to, FILTER_VALIDATE_EMAIL) ? $to : '';
+}
+
+/** Une alerte est-elle due pour cette gravité ? (programme l'envoi) */
+function sentinelle_alert_maybe($severity) {
+	$level = sbSetting('sentinelle_alert_level', 'critical');
+	$rank = array('info' => 1, 'warning' => 2, 'critical' => 3);
+	if (!isset($rank[$level]) || sentinelle_alert_email() === '' || ($rank[$severity] ?? 0) < $rank[$level]) return false;
+	$last = (int) sbSetting('sentinelle_alert_last', '0');
+	if (time() - $last < 900 || !empty($GLOBALS['sentinelle_alert_pending'])) return false;
+	$GLOBALS['sentinelle_alert_pending'] = true;
+	// Noté tout de suite : deux requêtes simultanées n'envoient pas deux alertes
+	if (function_exists('sbSettingsSave')) sbSettingsSave(array('sentinelle_alert_last' => (string) time()));
+	register_shutdown_function('sentinelle_deferred', 'sentinelle_send_alert', array($last, $level));
+	return true;
+}
+
+/** Résumé quotidien dû ? (une fois par jour, après 7 h) */
+function sentinelle_digest_maybe() {
+	if (sbSetting('sentinelle_digest') !== '1' || sentinelle_alert_email() === '' || (int) date('G') < 7) return false;
+	$today = date('Y-m-d');
+	if (sbSetting('sentinelle_digest_last') === $today || !empty($GLOBALS['sentinelle_digest_pending'])) return false;
+	$GLOBALS['sentinelle_digest_pending'] = true;
+	if (function_exists('sbSettingsSave')) sbSettingsSave(array('sentinelle_digest_last' => $today));
+	register_shutdown_function('sentinelle_deferred', 'sentinelle_send_digest', array());
+	return true;
+}
+
+/** Événements depuis $since (gravité >= $level), les plus récents d'abord */
+function sentinelle_events_since($since, $level = 'info', $limit = 50) {
+	$dbt = sentinelle_db();
+	if (!$dbt) return array();
+	list($db, $table) = $dbt;
+	$levels = array('info' => "('info','warning','critical')", 'warning' => "('warning','critical')", 'critical' => "('critical')");
+	$stmt = mysqli_prepare($db, "SELECT * FROM `$table` WHERE created_at >= ? AND severity IN " . ($levels[$level] ?? $levels['info']) . " ORDER BY id DESC LIMIT " . (int) $limit);
+	if (!$stmt) return array();
+	mysqli_stmt_bind_param($stmt, 's', $since);
+	mysqli_stmt_execute($stmt);
+	$res = mysqli_stmt_get_result($stmt);
+	$rows = array();
+	while ($res && ($r = mysqli_fetch_assoc($res))) $rows[] = $r;
+	mysqli_stmt_close($stmt);
+	return $rows;
+}
+
+/** Tableau HTML des événements (échappé) */
+function sentinelle_events_html(array $rows) {
+	$types = sentinelle_types();
+	$h = '<table cellpadding="6" cellspacing="0" border="1" style="border-collapse:collapse;font-family:sans-serif;font-size:13px">'
+		. '<tr style="background:#f1f5f9"><th>Date</th><th>IP</th><th>Événement</th><th>Gravité</th><th>Action</th><th>Adresse</th></tr>';
+	foreach ($rows as $r) {
+		$h .= '<tr><td>' . htmlspecialchars($r['created_at']) . '</td><td>' . htmlspecialchars($r['ip']) . '</td><td>'
+			. htmlspecialchars($types[$r['type']] ?? $r['type']) . '</td><td>' . htmlspecialchars($r['severity']) . '</td><td>'
+			. htmlspecialchars($r['action']) . '</td><td>' . htmlspecialchars(mb_substr($r['method'] . ' ' . $r['uri'], 0, 120, 'UTF-8')) . '</td></tr>';
+	}
+	return $h . '</table>';
+}
+
+/** Envoi d'un e-mail (PHPMailer du site, sinon mail()) */
+function sentinelle_mail($subject, $html) {
+	$to = sentinelle_alert_email();
+	if ($to === '') return false;
+	$site = defined('_AM_SITE_TITLE') && _AM_SITE_TITLE !== '' ? _AM_SITE_TITLE : (string) ($_SERVER['SERVER_NAME'] ?? 'Site');
+	if (function_exists('sb2faSender')) $from = sb2faSender();
+	elseif (defined('SBFROMEMAIL') && filter_var(SBFROMEMAIL, FILTER_VALIDATE_EMAIL)) $from = SBFROMEMAIL;
+	else $from = 'noreply@' . preg_replace('/^www\./', '', (string) ($_SERVER['SERVER_NAME'] ?? 'localhost'));
+	$subject = '[Sentinelle] ' . $site . ' : ' . $subject;
+	try {
+		$mail = function_exists('sbMailer') ? sbMailer() : null;
+		if ($mail) {
+			$mail->setFrom($from, $site);
+			$mail->addAddress($to);
+			$mail->Subject = $subject;
+			$mail->msgHTML($html);
+			return (bool) $mail->send();
+		}
+	} catch (Throwable $e) {
+		return false;
+	}
+	$headers = "MIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\nFrom: " . $from . "\r\n";
+	return @mail($to, '=?UTF-8?B?' . base64_encode($subject) . '?=', $html, $headers);
+}
+
+/** Envoi différé (fin de requête) : une erreur n'y est jamais fatale */
+function sentinelle_deferred($fn, array $args) {
+	try {
+		call_user_func_array($fn, $args);
+	} catch (Throwable $e) {
+	}
+}
+
+/** Libère le visiteur avant un envoi lent */
+function sentinelle_finish_response() {
+	if (function_exists('fastcgi_finish_request')) @fastcgi_finish_request();
+}
+
+/** Alerte : événements de la gravité réglée depuis la dernière alerte */
+function sentinelle_send_alert($last, $level) {
+	sentinelle_finish_response();
+	$since = date('Y-m-d H:i:s', max((int) $last, time() - 86400));
+	$rows = sentinelle_events_since($since, $level, 50);
+	if (!$rows) return false;
+	$html = '<p>Sentinelle a relevé ' . count($rows) . ' événement(s) ' . ($level === 'critical' ? 'critique(s)' : 'de sécurité')
+		. ' depuis le ' . htmlspecialchars($since) . ' (mode ' . (sentinelle_mode() === 'protect' ? 'protection' : 'observation') . ').</p>'
+		. sentinelle_events_html($rows) . '<p>Détail : Sentinelle &gt; Journal de sécurité, dans l\'administration.</p>';
+	return sentinelle_mail(count($rows) . ' événement(s) de sécurité', $html);
+}
+
+/** Résumé de la veille */
+function sentinelle_send_digest() {
+	sentinelle_finish_response();
+	$from = date('Y-m-d 00:00:00', time() - 86400);
+	$dbt = sentinelle_db();
+	if (!$dbt) return false;
+	list($db, $table) = $dbt;
+	$to = date('Y-m-d 00:00:00');
+	$res = mysqli_query($db, "SELECT type, severity, COUNT(*) AS n, COUNT(DISTINCT ip) AS ips FROM `$table` WHERE created_at >= '$from' AND created_at < '$to' GROUP BY type, severity ORDER BY n DESC");
+	$types = sentinelle_types();
+	$lines = ''; $total = 0;
+	while ($res && ($r = mysqli_fetch_assoc($res))) {
+		$total += (int) $r['n'];
+		$lines .= '<tr><td>' . htmlspecialchars($types[$r['type']] ?? $r['type']) . '</td><td>' . htmlspecialchars($r['severity']) . '</td><td>' . (int) $r['n'] . '</td><td>' . (int) $r['ips'] . '</td></tr>';
+	}
+	$html = '<p>Résumé de la journée du ' . date('d/m/Y', time() - 86400) . ' : <strong>' . $total . '</strong> événement(s).</p>'
+		. ($total ? '<table cellpadding="6" cellspacing="0" border="1" style="border-collapse:collapse;font-family:sans-serif;font-size:13px"><tr style="background:#f1f5f9"><th>Événement</th><th>Gravité</th><th>Nombre</th><th>IP</th></tr>' . $lines . '</table>' : '<p>Aucun événement.</p>')
+		. '<p>Bannissements en cours : ' . count(sentinelle_bans_active()) . '.</p>';
+	return sentinelle_mail('résumé du ' . date('d/m/Y', time() - 86400), $html);
 }
