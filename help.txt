@@ -56,6 +56,12 @@ Chaque site a son sbdbconfig.php (sbdbconfig-<dossier>.php pour les suivants).
 - Admin du module : admin/<nom>.php (contrôleur) et admin/tpls/ (gabarits),
   prioritaires sur backdoor/datas/modules/<nom>.php et tpls/ ; mêmes
   contrôles (droits, CSRF). Les gabarits du core passent toujours avant.
+- Widgets du dashboard : widgets/<clé>.php (clé de 17 caractères au plus)
+  retourne array('title', 'icon', 'link', 'format' => 'kpi'|'card',
+  'params' => array('nb' => array('label', 'type' => text|number|select|yesno,
+  'default', 'min', 'max', 'options')), 'render' => function ($params) {...}).
+  kpi : render() retourne la valeur ; card : du HTML (à échapper), ou des
+  variables pour widgets/<clé>.tpl. Masqué sans le droit « voir » du module.
 - Module propre à un site : 'origin' => 'site' dans module.php (jamais
   installé ni mis à jour depuis GitHub, fichiers hors mise à jour du core).
 - 'csrf_get' => array('duplicate', ...) : actions GET sensibles du module

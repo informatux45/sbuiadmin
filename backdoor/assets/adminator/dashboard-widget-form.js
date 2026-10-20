@@ -53,6 +53,46 @@
 			updateTypeFields(typeSelect);
 		}
 
+		// Widget de module : affiche les paramètres du widget choisi et
+		// propose son titre, son icône et son lien (champ vide ou encore
+		// égal à la proposition précédente)
+		var mwSelect = document.getElementById('module_widget');
+		if (mwSelect) {
+			var mwTitle = document.querySelector('input[name="widget_title"]');
+			var mwIcon  = document.getElementById('icon');
+			var mwLink  = document.getElementById('link');
+			var mwLast  = window.sbDashboardModuleWidgets && window.sbDashboardModuleWidgets[mwSelect.value] || null;
+			var mwFill  = function (input, prev, next) {
+				if (input && (input.value === '' || (prev !== null && input.value === prev))) {
+					input.value = next;
+					var preview = document.getElementById(input.id + 'Preview');
+					if (preview && input === mwIcon) preview.innerHTML = '<i class="fa-fw ' + (window.sbDashboardModuleWidgets[mwSelect.value] || {}).iconClass + '"></i>';
+					input.dispatchEvent(new Event('input', { bubbles: true }));
+					input.dispatchEvent(new Event('change', { bubbles: true }));
+				}
+			};
+			mwSelect.addEventListener('change', function () {
+				document.querySelectorAll('[data-module-widget-params]').forEach(function (group) {
+					group.style.display = (group.getAttribute('data-module-widget-params') === mwSelect.value) ? '' : 'none';
+				});
+				var next = window.sbDashboardModuleWidgets && window.sbDashboardModuleWidgets[mwSelect.value];
+				if (!next) return;
+				mwFill(mwTitle, mwLast ? mwLast.title : null, next.title);
+				mwFill(mwIcon, mwLast ? mwLast.icon : null, next.icon);
+				mwFill(mwLink, mwLast ? mwLast.link : null, next.link);
+				mwLast = next;
+			});
+			// Ajout : proposition dès que le type "module" est choisi
+			if (typePicker && typeSelect) {
+				typePicker.addEventListener('click', function () {
+					if (typeSelect.value !== 'module' || !mwLast) return;
+					mwFill(mwTitle, null, mwLast.title);
+					mwFill(mwIcon, null, mwLast.icon);
+					mwFill(mwLink, null, mwLast.link);
+				});
+			}
+		}
+
 		var tableSelect = document.getElementById('table_name');
 		var valueSelect = document.getElementById('value_column');
 		var dateSelect  = document.getElementById('date_column');

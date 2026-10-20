@@ -71,6 +71,7 @@ $sb_type_options = array(
 	'iframe'    => 'Contenu externe (iframe)',
 	'logs'      => 'Journal (fichier log)',
 	'logaccess' => 'Dernières connexions',
+	'module'    => 'Widget de module',
 );
 
 // Icône du sélecteur de type (boutons cliquables du formulaire) - purement
@@ -85,6 +86,7 @@ $sb_type_icons = array(
 	'iframe'    => 'external-link',
 	'logs'      => 'file-text-o',
 	'logaccess' => 'sign-in',
+	'module'    => 'puzzle-piece',
 );
 
 $sb_system_options = array(
@@ -140,6 +142,11 @@ foreach (sbModulesCollect('tables') as $sb_tname => $sb_tinfo) {
 	if (!empty($sb_tinfo['title'])) $sb_table_titles[$sb_tname] = $sb_tinfo['title'];
 }
 unset($sb_tname, $sb_tinfo);
+
+// Widgets livrés par les modules installés (datas/modules/<nom>/widgets/,
+// voir sbModuleWidgets()) : type "module", widget_key = "nom:clé",
+// paramètres en JSON dans "content"
+$sb_module_widgets = sbModuleWidgets();
 
 $action = $_GET['a'] ?? '';
 // PHP 8 : variables lues par certaines branches seulement
@@ -199,6 +206,9 @@ switch ($action) {
 		$sbsmarty->assign('sb_table_titles', $sb_table_titles);
 		$sbsmarty->assign('sb_type_options', $sb_type_options);
 		$sbsmarty->assign('sb_system_options', $sb_system_options);
+		$sb_module_widget_labels = array();
+		foreach ($sb_module_widgets as $sb_mw_id => $sb_mw) $sb_module_widget_labels[$sb_mw_id] = $sb_mw['module_title'] . ' › ' . $sb_mw['title'];
+		$sbsmarty->assign('sb_module_widget_labels', $sb_module_widget_labels);
 
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) {
@@ -235,7 +245,10 @@ switch ($action) {
 
 			// Injection des données
 			$id           = intval($_POST['id'] ?? 0);
-			$type         = in_array($_POST['type'] ?? null, array('table', 'system', 'weather', 'html', 'text', 'rss', 'iframe', 'logs', 'logaccess')) ? ($_POST['type'] ?? '') : 'table';
+			$type         = in_array($_POST['type'] ?? null, array('table', 'system', 'weather', 'html', 'text', 'rss', 'iframe', 'logs', 'logaccess', 'module')) ? ($_POST['type'] ?? '') : 'table';
+			// Widget de module : seul le jeu de paramètres du widget choisi compte
+			$module_widget = is_string($_POST['module_widget'] ?? null) ? $_POST['module_widget'] : '';
+			$mw_params     = (isset($_POST['mwp'][$module_widget]) && is_array($_POST['mwp'][$module_widget])) ? $_POST['mwp'][$module_widget] : array();
 			$table_name   = $sbsanitize->displayText($_POST['table_name'] ?? '', 'UTF-8', 1, 0);
 			$value_column = $sbsanitize->displayText($_POST['value_column'] ?? '', 'UTF-8', 1, 0);
 			$date_column  = $sbsanitize->displayText($_POST['date_column'] ?? '', 'UTF-8', 1, 0);
@@ -379,6 +392,23 @@ switch ($action) {
 					$show_chart = '0';
 					break;
 
+				case 'module':
+					$sb_valid = isset($sb_module_widgets[$module_widget]);
+					if (!$sb_valid) {
+						$sb_msg_error = 'Widget de module invalide (module désactivé ou retiré ?).';
+					} else {
+						list($sb_mw_values, $sb_msg_error) = sbModuleWidgetParams($sb_module_widgets[$module_widget], $mw_params);
+						$sb_valid = ($sb_msg_error === '');
+						if ($sb_valid) {
+							$sb_msg_error = false;
+							$content      = json_encode($sb_mw_values, JSON_UNESCAPED_UNICODE);
+							$widget_key   = $module_widget;
+						}
+					}
+					$table_name = $value_column = $date_column = '';
+					$show_chart = '0';
+					break;
+
 				case 'table':
 				default:
 					// Validation contre le vrai schéma de la base.
@@ -415,7 +445,8 @@ switch ($action) {
 					$result_add = $sbsql->query($query);
 					if ($result_add) {
 						// --- Vider les champs du formulaire
-						$table_name = $value_column = $date_column = $widget_key = $city_input = $content_html = $content_text = $rss_url = $rss_count = $iframe_url = $log_filename = $log_lines = $logaccess_count = $widget_title = $link = $icon = '';
+						$table_name = $value_column = $date_column = $widget_key = $city_input = $content_html = $content_text = $rss_url = $rss_count = $iframe_url = $log_filename = $log_lines = $logaccess_count = $widget_title = $link = $icon = $module_widget = '';
+						$mw_params = array();
 						$type = 'table'; $color = 'primary'; $show_chart = '0'; $active = '1';
 						// --- Message SUCCESS
 						$sb_msg_valid = $text . ' ajouté avec succès';
@@ -458,7 +489,8 @@ switch ($action) {
 			// Si AJOUT (First time)
 			// --- Vider les champs du formulaire
 			$type = 'table';
-			$table_name = $value_column = $date_column = $widget_key = $city_input = $content_html = $content_text = $rss_url = $rss_count = $iframe_url = $log_filename = $log_lines = $logaccess_count = $widget_title = $link = $icon = '';
+			$table_name = $value_column = $date_column = $widget_key = $city_input = $content_html = $content_text = $rss_url = $rss_count = $iframe_url = $log_filename = $log_lines = $logaccess_count = $widget_title = $link = $icon = $module_widget = '';
+			$mw_params = array();
 			$color = 'primary'; $show_chart = '0'; $active = '1';
 		}
 		// --------------------------------
@@ -489,6 +521,8 @@ switch ($action) {
 			$log_filename    = ($assoc['type'] == 'logs') ? sb_utf8_encode($assoc['location']) : '';
 			$log_lines       = ($assoc['type'] == 'logs') ? $assoc['value_column'] : '';
 			$logaccess_count = ($assoc['type'] == 'logaccess') ? $assoc['value_column'] : '';
+			$module_widget   = ($assoc['type'] == 'module') ? $assoc['widget_key'] : '';
+			$mw_params       = ($assoc['type'] == 'module') ? (array) json_decode((string) $assoc['content'], true) : array();
 			$widget_title    = sb_utf8_encode($assoc['title']);
 			$link         = sb_utf8_encode($assoc['link']);
 			$icon         = sb_utf8_encode($assoc['icon']);
@@ -631,6 +665,51 @@ switch ($action) {
 
 		$sbform->addInput('text', 'Nombre de connexions', array('id' => 'logaccess_count', 'name' => 'logaccess_count', 'value' => "$logaccess_count"), false, false, 'Entre 1 et 50 - 10 par défaut si laissé vide. Ne montre que les connexions réussies (module Journaux).');
 
+		// ----------------------------
+		// --- Groupe "module" (masqué par défaut) : un jeu de paramètres par
+		// widget, seul celui du widget choisi est affiché (et retenu)
+		// ----------------------------
+		$sbform->addAnything('</div><div data-widget-type-fields="module" style="display:none">');
+
+		if ($sb_module_widgets) {
+			$sbform->openSelect("Widget", array("id" => "module_widget", "name" => "module_widget"));
+			foreach ($sb_module_widgets as $sb_mw_id => $sb_mw) {
+				$sb_opt_args = array("value" => $sb_mw_id);
+				if ($sb_mw_id == $module_widget) $sb_opt_args['selected'] = '';
+				$sbform->addOption($sb_mw['module_title'] . ' › ' . $sb_mw['title'] . ($sb_mw['format'] == 'card' ? ' (carte)' : ' (tuile)'), $sb_opt_args);
+			}
+			$sbform->closeSelect('Widgets fournis par les modules installés (dossier widgets/ du module).');
+			$sb_mw_first = ($module_widget !== '' && isset($sb_module_widgets[$module_widget])) ? $module_widget : array_key_first($sb_module_widgets);
+			foreach ($sb_module_widgets as $sb_mw_id => $sb_mw) {
+				$sbform->addAnything('<div data-module-widget-params="' . htmlspecialchars($sb_mw_id) . '"' . ($sb_mw_id == $sb_mw_first ? '' : ' style="display:none"') . '>');
+				if ($sb_mw['description'] !== '') $sbform->addAnything('<p style="color:var(--t-muted);font-size:13px">' . $sb_mw['description'] . '</p>');
+				foreach ($sb_mw['params'] as $sb_p => $sb_pd) {
+					$sb_pname = 'mwp[' . $sb_mw_id . '][' . $sb_p . ']';
+					$sb_pid   = 'mwp_' . str_replace(':', '_', $sb_mw_id) . '_' . $sb_p;
+					$sb_pval  = ($sb_mw_id == $module_widget && isset($mw_params[$sb_p]) && is_scalar($mw_params[$sb_p])) ? (string) $mw_params[$sb_p] : (string) $sb_pd['default'];
+					$sb_phelp = $sb_pd['help'];
+					if ($sb_phelp === '' && $sb_pd['type'] == 'number' && $sb_pd['min'] !== null && $sb_pd['max'] !== null) $sb_phelp = 'Entre ' . $sb_pd['min'] . ' et ' . $sb_pd['max'] . '.';
+					if ($sb_pd['type'] == 'select' || $sb_pd['type'] == 'yesno') {
+						$sb_popts = ($sb_pd['type'] == 'yesno') ? array('1' => 'Oui', '0' => 'Non') : $sb_pd['options'];
+						$sbform->openSelect($sb_pd['label'], array('id' => $sb_pid, 'name' => $sb_pname));
+						foreach ($sb_popts as $sb_ov => $sb_ol) {
+							$sb_opt_args = array('value' => htmlspecialchars((string) $sb_ov));
+							if ((string) $sb_ov === $sb_pval) $sb_opt_args['selected'] = '';
+							$sbform->addOption($sb_ol, $sb_opt_args);
+						}
+						$sbform->closeSelect($sb_phelp);
+					} else {
+						// Champ "required" contrôlé côté serveur seulement (groupe masqué)
+						$sbform->addInput('text', $sb_pd['label'] . ($sb_pd['required'] ? ' *' : ''), array('id' => $sb_pid, 'name' => $sb_pname, 'value' => htmlspecialchars($sb_pval)), false, false, $sb_phelp);
+					}
+				}
+				if (!$sb_mw['params']) $sbform->addAnything('<p style="color:var(--t-light);font-size:13px">Ce widget n\'a pas de paramètre.</p>');
+				$sbform->addAnything('</div>');
+			}
+		} else {
+			$sbform->addAnything('<p style="color:var(--t-muted)">Aucun module installé ne propose de widget (fichiers datas/modules/&lt;nom&gt;/widgets/&lt;clé&gt;.php).</p>');
+		}
+
 		$sbform->addAnything('</div>');
 
 		// ----------------------------
@@ -675,6 +754,10 @@ switch ($action) {
 		// (assets/adminator/dashboard-widget-form.js), pas d'aller-retour AJAX.
 		$sbsmarty->assign('sb_dashboard_schema_json', json_encode($sb_schema));
 		$sbsmarty->assign('sb_dashboard_table_links_json', json_encode($sb_table_links));
+		// Titre, icône et lien proposés par chaque widget de module (préremplissage JS)
+		$sb_mw_defaults = array();
+		foreach ($sb_module_widgets as $sb_mw_id => $sb_mw) $sb_mw_defaults[$sb_mw_id] = array('title' => $sb_mw['title'], 'icon' => $sb_mw['icon'], 'iconClass' => sbFaClass($sb_mw['icon']), 'link' => $sb_mw['link']);
+		$sbsmarty->assign('sb_dashboard_module_widgets_json', json_encode((object) $sb_mw_defaults, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT));
 
 	break;
 }

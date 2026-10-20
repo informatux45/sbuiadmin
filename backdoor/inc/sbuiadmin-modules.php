@@ -200,6 +200,169 @@ function sbModuleAdminTplDir($name) {
 	return is_dir($dir) ? $dir : null;
 }
 
+/**
+ * Widgets du dashboard livrés par les modules installés :
+ * datas/modules/<nom>/widgets/<clé>.php (clé : 17 caractères au plus,
+ * « nom:clé » tient dans sb_dashboard_widgets.widget_key). Un fichier en
+ * erreur est ignoré, jamais une page blanche.
+ * @return array 'nom:clé' => définition normalisée (voir sbModuleWidgetLoad())
+ */
+function sbModuleWidgets($reset = false) {
+	static $list = null;
+	if ($list !== null && !$reset) return $list;
+	$list = array();
+	foreach (array_keys(sbModulesActive()) as $name) {
+		foreach ((array) @scandir(sbModulesDir() . $name . DIRECTORY_SEPARATOR . 'widgets') as $file) {
+			if (!preg_match('/^([a-z][a-z0-9_]{0,16})\.php$/', (string) $file, $m)) continue;
+			$w = sbModuleWidgetLoad($name, $m[1]);
+			if ($w) $list[$name . ':' . $m[1]] = $w;
+		}
+	}
+	return $list;
+}
+
+/**
+ * Lit et contrôle un widget de module. Le fichier retourne :
+ *   'title' (titre proposé), 'icon', 'link', 'description',
+ *   'format' => 'kpi' (tuile : render() retourne une valeur) ou 'card'
+ *   (carte : render() retourne du HTML, ou un tableau de variables pour
+ *   widgets/<clé>.tpl, ou affiche son HTML avec echo),
+ *   'params' => array('nom' => array('label', 'type' => text|number|select|yesno,
+ *   'default', 'min', 'max', 'options' => valeur => libellé, 'required', 'help')),
+ *   'render' => function (array $params) { ... }
+ */
+function sbModuleWidgetLoad($name, $key) {
+	$dir  = sbModulesDir() . $name . DIRECTORY_SEPARATOR . 'widgets' . DIRECTORY_SEPARATOR;
+	$file = $dir . $key . '.php';
+	if (!sbModuleValidName($name) || !is_file($file)) return null;
+	try {
+		$w = include $file;
+	} catch (Throwable $e) {
+		return null;
+	}
+	if (!is_array($w) || !isset($w['render']) || !is_callable($w['render'])) return null;
+
+	$params = array();
+	foreach ((array) ($w['params'] ?? array()) as $p => $d) {
+		if (!preg_match('/^[a-z][a-z0-9_]{0,31}$/', (string) $p) || !is_array($d)) continue;
+		$type = in_array($d['type'] ?? 'text', array('text', 'number', 'select', 'yesno'), true) ? ($d['type'] ?? 'text') : 'text';
+		$opts = array();
+		foreach ((array) ($d['options'] ?? array()) as $v => $l) $opts[(string) $v] = (string) $l;
+		if ($type === 'select' && !$opts) continue;
+		$min = isset($d['min']) ? (int) $d['min'] : null;
+		$max = isset($d['max']) ? (int) $d['max'] : null;
+		switch ($type) {
+			case 'number': $def = (int) ($d['default'] ?? ($min ?? 0)); break;
+			case 'yesno':  $def = empty($d['default']) ? 0 : 1; break;
+			case 'select': $def = isset($opts[(string) ($d['default'] ?? '')]) ? (string) $d['default'] : (string) array_key_first($opts); break;
+			default:       $def = (string) ($d['default'] ?? '');
+		}
+		$params[$p] = array(
+			'label' => (string) ($d['label'] ?? $p), 'type' => $type, 'default' => $def,
+			'min' => $min, 'max' => $max, 'options' => $opts,
+			'required' => !empty($d['required']), 'help' => (string) ($d['help'] ?? ''),
+		);
+	}
+
+	$meta = sbModuleMeta($name);
+	return array(
+		'module'       => $name,
+		'module_title' => (string) ($meta['title'] ?? $name),
+		'key'          => $key,
+		'title'        => (string) ($w['title'] ?? $key),
+		'icon'         => (string) ($w['icon'] ?? ($meta['icon'] ?? 'puzzle-piece')),
+		'link'         => (string) ($w['link'] ?? ''),
+		'description'  => (string) ($w['description'] ?? ''),
+		'format'       => (($w['format'] ?? 'kpi') === 'card') ? 'card' : 'kpi',
+		'params'       => $params,
+		'render'       => $w['render'],
+		'tpl'          => is_file($dir . $key . '.tpl') ? $dir . $key . '.tpl' : null,
+	);
+}
+
+/**
+ * Paramètres d'un widget de module contrôlés selon sa définition (valeur
+ * absente : valeur par défaut). Les textes sont rendus tels quels : au
+ * widget de les échapper.
+ * @return array array(valeurs, message d'erreur ou '')
+ */
+function sbModuleWidgetParams(array $w, $input) {
+	$input = is_array($input) ? $input : array();
+	$out   = array();
+	foreach ($w['params'] as $p => $d) {
+		$v = (isset($input[$p]) && is_scalar($input[$p])) ? trim((string) $input[$p]) : '';
+		switch ($d['type']) {
+			case 'number':
+				if ($v === '') $v = (string) $d['default'];
+				if (!preg_match('/^-?\d{1,9}$/', $v) || ($d['min'] !== null && (int) $v < $d['min']) || ($d['max'] !== null && (int) $v > $d['max'])) {
+					$range = ($d['min'] !== null && $d['max'] !== null) ? ' entre ' . $d['min'] . ' et ' . $d['max'] : '';
+					return array(array(), '« ' . $d['label'] . ' » : nombre' . $range . ' attendu.');
+				}
+				$out[$p] = (int) $v;
+				break;
+			case 'select':
+				if ($v === '') $v = $d['default'];
+				if (!isset($d['options'][$v])) return array(array(), '« ' . $d['label'] . ' » : choix invalide.');
+				$out[$p] = $v;
+				break;
+			case 'yesno':
+				$out[$p] = ($v === '1') ? 1 : (($v === '0') ? 0 : $d['default']);
+				break;
+			default:
+				// Texte : vidé volontairement dans le formulaire, ou absent (défaut)
+				if (!isset($input[$p])) $v = $d['default'];
+				$v = mb_substr($v, 0, 255);
+				if ($v === '' && $d['required']) return array(array(), '« ' . $d['label'] . ' » est obligatoire.');
+				$out[$p] = $v;
+		}
+	}
+	return array($out, '');
+}
+
+/**
+ * Calcul d'un widget de module pour le dashboard ($json : paramètres
+ * enregistrés). Une exception du widget donne une tuile « indisponible ».
+ * @return array|null null : widget masqué (module retiré ou désactivé,
+ *   fichier disparu, droit « voir » du module refusé)
+ */
+function sbModuleWidgetRender($id, $json) {
+	$all = sbModuleWidgets();
+	if (!isset($all[$id])) return null;
+	$w = $all[$id];
+	if (function_exists('sbCheckRightRow')) {
+		$uid = function_exists('sbGetCurrentUserId') ? sbGetCurrentUserId() : 0;
+		if ($uid <= 0 || !sbCheckRightRow($w['module'], 'view', $uid)) return null;
+	}
+
+	$out = array('format' => $w['format'], 'value' => '', 'html' => '', 'error' => false);
+	list($params, $err) = sbModuleWidgetParams($w, json_decode((string) $json, true));
+	// Définition changée depuis l'enregistrement : valeurs par défaut
+	if ($err !== '') list($params, $err) = sbModuleWidgetParams($w, array());
+	if ($err !== '') { $out['error'] = true; return $out; }
+
+	$level = ob_get_level();
+	ob_start();
+	try {
+		$r    = call_user_func($w['render'], $params);
+		$echo = (string) ob_get_contents();
+		if ($w['format'] === 'kpi') {
+			$out['value'] = is_scalar($r) ? (string) $r : '';
+		} elseif (is_array($r) && $w['tpl'] !== null) {
+			global $sbsmarty;
+			$tpl = $sbsmarty->createTemplate('file:' . $w['tpl'], $sbsmarty);
+			$tpl->assign($r + array('params' => $params));
+			$out['html'] = $tpl->fetch();
+		} else {
+			$out['html'] = is_string($r) ? $r : $echo;
+		}
+	} catch (Throwable $e) {
+		$out['error'] = true;
+	} finally {
+		while (ob_get_level() > $level) ob_end_clean();
+	}
+	return $out;
+}
+
 /** Langue d'administration des modules installés (constantes) */
 function sbModulesLoadAdminLang($lang) {
 	foreach (array_keys(sbModulesActive()) as $name) {

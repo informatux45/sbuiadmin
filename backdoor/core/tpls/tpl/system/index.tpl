@@ -17,7 +17,7 @@
 			{if $sb_dashboard_widgets}
 			<div class="kpi-grid" aria-label="Widgets configurables">
 				{foreach from=$sb_dashboard_widgets item=widget}
-				{if $widget.type == 'table' || $widget.type == 'system' || $widget.type == 'weather'}
+				{if $widget.type == 'table' || $widget.type == 'system' || $widget.type == 'weather' || ($widget.type == 'module' && $widget.format == 'kpi')}
 				<a href="{$widget.link}" class="kpi-card c-{$widget.color}">
 					<div class="kpi-top">
 						<div class="kpi-identity">
@@ -32,7 +32,7 @@
 						{/if}
 					</div>
 					<div class="kpi-value"{if $widget.type != 'table'} style="font-size:24px"{/if}>
-						{if $widget.type == 'table'}{$widget.cpt|default:0}{else}{$widget.value}{/if}
+						{if $widget.type == 'table'}{$widget.cpt|default:0}{elseif $widget.type == 'module'}{if $widget.error}<span style="font-size:14px;color:var(--t-muted)">Indisponible</span>{else}{$widget.value|escape:'html'}{/if}{else}{$widget.value}{/if}
 					</div>
 					{if $widget.trend}
 						<div class="kpi-compare">
@@ -126,6 +126,20 @@
 {/foreach}</pre>
 					{else}
 						<p style="color:var(--t-muted);font-size:13px;padding:10px 0">Journal indisponible ou vide.</p>
+					{/if}
+				</section>
+				{elseif $widget.type == 'module' && $widget.format == 'card'}
+				<section class="col-4 card">
+					<div class="card-head">
+						<div class="card-title-wrap">
+							<h2 class="card-title">{if $widget.icon}<i class="{$widget.icon|sbFaClass} fa-fw" style="color:var(--{$widget.color})"></i> {/if}{$widget.title|@sbDisplayLang}</h2>
+						</div>
+						{if $widget.link}<a class="card-action" href="{$widget.link}">Voir tout <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>{/if}
+					</div>
+					{if $widget.error}
+						<p style="color:var(--t-muted);font-size:13px;padding:10px 0">Widget indisponible pour l'instant.</p>
+					{else}
+						<div>{$widget.html}</div>
 					{/if}
 				</section>
 				{elseif $widget.type == 'logaccess'}

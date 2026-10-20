@@ -14,7 +14,7 @@
 				<div class="hero-text">
 					<span class="eyebrow">Dashboard</span>
 					<h1 class="hero-title">Widgets du tableau de bord</h1>
-					<p class="hero-sub">Choisissez quelles tables SQL apparaissent en page d'accueil, sous forme de tuiles et de listes.</p>
+					<p class="hero-sub">Choisissez ce qui apparaît en page d'accueil (tables SQL, métriques, widgets des modules...), sous forme de tuiles et de cartes.</p>
 				</div>
 				<div class="hero-actions">
 					{if $all && (!isset($smarty.get.a) || $smarty.get.a == '' || $smarty.get.a == 'del' || $smarty.get.a == 'up' || $smarty.get.a == 'down')}
@@ -65,6 +65,8 @@
 															logs/{$widget.location} ({$widget.value_column} lignes)
 														{elseif $widget.type == 'logaccess'}
 															{$widget.value_column} dernières connexions
+														{elseif $widget.type == 'module'}
+															{if isset($sb_module_widget_labels[$widget.widget_key])}{$sb_module_widget_labels[$widget.widget_key]}{else}<span style="color:var(--danger)" title="Module désactivé ou retiré : widget masqué">{$widget.widget_key}</span>{/if}
 														{elseif isset($sb_table_titles[$widget.table_name])}
 															{$sb_table_titles[$widget.table_name]}
 														{else}
@@ -137,7 +139,7 @@
 		<!-- Page-Level Scripts - Use this space this write your own code -->
 		<!-- ------------------------------------------------------------ -->
 		{if isset($sb_dashboard_schema_json)}
-			<script>window.sbDashboardSchema = {$sb_dashboard_schema_json}; window.sbDashboardTableLinks = {$sb_dashboard_table_links_json};</script>
+			<script>window.sbDashboardSchema = {$sb_dashboard_schema_json}; window.sbDashboardTableLinks = {$sb_dashboard_table_links_json}; window.sbDashboardModuleWidgets = {$sb_dashboard_module_widgets_json};</script>
 			<script defer src="assets/adminator/dashboard-widget-form.js"></script>
 		{/if}
 

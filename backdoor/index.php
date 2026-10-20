@@ -703,6 +703,26 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 						continue;
 					}
 
+					if ($sb_widget_type == 'module') {
+						// Widget livré par un module (datas/modules/<nom>/widgets/),
+						// "content" = paramètres JSON - voir sbModuleWidgetRender()
+						$sb_mw = sbModuleWidgetRender($sb_widget['widget_key'], $sb_widget['content']);
+						if ($sb_mw === null) continue;
+						$sb_dashboard_widgets[] = array(
+							'id'     => $sb_widget['id'],
+							'type'   => 'module',
+							'format' => $sb_mw['format'],
+							'title'  => $sb_widget['title'],
+							'link'   => $sb_widget['link'],
+							'icon'   => $sb_widget['icon'],
+							'color'  => $sb_widget['color'],
+							'value'  => $sb_mw['value'],
+							'html'   => $sb_mw['html'],
+							'error'  => $sb_mw['error'],
+						);
+						continue;
+					}
+
 					if ($sb_widget_type == 'logaccess') {
 						$sb_dashboard_widgets[] = array(
 							'id'    => $sb_widget['id'],
