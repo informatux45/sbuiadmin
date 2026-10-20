@@ -668,7 +668,7 @@ INSERT INTO `<DB_PREFIX>sb_modules` (`name`, `version`, `db_version`, `installed
 ('store', '2.0.0', '2.0.0', NOW()),
 ('contact', '1.1.0', '1.1.0', NOW()),
 ('download', '1.0.1', '1.0.1', NOW()),
-('faq', '1.0.0', '1.0.0', NOW()),
+('faq', '1.0.1', '1.0.1', NOW()),
 ('gallery', '1.0.0', '1.0.0', NOW()),
 ('news', '1.0.3', '1.0.3', NOW()),
 ('slider', '1.0.0', '1.0.0', NOW()),

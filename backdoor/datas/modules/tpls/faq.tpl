@@ -83,6 +83,7 @@
 											{foreach from=$allfaq item=faq}
 												<tr class="data-row">
 													<td>{$faq.sort}</td>
+													<td>{$faq.id}</td>
 													<td>{$faq.category_name|unescape:"htmlall"}</td>
 													<td>{$faq.question|unescape:"htmlall"}</td>
 													<td>

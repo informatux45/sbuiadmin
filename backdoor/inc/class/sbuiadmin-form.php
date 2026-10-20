@@ -285,6 +285,9 @@ class form extends sanitize {
 		// seule colonne sur petit écran
 		$this -> formBuffer['open'] .= '<style>.sbform-row{display:grid;gap:14px;align-items:start}'
 			. '.sbform-cell{min-width:0;display:flex;flex-direction:column;gap:6px}'
+			// Aide : -10px de bridge.css calculé pour l'écart de 14px du formulaire ;
+			// dans une case (6px), -2px laisse le même écart de 4px sous le champ
+			. '.sbform-cell .help-block.help-block{margin-top:-2px}'
 			. '.sbform-row-title{font-weight:600;font-size:13px;margin:0 0 -6px}'
 			. '@media (max-width:768px){.sbform-row{grid-template-columns:1fr !important}}</style>';
 		$this -> formBuffer['open'] .= "\n" . '<form style="display:flex;flex-direction:column;gap:14px" ';

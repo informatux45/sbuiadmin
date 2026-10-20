@@ -110,17 +110,20 @@ Installing in a sub-folder: see `help.txt`.
 
 ## 📝 Changelog
 
+**4.49**
+- FAQ 1.0.1: missing ID cell in the questions table (columns were shifted); help text spacing under fields placed in an openRow() line
+
 **4.48**
 - Form class: the 'time' input type is accepted again by addInput() (HH:MM, same look as text fields); example Time field in the sandbox page (new sb_sandbox.hour column)
 
 **4.47**
 - A module can ship its own admin controller and templates in its folder (datas/modules/<name>/admin/<name>.php and admin/tpls/), used instead of backdoor/datas/modules/ with the same rights and CSRF checks; core templates still take precedence
 
-**4.46**
-- Admin login page settings (Configuration > Admin Login): gradient colors, SBUIADMIN version shown or hidden, square logo picked from the media library; native color picker in the form class
-
 <details>
   <summary><strong>Older versions</strong></summary>
+
+**4.46**
+- Admin login page settings (Configuration > Admin Login): gradient colors, SBUIADMIN version shown or hidden, square logo picked from the media library; native color picker in the form class
 
 **4.45**
 - Sites updated from an old version: database port/socket and ALTCHA no longer depend on the site's own sbconfig.php; the Update page lists vendor/ folders that are not part of SBUIADMIN (vendor/.htaccess blocks web access to them)
