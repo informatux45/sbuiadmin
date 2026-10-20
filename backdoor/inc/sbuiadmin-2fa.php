@@ -253,6 +253,7 @@ function sb2faGate() {
 		} elseif ($_SESSION['sb2fa']['attempts'] >= SB2FA_MAX_ATTEMPTS) {
 			if (function_exists('sbLoginFailed')) sbLoginFailed($username); // blocage temporaire
 			$sbusers->updateAccessLog('error', sprintf("Double authentification : trop d'essais pour [%s] depuis [%s]", $username, $ip), $username);
+			if (function_exists('sbSecurityEvent')) sbSecurityEvent('twofa_failed', 'critical', 'Trop de codes incorrects : session fermée', 'blocked', $username);
 			sb2faResetSession();
 			$sbsmarty->assign('sbuiadmin_access_code', 'E7');
 			$sbsmarty->display('system/login.tpl');
@@ -262,6 +263,7 @@ function sb2faGate() {
 			$left  = SB2FA_MAX_ATTEMPTS - $_SESSION['sb2fa']['attempts'];
 			$error = "Code incorrect. Il vous reste $left essai" . ($left > 1 ? 's' : '') . '.';
 			$sbusers->updateAccessLog('error', sprintf("Double authentification : code incorrect pour [%s] depuis [%s]", $username, $ip), $username);
+			if (function_exists('sbSecurityEvent')) sbSecurityEvent('twofa_failed', 'warning', 'Code incorrect', 'logged', $username);
 		}
 
 	} elseif (isset($_GET['sb2fa']) && $_GET['sb2fa'] == 'resend') {

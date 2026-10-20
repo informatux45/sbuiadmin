@@ -32,6 +32,8 @@ return array(
 		$db = sbSettingsDb();
 		if (!$db) throw new RuntimeException('Base indisponible');
 		foreach (sbModulesPresent(true) as $name => $meta) {
+			// Modules apparus après la 4.29 : inscrits par leur propre migration
+			if (in_array($name, array('sentinelle'), true)) continue;
 			$m->query('INSERT IGNORE INTO `' . $m->table('sb_modules') . '` (`name`, `version`, `db_version`, `installed_at`) VALUES ('
 				. "'" . $db->real_escape_string($name) . "', '" . $db->real_escape_string($meta['version']) . "', '" . $db->real_escape_string($meta['version']) . "', NOW())");
 		}

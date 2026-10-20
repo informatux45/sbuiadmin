@@ -452,6 +452,7 @@ function sbUpdIsProtected($rel) {
 		'backdoor/.htaccess', 'backdoor/.user.ini', 'backdoor/install.php',
 		'backdoor/inc/admin/settings.txt', 'backdoor/inc/admin/dashboard.txt', 'backdoor/inc/admin/theme.txt',
 		'backdoor/inc/admin/php-audit.txt', 'backdoor/inc/admin/php-audit.log', 'backdoor/inc/admin/2fa-disabled',
+		'backdoor/inc/admin/sentinelle-disabled',
 	);
 	static $prefixes = array('upload/', 'datas/cache/', 'backdoor/datas/cache/', 'backdoor/datas/updates/', 'backdoor/install/', '.sbupd/');
 	if (in_array($rel, $exact, true)) return true;

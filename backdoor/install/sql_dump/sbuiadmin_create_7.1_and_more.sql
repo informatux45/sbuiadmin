@@ -650,6 +650,32 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_gallery_photos` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `sb_sentinelle_log`
+-- (module Sentinelle : journal de sécurité)
+--
+
+DROP TABLE IF EXISTS `<DB_PREFIX>sb_sentinelle_log`;
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_sentinelle_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created_at` datetime NOT NULL,
+  `ip` varchar(45) NOT NULL DEFAULT '',
+  `type` varchar(32) NOT NULL DEFAULT '',
+  `severity` varchar(10) NOT NULL DEFAULT 'warning' COMMENT 'info, warning, critical',
+  `action` varchar(10) NOT NULL DEFAULT 'logged' COMMENT 'logged, blocked, banned',
+  `context` varchar(10) NOT NULL DEFAULT '' COMMENT 'front, admin',
+  `method` varchar(10) NOT NULL DEFAULT '',
+  `uri` varchar(255) NOT NULL DEFAULT '',
+  `user_agent` varchar(255) NOT NULL DEFAULT '',
+  `user` varchar(64) NOT NULL DEFAULT '',
+  `detail` text NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `created_at` (`created_at`),
+  KEY `ip_type` (`ip`, `type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `sb_modules`
 -- (modules installés : voir backdoor/inc/sbuiadmin-modules.php)
 --
@@ -673,7 +699,8 @@ INSERT INTO `<DB_PREFIX>sb_modules` (`name`, `version`, `db_version`, `installed
 ('news', '1.0.3', '1.0.3', NOW()),
 ('slider', '1.0.0', '1.0.0', NOW()),
 ('tabbs', '1.0.1', '1.0.1', NOW()),
-('table', '1.0.1', '1.0.1', NOW());
+('table', '1.0.1', '1.0.1', NOW()),
+('sentinelle', '1.0.0', '1.0.0', NOW());
 
 -- --------------------------------------------------------
 

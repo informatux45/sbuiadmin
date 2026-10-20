@@ -101,7 +101,12 @@ if (!function_exists('sbSiteInstalled') || sbSiteInstalled()) {
 	// --- Check if Blocked IP
 	$user_ip = sbGetUserIP();
 	$is_ip_blocked = sbIsBlockedIP($user_ip);
-	if (isset($is_ip_blocked) && $is_ip_blocked == $user_ip) sbForbiddenRedirect();
+	if (isset($is_ip_blocked) && $is_ip_blocked == $user_ip) {
+		if (function_exists('sbSecurityEvent')) sbSecurityEvent('ip_blocked', 'info', 'Accès refusé à une IP bloquée', 'blocked');
+		sbForbiddenRedirect();
+	}
+	// --- Sentinelle (module de sécurité, SBADMIN/inc/sbuiadmin-sentinelle.php)
+	if (function_exists('sbSentinelleGuard')) sbSentinelleGuard('front');
 	// --- Check FLOOD : seulement si l'anti-flood est activé (Utilisateurs >
 	// --- IP bloquées > Paramètres), comme à la connexion admin. Il tournait
 	// --- dès que Memcache était présent : deux pages dans la même seconde

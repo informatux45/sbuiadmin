@@ -174,6 +174,7 @@ class flood extends sql {
         $query_new_ip   = "INSERT INTO ".$this->table_blocked_ip." (ip,blockedtime,expirationtime,reason,infos)
                    VALUES ('$ip','$blockedtime','$expirationtime','$reason','$infos')";
         $result__new_ip = $this->query($query_new_ip);
+        if (function_exists('sbSecurityEvent')) sbSecurityEvent('flood', 'warning', (string) $datas['reason'], 'banned');
         return true;
     }
 }

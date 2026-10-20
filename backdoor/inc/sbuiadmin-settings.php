@@ -136,6 +136,11 @@ function sbSettingsDefaults() {
 		// cloudflare ou custom, et proxys de confiance (adresses ou CIDR)
 		'proxy_mode'            => 'none',
 		'proxy_trusted'         => '',
+		// Module Sentinelle (datas/modules/sentinelle/guard.php) : observe ou
+		// protect, conservation du journal en jours, IP de confiance
+		'sentinelle_mode'       => 'observe',
+		'sentinelle_retention'  => '90',
+		'sentinelle_trusted'    => '',
 		'toast_duration'        => '7',
 		'pagebuilder_modules'   => '',
 		'theme'                 => '',
@@ -823,7 +828,7 @@ defined('_AM_MEDIAS_URL') or define('_AM_MEDIAS_URL', sbMediasUrl());
 
 // ALTCHA et blocage des connexions (4.45) : chargés ici aussi, un ancien
 // sbconfig.php ne les inclut pas (altcha.php en erreur, connexion bloquée)
-foreach (array('clientip', 'altcha', 'loginlock') as $sb_inc) {
+foreach (array('clientip', 'sentinelle', 'altcha', 'loginlock') as $sb_inc) {
 	if (is_file(__DIR__ . "/sbuiadmin-$sb_inc.php")) require_once(__DIR__ . "/sbuiadmin-$sb_inc.php");
 }
 unset($sb_inc);

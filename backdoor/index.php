@@ -124,6 +124,9 @@ $sb_link_settings = sbSettingsLegacyArray();
 $sbsmarty->assign('sb_url_customer', sbSetting('site_url'));
 $sbsmarty->assign('sb_toast_duration', sbSetting('toast_duration', '7') ?: 7);
 
+// --- Sentinelle (module de sécurité, inc/sbuiadmin-sentinelle.php)
+sbSentinelleGuard('admin');
+
 // ----------------------
 // Identification / Authentification
 // ----------------------
@@ -271,6 +274,7 @@ if ((isset($_POST['username']) && $_POST['username']) && (isset($_POST['password
 		$sbuiadmin_type = 'error';
 		$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_LOCKED, $sbuiadmin_user_name, sbLoginLockIp());
 		$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
+		sbSecurityEvent('login_locked', 'warning', 'Trop d\'échecs : connexion refusée sans vérifier le mot de passe', 'blocked', $sbuiadmin_user_name);
 		$sbsmarty->display('system/login.tpl');
 		exit;
 	}
@@ -281,6 +285,7 @@ if ((isset($_POST['username']) && $_POST['username']) && (isset($_POST['password
 		$sbuiadmin_type = 'error';
 		$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_CAPTCHA_ERROR, $sbuiadmin_user_name, sbLoginLockIp()) . ' (' . $GLOBALS['sb_altcha_error'] . ')';
 		$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event, $sbuiadmin_user_name);
+		sbSecurityEvent('captcha_failed', 'warning', (string) $GLOBALS['sb_altcha_error'], 'blocked', $sbuiadmin_user_name);
 		$sbsmarty->display('system/login.tpl');
 		exit;
 	}
@@ -337,6 +342,7 @@ if ((isset($_POST['username']) && $_POST['username']) && (isset($_POST['password
 		$sbuiadmin_type = 'error';
 		$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_NOGRANTED, sbLoginLockIp());
 		$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event);
+		sbSecurityEvent('login_failed', 'warning', 'Identifiant ou mot de passe incorrect', 'logged', $sbuiadmin_user_name);
 		$sbsmarty->display('system/login.tpl');
 		exit;
 	}
@@ -524,6 +530,7 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 		// direct par URL (connaître index.php?p=faq ne suffisait jusqu'ici
 		// qu'à contourner le masquage cosmétique du menu). Voir inc/sbuiadmin-rights.php.
 		if (!sbHasRight($sb_get_page)) {
+			sbSecurityEvent('forbidden', 'info', 'Page ' . $sb_get_page . ' (' . sbClassifyAction($sb_get_page) . ')', 'blocked', (string) ($_SESSION['sbuiadmin_user_name'] ?? ''));
 			http_response_code(403);
 			$sbsmarty->display("403.tpl");
 			exit;
@@ -536,6 +543,7 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 		if ($_SERVER['REQUEST_METHOD'] === 'GET'
 			&& (sbClassifyAction($sb_get_page) === 'delete' || in_array(sbRightsActionParam($sb_get_page), $sb_csrf_get[$sb_get_page] ?? array(), true))
 			&& (empty($_SESSION['sbuiadmin_csrf_token']) || !is_string($_GET['t'] ?? null) || !hash_equals($_SESSION['sbuiadmin_csrf_token'], $_GET['t']))) {
+			sbSecurityEvent('csrf_failed', 'warning', 'Lien sans jeton valide : page ' . $sb_get_page, 'blocked', (string) ($_SESSION['sbuiadmin_user_name'] ?? ''));
 			http_response_code(403);
 			$sbsmarty->display("403.tpl");
 			exit;
@@ -553,6 +561,7 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 		// Depuis la 4.44 : TOUT POST (formulaires, AJAX : champ ou en-tête
 		// X-SB-CSRF, ajoutés par assets/adminator/csrf.js)
 		if ($_SERVER['REQUEST_METHOD'] === 'POST' && !sbCheckCsrfToken()) {
+			sbSecurityEvent('csrf_failed', 'warning', 'Envoi sans jeton valide : page ' . $sb_get_page, 'blocked', (string) ($_SESSION['sbuiadmin_user_name'] ?? ''));
 			http_response_code(403);
 			$sbsmarty->display("403.tpl");
 			exit;

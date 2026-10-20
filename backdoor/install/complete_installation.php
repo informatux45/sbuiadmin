@@ -249,6 +249,9 @@
 											'flood_login_delay'     => '4',
 											'proxy_mode'            => 'none',
 											'proxy_trusted'         => '',
+											'sentinelle_mode'       => 'observe',
+											'sentinelle_retention'  => '90',
+											'sentinelle_trusted'    => '',
 											'toast_duration'        => '7',
 											'pagebuilder_modules'   => '',
 											// Thème du site (ancien inc/admin/theme.txt)

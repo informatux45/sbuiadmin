@@ -20,6 +20,14 @@
   Cloudflare (plages intégrées) ou Autre proxy (adresses/CIDR de confiance).
 - Sans proxy déclaré, X-Forwarded-For / CF-Connecting-IP sont ignorés.
 
+### Sentinelle (module de sécurité)
+- Journal des refus (connexion, ALTCHA, 2FA, CSRF, droits, IP bloquée,
+  anti-flood), mode observation ou protection, IP de confiance.
+- Bloqué par erreur : créer le fichier vide backdoor/inc/admin/sentinelle-disabled.
+- Module tiers : sbSecurityEvent('type', 'info|warning|critical', 'détail',
+  'logged|blocked|banned', 'identifiant') note un événement (sans effet si
+  Sentinelle est absente).
+
 ### Site dans un sous-dossier (ex. /new/)
 - Configuration > Générale > URL du site : https://exemple.fr/new/
 - .htaccess : ErrorDocument 404 /new/index.php?p=pages&id=404
