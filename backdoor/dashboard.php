@@ -249,6 +249,8 @@ switch ($action) {
 			// Widget de module : seul le jeu de paramètres du widget choisi compte
 			$module_widget = is_string($_POST['module_widget'] ?? null) ? $_POST['module_widget'] : '';
 			$mw_params     = (isset($_POST['mwp'][$module_widget]) && is_array($_POST['mwp'][$module_widget])) ? $_POST['mwp'][$module_widget] : array();
+			// Largeur d'une carte : vide = celle du widget, stockée dans "value_column"
+			$mw_width      = in_array($_POST['mw_width'] ?? '', array('4', '6', '8', '12'), true) ? $_POST['mw_width'] : '';
 			$table_name   = $sbsanitize->displayText($_POST['table_name'] ?? '', 'UTF-8', 1, 0);
 			$value_column = $sbsanitize->displayText($_POST['value_column'] ?? '', 'UTF-8', 1, 0);
 			$date_column  = $sbsanitize->displayText($_POST['date_column'] ?? '', 'UTF-8', 1, 0);
@@ -405,7 +407,8 @@ switch ($action) {
 							$widget_key   = $module_widget;
 						}
 					}
-					$table_name = $value_column = $date_column = '';
+					$value_column = $mw_width;
+					$table_name = $date_column = '';
 					$show_chart = '0';
 					break;
 
@@ -445,7 +448,7 @@ switch ($action) {
 					$result_add = $sbsql->query($query);
 					if ($result_add) {
 						// --- Vider les champs du formulaire
-						$table_name = $value_column = $date_column = $widget_key = $city_input = $content_html = $content_text = $rss_url = $rss_count = $iframe_url = $log_filename = $log_lines = $logaccess_count = $widget_title = $link = $icon = $module_widget = '';
+						$table_name = $value_column = $date_column = $widget_key = $city_input = $content_html = $content_text = $rss_url = $rss_count = $iframe_url = $log_filename = $log_lines = $logaccess_count = $widget_title = $link = $icon = $module_widget = $mw_width = '';
 						$mw_params = array();
 						$type = 'table'; $color = 'primary'; $show_chart = '0'; $active = '1';
 						// --- Message SUCCESS
@@ -489,7 +492,7 @@ switch ($action) {
 			// Si AJOUT (First time)
 			// --- Vider les champs du formulaire
 			$type = 'table';
-			$table_name = $value_column = $date_column = $widget_key = $city_input = $content_html = $content_text = $rss_url = $rss_count = $iframe_url = $log_filename = $log_lines = $logaccess_count = $widget_title = $link = $icon = $module_widget = '';
+			$table_name = $value_column = $date_column = $widget_key = $city_input = $content_html = $content_text = $rss_url = $rss_count = $iframe_url = $log_filename = $log_lines = $logaccess_count = $widget_title = $link = $icon = $module_widget = $mw_width = '';
 			$mw_params = array();
 			$color = 'primary'; $show_chart = '0'; $active = '1';
 		}
@@ -523,6 +526,7 @@ switch ($action) {
 			$logaccess_count = ($assoc['type'] == 'logaccess') ? $assoc['value_column'] : '';
 			$module_widget   = ($assoc['type'] == 'module') ? $assoc['widget_key'] : '';
 			$mw_params       = ($assoc['type'] == 'module') ? (array) json_decode((string) $assoc['content'], true) : array();
+			$mw_width        = ($assoc['type'] == 'module') ? $assoc['value_column'] : '';
 			$widget_title    = sb_utf8_encode($assoc['title']);
 			$link         = sb_utf8_encode($assoc['link']);
 			$icon         = sb_utf8_encode($assoc['icon']);
@@ -706,6 +710,13 @@ switch ($action) {
 				if (!$sb_mw['params']) $sbform->addAnything('<p style="color:var(--t-light);font-size:13px">Ce widget n\'a pas de paramètre.</p>');
 				$sbform->addAnything('</div>');
 			}
+			$sbform->openSelect("Largeur de la carte", array("id" => "mw_width", "name" => "mw_width"));
+			foreach (array('' => 'Celle du widget', '4' => '1/3 de la largeur (4 colonnes)', '6' => '1/2 (6 colonnes)', '8' => '2/3 (8 colonnes)', '12' => 'Toute la largeur (12 colonnes)') as $sb_wv => $sb_wl) {
+				$sb_opt_args = array("value" => $sb_wv);
+				if ((string) $sb_wv === (string) $mw_width) $sb_opt_args['selected'] = '';
+				$sbform->addOption($sb_wl, $sb_opt_args);
+			}
+			$sbform->closeSelect('Widgets en carte seulement (une tuile garde sa taille).');
 		} else {
 			$sbform->addAnything('<p style="color:var(--t-muted)">Aucun module installé ne propose de widget (fichiers datas/modules/&lt;nom&gt;/widgets/&lt;clé&gt;.php).</p>');
 		}

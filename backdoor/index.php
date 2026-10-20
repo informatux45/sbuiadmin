@@ -605,6 +605,8 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 				// widgets sont masqués (données gardées, module désactivé,
 				// sa page d'admin n'est plus accessible)
 				$sb_dashboard_off = array();
+				// Scripts demandés par les widgets de module, chargés une fois
+				$sb_dashboard_module_scripts = array();
 				foreach (sbModulesPresent() as $sb_mod_name => $sb_mod_meta) {
 					if (!sbModuleActive($sb_mod_name)) foreach (array_keys((array) $sb_mod_meta['tables']) as $sb_mod_t) $sb_dashboard_off[$sb_mod_t] = true;
 				}
@@ -706,8 +708,10 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 					if ($sb_widget_type == 'module') {
 						// Widget livré par un module (datas/modules/<nom>/widgets/),
 						// "content" = paramètres JSON - voir sbModuleWidgetRender()
-						$sb_mw = sbModuleWidgetRender($sb_widget['widget_key'], $sb_widget['content']);
+						// "value_column" = largeur choisie à l'ajout (vide : celle du widget)
+						$sb_mw = sbModuleWidgetRender($sb_widget['widget_key'], $sb_widget['content'], $sb_widget['value_column']);
 						if ($sb_mw === null) continue;
+						foreach ($sb_mw['scripts'] as $sb_mw_src) $sb_dashboard_module_scripts[$sb_mw_src] = true;
 						$sb_dashboard_widgets[] = array(
 							'id'     => $sb_widget['id'],
 							'type'   => 'module',
@@ -716,8 +720,11 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 							'link'   => $sb_widget['link'],
 							'icon'   => $sb_widget['icon'],
 							'color'  => $sb_widget['color'],
-							'value'  => $sb_mw['value'],
-							'html'   => $sb_mw['html'],
+							'value'   => $sb_mw['value'],
+							'compare' => $sb_mw['compare'],
+							'trend'   => $sb_mw['trend'],
+							'width'   => $sb_mw['width'],
+							'html'    => $sb_mw['html'],
 							'error'  => $sb_mw['error'],
 						);
 						continue;
@@ -806,6 +813,7 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 
 							$sb_item['trend'] = array(
 								'direction' => $sb_direction,
+								'tone'      => $sb_direction,
 								'percent'   => abs($sb_percent),
 								'current'   => $sb_current,
 								'previous'  => $sb_previous,
@@ -841,6 +849,7 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 				}
 
 				$sbsmarty->assign('sb_dashboard_widgets', $sb_dashboard_widgets);
+				$sbsmarty->assign('sb_dashboard_module_scripts', array_keys($sb_dashboard_module_scripts));
 
 				// --- Users (cpt) - hors mécanisme widgets, ligne KPI admin fixe (index.tpl)
 				$query_5  = "SELECT id FROM " . _AM_DB_PREFIX . "sb_users";

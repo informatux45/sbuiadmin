@@ -25,7 +25,7 @@
 							<div class="kpi-label">{$widget.title|@sbDisplayLang}</div>
 						</div>
 						{if $widget.trend}
-							<span class="kpi-pill {$widget.trend.direction}">
+							<span class="kpi-pill {$widget.trend.tone}">
 								<svg viewBox="0 0 24 24">{if $widget.trend.direction == 'up'}<path d="M7 17l10-10M7 7h10v10"/>{elseif $widget.trend.direction == 'down'}<path d="M7 7l10 10M17 7v10H7"/>{else}<path d="M5 12h14"/>{/if}</svg>
 								{if $widget.trend.direction == 'up'}+{elseif $widget.trend.direction == 'down'}-{/if}{$widget.trend.percent}%
 							</span>
@@ -34,7 +34,9 @@
 					<div class="kpi-value"{if $widget.type != 'table'} style="font-size:24px"{/if}>
 						{if $widget.type == 'table'}{$widget.cpt|default:0}{elseif $widget.type == 'module'}{if $widget.error}<span style="font-size:14px;color:var(--t-muted)">Indisponible</span>{else}{$widget.value|escape:'html'}{/if}{else}{$widget.value}{/if}
 					</div>
-					{if $widget.trend}
+					{if $widget.type == 'module'}
+						{if $widget.compare}<div class="kpi-compare">{$widget.compare|escape:'html'}</div>{/if}
+					{elseif $widget.trend}
 						<div class="kpi-compare">
 							<svg class="{$widget.trend.direction}" viewBox="0 0 24 24">{if $widget.trend.direction == 'up'}<path d="M7 17l10-10M7 7h10v10"/>{elseif $widget.trend.direction == 'down'}<path d="M7 7l10 10M17 7v10H7"/>{else}<path d="M5 12h14"/>{/if}</svg>
 							{if $widget.trend.direction == 'up'}en hausse{elseif $widget.trend.direction == 'down'}en baisse{else}stable{/if} depuis <strong>{$widget.trend.previous}</strong> <span class="sep">·</span> 7 derniers jours
@@ -47,6 +49,9 @@
 				{/foreach}
 			</div>
 
+			{* Scripts demandés par les widgets de module (clé 'scripts'), une fois chacun, avant les cartes *}
+			{foreach from=$sb_dashboard_module_scripts item=sbmwscript}<script src="{$sbmwscript|escape:'html'}"></script>
+			{/foreach}
 			<div class="grid">
 				{foreach from=$sb_dashboard_widgets item=widget}
 				{if $widget.type == 'table'}
@@ -129,7 +134,7 @@
 					{/if}
 				</section>
 				{elseif $widget.type == 'module' && $widget.format == 'card'}
-				<section class="col-4 card">
+				<section class="col-{$widget.width} card">
 					<div class="card-head">
 						<div class="card-title-wrap">
 							<h2 class="card-title">{if $widget.icon}<i class="{$widget.icon|sbFaClass} fa-fw" style="color:var(--{$widget.color})"></i> {/if}{$widget.title|@sbDisplayLang}</h2>

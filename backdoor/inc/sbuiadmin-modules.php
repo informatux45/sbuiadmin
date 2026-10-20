@@ -224,9 +224,14 @@ function sbModuleWidgets($reset = false) {
 /**
  * Lit et contrôle un widget de module. Le fichier retourne :
  *   'title' (titre proposé), 'icon', 'link', 'description',
- *   'format' => 'kpi' (tuile : render() retourne une valeur) ou 'card'
- *   (carte : render() retourne du HTML, ou un tableau de variables pour
+ *   'format' => 'kpi' (tuile : render() retourne une valeur, ou
+ *   array('value', 'compare' => texte sous la valeur, 'trend' => % signé,
+ *   'trend_good' => 'up'|'down' : sens favorable)) ou 'card' (carte :
+ *   render() retourne du HTML, ou un tableau de variables pour
  *   widgets/<clé>.tpl, ou affiche son HTML avec echo),
+ *   'width' => 4|6|8|12 (colonnes d'une carte, 4 par défaut),
+ *   'scripts' => array('chemin/relatif.js' ou 'https://...') chargés une
+ *   seule fois avant les cartes,
  *   'params' => array('nom' => array('label', 'type' => text|number|select|yesno,
  *   'default', 'min', 'max', 'options' => valeur => libellé, 'required', 'help')),
  *   'render' => function (array $params) { ... }
@@ -264,6 +269,12 @@ function sbModuleWidgetLoad($name, $key) {
 		);
 	}
 
+	$scripts = array();
+	foreach ((array) ($w['scripts'] ?? array()) as $src) {
+		$src = (string) $src;
+		if (preg_match('#^https://[^\s"\'<>]+$#', $src) || (preg_match('#^[A-Za-z0-9_./~-]+(\?[A-Za-z0-9_.=&-]*)?$#', $src) && strpos($src, '//') === false)) $scripts[] = $src;
+	}
+
 	$meta = sbModuleMeta($name);
 	return array(
 		'module'       => $name,
@@ -274,10 +285,17 @@ function sbModuleWidgetLoad($name, $key) {
 		'link'         => (string) ($w['link'] ?? ''),
 		'description'  => (string) ($w['description'] ?? ''),
 		'format'       => (($w['format'] ?? 'kpi') === 'card') ? 'card' : 'kpi',
+		'width'        => sbModuleWidgetWidth($w['width'] ?? 4),
+		'scripts'      => array_values(array_unique($scripts)),
 		'params'       => $params,
 		'render'       => $w['render'],
 		'tpl'          => is_file($dir . $key . '.tpl') ? $dir . $key . '.tpl' : null,
 	);
+}
+
+/** Largeur d'une carte (colonnes de la grille) : 4, 6, 8 ou 12, sinon 4 */
+function sbModuleWidgetWidth($width) {
+	return in_array((int) $width, array(4, 6, 8, 12), true) ? (int) $width : 4;
 }
 
 /**
@@ -321,11 +339,12 @@ function sbModuleWidgetParams(array $w, $input) {
 
 /**
  * Calcul d'un widget de module pour le dashboard ($json : paramètres
- * enregistrés). Une exception du widget donne une tuile « indisponible ».
+ * enregistrés, $width : largeur choisie à l'ajout, vide = celle du
+ * widget). Une exception du widget donne une tuile « indisponible ».
  * @return array|null null : widget masqué (module retiré ou désactivé,
  *   fichier disparu, droit « voir » du module refusé)
  */
-function sbModuleWidgetRender($id, $json) {
+function sbModuleWidgetRender($id, $json, $width = '') {
 	$all = sbModuleWidgets();
 	if (!isset($all[$id])) return null;
 	$w = $all[$id];
@@ -334,7 +353,10 @@ function sbModuleWidgetRender($id, $json) {
 		if ($uid <= 0 || !sbCheckRightRow($w['module'], 'view', $uid)) return null;
 	}
 
-	$out = array('format' => $w['format'], 'value' => '', 'html' => '', 'error' => false);
+	$out = array(
+		'format' => $w['format'], 'value' => '', 'compare' => '', 'trend' => null, 'html' => '', 'error' => false,
+		'width' => ((string) $width !== '') ? sbModuleWidgetWidth($width) : $w['width'], 'scripts' => $w['scripts'],
+	);
 	list($params, $err) = sbModuleWidgetParams($w, json_decode((string) $json, true));
 	// Définition changée depuis l'enregistrement : valeurs par défaut
 	if ($err !== '') list($params, $err) = sbModuleWidgetParams($w, array());
@@ -346,7 +368,13 @@ function sbModuleWidgetRender($id, $json) {
 		$r    = call_user_func($w['render'], $params);
 		$echo = (string) ob_get_contents();
 		if ($w['format'] === 'kpi') {
-			$out['value'] = is_scalar($r) ? (string) $r : '';
+			if (is_array($r)) {
+				$out['value']   = is_scalar($r['value'] ?? null) ? (string) $r['value'] : '';
+				$out['compare'] = is_scalar($r['compare'] ?? null) ? (string) $r['compare'] : '';
+				$out['trend']   = sbModuleWidgetTrend($r['trend'] ?? null, $r['trend_good'] ?? 'up');
+			} else {
+				$out['value'] = is_scalar($r) ? (string) $r : '';
+			}
 		} elseif (is_array($r) && $w['tpl'] !== null) {
 			global $sbsmarty;
 			$tpl = $sbsmarty->createTemplate('file:' . $w['tpl'], $sbsmarty);
@@ -361,6 +389,21 @@ function sbModuleWidgetRender($id, $json) {
 		while (ob_get_level() > $level) ob_end_clean();
 	}
 	return $out;
+}
+
+/**
+ * Pastille de tendance d'une tuile de module : flèche selon le signe,
+ * couleur selon le sens favorable ($good 'down' : une baisse est verte)
+ * @return array|null direction (flèche), tone (couleur), percent (texte)
+ */
+function sbModuleWidgetTrend($trend, $good = 'up') {
+	if (!is_int($trend) && !is_float($trend) && !(is_string($trend) && is_numeric($trend))) return null;
+	$trend = round((float) $trend, 1);
+	if (!is_finite($trend)) return null;
+	$direction = ($trend > 0) ? 'up' : (($trend < 0) ? 'down' : 'flat');
+	$tone = ($direction === 'flat') ? 'flat' : ((($direction === 'up') === ($good !== 'down')) ? 'up' : 'down');
+	$percent = str_replace('.', ',', rtrim(rtrim(number_format(abs($trend), 1, '.', ''), '0'), '.'));
+	return array('direction' => $direction, 'tone' => $tone, 'percent' => $percent);
 }
 
 /** Langue d'administration des modules installés (constantes) */

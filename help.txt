@@ -62,6 +62,9 @@ Chaque site a son sbdbconfig.php (sbdbconfig-<dossier>.php pour les suivants).
   'default', 'min', 'max', 'options')), 'render' => function ($params) {...}).
   kpi : render() retourne la valeur ; card : du HTML (à échapper), ou des
   variables pour widgets/<clé>.tpl. Masqué sans le droit « voir » du module.
+  Tuile enrichie : array('value', 'compare', 'trend' => % signé,
+  'trend_good' => 'down' si une baisse est bonne). 'width' => 4|6|8|12
+  (carte, modifiable à l'ajout), 'scripts' => array(...) chargés une fois.
 - Module propre à un site : 'origin' => 'site' dans module.php (jamais
   installé ni mis à jour depuis GitHub, fichiers hors mise à jour du core).
 - 'csrf_get' => array('duplicate', ...) : actions GET sensibles du module
