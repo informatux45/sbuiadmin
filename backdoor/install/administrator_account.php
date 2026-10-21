@@ -20,11 +20,16 @@
     require_once('include/settings.inc.php');    
 	require_once('include/functions.inc.php');
 	require_once('include/languages.inc.php');	
+	require_once('include/admindir.inc.php');
 
 	$task = isset($_POST['task']) ? prepare_input($_POST['task']) : '';
 	$passed_step = isset($_SESSION['passed_step']) ? (int)$_SESSION['passed_step'] : 0;
 	$focus_field = 'settings_customer_name';
 	$error_msg = '';
+	// Dossier d'administration tiré au hasard : installation neuve seulement
+	$sb_root        = dirname(__DIR__, 2);
+	$sb_admin_now   = basename(dirname(__DIR__));
+	$sb_ask_admin   = (($_SESSION['install_type'] ?? 'create') === 'create');
 	
 	// handle previous steps
 	// -------------------------------------------------
@@ -65,6 +70,7 @@
 		$admin_username         = isset($_POST['admin_username']) ? trim((string)$_POST['admin_username']) : '';
 		$admin_password         = isset($_POST['admin_password']) ? (string)$_POST['admin_password'] : '';
 		$admin_password_confirm = isset($_POST['admin_password_confirm']) ? (string)$_POST['admin_password_confirm'] : '';
+		$admin_dir              = $sb_ask_admin && isset($_POST['admin_dir']) ? strtolower(trim((string)$_POST['admin_dir'])) : $sb_admin_now;
 
 		// validation here
 		// -------------------------------------------------
@@ -86,6 +92,9 @@
 		}else if(!hash_equals($admin_password, $admin_password_confirm)){
 			$focus_field = 'admin_password_confirm';
 			$error_msg = lang_key('alert_admin_password_mismatch');
+		}else if($sb_ask_admin && ($sb_dir_error = sbInstAdminDirError($admin_dir, $sb_admin_now, $sb_root)) !== ''){
+			$focus_field = 'admin_dir';
+			$error_msg = htmlspecialchars($sb_dir_error, ENT_QUOTES, 'UTF-8');
 		}else{
 
 			if(EI_MODE == 'demo'){
@@ -100,6 +109,7 @@
 				$_SESSION['password_encryption'] = $password_encryption;				
 				$_SESSION['admin_username']      = $admin_username;
 				$_SESSION['admin_password_hash'] = password_hash($admin_password, PASSWORD_DEFAULT);
+				$_SESSION['admin_dir']           = $admin_dir;
 
 				$_SESSION['passed_step'] = 4;
 				header('location: ready_to_install.php');
@@ -108,8 +118,12 @@
 		}
 	} else {
 		// --- Initialization
-        $current_url          =  ( (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? 'https://' : 'http://' ) . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
-        $sbuiadmin_url        = str_replace('backdoor/install/administrator_account.php', '', $current_url);
+        // Adresse proposée pour le site : port gardé s'il n'est pas celui par défaut
+        $sb_https             = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off');
+        $sb_port              = (int) ($_SERVER['SERVER_PORT'] ?? 0);
+        $sb_port              = ($sb_port && $sb_port !== ($sb_https ? 443 : 80)) ? ':' . $sb_port : '';
+        $current_url          = ($sb_https ? 'https://' : 'http://') . $_SERVER['SERVER_NAME'] . $sb_port . $_SERVER['REQUEST_URI'];
+        $sbuiadmin_url        = str_replace($sb_admin_now . '/install/administrator_account.php', '', $current_url);
 		// Nom du client
 		$settings_customer_name = isset($_SESSION['settings_customer_name']) ? $_SESSION['settings_customer_name'] : '';
 		// Url du site client
@@ -117,6 +131,7 @@
 		
 		$password_encryption = isset($_SESSION['password_encryption']) ? $_SESSION['password_encryption'] : EI_PASSWORD_ENCRYPTION_TYPE;
 		$admin_username = isset($_SESSION['admin_username']) ? $_SESSION['admin_username'] : 'admin';
+		$admin_dir      = isset($_SESSION['admin_dir']) ? $_SESSION['admin_dir'] : sbInstAdminDirGenerate();
 		$install_type = isset($_SESSION['install_type']) ? $_SESSION['install_type'] : '';
 		
 		// skip administrator settings
@@ -179,6 +194,10 @@
 						<h4><?php echo lang_key('admin_password'); ?></h4>
 						<p><?php echo lang_key('admin_password_info'); ?></p>
 					</div>
+					<div id="notes_admin_dir" class="notes_container">
+						<h4>Dossier d'administration</h4>
+						<p>Nom tiré au hasard à la place de « <?php echo htmlspecialchars($sb_admin_now, ENT_QUOTES, 'UTF-8'); ?> » : l'adresse de la page de connexion ne sera plus celle que les robots connaissent. Le dossier est renommé à la toute fin de l'installation. <b>Notez ce nom</b> : l'administration sera à l'adresse du site suivie de ce nom.</p>
+					</div>
 					<img class="loading_img" src="images/ajax_loading.gif" alt="<?php echo lang_key('loading'); ?>..." />
 					<div id="notes_message" class="notes_container"></div>					
 				</td>
@@ -200,6 +219,16 @@
 				<td>&nbsp;<?php echo lang_key('admin_password_confirm'); ?>&nbsp;<span class="star">*</span></td>
 				<td><input name="admin_password_confirm" id="admin_password_confirm" class="form_text" type="password" size="28" value="" onfocus="textboxOnFocus('notes_admin_password')" onblur="textboxOnBlur('notes_admin_password')" autocomplete="new-password" minlength="10" required="" /></td>
 			</tr>
+			<?php if($sb_ask_admin){ ?>
+			<tr><td nowrap height="10px" colspan="3"></td></tr>
+			<tr>
+				<td>&nbsp;Dossier d'administration&nbsp;<span class="star">*</span></td>
+				<td>
+					<input name="admin_dir" id="admin_dir" class="form_text" size="28" maxlength="32" value="<?php echo htmlspecialchars($admin_dir ?? '', ENT_QUOTES, 'UTF-8'); ?>" onfocus="textboxOnFocus('notes_admin_dir')" onblur="textboxOnBlur('notes_admin_dir')" autocomplete="off" pattern="[a-z][a-z0-9]{5,31}" required="" />
+					<a href="#" onclick="return sbAdminDirDraw();" title="Tirer un autre nom">&#x21bb; autre nom</a>
+				</td>
+			</tr>
+			<?php } ?>
 				<?php if(EI_USE_PASSWORD_ENCRYPTION){ ?>
 				<tr>
 					<td>&nbsp;<?php echo lang_key('password_encryption'); ?>&nbsp;</td>
@@ -235,7 +264,16 @@
 <script type="text/javascript">
 	function bodyOnLoad(){
 		setFocus("<?php echo $focus_field; ?>");
-	}	
+	}
+	// Autre nom de dossier : même tirage que sbInstAdminDirGenerate(), générateur sûr du navigateur
+	function sbAdminDirDraw(){
+		var c = 'bcdfgjklmnprstvz', v = 'aeiou', r = new Uint32Array(11), name = '';
+		window.crypto.getRandomValues(r);
+		for (var i = 0; i < 5; i++) name += c.charAt(r[2 * i] % c.length) + v.charAt(r[2 * i + 1] % v.length);
+		var n = r[10] % 100;
+		document.getElementById('admin_dir').value = name + (n < 10 ? '0' : '') + n;
+		return false;
+	}
 </script>
 </body>
 </html>

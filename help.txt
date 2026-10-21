@@ -12,7 +12,8 @@
 - Clé d'installation : backdoor/install/installer/install-key.php
 
 ### Renommer le dossier d'administration
-- Renommer backdoor/, puis mettre le même nom dans SBADMIN (sbconfig.php).
+- Installation neuve : nom du dossier d'admin tiré au hasard (étape 4), renommé à la fin.
+- Plus tard : renommer le dossier, puis mettre le même nom dans SBADMIN (sbconfig.php).
   Les mises à jour le conservent.
 
 ### Proxy ou CDN (Cloudflare) devant le site

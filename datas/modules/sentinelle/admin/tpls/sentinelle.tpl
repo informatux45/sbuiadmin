@@ -96,6 +96,12 @@
 							{if $sb_integrity.counts.$k > 100}<p class="help-block">100 affichés sur {$sb_integrity.counts.$k}.</p>{/if}
 							{/if}
 						{/foreach}
+						{if !empty($sb_integrity.retired)}
+							<h3 style="margin-top:16px">Fichiers d'anciens modules officiels (conformes à leur version publiée)</h3>
+							<ul style="font-family:monospace;font-size:12px;word-break:break-all">{foreach from=$sb_integrity.retired item=f}<li>{$f|escape}</li>{/foreach}</ul>
+							{if $sb_integrity.counts.retired > 100}<p class="help-block">100 affichés sur {$sb_integrity.counts.retired}.</p>{/if}
+							<p class="help-block" style="margin-top:12px">Module{if $sb_integrity.retired_modules|@count > 1}s{/if} remplacé{if $sb_integrity.retired_modules|@count > 1}s{/if} dans le CMS : {foreach from=$sb_integrity.retired_modules item=rm name=rms}{$rm|escape}{if !$smarty.foreach.rms.last}, {/if}{/foreach}. Ces fichiers sont d'origine, pas des ajouts : installez le module qui le remplace (Mise à jour &gt; Modules, ex. E-commerce pour Boutique), il reprend les données et retire ces fichiers.</p>
+						{/if}
 						{if $sb_integrity.modules}<p class="help-block" style="margin-top:12px">Modules non vérifiés (version différente de celle publiée avec le cœur) : {foreach from=$sb_integrity.modules item=mm name=mods}{$mm|escape}{if !$smarty.foreach.mods.last}, {/if}{/foreach}.</p>{/if}
 					{else}
 						<p>Aucune analyse pour l'instant.</p>

@@ -154,11 +154,15 @@ Installing in a sub-folder: see `help.txt`.
 | `/backdoor/index.php?p=update` | *Configuration › Mise à jour*: updates of the core and of each module (signed releases only) |
 | `/?maintenance=apercu` | Preview of the maintenance page (administrators only) |
 
-The administration folder is named `backdoor` by default. You can rename it after installation (e.g. to hide the login page): rename the folder, then set the same name in `SBADMIN` in `sbconfig.php`; updates keep it. Third-party modules live in `datas/modules/<name>/`; see `help.txt` for their structure, rights and dashboard widgets.
+The administration folder is shipped as `backdoor`. A new installation proposes a random name (e.g. `vokadilumi47`) and renames the folder at the very end, so the login page is not at a known address; write the new address down. To rename it later: rename the folder, then set the same name in `SBADMIN` in `sbconfig.php`; updates keep it. Third-party modules live in `datas/modules/<name>/`; see `help.txt` for their structure, rights and dashboard widgets.
 
 ---
 
 ## 📝 Changelog
+
+**4.65**
+- New installs: random name for the administration folder (step 4, e.g. `vokadilumi47`), renamed at the very end of the installation; the default site URL keeps its port
+- Sentinelle 1.7.1: files of a retired official module (e.g. Boutique, replaced by E-commerce) are checked against that module's published list and shown apart instead of "added PHP"
 
 **4.64**
 - Sentinelle 1.7.0: site-specific PHP files can be approved from the Integrity page (path + SHA-256 in the database, password required; reported again if changed), watched prefixes (new files below them raise a warning instead of a critical event), real totals instead of a 500 cap; log columns no longer overlap
@@ -170,11 +174,11 @@ The administration folder is named `backdoor` by default. You can rename it afte
 - Admin forms ask for confirmation before leaving a page with unsaved changes
 - Theme read from the database only; the old inc/admin/theme.txt is removed (kept while an old sbconfig.php still reads it)
 
-**4.62**
-- Store module renamed to "E-commerce" with a star icon (display name and sidebar menu only; identifier, routes and tables unchanged)
-
 <details>
   <summary><strong>Older versions</strong></summary>
+
+**4.62**
+- Store module renamed to "E-commerce" with a star icon (display name and sidebar menu only; identifier, routes and tables unchanged)
 
 **4.61**
 - Page Builder: a dropped row/block no longer sometimes sticks in the middle of the canvas (leftover inline position from jQuery UI connectToSortable); inline styles are cleaned after every drop

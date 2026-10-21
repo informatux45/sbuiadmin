@@ -58,6 +58,41 @@
 		exit;
 	}
 
+	// -------------------------------------------------------------------
+	// Renommage du dossier d'administration (installation neuve, point 67),
+	// lancé par la page finale une fois affichée : la renommer pendant son
+	// propre affichage casserait ses feuilles de style et images. Même
+	// principe que la suppression ci-dessus : jeton à usage unique de 30 min,
+	// empreinte + nouveau nom dans installer/rename.token.
+	// -------------------------------------------------------------------
+	if (isset($_POST['task']) && $_POST['task'] === 'sb_rename_admin') {
+		require_once(__DIR__ . '/include/admindir.inc.php');
+		$sb_token_file = __DIR__ . '/installer/rename.token';
+		$sb_stored     = @file($sb_token_file, FILE_IGNORE_NEW_LINES);
+		$sb_given      = isset($_POST['sb_rename_token']) ? (string) $_POST['sb_rename_token'] : '';
+		$sb_dir        = realpath(__DIR__);
+		$sb_allowed    = $sb_stored && count($sb_stored) >= 3 && $sb_given !== ''
+			&& hash_equals($sb_stored[0], hash('sha256', $sb_given))
+			&& (time() - (int) $sb_stored[1]) < 1800
+			&& file_exists(__DIR__ . '/installer/installer.lock')
+			&& $sb_dir && basename($sb_dir) === 'install';
+		header('Content-Type: application/json; charset=utf-8');
+		if (!$sb_allowed) {
+			http_response_code(403);
+			echo json_encode(array('ok' => false, 'message' => "Renommage refusé (lien expiré ou invalide) : le dossier d'administration garde son nom."));
+			exit;
+		}
+		@unlink($sb_token_file);
+		$sb_root  = dirname($sb_dir, 2);
+		$sb_old   = basename(dirname($sb_dir));
+		$sb_new   = (string) $sb_stored[2];
+		$sb_error = sbInstAdminDirRename($sb_root, $sb_old, $sb_new);
+		echo json_encode($sb_error === ''
+			? array('ok' => true, 'name' => $sb_new, 'base' => '../../' . $sb_new . '/', 'message' => "Dossier d'administration renommé : " . $sb_new)
+			: array('ok' => false, 'name' => $sb_old, 'message' => "Dossier d'administration non renommé (" . $sb_error . ") : il garde son nom « " . $sb_old . " ». Renommez-le plus tard à la main (dossier + SBADMIN dans sbconfig.php)."));
+		exit;
+	}
+
 	require_once('inc-auth-guard.php');
 	
 	require_once('include/shared.inc.php');    
@@ -351,6 +386,23 @@
 								$set_errors = array_keys( $error_mg, true );
 								if (!$set_errors) {
 									$completed = true;
+									// Dossier d'administration à renommer (installation neuve) :
+									// possible ? alors jeton pour l'appel de la page finale
+									$sb_admin_old = basename(dirname(__DIR__));
+									$sb_admin_new = ($install_type == 'create' && !empty($_SESSION['admin_dir'])) ? (string) $_SESSION['admin_dir'] : $sb_admin_old;
+									$sb_site_url  = rtrim((string) ($_SESSION['settings_customer_url'] ?? ''), '/') . '/';
+									$sb_rename_token = $sb_rename_error = '';
+									if ($sb_admin_new !== $sb_admin_old) {
+										require_once(__DIR__ . '/include/admindir.inc.php');
+										$sb_rename_error = sbInstAdminDirCheck(dirname(__DIR__, 2), $sb_admin_old, $sb_admin_new);
+										if ($sb_rename_error === '') {
+											$sb_rename_token = bin2hex(random_bytes(16));
+											if (!@file_put_contents(__DIR__ . '/installer/rename.token', hash('sha256', $sb_rename_token) . "\n" . time() . "\n" . $sb_admin_new . "\n", LOCK_EX)) {
+												$sb_rename_token = '';
+												$sb_rename_error = 'installer/ non inscriptible';
+											}
+										}
+									}
 									session_destroy();
 									// Jeton du bouton « Supprimer le répertoire install/ »
 									$sb_remove_token = bin2hex(random_bytes(16));
@@ -465,7 +517,12 @@
 							</div>
 							<?php } ?>
 							<br /><br />
-							<?php if(EI_APPLICATION_START_FILE == '') { ?><a class="form_button" href="<?php echo '../'.EI_APPLICATION_START_FILE;?>"><?php echo lang_key('proceed_to_login_page'); ?></a><?php } ?>
+							<?php if (!empty($sb_rename_token)) { ?>
+							<div id="sb-admin-rename" class="alert alert-info" data-token="<?php echo htmlspecialchars($sb_rename_token); ?>" data-site="<?php echo htmlspecialchars($sb_site_url, ENT_QUOTES, 'UTF-8'); ?>">Renommage du dossier d'administration en « <?php echo htmlspecialchars($sb_admin_new, ENT_QUOTES, 'UTF-8'); ?> »…</div>
+							<?php } elseif ($sb_admin_new !== $sb_admin_old) { ?>
+							<div class="alert alert-warning">Dossier d'administration non renommé (<?php echo htmlspecialchars($sb_rename_error, ENT_QUOTES, 'UTF-8'); ?>) : il garde son nom « <?php echo htmlspecialchars($sb_admin_old, ENT_QUOTES, 'UTF-8'); ?> ». Renommez-le plus tard à la main (dossier + SBADMIN dans sbconfig.php).</div>
+							<?php } ?>
+							<?php if(EI_APPLICATION_START_FILE == '') { ?><a class="form_button" id="sb-admin-link" href="<?php echo '../'.EI_APPLICATION_START_FILE;?>"><?php echo lang_key('proceed_to_login_page'); ?></a><?php } ?>
 							&nbsp;&nbsp;&nbsp;
 							<a class="form_button" href="<?php echo '../../'; ?>">Aller sur votre site</a>
 						</td>
@@ -476,8 +533,42 @@
 			</table>
 			<br>
 
-			<?php if (!empty($sb_remove_token)) { ?>
+			<?php if (!empty($sb_remove_token) || !empty($sb_rename_token)) { ?>
 			<script>
+			// Adresse de ce script : change si le dossier d'administration est renommé
+			var sbInstallEndpoint = 'complete_installation.php';
+			// Renommage du dossier d'administration, lancé dès l'affichage
+			(function () {
+				var box = document.getElementById('sb-admin-rename');
+				if (!box) return;
+				var btns = document.querySelectorAll('.sb-remove-install button');
+				for (var i = 0; i < btns.length; i++) btns[i].disabled = true;
+				var body = new FormData();
+				body.append('task', 'sb_rename_admin');
+				body.append('sb_rename_token', box.getAttribute('data-token'));
+				var done = function (j) {
+					box.className = 'alert ' + (j.ok ? 'alert-success' : 'alert-warning');
+					box.textContent = j.message;
+					if (j.ok) {
+						var url = box.getAttribute('data-site') + j.name + '/';
+						var p = document.createElement('p');
+						p.innerHTML = '<b>Adresse de l\'administration :</b> ';
+						var a = document.createElement('a');
+						a.href = url; a.textContent = url;
+						p.appendChild(a);
+						p.appendChild(document.createTextNode(' — notez-la, elle n\'est écrite nulle part ailleurs.'));
+						box.appendChild(p);
+						var link = document.getElementById('sb-admin-link');
+						if (link) link.href = j.base;
+						sbInstallEndpoint = j.base + 'install/complete_installation.php';
+					}
+					for (var i = 0; i < btns.length; i++) btns[i].disabled = false;
+				};
+				fetch('complete_installation.php', {method: 'POST', body: body, credentials: 'same-origin'})
+					.then(function (r) { return r.json(); })
+					.then(done)
+					.catch(function () { done({ok: false, message: "Erreur réseau : vérifiez le nom du dossier d'administration sur le serveur (et SBADMIN dans sbconfig.php)."}); });
+			})();
 			// Suppression de install/ en AJAX (voir le haut de ce fichier)
 			function sbRemoveInstall(btn) {
 				if (!confirm('Supprimer définitivement le répertoire install/ ?')) return;
@@ -486,7 +577,7 @@
 				body.append('task', 'sb_remove_install');
 				body.append('sb_remove_token', btn.getAttribute('data-token'));
 				btn.disabled = true;
-				fetch('complete_installation.php', {method: 'POST', body: body, credentials: 'same-origin'})
+				fetch(sbInstallEndpoint, {method: 'POST', body: body, credentials: 'same-origin'})
 					.then(function (r) { return r.json(); })
 					.then(function (j) {
 						box.className = 'sb-remove-install-result alert ' + (j.ok ? 'alert-success' : 'alert-danger');

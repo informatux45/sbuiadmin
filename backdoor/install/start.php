@@ -89,7 +89,7 @@
 					<?php } else { ?>
 					
 					<h3>Répertoire d'administration</h3>
-					Vous pouvez modifier après l'installation effectuée le nom du répertoire de votre administration à votre convenance (la détection du nom du répertoire de votre administration est automatique) et modifier ensuite l'option <b>SBADMIN</b> du fichier <b>sbconfig.php</b> si vous êtes en mode CMS.
+					Pour une installation neuve, un nom tiré au hasard vous est proposé à l'étape 4 (modifiable) : le dossier est renommé à la fin de l'installation, l'adresse de l'administration n'est plus celle que les robots connaissent. Plus tard, vous pouvez encore renommer le dossier puis reporter le même nom dans l'option <b>SBADMIN</b> du fichier <b>sbconfig.php</b>.
 					
 					<h3><?php echo lang_key('select_installation_type'); ?></h3>
 					<?php if(EI_ALLOW_MANUAL_INSTALLATION){ ?>
