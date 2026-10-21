@@ -35,8 +35,8 @@ $sbsmarty->assign('module_url', $module_url);
 $sb_msg_error = false;
 $sb_msg_valid = false;
 
-// Thème du site : réglage « theme » de sb_config (inc/admin/theme.txt
-// jusqu'à la 4.14), voir sbSettingsTheme() dans inc/sbuiadmin-settings.php
+// Thème du site : réglage « theme » de sb_config, voir sbSettingsTheme()
+// dans inc/sbuiadmin-settings.php
 
 // ---------------------------------------------------
 // ---------------------------------------------------

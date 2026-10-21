@@ -211,12 +211,15 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_dashboard_widgets` (
 -- Dumping data for table `sb_dashboard_widgets`
 --
 
-INSERT INTO `<DB_PREFIX>sb_dashboard_widgets` (`id`, `type`, `position`, `table_name`, `value_column`, `date_column`, `widget_key`, `location`, `title`, `link`, `icon`, `color`, `show_chart`, `active`) VALUES
-(1, 'system', 0, '', '', '', 'users_count', '', 'Utilisateurs', 'index.php?p=users', 'users', 'primary', 0, 1),
-(2, 'system', 1, '', '', '', 'php_version', '', 'Version PHP', 'index.php?p=database', 'code', 'info', 0, 1),
-(3, 'system', 2, '', '', '', 'db_host', '', 'DB Host', 'index.php?p=settings', 'database', 'purple', 0, 1),
-(4, 'system', 3, '', '', '', 'upload_limit', '', 'Upload limit', 'index.php?p=settings', 'upload', 'warning', 0, 1),
-(5, 'table', 4, 'sb_sandbox', 'nom', '', '', '', 'Nom (Sandbox)', 'index.php?p=sandbox', 'ambulance', 'primary', 0, 1);
+INSERT INTO `<DB_PREFIX>sb_dashboard_widgets` (`id`, `type`, `position`, `table_name`, `value_column`, `date_column`, `widget_key`, `location`, `content`, `title`, `link`, `icon`, `color`, `show_chart`, `active`) VALUES
+(1, 'table', 0, 'sb_pages', 'title', '', '', '', NULL, 'Pages', 'index.php?p=pages', 'fa-solid fa-file-lines', 'primary', 0, 1),
+(2, 'table', 1, 'sb_news', 'title', '', '', '', NULL, 'Actualit&eacute;s', 'index.php?p=news', 'fa-solid fa-newspaper', 'info', 0, 1),
+(3, 'system', 2, '', '', '', 'users_count', '', NULL, 'Utilisateurs', 'index.php?p=users', 'fa-solid fa-users', 'purple', 0, 1),
+(4, 'system', 3, '', '', '', 'disk_free', '', NULL, 'Espace disque libre', 'index.php?p=server', 'fa-solid fa-hard-drive', 'warning', 0, 1),
+(5, 'logaccess', 4, '', '10', '', '', '', NULL, 'Derni&egrave;res connexions', 'index.php?p=logaccess', 'fa-solid fa-right-to-bracket', 'success', 0, 1),
+(6, 'module', 5, '', '', '', 'contact:unread', '', '{}', 'Messages non lus', 'index.php?p=contact', 'fa-solid fa-envelope', 'danger', 0, 1),
+(7, 'system', 6, '', '', '', 'media_size', '', NULL, 'Espace des m&eacute;dias', 'index.php?p=medias', 'fa-solid fa-images', 'info', 0, 1),
+(8, 'text', 7, '', '', '', '', '', '&lt;p&gt;Bienvenue dans SBUIADMIN. Pour bien d&eacute;marrer :&lt;/p&gt;&lt;ol&gt;&lt;li&gt;&lt;a href=&quot;index.php?p=settings&quot;&gt;Configuration&lt;/a&gt; : nom du site, e-mail, r&eacute;glages g&eacute;n&eacute;raux ;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;index.php?p=theme&quot;&gt;Th&egrave;me&lt;/a&gt; : apparence du site ;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;index.php?p=update&quot;&gt;Mise &agrave; jour&lt;/a&gt; : version du CMS, et carte Modules pour installer ou retirer des modules.&lt;/li&gt;&lt;/ol&gt;', 'Premiers pas', '', 'fa-solid fa-flag-checkered', 'success', 0, 1);
 
 -- --------------------------------------------------------
 
@@ -712,7 +715,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_modules` (
 
 INSERT INTO `<DB_PREFIX>sb_modules` (`name`, `version`, `db_version`, `installed_at`) VALUES
 ('store', '2.0.1', '2.0.1', NOW()),
-('contact', '1.1.0', '1.1.0', NOW()),
+('contact', '1.1.1', '1.1.1', NOW()),
 ('download', '1.0.1', '1.0.1', NOW()),
 ('faq', '1.0.1', '1.0.1', NOW()),
 ('gallery', '1.0.0', '1.0.0', NOW()),
@@ -1719,7 +1722,7 @@ ALTER TABLE `<DB_PREFIX>sb_config`
 -- AUTO_INCREMENT for table `sb_dashboard_widgets`
 --
 ALTER TABLE `<DB_PREFIX>sb_dashboard_widgets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 --
 -- AUTO_INCREMENT for table `sb_contact`
 --

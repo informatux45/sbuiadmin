@@ -263,7 +263,7 @@
 											'sentinelle_404'        => '24',
 											'toast_duration'        => '7',
 											'pagebuilder_modules'   => '',
-											// Thème du site (ancien inc/admin/theme.txt)
+											// Thème du site
 											'theme'                 => 'saxo',
 											// Double authentification : activée plus tard dans
 											// Configuration, après un code de test reçu par e-mail

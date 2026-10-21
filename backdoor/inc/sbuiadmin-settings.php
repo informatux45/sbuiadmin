@@ -777,16 +777,10 @@ function sbThemeIsValid($name) {
 		&& is_dir(SB_SETTINGS_SITE_ROOT . '/theme/' . $name);
 }
 
-/**
- * Thème du site : réglage « theme » de sb_config ; sinon l'ancien
- * inc/admin/theme.txt (site pas encore migré en 4.14) ; sinon saxo.
- */
+/** Thème du site : réglage « theme » de sb_config, sinon saxo */
 function sbSettingsTheme() {
 	$theme = sbSetting('theme');
-	if (sbThemeIsValid($theme)) return $theme;
-	$legacy = @file(__DIR__ . '/admin/theme.txt', FILE_IGNORE_NEW_LINES);
-	if ($legacy && sbThemeIsValid(trim($legacy[0]))) return trim($legacy[0]);
-	return 'saxo';
+	return sbThemeIsValid($theme) ? $theme : 'saxo';
 }
 
 /** Couleur « #rrggbb » (minuscules), ou '' si invalide */
@@ -843,7 +837,7 @@ if (sbSettingsLegacyLines()) {
 }
 $GLOBALS['sb_settings'] = sbSettingsLoad();
 
-// Thème du site (en base depuis la 4.14, avant dans inc/admin/theme.txt).
+// Thème du site (en base depuis la 4.14).
 // Défini ici, avant sbconfig.php : la base l'emporte sur l'ancien fichier.
 defined('SBTHEME') or define('SBTHEME', sbSettingsTheme());
 

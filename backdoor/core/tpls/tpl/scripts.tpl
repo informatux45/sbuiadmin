@@ -9,6 +9,7 @@
     <script defer src="assets/adminator/2026.js"></script>
     <script defer src="assets/adminator/datatable.js"></script>
     <script defer src="assets/adminator/confirm.js"></script>
+    <script defer src="assets/adminator/unsaved.js?v={$smarty.const._AM_START_VERSION}"></script>
     <script defer src="assets/adminator/lightbox.js"></script>
     <script defer src="assets/adminator/modal.js"></script>
     <script defer src="assets/adminator/icon-picker.js"></script>
