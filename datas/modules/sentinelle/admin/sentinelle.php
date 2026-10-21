@@ -64,7 +64,17 @@ switch ($action) {
 			$sb_abd = (int) ($_POST['sentinelle_autoban_duration'] ?? 86400);
 			$sb_404 = (int) ($_POST['sentinelle_404'] ?? 24);
 			$sb_geo = trim(is_string($_POST['sentinelle_geo_key'] ?? null) ? $_POST['sentinelle_geo_key'] : '');
-			if ($sb_404 !== 0 && ($sb_404 < 5 || $sb_404 > 100000)) {
+			// Préfixes surveillés : au moins deux niveaux (vendor/mpdf8/), jamais un dossier entier du site
+			$sb_prefixes = array();
+			$sb_prefixes_bad = array();
+			foreach (preg_split('/[\r\n]+/', is_string($_POST['sentinelle_integrity_prefixes'] ?? null) ? $_POST['sentinelle_integrity_prefixes'] : '') as $sb_p) {
+				$sb_p = trim(str_replace('\\', '/', $sb_p), " \t/");
+				if ($sb_p === '') continue;
+				if (strpos($sb_p, '..') === false && preg_match('#^[A-Za-z0-9_.\-]+(/[A-Za-z0-9_.\-]+)+$#', $sb_p) && strlen($sb_p) <= 200) $sb_prefixes[$sb_p] = $sb_p . '/'; else $sb_prefixes_bad[] = $sb_p;
+			}
+			if ($sb_prefixes_bad) {
+				$sb_msg_error = 'Préfixes surveillés : chemin invalide ou trop large (' . htmlspecialchars(implode(', ', array_slice($sb_prefixes_bad, 0, 5))) . '), il faut au moins deux niveaux, ex. vendor/mpdf8/. Rien n\'a été enregistré.';
+			} elseif ($sb_404 !== 0 && ($sb_404 < 5 || $sb_404 > 100000)) {
 				$sb_msg_error = 'Balayage (404) : de 5 à 100 000 par heure (0 = inactif). Rien n\'a été enregistré.';
 			} elseif ($sb_geo !== '' && !preg_match('/^[A-Za-z0-9]{8,64}$/', $sb_geo)) {
 				$sb_msg_error = 'Clé ipstack : caractères inattendus. Rien n\'a été enregistré.';
@@ -84,7 +94,7 @@ switch ($action) {
 				'sentinelle_rules' => implode(',', $sb_rules), 'sentinelle_exclude' => implode("\n", $sb_exclude),
 				'sentinelle_alert_email' => $sb_alert_email, 'sentinelle_alert_level' => $sb_alert_level, 'sentinelle_digest' => $sb_digest,
 				'sentinelle_integrity_auto' => $sb_integrity_auto, 'sentinelle_rate' => (string) $sb_rate, 'sentinelle_autoban' => (string) $sb_ab, 'sentinelle_autoban_window' => (string) $sb_abw, 'sentinelle_autoban_duration' => (string) $sb_abd,
-				'sentinelle_404' => (string) $sb_404, 'sentinelle_geo_key' => $sb_geo))) {
+				'sentinelle_404' => (string) $sb_404, 'sentinelle_geo_key' => $sb_geo, 'sentinelle_integrity_prefixes' => implode("\n", $sb_prefixes)))) {
 				$sb_msg_valid = 'Réglages de Sentinelle enregistrés';
 			} else {
 				$sb_msg_error = 'Error: Write Error (EDIT)!';
@@ -139,6 +149,8 @@ switch ($action) {
 		// Intégrité des fichiers
 		$sbform->addBreak('Intégrité des fichiers');
 		$sbform->addCheckbox('Analyse quotidienne', array(array('text' => 'Comparer chaque jour les fichiers à la version signée', 'name' => 'sentinelle_integrity_auto', 'checked' => sbSetting('sentinelle_integrity_auto', '1') === '1' ? '1' : '0')), '', false, '<br />', "Lancée à la première visite de l'administration de la journée, après l'affichage de la page. Un écart déclenche un événement critique (et une alerte si elle est réglée).");
+		$sbform->addTextarea('Préfixes surveillés', htmlspecialchars(sbSetting('sentinelle_integrity_prefixes')), array('name' => 'sentinelle_integrity_prefixes', 'placeholder' => 'vendor/mpdf8/', 'style' => 'height:90px;font-family:monospace'), false,
+			"Un dossier par ligne (au moins deux niveaux). Les nouveaux fichiers PHP dessous restent signalés, mais en alerte et non en critique : pour une bibliothèque du site qui se met à jour. Les fichiers isolés s'approuvent depuis la page Intégrité.");
 		// Alertes par e-mail
 		$sbform->addBreak('Alertes par e-mail');
 		$sbform->addInput('text', 'Destinataire des alertes', array('name' => 'sentinelle_alert_email', 'value' => htmlspecialchars(sbSetting('sentinelle_alert_email')), 'placeholder' => 'securite@exemple.fr'), false, false, 'Vide : aucune alerte. Envoi par le SMTP de Contact > Paramètres.');
@@ -161,21 +173,63 @@ switch ($action) {
 		$sbsmarty->assign('sb_sentinelle_rescue_path', basename(SBUIADMIN_PATH) . '/inc/admin/sentinelle-disabled');
 		break;
 
+	case 'approve':
+	case 'unapprove':
+		// --------------------------------
+		// --- Fichiers propres au site : approuver ceux de l'analyse, ou tout
+		// --- retirer (POST, mot de passe redemandé, tentatives comptées)
+		// --------------------------------
+		require_once(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'integrity.php');
+		$sb_user = (string) ($_SESSION['sbuiadmin_user_name'] ?? '');
+		if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+			$sb_msg_error = 'Action à lancer depuis la page Intégrité.';
+		} elseif (sbLoginLocked($sb_user)) {
+			$sb_msg_error = 'Trop de tentatives échouées : réessayez dans quelques minutes.';
+		} elseif (!$GLOBALS['sbusers']->login($sb_user, (string) ($_POST['password'] ?? ''))) {
+			sbLoginFailed($sb_user);
+			$sb_msg_error = 'Mot de passe incorrect : rien n\'a été changé.';
+		} elseif ($action === 'unapprove') {
+			if (sentinelle_integrity_unapprove_all($sb_user)) {
+				sentinelle_integrity_run();
+				$sb_msg_valid = 'Approbations retirées : les fichiers propres au site sont de nouveau signalés';
+			} else {
+				$sb_msg_error = 'Approbations : table absente, mettez à jour la base du module (Mise à jour > Modules).';
+			}
+		} else {
+			@set_time_limit(120);
+			$sb_scan = sentinelle_integrity_scan();
+			$sb_n = $sb_scan['error'] === '' ? sentinelle_integrity_approve($sb_scan, $sb_user) : -1;
+			if ($sb_scan['error'] !== '') $sb_msg_error = 'Analyse impossible : ' . htmlspecialchars($sb_scan['error']);
+			elseif ($sb_n < 0) $sb_msg_error = 'Approbations : table absente, mettez à jour la base du module (Mise à jour > Modules).';
+			else {
+				sentinelle_integrity_run();
+				$sb_msg_valid = $sb_n . ' fichier(s) propre(s) au site approuvé(s) : un changement de leur contenu sera signalé';
+			}
+		}
+		$action = 'integrity';
+		$sb_integrity_done = true;
+		// no break : page Intégrité
+
 	case 'integrity':
 		// --------------------------------
 		// --- Intégrité des fichiers (analyse à la demande : POST)
 		// --------------------------------
 		require_once(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'integrity.php');
-		if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+		if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($sb_integrity_done)) {
 			@set_time_limit(120);
 			$sb_sum = sentinelle_integrity_run();
 			if ($sb_sum['error'] !== '') $sb_msg_error = 'Analyse impossible : ' . htmlspecialchars($sb_sum['error']);
-			elseif (array_sum(array_intersect_key($sb_sum['counts'], array('modified' => 1, 'added' => 1, 'upload' => 1)))) $sb_msg_error = 'Analyse terminée : des fichiers sont à vérifier';
+			elseif (array_sum(array_intersect_key($sb_sum['counts'], array('modified' => 1, 'added' => 1, 'upload' => 1, 'approved_changed' => 1)))) $sb_msg_error = 'Analyse terminée : des fichiers sont à vérifier';
+			elseif ($sb_sum['counts']['watched']) $sb_msg_valid = 'Analyse terminée : ' . (int) $sb_sum['checked'] . ' fichiers conformes, ' . (int) $sb_sum['counts']['watched'] . ' PHP nouveau(x) sous un préfixe surveillé';
 			else $sb_msg_valid = 'Analyse terminée : ' . (int) $sb_sum['checked'] . ' fichiers conformes à la version signée';
 		}
 		$sbsmarty->assign('sb_sentinelle_page', 'integrity');
-		$sbsmarty->assign('sb_integrity', json_decode(sbSetting('sentinelle_integrity'), true));
+		$sb_isum = json_decode(sbSetting('sentinelle_integrity'), true);
+		$sbsmarty->assign('sb_integrity', $sb_isum);
+		$sbsmarty->assign('sb_to_approve', (int) ($sb_isum['counts']['added'] ?? 0) + (int) ($sb_isum['counts']['watched'] ?? 0) + (int) ($sb_isum['counts']['approved_changed'] ?? 0));
 		$sbsmarty->assign('sb_integrity_auto', sbSetting('sentinelle_integrity_auto', '1') === '1');
+		$sbsmarty->assign('sb_integrity_prefixes', sentinelle_integrity_prefixes());
+		$sbsmarty->assign('sb_integrity_approved', count(sentinelle_integrity_approved()));
 		break;
 
 	case 'advisor':

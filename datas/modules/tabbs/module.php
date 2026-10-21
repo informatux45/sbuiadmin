@@ -15,7 +15,7 @@ return array(
 	'title'         => 'Tabbs',
 	'icon'          => 'list-alt', // Font Awesome (menu, carte Modules)
 	'description'   => "Contenus présentés en onglets adaptatifs (accordéon sur mobile), à insérer dans une page par code court.",
-	'version'       => '1.0.1',
+	'version'       => '1.0.2',
 	'requires_core' => '4.29',
 	'author'        => 'INFORMATUX',
 	'routes'        => array(),

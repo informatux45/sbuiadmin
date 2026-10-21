@@ -627,6 +627,31 @@ require_once __DIR__ . '/../../inc/sbfontawesome.php';
  * 'modifiers' => array('maFonction') dans son module.php : enregistrées par
  * fermeture, elles peuvent être définies plus tard (inc/functions.php).
  */
+/**
+ * Libellé du fil d'Ariane pour l'action a= de l'adresse (texte brut, à
+ * échapper à l'affichage) ; action inconnue (module tiers) : son nom
+ */
+function sbCrumbActionLabel($action) {
+	if (!is_string($action) || $action === '') return '';
+	static $labels = array(
+		'add' => 'Ajout', 'addcustom' => 'Ajout', 'edit' => 'Modification', 'editcustom' => 'Modification',
+		'del' => 'Suppression', 'delete' => 'Suppression', 'sort' => 'Tri', 'sortmod' => 'Tri', 'up' => 'Tri', 'down' => 'Tri',
+		'settings' => 'Paramètres', 'settingscategory' => 'Paramètres des catégories',
+		'category' => 'Catégories', 'categoryadd' => 'Ajout d\'une catégorie', 'categoryedit' => 'Modification d\'une catégorie', 'categorydel' => 'Suppression d\'une catégorie',
+		'photo' => 'Photos', 'photoadd' => 'Ajout de photos', 'photoedit' => 'Modification d\'une photo', 'delphoto' => 'Suppression d\'une photo',
+		'tpl_list' => 'Gabarit de la liste', 'tpl_single' => 'Gabarit de l\'article',
+		'editfield' => 'Champs', 'delfield' => 'Suppression d\'un champ', 'sortstructure' => 'Tri des champs',
+		'editdatas' => 'Données', 'deldatas' => 'Suppression de données', 'sortdatas' => 'Tri des données',
+		'alltabs' => 'Onglets', 'tabadd' => 'Ajout d\'un onglet', 'tabedit' => 'Modification d\'un onglet', 'tabdel' => 'Suppression d\'un onglet',
+		'messages' => 'Messages', 'message' => 'Message', 'messagedel' => 'Suppression d\'un message',
+		'blockedip' => 'IP bloquées', 'blockedipsettings' => 'Paramètres des IP bloquées', 'delblockedip' => 'IP bloquées',
+		'menu' => 'Menu', 'integrity' => 'Intégrité', 'approve' => 'Intégrité', 'unapprove' => 'Intégrité', 'advisor' => 'Conseiller',
+		'bans' => 'IP bannies', 'banadd' => 'IP bannies', 'bandel' => 'IP bannies', 'purge' => 'Journal', 'export' => 'Export',
+	);
+	$key = strtolower($action);
+	return $labels[$key] ?? ucfirst($key);
+}
+
 function sbSmartyRegisterModifiers($smarty) {
 	$php = array(
 		'sprintf', 'strtoupper', 'ucfirst',

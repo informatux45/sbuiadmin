@@ -51,11 +51,11 @@
 					{/if}
 
 					{if isset($smarty.get.a) && $smarty.get.a == 'tpl_single'}
-						<button class="btn btn--primary" type="button" onclick="location.href='index.php?p=news&a=tpl_list&id={$smarty.get.id}'">
+						<button class="btn btn--primary" type="button" onclick="location.href='index.php?p=news&a=tpl_list&id={$smarty.get.id|escape:'url'}'">
 							Template LIST
 						</button>
 					{elseif isset($smarty.get.a) && $smarty.get.a == 'tpl_list'}
-						<button class="btn btn--primary" type="button" onclick="location.href='index.php?p=news&a=tpl_single&id={$smarty.get.id}'">
+						<button class="btn btn--primary" type="button" onclick="location.href='index.php?p=news&a=tpl_single&id={$smarty.get.id|escape:'url'}'">
 							Template SINGLE
 						</button>
 					{/if}
@@ -342,7 +342,7 @@
 									<p style="text-align: center;">
 										<b>Modifier le template de l'intro (LIST)</b>
 										<br>
-										<button onclick="location.href='index.php?p=news&a=tpl_list&id={$smarty.get.id}'" type="button" class="btn btn--primary">
+										<button onclick="location.href='index.php?p=news&a=tpl_list&id={$smarty.get.id|escape:'url'}'" type="button" class="btn btn--primary">
 											Template LIST
 										</button>
 									</p>
@@ -350,7 +350,7 @@
 									<p style="text-align: center;">
 										<b>Modifier le template de l'article (SINGLE)</b>
 										<br>
-										<button onclick="location.href='index.php?p=news&a=tpl_single&id={$smarty.get.id}'" type="button" class="btn btn--primary">
+										<button onclick="location.href='index.php?p=news&a=tpl_single&id={$smarty.get.id|escape:'url'}'" type="button" class="btn btn--primary">
 											Template SINGLE
 										</button>
 									</p>

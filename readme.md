@@ -160,6 +160,11 @@ The administration folder is named `backdoor` by default. You can rename it afte
 
 ## 📝 Changelog
 
+**4.64**
+- Sentinelle 1.7.0: site-specific PHP files can be approved from the Integrity page (path + SHA-256 in the database, password required; reported again if changed), watched prefixes (new files below them raise a warning instead of a critical event), real totals instead of a 500 cap; log columns no longer overlap
+- Security: reflected XSS fixed in the admin (breadcrumb and id= buttons); news 1.0.4, gallery 1.0.1, slider 1.0.1, tabbs 1.0.2, table 1.0.2
+- Admin breadcrumb shows the action in French
+
 **4.63**
 - New installs: 8 default dashboard widgets (pages, news, users, free disk space, last logins, unread contact messages, media size, first steps); contact 1.1.1 adds the "Unread messages" tile
 - Admin forms ask for confirmation before leaving a page with unsaved changes
@@ -168,11 +173,11 @@ The administration folder is named `backdoor` by default. You can rename it afte
 **4.62**
 - Store module renamed to "E-commerce" with a star icon (display name and sidebar menu only; identifier, routes and tables unchanged)
 
-**4.61**
-- Page Builder: a dropped row/block no longer sometimes sticks in the middle of the canvas (leftover inline position from jQuery UI connectToSortable); inline styles are cleaned after every drop
-
 <details>
   <summary><strong>Older versions</strong></summary>
+
+**4.61**
+- Page Builder: a dropped row/block no longer sometimes sticks in the middle of the canvas (leftover inline position from jQuery UI connectToSortable); inline styles are cleaned after every drop
 
 **4.60**
 - Sentinelle 1.6.0: automatic bans now count every serious attempt (even repeats collapsed in the log), slow-scan detection (too many 404s per IP), and the attacker's country in the log (CF-IPCountry header, or optional ipstack key)

@@ -30,13 +30,13 @@
 					</div>
 
 					{if isset($smarty.get.a) && ($smarty.get.a == 'editfield' || $smarty.get.a == 'delfield' || $smarty.get.a == 'sortstructure' || $smarty.get.a == 'sortdatas')}
-					<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=table&a=editdatas&tid={$smarty.get.tid}'">
+					<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=table&a=editdatas&tid={$smarty.get.tid|escape:'url'}'">
 						Ses données
 					</button>
 					{/if}
 
 					{if isset($smarty.get.a) && ($smarty.get.a == 'editdatas' || $smarty.get.a == 'deldatas' || $smarty.get.a == 'sortstructure' || $smarty.get.a == 'sortdatas')}
-					<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=table&a=editfield&tid={$smarty.get.tid}'">
+					<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=table&a=editfield&tid={$smarty.get.tid|escape:'url'}'">
 						Sa structure
 					</button>
 					{/if}
@@ -259,7 +259,7 @@
 							<div class="card-title-wrap">
 								<h2 class="card-title">Gestion des colonnes du tableau &laquo; {$tabname} &raquo;</h2>
 							</div>
-							<button class="btn btn--primary" type="button" onclick="location.href='index.php?p=table&a=sortstructure&tid={$smarty.get.tid}'">
+							<button class="btn btn--primary" type="button" onclick="location.href='index.php?p=table&a=sortstructure&tid={$smarty.get.tid|escape:'url'}'">
 								Trier les colonnes
 							</button>
 						</div>
@@ -325,7 +325,7 @@
 							<div class="card-title-wrap">
 								<h2 class="card-title">Gestion des données du tableau &laquo; {$tabname} &raquo;</h2>
 							</div>
-							<button class="btn btn--primary" type="button" onclick="location.href='index.php?p=table&a=sortdatas&tid={$smarty.get.tid}'">
+							<button class="btn btn--primary" type="button" onclick="location.href='index.php?p=table&a=sortdatas&tid={$smarty.get.tid|escape:'url'}'">
 								Trier les données
 							</button>
 						</div>

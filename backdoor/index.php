@@ -492,6 +492,7 @@ $sbsmarty->assign([
 	,'all' => false
 	,'sbtranfer_media' => false
 	,'sb_table_header' => false
+	,'sb_crumb_action' => sbCrumbActionLabel($_GET['a'] ?? '')
 ]);
 
 // --------------------------------

@@ -699,6 +699,23 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_sentinelle_ban` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `sb_sentinelle_approved`
+--
+
+DROP TABLE IF EXISTS `<DB_PREFIX>sb_sentinelle_approved`;
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_sentinelle_approved` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `path` varchar(255) NOT NULL DEFAULT '' COMMENT 'chemin de la liste (backdoor/ pour le dossier d''administration)',
+  `sha256` char(64) NOT NULL DEFAULT '',
+  `approved_at` datetime NOT NULL,
+  `user` varchar(64) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `path` (`path`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `sb_modules`
 -- (modules installés : voir backdoor/inc/sbuiadmin-modules.php)
 --
@@ -718,12 +735,12 @@ INSERT INTO `<DB_PREFIX>sb_modules` (`name`, `version`, `db_version`, `installed
 ('contact', '1.1.1', '1.1.1', NOW()),
 ('download', '1.0.1', '1.0.1', NOW()),
 ('faq', '1.0.1', '1.0.1', NOW()),
-('gallery', '1.0.0', '1.0.0', NOW()),
-('news', '1.0.3', '1.0.3', NOW()),
-('slider', '1.0.0', '1.0.0', NOW()),
-('tabbs', '1.0.1', '1.0.1', NOW()),
-('table', '1.0.1', '1.0.1', NOW()),
-('sentinelle', '1.6.0', '1.6.0', NOW());
+('gallery', '1.0.1', '1.0.1', NOW()),
+('news', '1.0.4', '1.0.4', NOW()),
+('slider', '1.0.1', '1.0.1', NOW()),
+('tabbs', '1.0.2', '1.0.2', NOW()),
+('table', '1.0.2', '1.0.2', NOW()),
+('sentinelle', '1.7.0', '1.7.0', NOW());
 
 -- --------------------------------------------------------
 

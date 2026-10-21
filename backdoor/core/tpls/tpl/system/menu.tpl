@@ -30,13 +30,13 @@
 					</div>
 
 					{if isset($smarty.get.id) && $smarty.get.a != 'sort'}
-					<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=menu&a=sort&id={$smarty.get.id}'">
+					<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=menu&a=sort&id={$smarty.get.id|escape:'url'}'">
 						Trier les pages du menu
 					</button>
 					{/if}
 
 					{if isset($smarty.get.a) && $smarty.get.a == 'sort'}
-					<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=menu&a=edit&id={$smarty.get.id}'">
+					<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=menu&a=edit&id={$smarty.get.id|escape:'url'}'">
 						Retour au menu
 					</button>
 					{/if}

@@ -40,7 +40,7 @@
 					{/if}
 
 					{if isset($smarty.get.a) && $smarty.get.a == 'edit'}
-						<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=slider&a=photo&sid={$smarty.get.id}'">
+						<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=slider&a=photo&sid={$smarty.get.id|escape:'url'}'">
 							Toutes les photos
 						</button>
 					{/if}

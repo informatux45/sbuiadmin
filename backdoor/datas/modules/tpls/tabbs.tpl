@@ -40,7 +40,7 @@
 						</div>
 					</div>
 					{if isset($smarty.get.a) && $smarty.get.a == 'edit'}
-						<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=tabbs&a=sort&tid={$smarty.get.id}'">
+						<button class="btn btn--ghost" type="button" onclick="location.href='index.php?p=tabbs&a=sort&tid={$smarty.get.id|escape:'url'}'">
 							Trier les onglets
 						</button>
 					{/if}

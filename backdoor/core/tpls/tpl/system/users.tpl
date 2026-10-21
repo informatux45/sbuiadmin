@@ -263,7 +263,7 @@
 					<section class="col-8 card">
 						<div class="card-head">
 							<div class="card-title-wrap">
-								<h2 class="card-title">{$legend_add_edit|unescape:"htmlall"} - {$smarty.get.a}</h2>
+								<h2 class="card-title">{$legend_add_edit|unescape:"htmlall"} - {$smarty.get.a|escape:'html'}</h2>
 							</div>
 						</div>
 							{* Afficher le formulaire ADD/EDIT *}

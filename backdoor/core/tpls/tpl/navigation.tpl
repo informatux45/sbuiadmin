@@ -37,10 +37,10 @@
 				{if $page_title}
 					<a href="{$smarty.const._AM_SITE_URL}"><i class="fa-solid fa-house fa-fw"></i> Dashboard</a>
 					<svg class="sep" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
-					<a href="{if isset($smarty.get.p)}{$smarty.const._AM_SITE_URL}index.php?p={$smarty.get.p}{else}#{/if}">{$page_title|lower|@ucfirst}</a>
-					{if isset($smarty.get.a)}
+					<a href="{if isset($smarty.get.p)}{$smarty.const._AM_SITE_URL}index.php?p={$smarty.get.p|escape:'url'}{else}#{/if}">{$page_title|lower|@ucfirst}</a>
+					{if $sb_crumb_action}
 						<svg class="sep" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
-						<span class="current">{$smarty.get.a|lower|@ucfirst}</span>
+						<span class="current">{$sb_crumb_action|escape:'html'}</span>
 					{/if}
 				{else}
 					<i class="fa-solid fa-house fa-fw"></i> <span class="current">{$pageindex|upper}</span>

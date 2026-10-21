@@ -46,5 +46,15 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_sentinelle_ban` (
   PRIMARY KEY (`id`),
   KEY `expires_at` (`expires_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_sentinelle_approved` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `path` varchar(255) NOT NULL DEFAULT '' COMMENT 'chemin de la liste (backdoor/ pour le dossier d''administration)',
+  `sha256` char(64) NOT NULL DEFAULT '',
+  `approved_at` datetime NOT NULL,
+  `user` varchar(64) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `path` (`path`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 SQL
 );

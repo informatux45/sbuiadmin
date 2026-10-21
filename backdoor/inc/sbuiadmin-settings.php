@@ -164,6 +164,8 @@ function sbSettingsDefaults() {
 		'sentinelle_integrity'  => '',
 		'sentinelle_integrity_last' => '',
 		'sentinelle_integrity_auto' => '1',
+		// préfixes surveillés (un par ligne) : nouveaux PHP dessous en alerte, pas en critique
+		'sentinelle_integrity_prefixes' => '',
 		// balayage lent (nombre de 404 par IP et par heure, 0 = inactif) et
 		// clé API ipstack facultative pour le pays des adresses
 		'sentinelle_404'        => '24',

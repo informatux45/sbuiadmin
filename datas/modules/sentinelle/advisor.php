@@ -205,11 +205,13 @@ function sentinelle_advisor_checks(?array $probes = null, array $env = array()) 
 		$add('integrity', 'sentinel', 'Intégrité des fichiers', 'unknown', 'jamais analysée', 'Lancez l\'analyse (Sentinelle > Intégrité) : elle compare les fichiers du site à la version signée.');
 	} else {
 		$ic = (array) ($integ['counts'] ?? array());
-		$alarm = (int) ($ic['modified'] ?? 0) + (int) ($ic['added'] ?? 0) + (int) ($ic['upload'] ?? 0);
+		$alarm = (int) ($ic['modified'] ?? 0) + (int) ($ic['added'] ?? 0) + (int) ($ic['upload'] ?? 0) + (int) ($ic['approved_changed'] ?? 0);
+		$watched = (int) ($ic['watched'] ?? 0);
 		$old = strtotime((string) ($integ['date'] ?? '')) < time() - 7 * 86400;
-		$add('integrity', 'sentinel', 'Intégrité des fichiers', ($integ['error'] ?? '') !== '' ? 'unknown' : ($alarm ? 'bad' : ($old ? 'warn' : 'ok')),
-			($integ['error'] ?? '') !== '' ? 'analyse impossible' : ($alarm ? $alarm . ' fichier(s) à vérifier' : 'conforme') . ' (' . date('d/m/Y', strtotime((string) $integ['date'])) . ')',
-			$alarm ? 'Ouvrez Sentinelle > Intégrité : un fichier modifié ou un PHP ajouté peut être une porte dérobée. Remettez les fichiers d\'origine (mise à jour, ou archive de la version).' : 'Relancez l\'analyse (Sentinelle > Intégrité) ou activez l\'analyse quotidienne.');
+		$add('integrity', 'sentinel', 'Intégrité des fichiers', ($integ['error'] ?? '') !== '' ? 'unknown' : ($alarm ? 'bad' : ($old || $watched ? 'warn' : 'ok')),
+			($integ['error'] ?? '') !== '' ? 'analyse impossible' : ($alarm ? $alarm . ' fichier(s) à vérifier' : ($watched ? $watched . ' PHP nouveau(x) sous un préfixe surveillé' : 'conforme')) . ' (' . date('d/m/Y', strtotime((string) $integ['date'])) . ')',
+			$alarm ? 'Ouvrez Sentinelle > Intégrité : un fichier modifié ou un PHP ajouté peut être une porte dérobée. Remettez les fichiers d\'origine (mise à jour, ou archive de la version) ; approuvez seulement les fichiers propres au site que vous connaissez.'
+				: ($watched ? 'Ouvrez Sentinelle > Intégrité : vérifiez les nouveaux fichiers de vos bibliothèques puis approuvez-les.' : 'Relancez l\'analyse (Sentinelle > Intégrité) ou activez l\'analyse quotidienne.'));
 	}
 	$rate = (int) $setting('sentinelle_rate', '120'); $ab = (int) $setting('sentinelle_autoban', '10');
 	$add('sentinel_autoban', 'sentinel', 'Anti-rafales et bannissement automatique', $rate > 0 && $ab > 0 ? 'ok' : 'warn',
