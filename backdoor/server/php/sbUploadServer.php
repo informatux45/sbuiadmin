@@ -25,9 +25,9 @@ defined('SBUIADMIN_URL')  or define('SBUIADMIN_URL', $_SERVER['SERVER_NAME'] . (
 // --- point d'entree repose sa propre session sous PHPSESSID et perd tout
 // --- ce que les autres y ont mis. Voir inc/sbsession.php.
 require_once(__DIR__ . '/../../../inc/sbsession.php');
-session_start([
+session_start(sbSessionStartOptions([
 	'cookie_lifetime' => 86400,
-]);
+]));
 
 require_once(SBUIADMIN_PATH . '/inc/sbuiadmin-config.php');
 require_once(SBUIADMIN_PATH . '/inc/sbuiadmin-rights.php');

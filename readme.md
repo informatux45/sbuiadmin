@@ -160,6 +160,11 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 
 ## 📝 Changelog
 
+**4.66**
+- Fixes: migration collation accepted by older MariaDB, theme kept when migrating old settings, database config found from the command line, session options already set by php.ini no longer logged as errors
+- Anti-flood bans only after repeated bursts from the same IP; banned IPs expire on time; lightbox CSS no longer hides theme elements; `sql::error()` public again, `sql::next_result()` restored
+- Themes can show the page's additional template themselves (`$theme['various_in_theme'] = true;` in their config.php); Sentinelle 1.7.2 (help text)
+
 **4.65**
 - New installs: random name for the administration folder (step 4, e.g. `vokadilumi47`), renamed at the very end of the installation; the default site URL keeps its port
 - Sentinelle 1.7.1: files of a retired official module (e.g. Boutique, replaced by E-commerce) are checked against that module's published list and shown apart instead of "added PHP"
@@ -169,13 +174,13 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 - Security: reflected XSS fixed in the admin (breadcrumb and id= buttons); news 1.0.4, gallery 1.0.1, slider 1.0.1, tabbs 1.0.2, table 1.0.2
 - Admin breadcrumb shows the action in French
 
+<details>
+  <summary><strong>Older versions</strong></summary>
+
 **4.63**
 - New installs: 8 default dashboard widgets (pages, news, users, free disk space, last logins, unread contact messages, media size, first steps); contact 1.1.1 adds the "Unread messages" tile
 - Admin forms ask for confirmation before leaving a page with unsaved changes
 - Theme read from the database only; the old inc/admin/theme.txt is removed (kept while an old sbconfig.php still reads it)
-
-<details>
-  <summary><strong>Older versions</strong></summary>
 
 **4.62**
 - Store module renamed to "E-commerce" with a star icon (display name and sidebar menu only; identifier, routes and tables unchanged)

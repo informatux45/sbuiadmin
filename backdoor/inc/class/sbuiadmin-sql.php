@@ -149,9 +149,16 @@ class sql extends Smarty {
         }
         return $res_array;
     }
-    private function error() {
+    // --- Publique : appelée hors de la classe (plugin {lang}, modules)
+    public function error() {
         if (!$this->connect_id) $this->connect();
         return mysqli_error($this->connect_id);
+    }
+    // --- Résultat suivant d'une requête multiple. Reprise de l'ancien CMS,
+    // --- encore appelée par des modules de sites.
+    public function next_result() {
+        if (!$this->connect_id) $this->connect();
+        return mysqli_more_results($this->connect_id) && mysqli_next_result($this->connect_id);
     }
     public function close() {
         if (!$this->connect_id) $this->connect();

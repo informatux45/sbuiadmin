@@ -109,7 +109,7 @@ switch ($action) {
 		), array('name' => 'sentinelle_mode', 'checked' => sentinelle_mode()), false, '<br>', "Commencez par l'observation : consultez le journal quelques jours, ajoutez vos adresses aux IP de confiance, puis passez en protection.");
 		$sbform->addInput('text', 'Conservation du journal (jours)', array('name' => 'sentinelle_retention', 'value' => (string) sentinelle_retention(), 'placeholder' => '90'), true, false, 'Les lignes plus anciennes sont supprimées automatiquement.');
 		$sbform->addTextarea('IP de confiance', htmlspecialchars(implode("\n", sentinelle_trusted())), array('name' => 'sentinelle_trusted', 'rows' => '4', 'placeholder' => sbClientIp()),
-			false, 'Jamais bloquées par Sentinelle (vos connexions, votre bureau). Une adresse IPv4/IPv6 ou une plage CIDR par ligne. Votre adresse actuelle : <strong>' . htmlspecialchars(sbClientIp()) . '</strong>.');
+			false, 'Jamais bloquées par Sentinelle (vos connexions, votre bureau). En protection, déclarez-y aussi tout service externe qui surveille le site (disponibilité, référencement) : ceux qui se présentent comme Googlebot sont pris pour de faux robots. Une adresse IPv4/IPv6 ou une plage CIDR par ligne. Votre adresse actuelle : <strong>' . htmlspecialchars(sbClientIp()) . '</strong>.');
 		// Filtres d'attaques
 		$sbform->addBreak('Filtres d\'attaques');
 		$sb_rule_set = array();

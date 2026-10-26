@@ -46,6 +46,10 @@ return array(
 		$lines = @file($sb414_dir . 'theme.txt', FILE_IGNORE_NEW_LINES);
 		$theme = $lines ? trim((string) $lines[0]) : '';
 		$m->addConfig('theme', $sb414_theme_ok($theme) ? $theme : 'saxo');
+		// Ligne déjà créée vide par les réglages par défaut : addConfig() n'y touche pas
+		if ($sb414_theme_ok($theme) && !$sb414_theme_ok($sb414_get($m, 'theme'))) {
+			$m->query('UPDATE `' . $m->table('sb_config') . "` SET `content` = '" . $theme . "' WHERE `config` = 'theme'");
+		}
 
 		// dashboard.txt : contenu gardé, puis fichier supprimé
 		$dash = $sb414_dir . 'dashboard.txt';

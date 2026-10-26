@@ -1,3 +1,4 @@
+/* SBUIADMIN : sélecteurs de la classe lightbox remplacés par l’id lightbox (conteneur créé par lightbox.js), pour ne pas toucher les blocs de même classe des thèmes */
 :root {
   --lb-overlay-opacity: 0.8;
   --lb-overlay-bg: black;
@@ -25,7 +26,7 @@ body.lb-disable-scrolling {
   display: none;
 }
 
-.lightbox {
+#lightbox {
   position: fixed;
   left: 0;
   width: 100%;
@@ -36,7 +37,7 @@ body.lb-disable-scrolling {
   outline: none;
 }
 
-.lightbox .lb-image {
+#lightbox .lb-image {
   display: block;
   height: auto;
   max-width: inherit;
@@ -47,7 +48,7 @@ body.lb-disable-scrolling {
   border: var(--lb-image-border-width) solid var(--lb-image-border-color);
 }
 
-.lightbox a img {
+#lightbox a img {
   border: none;
 }
 

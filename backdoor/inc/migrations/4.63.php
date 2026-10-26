@@ -23,7 +23,26 @@ return array(
 	'reversible'  => true,
 
 	'up' => function (SbMigration $m) use ($sb463_file, $sb463_needed) {
-		if (is_file($sb463_file) && !$sb463_needed()) @unlink($sb463_file);
+		if (!is_file($sb463_file)) return;
+		// Thème resté vide en base (ligne créée vide avant la 4.14) : repris du fichier
+		$ok = function ($name) {
+			return is_string($name) && preg_match('/^[A-Za-z0-9_-]{1,64}$/', $name) && is_dir(dirname(SBUIADMIN_PATH) . '/theme/' . $name);
+		};
+		$db = sbSettingsDb();
+		if (!$db) throw new RuntimeException('Base indisponible');
+		$t = $m->table('sb_config');
+		$r = $db->query("SELECT `content` FROM `$t` WHERE `config` = 'theme'");
+		if ($r === false) throw new RuntimeException('Requête en échec : ' . $db->error);
+		$row = $r->fetch_row();
+		if (!$row || !$ok((string) $row[0])) {
+			$lines = @file($sb463_file, FILE_IGNORE_NEW_LINES);
+			$theme = $lines ? trim((string) $lines[0]) : '';
+			if (!$ok($theme)) return; // rien d'utilisable : fichier gardé
+			$m->query($row
+				? "UPDATE `$t` SET `content` = '$theme' WHERE `config` = 'theme'"
+				: "INSERT INTO `$t` (`config`, `content`) VALUES ('theme', '$theme')");
+		}
+		if (!$sb463_needed()) @unlink($sb463_file);
 	},
 
 	// Rien à recréer : le core de la 4.62 lit d'abord le thème en base

@@ -24,13 +24,13 @@ $sb_is_https = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
 // --- point d'entree repose sa propre session sous PHPSESSID et perd tout
 // --- ce que les autres y ont mis. Voir inc/sbsession.php.
 require_once(__DIR__ . '/inc/sbsession.php');
-session_start([
+session_start(sbSessionStartOptions([
     'cookie_lifetime' => 86400,
     'gc_maxlifetime'  => 86400,
     'cookie_secure'   => $sb_is_https,
     'cookie_httponly' => true,
     'cookie_samesite' => 'Lax',
-]);
+]));
 ob_start();
 
 // ----------------------
@@ -271,10 +271,15 @@ if (in_array($sb_get_page, $sb_front_pages)) {
 		// ---------------------------------------
 		// Define TPL View (Specify in your Theme)
 		// ---------------------------------------
+		$sbsmarty->assign("sb_theme_various", false);
 		if (file_exists(SB_THEME_DIR . 'config.php')) {
 			// --- Include config.php Theme file
 			include_once(SB_THEME_DIR . 'config.php');
 			global $theme;
+			// --- Le thème affiche lui-même le gabarit annexe de la page
+			// --- ($theme['various_in_theme'] = true;) : le module pages ne
+			// --- l'affiche plus (sinon il apparaît deux fois)
+			$sbsmarty->assign("sb_theme_various", !empty($theme['various_in_theme']));
 			// --- Check if view exist in config theme
 			if (in_array($modpage['theme_main'], $theme['view'])) {
 				$mod_theme_view = $modpage['theme_main'];

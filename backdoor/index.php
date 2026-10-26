@@ -25,12 +25,12 @@ $sb_is_https = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
 // --- point d'entree repose sa propre session sous PHPSESSID et perd tout
 // --- ce que les autres y ont mis. Voir inc/sbsession.php.
 require_once(__DIR__ . '/../inc/sbsession.php');
-session_start([
+session_start(sbSessionStartOptions([
     'cookie_lifetime' => 86400,
     'cookie_secure'   => $sb_is_https,
     'cookie_httponly' => true,
     'cookie_samesite' => 'Lax',
-]);
+]));
 
 // Point 1 (audit sécurité) : les cookies "Se souvenir de moi" utilisaient
 // l'ancienne syntaxe setcookie(nom, valeur, expiration, chemin) - aucun

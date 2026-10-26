@@ -134,7 +134,7 @@ $sb_schema_443 = array (
   array (
     'module' => 'contact',
     'definition' => '`id` int NOT NULL AUTO_INCREMENT, `form_id` int NOT NULL DEFAULT \'0\' COMMENT \'0: page Contact du module\', `created_at` datetime NOT NULL, `name` varchar(255) NOT NULL DEFAULT \'\', `email` varchar(255) NOT NULL DEFAULT \'\', `fields` mediumtext NOT NULL COMMENT \'champs saisis (JSON)\', `recipients` text NOT NULL COMMENT \'destinataires valides\', `sent` tinyint(1) NOT NULL DEFAULT \'0\' COMMENT \'1: mail envoyé\', `error` varchar(255) NOT NULL DEFAULT \'\' COMMENT \'erreur d\'\'envoi\', `is_read` tinyint(1) NOT NULL DEFAULT \'0\', PRIMARY KEY (`id`), KEY `form_created` (`form_id`,`created_at`)',
-    'options' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci',
+    'options' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci',
     'columns' => 
     array (
       'id' => 'int NOT NULL AUTO_INCREMENT',

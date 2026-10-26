@@ -48,6 +48,10 @@
   'logged|blocked|banned', 'identifiant') note un événement (sans effet si
   Sentinelle est absente).
 
+### Thème
+- Le thème affiche lui-même le gabarit annexe des pages : mettre
+  $theme['various_in_theme'] = true; dans son config.php (sinon doublon).
+
 ### Site dans un sous-dossier (ex. /new/)
 - Configuration > Générale > URL du site : https://exemple.fr/new/
 - .htaccess : ErrorDocument 404 /new/index.php?p=pages&id=404

@@ -150,6 +150,28 @@ if (!function_exists('sbSessionResolveName')) {
 	}
 }
 
+/**
+* Retire des options de session_start() celles que le php.ini fixe deja a la
+* meme valeur. Un hebergeur (ISPConfig, PHP-FPM) peut les poser en
+* php_admin_value : le script ne peut plus les modifier et session_start()
+* ecrit alors « Setting option ... failed » dans le journal a CHAQUE requete,
+* alors que le cookie est bien protege.
+* @param	array	$options	options de session_start(), sans le prefixe "session."
+* @return	array
+*/
+if (!function_exists('sbSessionStartOptions')) {
+	function sbSessionStartOptions(array $options) {
+		foreach ($options as $key => $value) {
+			$current = ini_get('session.' . $key);
+			if ($current === false) continue; // pas une directive ini (read_and_close...)
+			$current = trim($current, " '\"");
+			$same = is_bool($value) ? (filter_var($current, FILTER_VALIDATE_BOOLEAN) === $value) : (strcasecmp($current, (string) $value) === 0);
+			if ($same) unset($options[$key]);
+		}
+		return $options;
+	}
+}
+
 // --- SB_SESSION_NAME peut etre impose en amont (multi-sites gere a la main,
 // --- tests). Sinon on resout depuis le fichier de l'installation.
 defined('SB_SESSION_NAME') OR define('SB_SESSION_NAME', sbSessionResolveName());

@@ -30,6 +30,13 @@ $theme['headpage'][0] = true;
 $theme['slogan'] = "";
 
 // ---------------------------------
+// --- Gabarit annexe des pages
+// ---------------------------------
+// Décommenter si le thème affiche lui-même le gabarit annexe
+// ($sb_pages_various) : le module pages ne l'affiche alors plus
+//$theme['various_in_theme'] = true;
+
+// ---------------------------------
 // --- Special blocks
 // ---------------------------------
 //$theme['blocks'][0]['unique'] = '';

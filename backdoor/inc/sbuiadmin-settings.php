@@ -228,7 +228,10 @@ function sbDbConfigDirs() {
 	$root = sbDbConfigSiteId();
 	$docroot = !empty($_SERVER['DOCUMENT_ROOT']) ? @realpath($_SERVER['DOCUMENT_ROOT']) : false;
 	if (!$docroot || ($root !== $docroot && strpos($root . DIRECTORY_SEPARATOR, $docroot . DIRECTORY_SEPARATOR) !== 0)) {
-		$docroot = dirname($root); // hors contexte web (CLI) : site supposé dans un sous-dossier
+		// Hors contexte web (CLI) : site supposé dans un sous-dossier, sauf si
+		// private/ est à côté de lui (site à la racine web, ex. ISPConfig web2/web)
+		$up = dirname($root);
+		$docroot = (@is_dir($up . DIRECTORY_SEPARATOR . 'private') && !@is_dir(dirname($up) . DIRECTORY_SEPARATOR . 'private')) ? $root : $up;
 	}
 	$account = dirname($docroot);
 	$dirs = array();

@@ -21,7 +21,7 @@ class flood extends sql {
     const HOST = "localhost";
     const PORT = 11211;
     var $expiration = 1 * 24 * 60 * 60; // 1 jour; 24 heures; 60 minutes; 60 secondes == 1 journée
-    var $how_many = 3; // Combien de fois avant le blocage définitif
+    var $how_many = 3; // Combien de rafales (dans la minute) avant le blocage
     var $last_request = 2; // Derniere requete en secondes
     var $message = 'Blocked'; // Message à l'IP bloquée
     var $reason = 'Too many connexion in %s request(s) that last %s second(s) each one';
@@ -34,11 +34,6 @@ class flood extends sql {
         "DEFAULT" => 1,
         "CHAT"    => 3,
         "LOGIN"   => 4
-    ];
-    private $timeLimitProcess = [
-        "DEFAULT" => 0.1,
-        "CHAT"    => 1.5,
-        "LOGIN"   => 0.1
     ];
 
     public function __construct() {
@@ -67,10 +62,6 @@ class flood extends sql {
 
     private function addUserlimit($key, $time) {
         $this->timeLimitUser [$key] = $time;
-    }
-
-    private function addProcesslimit($key, $time) {
-        $this->timeLimitProcess [$key] = $time;
     }
 
     public function quickIP() {
@@ -132,35 +123,33 @@ class flood extends sql {
 
         $ip = $this->quickIP ();
         $ipKey = "flood" . $action . sha1 ( $ip );
+        $strikesKey = $ipKey . "strikes";
 
-        $runtime = $this->memcache->get ( 'floodControl' );
-        $iptime = $this->memcache->get ( $ipKey );
-
+        $iptime = (float) $this->memcache->get ( $ipKey );
         $limitUser = isset ( $this->timeLimitUser [$action] ) ? $this->timeLimitUser [$action] : $this->timeLimitUser ['DEFAULT'];
-        $limitProcess = isset ( $this->timeLimitProcess [$action] ) ? $this->timeLimitProcess [$action] : $this->timeLimitProcess ['DEFAULT'];
 
-        // Initialise
-        $datas = [
-             'ip' => $ip
-            ,'blockedtime' => time()
-            ,'expirationtime' => time() + $this->expiration
-            ,'reason' => sprintf( $this->reason, $this->how_many, $this->last_request )
-            ,'infos' => $this->getUserInfosIPSTACK($ip)
-        ];
-        
-        // Limit All User
+        // --- Requête trop rapprochée de la précédente de CETTE IP : une
+        // --- rafale. Bannissement seulement à la $how_many-ième rafale dans
+        // --- la minute : un lien chargé deux fois (messagerie, proxy d'images
+        // --- Gmail) ne bannit plus. L'ancien seuil global (« floodControl »,
+        // --- 0,1 s entre deux requêtes de N'IMPORTE QUELS visiteurs) bannissait
+        // --- le second de deux visiteurs différents : supprimé.
         if ((microtime ( true ) - $iptime) < $limitUser) {
-            $this->insertNewIP($datas);
-            sbForbiddenRedirect();
+            $strikes = (int) $this->memcache->get ( $strikesKey ) + 1;
+            if ($strikes >= $this->how_many) {
+                $this->memcache->delete ( $strikesKey );
+                $this->insertNewIP([
+                     'ip' => $ip
+                    ,'blockedtime' => time()
+                    ,'expirationtime' => time() + $this->expiration
+                    ,'reason' => sprintf( $this->reason, $this->how_many, $limitUser )
+                    ,'infos' => $this->getUserInfosIPSTACK($ip)
+                ]);
+                sbForbiddenRedirect();
+            }
+            $this->memcache->set ( $strikesKey, $strikes, 0, 60 );
         }
 
-        // Limit All request
-        if ((microtime ( true ) - $runtime) < $limitProcess) {
-            $this->insertNewIP($datas);
-            sbForbiddenRedirect();
-        }
-
-        $this->memcache->set ( "floodControl", microtime ( true ) );
         $this->memcache->set ( $ipKey, microtime ( true ) );
     }
     

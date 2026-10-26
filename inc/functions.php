@@ -535,26 +535,20 @@ if (!function_exists("insert_sbGetUserIP")) {
  */
 if (!function_exists("sbIsBlockedIP")) {
 	function sbIsBlockedIP( $ip = '') {
-		global $sbsql, $sbsanitize, $sbflood;
-		if (class_exists('Memcache') && extension_loaded('memcache') && function_exists('memcache_connect')) {
-			$time_flood   = $sbflood->expiration;    // 1 jour; 24 heures; 60 minutes; 60 secondes
-			$how_many     = $sbflood->how_many;      // Combien de fois avant le blocage définitif
-			$last_request = $sbflood->last_request;  // Derniere requete en secondes
-		} else {
-			$time_flood   = 1 * 24 * 60 * 60; // 1 jour; 24 heures; 60 minutes; 60 secondes
-			$how_many     = 3;  // Combien de fois avant le blocage définitif
-			$last_request = 2;  // Derniere requete en secondes
-		}
+		global $sbsql, $sbsanitize;
 		$table   = _AM_DB_PREFIX . 'sb_blocked_ip';
 		// L'IP vient de Client-IP / X-Forwarded-For quand ils sont présents :
 		// valeur choisie par le visiteur, et stopXSS() laisse passer l'apostrophe.
 		// Appelé sur CHAQUE page du front (header.php) : injection SQL sans session.
 		$user_ip = $sbsql->escape_string(trim( $sbsanitize->stopXSS( (empty($ip)) ? sbGetUserIP() : $ip ) ));
 		
-		// Supprimer tout ceux dont le temps a expiré
-		$sbsql->query("DELETE FROM $table WHERE expirationtime + $time_flood < " . time());
-		// Chercher si l'ip est présente dans la table
-		$query   = "SELECT ip FROM $table WHERE ip = '$user_ip'";
+		// Supprimer tout ceux dont le temps a expiré. expirationtime contient
+		// déjà la durée du bannissement : y rajouter cette durée doublait le
+		// bannissement (24 h réglées, 48 h subies).
+		$now = time();
+		$sbsql->query("DELETE FROM $table WHERE expirationtime < $now");
+		// Chercher si l'ip est présente dans la table (et toujours bannie)
+		$query   = "SELECT ip FROM $table WHERE ip = '$user_ip' AND expirationtime >= $now";
 		$request = $sbsql->query($query);
 		$user    = $sbsql->assoc($request);
 
