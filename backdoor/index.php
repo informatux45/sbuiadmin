@@ -124,6 +124,9 @@ $sb_link_settings = sbSettingsLegacyArray();
 $sbsmarty->assign('sb_url_customer', sbSetting('site_url'));
 $sbsmarty->assign('sb_toast_duration', sbSetting('toast_duration', '7') ?: 7);
 
+// --- Purge du journal des connexions, une fois par jour
+$sbusers->purgeAccessLogDaily();
+
 // --- Sentinelle (module de sécurité, inc/sbuiadmin-sentinelle.php)
 sbSentinelleGuard('admin');
 

@@ -179,6 +179,8 @@ switch($action) {
 			}
 
 			$result_edit = sbSettingsSave($sb_new_settings);
+			// Durée de conservation appliquée tout de suite
+			if ($result_edit) $sbusers->purgeAccessLog();
 
 			// Double authentification : activée seulement après saisie d'un
 			// code de test reçu par e-mail (un envoi d'e-mails qui ne marche

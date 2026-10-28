@@ -240,9 +240,8 @@ class user extends sql {
 		$result = $this->query($sql);
 		if (!$result)
 			return false;
-		// Purge des lignes trop anciennes, de temps en temps
-		if (mt_rand(1, 100) === 1) $this->purgeAccessLog();
-		return true;
+		else
+			return true;
 	}
 
 
@@ -257,6 +256,21 @@ class user extends sql {
 				WHERE `logaccess_type` <> 'update'
 				AND `logaccess_date` < UNIX_TIMESTAMP() - " . ($days * 86400);
 		return (bool) $this->query($sql);
+	}
+
+
+	/**
+	* Purge du journal au plus une fois par jour (date dans logaccess_lastpurge),
+	* appelée à chaque requête par index.php et backdoor/index.php
+	* @return bool purge faite
+	*/
+	public function purgeAccessLogDaily() {
+		if (!function_exists('sbSettingsSave')) return false;
+		$today = date('Y-m-d');
+		if (sbSetting('logaccess_lastpurge') === $today) return false;
+		// Date posée d'abord : une seule tentative par jour, même en échec
+		if (!sbSettingsSave(array('logaccess_lastpurge' => $today))) return false;
+		return $this->purgeAccessLog();
 	}
 
 

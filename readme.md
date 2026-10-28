@@ -160,167 +160,164 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 
 ## 📝 Changelog
 
+**4.68**
+- Login log purged once a day, and right after saving the retention
+
 **4.67**
-- Admin messaging: an expired tab no longer logs "missing password" every 15 s (AJAX calls without a session get 401 JSON and polling stops; the event is logged only when the login form is posted); the login page no longer polls
-- Users without the Messages right no longer load its script (no repeated 403 / Sentinelle "forbidden"); `update_last_check` and `modules_catalog` in sb_config are volatile
-- Login log (`sb_logaccess`) purged automatically after 180 days (setting in Configuration > Features, 30 to 3650 days; update history kept), newest entries first
+- Admin AJAX calls without a session: 401, no log entry
+- Messages script loaded only with the Messages right
+- Login log purge (Configuration > Features), newest entries first
 
 **4.66**
-- Fixes: migration collation accepted by older MariaDB, theme kept when migrating old settings, database config found from the command line, session options already set by php.ini no longer logged as errors
-- Anti-flood bans only after repeated bursts from the same IP; banned IPs expire on time; lightbox CSS no longer hides theme elements; `sql::error()` public again, `sql::next_result()` restored
-- Themes can show the page's additional template themselves (`$theme['various_in_theme'] = true;` in their config.php); Sentinelle 1.7.2 (help text)
-
-**4.65**
-- New installs: random name for the administration folder (step 4, e.g. `vokadilumi47`), renamed at the very end of the installation; the default site URL keeps its port
-- Sentinelle 1.7.1: files of a retired official module (e.g. Boutique, replaced by E-commerce) are checked against that module's published list and shown apart instead of "added PHP"
-
-**4.64**
-- Sentinelle 1.7.0: site-specific PHP files can be approved from the Integrity page (path + SHA-256 in the database, password required; reported again if changed), watched prefixes (new files below them raise a warning instead of a critical event), real totals instead of a 500 cap; log columns no longer overlap
-- Security: reflected XSS fixed in the admin (breadcrumb and id= buttons); news 1.0.4, gallery 1.0.1, slider 1.0.1, tabbs 1.0.2, table 1.0.2
-- Admin breadcrumb shows the action in French
+- Fixes: older MariaDB collation, theme migration, CLI database config, php.ini session options
+- Anti-flood and IP bans fixed, lightbox CSS
+- Theme option various_in_theme; Sentinelle 1.7.2
 
 <details>
   <summary><strong>Older versions</strong></summary>
 
+**4.65**
+- Random admin folder name on new installs
+- Sentinelle 1.7.1: retired official modules recognised
+
+**4.64**
+- Sentinelle 1.7.0: approved site files, watched prefixes
+- Admin XSS fixed; News, Gallery, Slider, Tabbs, Table updated
+- Admin breadcrumb in French
+
 **4.63**
-- New installs: 8 default dashboard widgets (pages, news, users, free disk space, last logins, unread contact messages, media size, first steps); contact 1.1.1 adds the "Unread messages" tile
-- Admin forms ask for confirmation before leaving a page with unsaved changes
-- Theme read from the database only; the old inc/admin/theme.txt is removed (kept while an old sbconfig.php still reads it)
+- 8 default dashboard widgets on new installs; Contact 1.1.1
+- Confirmation before leaving an unsaved form
+- Theme read from the database only
 
 **4.62**
-- Store module renamed to "E-commerce" with a star icon (display name and sidebar menu only; identifier, routes and tables unchanged)
+- Store module renamed "E-commerce"
 
 **4.61**
-- Page Builder: a dropped row/block no longer sometimes sticks in the middle of the canvas (leftover inline position from jQuery UI connectToSortable); inline styles are cleaned after every drop
+- Page Builder: dropped blocks no longer stuck
 
 **4.60**
-- Sentinelle 1.6.0: automatic bans now count every serious attempt (even repeats collapsed in the log), slow-scan detection (too many 404s per IP), and the attacker's country in the log (CF-IPCountry header, or optional ipstack key)
+- Sentinelle 1.6.0: stronger auto-ban, slow scans, country
 
 **4.59**
-- Sentinelle 1.5.0: file integrity check against the signed file list of the installed version (core and official modules modified or missing, added PHP files, scripts in upload/), on demand and daily, critical event and alert on any change; advisor point
+- Sentinelle 1.5.0: file integrity check
 
 **4.58**
-- Sentinelle 1.4.0: request burst limit per IP (no Memcache needed), search engine bots verified by reverse DNS, automatic bans after repeated serious events (longer for repeat offenders), protection mode only; member area login failures reported to Sentinelle
+- Sentinelle 1.4.0: burst limit, bot check, auto-ban
 
 **4.57**
-- Sentinelle 1.3.0: security advisor (PHP settings, HTTPS and security headers, exposed files such as .git or the installer, accounts, Sentinelle and update settings), each point with the fix to apply, score out of 100 and "Security score" dashboard tile
+- Sentinelle 1.3.0: security advisor and score
 
 **4.56**
-- Sentinelle 1.2.0: banned IPs and ranges (duration or permanent, 403 in both modes, ban from the log), CSV export, dashboard widgets (attacks tile, most active IPs card), e-mail alerts (at most one per 15 min) and daily summary
-- Modules card: new "Update database" action when a module's files are newer than its registered version (files copied by hand), with encrypted backup and undo
+- Sentinelle 1.2.0: IP bans, CSV export, widgets, e-mail alerts
+- Modules: "Update database" action
 
 **4.55**
-- Sentinelle 1.1.0: attack filters (SQL injection, XSS, path traversal, file inclusion, null bytes, globals overwrite, vulnerability scanners, attack tools, dangerous uploads), each off / log only / by mode (403 in protection mode); trusted IPs, logged-in administrators, passwords and tokens are never inspected; excluded parameters
+- Sentinelle 1.1.0: attack filters
 
 **4.54**
-- New official security module Sentinelle 1.0.0 (installed with new sites, from the Modules card on existing ones): security log of refused logins, ALTCHA/2FA/CSRF failures, rights denials, blocked IPs and anti-flood bans, observation/protection mode, trusted IPs, rescue file; sbSecurityEvent() for third-party modules
+- New security module Sentinelle 1.0.0
 
 **4.53**
-- Visitor IP address: proxy headers (X-Forwarded-For, CF-Connecting-IP) are only trusted from a declared proxy (Users > Blocked IPs > Settings: none, Cloudflare or custom list); IP blocking, login lock and logs could be bypassed or misdirected by forged headers
+- Proxy headers trusted only from a declared proxy
 
 **4.52**
-- Readme: Getting Started section (prerequisites, net and manual install, usage); zip extension now required by the installer; renaming the administration folder documented (help.txt, sbconfig.php)
+- Readme: Getting Started; zip extension required
 
 **4.51**
-- Module widgets: tiles can show a comparison line and a trend badge (favorable direction chooses the color), cards can be 4/6/8/12 columns wide (set by the widget or when adding it), scripts declared by widgets are loaded once
+- Module widgets: trends, card widths
 
 **4.50**
-- Dashboard widgets shipped by modules: datas/modules/<name>/widgets/<key>.php (tile or card, optional .tpl, settings: text, number, select, yes/no), new "Module widget" type on the Dashboard page, hidden without the module's view right
+- Dashboard widgets shipped by modules
 
 **4.49**
-- FAQ 1.0.1: missing ID cell in the questions table (columns were shifted); help text spacing under fields placed in an openRow() line
+- FAQ 1.0.1: table fix
 
 **4.48**
-- Form class: the 'time' input type is accepted again by addInput() (HH:MM, same look as text fields); example Time field in the sandbox page (new sb_sandbox.hour column)
+- Form class: time field again
 
 **4.47**
-- A module can ship its own admin controller and templates in its folder (datas/modules/<name>/admin/<name>.php and admin/tpls/), used instead of backdoor/datas/modules/ with the same rights and CSRF checks; core templates still take precedence
+- Modules can ship their own admin pages
 
 **4.46**
-- Admin login page settings (Configuration > Admin Login): gradient colors, SBUIADMIN version shown or hidden, square logo picked from the media library; native color picker in the form class
+- Admin login page settings (colors, logo, version)
 
 **4.45**
-- Sites updated from an old version: database port/socket and ALTCHA no longer depend on the site's own sbconfig.php; the Update page lists vendor/ folders that are not part of SBUIADMIN (vendor/.htaccess blocks web access to them)
+- Old sbconfig.php supported; foreign vendor/ folders listed
 
 **4.44**
-- CSRF token required on every admin POST, added automatically to forms, fetch and jQuery requests; modules can declare sensitive GET actions ('csrf_get') and Smarty modifiers ('modifiers'); more PHP functions usable in templates (null-safe); new date formats US1, FRM, FRH2, MONTH
+- CSRF token on every admin POST; new date formats
 
 **4.43**
-- Database catch-up for old sites: missing core tables and columns (and those of installed modules) added from the installer schema, no data changed; a database without version and without sb_modules/sb_users_rights is now upgraded instead of being marked current; option to hide the GitHub banner on the maintenance page
+- Database catch-up for old sites
 
 **4.42**
-- Security audit (part 3): installer closed once installed, escaped URL values in the Volton 404 page, fixed template choice in News and User, logout links require the session token, HTTP 403 for access denied, single install dump, front language kept across pages, clean download file names; News 1.0.3, Downloads 1.0.1
+- Security audit (part 3); News 1.0.3, Downloads 1.0.1
 
 **4.41**
-- Security audit (part 2): admin-only pages refused before running, per-action rights read from the controller's own parameter, CSRF token on delete links, SQL escaping hardened (backslash, multi-select ids), non-admin accounts get modules only by default (Media to be granted); News module 1.0.2
+- Security audit (part 2); News 1.0.2
 
 **4.40**
-- Shop module renamed "store" 2.0.0 (sb_store_* tables, no routes): an installed official "boutique" is taken over on install, a site's own shop is never touched; 'origin' => 'site' marker for site-specific modules (never installed or updated from GitHub)
+- Shop module renamed "store" 2.0.0
 
 **4.39**
-- Security audit (part 1): public maintenance access code replaced by a random one, unused AJAX endpoints removed, CSRF token on sitemap generation, thumbnail cache capped, direct-access guards restored
+- Security audit (part 1)
 
 **4.38**
-- Contact module 1.1.0: received messages kept and listed per form (retention setting, 12 months by default), unread count shown in the side menu, several recipients, real error shown on send failure
+- Contact 1.1.0: received messages kept and listed
 
 **4.37**
-- PHP 8 / PHP 9 readiness: fatal errors and deprecations fixed (sanitize, forms, CSV, media, thumbnails, search), wrong docblocks corrected; Shop and Tabs modules 1.0.1
+- PHP 8 / PHP 9 readiness fixes
 
 **4.36**
-- Update page: database left behind the files (FTP copy…) detected, upgraded on demand with a backup restored on failure; Modules table centred
+- Update page: database behind the files upgraded
 
 **4.35**
-- Update page: Reload button fixed, clearer module messages (module name, plurals), better spacing in the Modules table
+- Update page fixes
 
 **4.34**
-- Modules: Cancel button to undo the last operation (update, uninstall, removal, install); backups limited to the module tables
-- Update page: progress spinner and results where the action happens; module files are downloaded once
+- Modules: undo the last operation
+- Update page: progress where the action happens
 
 **4.33**
-- PHP 8: no more warnings on the site and in the administration (templates, pages, news, logout, forms)
-- Dashboard: the widget form title is shown again
+- PHP 8 warnings removed
 
 **4.32**
-- Update page: progress and errors now show where the action happens (update card, module row)
-- Stray system files removed (.DS_Store, Thumbs.db, .orig); module files no longer reported as modified when they are not
+- Update page: progress and errors in place
+- Stray system files removed
 
 **4.31**
-- Modules card simplified: Install (downloads the module if needed), Update, Uninstall
-- Uninstall can now remove the whole module (data, tables, files), listing what will be lost before confirming
+- Modules card simplified; full module removal
 
 **4.30**
-- Fixed: updating from 4.28 or earlier stopped on the 4.29 database migration (it was rolled back automatically)
-- Update page: version and status side by side, green when up to date; the update icon now counts core and module updates
+- Fixed update from 4.28 or earlier
+- Update page layout and counter
 
 **4.29**
-- Modules (news, contact, faq, gallery, download, slider, tabbs, table, shop) are now separate from the core, each with its own version
-- New "Modules" card in Configuration > Update: download, install, uninstall, delete files
-- PHP 8: no more undefined index warnings in modules
+- Modules separated from the core, each with its own version
+- New Modules card in Configuration > Update
 
 **4.28**
-- Text conversion no longer drops strings with characters outside Latin-1 (euro, curly quotes, emoji)
-- Maintenance page: local fonts linked, social icons no longer doubled on desktop
-- Form class: no more PHP 8 "Undefined variable" warnings
+- Text conversion keeps non Latin-1 characters
+- Maintenance page and form class fixes
 
 **4.27**
-- Media folder and URL now set by the updated core, so sites keeping an older sbconfig.php need no manual change
+- Media folder and URL set by the core
 
 **4.26**
-- Media uploads hardened: safe file names (duplicates included), content must match the extension, size limit enforced server-side, CSRF token
-- Media folder fixed to upload/ (no longer set at install or in Configuration), media URL derived from the site URL; no more double slashes
+- Media uploads hardened
+- Media folder fixed to upload/
 
 **4.25**
-- Configuration > Server rebuilt: shared / VPS / dedicated detected (or forced), disk ring, live CPU load chart, "not detected" instead of zeros
-- Container load read from /proc/loadavg (not the host); old status iframe and Chart.js removed
+- Configuration > Server rebuilt
 
 **4.24**
-- Font Awesome 7 Free served locally (themes, admin, editor, icon picker), old icon names still accepted
-- Blocked IPs and front anti-flood active again, 403 redirect fixed; local Chart.js 4.5.1
+- Font Awesome 7 served locally
+- Blocked IPs and anti-flood fixed; local Chart.js
 
 **4.23**
-- Google Analytics 4 (G-) instead of Universal Analytics, Google verification meta fixed
-- Google Fonts served locally by the themes, CMS config > Fonts removed
-- Pinkrio: ColorBox no longer opens by itself (jQuery 4)
+- Google Analytics 4, local Google Fonts
+- Pinkrio: ColorBox fix
 
 **4.22**
 - Activebox, Editorial and Volton themes: local jQuery 4, Waypoints 4.0.1

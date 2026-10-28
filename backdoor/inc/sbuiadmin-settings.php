@@ -172,8 +172,10 @@ function sbSettingsDefaults() {
 		'sentinelle_geo_key'    => '',
 		'toast_duration'        => '7',
 		// Journal des connexions (sb_logaccess) : conservation en jours,
-		// lignes « update » jamais purgées (sbLogaccessRetention())
+		// lignes « update » jamais purgées (sbLogaccessRetention()) ; date de
+		// la dernière purge quotidienne (users::purgeAccessLogDaily())
 		'logaccess_retention'   => '180',
+		'logaccess_lastpurge'   => '',
 		'pagebuilder_modules'   => '',
 		'theme'                 => '',
 		// Double authentification par e-mail : activée à la main dans

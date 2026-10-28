@@ -51,8 +51,9 @@
   401 {"error":"session"}, rien au journal ; arrêter le rafraîchissement.
 - Clés de sb_config réécrites à chaque vérification des mises à jour
   (update_last_check, modules_catalog) : volatiles, comme les sentinelle_*.
-- Journal sb_logaccess : purge automatique au-delà de logaccess_retention
-  (180 j par défaut, sbLogaccessRetention()), sauf les lignes « update ».
+- Journal sb_logaccess : purgé une fois par jour au-delà de logaccess_retention
+  (180 j), sauf « update ». Un module y écrit par $sbusers->updateAccessLog(),
+  jamais par son propre INSERT. logaccess_lastpurge : clé volatile.
 
 ### Thème
 - Le thème affiche lui-même le gabarit annexe des pages : mettre

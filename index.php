@@ -80,6 +80,11 @@ if (file_exists($sbuiadmin_install_dir)) {
 }
 
 // ----------------------
+// Purge du journal des connexions, une fois par jour
+// ----------------------
+$sbusers->purgeAccessLogDaily();
+
+// ----------------------
 // Get Global Configuration
 // ----------------------
 $sbsmarty->assign('sb_site_title', _AM_SITE_TITLE);
