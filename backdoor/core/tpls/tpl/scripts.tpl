@@ -7,7 +7,7 @@
     <script defer src="assets/adminator/vendor-chartjs.js"></script>
     <script defer src="assets/adminator/vendors.js"></script>
     <script defer src="assets/adminator/2026.js"></script>
-    <script defer src="assets/adminator/datatable.js"></script>
+    <script defer src="assets/adminator/datatable.js?v={$smarty.const._AM_START_VERSION}"></script>
     <script defer src="assets/adminator/confirm.js"></script>
     <script defer src="assets/adminator/unsaved.js?v={$smarty.const._AM_START_VERSION}"></script>
     <script defer src="assets/adminator/lightbox.js"></script>
@@ -16,7 +16,7 @@
     <script defer src="assets/adminator/peek.js"></script>
     <script>window.SB_TOAST_DURATION = {if isset($sb_toast_duration) && $sb_toast_duration != ''}{$sb_toast_duration}{else}7{/if} * 1000;</script>
     <script defer src="assets/adminator/toast.js"></script>
-    <script defer src="assets/adminator/messages.js"></script>
+    {if !empty($sb_can_view_messages) && (!isset($page) || $page != 'login')}<script defer src="assets/adminator/messages.js?v={$smarty.const._AM_START_VERSION}"></script>{/if}
     <script defer src="assets/adminator/dashboard-chart.js"></script>
 
 	{if $page != 'login'}

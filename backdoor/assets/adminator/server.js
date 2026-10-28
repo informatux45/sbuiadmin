@@ -170,10 +170,14 @@
 		set('time', d.time);
 	}
 
+	var timer = null;
 	function refresh() {
 		if (document.hidden) return;
 		fetch(url + 'live', { credentials: 'same-origin' })
-			.then(function (r) { return r.ok ? r.json() : null; })
+			.then(function (r) {
+				if (r.status === 401 && timer) { clearInterval(timer); timer = null; } // session expirée
+				return r.ok ? r.json() : null;
+			})
 			.then(function (d) { if (d) render(d); })
 			.catch(function () {});
 	}
@@ -185,7 +189,7 @@
 
 	try { render(JSON.parse(root.getAttribute('data-live'))); } catch (e) {}
 	// Mutualisé : les relevés affichés ne changent pas, pas de rafraîchissement
-	if (root.getAttribute('data-type') !== 'shared') setInterval(refresh, 5000);
+	if (root.getAttribute('data-type') !== 'shared') timer = setInterval(refresh, 5000);
 
 	fetch(url + 'sizes', { credentials: 'same-origin' })
 		.then(function (r) { return r.ok ? r.json() : null; })

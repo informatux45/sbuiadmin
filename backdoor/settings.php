@@ -147,6 +147,7 @@ switch($action) {
 				'smarty_cache_lifetime' => $sb_text('smarty_caching_time'),
 				'medias_per_page'       => $sb_text('medias_per_page'),
 				'toast_duration'        => $sb_text('toast_duration'),
+				'logaccess_retention'   => (string) max(30, min(3650, (int) $sb_raw('logaccess_retention') ?: 180)),
 				// Page de connexion (sbLoginBranding()) : valeur invalide = défaut
 				'login_color_start'     => sbColorHex($sb_raw('login_color_start')),
 				'login_color_end'       => sbColorHex($sb_raw('login_color_end')),
@@ -447,6 +448,7 @@ switch($action) {
 		$sbform->addCheckbox('Activation des différents modes de DEBUG (FRONT)', $tab_check_7, '', false, '<br />', "Activation des modes DEBUG (FRONT) Inline, Smarty (core)");
 		$sbform->addBreak('Fonctionnalités');
 		$sbform->addInput('text', "Durée d'affichage des toasts (secondes)", array ('name' => 'toast_duration', 'value' => "$sb_config_toast_duration", 'placeholder' => "7"), true, false, "Notifications flottantes (haut droite) après une action réussie ou en erreur.");
+		$sbform->addInput('text', "Purge des journaux de connexion (jours)", array ('name' => 'logaccess_retention', 'value' => (string) sbLogaccessRetention(), 'placeholder' => "180"), true, false, "Les connexions et tentatives plus anciennes sont supprimées automatiquement (30 à 3650 jours).<br>L'historique des mises à jour est conservé.");
 		// Checkbox du Sandbox
 		$tab_check_2 = array();
 		$tab_check_2[0]['text']    = 'Sandbox';

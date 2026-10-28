@@ -137,6 +137,16 @@
 			renderPager(totalPages);
 		}
 
+		// Tri initial : <th data-sort-default="desc"> (ou "asc")
+		headers.forEach(function (th, idx) {
+			var def = th.getAttribute('data-sort-default');
+			if (sortCol < 0 && (def === 'asc' || def === 'desc')) {
+				sortCol = idx;
+				sortDir = def === 'asc' ? 1 : -1;
+				th.classList.add(def === 'asc' ? 'sorted-asc' : 'sorted-desc');
+			}
+		});
+
 		headers.forEach(function (th, idx) {
 			if (th.getAttribute('data-sort') === 'false') return;
 			th.style.cursor = 'pointer';

@@ -62,7 +62,7 @@ switch($action) {
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		
 		// Contents table
-		$query     = "SELECT * FROM $table";
+		$query     = "SELECT * FROM $table ORDER BY logaccess_date DESC, id DESC";
 		$request2  = $sbsql->query($query);
 		$result2   = $sbsql->toarray($request2);
 		

@@ -10,6 +10,17 @@
 (function () {
 	var POLL_UNREAD_MS = 15000;
 	var POLL_THREAD_MS = 4000;
+	var timers = [];
+
+	// Session expirée (401) : plus aucun appel tant que la page n'est pas rechargée
+	function json(r) {
+		if (r.status === 401) {
+			timers.forEach(clearInterval);
+			timers = [];
+			throw new Error('session');
+		}
+		return r.json();
+	}
 
 	function pad2(n) {
 		return ('0' + n).slice(-2);
@@ -33,14 +44,14 @@
 
 	function pollUnread() {
 		fetch('index.php?p=messages&ajax=unread', { credentials: 'same-origin' })
-			.then(function (r) { return r.json(); })
+			.then(json)
 			.then(function (data) { updateUnreadBadges(data.count || 0); })
 			.catch(function () {});
 	}
 
 	function initUnreadPolling() {
 		pollUnread();
-		setInterval(pollUnread, POLL_UNREAD_MS);
+		timers.push(setInterval(pollUnread, POLL_UNREAD_MS));
 	}
 
 	function initThread() {
@@ -88,7 +99,7 @@
 
 		function pollThread() {
 			fetch(baseUrl + '&ajax=thread&with=' + withId + '&since=' + lastCreatedAt(), { credentials: 'same-origin' })
-				.then(function (r) { return r.json(); })
+				.then(json)
 				.then(function (data) { (data.messages || []).forEach(appendMessage); })
 				.catch(function () {});
 		}
@@ -104,11 +115,11 @@
 				credentials: 'same-origin',
 				body: text,
 			})
-				.then(function (r) { return r.json(); })
+				.then(json)
 				.then(function (data) {
 					if (data.ok && data.message) appendMessage(data.message);
 				})
-				.catch(function () {})
+				.catch(function () { if (!input.value) input.value = text; }) // envoi raté (session expirée…) : texte rendu
 				.then(function () {
 					input.disabled = false;
 					input.focus();
@@ -143,7 +154,7 @@
 		}
 
 		thread.scrollTop = thread.scrollHeight;
-		setInterval(pollThread, POLL_THREAD_MS);
+		timers.push(setInterval(pollThread, POLL_THREAD_MS));
 	}
 
 	document.addEventListener('DOMContentLoaded', function () {

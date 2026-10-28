@@ -240,8 +240,23 @@ class user extends sql {
 		$result = $this->query($sql);
 		if (!$result)
 			return false;
-		else
-			return true;
+		// Purge des lignes trop anciennes, de temps en temps
+		if (mt_rand(1, 100) === 1) $this->purgeAccessLog();
+		return true;
+	}
+
+
+	/**
+	* Purge Access Log : lignes plus anciennes que la durée de conservation
+	* (Configuration > Fonctionnalités), sauf l'historique des mises à jour
+	* @return bool
+	*/
+	public function purgeAccessLog() {
+		$days = function_exists('sbLogaccessRetention') ? sbLogaccessRetention() : 180;
+		$sql = "DELETE FROM " . _AM_DB_PREFIX . "sb_logaccess
+				WHERE `logaccess_type` <> 'update'
+				AND `logaccess_date` < UNIX_TIMESTAMP() - " . ($days * 86400);
+		return (bool) $this->query($sql);
 	}
 
 

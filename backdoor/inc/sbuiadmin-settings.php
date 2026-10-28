@@ -171,6 +171,9 @@ function sbSettingsDefaults() {
 		'sentinelle_404'        => '24',
 		'sentinelle_geo_key'    => '',
 		'toast_duration'        => '7',
+		// Journal des connexions (sb_logaccess) : conservation en jours,
+		// lignes « update » jamais purgées (sbLogaccessRetention())
+		'logaccess_retention'   => '180',
 		'pagebuilder_modules'   => '',
 		'theme'                 => '',
 		// Double authentification par e-mail : activée à la main dans
@@ -740,6 +743,12 @@ function sbMediasLegacyNotice() {
 /** Réglage booléen ("1") */
 function sbSettingBool($name) {
 	return sbSetting($name) === '1';
+}
+
+/** Conservation du journal des connexions, en jours (30 à 3650, 180 par défaut) */
+function sbLogaccessRetention() {
+	$days = (int) sbSetting('logaccess_retention', '180');
+	return $days > 0 ? max(30, min(3650, $days)) : 180;
 }
 
 /**

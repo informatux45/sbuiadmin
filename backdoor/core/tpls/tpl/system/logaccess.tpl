@@ -41,7 +41,7 @@
                                     <thead>
                                         <tr>
                                             {foreach from=$sb_table_header item=header}
-												<th>
+												<th{if $header == 'Date'} data-sort-default="desc"{/if}>
 													{$header} <span class="sort"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
 												</th>
 											{/foreach}

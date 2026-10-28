@@ -297,6 +297,7 @@
 											'sentinelle_integrity_auto' => '1',
 											'sentinelle_404'        => '24',
 											'toast_duration'        => '7',
+											'logaccess_retention'   => '180',
 											'pagebuilder_modules'   => '',
 											// Thème du site
 											'theme'                 => 'saxo',

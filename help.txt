@@ -47,6 +47,12 @@
 - Module tiers : sbSecurityEvent('type', 'info|warning|critical', 'détail',
   'logged|blocked|banned', 'identifiant') note un événement (sans effet si
   Sentinelle est absente).
+- Appel AJAX d'un module (ajax=… ou en-tête X-Requested-With) sans session :
+  401 {"error":"session"}, rien au journal ; arrêter le rafraîchissement.
+- Clés de sb_config réécrites à chaque vérification des mises à jour
+  (update_last_check, modules_catalog) : volatiles, comme les sentinelle_*.
+- Journal sb_logaccess : purge automatique au-delà de logaccess_retention
+  (180 j par défaut, sbLogaccessRetention()), sauf les lignes « update ».
 
 ### Thème
 - Le thème affiche lui-même le gabarit annexe des pages : mettre

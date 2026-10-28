@@ -163,3 +163,13 @@ function sbLoginSucceeded($login) {
 		mysqli_stmt_close($stmt);
 	}
 }
+
+/** Appel AJAX (ajax=… ou X-Requested-With) : sans session, réponse 401 en JSON, rien au journal */
+function sbIsAjaxRequest() {
+	return isset($_GET['ajax']) || strtolower((string) ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '')) === 'xmlhttprequest';
+}
+
+/** Vrai envoi du formulaire de connexion (champ vide compris) : seul cas journalisé en « mot de passe manquant » */
+function sbLoginFormPosted() {
+	return ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && (isset($_POST['username']) || isset($_POST['password']));
+}

@@ -352,10 +352,22 @@ if (!isset($_SESSION['sbuiadmin_user_name']) || $_SESSION['sbuiadmin_user_name']
 	// --- SESSION Auth
 	// ------------------
 	// --- No session
+	// Onglet dont la session a expiré (messagerie, mises à jour) : 401 en
+	// JSON, pas une tentative de connexion
+	if (sbIsAjaxRequest()) {
+		http_response_code(401);
+		header('Content-Type: application/json');
+		echo json_encode(array('error' => 'session'));
+		exit;
+	}
 	$sbsmarty->assign('uiadmin_access_code', 'E3');
-	$sbuiadmin_type = 'error';
-	$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_MISSING, sbLoginLockIp());
-	$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event);
+	// Journalisé seulement pour un formulaire envoyé avec un champ vide,
+	// pas pour un simple affichage de la page de connexion
+	if (sbLoginFormPosted()) {
+		$sbuiadmin_type = 'error';
+		$sbuiadmin_event = sprintf(SBUIADMIN_MSG_LOG_ACCESS_MISSING, sbLoginLockIp());
+		$sbusers->updateAccessLog($sbuiadmin_type, $sbuiadmin_event);
+	}
 	$sbsmarty->display('system/login.tpl');
 	exit;
 }
@@ -531,6 +543,13 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 		// direct par URL (connaître index.php?p=faq ne suffisait jusqu'ici
 		// qu'à contourner le masquage cosmétique du menu). Voir inc/sbuiadmin-rights.php.
 		if (!sbHasRight($sb_get_page)) {
+			// Compteur de non-lus d'un onglet ouvert avant le retrait du droit :
+			// zéro, sans 403 ni événement à chaque appel
+			if ($sb_get_page === 'messages' && ($_GET['ajax'] ?? '') === 'unread') {
+				header('Content-Type: application/json');
+				echo json_encode(array('count' => 0));
+				exit;
+			}
 			sbSecurityEvent('forbidden', 'info', 'Page ' . $sb_get_page . ' (' . sbClassifyAction($sb_get_page) . ')', 'blocked', (string) ($_SESSION['sbuiadmin_user_name'] ?? ''));
 			http_response_code(403);
 			$sbsmarty->display("403.tpl");

@@ -160,6 +160,11 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 
 ## 📝 Changelog
 
+**4.67**
+- Admin messaging: an expired tab no longer logs "missing password" every 15 s (AJAX calls without a session get 401 JSON and polling stops; the event is logged only when the login form is posted); the login page no longer polls
+- Users without the Messages right no longer load its script (no repeated 403 / Sentinelle "forbidden"); `update_last_check` and `modules_catalog` in sb_config are volatile
+- Login log (`sb_logaccess`) purged automatically after 180 days (setting in Configuration > Features, 30 to 3650 days; update history kept), newest entries first
+
 **4.66**
 - Fixes: migration collation accepted by older MariaDB, theme kept when migrating old settings, database config found from the command line, session options already set by php.ini no longer logged as errors
 - Anti-flood bans only after repeated bursts from the same IP; banned IPs expire on time; lightbox CSS no longer hides theme elements; `sql::error()` public again, `sql::next_result()` restored
