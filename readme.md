@@ -160,6 +160,10 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 
 ## 📝 Changelog
 
+**4.69**
+- Smarty trim modifiers ready for PHP 9
+- Session options locked by the host skipped
+
 **4.68**
 - Login log purged once a day, and right after saving the retention
 
@@ -168,13 +172,13 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 - Messages script loaded only with the Messages right
 - Login log purge (Configuration > Features), newest entries first
 
+<details>
+  <summary><strong>Older versions</strong></summary>
+
 **4.66**
 - Fixes: older MariaDB collation, theme migration, CLI database config, php.ini session options
 - Anti-flood and IP bans fixed, lightbox CSS
 - Theme option various_in_theme; Sentinelle 1.7.2
-
-<details>
-  <summary><strong>Older versions</strong></summary>
 
 **4.65**
 - Random admin folder name on new installs

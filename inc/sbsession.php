@@ -156,14 +156,21 @@ if (!function_exists('sbSessionResolveName')) {
 * php_admin_value : le script ne peut plus les modifier et session_start()
 * ecrit alors « Setting option ... failed » dans le journal a CHAQUE requete,
 * alors que le cookie est bien protege.
+* Retire aussi celles que le script ne peut pas modifier (php_admin_flag) :
+* leur valeur imposee s'applique de toute facon.
 * @param	array	$options	options de session_start(), sans le prefixe "session."
 * @return	array
 */
 if (!function_exists('sbSessionStartOptions')) {
 	function sbSessionStartOptions(array $options) {
+		$ini = ini_get_all('session');
 		foreach ($options as $key => $value) {
 			$current = ini_get('session.' . $key);
 			if ($current === false) continue; // pas une directive ini (read_and_close...)
+			if (isset($ini['session.' . $key]['access']) && !($ini['session.' . $key]['access'] & INI_USER)) {
+				unset($options[$key]);
+				continue;
+			}
 			$current = trim($current, " '\"");
 			$same = is_bool($value) ? (filter_var($current, FILTER_VALIDATE_BOOLEAN) === $value) : (strcasecmp($current, (string) $value) === 0);
 			if ($same) unset($options[$key]);

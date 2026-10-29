@@ -19,5 +19,7 @@
  */
 function smarty_modifier_ltrim($string, $character = null) {
     // Strip whitespace (or other characters) from the end of a string
-    return ltrim($string, $character);
+    // PHP 8.1+ : null en 2e argument (ou en chaine) est deprecie, PHP 9 le refusera
+    $string = (string) ($string ?? '');
+    return ($character === null) ? ltrim($string) : ltrim($string, (string) $character);
 }
