@@ -39,6 +39,9 @@ define('SBUIADMIN_SETTINGS_LOADED', true);
 // Permet l'include de sbdbconfig.php (appelé directement, il ne fait rien)
 defined('SBUIADMIN_DBCONFIG') or define('SBUIADMIN_DBCONFIG', true);
 
+// Accès base par PDO (sbDb()), MySQL/MariaDB ou SQLite
+require_once(__DIR__ . DIRECTORY_SEPARATOR . 'class' . DIRECTORY_SEPARATOR . 'sbuiadmin-db.php');
+
 defined('SB_SETTINGS_SITE_ROOT')  or define('SB_SETTINGS_SITE_ROOT', dirname(__DIR__, 2));
 defined('SB_SETTINGS_LEGACY_FILE') or define('SB_SETTINGS_LEGACY_FILE', __DIR__ . '/admin/settings.txt');
 defined('SB_SETTINGS_ENC_PREFIX') or define('SB_SETTINGS_ENC_PREFIX', 'sbenc1:');
@@ -327,21 +330,23 @@ function sbDbConfigPathReset() {
 /**
  * Accès base + clé : variables d'environnement d'abord, puis sbdbconfig.php,
  * puis (installation pas encore migrée) l'ancien settings.txt.
- * @return array host, name, user, password, prefix, key, source
+ * @return array driver (mysql, sqlite), host, name, user, password, prefix,
+ *               path (fichier SQLite), key, source
  */
 function sbDbConfig($reload = false) {
 	static $config = null;
 	if ($config !== null && !$reload) return $config;
 
-	$config = array('host' => '', 'name' => '', 'user' => '', 'password' => '', 'prefix' => '', 'key' => '', 'source' => 'none');
+	$config = array('driver' => 'mysql', 'host' => '', 'name' => '', 'user' => '', 'password' => '', 'prefix' => '', 'path' => '', 'key' => '', 'source' => 'none');
 
 	$file = $reload ? sbDbConfigPathReset() : sbDbConfigPath();
 	if ($file) {
 		$data = sbDbConfigRead($file);
 		if (is_array($data)) {
-			foreach (array('host', 'name', 'user', 'password', 'prefix', 'key') as $k) {
+			foreach (array('driver', 'host', 'name', 'user', 'password', 'prefix', 'path', 'key') as $k) {
 				if (isset($data[$k])) $config[$k] = (string) $data[$k];
 			}
+			if ($config['driver'] === '') $config['driver'] = 'mysql';
 			$config['source'] = $file;
 			// Fichier sans marque : marqué au nom de ce site (sinon un autre
 			// site du compte, à son installation, le prendrait pour le sien)
@@ -360,6 +365,12 @@ function sbDbConfig($reload = false) {
 		$config['name']     = (string) getenv('SBUIADMIN_DB_NAME');
 		$config['user']     = (string) getenv('SBUIADMIN_DB_USER');
 		$config['password'] = (string) getenv('SBUIADMIN_DB_PASSWORD');
+		$config['prefix']   = (string) getenv('SBUIADMIN_DB_PREFIX');
+		$config['driver']   = 'mysql';
+		$config['source']   = 'env';
+	} elseif (getenv('SBUIADMIN_DB_DRIVER') === 'sqlite' && getenv('SBUIADMIN_DB_PATH') !== false) {
+		$config['driver']   = 'sqlite';
+		$config['path']     = (string) getenv('SBUIADMIN_DB_PATH');
 		$config['prefix']   = (string) getenv('SBUIADMIN_DB_PREFIX');
 		$config['source']   = 'env';
 	}
@@ -397,7 +408,7 @@ function sbDbConfigRender(array $c) {
 	$out .= "// Appelé directement par le web, il ne renvoie rien.\n";
 	$out .= "if (!defined('SBUIADMIN_DBCONFIG')) { http_response_code(404); exit; }\n";
 	$out .= "return array(\n";
-	foreach (array('host', 'name', 'user', 'password', 'prefix', 'key') as $k) {
+	foreach (array('driver', 'host', 'name', 'user', 'password', 'prefix', 'path', 'key') as $k) {
 		$out .= "\t" . var_export($k, true) . ' => ' . var_export(isset($c[$k]) ? (string) $c[$k] : '', true) . ",\n";
 	}
 	// Site propriétaire : un autre site du même compte ignore ce fichier

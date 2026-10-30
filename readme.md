@@ -160,6 +160,10 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 
 ## 📝 Changelog
 
+**4.71**
+- New PDO database layer (MySQL/MariaDB, SQLite), not wired in yet
+- Updates check the required PHP extensions first
+
 **4.70**
 - Administrators can view the admin as another user
 - theme.txt removed, older sbconfig.php fixed; Sentinelle 1.7.3
@@ -168,11 +172,11 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 - Smarty trim modifiers ready for PHP 9
 - Session options locked by the host skipped
 
-**4.68**
-- Login log purged once a day, and right after saving the retention
-
 <details>
   <summary><strong>Older versions</strong></summary>
+
+**4.68**
+- Login log purged once a day, and right after saving the retention
 
 **4.67**
 - Admin AJAX calls without a session: 401, no log entry

@@ -647,12 +647,13 @@ function sbUpdPrepare() {
 }
 
 /**
- * Vérifications préalables, avant de toucher à quoi que ce soit : tous les
- * fichiers à écrire ou retirer sont modifiables, l'espace disque suffit
- * (archive + sauvegarde des fichiers et de la base), la clé de chiffrement
- * des sauvegardes existe.
+ * Vérifications préalables, avant de toucher à quoi que ce soit : extensions
+ * PHP exigées par la nouvelle version, tous les fichiers à écrire ou retirer
+ * sont modifiables, l'espace disque suffit (archive + sauvegarde des fichiers
+ * et de la base), la clé de chiffrement des sauvegardes existe.
  */
 function sbUpdPreflight(array $job) {
+	sbUpdCheckExtensions($job['manifest'], $job['to']);
 	sbUpdBackupKey();
 	$root = sbUpdSiteRoot() . '/';
 	$denied = array();
@@ -672,6 +673,24 @@ function sbUpdPreflight(array $job) {
 	$need = (int) ($job['manifest']['size'] * 3 + $dbSize * 2 + 20 * 1024 * 1024);
 	$free = @disk_free_space(sbUpdWorkDir());
 	if ($free !== false && $free < $need) throw new RuntimeException('Espace disque insuffisant : ' . round($free / 1048576) . ' Mo libres, ' . round($need / 1048576) . ' Mo nécessaires');
+}
+
+/**
+ * Extensions PHP exigées par le manifeste signé : requires_ext (liste) et
+ * requires_pdo (pilote PDO de la base du site : pdo_mysql ou pdo_sqlite).
+ * Un site sans elles serait cassé juste après la copie.
+ */
+function sbUpdCheckExtensions(array $manifest, $to) {
+	$need = array();
+	foreach ((array) ($manifest['requires_ext'] ?? array()) as $ext) {
+		if (is_string($ext) && preg_match('/^[a-z0-9_]{1,32}$/', $ext)) $need[] = $ext;
+	}
+	if (!empty($manifest['requires_pdo'])) {
+		$c = function_exists('sbDbConfig') ? sbDbConfig() : array();
+		$need[] = ($c['driver'] ?? 'mysql') === 'sqlite' ? 'pdo_sqlite' : 'pdo_mysql';
+	}
+	$missing = array_values(array_filter(array_unique($need), function ($e) { return !extension_loaded($e); }));
+	if ($missing) throw new RuntimeException('Extension PHP absente, exigée par la version ' . $to . ' : ' . implode(', ', $missing) . ' (à activer chez l\'hébergeur). Rien n\'a été modifié.');
 }
 
 function sbUpdDbPrefix() {

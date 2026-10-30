@@ -153,7 +153,7 @@
 		$validations['divider_extensions'] = array('title' => 'Extensions PHP requises', 'description' => '');
 		foreach (array(
 			'mysqli'   => 'MySQLi (base de données du CMS)',
-			'pdo_mysql'=> 'PDO MySQL (assistant d\'installation)',
+			'pdo_mysql'=> 'PDO MySQL (base de données du CMS)',
 			'session'  => 'Session',
 			'json'     => 'JSON',
 			'mbstring' => 'mbstring (texte UTF-8)',
@@ -172,6 +172,7 @@
 		$validations['divider_extensions_reco'] = array('title' => 'Extensions PHP recommandées', 'description' => 'Facultatives : seule la fonction indiquée est privée si elles manquent.');
 		foreach (array(
 			'mysqlnd'  => 'mysqlnd (pilote MySQL natif)',
+			'pdo_sqlite' => 'PDO SQLite (base SQLite, à venir)',
 			'exif'     => 'EXIF (orientation des photos)',
 			'intl'     => 'intl (dates et tri localisés)',
 			'iconv'    => 'iconv (conversions de jeux de caractères)',
