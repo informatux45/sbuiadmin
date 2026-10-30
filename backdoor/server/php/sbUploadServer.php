@@ -31,7 +31,7 @@ session_start(sbSessionStartOptions([
 
 require_once(SBUIADMIN_PATH . '/inc/sbuiadmin-config.php');
 require_once(SBUIADMIN_PATH . '/inc/sbuiadmin-rights.php');
-require_once(_AM_SMARTY_DIR . 'Smarty.class.php'); // la classe "sql" hérite de Smarty
+require_once(_AM_SMARTY_DIR . 'Smarty.class.php');
 require_once(SBUIADMIN_PATH . '/inc/class/sbuiadmin-sql.php');
 require_once(SBUIADMIN_PATH . '/inc/class/sbuiadmin-sanitize.php');
 require_once(SBUIADMIN_PATH . '/inc/class/sbuiadmin-users.php');

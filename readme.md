@@ -160,6 +160,10 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 
 ## 📝 Changelog
 
+**4.72**
+- SQL class now runs on PDO (pdo_mysql required)
+- Clear page when the PDO extension is missing
+
 **4.71**
 - New PDO database layer (MySQL/MariaDB, SQLite), not wired in yet
 - Updates check the required PHP extensions first
@@ -168,12 +172,12 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 - Administrators can view the admin as another user
 - theme.txt removed, older sbconfig.php fixed; Sentinelle 1.7.3
 
+<details>
+  <summary><strong>Older versions</strong></summary>
+
 **4.69**
 - Smarty trim modifiers ready for PHP 9
 - Session options locked by the host skipped
-
-<details>
-  <summary><strong>Older versions</strong></summary>
 
 **4.68**
 - Login log purged once a day, and right after saving the retention

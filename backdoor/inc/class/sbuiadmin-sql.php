@@ -1,7 +1,14 @@
 <?php
 /**
- * MySQLI Class
+ * SQL Class (ancienne API, sur PDO depuis la 4.72)
  * SBUIADMIN Class
+ *
+ * Mêmes méthodes qu'avant (query, assoc, toarray, object, numrows,
+ * lastinsertid, escape_string, error), sur la connexion PDO partagée
+ * sbDb() : MySQL/MariaDB ou SQLite. query() renvoie un sbresult, qui imite
+ * aussi mysqli_result (fetch_assoc(), fetch_row(), num_rows...), ou true
+ * (INSERT, UPDATE...), ou false. Les fonctions mysqli_* ne marchent plus sur
+ * ces résultats. Nouveau code : sbDb() et ses requêtes préparées.
  *
  * @link https://dev.informatux.com/
  *
@@ -15,6 +22,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
+require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'sbuiadmin-db.php');
 
 // sbconfig.php d'avant 2018 (propre au site, jamais remplacé par la mise à
 // jour) : ni port ni socket, lus depuis l'hôte (« hôte:port » ou « hôte:/socket »)
@@ -25,198 +33,159 @@ if (!defined('_AM_DB_PORT') || !defined('_AM_DB_SOCKET')) {
 	unset($sb_db_parts);
 }
 
-class sql extends Smarty {
-    var $host       = _AM_DB_HOST;
-    var $user       = _AM_DB_USER;
-    var $pass       = _AM_DB_PWD;
-    var $base       = _AM_DB_NAME;
-    var $port       = _AM_DB_PORT;
-    var $socket     = _AM_DB_SOCKET;
-    var $connect_id = 0;
-    var $error;
-    var $debug      = NULL;
-    var $result_id  = false;
-    var $query      = "";
-    var $records    = array(); // lu par numrows() sans requête : count(null) = erreur en PHP 8
+/** Résultat d'une requête (lignes déjà lues, comme mysqli_query()) */
+class sbresult implements IteratorAggregate, Countable {
+	public $num_rows    = 0;
+	public $field_count = 0;
+	private $names = array();
+	private $rows  = array();
+	private $pos   = 0;
 
-    private function connect() {
-        // Point 9 (compat PHP 8.4) : MYSQLI_REPORT_ERROR|STRICT fait lever
-        // des mysqli_sql_exception non attrapées sur toute erreur SQL
-        // (comportement par défaut depuis PHP 8.1, ici explicitement forcé
-        // en plus) - déjà provoqué un plantage avec trace technique
-        // visible (chemins serveur, nom de la base) pendant les tests du
-        // Point 1, le temps qu'une table manquante soit créée. Tout ce
-        // codebase (des centaines de "if ($result) {...} else {erreur
-        // gérée}") est écrit pour le comportement pré-8.1 : mysqli_query()
-        // renvoie simplement false sur erreur, jamais d'exception.
-        mysqli_report(MYSQLI_REPORT_OFF);
-        if ($this->socket === false) {
-            try {
-                $this->connect_id = mysqli_connect($this->host, $this->user, $this->pass, $this->base, (int) $this->port);
-            } catch (Exception $e) {
-                echo $e->getMessage();
-                exit;
-            }
-        } else {
-            try {
-                $this->connect_id = mysqli_connect($this->host, $this->user, $this->pass, $this->base, $this->port, $this->socket);
-            } catch (Exception $e) {
-                echo $e->getMessage();
-                exit;
-            } 
-        }
-        if (mysqli_connect_errno()) {
-            //$this->dump(mysqli_connect_error() . ' (' . mysqli_errno($this->connect_id) . ')', 'Connect MYSQLI DB (Error)');
-            return false;
-        } else {
-            // utf8mb4 sur la connexion (pas seulement sur les tables) : nécessaire
-            // pour que les caractères 4 octets (emojis) passent sans corruption -
-            // sans danger pour les tables encore en utf8 (sous-ensemble strict).
-            mysqli_set_charset($this->connect_id, 'utf8mb4');
-            //$this->dump(mysqli_get_host_info($this->connect_id), 'Connect SQL DB (success) : ');
-            return $this->connect_id;
-        }
-    }
-    
-    public function query($query) {
-        // Check if DB connect ID
-        if (!$this->connect_id) $this->connect();
-        // Check Request SQL
-        $this->result_id = mysqli_query($this->connect_id, $query);
-        if ($this->result_id) {
-            $this->query = trim($query);
-            $this->error = '';
-            //$this->dump(trim($query), 'Query SQL (success)');
-            return $this->result_id;
-        } else {
-            //$this->dump(mysqli_error(), 'Query SQL (error)');
-            $this->error = mysqli_error($this->connect_id);
-            return false;
-        }
-        /* Fermeture de la connexion */
-        mysqli_close($this->connect_id);
-    }
-    public function lastinsertid() {
-        return mysqli_insert_id($this->connect_id);
-    }
-    public function numrows() {
-        if (!isset($this->result_id)) return count($this->records);
+	public function __construct(PDOStatement $st) {
+		$this->field_count = $st->columnCount();
+		for ($i = 0; $i < $this->field_count; $i++) {
+			$meta = $st->getColumnMeta($i);
+			$this->names[$i] = $meta && isset($meta['name']) ? (string) $meta['name'] : (string) $i;
+		}
+		$this->rows = $st->fetchAll(PDO::FETCH_NUM);
+		$st->closeCursor();
+		$this->num_rows = count($this->rows);
+	}
 
-        // --- Une requete en echec laisse result_id a FALSE (mysqli_report() est
-        // --- en MYSQLI_REPORT_OFF depuis le Point 9 : plus d'exception, juste un
-        // --- false) et laisse $this->query sur la requete PRECEDENTE, qui a
-        // --- reussi. Sans ce garde, mysqli_num_rows(false) leve une TypeError
-        // --- fatale sous PHP 8 - erreur 500 au lieu d'un simple resultat vide.
-        if ($this->result_id === false) return 0;
+	private function next() {
+		return $this->pos < $this->num_rows ? $this->rows[$this->pos++] : null;
+	}
 
-        if (preg_match('`^select`i', $this->query)) {
-            return ($this->result_id instanceof mysqli_result) ? mysqli_num_rows($this->result_id) : 0;
-        }
-        // --- mysqli_affected_rows() attend la CONNEXION, pas le resultat : sur
-        // --- un INSERT/UPDATE/DELETE, result_id vaut TRUE (booleen) et l'ancien
-        // --- appel levait lui aussi une TypeError sous PHP 8.
-        if (preg_match('`^(insert|update|delete)`i', $this->query)) return mysqli_affected_rows($this->connect_id);
+	/** Colonne de même nom : la dernière l'emporte (comme mysqli) */
+	private function assocOf(array $r) {
+		$a = array();
+		foreach ($r as $i => $v) $a[$this->names[$i]] = $v;
+		return $a;
+	}
 
-        return 0;
-    }
-    public function object($query) {
-        return mysqli_fetch_object($query);
-    }
-    private function getArray($query, $mode = 'ASSOC') {
-        switch ($mode) {
-            case 'NUM':
-                return mysqli_fetch_array($query, MYSQLI_NUM);
-            break;
-            case 'BOTH':
-                return mysqli_fetch_array($query, MYSQLI_BOTH);
-            break;
-            case 'ASSOC':
-                return mysqli_fetch_array($query, MYSQLI_ASSOC);
-            break;
-            default:
-                return mysqli_fetch_assoc($query);
-        }
-    }
-    public function assoc($query) {
-        if (!$query) return false;
-        return mysqli_fetch_assoc($query);
-    }
-    public function toarray($result) {
-        if (!$result) return false;
-        $res_array = array();
-        for ($count = 0; $row = mysqli_fetch_array($result); $count++) {
-            $res_array[$count] = $row;
-        }
-        return $res_array;
-    }
-    // --- Publique : appelée hors de la classe (plugin {lang}, modules)
-    public function error() {
-        if (!$this->connect_id) $this->connect();
-        return mysqli_error($this->connect_id);
-    }
-    // --- Résultat suivant d'une requête multiple. Reprise de l'ancien CMS,
-    // --- encore appelée par des modules de sites.
-    public function next_result() {
-        if (!$this->connect_id) $this->connect();
-        return mysqli_more_results($this->connect_id) && mysqli_next_result($this->connect_id);
-    }
-    public function close() {
-        if (!$this->connect_id) $this->connect();
-        return mysqli_close($this->connect_id);
-    }
-    public function free() {
-        //if (!$this->connect_id) $this->connect();
-        //return mysqli_free_result($this->connect_id);
-    }
-    public function escape_string($escapestr) {
-        if (!$this->connect_id) $this->connect();
-        return mysqli_real_escape_string($this->connect_id, $escapestr);
-    }
-    private function optimize($tbl_name) {
-        if (!$this->connect_id) $this->connect();
-        $query = "OPTIMIZE TABLE $tbl_name";
-        if ($this->result_id = mysqli_query($this->connect_id, $query)) {
-            $this->query = trim($query);
-            $this->error = '';
-            return $this->result_id;
-        } else {
-            $this->error = mysqli_error($this->connect_id);
-            return false;
-        }
-    }
-    private function truncate($tbl_name) {
-        //if (!$this->connect_id) $this->connect();
-        $query = "TRUNCATE TABLE $tbl_name";
-        if ($this->result_id = mysqli_query($this->connect_id, $query)) {
-            $this->query = trim($query);
-            $this->error = '';
-            return $this->result_id;
-        } else {
-            $this->error = mysqli_error($this->connect_id);
-            return false;
-        }
-    }
-    private function blob($file) {
-        $blob = file_get_contents($file);
-        $blob = addslashes($blob);
-        $blob = addcslashes($blob, "");
-        return $blob;
-    }
-    private function showUpdateResult($result, $msg_success = '', $msg_error = '') {
-        $result_error = ($msg_error != '') ? $msg_error : _AM_SYS_MSG_ERROR_NOUPDATE;
-        $result_success = ($msg_success != '') ? '1:' . $msg_success : '1';
-        if ($result) {
-            echo $result_success;
-        } else {
-            if (_AM_DEBUG_MODE == '4') $error = $this->error();
-            echo $result_error . '<br />' . $error;
-        }
-    }
-    private function redirect_error($code) {
-        $error_msg = addslashes($this->error());
-        header("Location:redirect.php?errorid=$code&msg=$error_msg");
-        exit;
-    }
+	private function bothOf(array $r) {
+		$a = array();
+		foreach ($r as $i => $v) { $a[$i] = $v; $a[$this->names[$i]] = $v; }
+		return $a;
+	}
+
+	public function fetch_assoc() { $r = $this->next(); return $r === null ? null : $this->assocOf($r); }
+	public function fetch_row()   { return $this->next(); }
+	public function fetch_array($mode = 3) {
+		$r = $this->next();
+		if ($r === null) return null;
+		return $mode === 2 ? $r : ($mode === 1 ? $this->assocOf($r) : $this->bothOf($r)); // 1 ASSOC, 2 NUM, 3 BOTH
+	}
+	public function fetch_object() { $r = $this->fetch_assoc(); return $r === null ? null : (object) $r; }
+	public function fetch_all($mode = 2) {
+		$out = array();
+		while (($r = $this->fetch_array($mode)) !== null) $out[] = $r;
+		return $out;
+	}
+	public function data_seek($n) {
+		if ($n < 0 || $n >= $this->num_rows) return false;
+		$this->pos = (int) $n;
+		return true;
+	}
+	public function free() { $this->rows = array(); $this->num_rows = 0; $this->pos = 0; }
+	public function close() { $this->free(); }
+	public function count(): int { return $this->num_rows; }
+	public function getIterator(): Iterator {
+		foreach ($this->rows as $r) yield $this->assocOf($r);
+	}
+}
+
+class sql {
+	public $error  = '';
+	public $query  = '';
+	/** Dernier résultat (sbresult, true ou false) */
+	public $result_id = false;
+	/** Lignes lues (SELECT, SHOW...) ou modifiées (INSERT, UPDATE...) par la dernière requête */
+	private $rows = 0;
+	private static $lastError = '';
+
+	/** Connexion partagée ; base indisponible : page d'erreur 503 (sbDbUnavailable) */
+	protected function db() {
+		$db = sbDb();
+		if (!$db) sbDbUnavailable();
+		return $db;
+	}
+
+	public function query($query) {
+		$db  = $this->db();
+		$pdo = $db->pdo();
+		$this->query = trim((string) $query);
+		$this->rows  = 0;
+		try {
+			// Requête complète, sans paramètres : envoyée telle quelle (comme
+			// mysqli_query), y compris les ordres que MySQL ne sait pas préparer
+			$st = $db->driver() === 'mysql'
+				? $pdo->prepare($this->query, array(PDO::ATTR_EMULATE_PREPARES => true))
+				: $pdo->prepare($this->query);
+			$st->execute();
+			if ($st->columnCount() > 0) {
+				$this->result_id = new sbresult($st);
+				$this->rows = $this->result_id->num_rows;
+			} else {
+				$this->rows = $st->rowCount();
+				$st->closeCursor();
+				$this->result_id = true;
+			}
+			$this->error = self::$lastError = '';
+		} catch (PDOException $e) {
+			$this->result_id = false;
+			$this->error = self::$lastError = isset($e->errorInfo[2]) && $e->errorInfo[2] !== '' ? (string) $e->errorInfo[2] : $e->getMessage();
+		}
+		return $this->result_id;
+	}
+
+	public function lastinsertid() {
+		return $this->db()->lastInsertId();
+	}
+
+	/** Lignes de la dernière requête : lues (SELECT) ou modifiées (INSERT, UPDATE, DELETE) ; 0 après un échec */
+	public function numrows() {
+		return $this->result_id === false ? 0 : $this->rows;
+	}
+
+	public function object($result) {
+		return ($result instanceof sbresult) ? $result->fetch_object() : null;
+	}
+
+	public function assoc($result) {
+		if (!($result instanceof sbresult)) return false;
+		return $result->fetch_assoc();
+	}
+
+	/** Lignes restantes, chaque colonne par nom ET par numéro (comme MYSQLI_BOTH) */
+	public function toarray($result) {
+		if (!($result instanceof sbresult)) return false;
+		return $result->fetch_all(3);
+	}
+
+	// --- Publique : appelée hors de la classe (plugin {lang}, modules)
+	public function error() {
+		return self::$lastError;
+	}
+
+	// --- Ancienne requête multiple : plus jamais de résultat suivant
+	// --- (une requête à la fois, voir sbdb::connect)
+	public function next_result() {
+		return false;
+	}
+
+	// --- La connexion est partagée par toute la page : jamais fermée ici
+	public function close() {
+		return true;
+	}
+
+	public function free() {
+	}
+
+	/** Chaîne échappée sans guillemets (ancien code : préférer sbDb() et ses paramètres liés) */
+	public function escape_string($escapestr) {
+		return $this->db()->escape((string) $escapestr);
+	}
 }
 
 ?>

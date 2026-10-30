@@ -412,7 +412,10 @@ class sbdb {
 
 	/** Chaîne échappée sans guillemets (ancien code seulement : préférer les paramètres liés) */
 	public function escape($s) {
-		return substr($this->pdo->quote((string) $s), 1, -1);
+		$s = (string) $s;
+		// SQLite refuse l'octet nul dans un littéral : retiré
+		if ($this->driver === 'sqlite') $s = str_replace("\0", '', $s);
+		return substr($this->pdo->quote($s), 1, -1);
 	}
 
 	/** Version du serveur (« 8.0.36 », « 3.45.1 ») */
@@ -446,6 +449,36 @@ function sbDb($reset = false) {
 /** Raison du dernier échec de sbDb() */
 function sbDbError() {
 	return isset($GLOBALS['sb_db_error']) ? (string) $GLOBALS['sb_db_error'] : '';
+}
+
+/**
+ * Base inutilisable : page 503 claire (jamais d'erreur PHP ni de détail
+ * technique à l'écran), puis arrêt. Extension PDO absente : son nom, à
+ * activer chez l'hébergeur. En ligne de commande : message sur STDERR.
+ */
+function sbDbUnavailable() {
+	$c = function_exists('sbDbConfig') ? sbDbConfig() : array();
+	$driver = isset($c['driver']) && isset(sbdb::DRIVERS[$c['driver']]) ? $c['driver'] : 'mysql';
+	$ext = sbdb::DRIVERS[$driver];
+	$missing = !extension_loaded($ext);
+	$title = $missing ? 'Extension PHP manquante' : 'Base de données indisponible';
+	$text  = $missing
+		? "L'extension PHP « " . $ext . " » n'est pas activée sur ce serveur. Elle est nécessaire au site depuis la version 4.72 : activez-la dans la configuration PHP de l'hébergement (ou demandez-le à votre hébergeur), puis rechargez la page."
+		: 'Le site ne parvient pas à joindre sa base de données. Merci de revenir dans quelques instants.';
+	if (PHP_SAPI === 'cli') {
+		fwrite(STDERR, 'SBUIADMIN : ' . $title . ' - ' . $text . (sbDbError() !== '' ? ' (' . sbDbError() . ')' : '') . "\n");
+		exit(1);
+	}
+	if (!headers_sent()) {
+		http_response_code(503);
+		header('Retry-After: ' . ($missing ? 3600 : 60));
+		header('Content-Type: text/html; charset=utf-8');
+		header('Cache-Control: no-store');
+	}
+	while (ob_get_level() > 0) @ob_end_clean();
+	echo '<!doctype html><html lang="fr"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>' . $title . '</title>'
+		. '<div style="font-family:sans-serif;max-width:36em;margin:20vh auto 0;padding:0 16px;text-align:center"><h1 style="font-size:1.4em">' . $title . '</h1><p>' . htmlspecialchars($text, ENT_QUOTES, 'UTF-8') . '</p></div></html>';
+	exit;
 }
 
 /** Pilote PDO disponible sur ce serveur ? ('mysql' ou 'sqlite') */

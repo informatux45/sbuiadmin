@@ -1,7 +1,7 @@
 # SBUIADMIN - Installation
 
 ### Prérequis
-- PHP 8.4+ (mysqli, sodium, openssl, curl, gd, mbstring, zip)
+- PHP 8.4+ (pdo_mysql, mysqli, sodium, openssl, curl, gd, mbstring, zip)
 - MySQL 5.7+ / MariaDB 10.3+, Apache + mod_rewrite + mod_headers
 
 ### Installation
@@ -98,9 +98,20 @@ Chaque site a son sbdbconfig.php (sbdbconfig-<dossier>.php pour les suivants).
   Après modification, vider l'opcache si rien ne change.
 - 4.70 : un ancien sbconfig.php qui lisait inc/admin/theme.txt est corrigé
   (thème en base) puis theme.txt supprimé ; original gardé pour le retour.
+- 4.72 : la base passe par PDO (extension pdo_mysql exigée, vérifiée avant la
+  mise à jour depuis la 4.71 ; sinon page « Extension PHP manquante »).
 - vendor/.htaccess refuse tout au web : un dossier de vendor/ propre au site
   qui sert des fichiers (retour de paiement, scripts) doit avoir son propre
   .htaccess (Require all granted). La page Mise à jour les signale.
+
+### Requêtes SQL (développeurs)
+- Nouveau code : sbDb() (PDO, une connexion par page), valeurs toujours en
+  paramètres : $db->row("SELECT * FROM {sb_users} WHERE id = ?", array($id)),
+  insert(), update(), delete(), order() pour un tri reçu. Voir
+  inc/class/sbuiadmin-db.php.
+- $sbsql->query() / assoc() / toarray() / numrows() marchent comme avant,
+  mais mysqli_fetch_*() sur leurs résultats non (4.72) : $sbsql->assoc($r)
+  ou $r->fetch_assoc().
 
 ### Migrations de la base (développeurs)
 - backdoor/inc/migrations/<version>.php, modèle dans inc/sbuiadmin-update-db.php
