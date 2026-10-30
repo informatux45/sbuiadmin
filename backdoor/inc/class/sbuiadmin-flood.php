@@ -154,15 +154,14 @@ class flood extends sql {
     }
     
     public function insertNewIP($datas) {
-        // infos vient d'une API externe : tout échapper.
-        $ip = $this->escape_string($datas['ip']);
-        $blockedtime = intval($datas['blockedtime']);
-        $expirationtime = intval($datas['expirationtime']);
-        $reason = $this->escape_string($datas['reason']);
-        $infos = $this->escape_string((string)$datas['infos']);
-        $query_new_ip   = "INSERT INTO ".$this->table_blocked_ip." (ip,blockedtime,expirationtime,reason,infos)
-                   VALUES ('$ip','$blockedtime','$expirationtime','$reason','$infos')";
-        $result__new_ip = $this->query($query_new_ip);
+        // infos vient d'une API externe : valeurs liées, jamais insérées dans la requête
+        $this->db()->insert('sb_blocked_ip', array(
+            'ip'             => (string) $datas['ip'],
+            'blockedtime'    => intval($datas['blockedtime']),
+            'expirationtime' => intval($datas['expirationtime']),
+            'reason'         => (string) $datas['reason'],
+            'infos'          => (string) $datas['infos'],
+        ));
         if (function_exists('sbSecurityEvent')) sbSecurityEvent('flood', 'warning', (string) $datas['reason'], 'banned');
         return true;
     }

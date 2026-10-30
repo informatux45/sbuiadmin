@@ -307,13 +307,12 @@ function sbClassifyAction($module) {
  * @return bool
  */
 function sbRightsUserIsAdmin($user_id) {
-	global $sbsql;
 	static $cache = array();
 	$user_id = intval($user_id);
 	if (isset($cache[$user_id])) return $cache[$user_id];
 	$admins = array_filter(array_map('trim', explode(',', function_exists('sbSetting') ? (string) sbSetting('administrators') : '')));
-	$row = $sbsql->assoc($sbsql->query('SELECT username FROM ' . _AM_DB_PREFIX . 'sb_users WHERE id = ' . $user_id));
-	return $cache[$user_id] = ($row && in_array(trim((string) $row['username']), $admins, true));
+	$username = sbDb() ? sbDb()->value('SELECT username FROM {sb_users} WHERE id = ?', array($user_id)) : null;
+	return $cache[$user_id] = (is_string($username) && in_array(trim($username), $admins, true));
 }
 
 /**
@@ -333,13 +332,7 @@ function sbRightsDefault($key, $user_id) {
 }
 
 function sbCheckRightRow($key, $action, $user_id) {
-	global $sbsql;
-
-	$table   = _AM_DB_PREFIX . 'sb_users_rights';
-	$key_esc = $sbsql->escape_string($key);
-	$query   = "SELECT can_view, can_add, can_edit, can_delete FROM $table WHERE user_id = $user_id AND module = '$key_esc'";
-	$request = $sbsql->query($query);
-	$row     = $sbsql->assoc($request);
+	$row = sbDb() ? sbDb()->row("SELECT can_view, can_add, can_edit, can_delete FROM {sb_users_rights} WHERE user_id = ? AND module = ?", array(intval($user_id), (string) $key)) : null;
 
 	if (!$row) return sbRightsDefault($key, $user_id);
 	if ($row['can_view'] != 1) return false;
@@ -500,15 +493,9 @@ function sbHasMenuLinkRight($link, $rights_key = null) {
  * @return array ex: ['faq' => ['label'=>'FAQ','can_view'=>1,'can_add'=>1,'can_edit'=>1,'can_delete'=>1], ...]
  */
 function sbGetRightsMatrix($user_id) {
-	global $sbsql;
-
 	$user_id = intval($user_id);
 	$modules = sbGetRightsModules();
-	$table   = _AM_DB_PREFIX . 'sb_users_rights';
-
-	$query   = "SELECT module, can_view, can_add, can_edit, can_delete FROM $table WHERE user_id = $user_id";
-	$request = $sbsql->query($query);
-	$rows    = $sbsql->toarray($request);
+	$rows    = sbDb() ? sbDb()->all("SELECT module, can_view, can_add, can_edit, can_delete FROM {sb_users_rights} WHERE user_id = ?", array($user_id)) : false;
 
 	$existing = array();
 	if ($rows) {
@@ -549,12 +536,9 @@ function sbGetRightsMatrix($user_id) {
  * @return bool
  */
 function sbSaveRightsMatrix($user_id, $postData) {
-	global $sbsql;
-
 	$user_id      = intval($user_id);
 	$is_self      = ($user_id == sbGetCurrentUserId());
 	$modules      = sbGetRightsModules();
-	$table        = _AM_DB_PREFIX . 'sb_users_rights';
 	$ok           = true;
 
 	foreach ($modules as $key => $label) {
@@ -568,13 +552,8 @@ function sbSaveRightsMatrix($user_id, $postData) {
 			$can_edit = 1;
 		}
 
-		$module_esc = $sbsql->escape_string($key);
-
-		$query = "INSERT INTO $table (user_id, module, can_view, can_add, can_edit, can_delete)
-				  VALUES ($user_id, '$module_esc', $can_view, $can_add, $can_edit, $can_delete)
-				  ON DUPLICATE KEY UPDATE can_view = $can_view, can_add = $can_add, can_edit = $can_edit, can_delete = $can_delete";
-		$result = $sbsql->query($query);
-		if (!$result) $ok = false;
+		$row = array('user_id' => intval($user_id), 'module' => (string) $key, 'can_view' => $can_view, 'can_add' => $can_add, 'can_edit' => $can_edit, 'can_delete' => $can_delete);
+		if (!sbDb() || !sbDb()->upsert('sb_users_rights', $row, array('user_id', 'module'))) $ok = false;
 	}
 
 	return $ok;

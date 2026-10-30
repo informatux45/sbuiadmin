@@ -25,12 +25,7 @@ class user extends sql {
 		// stopXSS() (ne protège pas l'apostrophe) - injection SQL possible
 		// depuis le formulaire de connexion lui-même, accessible sans
 		// authentification.
-		$username_esc = $this->escape_string($username);
-		$query  = "SELECT id, username, password FROM " . _AM_DB_PREFIX . "sb_users WHERE username = '$username_esc'";
-        $result = $this->query($query);
-		$infos  = $this->assoc($result);
-		// $result (retour mysqli_query) est vrai même pour 0 ligne trouvée -
-		// vérifier $infos, pas $result, pour un "utilisateur inconnu" correct.
+		$infos = $this->db()->row("SELECT id, username, password FROM {sb_users} WHERE username = ?", array((string) $username));
 		if (!$infos || !isset($infos['password']) || $infos['password'] === '') {
 			return false;
 		}
@@ -68,9 +63,7 @@ class user extends sql {
 	 * jamais avant.
 	 */
 	private function rehashPassword($user_id, $plain_password) {
-		$user_id  = intval($user_id);
-		$new_hash = $this->escape_string($this->hashPassword($plain_password));
-		$this->query("UPDATE " . _AM_DB_PREFIX . "sb_users SET password = '$new_hash' WHERE id = $user_id");
+		$this->db()->update('sb_users', array('password' => $this->hashPassword($plain_password)), 'id = ?', array(intval($user_id)));
 	}
 
 
@@ -87,9 +80,8 @@ class user extends sql {
 	 * Hash stocké en base pour ce compte, false si le compte est inconnu.
 	 */
 	public function getPasswordHash($username) {
-		$username_esc = $this->escape_string($username);
-		$infos = $this->assoc($this->query("SELECT password FROM " . _AM_DB_PREFIX . "sb_users WHERE username = '$username_esc'"));
-		return ($infos && isset($infos['password'])) ? (string)$infos['password'] : false;
+		$hash = $this->db()->value("SELECT password FROM {sb_users} WHERE username = ?", array((string) $username));
+		return is_string($hash) ? $hash : false;
 	}
 
 
@@ -121,8 +113,8 @@ class user extends sql {
 		$hash      = hash('sha256', $validator);
 		$expires   = time() + intval($lifetime);
 
-		$query = "INSERT INTO " . _AM_DB_PREFIX . "sb_users_remember_tokens (user_id, selector, validator_hash, expires) VALUES ($user_id, '$selector', '$hash', $expires)";
-		if (!$this->query($query)) return false;
+		$row = array('user_id' => $user_id, 'selector' => $selector, 'validator_hash' => $hash, 'expires' => $expires);
+		if ($this->db()->insert('sb_users_remember_tokens', $row) === false) return false;
 
 		return $selector . ':' . $validator;
 	}
@@ -140,14 +132,10 @@ class user extends sql {
 	public function verifyRememberToken($cookie_value) {
 		if (strpos((string)$cookie_value, ':') === false) return false;
 		list($selector, $validator) = explode(':', $cookie_value, 2);
-		$selector_esc = $this->escape_string($selector);
-
-		$query = "SELECT t.id, t.user_id, t.validator_hash, t.expires, u.username
-					FROM " . _AM_DB_PREFIX . "sb_users_remember_tokens t
-					INNER JOIN " . _AM_DB_PREFIX . "sb_users u ON u.id = t.user_id
-					WHERE t.selector = '$selector_esc'";
-		$result = $this->query($query);
-		$row    = $this->assoc($result);
+		$row = $this->db()->row("SELECT t.id, t.user_id, t.validator_hash, t.expires, u.username
+					FROM {sb_users_remember_tokens} t
+					INNER JOIN {sb_users} u ON u.id = t.user_id
+					WHERE t.selector = ?", array($selector));
 
 		if (!$row) return false;
 		$this->deleteRememberTokenById($row['id']);
@@ -169,8 +157,7 @@ class user extends sql {
 	public function deleteRememberTokenBySelector($cookie_value) {
 		if (strpos((string)$cookie_value, ':') === false) return;
 		list($selector) = explode(':', $cookie_value, 2);
-		$selector_esc = $this->escape_string($selector);
-		$this->query("DELETE FROM " . _AM_DB_PREFIX . "sb_users_remember_tokens WHERE selector = '$selector_esc'");
+		$this->db()->delete('sb_users_remember_tokens', 'selector = ?', array($selector));
 	}
 
 	/**
@@ -178,13 +165,11 @@ class user extends sql {
 	 * à chaque changement de mot de passe.
 	 */
 	public function revokeRememberTokens($user_id) {
-		$user_id = intval($user_id);
-		$this->query("DELETE FROM " . _AM_DB_PREFIX . "sb_users_remember_tokens WHERE user_id = $user_id");
+		$this->db()->delete('sb_users_remember_tokens', 'user_id = ?', array(intval($user_id)));
 	}
 
 	private function deleteRememberTokenById($id) {
-		$id = intval($id);
-		$this->query("DELETE FROM " . _AM_DB_PREFIX . "sb_users_remember_tokens WHERE id = $id");
+		$this->db()->delete('sb_users_remember_tokens', 'id = ?', array(intval($id)));
 	}
 	
 	
@@ -203,16 +188,10 @@ class user extends sql {
     }
 	
 	
+    // Compte inconnu : inactif (avant la 4.73 : actif, avec une alerte PHP)
     public function checkUserIsActive($username) {
-        $username_esc = $this->escape_string($username);
-        $query_user = "SELECT active FROM " . _AM_DB_PREFIX . "sb_users WHERE username = '$username_esc'";
-        $result_user = $this->query($query_user);
-        $user_infos = $this->assoc($result_user);
-        if ($user_infos['active'] == '0') {
-            return false;
-        } else {
-            return true;
-        }
+        $active = $this->db()->value("SELECT active FROM {sb_users} WHERE username = ?", array((string) $username));
+        return $active !== null && $active !== false && $active != '0';
     }
 	
 	
@@ -234,14 +213,12 @@ class user extends sql {
 		// pour le SQL. Le nom vient du formulaire de login, sans session.
 	        $_sbuiadmin_event = $sbsanitize->displayText($sbuiadmin_event, 'UTF-8', $entities = 1, $decode_entities = 0, $html = 0, $br = 0, $clickable = 0, $xss = 1);
 	        $_sbuiadmin_user  = $sbsanitize->displayText($sbuiadmin_user, 'UTF-8', $entities = 1, $decode_entities = 0, $html = 0, $br = 0, $clickable = 0, $xss = 1);
-		$sql = "INSERT INTO " . _AM_DB_PREFIX . "sb_logaccess
-				(`logaccess_type`, `logaccess_date`, `logaccess_user`, `logaccess_event`)
-				VALUES ('" . $this->escape_string($sbuiadmin_type) . "', UNIX_TIMESTAMP(), '" . $this->escape_string($_sbuiadmin_user) . "', '" . $this->escape_string($_sbuiadmin_event) . "')";
-		$result = $this->query($sql);
-		if (!$result)
-			return false;
-		else
-			return true;
+		return $this->db()->insert('sb_logaccess', array(
+			'logaccess_type'  => (string) $sbuiadmin_type,
+			'logaccess_date'  => time(),
+			'logaccess_user'  => $_sbuiadmin_user,
+			'logaccess_event' => $_sbuiadmin_event,
+		)) !== false;
 	}
 
 
@@ -252,10 +229,7 @@ class user extends sql {
 	*/
 	public function purgeAccessLog() {
 		$days = function_exists('sbLogaccessRetention') ? sbLogaccessRetention() : 180;
-		$sql = "DELETE FROM " . _AM_DB_PREFIX . "sb_logaccess
-				WHERE `logaccess_type` <> 'update'
-				AND `logaccess_date` < UNIX_TIMESTAMP() - " . ($days * 86400);
-		return (bool) $this->query($sql);
+		return $this->db()->delete('sb_logaccess', "`logaccess_type` <> 'update' AND `logaccess_date` < ?", array(time() - intval($days) * 86400)) !== false;
 	}
 
 
@@ -280,21 +254,10 @@ class user extends sql {
 	*/
 	public function updateAccessUserLogin($sbuiadmin_user, $lastlogin = false, $time = false) {
 		// --- Update the Access User logintime
-		$sbuiadmin_user_esc = $this->escape_string($sbuiadmin_user);
 		if ($sbuiadmin_user != '' && $lastlogin == false) {
-			$sql = "UPDATE " . _AM_DB_PREFIX . "sb_users SET logintime = '$time' WHERE username = '$sbuiadmin_user_esc'";
-			$result = $this->query($sql);
-			if (!$result)
-				return false;
-			else
-				return true;
+			return $this->db()->update('sb_users', array('logintime' => (string) $time), 'username = ?', array((string) $sbuiadmin_user)) !== false;
 		} elseif ($sbuiadmin_user != '' && $lastlogin) {
-			$sql = "UPDATE " . _AM_DB_PREFIX . "sb_users SET lastlogin = logintime WHERE username = '$sbuiadmin_user_esc'";
-			$result = $this->query($sql);
-			if (!$result)
-				return false;
-			else
-				return true;
+			return $this->db()->run("UPDATE {sb_users} SET lastlogin = logintime WHERE username = ?", array((string) $sbuiadmin_user)) !== false;
 		} else {
 			return false;
 		}
@@ -307,17 +270,11 @@ class user extends sql {
 	public function getUserInfo($sbuiadmin_user, $field = '') {
 		global $sbsanitize;
 		// --- Initialization
-		$field        = $sbsanitize->stopXSS($field);
-		$sbuiadmin_user_esc = $this->escape_string($sbsanitize->stopXSS($sbuiadmin_user));
-
-        $sql       = "SELECT $field FROM " . _AM_DB_PREFIX . "sb_users WHERE username = '$sbuiadmin_user_esc'";
-        $result    = $this->query($sql);
-        $user_info = $this->assoc($result);
-        if (isset($user_info[$field])) {
-            return $user_info[$field];
-        } else {
-            return false;
-        }
+		$db = $this->db();
+		// Nom de colonne : seulement une vraie colonne de sb_users
+		if (!is_string($field) || !in_array($field, $db->columns('sb_users'), true)) return false;
+		$value = $db->value("SELECT " . $db->ident($field) . " FROM {sb_users} WHERE username = ?", array($sbsanitize->stopXSS($sbuiadmin_user)));
+		return ($value === null || $value === false) ? false : $value;
 	}
 
 }

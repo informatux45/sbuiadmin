@@ -38,6 +38,7 @@ $sb_msg_valid = false;
 
 $table = _AM_DB_PREFIX . "sb_users";
 $table_blockedip = _AM_DB_PREFIX . "sb_blocked_ip";
+$sbdb  = sbDb();
 $text  = "Utilisateur";
 $sbsmarty->assign('sb_form_submit_value', 'Modifier');
 
@@ -53,8 +54,8 @@ switch($action) {
 		// Action DELETE
 		if ($action == 'del') {
 			$get_id   = intval($_GET['id'] ?? 0);
-			$query_2  = "DELETE FROM $table WHERE id = '$get_id'";
-			$request  = $sbsql->query($query_2);
+			$query_2  = "DELETE FROM $table WHERE id = $get_id";
+			$request  = $sbdb->delete('sb_users', 'id = ?', array($get_id)) !== false;
 			
 			if ($request)
 				$sb_msg_valid = $text . ' supprimé avec succès';
@@ -123,24 +124,27 @@ switch($action) {
 			// n'est qu'un nom de fichier choisi/déjà présent dans ce dossier,
 			// pas un upload natif géré ici.
 			if (!$self_password_only) {
-				$prenom                = $sbsql->escape_string($sbsanitize->displayText($_POST['prenom'] ?? '', 'UTF-8', 1, 0));
-				$nom                   = $sbsql->escape_string($sbsanitize->displayText($_POST['nom'] ?? '', 'UTF-8', 1, 0));
-				$telephone             = $sbsql->escape_string($sbsanitize->displayText($_POST['telephone'] ?? '', 'UTF-8', 1, 0));
-				$fonction              = $sbsql->escape_string($sbsanitize->displayText($_POST['fonction'] ?? '', 'UTF-8', 1, 0));
-				$profession            = $sbsql->escape_string($sbsanitize->displayText($_POST['profession'] ?? '', 'UTF-8', 1, 0));
-				$centres_interet       = $sbsql->escape_string($sbsanitize->displayText($_POST['centres_interet'] ?? '', 'UTF-8', 1, 0));
-				$infos_complementaires = $sbsql->escape_string($sbsanitize->displayText($_POST['infos_complementaires'] ?? '', 'UTF-8', 1, 0));
-				$avatar                = $sbsql->escape_string($sbsanitize->displayText($_POST['avatar'] ?? '', 'UTF-8', 1, 0));
+				$prenom                = $sbsanitize->displayText($_POST['prenom'] ?? '', 'UTF-8', 1, 0);
+				$nom                   = $sbsanitize->displayText($_POST['nom'] ?? '', 'UTF-8', 1, 0);
+				$telephone             = $sbsanitize->displayText($_POST['telephone'] ?? '', 'UTF-8', 1, 0);
+				$fonction              = $sbsanitize->displayText($_POST['fonction'] ?? '', 'UTF-8', 1, 0);
+				$profession            = $sbsanitize->displayText($_POST['profession'] ?? '', 'UTF-8', 1, 0);
+				$centres_interet       = $sbsanitize->displayText($_POST['centres_interet'] ?? '', 'UTF-8', 1, 0);
+				$infos_complementaires = $sbsanitize->displayText($_POST['infos_complementaires'] ?? '', 'UTF-8', 1, 0);
+				$avatar                = $sbsanitize->displayText($_POST['avatar'] ?? '', 'UTF-8', 1, 0);
 			}
 
 			// ADD or EDIT
 			if ($formType == 'add') {
 				// INSERT DATAS
 				// --- Mot de passe haché (password_hash()), jamais chiffré
-				$password = $sbsql->escape_string($sbusers->hashPassword($password));
-				$query = "INSERT INTO $table (`username`, `password`, `email`, `active`, `logintime`, `lastlogin`, `menu`, `groupe`, `prenom`, `nom`, `telephone`, `fonction`, `profession`, `centres_interet`, `infos_complementaires`, `avatar`)
-						  VALUES ('$username','$password','$email','$active','0','0',' ','admin','$prenom','$nom','$telephone','$fonction','$profession','$centres_interet','$infos_complementaires','$avatar')";
-				$result_add = $sbsql->query($query);
+				$result_add = $sbdb->insert('sb_users', array(
+					'username' => $username, 'password' => $sbusers->hashPassword($password), 'email' => $email, 'active' => $active,
+					'logintime' => '0', 'lastlogin' => '0', 'menu' => ' ', 'groupe' => 'admin',
+					'prenom' => $prenom, 'nom' => $nom, 'telephone' => $telephone, 'fonction' => $fonction, 'profession' => $profession,
+					'centres_interet' => $centres_interet, 'infos_complementaires' => $infos_complementaires, 'avatar' => $avatar,
+				)) !== false;
+				$query = $sbdb->lastQuery()[0];
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$username = $password = $email = $active = '';
@@ -161,9 +165,8 @@ switch($action) {
 
 				if ($self_password_only) {
 					if ($password != '') {
-						$password = $sbsql->escape_string($sb_new_hash);
-						$query = "UPDATE $table SET password = '$password' WHERE id = '$id'";
-						$result_edit = $sbsql->query($query);
+						$result_edit = $sbdb->update('sb_users', array('password' => $sb_new_hash), 'id = ?', array($id)) !== false;
+						$query = $sbdb->lastQuery()[0];
 						if ($result_edit) {
 							// Mot de passe changé : jetons "Se souvenir de moi"
 							// révoqués, et toutes les AUTRES sessions de ce compte
@@ -179,40 +182,15 @@ switch($action) {
 						$sb_msg_error = 'Veuillez saisir un mot de passe';
 					}
 				} else {
-					// UPDATE DATAS
-					if ($password == '') {
-						// Request without password
-						$query = "UPDATE $table SET username = '$username'
-																		,email = '$email'
-																		,active = '$active'
-																		,prenom = '$prenom'
-																		,nom = '$nom'
-																		,telephone = '$telephone'
-																		,fonction = '$fonction'
-																		,profession = '$profession'
-																		,centres_interet = '$centres_interet'
-																		,infos_complementaires = '$infos_complementaires'
-																		,avatar = '$avatar'
-																		WHERE id = '$id'";
-					} else {
-						// --- Mot de passe haché (password_hash())
-						$password = $sbsql->escape_string($sb_new_hash);
-						$query = "UPDATE $table SET username = '$username'
-																		,password = '$password'
-																		,email = '$email'
-																		,active = '$active'
-																		,prenom = '$prenom'
-																		,nom = '$nom'
-																		,telephone = '$telephone'
-																		,fonction = '$fonction'
-																		,profession = '$profession'
-																		,centres_interet = '$centres_interet'
-																		,infos_complementaires = '$infos_complementaires'
-																		,avatar = '$avatar'
-																		WHERE id = '$id'";
-					}
-
-					$result_edit = $sbsql->query($query);
+					// UPDATE DATAS (mot de passe seulement s'il est saisi)
+					$sb_fields = array(
+						'username' => $username, 'email' => $email, 'active' => $active,
+						'prenom' => $prenom, 'nom' => $nom, 'telephone' => $telephone, 'fonction' => $fonction, 'profession' => $profession,
+						'centres_interet' => $centres_interet, 'infos_complementaires' => $infos_complementaires, 'avatar' => $avatar,
+					);
+					if ($password != '') $sb_fields['password'] = $sb_new_hash;
+					$result_edit = $sbdb->update('sb_users', $sb_fields, 'id = ?', array($id)) !== false;
+					$query = $sbdb->lastQuery()[0];
 					if ($result_edit && $sb_new_hash != '') {
 						// Mot de passe changé : jetons "Se souvenir de moi"
 						// révoqués, et toutes les sessions de ce compte tombent
@@ -248,8 +226,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id       = intval($_GET['id'] ?? 0);
 			$query_1  = "SELECT * FROM $table WHERE id = $id";
-			$requestQ = $sbsql->query($query_1);
-			$assoc    = $sbsql->assoc($requestQ);
+			$assoc    = $sbdb->row("SELECT * FROM {sb_users} WHERE id = ?", array($id)) ?: array();
 			$username               = sb_utf8_encode($assoc['username']);
 			$password               = sb_utf8_encode($assoc['password']);
 			$email                  = sb_utf8_encode($assoc['email']);
@@ -368,10 +345,7 @@ switch($action) {
 			}
 			
 			// --- Recuperation du username
-			$query_name   = "SELECT username FROM $table WHERE id = $id";
-			$request_name = $sbsql->query($query_name);
-			$assoc_name   = $sbsql->assoc($request_name);
-			$username     = sb_utf8_encode($assoc_name['username']);
+			$username     = sb_utf8_encode((string) $sbdb->value("SELECT username FROM {sb_users} WHERE id = ?", array($id)));
 
 			// --- Debug SQL
 			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', 'sbSaveRightsMatrix(' . $id . ', $_POST)' . "\n" . 'Submit Form Type = '.$formType);
@@ -383,9 +357,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id       = intval($_GET['id'] ?? 0);
 			$query_1  = "SELECT * FROM $table WHERE id = $id";
-			$requestQ = $sbsql->query($query_1);
-			$assoc    = $sbsql->assoc($requestQ);
-			$username = sb_utf8_encode($assoc['username']);
+			$username = sb_utf8_encode((string) $sbdb->value("SELECT username FROM {sb_users} WHERE id = ?", array($id)));
 			$sbsmarty->assign('assoc', $query_1);
 
 			// --- Debug SQL
@@ -442,8 +414,8 @@ switch($action) {
 		// Action DELETE
 		if ($action == 'delblockedip') {
 			$get_id   = intval($_GET['id'] ?? 0);
-			$query_2  = "DELETE FROM $table_blockedip WHERE id = '$get_id'";
-			$request  = $sbsql->query($query_2);
+			$query_2  = "DELETE FROM $table_blockedip WHERE id = $get_id";
+			$request  = $sbdb->delete('sb_blocked_ip', 'id = ?', array($get_id)) !== false;
 			
 			if ($request)
 				$sb_msg_valid = $text . ' débloquée avec succès';

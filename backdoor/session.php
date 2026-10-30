@@ -59,8 +59,7 @@ if (!empty($_POST['form_submit'])) {
 	
 	// --- EDIT
 	// UPDATE DATAS
-	$query_session = "UPDATE $table SET content = '$session_cookie_lifetime' WHERE config = 'cookie-lifetime'";
-	$result_session = $sbsql->query($query_session);
+	$result_session = sbDb()->update('sb_config', array('content' => (string) $session_cookie_lifetime), "config = 'cookie-lifetime'") !== false;
 	
 	if ($result_session) {
 		// --- Message SUCCES

@@ -42,6 +42,7 @@ $sb_msg_valid = false;
 $table       = _AM_DB_PREFIX . "sb_messages";
 $table_users = _AM_DB_PREFIX . "sb_users";
 $sb_me       = sbGetCurrentUserId();
+$sbdb        = sbDb();
 // Identité prise par un administrateur (point 73) : lecture seule, rien
 // envoyé au nom de l'utilisateur, ses messages restent non lus
 $sb_readonly = sbImpersonating();
@@ -51,8 +52,7 @@ $sb_readonly = sbImpersonating();
 // --- pas seulement celle-ci, pour le badge topbar - voir navigation.tpl)
 // --------------------------------
 if (isset($_GET['ajax']) && $_GET['ajax'] == 'unread') {
-	$request_unread = $sbsql->query("SELECT COUNT(*) AS cpt FROM $table WHERE recipient_id = $sb_me AND read_at = 0");
-	$row_unread     = $sbsql->assoc($request_unread);
+	$row_unread = $sbdb->row("SELECT COUNT(*) AS cpt FROM {sb_messages} WHERE recipient_id = ? AND read_at = 0", array($sb_me));
 
 	header('Content-Type: application/json');
 	echo json_encode(array('count' => ($row_unread) ? intval($row_unread['cpt']) : 0));
@@ -70,13 +70,12 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == 'thread') {
 
 	if ($sb_with > 0) {
 		// Marque lu au passage (le poller tourne tant que le fil est ouvert)
-		if (!$sb_readonly) $sbsql->query("UPDATE $table SET read_at = " . time() . " WHERE sender_id = $sb_with AND recipient_id = $sb_me AND read_at = 0");
+		if (!$sb_readonly) $sbdb->update('sb_messages', array('read_at' => time()), 'sender_id = ? AND recipient_id = ? AND read_at = 0', array($sb_with, $sb_me));
 
-		$request_thread = $sbsql->query("SELECT * FROM $table
-			WHERE ((sender_id = $sb_me AND recipient_id = $sb_with) OR (sender_id = $sb_with AND recipient_id = $sb_me))
-			AND created_at > $sb_since
-			ORDER BY created_at ASC");
-		$sb_thread_rows = $sbsql->toarray($request_thread);
+		$sb_thread_rows = $sbdb->all("SELECT * FROM {sb_messages}
+			WHERE ((sender_id = ? AND recipient_id = ?) OR (sender_id = ? AND recipient_id = ?))
+			AND created_at > ?
+			ORDER BY created_at ASC", array($sb_me, $sb_with, $sb_with, $sb_me, $sb_since)) ?: array();
 	}
 
 	$sb_messages_out = array();
@@ -105,19 +104,16 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == 'send' && $_SERVER['REQUEST_METHOD'
 	header('Content-Type: application/json');
 
 	// Destinataire valide (existe, différent de soi-même) et message non vide
-	$request_check = $sbsql->query("SELECT id FROM $table_users WHERE id = $sb_with");
-	$sb_dest_ok     = ($sb_with > 0 && $sb_with != $sb_me && $sbsql->numrows() > 0);
+	$sb_dest_ok = ($sb_with > 0 && $sb_with != $sb_me && $sbdb->value("SELECT id FROM {sb_users} WHERE id = ?", array($sb_with)) !== null);
 
 	if ($sb_dest_ok && $sb_body !== '' && !$sb_readonly) {
-		$sb_body_escaped = $sbsql->escape_string($sb_body);
 		$sb_now = time();
-		$sbsql->query("INSERT INTO $table (sender_id, recipient_id, message, created_at, read_at)
-			VALUES ($sb_me, $sb_with, '$sb_body_escaped', $sb_now, 0)");
+		$sb_new_id = $sbdb->insert('sb_messages', array('sender_id' => $sb_me, 'recipient_id' => $sb_with, 'message' => $sb_body, 'created_at' => $sb_now, 'read_at' => 0));
 
 		echo json_encode(array(
 			'ok'      => true,
 			'message' => array(
-				'id'         => $sbsql->lastinsertid(),
+				'id'         => (int) $sb_new_id,
 				'message'    => $sbsanitize->displayText($sb_body, 'UTF-8', 0, 1),
 				'created_at' => $sb_now,
 				'mine'       => true,
@@ -154,12 +150,11 @@ $sb_with_user = ($sb_with > 0 && isset($sb_users_by_id[$sb_with])) ? $sb_users_b
 $sb_thread    = array();
 
 if ($sb_with_user) {
-	if (!$sb_readonly) $sbsql->query("UPDATE $table SET read_at = " . time() . " WHERE sender_id = $sb_with AND recipient_id = $sb_me AND read_at = 0");
+	if (!$sb_readonly) $sbdb->update('sb_messages', array('read_at' => time()), 'sender_id = ? AND recipient_id = ? AND read_at = 0', array($sb_with, $sb_me));
 
-	$request_thread = $sbsql->query("SELECT * FROM $table
-		WHERE (sender_id = $sb_me AND recipient_id = $sb_with) OR (sender_id = $sb_with AND recipient_id = $sb_me)
-		ORDER BY created_at ASC");
-	$sb_thread_rows = $sbsql->toarray($request_thread);
+	$sb_thread_rows = $sbdb->all("SELECT * FROM {sb_messages}
+		WHERE (sender_id = ? AND recipient_id = ?) OR (sender_id = ? AND recipient_id = ?)
+		ORDER BY created_at ASC", array($sb_me, $sb_with, $sb_with, $sb_me)) ?: array();
 
 	foreach ($sb_thread_rows as $sb_row) {
 		$sb_thread[] = array(
@@ -176,8 +171,7 @@ if ($sb_with_user) {
 // --- GROUP BY fragile) - la 1ère occurrence par correspondant rencontrée
 // --- dans ce tri DESC est la plus récente.
 // --------------------------------
-$request_conv = $sbsql->query("SELECT * FROM $table WHERE sender_id = $sb_me OR recipient_id = $sb_me ORDER BY created_at DESC");
-$sb_conv_rows = $sbsql->toarray($request_conv);
+$sb_conv_rows = $sbdb->all("SELECT * FROM {sb_messages} WHERE sender_id = ? OR recipient_id = ? ORDER BY created_at DESC", array($sb_me, $sb_me)) ?: array();
 
 $sb_conversations = array();
 foreach ($sb_conv_rows as $sb_row) {

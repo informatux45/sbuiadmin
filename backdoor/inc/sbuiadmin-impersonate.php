@@ -64,7 +64,7 @@ function sbImpersonateStart($id) {
 	if ($admin === '' || !sbImpersonateIsAdmin($admin) || sbGetCurrentUserId() === 0) return 'Réservé aux administrateurs.';
 
 	$id  = intval($id);
-	$row = $id > 0 ? $sbusers->assoc($sbusers->query("SELECT username, password, active FROM " . _AM_DB_PREFIX . "sb_users WHERE id = $id")) : null;
+	$row = ($id > 0 && sbDb()) ? sbDb()->row("SELECT username, password, active FROM {sb_users} WHERE id = ?", array($id)) : null;
 	if (!$row) return 'Utilisateur introuvable.';
 	$target = trim((string) $row['username']);
 	if ($target === '' || $target === $admin) return 'Impossible de prendre votre propre identité.';

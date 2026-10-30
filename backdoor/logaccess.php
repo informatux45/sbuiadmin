@@ -48,8 +48,8 @@ switch($action) {
 		// Action DELETE
 		if ($action == 'del') {
 			$get_id   = intval($_GET['id'] ?? 0);
-			$query_2  = "DELETE FROM $table WHERE id = '$get_id'";
-			$request  = $sbsql->query($query_2);
+			$query_2  = "DELETE FROM $table WHERE id = $get_id";
+			$request  = sbDb()->delete('sb_logaccess', 'id = ?', array($get_id)) !== false;
 			
 			if ($request)
 				$sb_msg_valid = $text . ' supprimée avec succès';

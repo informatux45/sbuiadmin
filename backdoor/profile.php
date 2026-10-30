@@ -52,8 +52,7 @@ $table = _AM_DB_PREFIX . "sb_users";
 $id    = sbGetCurrentUserId();
 
 $query   = "SELECT * FROM $table WHERE id = $id";
-$request = $sbsql->query($query);
-$assoc   = $sbsql->assoc($request);
+$assoc   = sbDb()->row("SELECT * FROM {sb_users} WHERE id = ?", array($id)) ?: array();
 
 $sbsmarty->assign('profile', array(
 	'username'              => $assoc['username'],
