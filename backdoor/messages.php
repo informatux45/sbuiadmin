@@ -42,6 +42,9 @@ $sb_msg_valid = false;
 $table       = _AM_DB_PREFIX . "sb_messages";
 $table_users = _AM_DB_PREFIX . "sb_users";
 $sb_me       = sbGetCurrentUserId();
+// Identité prise par un administrateur (point 73) : lecture seule, rien
+// envoyé au nom de l'utilisateur, ses messages restent non lus
+$sb_readonly = sbImpersonating();
 
 // --------------------------------
 // --- AJAX : compteur de messages non lus (pollé sur TOUTES les pages,
@@ -67,7 +70,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == 'thread') {
 
 	if ($sb_with > 0) {
 		// Marque lu au passage (le poller tourne tant que le fil est ouvert)
-		$sbsql->query("UPDATE $table SET read_at = " . time() . " WHERE sender_id = $sb_with AND recipient_id = $sb_me AND read_at = 0");
+		if (!$sb_readonly) $sbsql->query("UPDATE $table SET read_at = " . time() . " WHERE sender_id = $sb_with AND recipient_id = $sb_me AND read_at = 0");
 
 		$request_thread = $sbsql->query("SELECT * FROM $table
 			WHERE ((sender_id = $sb_me AND recipient_id = $sb_with) OR (sender_id = $sb_with AND recipient_id = $sb_me))
@@ -105,7 +108,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == 'send' && $_SERVER['REQUEST_METHOD'
 	$request_check = $sbsql->query("SELECT id FROM $table_users WHERE id = $sb_with");
 	$sb_dest_ok     = ($sb_with > 0 && $sb_with != $sb_me && $sbsql->numrows() > 0);
 
-	if ($sb_dest_ok && $sb_body !== '') {
+	if ($sb_dest_ok && $sb_body !== '' && !$sb_readonly) {
 		$sb_body_escaped = $sbsql->escape_string($sb_body);
 		$sb_now = time();
 		$sbsql->query("INSERT INTO $table (sender_id, recipient_id, message, created_at, read_at)
@@ -151,7 +154,7 @@ $sb_with_user = ($sb_with > 0 && isset($sb_users_by_id[$sb_with])) ? $sb_users_b
 $sb_thread    = array();
 
 if ($sb_with_user) {
-	$sbsql->query("UPDATE $table SET read_at = " . time() . " WHERE sender_id = $sb_with AND recipient_id = $sb_me AND read_at = 0");
+	if (!$sb_readonly) $sbsql->query("UPDATE $table SET read_at = " . time() . " WHERE sender_id = $sb_with AND recipient_id = $sb_me AND read_at = 0");
 
 	$request_thread = $sbsql->query("SELECT * FROM $table
 		WHERE (sender_id = $sb_me AND recipient_id = $sb_with) OR (sender_id = $sb_with AND recipient_id = $sb_me)

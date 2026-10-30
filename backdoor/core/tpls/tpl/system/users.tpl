@@ -235,6 +235,11 @@
 																<a class="btn--icon" href="{$module_url}&a=edit&id={$user.id}" data-tooltip="Modifier">
 																	<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"/></svg>
 																</a>
+																{if $sbuiadmin_user_type == 'admin' && !$sb_impersonator && $user.active && $user.username != $sbuiadmin_user_name && ($user.username|@sbGetUserGroup) != 'admin'}
+																	<a class="btn--icon" href="{$smarty.const._AM_SITE_URL}index.php?ac=impersonate&amp;id={$user.id|escape:'url'}&amp;t={$sb_csrf_token|escape:'url'}" data-tooltip="Prendre l'identité de {$user.username|escape:'html'}">
+																		<svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+																	</a>
+																{/if}
 																{if $user.username != $sbuiadmin_user_name}
 																	<a class="btn--icon" data-confirm="Sûr de vouloir supprimer ceci ?" href="{$module_url}&a=del&id={$user.id}" data-tooltip="Supprimer">
 																		<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>

@@ -160,6 +160,10 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 
 ## 📝 Changelog
 
+**4.70**
+- Administrators can view the admin as another user
+- theme.txt removed, older sbconfig.php fixed; Sentinelle 1.7.3
+
 **4.69**
 - Smarty trim modifiers ready for PHP 9
 - Session options locked by the host skipped
@@ -167,13 +171,13 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 **4.68**
 - Login log purged once a day, and right after saving the retention
 
+<details>
+  <summary><strong>Older versions</strong></summary>
+
 **4.67**
 - Admin AJAX calls without a session: 401, no log entry
 - Messages script loaded only with the Messages right
 - Login log purge (Configuration > Features), newest entries first
-
-<details>
-  <summary><strong>Older versions</strong></summary>
 
 **4.66**
 - Fixes: older MariaDB collation, theme migration, CLI database config, php.ini session options

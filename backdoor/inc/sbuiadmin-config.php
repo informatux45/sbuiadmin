@@ -24,6 +24,8 @@ require_once(__DIR__ . '/sbuiadmin-settings.php');
 // --- Anti-robot ALTCHA et blocage des tentatives de connexion
 require_once(__DIR__ . '/sbuiadmin-altcha.php');
 require_once(__DIR__ . '/sbuiadmin-loginlock.php');
+// --- Prendre l'identité d'un utilisateur (administrateurs)
+require_once(__DIR__ . '/sbuiadmin-impersonate.php');
 // --- Registre des modules (datas/modules/<nom>/module.php, table sb_modules)
 require_once(__DIR__ . '/sbuiadmin-modules.php');
 // Ancien tableau positionnel, pour le code tiers qui le lirait encore

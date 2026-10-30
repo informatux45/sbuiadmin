@@ -450,7 +450,7 @@ function sbUpdIsProtected($rel) {
 		'.htaccess', '.user.ini', 'sbconfig.php', 'sitemap.xml', 'robots.txt', 'sbuiadmin_netinstall.php',
 		'inc/cmscustom.php', 'inc/sbsession.txt',
 		'backdoor/.htaccess', 'backdoor/.user.ini', 'backdoor/install.php',
-		'backdoor/inc/admin/settings.txt', 'backdoor/inc/admin/dashboard.txt', 'backdoor/inc/admin/theme.txt',
+		'backdoor/inc/admin/settings.txt', 'backdoor/inc/admin/dashboard.txt',
 		'backdoor/inc/admin/php-audit.txt', 'backdoor/inc/admin/php-audit.log', 'backdoor/inc/admin/2fa-disabled',
 		'backdoor/inc/admin/sentinelle-disabled',
 	);

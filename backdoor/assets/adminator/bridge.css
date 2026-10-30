@@ -948,3 +948,7 @@ p.sbmedia > span.sbmedia-other {
 
 /* Bulle du menu de gauche posée par un module (menu.php : 'badge'), ex. messages non lus du Contact */
 .nav-badge.nav-count { background: #dc2626; color: #fff; font-size: 10px; min-width: 18px; text-align: center; }
+
+/* Bandeau « identité prise » (point 73), sous la barre du haut */
+.sb-impersonate-bar { align-items: center; margin: 16px 32px 0; position: sticky; top: 68px; z-index: 9; }
+@media (max-width: 768px) { .sb-impersonate-bar { margin: 12px 16px 0; grid-template-columns: 24px 1fr; } .sb-impersonate-bar .btn { grid-column: 1 / -1; justify-content: center; } }

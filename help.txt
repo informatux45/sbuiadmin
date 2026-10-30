@@ -59,6 +59,11 @@
 - Le thème affiche lui-même le gabarit annexe des pages : mettre
   $theme['various_in_theme'] = true; dans son config.php (sinon doublon).
 
+### Prendre l'identité d'un utilisateur
+- Utilisateurs > icône « Prendre l'identité » : administrateurs seulement,
+  jamais sur un autre administrateur. Messagerie en lecture seule ;
+  début et fin notés au journal des connexions (type impersonate) et Sentinelle.
+
 ### Site dans un sous-dossier (ex. /new/)
 - Configuration > Générale > URL du site : https://exemple.fr/new/
 - .htaccess : ErrorDocument 404 /new/index.php?p=pages&id=404
@@ -91,6 +96,8 @@ Chaque site a son sbdbconfig.php (sbdbconfig-<dossier>.php pour les suivants).
   qui manque à un ancien fichier, mais tout define() doit y être précédé de
   defined('X') or (sinon « already defined », erreur en PHP 9).
   Après modification, vider l'opcache si rien ne change.
+- 4.70 : un ancien sbconfig.php qui lisait inc/admin/theme.txt est corrigé
+  (thème en base) puis theme.txt supprimé ; original gardé pour le retour.
 - vendor/.htaccess refuse tout au web : un dossier de vendor/ propre au site
   qui sert des fichiers (retour de paiement, scripts) doit avoir son propre
   .htaccess (Require all granted). La page Mise à jour les signale.

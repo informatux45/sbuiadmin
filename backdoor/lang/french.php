@@ -18,6 +18,8 @@ defined('SBUIADMIN_MSG_LOG_ACCESS_CAPTCHA_ERROR2') OR define("SBUIADMIN_MSG_LOG_
 defined('SBUIADMIN_MSG_LOG_ACCESS_USER_ERROR') OR define("SBUIADMIN_MSG_LOG_ACCESS_USER_ERROR", "Utilisateur d&eacute;sactiv&eacute; [%s] a essay&eacute; de s&#39;identifier depuis [%s]");
 defined('SBUIADMIN_MSG_LOG_ACCESS_NOGRANTED') OR define("SBUIADMIN_MSG_LOG_ACCESS_NOGRANTED", "Identification non autoris&eacute;e depuis [%s] - propablement un intru");
 defined('SBUIADMIN_MSG_LOG_ACCESS_MISSING') OR define("SBUIADMIN_MSG_LOG_ACCESS_MISSING", "Erreur d&#39;acc&egrave;s depuis [%s] - identifiant et&#47;ou mot de passe manquant");
+defined('SBUIADMIN_MSG_LOG_IMPERSONATE_START') OR define("SBUIADMIN_MSG_LOG_IMPERSONATE_START", "Administrateur [%s] a pris l&#39;identit&eacute; de [%s] depuis [%s]");
+defined('SBUIADMIN_MSG_LOG_IMPERSONATE_STOP') OR define("SBUIADMIN_MSG_LOG_IMPERSONATE_STOP", "Administrateur [%s] a rendu l&#39;identit&eacute; de [%s] apr&egrave;s %d min");
  
  // ** Control access message
 defined('SBUIADMIN_MSG_ERROR_E1') OR define("SBUIADMIN_MSG_ERROR_E1", "V&eacute;rification anti-robot &eacute;chou&eacute;e : merci de r&eacute;essayer.");

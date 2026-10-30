@@ -29,6 +29,7 @@ function sentinelle_types() {
 		'auto_ban'      => 'Bannissement automatique',
 		'integrity'     => 'Intégrité des fichiers',
 		'integrity_approve' => 'Fichiers du site approuvés',
+		'impersonate'   => 'Identité prise (administrateur)',
 	) + sentinelle_rules();
 }
 
@@ -75,8 +76,8 @@ function sentinelle_excluded() {
 
 /** Types toujours enregistrés, même répétés (chaque tentative compte) */
 function sentinelle_types_every() {
-	// integrity_approve : action d'un admin (mot de passe redemandé), trace complète
-	return array('login_failed', 'twofa_failed', 'captcha_failed', 'integrity_approve');
+	// integrity_approve, impersonate : actions d'un admin, trace complète
+	return array('login_failed', 'twofa_failed', 'captcha_failed', 'integrity_approve', 'impersonate');
 }
 
 /** Mode : observe (journal seulement) ou protect (les filtres bloquent) */

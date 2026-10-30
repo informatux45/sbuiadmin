@@ -98,8 +98,8 @@
 										</div>
 									</div>
 								</div>
-								<textarea id="sbMessagesInput" placeholder="Votre message…" rows="1"></textarea>
-								<button class="chat-composer-send" id="sbMessagesSend" aria-label="Envoyer">
+								<textarea id="sbMessagesInput" placeholder="{if $sb_impersonator}Lecture seule : identité prise{else}Votre message…{/if}" rows="1"{if $sb_impersonator} disabled{/if}></textarea>
+								<button class="chat-composer-send" id="sbMessagesSend" aria-label="Envoyer"{if $sb_impersonator} disabled{/if}>
 									<svg viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></svg>
 								</button>
 							</div>

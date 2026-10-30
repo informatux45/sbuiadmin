@@ -235,6 +235,13 @@ if (isset($_SESSION['sbuiadmin_user_name']) && $_SESSION['sbuiadmin_user_name'] 
 	// Le hash du mot de passe gardé en session doit être celui en base :
 	// un mot de passe changé (ici ou ailleurs) ferme toutes les sessions
 	// ouvertes sur ce compte.
+	// Identité prise (point 73) : compte visé modifié ou désactivé entre-temps,
+	// retour au compte de l'administrateur plutôt qu'une déconnexion
+	if (sbImpersonating() && (!$sbusers->checkSessionHash($sbuiadmin_user_name, (string) ($_SESSION['sbuiadmin_user_password'] ?? '')) || !$sbusers->checkUserIsActive($sbuiadmin_user_name))) {
+		$sb_back = sbImpersonateStop('compte modifié entre-temps');
+		header('Location: ' . ($sb_back ? 'index.php?p=users' : 'index.php'));
+		exit;
+	}
 	if (!$sbusers->checkSessionHash($sbuiadmin_user_name, isset($_SESSION['sbuiadmin_user_password']) ? $_SESSION['sbuiadmin_user_password'] : '')) {
 		$_SESSION = array();
 		session_regenerate_id(true);
@@ -381,7 +388,11 @@ if (isset($_GET['ac']) && $_GET['ac'] == 'logout' && is_string($_GET['t'] ?? nul
 	// ------------------
 	// --- Logout required
 	// ------------------
-	// Update LastLogin
+	// Update LastLogin (celui de l'administrateur si l'identité est prise)
+	if (sbImpersonating()) {
+		$sbuiadmin_user_name = sbImpersonator();
+		sbImpersonateStop('logout');
+	}
 	$sbusers->updateAccessUserLogin($sbuiadmin_user_name, true);
 	// Start SESSION
 	session_start();
@@ -428,6 +439,30 @@ if (is_file($sb_update_lock) && (time() - (int) @file_get_contents($sb_update_lo
 	echo '<!doctype html><html lang="fr"><meta charset="utf-8"><title>Mise à jour en cours</title><p style="font-family:sans-serif;text-align:center;margin-top:20vh">Mise à jour de SBUIADMIN en cours, merci de patienter.<br><a href="index.php?p=update">Suivre la mise à jour</a></p></html>';
 	exit;
 }
+// ----------------------
+// Prendre / rendre l'identité d'un utilisateur (point 73) : administrateurs
+// seulement, jeton exigé comme pour la déconnexion
+// ----------------------
+if (in_array($_GET['ac'] ?? '', array('impersonate', 'impersonate_stop'), true)) {
+	if (!is_string($_GET['t'] ?? null) || !hash_equals(sbCsrfToken(), $_GET['t'])) {
+		sbSecurityEvent('csrf_failed', 'warning', 'Lien sans jeton valide : ' . $_GET['ac'], 'blocked', (string) $_SESSION['sbuiadmin_user_name']);
+		http_response_code(403);
+		$sbsmarty->display("403.tpl");
+		exit;
+	}
+	if ($_GET['ac'] === 'impersonate') {
+		$sb_imp_error = sbImpersonateStart($_GET['id'] ?? 0);
+		if ($sb_imp_error !== '') $_SESSION['sb_impersonate_msg'] = $sb_imp_error;
+		header('Location: ' . ($sb_imp_error === '' ? 'index.php' : 'index.php?p=users'));
+	} else {
+		header('Location: ' . (sbImpersonateStop() ? 'index.php?p=users' : 'index.php'));
+	}
+	exit;
+}
+$sbsmarty->assign('sb_impersonator', sbImpersonator());
+$sbsmarty->assign('sb_impersonate_msg', $_SESSION['sb_impersonate_msg'] ?? '');
+unset($_SESSION['sb_impersonate_msg']);
+
 // ----------------------
 // Get Global Infos
 // ----------------------

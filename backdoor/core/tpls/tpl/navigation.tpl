@@ -154,4 +154,18 @@
 				</div>
 			</div>
 		</header>
+		{if $sb_impersonator}
+		<div class="alert warning sb-impersonate-bar" role="status">
+			<span class="ico"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+			<div class="body">
+				Vous voyez l'administration comme <strong>{$sbuiadmin_user_name|escape:'html'}</strong> (connecté en tant que {$sb_impersonator|escape:'html'}). Messagerie en lecture seule.
+			</div>
+			<a class="btn btn--primary" href="{$smarty.const._AM_SITE_URL}index.php?ac=impersonate_stop&amp;t={$sb_csrf_token|escape:'url'}">Revenir à mon compte</a>
+		</div>
+		{elseif $sb_impersonate_msg}
+		<div class="alert danger sb-impersonate-bar" role="alert">
+			<span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></span>
+			<div class="body">{$sb_impersonate_msg|escape:'html'}</div>
+		</div>
+		{/if}
 
