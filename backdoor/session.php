@@ -75,8 +75,7 @@ if (!empty($_POST['form_submit'])) {
 // --- Recuperation des donnees
 // --------------------------------
 $query   = "SELECT config, content FROM $table WHERE config = 'cookie-lifetime'";
-$request = $sbsql->query($query);
-$assoc   = $sbsql->toarray($request);
+$assoc   = sbDb()->all("SELECT config, content FROM {sb_config} WHERE config = 'cookie-lifetime'") ?: array();
 // --------------------------------
 $cs = [];
 foreach($assoc as $row) {

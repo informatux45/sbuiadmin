@@ -69,12 +69,10 @@ switch($action) {
 			$form_config = $_POST['form_config'] ?? '';
 			// --- EDIT
 			// UPDATE / INSERT DATAS
-			if ($form_config == 'toolbarck')
-				$query  = "UPDATE $table SET content = '$active' WHERE config = 'toolbarck'";
-			else
-				$query = "INSERT INTO $table (config,content) VALUES ('toolbarck','$content')";
+			// (l'ancien INSERT, ligne absente, écrivait une variable vide)
+			$query  = "INSERT/UPDATE $table SET content = '$active' WHERE config = 'toolbarck'";
 			// --- Result
-			$result = $sbsql->query($query);
+			$result = sbConfigWrite(array('toolbarck' => $active), true);
 			if ($result) {
 				// --- Message SUCCES
 				$sb_msg_valid = 'Le comportement de la TOOLBAR CKEditor a été modifié avec succès';
@@ -91,8 +89,7 @@ switch($action) {
 		// --- Recuperation des donnees
 		// --------------------------------
 		$query = "SELECT config, content FROM $table WHERE config = 'toolbarck'";
-		$request = $sbsql->query($query);
-		$assoc   = $sbsql->assoc($request);
+		$assoc  = sbDb()->row("SELECT config, content FROM {sb_config} WHERE config = 'toolbarck'") ?: array('config' => '', 'content' => '');
 		// --------------------------------
 		$active = intval($assoc['content']);
 		// --------------------------------

@@ -69,8 +69,7 @@ switch($action) {
 		
 		// Contents table
 		$query     = "SELECT * FROM $table";
-		$request2  = $sbsql->query($query);
-		$result2   = $sbsql->toarray($request2);
+		$result2   = sbDb()->all("SELECT * FROM {sb_users}") ?: array();
 		
 		$sbsmarty->assign('all', true);
 		$sbsmarty->assign('alluser', $result2);
@@ -429,8 +428,7 @@ switch($action) {
 		
 		// Contents table
 		$query     = "SELECT * FROM $table_blockedip";
-		$request2  = $sbsql->query($query);
-		$result2   = $sbsql->toarray($request2);
+		$result2   = sbDb()->all("SELECT * FROM {sb_blocked_ip}") ?: array();
 		
 		$sbsmarty->assign('allips', true);
 		$sbsmarty->assign('allblockedip', $result2);

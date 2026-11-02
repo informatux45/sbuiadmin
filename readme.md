@@ -160,6 +160,11 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 
 ## 📝 Changelog
 
+**4.74**
+- System pages (dashboard, menus, blocks, CMS config) use bound SQL parameters
+- Block sorting by module fixed (injection, blocks missing after creation)
+- News 1.0.5: adding an article fixed on older databases
+
 **4.73**
 - Login, users, rights and messages use bound SQL parameters
 
@@ -167,12 +172,12 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 - SQL class now runs on PDO (pdo_mysql required)
 - Clear page when the PDO extension is missing
 
+<details>
+  <summary><strong>Older versions</strong></summary>
+
 **4.71**
 - New PDO database layer (MySQL/MariaDB, SQLite), not wired in yet
 - Updates check the required PHP extensions first
-
-<details>
-  <summary><strong>Older versions</strong></summary>
 
 **4.70**
 - Administrators can view the admin as another user

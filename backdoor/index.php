@@ -110,10 +110,8 @@ if (is_dir(SBUIADMIN_PATH . '/install')) {
 // ----------------------
 // --- CKEditor Behavior
 // ----------------------
-$query_ckeditor_behavior   = "SELECT content FROM " . _AM_DB_PREFIX . "sb_config WHERE config = 'toolbarck'";
-$request_ckeditor_behavior = $sbsql->query($query_ckeditor_behavior);
-$ckeditor_behavior         = $sbsql->assoc($request_ckeditor_behavior);
-defined('SBUIADMIN_CKEDITOR_BEHAVIOR') or define('SBUIADMIN_CKEDITOR_BEHAVIOR', (trim($ckeditor_behavior['content']) == 1) ? true : false);
+$ckeditor_behavior = (string) sbDb()->value("SELECT content FROM {sb_config} WHERE config = 'toolbarck'");
+defined('SBUIADMIN_CKEDITOR_BEHAVIOR') or define('SBUIADMIN_CKEDITOR_BEHAVIOR', (trim($ckeditor_behavior) == 1) ? true : false);
 
 // ----------------------
 // --- Settings file init
@@ -492,11 +490,7 @@ $sbsmarty->assign('sb_warning_admin_user', $_SESSION['sb_warning_admin_default']
 // ----------------------
 // --- Link CUSTOMER WEBSITE
 if (sbSetting('maintenance') == '1') {
-	$table           = _AM_DB_PREFIX . "sb_config";
-	$query           = "SELECT config, content FROM $table WHERE config = 'coming-soon-url'";
-	$request         = $sbsql->query($query);
-	$assoc           = $sbsql->object($request);
-	$sb_url_customer = sbSetting('site_url') . '?d=' . trim($assoc->content);
+	$sb_url_customer = sbSetting('site_url') . '?d=' . trim((string) sbDb()->value("SELECT content FROM {sb_config} WHERE config = 'coming-soon-url'"));
 } else {
 	$sb_url_customer = sbSetting('site_url');
 }
@@ -663,8 +657,7 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 				// précédents) et graphique en option si une colonne date a
 				// été configurée pour ce widget (voir dashboard.php).
 				// --------------------------------
-				$sb_dashboard_widgets_query = $sbsql->query("SELECT * FROM " . _AM_DB_PREFIX . "sb_dashboard_widgets WHERE active = 1 ORDER BY position ASC");
-				$sb_dashboard_widgets_rows  = $sbsql->toarray($sb_dashboard_widgets_query);
+				$sb_dashboard_widgets_rows = sbDb()->all("SELECT * FROM {sb_dashboard_widgets} WHERE active = 1 ORDER BY position ASC") ?: array();
 
 				$sb_dashboard_schema  = sbGetDbSchema();
 				$sb_dashboard_widgets = array();
@@ -821,7 +814,9 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 						continue;
 					}
 
-					$sb_full_table = _AM_DB_PREFIX . $sb_widget['table_name'];
+					// Table et colonnes vérifiées dans le schéma ci-dessus ;
+					// délimitées par sbDb() ({table}, ident())
+					$sb_full_table = '{' . $sb_widget['table_name'] . '}';
 					$sb_value_col  = $sb_widget['value_column'];
 					$sb_date_col   = $sb_widget['date_column'];
 					$sb_has_date   = ($sb_date_col != '' && array_key_exists($sb_date_col, $sb_dashboard_schema[$sb_widget['table_name']]));
@@ -841,11 +836,9 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 
 					// --- Compteur total + 10 plus récents
 					$sb_order_col = $sb_has_date ? $sb_date_col : $sb_value_col;
-					$sb_count_row = $sbsql->assoc($sbsql->query("SELECT COUNT(*) AS cpt FROM `$sb_full_table`"));
-					$sb_item['cpt'] = ($sb_count_row) ? intval($sb_count_row['cpt']) : 0;
+					$sb_item['cpt'] = (int) sbDb()->value("SELECT COUNT(*) FROM $sb_full_table");
 
-					$sb_list_request = $sbsql->query("SELECT `$sb_value_col` AS val FROM `$sb_full_table` ORDER BY `$sb_order_col` DESC LIMIT 10");
-					$sb_item['all']  = $sbsql->toarray($sb_list_request);
+					$sb_item['all'] = sbDb()->all("SELECT `$sb_value_col` AS val FROM $sb_full_table ORDER BY `$sb_order_col` DESC LIMIT 10") ?: array();
 
 					// --- Tendance + graphique (seulement si colonne date valide)
 					if ($sb_has_date) {
@@ -854,21 +847,19 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 						$sb_is_int_ts    = (bool) preg_match('/^(int|bigint|mediumint|smallint)/i', $sb_col_type);
 
 						if ($sb_is_real_date || $sb_is_int_ts) {
+							// Bornes calculées en PHP (INTERVAL n'existe pas en SQLite)
 							if ($sb_is_int_ts) {
-								$sb_bound_7    = 'UNIX_TIMESTAMP(NOW() - INTERVAL 7 DAY)';
-								$sb_bound_14   = 'UNIX_TIMESTAMP(NOW() - INTERVAL 14 DAY)';
+								$sb_bound_7    = time() - 7 * 86400;
+								$sb_bound_14   = time() - 14 * 86400;
 								$sb_group_expr = "FROM_UNIXTIME(`$sb_date_col`, '%Y-%m-%d')";
 							} else {
-								$sb_bound_7    = 'NOW() - INTERVAL 7 DAY';
-								$sb_bound_14   = 'NOW() - INTERVAL 14 DAY';
+								$sb_bound_7    = date('Y-m-d H:i:s', time() - 7 * 86400);
+								$sb_bound_14   = date('Y-m-d H:i:s', time() - 14 * 86400);
 								$sb_group_expr = "DATE(`$sb_date_col`)";
 							}
 
-							$sb_current_row  = $sbsql->assoc($sbsql->query("SELECT COUNT(*) AS cpt FROM `$sb_full_table` WHERE `$sb_date_col` >= $sb_bound_7"));
-							$sb_previous_row = $sbsql->assoc($sbsql->query("SELECT COUNT(*) AS cpt FROM `$sb_full_table` WHERE `$sb_date_col` >= $sb_bound_14 AND `$sb_date_col` < $sb_bound_7"));
-
-							$sb_current  = ($sb_current_row) ? intval($sb_current_row['cpt']) : 0;
-							$sb_previous = ($sb_previous_row) ? intval($sb_previous_row['cpt']) : 0;
+							$sb_current  = (int) sbDb()->value("SELECT COUNT(*) FROM $sb_full_table WHERE `$sb_date_col` >= ?", array($sb_bound_7));
+							$sb_previous = (int) sbDb()->value("SELECT COUNT(*) FROM $sb_full_table WHERE `$sb_date_col` >= ? AND `$sb_date_col` < ?", array($sb_bound_14, $sb_bound_7));
 
 							if ($sb_current > $sb_previous) $sb_direction = 'up';
 							elseif ($sb_current < $sb_previous) $sb_direction = 'down';
@@ -888,12 +879,11 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 
 							// --- Graphique : répartition par jour sur les 14 derniers jours
 							if ($sb_widget['show_chart']) {
-								$sb_chart_request = $sbsql->query(
-									"SELECT $sb_group_expr AS jour, COUNT(*) AS cpt FROM `$sb_full_table`
-									 WHERE `$sb_date_col` >= $sb_bound_14
-									 GROUP BY jour ORDER BY jour ASC"
-								);
-								$sb_chart_rows   = $sbsql->toarray($sb_chart_request);
+								$sb_chart_rows = sbDb()->all(
+									"SELECT $sb_group_expr AS jour, COUNT(*) AS cpt FROM $sb_full_table
+									 WHERE `$sb_date_col` >= ?
+									 GROUP BY jour ORDER BY jour ASC", array($sb_bound_14)
+								) ?: array();
 								$sb_chart_by_day = array();
 								foreach ($sb_chart_rows as $sb_crow) {
 									$sb_chart_by_day[$sb_crow['jour']] = intval($sb_crow['cpt']);
@@ -919,10 +909,7 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 				$sbsmarty->assign('sb_dashboard_module_scripts', array_keys($sb_dashboard_module_scripts));
 
 				// --- Users (cpt) - hors mécanisme widgets, ligne KPI admin fixe (index.tpl)
-				$query_5  = "SELECT id FROM " . _AM_DB_PREFIX . "sb_users";
-				$request5 = $sbsql->query($query_5);
-				$result5  = $sbsql->numrows($request5);
-				$sbsmarty->assign('sb_users_cpt', $result5);
+				$sbsmarty->assign('sb_users_cpt', (int) sbDb()->value("SELECT COUNT(*) FROM {sb_users}"));
 
 			}
 			$sbsmarty->display("system/$sb_get_page.tpl");

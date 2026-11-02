@@ -49,8 +49,8 @@ switch($action) {
 		// Action DELETE
 		if ($action == 'del') {
 			$get_id   = intval($_GET['id'] ?? 0);
-			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
-			$request  = $sbsql->query($query_2);
+			$query_2 = "DELETE FROM $table WHERE id = $get_id";
+			$request  = sbDb()->delete('sb_menu', 'id = ?', array($get_id)) !== false;
 			
 			if ($request)
 				$sb_msg_valid = $text . ' supprimé avec succès';
@@ -64,8 +64,7 @@ switch($action) {
 		
 		// Contents table
 		$query = "SELECT * FROM $table";
-		$request2  = $sbsql->query($query);
-		$result2   = $sbsql->toarray($request2);
+		$result2   = sbDb()->all("SELECT * FROM {sb_menu}") ?: array();
 		
 		$sbsmarty->assign('all', true);
 		$sbsmarty->assign('allmenu', $result2);
@@ -106,9 +105,8 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'add') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table (name,tag,pages,active)
-						  VALUES ('$name','$tag','$pages','$active')";
-				$result_add = $sbsql->query($query);
+				$query = "INSERT INTO $table (name,tag,pages,active)";
+				$result_add = sbDb()->insert('sb_menu', array('name' => $name, 'tag' => $tag, 'pages' => $pages, 'active' => $active)) !== false;
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$name = $tag = $pages = $active = '';
@@ -122,13 +120,8 @@ switch($action) {
 			} elseif ($formType == 'edit' && $id > 0) {
 
 				// UPDATE DATAS
-				$query = "UPDATE $table SET name = '$name'
-										   ,tag = '$tag'
-										   ,pages = '$pages'
-										   ,active = '$active'
-										   WHERE id = '$id'";
-											 
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table SET name, tag, pages, active WHERE id = $id";
+				$result_edit = sbDb()->update('sb_menu', array('name' => $name, 'tag' => $tag, 'pages' => $pages, 'active' => $active), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -154,8 +147,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id       = intval($_GET['id'] ?? 0);
 			$query_1 = "SELECT * FROM $table WHERE id = $id";
-			$requestQ = $sbsql->query($query_1);
-			$assoc    = $sbsql->assoc($requestQ);
+			$assoc    = sbDb()->row("SELECT * FROM {sb_menu} WHERE id = ?", array($id)) ?: array('name' => '', 'tag' => '', 'pages' => '', 'active' => '');
 			$name     = $sbsanitize->displayLang(sb_utf8_encode($assoc['name']));
 			$tag      = $assoc['tag'];
 			$pages    = $assoc['pages'];
@@ -185,10 +177,7 @@ switch($action) {
 		// ----------------------------
 		// Pages
 		// ----------------------------
-		$sbsql->free();
-		$query_pages = "SELECT * FROM $table_pages WHERE active = 1 ORDER BY id DESC";
-		$allpages    = $sbsql->query($query_pages);
-		$allpages    = $sbsql->toarray($allpages);
+		$allpages    = sbDb()->all("SELECT * FROM {sb_pages} WHERE active = 1 ORDER BY id DESC") ?: array();
 		// --- Initialisation
 		$tab_pages = array();
 		// --- Tableau des types du bien
@@ -244,8 +233,8 @@ switch($action) {
 			}
 			$sb_pages_sorted = substr($sb_pages_sorted, 0, -1);
 
-			$query_sort  = "UPDATE $table SET pages = '$sb_pages_sorted' WHERE id = '$id'";
-			$result_sort = $sbsql->query($query_sort);
+			$query_sort  = "UPDATE $table SET pages = '$sb_pages_sorted' WHERE id = $id";
+			$result_sort = sbDb()->update('sb_menu', array('pages' => $sb_pages_sorted), 'id = ?', array($id)) !== false;
 			if (!$result_sort) {
 				// --- Error Database
 				$sb_msg_error = 'Error: Write Error (SORT)!';
@@ -258,15 +247,12 @@ switch($action) {
 		
 		// --- Recuperation des donnees
 		$id            = intval($_GET['id'] ?? 0);
-		$query_3      = "SELECT * FROM $table WHERE id = '$id'";
-		$requestQ      = $sbsql->query($query_3);
-		$sort_array    = $sbsql->assoc($requestQ);
-		$assoc_pages   = explode("|", $sort_array['pages']);
+		$query_3      = "SELECT * FROM $table WHERE id = $id";
+		$sort_array    = sbDb()->row("SELECT * FROM {sb_menu} WHERE id = ?", array($id)) ?: array('pages' => '');
+		$assoc_pages   = explode("|", (string) $sort_array['pages']);
+		$toSort        = array();
 		foreach($assoc_pages as $sort) {
-			$query_4 = "SELECT menu FROM $table_pages WHERE id = '$sort'";
-			$requestP = $sbsql->query($query_4);
-			$one_page = $sbsql->assoc($requestP);
-			$toSort[$sort] = $sbsanitize->displayLang($one_page['menu']);
+			$toSort[$sort] = $sbsanitize->displayLang((string) sbDb()->value("SELECT menu FROM {sb_pages} WHERE id = ?", array((int) $sort)));
 		}
 
 		// --- Debug SQL

@@ -128,8 +128,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == 'send' && $_SERVER['REQUEST_METHOD'
 // --------------------------------
 // --- Vue normale : liste des utilisateurs (pour le sélecteur "New chat")
 // --------------------------------
-$request_users = $sbsql->query("SELECT id, username, email FROM $table_users ORDER BY username ASC");
-$sb_all_users  = $sbsql->toarray($request_users);
+$sb_all_users  = sbDb()->all("SELECT id, username, email FROM {sb_users} ORDER BY username ASC") ?: array();
 
 $sb_users_by_id  = array();
 $sb_pickable_users = array();

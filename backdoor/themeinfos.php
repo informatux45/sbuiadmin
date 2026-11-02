@@ -72,37 +72,12 @@ if (!empty($_POST['form_submit'])) {
 	
 	// --- EDIT
 	// UPDATE DATAS
-	$query_tel         = "UPDATE $table SET content = '$theme_infos_tel' WHERE config = 'theme_infos_tel'";
-	$query_address     = "UPDATE $table SET content = '$theme_infos_address' WHERE config = 'theme_infos_address'";
-	$query_email       = "UPDATE $table SET content = '$theme_infos_email' WHERE config = 'theme_infos_email'";
-	$query_facebook    = "UPDATE $table SET content = '$theme_infos_facebook' WHERE config = 'theme_infos_facebook'";
-	$query_twitter     = "UPDATE $table SET content = '$theme_infos_twitter' WHERE config = 'theme_infos_twitter'";
-	$query_google_plus = "UPDATE $table SET content = '$theme_infos_google_plus' WHERE config = 'theme_infos_google_plus'";
-	$query_pinterest   = "UPDATE $table SET content = '$theme_infos_pinterest' WHERE config = 'theme_infos_pinterest'";
-	$query_instagram   = "UPDATE $table SET content = '$theme_infos_instagram' WHERE config = 'theme_infos_instagram'";
-	$query_skype       = "UPDATE $table SET content = '$theme_infos_skype' WHERE config = 'theme_infos_skype'";
-	$query_viadeo      = "UPDATE $table SET content = '$theme_infos_viadeo' WHERE config = 'theme_infos_viadeo'";
-	$query_linkedin    = "UPDATE $table SET content = '$theme_infos_linkedin' WHERE config = 'theme_infos_linkedin'";
-	$query_vimeo       = "UPDATE $table SET content = '$theme_infos_vimeo' WHERE config = 'theme_infos_vimeo'";
-	$query_youtube     = "UPDATE $table SET content = '$theme_infos_youtube' WHERE config = 'theme_infos_youtube'";
-	$query_github      = "UPDATE $table SET content = '$theme_infos_github' WHERE config = 'theme_infos_github'";
+	$sb_theme_infos_ok = true;
+	foreach (array('tel', 'address', 'email', 'facebook', 'twitter', 'google_plus', 'pinterest', 'instagram', 'skype', 'viadeo', 'linkedin', 'vimeo', 'youtube', 'github') as $sb_info) {
+		$sb_theme_infos_ok = sbDb()->update('sb_config', array('content' => ${'theme_infos_' . $sb_info}), 'config = ?', array('theme_infos_' . $sb_info)) !== false && $sb_theme_infos_ok;
+	}
 	
-	$result_tel         = $sbsql->query($query_tel);
-	$result_address     = $sbsql->query($query_address);
-	$result_email       = $sbsql->query($query_email);
-	$result_facebook    = $sbsql->query($query_facebook);
-	$result_twitter     = $sbsql->query($query_twitter);
-	$result_google_plus = $sbsql->query($query_google_plus);
-	$result_pinterest   = $sbsql->query($query_pinterest);
-	$result_instagram   = $sbsql->query($query_instagram);
-	$result_skype       = $sbsql->query($query_skype);
-	$result_viadeo      = $sbsql->query($query_viadeo);
-	$result_linkedin    = $sbsql->query($query_linkedin);
-	$result_vimeo       = $sbsql->query($query_vimeo);
-	$result_youtube     = $sbsql->query($query_youtube);
-	$result_github      = $sbsql->query($query_github);
-	
-	if ($result_tel && $result_address && $result_email && $result_facebook  && $result_twitter && $result_youtube && $result_pinterest && $result_instagram && $result_skype && $result_viadeo && $result_linkedin && $result_vimeo && $result_google_plus && $result_github) {
+	if ($sb_theme_infos_ok) {
 		// --- Message SUCCES
 		$sb_msg_valid = 'Infos du thème modifiées avec succès';
 	} else {
@@ -115,23 +90,8 @@ if (!empty($_POST['form_submit'])) {
 // --------------------------------
 // --- Recuperation des donnees
 // --------------------------------
-$query = "SELECT config, content FROM $table WHERE config = 'theme_infos_tel'
-												OR config = 'theme_infos_address'
-												OR config = 'theme_infos_email'
-												OR config = 'theme_infos_facebook'
-												OR config = 'theme_infos_twitter'
-												OR config = 'theme_infos_youtube'
-												OR config = 'theme_infos_pinterest'
-												OR config = 'theme_infos_instagram'
-												OR config = 'theme_infos_skype'
-												OR config = 'theme_infos_viadeo'
-												OR config = 'theme_infos_linkedin'
-												OR config = 'theme_infos_vimeo'
-												OR config = 'theme_infos_google_plus'
-												OR config = 'theme_infos_github'
-												";
-$request = $sbsql->query($query);
-$assoc   = $sbsql->toarray($request);
+$query = "SELECT config, content FROM {sb_config} WHERE config IN ('theme_infos_tel', 'theme_infos_address', 'theme_infos_email', 'theme_infos_facebook', 'theme_infos_twitter', 'theme_infos_youtube', 'theme_infos_pinterest', 'theme_infos_instagram', 'theme_infos_skype', 'theme_infos_viadeo', 'theme_infos_linkedin', 'theme_infos_vimeo', 'theme_infos_google_plus', 'theme_infos_github')";
+$assoc = sbDb()->all($query) ?: array();
 // --------------------------------
 $cs = [];
 foreach($assoc as $row) {

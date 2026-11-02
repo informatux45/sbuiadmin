@@ -220,10 +220,11 @@ if (!function_exists("sbGetTagifyDatas")) {
       } else {
          $returns = json_decode(trim($datas));
          if (_AM_SITE_DEBUG) $sbsmarty->append('sbdebugsql', $returns);
-         if (array_keys( $returns, true )) {
+         // JSON de Tagify attendu : autre chose (liste brute) = aucun tag, pas une erreur fatale
+         if (is_array($returns) && $returns) {
             $return = "";
             foreach($returns as $row) {
-               $return .= $sbsanitize->displayText($row->value, 'UTF-8', 1, 0) . ",";
+               $return .= $sbsanitize->displayText(is_object($row) ? ($row->value ?? '') : '', 'UTF-8', 1, 0) . ",";
             }
             rtrim($return, ",");
          } else {
@@ -786,23 +787,49 @@ function sbTruncate($string, $max = 20, $replacement = '') {
 * @return string html
 */
 function sbGetConfig($config, $langdefault = 'fr') {
-	global $sbsanitize, $sbsql;
-	$table_config = _AM_DB_PREFIX . 'sb_config';
+	global $sbsanitize;
 	$config_name  = $sbsanitize->stopXSS(trim($config));
 
 	// --- Get CMS Configuration
-	$query   = "SELECT content FROM $table_config WHERE config = '$config_name'";
-	$request = $sbsql->query($query);
-	$result  = $sbsql->object($request);
+	$content = (string) sbDb()->value("SELECT content FROM {sb_config} WHERE config = ?", array($config_name));
 	
 	// Secrets chiffrés en base (mot de passe SMTP du contact)
 	if (function_exists('sbConfigSecretNames') && in_array($config_name, sbConfigSecretNames(), true)) {
-		return sbSecretOpen($result ? $result->content : '');
+		return sbSecretOpen($content);
 	}
 
 	$lang    = (isset($_SESSION['lang']) && $_SESSION['lang'] != '') ? $_SESSION['lang'] : $langdefault;
 	
-	return ($sbsanitize->displayText($sbsanitize->displayLang($result->content, $lang)));
+	return ($sbsanitize->displayText($sbsanitize->displayLang($content, $lang)));
+}
+
+/**
+ * Écrit plusieurs lignes de sb_config : array('config' => contenu).
+ * $create : ligne absente créée (sinon seule une ligne existante change).
+ * @return bool true si toutes les écritures ont réussi
+ */
+function sbConfigWrite(array $values, $create = false) {
+	$ok = true;
+	foreach ($values as $config => $content) {
+		$r = $create
+			? sbDb()->upsert('sb_config', array('config' => (string) $config, 'content' => (string) $content), array('config'))
+			: sbDb()->update('sb_config', array('content' => (string) $content), 'config = ?', array((string) $config)) !== false;
+		$ok = $r && $ok;
+	}
+	return $ok;
+}
+
+/**
+ * Lignes de sb_config demandées, contenu brut : array('config' => contenu).
+ * Une ligne absente n'apparaît pas.
+ */
+function sbConfigRead(array $names) {
+	$out = array();
+	if (!$names) return $out;
+	$names = array_values(array_map('strval', $names));
+	$rows  = sbDb()->all("SELECT config, content FROM {sb_config} WHERE config IN (" . implode(',', array_fill(0, count($names), '?')) . ")", $names);
+	foreach ($rows ?: array() as $row) $out[$row['config']] = $row['content'];
+	return $out;
 }
 
 /**
@@ -927,38 +954,29 @@ function sbGetUserAvatar($avatar, $email, $s = 80) {
  * @return array ['nom_table_sans_prefixe' => ['col1' => 'type', ...]]
  */
 function sbGetDbSchema() {
-    global $sbsql;
-
     $schema = array();
-    $prefix = _AM_DB_PREFIX;
+    $db     = sbDb();
+    if (!$db) return $schema;
+    $prefix = $db->prefix();
+    $sqlite = $db->driver() === 'sqlite';
 
-    // mysqli_report(MYSQLI_REPORT_STRICT) est actif (voir sql::connect()) :
-    // une requête en échec lève une exception au lieu de renvoyer false -
-    // cette fonction ne doit jamais casser toute la page pour un souci de
-    // schéma ponctuel (droits DB restreints, table verrouillée, etc.).
-    try {
-        $request_tables = $sbsql->query("SHOW TABLES LIKE '" . $sbsql->escape_string($prefix) . "%'");
-        $tables = $sbsql->toarray($request_tables);
-        if (!is_array($tables)) return $schema;
-    } catch (Exception $e) {
-        return $schema;
-    }
-
-    foreach ($tables as $t) {
-        $full_name  = $t[0];
-        $short_name = (strpos($full_name, $prefix) === 0) ? substr($full_name, strlen($prefix)) : $full_name;
-
+    // Une table illisible (droits restreints, verrou...) est ignorée :
+    // jamais toute la page cassée pour un souci de schéma ponctuel.
+    foreach ($db->tables($prefix) as $full_name) {
+        $short_name = substr($full_name, strlen($prefix));
         try {
-            $request_cols = $sbsql->query("SHOW COLUMNS FROM `$full_name`");
-            $cols = $sbsql->toarray($request_cols);
-            if (!is_array($cols)) continue;
-        } catch (Exception $e) {
+            $q = $db->ident($full_name);
+        } catch (InvalidArgumentException $e) {
             continue;
         }
+        $cols = $db->all($sqlite ? 'PRAGMA table_info(' . $q . ')' : 'SHOW COLUMNS FROM ' . $q);
+        if (!is_array($cols)) continue;
 
         $schema[$short_name] = array();
         foreach ($cols as $c) {
-            $schema[$short_name][$c[0]] = $c[1];
+            // Type en minuscules (SQLite le garde tel que déclaré)
+            if ($sqlite) $schema[$short_name][$c['name']] = strtolower((string) $c['type']);
+            else         $schema[$short_name][$c['Field']] = $c['Type'];
         }
     }
 
@@ -972,16 +990,9 @@ function sbGetDbSchema() {
  * @return string valeur déjà formatée pour affichage
  */
 function sbGetSystemWidgetValue($key) {
-    global $sbsql;
-
     switch ($key) {
         case 'users_count':
-            try {
-                $row = $sbsql->assoc($sbsql->query("SELECT COUNT(*) AS cpt FROM " . _AM_DB_PREFIX . "sb_users"));
-                return ($row) ? intval($row['cpt']) : 0;
-            } catch (Exception $e) {
-                return 0;
-            }
+            return (int) sbDb()->value("SELECT COUNT(*) FROM {sb_users}");
 
         case 'php_version':
             return _AM_SERVER_PHP_VERSION_ID;
@@ -1000,12 +1011,7 @@ function sbGetSystemWidgetValue($key) {
             return sbFormatByteSize(sbGetDirectorySize(_AM_MEDIAS_DIR));
 
         case 'active_sessions':
-            try {
-                $row = $sbsql->assoc($sbsql->query("SELECT COUNT(*) AS cpt FROM " . _AM_DB_PREFIX . "sb_sessions WHERE expiredate > NOW()"));
-                return ($row) ? intval($row['cpt']) : 0;
-            } catch (Exception $e) {
-                return 0;
-            }
+            return (int) sbDb()->value("SELECT COUNT(*) FROM {sb_sessions} WHERE expiredate > NOW()");
     }
 
     return '';
@@ -1252,24 +1258,18 @@ function sbTailLogFile($filename, $lines = 15) {
  * @return array [['user'=>.., 'date'=>..], ...] (vide si aucune ou en cas d'erreur)
  */
 function sbGetLastLoginsWidgetValue($limit = 10) {
-    global $sbsql;
-
-    try {
-        // LEFT JOIN : un utilisateur supprimé depuis reste visible dans
-        // l'historique (avatar/email absents -> repli Gravatar générique
-        // via sbGetUserAvatar()).
-        $rows = $sbsql->toarray($sbsql->query(
-            "SELECT l.logaccess_user, l.logaccess_date, u.avatar, u.email
-			 FROM " . _AM_DB_PREFIX . "sb_logaccess l
-			 LEFT JOIN " . _AM_DB_PREFIX . "sb_users u ON u.username = l.logaccess_user
-			 WHERE l.logaccess_type = 'login' ORDER BY l.logaccess_date DESC LIMIT " . intval($limit)
-        ));
-    } catch (Exception $e) {
-        return array();
-    }
+    // LEFT JOIN : un utilisateur supprimé depuis reste visible dans
+    // l'historique (avatar/email absents -> repli Gravatar générique
+    // via sbGetUserAvatar()).
+    $rows = sbDb()->all(
+        "SELECT l.logaccess_user, l.logaccess_date, u.avatar, u.email
+		 FROM {sb_logaccess} l
+		 LEFT JOIN {sb_users} u ON u.username = l.logaccess_user
+		 WHERE l.logaccess_type = 'login' ORDER BY l.logaccess_date DESC " . sbDb()->limit($limit)
+    );
 
     $items = array();
-    foreach ($rows as $sb_row) {
+    foreach ($rows ?: array() as $sb_row) {
         $items[] = array(
             'user'   => $sb_row['logaccess_user'],
             'date'   => date('d/m/Y H:i', intval($sb_row['logaccess_date'])),

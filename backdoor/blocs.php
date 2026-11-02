@@ -65,12 +65,11 @@ switch($action) {
 		// Action DELETE
 		if ($action == 'del') {
 			$get_id   = intval($_GET['id'] ?? 0);
-			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
-			$request  = $sbsql->query($query_2);
+			$query_2 = "DELETE FROM $table WHERE id = $get_id";
+			$request  = sbDb()->delete('sb_blocs', 'id = ?', array($get_id)) !== false;
 			
 			// --- Delete bloc sort too ;-)
-			$query_4 = "DELETE FROM $table_sort WHERE bloc_id = '$get_id'";
-			$request4 = $sbsql->query($query_4);			
+			sbDb()->delete('sb_blocs_sort', 'bloc_id = ?', array($get_id));
 			
 			if ($request)
 				$sb_msg_valid = $text . ' supprimé avec succès';
@@ -84,13 +83,10 @@ switch($action) {
 		
 		// Contents table
 		$query     = "SELECT * FROM $table";
-		$request2  = $sbsql->query($query);
-		$result2   = $sbsql->toarray($request2);
+		$result2   = sbDb()->all("SELECT * FROM {sb_blocs}") ?: array();
 		
 		// --- Extract all pages
-		$query_pages    = "SELECT * FROM $table_pages";
-		$request_pages  = $sbsql->query($query_pages);
-		$result_pages   = $sbsql->toarray($request_pages);
+		$result_pages   = sbDb()->all("SELECT * FROM {sb_pages}") ?: array();
 		// --- Extract all modules
 		$result_modules = sbGetModulesPage();
 		
@@ -153,9 +149,9 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'add') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table (pages_id,modules_id,name,title,content,position,various_view,active,sort)
-						  VALUES ('$pages','$modules','$name','$title','$content','$position','$various_view','$active','0')";
-				$result_add = $sbsql->query($query);
+				$query = "INSERT INTO $table (pages_id,modules_id,name,title,content,position,various_view,active,sort)";
+				$bloc_id = sbDb()->insert('sb_blocs', array('pages_id' => $pages, 'modules_id' => $modules, 'name' => $name, 'title' => $title, 'content' => $content, 'position' => $position, 'various_view' => $various_view, 'active' => $active, 'sort' => 0));
+				$result_add = $bloc_id !== false;
 				if ($result_add) {
 					// --------------------------------------------------
 					// --- Vider les champs du formulaire
@@ -164,10 +160,13 @@ switch($action) {
 					// ------------------------------------------------------
 					// --- Ajouter les blocs dans leurs pages respectives ---
 					// ------------------------------------------------------
-					$bloc_id = $sbsql->lastinsertid();
 					foreach(array_map('intval', (array)($_POST['pages'] ?? [])) as $page_id) {
-						$query_bloc_sort  = "INSERT INTO $table_sort (page_id,bloc_id,sort) VALUES ('$page_id','$bloc_id','0')";
-						$result_bloc_sort = $sbsql->query($query_bloc_sort);
+						sbDb()->insert('sb_blocs_sort', array('page_id' => $page_id, 'bloc_id' => $bloc_id, 'sort' => 0));
+					}
+					// --- Modules (oubliés à l'ajout : le bloc n'apparaissait
+					// dans le tri des modules qu'après une modification)
+					foreach(array_map('intval', (array)($_POST['modules'] ?? [])) as $module_id) {
+						sbDb()->insert('sb_blocs_sort', array('module_id' => $module_id, 'bloc_id' => $bloc_id, 'sort' => 0));
 					}
 					// -------------------------------------------------
 					// --- Message SUCCESS
@@ -182,17 +181,8 @@ switch($action) {
 			} elseif ($formType == 'edit' && $id > 0) {
 
 				// UPDATE DATAS
-				$query = "UPDATE $table SET pages_id = '$pages'
-										   ,modules_id = '$modules'
-										   ,name = '$name'
-										   ,title = '$title'
-										   ,content = '$content'
-										   ,various_view = '$various_view'
-										   ,position = '$position'
-										   ,active = '$active'
-										   WHERE id = '$id'";
-											 
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table SET pages_id, modules_id, name, title, content, various_view, position, active WHERE id = $id";
+				$result_edit = sbDb()->update('sb_blocs', array('pages_id' => $pages, 'modules_id' => $modules, 'name' => $name, 'title' => $title, 'content' => $content, 'various_view' => $various_view, 'position' => $position, 'active' => $active), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --------------------------------------------------
 					// --- On ne vide pas les champs du formulaire
@@ -203,17 +193,14 @@ switch($action) {
 					// --- Bloc id
 					$bloc_id = $id;
 					// --- Delete blocs infos in DB
-					$query_bloc_delete   = "DELETE FROM $table_sort WHERE bloc_id = '$id'";
-					$request_bloc_delete = $sbsql->query($query_bloc_delete);
+					sbDb()->delete('sb_blocs_sort', 'bloc_id = ?', array($id));
 					// --- Pages sort
 					foreach(array_map('intval', (array)($_POST['pages'] ?? [])) as $page_id) {
-						$query_bloc_sort  = "INSERT INTO $table_sort (page_id,bloc_id,sort) VALUES ('$page_id','$bloc_id','0')";
-						$result_bloc_sort = $sbsql->query($query_bloc_sort);
+						sbDb()->insert('sb_blocs_sort', array('page_id' => $page_id, 'bloc_id' => $bloc_id, 'sort' => 0));
 					}
 					// --- Modules sort
 					foreach(array_map('intval', (array)($_POST['modules'] ?? [])) as $module_id) {
-						$query_bloc_sort_mod  = "INSERT INTO $table_sort (module_id,bloc_id,sort) VALUES ('$module_id','$bloc_id','0')";
-						$result_bloc_sort_mod = $sbsql->query($query_bloc_sort_mod);
+						sbDb()->insert('sb_blocs_sort', array('module_id' => $module_id, 'bloc_id' => $bloc_id, 'sort' => 0));
 					}
 					// -------------------------------------------------
 					// --- Message SUCCES
@@ -251,8 +238,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id           = intval($_GET['id'] ?? 0);
 			$query_1      = "SELECT * FROM $table WHERE id = $id";
-			$requestQ     = $sbsql->query($query_1);
-			$assoc        = $sbsql->assoc($requestQ);
+			$assoc        = sbDb()->row("SELECT * FROM {sb_blocs} WHERE id = ?", array($id)) ?: array();
 			$pages        = $assoc['pages_id'];
 			$modules      = $assoc['modules_id'];
 			$name         = $sbsanitize->displayLang(sb_utf8_encode($assoc['name']));
@@ -301,10 +287,7 @@ switch($action) {
 		// -----------------------------------
 		// --- Choix de la page pour afficher le bloc
 		// -----------------------------------
-		$sbsql->free();
-		$query_pages = "SELECT * FROM $table_pages";
-		$allpages    = $sbsql->query($query_pages);
-		$allpages    = $sbsql->toarray($allpages);
+		$allpages    = sbDb()->all("SELECT * FROM {sb_pages}") ?: array();
 		// --- Initialisation
 		$tab_pages = array();
 		// --- Tableau des types du bien
@@ -418,7 +401,7 @@ switch($action) {
 				// --- brut dans le WHERE (les actions de tri ne passent pas par le jeton
 				// --- CSRF de openForm(), voir index.php).
 				$query_sort  = "UPDATE $table_sort SET sort = $tri WHERE id = " . intval($sb_toSort[$i]);
-				$result_sort = $sbsql->query($query_sort);
+				$result_sort = sbDb()->update('sb_blocs_sort', array('sort' => $tri), 'id = ?', array(intval($sb_toSort[$i]))) !== false;
 				if (!$result_sort) {
 					// --- Error Database
 					$sql_error++;
@@ -442,11 +425,10 @@ switch($action) {
 						  LEFT JOIN $table AS t2 ON (t1.bloc_id = t2.id)
 						  WHERE t1.page_id = $selected_page
 						  ORDER BY t1.sort ASC ";
-		$requestQ      = $sbsql->query($query_3);
-		$sort_array    = $sbsql->toarray($requestQ);
+		$sort_array    = sbDb()->all("SELECT t1.*, t2.name AS blocname FROM {sb_blocs_sort} AS t1 LEFT JOIN {sb_blocs} AS t2 ON (t1.bloc_id = t2.id) WHERE t1.page_id = ? ORDER BY t1.sort ASC", array($selected_page)) ?: array();
 		foreach($sort_array as $sort) {
 			$sort_id          = $sort['id'];
-			$toSort[$sort_id] = sb_utf8_encode($sort['blocname']);
+			$toSort[$sort_id] = sb_utf8_encode((string) $sort['blocname']);
 		}
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_3 . "\n" . 'Form Type = '.$formType);
@@ -476,7 +458,7 @@ switch($action) {
 		$formType        = "sortmod";
 		$btn_add_edit    = "Valider";
 		$legend_add_edit = "Trier les " . strtolower($text) . 's de modules';
-		$selected_page   = $_GET['pid'] ?? '';
+		$selected_page   = intval($_GET['pid'] ?? 0);
 		// --------------------------------
 		if (!empty($_POST['drag'])) {
 			// --------------------------------
@@ -494,7 +476,7 @@ switch($action) {
 				// --- brut dans le WHERE (les actions de tri ne passent pas par le jeton
 				// --- CSRF de openForm(), voir index.php).
 				$query_sort  = "UPDATE $table_sort SET sort = $tri WHERE id = " . intval($sb_toSort[$i]);
-				$result_sort = $sbsql->query($query_sort);
+				$result_sort = sbDb()->update('sb_blocs_sort', array('sort' => $tri), 'id = ?', array(intval($sb_toSort[$i]))) !== false;
 				if (!$result_sort) {
 					// --- Error Database
 					$sql_error++;
@@ -516,13 +498,12 @@ switch($action) {
 		$query_3      = "SELECT t1.*, t2.name AS blocname
 						  FROM $table_sort AS t1
 						  LEFT JOIN $table AS t2 ON (t1.bloc_id = t2.id)
-						  WHERE t1.module_id = '$selected_page'
+						  WHERE t1.module_id = $selected_page
 						  ORDER BY t1.sort ASC ";
-		$requestQ      = $sbsql->query($query_3);
-		$sort_array    = $sbsql->toarray($requestQ);
+		$sort_array    = sbDb()->all("SELECT t1.*, t2.name AS blocname FROM {sb_blocs_sort} AS t1 LEFT JOIN {sb_blocs} AS t2 ON (t1.bloc_id = t2.id) WHERE t1.module_id = ? ORDER BY t1.sort ASC", array($selected_page)) ?: array();
 		foreach($sort_array as $sort) {
 			$sort_id          = $sort['id'];
-			$toSort[$sort_id] = sb_utf8_encode($sort['blocname']);
+			$toSort[$sort_id] = sb_utf8_encode((string) $sort['blocname']);
 		}
 
 		// --- Debug SQL

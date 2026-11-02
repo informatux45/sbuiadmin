@@ -218,8 +218,9 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'add') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table (catid,title,subtitle,desc_short,desc_full,image,date,active)
-						  VALUES ('$catid','$title','$subtitle','$desc_short','$desc_full','$photo','$date','$active')";
+				// viewed explicite : des bases anciennes n'ont pas de DEFAULT (mode strict)
+				$query = "INSERT INTO $table (catid,title,subtitle,desc_short,desc_full,image,date,viewed,active)
+						  VALUES ('$catid','$title','$subtitle','$desc_short','$desc_full','$photo','$date',0,'$active')";
 				$result_add = $sbsql->query($query);
 				if ($result_add) {
 					// --- Vider les champs du formulaire

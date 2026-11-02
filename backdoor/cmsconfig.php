@@ -70,10 +70,8 @@ switch($action) {
 			if ($id > 0) {
 
 				// UPDATE DATAS
-				$query = "UPDATE $table SET content = '$content'
-										   WHERE id = '$id'";
-											 
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table SET content WHERE id = $id";
+				$result_edit = sbDb()->update('sb_config', array('content' => $content), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -95,8 +93,7 @@ switch($action) {
 		if ($formType == 'edit' && empty($_POST['form_submit']) && empty($_POST['id'])) {
 			// --- Recuperation des donnees
 			$query_1   = "SELECT * FROM $table WHERE config = '$action'";
-			$requestQ  = $sbsql->query($query_1);
-			$assoc     = $sbsql->assoc($requestQ);
+			$assoc     = sbDb()->row("SELECT * FROM {sb_config} WHERE config = ?", array($action)) ?: array('id' => 0, 'content' => '');
 			$id        = intval($assoc['id']);
 			$content   = sb_utf8_encode($assoc['content']);
 
@@ -157,9 +154,7 @@ switch($action) {
 			$query_header = "UPDATE $table SET content = '$content_header' WHERE config = 'header'";
 			$query_footer = "UPDATE $table SET content = '$content_footer' WHERE config = 'footer'";
 			
-			$result_edit_header = $sbsql->query($query_header);
-			$result_edit_footer = $sbsql->query($query_footer);
-			if ($result_edit_header && $result_edit_footer) {
+			if (sbConfigWrite(array('header' => $content_header, 'footer' => $content_footer))) {
 				// --- Message SUCCES
 				$sb_msg_valid = 'Code modifié avec succès';
 			} else {
@@ -177,10 +172,9 @@ switch($action) {
 		// --------------------------------
 		$queryH   = "SELECT content FROM $table WHERE config = 'header'";
 		$queryF   = "SELECT content FROM $table WHERE config = 'footer'";
-		$requestH = $sbsql->query($queryH);
-		$requestF = $sbsql->query($queryF);
-		$assocH   = $sbsql->assoc($requestH);
-		$assocF   = $sbsql->assoc($requestF);
+		$sb_hf    = sbConfigRead(array('header', 'footer'));
+		$assocH   = array('content' => $sb_hf['header'] ?? '');
+		$assocF   = array('content' => $sb_hf['footer'] ?? '');
 		$contentH = sb_utf8_encode($assocH['content']);
 
 		// --- Debug SQL
@@ -249,44 +243,14 @@ switch($action) {
 			
 			// --- EDIT
 			// UPDATE DATAS
-			$query_url          = "UPDATE $table SET content = '$coming_soon_url' WHERE config = 'coming-soon-url'";
-			$query_title        = "UPDATE $table SET content = '$coming_soon_title' WHERE config = 'coming-soon-title'";
-			$query_title2       = "UPDATE $table SET content = '$coming_soon_title2' WHERE config = 'coming-soon-title2'";
-			$query_text         = "UPDATE $table SET content = '$coming_soon_text' WHERE config = 'coming-soon-text'";
-			$query_tel          = "UPDATE $table SET content = '$coming_soon_tel' WHERE config = 'coming-soon-tel'";
-			$query_address      = "UPDATE $table SET content = '$coming_soon_address' WHERE config = 'coming-soon-address'";
-			$query_email        = "UPDATE $table SET content = '$coming_soon_email' WHERE config = 'coming-soon-email'";
-			$query_facebook     = "UPDATE $table SET content = '$coming_soon_facebook' WHERE config = 'coming-soon-facebook'";
-			$query_twitter      = "UPDATE $table SET content = '$coming_soon_twitter' WHERE config = 'coming-soon-twitter'";
-			$query_youtube      = "UPDATE $table SET content = '$coming_soon_youtube' WHERE config = 'coming-soon-youtube'";
-			$query_type         = "UPDATE $table SET content = '$coming_soon_type' WHERE config = 'coming-soon-type'";
-			$query_image        = "UPDATE $table SET content = '$coming_soon_image' WHERE config = 'coming-soon-image'";
-			$query_video        = "UPDATE $table SET content = '$coming_soon_video' WHERE config = 'coming-soon-video'";
-			$query_dark         = "UPDATE $table SET content = '$coming_soon_dark' WHERE config = 'coming-soon-dark'";
-			$query_date         = "UPDATE $table SET content = '$coming_soon_date' WHERE config = 'coming-soon-date'";
-			// Réglage ajouté en 4.17 : créé s'il manque
-			$query_countdown    = "INSERT INTO $table (config, content) VALUES ('coming-soon-countdown', '$coming_soon_countdown') ON DUPLICATE KEY UPDATE content = VALUES(content)";
-			$query_github       = "INSERT INTO $table (config, content) VALUES ('coming-soon-github', '$coming_soon_github') ON DUPLICATE KEY UPDATE content = VALUES(content)";
+			$sb_cs_names = array('url', 'title', 'title2', 'text', 'tel', 'address', 'email', 'facebook', 'twitter', 'youtube', 'type', 'image', 'video', 'dark', 'date');
+			$sb_cs_values = array();
+			foreach ($sb_cs_names as $sb_cs_name) $sb_cs_values['coming-soon-' . $sb_cs_name] = ${'coming_soon_' . $sb_cs_name};
+			$sb_cs_ok = sbConfigWrite($sb_cs_values);
+			// Réglages ajoutés en 4.17 : créés s'ils manquent
+			$sb_cs_ok = sbConfigWrite(array('coming-soon-countdown' => $coming_soon_countdown, 'coming-soon-github' => $coming_soon_github), true) && $sb_cs_ok;
 			
-			$result_url         = $sbsql->query($query_url);			
-			$result_title       = $sbsql->query($query_title);
-			$result_title2      = $sbsql->query($query_title2);
-			$result_text        = $sbsql->query($query_text);
-			$result_tel         = $sbsql->query($query_tel);
-			$result_address     = $sbsql->query($query_address);
-			$result_email       = $sbsql->query($query_email);
-			$result_facebook    = $sbsql->query($query_facebook);
-			$result_twitter     = $sbsql->query($query_twitter);
-			$result_youtube     = $sbsql->query($query_youtube);
-			$result_type        = $sbsql->query($query_type);
-			$result_image       = $sbsql->query($query_image);
-			$result_video       = $sbsql->query($query_video);
-			$result_dark        = $sbsql->query($query_dark);
-			$result_date        = $sbsql->query($query_date);
-			$result_countdown   = $sbsql->query($query_countdown);
-			$result_github      = $sbsql->query($query_github);
-			
-			if ($result_url && $result_title && $result_title && $result_text && $result_tel && $result_address && $result_email && $result_facebook  && $result_twitter && $result_youtube && $result_type && $result_image && $result_video && $result_dark && $result_date && $result_countdown && $result_github) {
+			if ($sb_cs_ok) {
 				// --- Message SUCCES
 				$sb_msg_valid = 'Page de maintenance modifiée avec succès';
 			} else {
@@ -299,26 +263,8 @@ switch($action) {
 		// --------------------------------
 		// --- Recuperation des donnees
 		// --------------------------------
-		$query = "SELECT config, content FROM $table WHERE config = 'coming-soon-url'
-																			 OR config = 'coming-soon-title'
-																			 OR config = 'coming-soon-title2'
-																			 OR config = 'coming-soon-text'
-																			 OR config = 'coming-soon-tel'
-																			 OR config = 'coming-soon-address'
-																			 OR config = 'coming-soon-email'
-																			 OR config = 'coming-soon-facebook'
-																			 OR config = 'coming-soon-twitter'
-																			 OR config = 'coming-soon-youtube'
-																			 OR config = 'coming-soon-type'
-																			 OR config = 'coming-soon-image'
-																			 OR config = 'coming-soon-video'
-																			 OR config = 'coming-soon-dark'
-																			 OR config = 'coming-soon-date'
-																			 OR config = 'coming-soon-countdown'
-																			 OR config = 'coming-soon-github'
-																			 ";
-		$request = $sbsql->query($query);
-		$assoc   = $sbsql->toarray($request);
+		$query = "SELECT config, content FROM {sb_config} WHERE config LIKE 'coming-soon-%'";
+		$assoc = sbDb()->all($query) ?: array();
 		// --------------------------------
 		foreach($assoc as $row) {
 			$cs[$row['config']] = sb_utf8_encode($row['content']);
@@ -440,7 +386,7 @@ switch($action) {
 			// --- EDIT
 			// UPDATE DATAS
 			$query_active = "UPDATE $table SET content = '$active' WHERE config = 'multilang'";
-			$result_active   = $sbsql->query($query_active);
+			$result_active   = sbConfigWrite(array('multilang' => $active));
 			if ($result_active) {
 				// --- Message SUCCES
 				$sb_msg_valid = 'Multilangue modifié avec succès';
@@ -458,10 +404,7 @@ switch($action) {
 		// --- Recuperation des donnees
 		// --------------------------------
 		$query = "SELECT content FROM $table WHERE config = 'multilang'";
-		$request = $sbsql->query($query);
-		$assoc   = $sbsql->assoc($request);
-		// --------------------------------
-		$active = intval($assoc['content']);
+		$active = intval(sbDb()->value("SELECT content FROM {sb_config} WHERE config = 'multilang'"));
 		// --------------------------------
 
 		// --- Debug SQL
@@ -512,12 +455,12 @@ switch($action) {
 			$sb_consent_policy = trim((string) ($_POST['consent_policy'] ?? ''));
 			if ($sb_consent_policy !== '' && !preg_match('#^(https?://|/)[^\s"\'<>\\\\]*$#i', $sb_consent_policy)) $sb_consent_policy = '';
 			$sb_consent_policy = $sbsanitize->displayText($sb_consent_policy, 'UTF-8', 1, 0);
-			$sbsql->query("INSERT INTO $table (config, content) VALUES ('plugin-consent-policy', '$sb_consent_policy') ON DUPLICATE KEY UPDATE content = VALUES(content)");
+			sbConfigWrite(array('plugin-consent-policy' => $sb_consent_policy), true);
 			
 			// --- EDIT
 			// UPDATE DATAS
 			$query  = "UPDATE $table SET content = '$plugins' WHERE config = 'plugins'";
-			$result = $sbsql->query($query);
+			$result = sbConfigWrite(array('plugins' => $plugins));
 			if ($result) {
 				// --- Message SUCCES
 				$sb_msg_valid = 'Plugins modifiés avec succès';
@@ -535,10 +478,7 @@ switch($action) {
 		// --- Recuperation des donnees
 		// --------------------------------
 		$query = "SELECT content FROM $table WHERE config = 'plugins'";
-		$request = $sbsql->query($query);
-		$assoc   = $sbsql->assoc($request);
-		// --------------------------------
-		$plugins = explode("|", $assoc['content']);
+		$plugins = explode("|", (string) sbDb()->value("SELECT content FROM {sb_config} WHERE config = 'plugins'"));
 		// --------------------------------
 
 		// --- Debug SQL
@@ -614,7 +554,7 @@ switch($action) {
 		// --------------------------------
 		// --- Bandeau de consentement : politique de confidentialité
 		// --------------------------------
-		$sb_consent_row = $sbsql->assoc($sbsql->query("SELECT content FROM $table WHERE config = 'plugin-consent-policy'"));
+		$sb_consent_row = array('content' => sbDb()->value("SELECT content FROM {sb_config} WHERE config = 'plugin-consent-policy'"));
 		$sbform->addAnything('<div style="clear: both;"></div>');
 		$sbform->addInput('text', 'Bandeau de consentement : page « Politique de confidentialité »', array('name' => 'consent_policy', 'value' => html_entity_decode((string) ($sb_consent_row['content'] ?? ''), ENT_QUOTES, 'UTF-8'), 'placeholder' => 'https://votresite.fr/confidentialite ou /confidentialite'), false, false, "Facultatif. Lien affiché dans le bandeau et dans la fenêtre « Gérer les cookies ».");
 		// --------------------------------
@@ -653,28 +593,13 @@ switch($action) {
 			
 			// --- EDIT
 			// UPDATE DATAS
-			$query_keywords                 = "UPDATE $table SET content = '$seo_keywords' WHERE config = 'seo-keywords'";
-			$query_description              = "UPDATE $table SET content = '$seo_description' WHERE config = 'seo-description'";
-			$query_robots                   = "UPDATE $table SET content = '$seo_robots' WHERE config = 'seo-robots'";
-			$query_rating                   = "UPDATE $table SET content = '$seo_rating' WHERE config = 'seo-rating'";
-			$query_author                   = "UPDATE $table SET content = '$seo_author' WHERE config = 'seo-author'";
-			$query_copyright                = "UPDATE $table SET content = '$seo_copyright' WHERE config = 'seo-copyright'";
-			$query_generator                = "UPDATE $table SET content = '$seo_generator' WHERE config = 'seo-generator'";
-			$query_google_site_verification = "UPDATE $table SET content = '$seo_google_site_verification' WHERE config = 'seo-google-site-verification'";
-			$query_google_analytics         = "UPDATE $table SET content = '$seo_google_analytics' WHERE config = 'seo-google-analytics'";
+			$query = "UPDATE $table SET content WHERE config = 'seo-...'";
+			$sb_seo_values = array();
+			foreach (array('keywords', 'description', 'robots', 'rating', 'author', 'copyright', 'generator', 'google_site_verification', 'google_analytics') as $sb_seo_name) {
+				$sb_seo_values['seo-' . str_replace('_', '-', $sb_seo_name)] = ${'seo_' . $sb_seo_name};
+			}
 			
-			$result_keywords                 = $sbsql->query($query_keywords);			
-			$result_description              = $sbsql->query($query_description);
-			$result_robots                   = $sbsql->query($query_robots);
-			$result_rating                   = $sbsql->query($query_rating);
-			$result_author                   = $sbsql->query($query_author);
-			$result_copyright                = $sbsql->query($query_copyright);
-			$result_generator                = $sbsql->query($query_generator);
-			$result_google_site_verification = $sbsql->query($query_google_site_verification);
-			$result_google_analytics         = $sbsql->query($query_google_analytics );
-			
-			
-			if ($result_keywords && $result_description && $result_robots && $result_rating && $result_author && $result_copyright && $result_generator && $result_google_site_verification && $result_google_analytics) {
+			if (sbConfigWrite($sb_seo_values)) {
 				// --- Message SUCCES
 				if ($ga_refused) $sb_msg_error = 'SEO modifié, mais identifiant Google Analytics refusé (attendu : G-XXXXXXXXXX, Google Analytics 4) : champ vidé';
 				else $sb_msg_valid = 'SEO modifié avec succès';
@@ -691,10 +616,8 @@ switch($action) {
 		// --------------------------------
 		// --- Recuperation des donnees
 		// --------------------------------
-		$query = "SELECT config, content FROM $table WHERE config LIKE 'seo-%'
-														";
-		$request = $sbsql->query($query);
-		$assoc   = $sbsql->toarray($request);
+		$query = "SELECT config, content FROM {sb_config} WHERE config LIKE 'seo-%'";
+		$assoc = sbDb()->all($query) ?: array();
 		// --------------------------------
 		foreach($assoc as $row) {
 			$cs[$row['config']] = sb_utf8_encode($row['content']);

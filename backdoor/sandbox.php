@@ -196,8 +196,8 @@ switch($action) {
 		// Action DELETE
 		if ($action == 'del') {
 			$get_id   = intval($_GET['id'] ?? 0);
-			$query_2  = "DELETE FROM $table WHERE id = '$get_id'";
-			$request  = $sbsql->query($query_2);
+			$query_2  = "DELETE FROM $table WHERE id = $get_id";
+			$request  = sbDb()->delete('sb_sandbox', 'id = ?', array($get_id)) !== false;
 			
 			if ($request)
 				$sb_msg_valid = 'Enregistrement supprimé avec succès';
@@ -211,8 +211,7 @@ switch($action) {
 		
 		// Contents table
 		$query     = "SELECT * FROM $table";
-		$request2  = $sbsql->query($query);
-		$result2   = $sbsql->toarray($request2);
+		$result2   = sbDb()->all("SELECT * FROM {sb_sandbox}") ?: array();
 		
 		$sbsmarty->assign('all', true);
 		$sbsmarty->assign('allsandbox', $result2);
@@ -279,34 +278,23 @@ switch($action) {
 
 			if (!$tags) $tags = '';
 
-			// Échappement SQL - absent jusqu'ici sur tout ce bloc (aucun
-			// escape_string() nulle part), risque d'injection et requête
-			// cassée dès qu'une valeur contient une apostrophe.
-			$yourname_esc          = $sbsql->escape_string($yourname);
-			$montant_esc           = $sbsql->escape_string($montant);
-			$seo_url_esc           = $sbsql->escape_string($seo_url);
-			$country_esc           = $sbsql->escape_string($country);
-			$dob_esc               = $sbsql->escape_string($dob);
-			$color_esc             = $sbsql->escape_string($color);
-			$hour_esc              = $sbsql->escape_string($hour);
-			$tags_esc              = $sbsql->escape_string($tags);
-			$pdf_esc                = $sbsql->escape_string($pdf);
-			$photo_esc              = $sbsql->escape_string($photo);
-			$video_esc              = $sbsql->escape_string($video);
-			$type_esc               = $sbsql->escape_string($type);
-			$selection_table_esc    = $sbsql->escape_string($selection_table);
-			$comment_esc            = $sbsql->escape_string($comment);
-			$comment_ckeditor1_esc  = $sbsql->escape_string($comment_ckeditor1);
-			$comment_ckeditor2_esc  = $sbsql->escape_string($comment_ckeditor2);
-			$comment_ckeditor3_esc  = $sbsql->escape_string($comment_ckeditor3);
-			$page_builder_content_esc = $sbsql->escape_string($page_builder_content);
+			// Valeurs liées (requête préparée) : jamais concaténées au SQL
+			$sb_sandbox_data = array(
+				'active' => (string) $active, 'yourname' => (string) $yourname, 'montant' => (string) $montant, 'seo_url' => (string) $seo_url,
+				'country' => (string) $country, 'dob' => (string) $dob, 'color' => (string) $color, 'hour' => (string) $hour, 'tags' => (string) $tags,
+				'pdf' => (string) $pdf, 'photo' => (string) $photo, 'video' => (string) $video,
+				'option_one' => (string) $option_one, 'option_two' => (string) $option_two, 'option_three' => (string) $option_three,
+				'type' => (string) $type, 'selection' => (string) $selection_table, 'comment' => (string) $comment,
+				'comment_editor1' => (string) $comment_ckeditor1, 'comment_editor2' => (string) $comment_ckeditor2, 'comment_editor3' => (string) $comment_ckeditor3,
+				'page_builder_content' => (string) $page_builder_content,
+			);
 
 			// Réaffichage du formulaire dans la même requête après soumission
 			// (pas de redirection HTTP : "add" échoué et "edit" ne vident
 			// jamais les champs, voir plus bas) : $page_builder_content
 			// ci-dessus est encore la version encodée en entités pour le
 			// stockage (displayText()), déjà capturée dans
-			// $page_builder_content_esc pour la requête SQL - on peut donc
+			// $sb_sandbox_data pour la requête SQL - on peut donc
 			// la re-décoder sans risque pour redonner à addPageBuilder() du
 			// HTML brut, exactement comme le fait le bloc GET plus bas
 			// (html_entity_decode(sb_utf8_encode(...))). Sans ce re-décodage,
@@ -319,9 +307,8 @@ switch($action) {
 
 			// ADD or EDIT
 			if ($formType == 'add') {
-				$query = "INSERT INTO $table (active, yourname, montant, seo_url, country, dob, color, hour, tags, pdf, photo, video, option_one, option_two, option_three, type, selection, comment, comment_editor1, comment_editor2, comment_editor3, page_builder_content, sort)
-						  VALUES ('$active','$yourname_esc','$montant_esc','$seo_url_esc','$country_esc','$dob_esc','$color_esc','$hour_esc','$tags_esc','$pdf_esc','$photo_esc','$video_esc','$option_one','$option_two','$option_three','$type_esc','$selection_table_esc','$comment_esc','$comment_ckeditor1_esc','$comment_ckeditor2_esc','$comment_ckeditor3_esc','$page_builder_content_esc','0')";
-				$result_add = $sbsql->query($query);
+				$query = "INSERT INTO $table (" . implode(', ', array_keys($sb_sandbox_data)) . ", sort)";
+				$result_add = sbDb()->insert('sb_sandbox', $sb_sandbox_data + array('sort' => 0)) !== false;
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$yourname = $montant = $seo_url = $country = $dob = $color = $hour = $tags = $pdf = $photo = $video = $selection_table = $comment = $comment_ckeditor1 = $comment_ckeditor2 = $comment_ckeditor3 = $page_builder_content = $type = '';
@@ -336,31 +323,8 @@ switch($action) {
 			} elseif ($formType == 'edit' && $id > 0) {
 
 				// UPDATE DATAS
-				$query = "UPDATE $table SET active = '$active'
-											 ,yourname = '$yourname_esc'
-											 ,montant = '$montant_esc'
-											 ,seo_url = '$seo_url_esc'
-											 ,country = '$country_esc'
-											 ,dob = '$dob_esc'
-											 ,color = '$color_esc'
-											 ,hour = '$hour_esc'
-											 ,tags = '$tags_esc'
-											 ,pdf = '$pdf_esc'
-											 ,photo = '$photo_esc'
-											 ,video = '$video_esc'
-											 ,option_one = '$option_one'
-											 ,option_two = '$option_two'
-											 ,option_three = '$option_three'
-											 ,type = '$type_esc'
-											 ,selection = '$selection_table_esc'
-											 ,comment = '$comment_esc'
-											 ,comment_editor1 = '$comment_ckeditor1_esc'
-											 ,comment_editor2 = '$comment_ckeditor2_esc'
-											 ,comment_editor3 = '$comment_ckeditor3_esc'
-											 ,page_builder_content = '$page_builder_content_esc'
-											 WHERE id = '$id'";
-
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table SET " . implode(', ', array_keys($sb_sandbox_data)) . " WHERE id = $id";
+				$result_edit = sbDb()->update('sb_sandbox', $sb_sandbox_data, 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -387,8 +351,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id                = intval($_GET['id'] ?? 0);
 			$query_1           = "SELECT * FROM $table WHERE id = $id";
-			$requestQ          = $sbsql->query($query_1);
-			$assoc             = $sbsql->assoc($requestQ);
+			$assoc             = sbDb()->row("SELECT * FROM {sb_sandbox} WHERE id = ?", array($id)) ?: array();
 			$active            = $assoc['active'];
 			$yourname          = sb_utf8_encode($assoc['yourname']);
 			$montant           = sb_utf8_encode($assoc['montant']);
@@ -629,7 +592,7 @@ switch($action) {
 				// --- brut dans le WHERE (les actions de tri ne passent pas par le jeton
 				// --- CSRF de openForm(), voir index.php).
 				$query_sort  = "UPDATE $table SET sort = $i WHERE id = " . intval($sb_toSort[$i]);
-				$result_sort = $sbsql->query($query_sort);
+				$result_sort = sbDb()->update('sb_sandbox', array('sort' => $i), 'id = ?', array(intval($sb_toSort[$i]))) !== false;
 				if (!$result_sort) {
 					// --- Error Database
 					$sql_error++;
@@ -649,8 +612,7 @@ switch($action) {
 		// --- Recuperation des donnees
 		$id            = intval($_GET['id'] ?? 0);
 		$query_3       = "SELECT * FROM $table WHERE active = '1' ORDER BY sort ASC";
-		$requestQ      = $sbsql->query($query_3);
-		$sort_array    = $sbsql->toarray($requestQ);
+		$sort_array    = sbDb()->all("SELECT * FROM {sb_sandbox} WHERE active = '1' ORDER BY sort ASC") ?: array();
 		foreach($sort_array as $sort) {
 			$sort_id          = $sort['id'];
 			$toSort[$sort_id] = sb_utf8_encode($sort['yourname']);

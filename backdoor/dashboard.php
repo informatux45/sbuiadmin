@@ -159,8 +159,8 @@ switch ($action) {
 		// Action DELETE
 		if ($action == 'del') {
 			$get_id  = intval($_GET['id'] ?? 0);
-			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
-			$request = $sbsql->query($query_2);
+			$query_2 = "DELETE FROM $table WHERE id = $get_id";
+			$request = sbDb()->delete('sb_dashboard_widgets', 'id = ?', array($get_id)) !== false;
 
 			if ($request)
 				$sb_msg_valid = $text . ' supprimé avec succès';
@@ -172,16 +172,16 @@ switch ($action) {
 		// immédiat (pas de glisser-déposer, juste ↑/↓ sur chaque ligne).
 		if ($action == 'up' || $action == 'down') {
 			$get_id  = intval($_GET['id'] ?? 0);
-			$current = $sbsql->assoc($sbsql->query("SELECT id, position FROM $table WHERE id = '$get_id'"));
+			$current = sbDb()->row("SELECT id, position FROM {sb_dashboard_widgets} WHERE id = ?", array($get_id));
 
 			if ($current) {
 				$op       = ($action == 'up') ? '<' : '>';
 				$order    = ($action == 'up') ? 'DESC' : 'ASC';
-				$neighbor = $sbsql->assoc($sbsql->query("SELECT id, position FROM $table WHERE position $op '" . intval($current['position']) . "' ORDER BY position $order LIMIT 1"));
+				$neighbor = sbDb()->row("SELECT id, position FROM {sb_dashboard_widgets} WHERE position $op ? ORDER BY position $order LIMIT 1", array(intval($current['position'])));
 
 				if ($neighbor) {
-					$sbsql->query("UPDATE $table SET position = '" . intval($neighbor['position']) . "' WHERE id = '" . intval($current['id']) . "'");
-					$sbsql->query("UPDATE $table SET position = '" . intval($current['position']) . "' WHERE id = '" . intval($neighbor['id']) . "'");
+					sbDb()->update('sb_dashboard_widgets', array('position' => intval($neighbor['position'])), 'id = ?', array(intval($current['id'])));
+					sbDb()->update('sb_dashboard_widgets', array('position' => intval($current['position'])), 'id = ?', array(intval($neighbor['id'])));
 				}
 			}
 		}
@@ -192,8 +192,7 @@ switch ($action) {
 
 		// Contents table
 		$query_0  = "SELECT * FROM $table ORDER BY position ASC";
-		$request0 = $sbsql->query($query_0);
-		$result0  = $sbsql->toarray($request0);
+		$result0  = sbDb()->all("SELECT * FROM {sb_dashboard_widgets} ORDER BY position ASC") ?: array();
 		foreach ($result0 as &$sb_row) {
 			// Affichage liste uniquement : "location" est stockée
 			// "Ville|lat|lon" (voir sbGeocodeCity()), seule la ville est utile ici.
@@ -425,27 +424,30 @@ switch ($action) {
 			}
 
 			if ($sb_valid) {
-				$type_esc         = $sbsql->escape_string($type);
-				$table_name_esc   = $sbsql->escape_string($table_name);
-				$value_column_esc = $sbsql->escape_string($value_column);
-				$date_column_esc  = $sbsql->escape_string($date_column);
-				$widget_key_esc   = $sbsql->escape_string($widget_key);
-				$location_esc     = $sbsql->escape_string($location);
-				$content_esc      = $sbsql->escape_string($content);
-				$widget_title_esc = $sbsql->escape_string($widget_title);
-				$link_esc         = $sbsql->escape_string($link);
-				$icon_esc         = $sbsql->escape_string($icon);
-				$color_esc        = $sbsql->escape_string($color);
+				$sb_widget_data = array(
+					'type'         => (string) $type,
+					'table_name'   => (string) $table_name,
+					'value_column' => (string) $value_column,
+					'date_column'  => (string) $date_column,
+					'widget_key'   => (string) $widget_key,
+					'location'     => (string) $location,
+					'content'      => (string) $content,
+					'title'        => (string) $widget_title,
+					'link'         => (string) $link,
+					'icon'         => (string) $icon,
+					'color'        => (string) $color,
+					'show_chart'   => (string) $show_chart,
+					'active'       => (string) $active,
+				);
 
 				// ADD or EDIT
 				if ($formType == 'add') {
 					// Prochaine position libre (à la suite des widgets existants)
-					$row_next_pos  = $sbsql->assoc($sbsql->query("SELECT MAX(position) AS maxpos FROM $table"));
-					$next_position = (($row_next_pos && $row_next_pos['maxpos'] !== null) ? intval($row_next_pos['maxpos']) : -1) + 1;
+					$sb_max_pos    = sbDb()->value("SELECT MAX(position) FROM {sb_dashboard_widgets}");
+					$next_position = (($sb_max_pos !== null && $sb_max_pos !== false) ? intval($sb_max_pos) : -1) + 1;
 
-					$query = "INSERT INTO $table (position, type, table_name, value_column, date_column, widget_key, location, content, title, link, icon, color, show_chart, active)
-							  VALUES ('$next_position','$type_esc','$table_name_esc','$value_column_esc','$date_column_esc','$widget_key_esc','$location_esc','$content_esc','$widget_title_esc','$link_esc','$icon_esc','$color_esc','$show_chart','$active')";
-					$result_add = $sbsql->query($query);
+					$query = "INSERT INTO $table (position, " . implode(', ', array_keys($sb_widget_data)) . ")";
+					$result_add = sbDb()->insert('sb_dashboard_widgets', array('position' => $next_position) + $sb_widget_data) !== false;
 					if ($result_add) {
 						// --- Vider les champs du formulaire
 						$table_name = $value_column = $date_column = $widget_key = $city_input = $content_html = $content_text = $rss_url = $rss_count = $iframe_url = $log_filename = $log_lines = $logaccess_count = $widget_title = $link = $icon = $module_widget = $mw_width = '';
@@ -459,21 +461,8 @@ switch ($action) {
 					}
 
 				} elseif ($formType == 'edit' && $id > 0) {
-					$query = "UPDATE $table SET type = '$type_esc'
-																	,table_name = '$table_name_esc'
-																	,value_column = '$value_column_esc'
-																	,date_column = '$date_column_esc'
-																	,widget_key = '$widget_key_esc'
-																	,location = '$location_esc'
-																	,content = '$content_esc'
-																	,title = '$widget_title_esc'
-																	,link = '$link_esc'
-																	,icon = '$icon_esc'
-																	,color = '$color_esc'
-																	,show_chart = '$show_chart'
-																	,active = '$active'
-																	WHERE id = '$id'";
-					$result_edit = $sbsql->query($query);
+					$query = "UPDATE $table SET " . implode(', ', array_keys($sb_widget_data)) . " WHERE id = $id";
+					$result_edit = sbDb()->update('sb_dashboard_widgets', $sb_widget_data, 'id = ?', array($id)) !== false;
 					if ($result_edit) {
 						// --- On ne vide pas les champs du formulaire
 						// --- Message SUCCES
@@ -501,8 +490,7 @@ switch ($action) {
 			// --- Recuperation des donnees
 			$id       = intval($_GET['id'] ?? 0);
 			$query_1  = "SELECT * FROM $table WHERE id = $id";
-			$requestQ = $sbsql->query($query_1);
-			$assoc    = $sbsql->assoc($requestQ);
+			$assoc    = sbDb()->row("SELECT * FROM {sb_dashboard_widgets} WHERE id = ?", array($id)) ?: array();
 			$type         = $assoc['type'];
 			$table_name   = $assoc['table_name'];
 			$value_column = $assoc['value_column'];

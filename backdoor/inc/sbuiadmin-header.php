@@ -149,9 +149,7 @@ $sbsmarty->assign('sb_can_view_messages', $sb_can_view_messages);
 // ------------------
 $sbuiadmin_user_avatar = '';
 if ($sb_current_user_id > 0) {
-	$sb_avatar_result      = $sbsql->query("SELECT avatar FROM " . _AM_DB_PREFIX . "sb_users WHERE id = " . $sb_current_user_id);
-	$sb_avatar_row         = $sbsql->assoc($sb_avatar_result);
-	$sbuiadmin_user_avatar = ($sb_avatar_row) ? $sb_avatar_row['avatar'] : '';
+	$sbuiadmin_user_avatar = (string) sbDb()->value("SELECT avatar FROM {sb_users} WHERE id = ?", array($sb_current_user_id));
 }
 $sbsmarty->assign('sbuiadmin_user_avatar', $sbuiadmin_user_avatar);
 // ------------------
@@ -162,9 +160,7 @@ $sbsmarty->assign('sbuiadmin_user_avatar', $sbuiadmin_user_avatar);
 // ------------------
 $sb_unread_messages = 0;
 if ($sb_can_view_messages) {
-	$sb_unread_result = $sbsql->query("SELECT COUNT(*) AS cpt FROM " . _AM_DB_PREFIX . "sb_messages WHERE recipient_id = " . $sb_current_user_id . " AND read_at = 0");
-	$sb_unread_row    = $sbsql->assoc($sb_unread_result);
-	$sb_unread_messages = ($sb_unread_row) ? intval($sb_unread_row['cpt']) : 0;
+	$sb_unread_messages = (int) sbDb()->value("SELECT COUNT(*) FROM {sb_messages} WHERE recipient_id = ? AND read_at = 0", array($sb_current_user_id));
 }
 $sbsmarty->assign('sb_unread_messages', $sb_unread_messages);
 // ------------------
@@ -175,10 +171,7 @@ $sbsmarty->assign('sb_unread_messages', $sb_unread_messages);
 // ------------------
 $sb_messages_preview = array();
 if ($sb_can_view_messages) {
-	$sb_msg_table_prev = _AM_DB_PREFIX . "sb_messages";
-
-	$sb_preview_result = $sbsql->query("SELECT * FROM $sb_msg_table_prev WHERE sender_id = $sb_current_user_id OR recipient_id = $sb_current_user_id ORDER BY created_at DESC LIMIT 300");
-	$sb_preview_rows   = $sbsql->toarray($sb_preview_result);
+	$sb_preview_rows = sbDb()->all("SELECT * FROM {sb_messages} WHERE sender_id = ? OR recipient_id = ? ORDER BY created_at DESC LIMIT 300", array($sb_current_user_id, $sb_current_user_id)) ?: array();
 
 	$sb_preview_conv = array();
 	foreach ($sb_preview_rows as $sb_prow) {
@@ -202,10 +195,10 @@ if ($sb_can_view_messages) {
 	})), 0, 5);
 
 	if (!empty($sb_preview_conv)) {
-		$sb_other_ids_list = implode(',', array_map('intval', array_column($sb_preview_conv, 'other_id')));
-		$sb_preview_users_result = $sbsql->query("SELECT id, username FROM " . _AM_DB_PREFIX . "sb_users WHERE id IN ($sb_other_ids_list)");
+		$sb_other_ids = array_map('intval', array_column($sb_preview_conv, 'other_id'));
+		$sb_preview_users = sbDb()->all("SELECT id, username FROM {sb_users} WHERE id IN (" . implode(',', array_fill(0, count($sb_other_ids), '?')) . ")", $sb_other_ids);
 		$sb_preview_users_by_id  = array();
-		foreach ($sbsql->toarray($sb_preview_users_result) as $sb_pu) {
+		foreach ($sb_preview_users ?: array() as $sb_pu) {
 			$sb_preview_users_by_id[$sb_pu['id']] = $sb_pu['username'];
 		}
 

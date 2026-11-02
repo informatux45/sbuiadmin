@@ -63,8 +63,7 @@ switch($action) {
 		
 		// Contents table
 		$query     = "SELECT * FROM $table ORDER BY logaccess_date DESC, id DESC";
-		$request2  = $sbsql->query($query);
-		$result2   = $sbsql->toarray($request2);
+		$result2   = sbDb()->all("SELECT * FROM {sb_logaccess} ORDER BY logaccess_date DESC, id DESC") ?: array();
 		
 		$sbsmarty->assign('all', true);
 		$sbsmarty->assign('allaccess', $result2);

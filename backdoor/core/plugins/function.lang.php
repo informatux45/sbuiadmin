@@ -12,20 +12,17 @@
  */
 function smarty_function_lang($params, Smarty_Internal_Template $template) {
     // Global include CLASS File (SQL)
-	global $sbsql, $sbsanitize;
+	global $sbsanitize;
 	
 	// Initialize
 	$i18n_debug = false;
 	$i18n_txt   = $params['i18n'];
 	$i18n_lang  = (isset($params['l'])) ? $params['l'] : $_SESSION['lang'];
 	$i18n_cat   = (isset($params['category'])) ? $params['category'] : 'general';
-	$i18n_table = _AM_DB_PREFIX . 'sb_i18n'; 
 	
-	// Search if entry exists
-	$i18_search = $sbsanitize->addSlashes($sbsanitize->addSlashes($sbsanitize->htmlEntities($i18n_txt)));
-	$query      = "SELECT json FROM $i18n_table WHERE i18n = '$i18_search'";
-	$request    = $sbsql->query($query);
-	$result     = $sbsql->assoc($request);
+	// Search if entry exists (clé stockée telle qu'avant : entités + antislashs)
+	$i18_search = $sbsanitize->addSlashes($sbsanitize->htmlEntities($i18n_txt));
+	$result     = sbDb()->row("SELECT json FROM {sb_i18n} WHERE i18n = ?", array($i18_search));
 	if ($result) {
 		// ------------------------------------
 		// If result - Extract JSON (i18n_lang)
@@ -42,11 +39,10 @@ function smarty_function_lang($params, Smarty_Internal_Template $template) {
 		// ------------------------------------
 		// No result - Create entry
 		// ------------------------------------
-		$query_create   = 'INSERT INTO '.$i18n_table.' (i18n, category, json) VALUES (\''.$i18_search.'\', \''.$i18n_cat.'\', \'{"'.$i18n_lang.'": "'.$i18_search.'"}\')';
-		$request_create = $sbsql->query($query_create);
+		sbDb()->insert('sb_i18n', array('i18n' => $i18_search, 'category' => (string) $i18n_cat, 'json' => '{"' . $i18n_lang . '": "' . $i18_search . '"}'));
 		$i18n_result    = $i18n_txt;
 		// --- Debug
-		if ($i18n_debug) $i18n_result = "Error: ".$sbsql->error();
+		if ($i18n_debug) $i18n_result = "Error: " . sbDb()->error();
 		// ------------------------------------
 	}
 	

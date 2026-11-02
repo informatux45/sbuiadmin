@@ -238,13 +238,19 @@ function sbServerPhp() {
 	);
 }
 
-/** Fiche base de données (MySQL / MariaDB) */
-function sbServerDb($sbsql) {
+/** Fiche base de données (MySQL / MariaDB ou SQLite) ; argument gardé pour l'ancien appel */
+function sbServerDb($sbsql = null) {
 	$out = array('version' => null, 'size' => null, 'tables' => null);
-	$r = @$sbsql->query("SELECT VERSION() AS v");
-	if ($r && ($row = $sbsql->assoc($r))) $out['version'] = $row['v'];
-	$r = @$sbsql->query("SELECT COUNT(*) AS n, SUM(data_length + index_length) AS s FROM information_schema.TABLES WHERE table_schema = DATABASE()");
-	if ($r && ($row = $sbsql->assoc($r))) { $out['tables'] = (int) $row['n']; $out['size'] = (int) $row['s']; }
+	$db  = sbDb();
+	if (!$db) return $out;
+	$out['version'] = $db->serverVersion() ?: null;
+	if ($db->driver() === 'sqlite') {
+		$out['tables'] = count($db->tables());
+		$out['size']   = (int) $db->value("PRAGMA page_count") * (int) $db->value("PRAGMA page_size");
+	} elseif ($row = $db->row("SELECT COUNT(*) AS n, SUM(data_length + index_length) AS s FROM information_schema.TABLES WHERE table_schema = DATABASE()")) {
+		$out['tables'] = (int) $row['n'];
+		$out['size']   = (int) $row['s'];
+	}
 	return $out;
 }
 
