@@ -58,8 +58,8 @@ switch($action) {
 		// Action DELETE
 		if ($action == 'del') {
 			$get_id  = intval($_GET['id'] ?? 0);
-			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
-			$request = $sbsql->query($query_2);
+			$query_2 = "DELETE FROM $table WHERE id = $get_id";
+			$request = sbDb()->delete('sb_gallery', 'id = ?', array($get_id)) !== false;
 			
 			if ($request)
 				$sb_msg_valid = $text . ' supprimée avec succès';
@@ -75,8 +75,7 @@ switch($action) {
 		$query     = "SELECT t1.*, COUNT(t2.id) AS cpt_img
 					  FROM $table AS t1
 					  LEFT JOIN $table_photo AS t2 ON (t1.id = t2.gid) GROUP BY t1.id";
-		$request2  = $sbsql->query($query);
-		$result2   = $sbsql->toarray($request2);
+		$result2   = sbDb()->all($query) ?: array();
 		
 		$sbsmarty->assign('all', true);
 		$sbsmarty->assign('allgallery', $result2);
@@ -97,8 +96,8 @@ switch($action) {
 		// Action DELETE photo
 		if ($action == 'delphoto') {
 			$get_id  = intval($_GET['id'] ?? 0);
-			$query_5 = "DELETE FROM $table_photo WHERE id = '$get_id'";
-			$request = $sbsql->query($query_5);
+			$query_5 = "DELETE FROM $table_photo WHERE id = $get_id";
+			$request = sbDb()->delete('sb_gallery_photos', 'id = ?', array($get_id)) !== false;
 			
 			if ($request)
 				$sb_msg_valid = $text . ' supprimé avec succès';
@@ -113,9 +112,8 @@ switch($action) {
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		
 		// Contents table
-		$query_4  = "SELECT * FROM $table_photo WHERE gid = '$gid'";
-		$request2 = $sbsql->query($query_4);
-		$result2  = $sbsql->toarray($request2);
+		$query_4  = "SELECT * FROM $table_photo WHERE gid = " . intval($gid);
+		$result2  = sbDb()->all("SELECT * FROM {sb_gallery_photos} WHERE gid = ?", array(intval($gid))) ?: array();
 		
 		$sbsmarty->assign('allphoto', $result2);
 		
@@ -169,9 +167,8 @@ switch($action) {
 			if ($formType == 'edit' && $id > 0 && !$editor_ran && $editors_void) {
 
 				// --- Relecture pour réafficher l'existant plutôt que du vide
-				$query          = "SELECT title, css, javascript, template, active FROM $table WHERE id = '$id'";
-				$requestCurrent = $sbsql->query($query);
-				$assocCurrent   = $sbsql->assoc($requestCurrent);
+				$query          = "SELECT title, css, javascript, template, active FROM $table WHERE id = $id";
+				$assocCurrent   = sbDb()->row("SELECT title, css, javascript, template, active FROM {sb_gallery} WHERE id = ?", array($id)) ?: array();
 				$css            = isset($assocCurrent['css'])        ? $assocCurrent['css']        : '';
 				$javascript     = isset($assocCurrent['javascript']) ? $assocCurrent['javascript'] : '';
 				$template       = isset($assocCurrent['template'])   ? $assocCurrent['template']   : '';
@@ -181,9 +178,8 @@ switch($action) {
 			// ADD or EDIT
 			} elseif ($formType == 'add') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table (title,css,javascript,template,active)
-						  VALUES ('$title','$css','$javascript','$template','$active')";
-				$result_add = $sbsql->query($query);
+				$query = "INSERT INTO $table (title,css,javascript,template,active)";
+				$result_add = sbDb()->insert('sb_gallery', array('title' => $title, 'css' => $css, 'javascript' => $javascript, 'template' => $template, 'active' => $active)) !== false;
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$title = $active = '';
@@ -196,14 +192,8 @@ switch($action) {
 
 			} elseif ($formType == 'edit' && $id > 0) {
 				// UPDATE DATAS
-				$query = "UPDATE $table SET title = '$title'
-				                           ,css = '$css'
-										   ,javascript = '$javascript'
-										   ,template = '$template'
-										   ,active = '$active'
-										   WHERE id = '$id'";
-											 
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table SET title, css, javascript, template, active WHERE id = $id";
+				$result_edit = sbDb()->update('sb_gallery', array('title' => $title, 'css' => $css, 'javascript' => $javascript, 'template' => $template, 'active' => $active), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -229,8 +219,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id         = intval($_GET['id'] ?? 0);
 			$query_1    = "SELECT * FROM $table WHERE id = $id";
-			$requestQ   = $sbsql->query($query_1);
-			$assoc      = $sbsql->assoc($requestQ);
+			$assoc      = sbDb()->row("SELECT * FROM {sb_gallery} WHERE id = ?", array($id)) ?: array();
 			$title      = sb_utf8_encode($assoc['title']);
 			$css        = sb_utf8_encode($assoc['css']);
 			$javascript = sb_utf8_encode($assoc['javascript']);
@@ -314,9 +303,8 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'photoadd') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table_photo (title,gid,photo,type,active,sort)
-						  VALUES ('$title','$gid','$media','$type','$active','0')";
-				$result_add = $sbsql->query($query);
+				$query = "INSERT INTO $table_photo (title,gid,photo,type,active,sort)";
+				$result_add = sbDb()->insert('sb_gallery_photos', array('title' => $title, 'gid' => $gid, 'photo' => $media, 'type' => $type, 'active' => $active, 'sort' => 0)) !== false;
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$title = $photo = $video = $type = $active = '';
@@ -329,14 +317,8 @@ switch($action) {
 
 			} elseif ($formType == 'photoedit' && $id > 0) {
 				// UPDATE DATAS
-				$query = "UPDATE $table_photo SET title = '$title'
-												 ,photo = '$media'
-												 ,type = '$type' 
-												 ,active = '$active'
-												 ,gid = '$gid'
-												 WHERE id = '$id'";
-											 
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table_photo SET title, photo, type, active, gid WHERE id = $id";
+				$result_edit = sbDb()->update('sb_gallery_photos', array('title' => $title, 'photo' => $media, 'type' => $type, 'active' => $active, 'gid' => $gid), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -362,8 +344,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id       = intval($_GET['id'] ?? 0);
 			$query_1  = "SELECT * FROM $table_photo WHERE id = $id";
-			$requestQ = $sbsql->query($query_1);
-			$assoc    = $sbsql->assoc($requestQ);
+			$assoc    = sbDb()->row("SELECT * FROM {sb_gallery_photos} WHERE id = ?", array($id)) ?: array();
 			$gid      = $assoc['gid'];
 			$title    = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), 'UTF-8', 1, 0);
 			$type     = $sbsanitize->displayLang(sb_utf8_encode($assoc['type']), 'UTF-8', 1, 0);
@@ -394,8 +375,7 @@ switch($action) {
 		// --- Choix du slider
 		// -----------------------------------
 		$query_gallery   = "SELECT id, title FROM $table";
-		$request_gallery = $sbsql->query($query_gallery);
-		$galleries       = $sbsql->toarray($request_gallery);
+		$galleries       = sbDb()->all($query_gallery) ?: array();
 		$sbform->openSelect("Choix de la galerie", array("id"=>"gid", "name"=>"gid"), true);
 		$sbform->addOption('Choisissez une galerie', array ("value"=>"", "selected"=>""));
 		foreach($galleries as $row) {
@@ -475,7 +455,7 @@ switch($action) {
 				// --- sinon brut dans le WHERE (les actions de tri ne passent pas par
 				// --- le jeton CSRF de openForm(), voir index.php).
 				$query_sort  = "UPDATE $table_photo SET sort = $tri WHERE id = " . intval($sb_toSort[$i]);
-				$result_sort = $sbsql->query($query_sort);
+				$result_sort = sbDb()->update('sb_gallery_photos', array('sort' => $tri), 'id = ?', array(intval($sb_toSort[$i]))) !== false;
 				if (!$result_sort) {
 					// --- Error Database
 					$sql_error++;
@@ -494,9 +474,8 @@ switch($action) {
 		
 		// --- Recuperation des donnees
 		$gid        = intval($_GET['gid'] ?? 0);
-		$query_3    = "SELECT * FROM $table_photo WHERE gid = '$gid' ORDER BY sort ASC";
-		$requestQ   = $sbsql->query($query_3);
-		$sort_array = $sbsql->toarray($requestQ);
+		$query_3    = "SELECT * FROM $table_photo WHERE gid = $gid ORDER BY sort ASC";
+		$sort_array = sbDb()->all("SELECT * FROM {sb_gallery_photos} WHERE gid = ? ORDER BY sort ASC", array($gid)) ?: array();
 		foreach($sort_array as $sort) {
 			$title  = $sbsanitize->displayText($sort['title'], 'UTF-8', 1, 0, 0, 0, 0, 1);
 			$active = ($sort['active']) ? $title : "<span style='color: red;'>" . $title . "</span>";

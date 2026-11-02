@@ -18,19 +18,18 @@ if (!defined('SB_PATH')) {
 */
 if (!function_exists("sbSearchSource_gallery")) {
 	function sbSearchSource_gallery($terms, $lang) {
-		global $sbsql;
 		$results   = array();
 		$hits      = array();
 		$t_gallery = sbSearchTable('sb_gallery');
 
-		$where   = sbSearchWhere(array('title'), $terms);
-		$request = $sbsql->query("SELECT id, title FROM {$t_gallery} WHERE active = '1'" . $where);
-		$rows    = $sbsql->toarray($request);
+		$bind    = array();
+		$where   = sbSearchWhere(array('title'), $terms, $bind);
+		$rows    = sbDb()->all("SELECT id, title FROM {$t_gallery} WHERE active = '1'" . $where, $bind);
 		if ($rows) foreach ($rows as $row) $hits[intval($row['id'])] = '';
 
-		$where   = sbSearchWhere(array('title'), $terms);
-		$request = $sbsql->query("SELECT gid, title FROM " . sbSearchTable('sb_gallery_photos') . " WHERE active = '1'" . $where);
-		$rows    = $sbsql->toarray($request);
+		$bind    = array();
+		$where   = sbSearchWhere(array('title'), $terms, $bind);
+		$rows    = sbDb()->all("SELECT gid, title FROM " . sbSearchTable('sb_gallery_photos') . " WHERE active = '1'" . $where, $bind);
 		if ($rows) foreach ($rows as $row) {
 			$gid = intval($row['gid']);
 			if (empty($hits[$gid])) $hits[$gid] = $row['title'];
@@ -38,8 +37,7 @@ if (!function_exists("sbSearchSource_gallery")) {
 
 		if (!empty($hits)) {
 			$in      = implode(',', array_map('intval', array_keys($hits)));
-			$request = $sbsql->query("SELECT id, title FROM {$t_gallery} WHERE active = '1' AND id IN ($in)");
-			$rows    = $sbsql->toarray($request);
+			$rows    = sbDb()->all("SELECT id, title FROM {$t_gallery} WHERE active = '1' AND id IN ($in)");
 			if ($rows) {
 				foreach ($rows as $row) {
 					if (!sbSearchMatches(array($row['title'], $hits[intval($row['id'])]), $terms)) continue;

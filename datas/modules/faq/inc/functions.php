@@ -20,20 +20,17 @@ if (!defined('SB_PATH')) {
  * return HTML
  */
 function shortcode_sbfaq($param = '') {
-	global $sbsanitize, $sbsql;
+	global $sbsanitize;
 
 	// --- Initialization
 	$item_html = '';
-	// --- Tables
-	$table = _AM_DB_PREFIX . 'sb_faq';
 
 	// --- SQL FAQ
 	$where = "active = '1'";
-	if (!empty($param['id'])) $where .= " AND category = '" . intval($param['id']) . "'";
+	$bind  = array();
+	if (!empty($param['id'])) { $where .= " AND category = ?"; $bind[] = intval($param['id']); }
 
-	$query   = "SELECT question, response FROM $table WHERE $where ORDER BY sort ASC";
-	$request = $sbsql->query($query);
-	$faqs    = $sbsql->toarray($request);
+	$faqs    = sbDb()->all("SELECT question, response FROM {sb_faq} WHERE $where ORDER BY sort ASC", $bind) ?: array();
 
 	// --- Check if FAQ exists
 	if ($faqs) {

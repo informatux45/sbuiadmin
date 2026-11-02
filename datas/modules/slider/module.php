@@ -15,8 +15,8 @@ return array(
 	'title'         => 'Sliders',
 	'icon'          => 'sliders', // Font Awesome (menu, carte Modules)
 	'description'   => "Diaporamas d'images et de vidéos (bxSlider), à insérer par code court ou en tête de page.",
-	'version'       => '1.0.1',
-	'requires_core' => '4.29',
+	'version'       => '1.0.2',
+	'requires_core' => '4.75',
 	'author'        => 'INFORMATUX',
 	'routes'        => array(),
 	'page_module'   => false,

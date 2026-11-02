@@ -38,18 +38,12 @@ function shortcode_sbgallery($param = '') {
 	// --- Id de galerie : toujours un entier, il vient du texte d'un contenu
 	$gid       = isset($param['id']) ? intval($param['id']) : 0;
 	if ($gid <= 0) return defined('_CMS_GALLERY_ITEMNOTFOUND') ? _CMS_GALLERY_ITEMNOTFOUND : '';
-	// --- Tables
-	$table = _AM_DB_PREFIX . 'sb_gallery';
-	$table_photos = _AM_DB_PREFIX . 'sb_gallery_photos';
 	// --- SQL Gallery
-	$query_item   = "SELECT t1.*, t2.title AS image_name, t2.photo AS image_photo, t2.type AS image_type
-					 FROM $table AS t1
-					 LEFT JOIN $table_photos AS t2 ON (t2.gid = t1.id)
-					 WHERE t1.id = '$gid' AND t2.active = '1' AND t1.active = '1'
-					 ORDER BY t2.sort ASC
-					 ";
-	$request_item = $sbsql->query($query_item);
-	$item_infos   = $sbsql->toarray($request_item);
+	$item_infos   = sbDb()->all("SELECT t1.*, t2.title AS image_name, t2.photo AS image_photo, t2.type AS image_type
+					 FROM {sb_gallery} AS t1
+					 LEFT JOIN {sb_gallery_photos} AS t2 ON (t2.gid = t1.id)
+					 WHERE t1.id = ? AND t2.active = '1' AND t1.active = '1'
+					 ORDER BY t2.sort ASC", array($gid)) ?: array();
 	// --- Check if news exists
 	if ($item_infos) {
 		// --- Check if new is active

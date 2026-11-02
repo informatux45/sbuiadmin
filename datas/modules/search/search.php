@@ -92,12 +92,12 @@ if ($sb_search_raw === '') {
 	// --------------------------------------------------
 	// --- 1. PAGES (titre + contenu)
 	// --------------------------------------------------
-	$where   = sbSearchWhere(array('title', 'content'), $sb_search_terms);
+	$bind    = array();
+	$where   = sbSearchWhere(array('title', 'content'), $sb_search_terms, $bind);
 	$query   = "SELECT id, menu, title, seo_url, url_custom, content
 				FROM {$module['tables']['pages']}
 				WHERE active = '1'" . $where . " ORDER BY sort ASC";
-	$request = $sbsql->query($query);
-	$rows    = $sbsql->toarray($request);
+	$rows    = sbDb()->all($query, $bind);
 	if ($rows) {
 		foreach ($rows as $row) {
 			// --- Le LIKE ne fait que degrossir : il travaille sur la forme

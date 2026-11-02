@@ -18,19 +18,18 @@ if (!defined('SB_PATH')) {
 */
 if (!function_exists("sbSearchSource_tabbs")) {
 	function sbSearchSource_tabbs($terms, $lang) {
-		global $sbsql;
 		$results = array();
 		$hits    = array();
 		$t_tabbs = sbSearchTable('sb_tabbs');
 
-		$where   = sbSearchWhere(array('name'), $terms);
-		$request = $sbsql->query("SELECT id, name FROM {$t_tabbs} WHERE active = '1'" . $where);
-		$rows    = $sbsql->toarray($request);
+		$bind    = array();
+		$where   = sbSearchWhere(array('name'), $terms, $bind);
+		$rows    = sbDb()->all("SELECT id, name FROM {$t_tabbs} WHERE active = '1'" . $where, $bind);
 		if ($rows) foreach ($rows as $row) $hits[intval($row['id'])] = '';
 
-		$where   = sbSearchWhere(array('title', 'content'), $terms);
-		$request = $sbsql->query("SELECT tid, title, content FROM " . sbSearchTable('sb_tabbs_tab') . " WHERE active = '1'" . $where);
-		$rows    = $sbsql->toarray($request);
+		$bind    = array();
+		$where   = sbSearchWhere(array('title', 'content'), $terms, $bind);
+		$rows    = sbDb()->all("SELECT tid, title, content FROM " . sbSearchTable('sb_tabbs_tab') . " WHERE active = '1'" . $where, $bind);
 		if ($rows) foreach ($rows as $row) {
 			$tid = intval($row['tid']);
 			// --- Concatenation de deux champs MULTILINGUES : sans danger ici car
@@ -41,8 +40,7 @@ if (!function_exists("sbSearchSource_tabbs")) {
 
 		if (!empty($hits)) {
 			$in      = implode(',', array_map('intval', array_keys($hits)));
-			$request = $sbsql->query("SELECT id, name FROM {$t_tabbs} WHERE active = '1' AND id IN ($in)");
-			$rows    = $sbsql->toarray($request);
+			$rows    = sbDb()->all("SELECT id, name FROM {$t_tabbs} WHERE active = '1' AND id IN ($in)");
 			if ($rows) {
 				foreach ($rows as $row) {
 					if (!sbSearchMatches(array($row['name'], $hits[intval($row['id'])]), $terms)) continue;
@@ -68,12 +66,10 @@ if (!function_exists("sbSearchSource_tabbs")) {
 */
 if (!function_exists("sbSearchHosts_tabbs")) {
 	function sbSearchHosts_tabbs($collect, array &$index) {
-		global $sbsql;
 		$query   = "SELECT tid, content
 					FROM " . sbSearchTable('sb_tabbs_tab') . "
 					WHERE active = '1' AND content LIKE '%[CS %'";
-		$request = $sbsql->query($query);
-		$rows    = $sbsql->toarray($request);
+		$rows    = sbDb()->all($query);
 		if ($rows) {
 			foreach ($rows as $row) {
 				$host = isset($index['sbtabbs'][intval($row['tid'])]) ? $index['sbtabbs'][intval($row['tid'])] : false;

@@ -15,8 +15,8 @@ return array(
 	'title'         => 'FAQ',
 	'icon'          => 'question-circle', // Font Awesome (menu, carte Modules)
 	'description'   => "Foire aux questions : questions et réponses classées par catégories, à insérer dans une page par code court.",
-	'version'       => '1.0.1',
-	'requires_core' => '4.29',
+	'version'       => '1.0.2',
+	'requires_core' => '4.75',
 	'author'        => 'INFORMATUX',
 	'routes'        => array(),
 	'page_module'   => false,

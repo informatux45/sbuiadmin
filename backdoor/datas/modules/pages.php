@@ -64,8 +64,8 @@ switch($action) {
 		// Action DELETE
 		if ($action == 'del') {
 			$get_id   = intval($_GET['id'] ?? 0);
-			$query_2  = "DELETE FROM $table WHERE id = '$get_id'";
-			$request  = $sbsql->query($query_2);
+			$query_2  = "DELETE FROM $table WHERE id = $get_id";
+			$request  = sbDb()->delete('sb_pages', 'id = ?', array($get_id)) !== false;
 			
 			if ($request)
 				$sb_msg_valid = 'Page supprimée avec succès';
@@ -79,8 +79,7 @@ switch($action) {
 		
 		// Contents table
 		$query     = "SELECT * FROM $table";
-		$request2  = $sbsql->query($query);
-		$result2   = $sbsql->toarray($request2);
+		$result2   = sbDb()->all($query) ?: array();
 		
 		$sbsmarty->assign('all', true);
 		$sbsmarty->assign('allpage', $result2);
@@ -158,9 +157,9 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'add') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table (menu,title,content,seo_url,url_custom,seo_keywords,seo_description,active,theme_view,module_view,various_view,headpage,photo,sort)
-						  VALUES ('$menu','$title','$content','$seo_url','$url_custom','$seo_keywords','$seo_description','$active','$theme_view','$module_view','$various_view','$headpage','$photo','0')";
-				$result_add = $sbsql->query($query);
+				$sb_page_data = array_map('strval', compact('menu', 'title', 'content', 'seo_url', 'url_custom', 'seo_keywords', 'seo_description', 'active', 'theme_view', 'module_view', 'various_view', 'headpage', 'photo'));
+				$query = "INSERT INTO $table (" . implode(',', array_keys($sb_page_data)) . ",sort)";
+				$result_add = sbDb()->insert('sb_pages', $sb_page_data + array('sort' => 0)) !== false;
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$menu_fr = $menu_en = $title_fr = $title_en = $content_fr = $content_en = $seo_url = $seo_keywords = $seo_description = $theme_view = $headpage = $photo = $module_view = $various_view = $active = '';
@@ -173,21 +172,10 @@ switch($action) {
 
 			} elseif ($formType == 'edit' && $id > 0) {
 				// UPDATE DATAS
-				$query = "UPDATE $table SET menu = '$menu'
-										   ,title = '$title'
-										   ,content = '$content'
-										   ,seo_url = '$seo_url'
-										   ,seo_keywords = '$seo_keywords'
-										   ,seo_description = '$seo_description'
-										   ,active = '$active'
-										   ,theme_view = '$theme_view'
-										   ,module_view = '$module_view'
-										   ,various_view = '$various_view'
-										   ,headpage = '$headpage'
-										   ,photo = '$photo'
-										   WHERE id = '$id'";
-											 
-				$result_edit = $sbsql->query($query);
+				// url_custom n'est pas modifié par ce formulaire
+				$sb_page_data = array_map('strval', compact('menu', 'title', 'content', 'seo_url', 'seo_keywords', 'seo_description', 'active', 'theme_view', 'module_view', 'various_view', 'headpage', 'photo'));
+				$query = "UPDATE $table SET " . implode(', ', array_keys($sb_page_data)) . " WHERE id = $id";
+				$result_edit = sbDb()->update('sb_pages', $sb_page_data, 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -223,8 +211,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id              = intval($_GET['id'] ?? 0);
 			$query_1         = "SELECT * FROM $table WHERE id = $id";
-			$requestQ        = $sbsql->query($query_1);
-			$assoc           = $sbsql->assoc($requestQ);
+			$assoc           = sbDb()->row("SELECT * FROM {sb_pages} WHERE id = ?", array($id)) ?: array();
 			$menu_fr         = $sbsanitize->displayLang(sb_utf8_encode($assoc['menu']));
 			$title_fr        = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']));
 			$content_fr      = $sbsanitize->displayLang(sb_utf8_encode($assoc['content']));
@@ -257,8 +244,7 @@ switch($action) {
 		// --- Assign theme headpage (sliders : uniquement si le module est installé)
 		if (!empty($theme['headpage']) && sbModuleActive('slider')) {
 			$query_slider   = "SELECT * FROM $table_slider WHERE active = '1' ORDER BY title ASC";
-			$request_slider = $sbsql->query($query_slider);
-			$slider_array   = $sbsql->toarray($request_slider);
+			$slider_array   = sbDb()->all($query_slider) ?: array();
 			$sbsmarty->assign('theme_headpage',  $slider_array);
 			$sbsmarty->assign('show_headpage', true);
 			$sbsmarty->assign('headpage', $headpage); // If edit
@@ -407,9 +393,9 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'addcustom') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table (menu,title,url_custom,active,sort)
-						  VALUES ('$menu','$menu','$url_custom','$active','0')";
-				$result_add = $sbsql->query($query);
+				$query = "INSERT INTO $table (menu,title,url_custom,active,sort)";
+				// Colonnes texte NOT NULL sans défaut : vides (sinon refus en mode strict)
+				$result_add = sbDb()->insert('sb_pages', array('menu' => $menu, 'title' => $menu, 'content' => '', 'seo_url' => '', 'url_custom' => $url_custom, 'seo_keywords' => '', 'seo_description' => '', 'active' => $active, 'theme_view' => '', 'module_view' => '', 'headpage' => '', 'sort' => 0)) !== false;
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$menu_fr = $menu_en = $url_custom = $active = '';
@@ -422,13 +408,8 @@ switch($action) {
 
 			} elseif ($formType == 'editcustom' && $id > 0) {
 				// UPDATE DATAS
-				$query = "UPDATE $table SET menu = '$menu'
-										   ,title = '$menu'
-										   ,url_custom = '$url_custom'
-										   ,active = '$active'
-										   WHERE id = '$id'";
-											 
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table SET menu, title, url_custom, active WHERE id = $id";
+				$result_edit = sbDb()->update('sb_pages', array('menu' => $menu, 'title' => $menu, 'url_custom' => $url_custom, 'active' => $active), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -454,8 +435,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id              = intval($_GET['id'] ?? 0);
 			$query_1         = "SELECT * FROM $table WHERE id = $id";
-			$requestQ        = $sbsql->query($query_1);
-			$assoc           = $sbsql->assoc($requestQ);
+			$assoc           = sbDb()->row("SELECT * FROM {sb_pages} WHERE id = ?", array($id)) ?: array();
 			$menu_fr         = $sbsanitize->displayLang(sb_utf8_encode($assoc['menu']));
 			// ---------------------------
 			$menu_en         = $sbsanitize->displayLang(sb_utf8_encode($assoc['menu']), 'en');

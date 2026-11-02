@@ -44,10 +44,7 @@ if (SBREWRITEURL && isset($_GET['id'])) {
 // --- Une clé est un jeton alphanumérique généré par sbGenerateRandKey()
 if ($key !== '' && preg_match('/^[A-Za-z0-9]+$/', $key)) {
 
-	$key_sql = $sbsql->escape_string($key);
-	$query   = "SELECT * FROM {$module['tables']['download']} WHERE active = '1' AND randkey = '$key_sql'";
-	$request = $sbsql->query($query);
-	$file    = $sbsql->assoc($request);
+	$file    = sbDb()->row("SELECT * FROM {sb_download} WHERE active = '1' AND randkey = ?", array($key));
 
 	if ($file) {
 		// --------------------------
@@ -62,8 +59,7 @@ if ($key !== '' && preg_match('/^[A-Za-z0-9]+$/', $key)) {
 		if ($file_path !== false && is_file($file_path) && strpos($file_path, $file_dir . DIRECTORY_SEPARATOR) === 0) {
 
 			// --- Compteur de téléchargements
-			$query_downloaded = "UPDATE {$module['tables']['download']} SET downloaded = downloaded + 1 WHERE randkey = '$key_sql'";
-			$sbsql->query($query_downloaded);
+			sbDb()->run("UPDATE {sb_download} SET downloaded = downloaded + 1 WHERE randkey = ?", array($key));
 
 			// --- Purge de tout ce qui aurait déjà été émis avant l'en-tête
 			while (ob_get_level() > 0) ob_end_clean();

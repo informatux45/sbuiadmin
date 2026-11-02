@@ -20,14 +20,14 @@ if (!defined('SB_PATH')) {
 */
 if (!function_exists("sbSearchSource_download")) {
 	function sbSearchSource_download($terms, $lang) {
-		global $sbsql, $sbsanitize;
+		global $sbsanitize;
 		$results = array();
-		$where   = sbSearchWhere(array('title', 'description'), $terms);
+		$bind    = array();
+		$where   = sbSearchWhere(array('title', 'description'), $terms, $bind);
 		$query   = "SELECT id, title, description, filename, randkey
 					FROM " . sbSearchTable('sb_download') . "
 					WHERE active = '1'" . $where . " ORDER BY id DESC";
-		$request = $sbsql->query($query);
-		$rows    = $sbsql->toarray($request);
+		$rows    = sbDb()->all($query, $bind);
 		if ($rows) {
 			foreach ($rows as $row) {
 				if (!sbSearchMatches(array($row['title'], $row['description']), $terms)) continue;

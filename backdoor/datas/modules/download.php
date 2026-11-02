@@ -57,8 +57,8 @@ switch($action) {
 		// Action DELETE
 		if ($action == 'del') {
 			$get_id  = intval($_GET['id'] ?? 0);
-			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
-			$request = $sbsql->query($query_2);
+			$query_2 = "DELETE FROM $table WHERE id = $get_id";
+			$request = sbDb()->delete('sb_download', 'id = ?', array($get_id)) !== false;
 			
 			if ($request)
 				$sb_msg_valid = $text . ' supprimé avec succès';
@@ -72,8 +72,7 @@ switch($action) {
 		
 		// Contents table
 		$query    = "SELECT * FROM $table";
-		$request2 = $sbsql->query($query);
-		$result2  = $sbsql->toarray($request2);
+		$result2  = sbDb()->all($query) ?: array();
 		
 		$sbsmarty->assign('all', true);
 		$sbsmarty->assign('alldownload', $result2);
@@ -82,18 +81,15 @@ switch($action) {
 		// --- Download infos
 		// ----------------------------------------
 		$query_download_total   = "SELECT SUM(downloaded) AS total_of_download FROM $table";
-		$request_download_total = $sbsql->query($query_download_total);
-		$numrows_download_total = $sbsql->assoc($request_download_total);
+		$numrows_download_total = sbDb()->row($query_download_total) ?: array('total_of_download' => null);
 		$sbsmarty->assign('total_downloads', $numrows_download_total['total_of_download']);
 		// ----------------------------------------
-		$query_download_active   = "SELECT id FROM $table WHERE active = '1'";
-		$request_download_active = $sbsql->query($query_download_active);
-		$numrows_download_active = $sbsql->numrows();
+		$query_download_active   = "SELECT COUNT(*) FROM $table WHERE active = '1'";
+		$numrows_download_active = (int) sbDb()->value($query_download_active);
 		$sbsmarty->assign('total_download_active', $numrows_download_active);
 		// ----------------------------------------
-		$query_download_inactive   = "SELECT id FROM $table WHERE active = '0'";
-		$request_download_inactive = $sbsql->query($query_download_inactive);
-		$numrows_download_inactive = $sbsql->numrows();
+		$query_download_inactive   = "SELECT COUNT(*) FROM $table WHERE active = '0'";
+		$numrows_download_inactive = (int) sbDb()->value($query_download_inactive);
 		$sbsmarty->assign('total_download_inactive', $numrows_download_inactive);
 		// ----------------------------------------
 		
@@ -147,9 +143,8 @@ switch($action) {
 			if ($formType == 'add') {
 				// INSERT DATAS
 				$randkey = sbGenerateRandKey();
-				$query   = "INSERT INTO $table (title,description,size,filename,randkey,active)
-						    VALUES ('$title','$description','$size','$filename','$randkey','$active')";
-				$result_add = $sbsql->query($query);
+				$query   = "INSERT INTO $table (title,description,size,filename,randkey,active)";
+				$result_add = sbDb()->insert('sb_download', array('title' => $title, 'description' => $description, 'size' => $size, 'filename' => $filename, 'randkey' => $randkey, 'active' => $active)) !== false;
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$title_fr = $description_fr = $title_en = $description_en = $filename = $size = $active = '';
@@ -162,14 +157,8 @@ switch($action) {
 
 			} elseif ($formType == 'edit' && $id > 0) {
 				// UPDATE DATAS
-				$query = "UPDATE $table SET title = '$title'
-										   ,description = '$description'
-										   ,size = '$size'
-										   ,filename = '$filename'
-										   ,active = '$active'
-										WHERE id = '$id'";
-											 
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table SET title, description, size, filename, active WHERE id = $id";
+				$result_edit = sbDb()->update('sb_download', array('title' => $title, 'description' => $description, 'size' => $size, 'filename' => $filename, 'active' => $active), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -195,8 +184,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id             = intval($_GET['id'] ?? 0);
 			$query_1        = "SELECT * FROM $table WHERE id = $id";
-			$requestQ       = $sbsql->query($query_1);
-			$assoc          = $sbsql->assoc($requestQ);
+			$assoc          = sbDb()->row("SELECT * FROM {sb_download} WHERE id = ?", array($id)) ?: array();
 			// ----------------------------
 			$title_fr       = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']));
 			$description_fr = $sbsanitize->displayLang(sb_utf8_encode($assoc['description']));

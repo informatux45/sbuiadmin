@@ -21,22 +21,16 @@ if (!defined('SB_PATH')) {
  * return HTML
  */
 function shortcode_sbtabbs($param = '') {
-	global $sbsanitize, $sbsql;
+	global $sbsanitize;
 
 	// --- Initialization
 	$item_html = '';
-	// --- Tables
-	$table     = _AM_DB_PREFIX . 'sb_tabbs';
-	$table_tab = _AM_DB_PREFIX . 'sb_tabbs_tab';
-	// --- SQL TABBS
-	$query = "SELECT t2.title, t2.content
-			  FROM $table AS t1
-			  LEFT JOIN $table_tab AS t2 ON (t1.id = t2.tid)
-			  WHERE t1.id = '{$param['id']}' AND t1.active = '1' AND t2.active = '1'
-			  ORDER BY t2.sort ASC
-			 ";
-	$request = $sbsql->query($query);
-	$tabbs   = $sbsql->toarray($request);
+	// --- SQL TABBS (id : entier, il vient du texte d'un contenu)
+	$tabbs   = sbDb()->all("SELECT t2.title, t2.content
+			  FROM {sb_tabbs} AS t1
+			  LEFT JOIN {sb_tabbs_tab} AS t2 ON (t1.id = t2.tid)
+			  WHERE t1.id = ? AND t1.active = '1' AND t2.active = '1'
+			  ORDER BY t2.sort ASC", array(intval($param['id'] ?? 0))) ?: array();
 
 	// --- Check if news exists
 	if ($tabbs) {

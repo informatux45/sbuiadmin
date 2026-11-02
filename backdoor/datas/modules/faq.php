@@ -54,8 +54,8 @@ switch($action) {
 		// Action DELETE
 		if ($action == 'del') {
 			$get_id   = intval($_GET['id'] ?? 0);
-			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
-			$request  = $sbsql->query($query_2);
+			$query_2 = "DELETE FROM $table WHERE id = $get_id";
+			$request  = sbDb()->delete('sb_faq', 'id = ?', array($get_id)) !== false;
 
 			if ($request)
 				$sb_msg_valid = $text . ' supprimé avec succès';
@@ -72,8 +72,7 @@ switch($action) {
 		            FROM $table AS t1
 					LEFT JOIN $table_cat AS t2 ON (t1.category = t2.id)
 					ORDER BY t1.sort ASC";
-		$request0  = $sbsql->query($query_0);
-		$result0   = $sbsql->toarray($request0);
+		$result0   = sbDb()->all($query_0) ?: array();
 
 		$sbsmarty->assign('all', true);
 		$sbsmarty->assign('allfaq', $result0);
@@ -113,9 +112,8 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'add') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table (category,question,response,active)
-						  VALUES ('$category','$question','$response','$active')";
-				$result_add = $sbsql->query($query);
+				$query = "INSERT INTO $table (category,question,response,active)";
+				$result_add = sbDb()->insert('sb_faq', array('category' => $category, 'question' => $question, 'response' => $response, 'active' => $active)) !== false;
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$category = $question = $response = $active = '';
@@ -128,13 +126,8 @@ switch($action) {
 
 			} elseif ($formType == 'edit' && $id > 0) {
 				// UPDATE DATAS
-				$query = "UPDATE $table SET category = '$category'
-											,question = '$question'
-				                            ,response = '$response'
-											,active = '$active'
-											WHERE id = '$id'";
-
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table SET category, question, response, active WHERE id = $id";
+				$result_edit = sbDb()->update('sb_faq', array('category' => $category, 'question' => $question, 'response' => $response, 'active' => $active), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -171,8 +164,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id          = intval($_GET['id'] ?? 0);
 			$query_1     = "SELECT * FROM $table WHERE id = $id";
-			$requestQ    = $sbsql->query($query_1);
-			$assoc       = $sbsql->assoc($requestQ);
+			$assoc       = sbDb()->row("SELECT * FROM {sb_faq} WHERE id = ?", array($id)) ?: array();
 			$category    = $assoc['category'];
 			$question    = $sbsanitize->displayLang(sb_utf8_encode($assoc['question']));
 			$response    = $sbsanitize->displayLang(sb_utf8_encode($assoc['response']));
@@ -200,8 +192,7 @@ switch($action) {
 		// --- Categorie
 		// ----------------------------
 		$query_category   = "SELECT * FROM $table_cat WHERE active = '1' ORDER BY name ASC";
-		$request_category = $sbsql->query($query_category);
-		$categories       = $sbsql->toarray($request_category);
+		$categories       = sbDb()->all($query_category) ?: array();
 		$sbform->openSelect("Catégorie", array("id"=>"category", "name"=>"category", "style" => "width: 500px;"), true);
 		if ($category == '' || $category > 0) $sbform->addOption('Choisissez une catégorie', array ("value"=>"", "selected"=>""));
 		foreach($categories as $row) {
@@ -259,7 +250,7 @@ switch($action) {
 				// --- brut dans le WHERE (les actions de tri ne passent pas par le jeton
 				// --- CSRF de openForm(), voir index.php).
 				$query_sort  = "UPDATE $table SET sort = $tri WHERE id = " . intval($sb_toSort[$i]);
-				$result_sort = $sbsql->query($query_sort);
+				$result_sort = sbDb()->update('sb_faq', array('sort' => $tri), 'id = ?', array(intval($sb_toSort[$i]))) !== false;
 				if (!$result_sort) {
 					// --- Error Database
 					$sql_error++;
@@ -278,8 +269,7 @@ switch($action) {
 
 		// --- Recuperation des donnees
 		$query_3      = "SELECT * FROM $table ORDER BY sort ASC";
-		$requestQ      = $sbsql->query($query_3);
-		$sort_array    = $sbsql->toarray($requestQ);
+		$sort_array    = sbDb()->all($query_3) ?: array();
 		foreach($sort_array as $sort) {
 			$active = ($sort['active']) ? $sbsanitize->displayLang(sb_utf8_encode($sort['question'])) : "<span style='color: red;'>".$sbsanitize->displayLang(sb_utf8_encode($sort['question']))."</span>";
 			$sort_id          = $sort['id'];
@@ -313,14 +303,13 @@ switch($action) {
 			// -------------------------------------
 			// --- Check if question uses this category
 			$query_faq   = "SELECT id FROM $table WHERE category = $get_id";
-			$request_faq = $sbsql->query($query_faq);
-			$numrows_faq = $sbsql->numrows($request_faq);
+			$numrows_faq = (int) sbDb()->value("SELECT COUNT(*) FROM {sb_faq} WHERE category = ?", array($get_id));
 			// -------------------------------------
 			if ($numrows_faq > 0) {
 				$sb_msg_error = 'Cette catégorie contient des questions !!<br>Vous devez supprimer ou déplacer les questions de cette catégorie avant !!';
 			} else {
-				$query_5 = "DELETE FROM $table_cat WHERE id = '$get_id'";
-				$request  = $sbsql->query($query_5);
+				$query_5 = "DELETE FROM $table_cat WHERE id = $get_id";
+				$request  = sbDb()->delete('sb_faq_category', 'id = ?', array($get_id)) !== false;
 
 				if ($request)
 					$sb_msg_valid = 'Catégorie supprimée avec succès';
@@ -335,8 +324,7 @@ switch($action) {
 
 		// Contents table
 		$query_4  = "SELECT * FROM $table_cat ORDER BY name ASC";
-		$request2 = $sbsql->query($query_4);
-		$result2  = $sbsql->toarray($request2);
+		$result2  = sbDb()->all($query_4) ?: array();
 
 		$sbsmarty->assign('allcat', true);
 		$sbsmarty->assign('allcategory', $result2);
@@ -374,9 +362,8 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'categoryadd') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table_cat (name,active)
-						  VALUES ('$name','$active')";
-				$result_add = $sbsql->query($query);
+				$query = "INSERT INTO $table_cat (name,active)";
+				$result_add = sbDb()->insert('sb_faq_category', array('name' => $name, 'active' => $active)) !== false;
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$name = $active = '';
@@ -389,11 +376,8 @@ switch($action) {
 
 			} elseif ($formType == 'categoryedit' && $id > 0) {
 				// UPDATE DATAS
-				$query = "UPDATE $table_cat SET name = '$name'
-											    ,active = '$active'
-											    WHERE id = '$id'";
-
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table_cat SET name, active WHERE id = $id";
+				$result_edit = sbDb()->update('sb_faq_category', array('name' => $name, 'active' => $active), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- Message SUCCES
 					$sb_msg_valid = 'Catégorie modifiée avec succès';
@@ -417,8 +401,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id       = intval($_GET['id'] ?? 0);
 			$query_1  = "SELECT * FROM $table_cat WHERE id = $id";
-			$requestQ = $sbsql->query($query_1);
-			$assoc    = $sbsql->assoc($requestQ);
+			$assoc    = sbDb()->row("SELECT * FROM {sb_faq_category} WHERE id = ?", array($id)) ?: array();
 			$name     = $sbsanitize->displayLang(sb_utf8_encode($assoc['name']));
 			$active   = $assoc['active'];
 

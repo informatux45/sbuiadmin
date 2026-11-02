@@ -160,6 +160,11 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 
 ## 📝 Changelog
 
+**4.75**
+- FAQ, downloads, galleries, sliders, tabs, pages and search use bound SQL parameters
+- Slider admin and shortcodes: injection through the slider id fixed
+- Pages: adding a custom link fixed (strict MySQL)
+
 **4.74**
 - System pages (dashboard, menus, blocks, CMS config) use bound SQL parameters
 - Block sorting by module fixed (injection, blocks missing after creation)
@@ -168,12 +173,12 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 **4.73**
 - Login, users, rights and messages use bound SQL parameters
 
+<details>
+  <summary><strong>Older versions</strong></summary>
+
 **4.72**
 - SQL class now runs on PDO (pdo_mysql required)
 - Clear page when the PDO extension is missing
-
-<details>
-  <summary><strong>Older versions</strong></summary>
 
 **4.71**
 - New PDO database layer (MySQL/MariaDB, SQLite), not wired in yet

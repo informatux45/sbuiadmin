@@ -61,14 +61,13 @@ switch($action) {
 			// -------------------------------------
 			// --- Check if tab in TABBS
 			$query_tab   = "SELECT * FROM $table_tab WHERE tid = $get_id";
-			$request_tab = $sbsql->query($query_tab);
-			$numrows_tab = $sbsql->numrows($request_tab);
+			$numrows_tab = (int) sbDb()->value("SELECT COUNT(*) FROM {sb_tabbs_tab} WHERE tid = ?", array($get_id));
 			// -------------------------------------
 			if ($numrows_tab > 0) {
 				$sb_msg_error = 'Ce TABBS contient des onglets !!<br>Vous devez supprimer les onglets contenus dans ce TABBS avant !!';		
 			} else {
-				$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
-				$request  = $sbsql->query($query_2);
+				$query_2 = "DELETE FROM $table WHERE id = $get_id";
+				$request  = sbDb()->delete('sb_tabbs', 'id = ?', array($get_id)) !== false;
 				
 				if ($request)
 					$sb_msg_valid = $text . ' supprimé avec succès';
@@ -83,8 +82,7 @@ switch($action) {
 		
 		// Contents table
 		$query     = "SELECT * FROM $table";
-		$request2  = $sbsql->query($query);
-		$result2   = $sbsql->toarray($request2);
+		$result2   = sbDb()->all($query) ?: array();
 		
 		$sbsmarty->assign('all', true);
 		$sbsmarty->assign('alltabb', $result2);
@@ -105,8 +103,8 @@ switch($action) {
 		// Action DELETE
 		if ($action == 'deltab') {
 			$get_id   = intval($_GET['id'] ?? 0);
-			$query_7  = "DELETE FROM $table_tab WHERE id = '$get_id'";
-			$request  = $sbsql->query($query_7);
+			$query_7  = "DELETE FROM $table_tab WHERE id = $get_id";
+			$request  = sbDb()->delete('sb_tabbs_tab', 'id = ?', array($get_id)) !== false;
 			
 			if ($request)
 				$sb_msg_valid = 'Onglet supprimé avec succès';
@@ -122,8 +120,7 @@ switch($action) {
 		$query = "SELECT t1.*, t2.name AS catname
 					 FROM $table_tab AS t1
 					 LEFT JOIN $table AS t2 ON (t1.tid = t2.id)";
-		$request2  = $sbsql->query($query);
-		$result2   = $sbsql->toarray($request2);
+		$result2   = sbDb()->all($query) ?: array();
 		
 		$sbsmarty->assign('allt', true);
 		$sbsmarty->assign('alltabs', $result2);
@@ -162,9 +159,8 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'add') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table (name,active)
-						  VALUES ('$name', '$active')";
-				$result_add = $sbsql->query($query);
+				$query = "INSERT INTO $table (name,active)";
+				$result_add = sbDb()->insert('sb_tabbs', array('name' => $name, 'active' => $active)) !== false;
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$name = $active = '';
@@ -177,11 +173,8 @@ switch($action) {
 
 			} elseif ($formType == 'edit' && $id > 0) {
 				// UPDATE DATAS
-				$query = "UPDATE $table SET name = '$name'
-										   ,active = '$active'
-										   WHERE id = '$id'";
-											 
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table SET name, active WHERE id = $id";
+				$result_edit = sbDb()->update('sb_tabbs', array('name' => $name, 'active' => $active), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -207,8 +200,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id       = intval($_GET['id'] ?? 0);
 			$query_1  = "SELECT * FROM $table WHERE id = $id";
-			$requestQ = $sbsql->query($query_1);
-			$assoc    = $sbsql->assoc($requestQ);
+			$assoc    = sbDb()->row("SELECT * FROM {sb_tabbs} WHERE id = ?", array($id)) ?: array();
 			$name     = sb_utf8_encode($assoc['name']);
 			$active   = $assoc['active'];
 
@@ -280,9 +272,8 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'tabadd') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table_tab (tid,title,content,active,sort)
-						  VALUES ('$tid','$title','$content','$active','0')";
-				$result_add = $sbsql->query($query);
+				$query = "INSERT INTO $table_tab (tid,title,content,active,sort)";
+				$result_add = sbDb()->insert('sb_tabbs_tab', array('tid' => $tid, 'title' => $title, 'content' => $content, 'active' => $active, 'sort' => 0)) !== false;
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$tid = $title_fr = $content_fr = $title_en = $content_en = $photo = $active = '';
@@ -295,13 +286,8 @@ switch($action) {
 
 			} elseif ($formType == 'tabedit' && $id > 0) {
 				// UPDATE DATAS
-				$query = "UPDATE $table_tab SET tid = '$tid'
-											   ,title = '$title'
-											   ,content = '$content'
-											   ,active = '$active'
-											   WHERE id = '$id'";
-											 
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table_tab SET tid, title, content, active WHERE id = $id";
+				$result_edit = sbDb()->update('sb_tabbs_tab', array('tid' => $tid, 'title' => $title, 'content' => $content, 'active' => $active), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -337,8 +323,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id         = intval($_GET['id'] ?? 0);
 			$query_1   = "SELECT * FROM $table_tab WHERE id = $id";
-			$requestQ   = $sbsql->query($query_1);
-			$assoc      = $sbsql->assoc($requestQ);
+			$assoc      = sbDb()->row("SELECT * FROM {sb_tabbs_tab} WHERE id = ?", array($id)) ?: array();
 			$tid        = intval($assoc['tid']);
 			$title_fr   = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']));
 			$content_fr = $sbsanitize->displayLang(sb_utf8_encode($assoc['content']));
@@ -370,8 +355,7 @@ switch($action) {
 		// --- Liste des TABBS
 		// ----------------------------
 		$query_tabbs   = "SELECT * FROM $table";
-		$request_tabbs = $sbsql->query($query_tabbs);
-		$tabbs         = $sbsql->toarray($request_tabbs);
+		$tabbs         = sbDb()->all($query_tabbs) ?: array();
 		$sbform->openSelect("Tabbs", array("id"=>"tid", "name"=>"tid"), true);
 		if ($formType == 'tabadd') $sbform->addOption('Choisissez un tabbs', array ("value"=>"", "selected"=>""));
 		foreach($tabbs as $row) {
@@ -438,7 +422,7 @@ switch($action) {
 				// --- brut dans le WHERE (les actions de tri ne passent pas par le jeton
 				// --- CSRF de openForm(), voir index.php).
 				$query_sort  = "UPDATE $table_tab SET sort = $tri WHERE id = " . intval($sb_toSort[$i]);
-				$result_sort = $sbsql->query($query_sort);
+				$result_sort = sbDb()->update('sb_tabbs_tab', array('sort' => $tri), 'id = ?', array(intval($sb_toSort[$i]))) !== false;
 				if (!$result_sort) {
 					// --- Error Database
 					$sql_error++;
@@ -457,9 +441,8 @@ switch($action) {
 		
 		// --- Recuperation des donnees
 		$tid           = intval($_GET['tid'] ?? 0);
-		$query_3       = "SELECT * FROM $table_tab WHERE tid = '$tid' ORDER BY sort ASC";
-		$requestQ      = $sbsql->query($query_3);
-		$sort_array    = $sbsql->toarray($requestQ);
+		$query_3       = "SELECT * FROM $table_tab WHERE tid = $tid ORDER BY sort ASC";
+		$sort_array    = sbDb()->all("SELECT * FROM {sb_tabbs_tab} WHERE tid = ? ORDER BY sort ASC", array($tid)) ?: array();
 		foreach($sort_array as $sort) {
 			$active = ($sort['active']) ? $sbsanitize->displayLang(sb_utf8_encode($sort['title'])) : "<span style='color: red;'>".$sbsanitize->displayLang(sb_utf8_encode($sort['title']))."</span>";
 			$sort_id          = $sort['id'];

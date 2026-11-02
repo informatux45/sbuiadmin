@@ -28,12 +28,8 @@ function shortcode_sbdownload($param = '') {
 	// --- Id : toujours un entier, il vient du texte d'un contenu
 	$did       = isset($param['id']) ? intval($param['id']) : 0;
 	if ($did <= 0) return false;
-	// --- Tables
-	$table = _AM_DB_PREFIX . 'sb_download';
 	// --- SQL Download
-	$query_item   = "SELECT * FROM $table WHERE id = '$did' AND active = '1'";
-	$request_item = $sbsql->query($query_item);
-	$item_info    = $sbsql->assoc($request_item);
+	$item_info    = sbDb()->row("SELECT * FROM {sb_download} WHERE id = ? AND active = '1'", array($did));
 	// --- Check if download exists
 	if ($item_info) {
 		// --- Check if new is active

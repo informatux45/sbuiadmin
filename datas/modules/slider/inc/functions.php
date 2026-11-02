@@ -14,20 +14,15 @@ if (!defined('SB_PATH')) {
 }
 
 function shortcode_sbslider($param = '') {
-	global $sbsanitize, $sbsql;
-	// --- Tables
-	$table_slider = _AM_DB_PREFIX . 'sb_slider';
-	$table_photos = _AM_DB_PREFIX . 'sb_slider_photos';
+	global $sbsanitize;
+	// --- Id : toujours un entier (il vient du texte d'un contenu, partait tel quel dans le SQL)
+	$sid = intval($param['id'] ?? 0);
 	// --- SQL Slider
-	$query_slider   = "SELECT * FROM $table_slider WHERE id = '{$param['id']}'";
-	$request_slider = $sbsql->query($query_slider);
-	$slider_config  = $sbsql->assoc($request_slider);
+	$slider_config  = sbDb()->row("SELECT * FROM {sb_slider} WHERE id = ?", array($sid)) ?: array('active' => 0);
 	// --- Check if slider is active
 	if ($slider_config['active']) {
 		// --- Sql photos	
-		$query_photos   = "SELECT * FROM $table_photos WHERE active = '1' AND sid = '{$param['id']}' ORDER BY sort ASC";
-		$request_photos = $sbsql->query($query_photos);
-		$photos         = $sbsql->toarray($request_photos);
+		$photos         = sbDb()->all("SELECT * FROM {sb_slider_photos} WHERE active = '1' AND sid = ? ORDER BY sort ASC", array($sid)) ?: array();
 	
 		// --- Slider HTML Construct
 		$slider_html  = '';
@@ -37,7 +32,7 @@ function shortcode_sbslider($param = '') {
 		if ($slider_config['video']) $slider_html .= '<script src="' . SB_MODULES_URL . 'slider/inc/plugins/jquery.fitvids.js"></script>';
 		$slider_html .= '<link href="' . SB_MODULES_URL . 'slider/inc/jquery.bxslider.css" rel="stylesheet" />';
 		// --- Photos list
-		$slider_html .= '<ul class="sbslider'.$param['id'].'">';
+		$slider_html .= '<ul class="sbslider'.$sid.'">';
 		foreach($photos as $row) {
 			if ($row['type'] == 'video')
 				$slider_html .= '<li>' . $sbsanitize->displayText($row['photo'], 'UTF-8', 0, 1) . '</li>';
@@ -47,7 +42,7 @@ function shortcode_sbslider($param = '') {
 		$slider_html .= '</ul>';
 		// --- Slider options
 		$slider_html .= "<script type='text/javascript'>
-						  $('.sbslider".$param['id']."').bxSlider({
+						  $('.sbslider".$sid."').bxSlider({
 							auto: ".slider_showtrueorfalse($slider_config['auto']).",
 							randomStart: ".slider_showtrueorfalse($slider_config['randomstart']).",
 							mode: '". $slider_config['mode'] ."',

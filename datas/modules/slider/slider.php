@@ -30,10 +30,7 @@ $modpage['template_main'] = MODFILE . '_' . $template . '.tpl';
 // --------------------------
 // --- Switch with Op GET
 // --------------------------
-// stopXSS() ne retire PAS l'apostrophe : ce n'est pas une protection SQL.
-$query   = "SELECT * FROM {$modpage['tables']['slider']} WHERE id = '" . $sbsql->escape_string($id) . "'";
-$request = $sbsql->query($query);
-$assoc   = $sbsql->assoc($request);
+$assoc   = sbDb()->row("SELECT * FROM {sb_slider} WHERE id = ?", array((string) $id));
 // --- Assign Array
 $sb_slider_title   = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']);
 $sb_slider_content = $sbsanitize->displayLang(sb_utf8_encode($assoc['content']), $_SESSION['lang']);

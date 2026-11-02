@@ -261,17 +261,13 @@ if (!function_exists("sbSearchRegexTerm")) {
 */
 if (!function_exists("sbSearchEngine")) {
 	function sbSearchEngine() {
-		global $sbsql;
 		static $engine = null;
 
 		if ($engine !== null) return $engine;
 
-		$engine  = 'like';
-		$request = $sbsql->query("SELECT ('g" . "\xc3\xa9" . "oles' REGEXP 'g(e|" . "\xc3\xa9" . ")oles') AS sbok");
-		if ($request) {
-			$row = $sbsql->assoc($request);
-			if ($row && intval($row['sbok']) === 1) $engine = 'regexp';
-		}
+		$engine = 'like';
+		$ok     = sbDb()->value("SELECT ('g" . "\xc3\xa9" . "oles' REGEXP 'g(e|" . "\xc3\xa9" . ")oles') AS sbok");
+		if ($ok !== false && intval($ok) === 1) $engine = 'regexp';
 
 		return $engine;
 	}
@@ -295,6 +291,17 @@ if (!function_exists("sbSearchLikeTerm")) {
 }
 
 /**
+* Valeur liee d'un LIKE : jokers et antislash neutralises, entouree de %.
+* @param	string	$term
+* @return	string
+*/
+if (!function_exists("sbSearchLikeValue")) {
+	function sbSearchLikeValue($term) {
+		return '%' . addcslashes((string)$term, '\\%_') . '%';
+	}
+}
+
+/**
 * Construit la clause WHERE d'une source : TOUS les termes doivent etre
 * presents (ET), chacun pouvant apparaitre dans N'IMPORTE laquelle des
 * colonnes cherchees (CONCAT_WS, qui ignore les NULL contrairement a CONCAT).
@@ -306,13 +313,17 @@ if (!function_exists("sbSearchLikeTerm")) {
 *
 * @param	array	$columns	colonnes SQL (deja prefixees t1./t2. si besoin)
 * @param	array	$terms		termes issus de sbSearchTerms()
+* @param	array	$bind		(facultatif) recoit les valeurs des marqueurs ?
 * @return	string	fragment SQL commencant par " AND (" , ou '' si rien
 */
 if (!function_exists("sbSearchWhere")) {
-	function sbSearchWhere($columns, $terms) {
+	function sbSearchWhere($columns, $terms, &$bind = null) {
 		global $sbsql;
 
 		if (empty($columns) || empty($terms)) return '';
+		// --- $bind (tableau) : marqueurs ? et valeurs ajoutees a $bind ;
+		// --- sans lui, valeurs echappees dans le texte (ancien appel)
+		$bound = is_array($bind);
 
 		$haystack = "CONCAT_WS(' ', " . implode(', ', $columns) . ")";
 		$engine   = sbSearchEngine();
@@ -328,16 +339,28 @@ if (!function_exists("sbSearchWhere")) {
 			// --- en silence (query() renvoie false). Au-dela, on retombe sur
 			// --- le LIKE, moins juste mais toujours fonctionnel.
 			if ($regex !== '' && strlen($regex) <= 4000) {
-				$clauses[] = "$haystack REGEXP '" . $sbsql->escape_string($regex) . "'";
+				if ($bound) {
+					$clauses[] = "$haystack REGEXP ?";
+					$bind[]    = $regex;
+				} else {
+					$clauses[] = "$haystack REGEXP '" . $sbsql->escape_string($regex) . "'";
+				}
 			} else {
 				// --- Repli : pas d'insensibilite aux accents, on cherche donc
 				// --- le terme tel quel ET sa forme encodee en entites.
-				$variants = array(sbSearchLikeTerm($term));
+				$variants = array($term);
 				$encoded  = htmlentities($term, ENT_QUOTES, 'UTF-8');
-				if ($encoded !== $term) $variants[] = sbSearchLikeTerm($encoded);
+				if ($encoded !== $term) $variants[] = $encoded;
 
 				$ors = array();
-				foreach ($variants as $variant) $ors[] = "$haystack LIKE '%$variant%'";
+				foreach ($variants as $variant) {
+					if ($bound) {
+						$ors[]  = "$haystack LIKE ?";
+						$bind[] = sbSearchLikeValue($variant);
+					} else {
+						$ors[]  = "$haystack LIKE '%" . sbSearchLikeTerm($variant) . "%'";
+					}
+				}
 				$clauses[] = implode(' OR ', $ors);
 			}
 		}
@@ -608,7 +631,7 @@ if (!function_exists("sbSearchExcerpt")) {
 */
 if (!function_exists("sbSearchHostIndex")) {
 	function sbSearchHostIndex() {
-		global $sbsql, $sbsanitize;
+		global $sbsanitize;
 		static $index = null;
 
 		if ($index !== null) return $index;
@@ -640,8 +663,7 @@ if (!function_exists("sbSearchHostIndex")) {
 		$query   = "SELECT id, menu, title, seo_url, url_custom, content
 					FROM {$t_pages}
 					WHERE active = '1' AND content LIKE '%[CS %'";
-		$request = $sbsql->query($query);
-		$rows    = $sbsql->toarray($request);
+		$rows    = sbDb()->all($query);
 		if ($rows) {
 			foreach ($rows as $row) {
 				$collect($row['content'], sbSearchPageUrl($row), sbSearchPageLabel($row));
@@ -664,8 +686,7 @@ if (!function_exists("sbSearchHostIndex")) {
 		$query   = "SELECT pages_id, content
 					FROM {$t_blocs}
 					WHERE active = '1' AND content LIKE '%[CS %'";
-		$request = $sbsql->query($query);
-		$rows    = $sbsql->toarray($request);
+		$rows    = sbDb()->all($query);
 		if ($rows) {
 			foreach ($rows as $row) {
 				$page_ids = array_filter(array_map('intval', explode('|', (string)$row['pages_id'])));
@@ -674,8 +695,7 @@ if (!function_exists("sbSearchHostIndex")) {
 				$q_page   = "SELECT id, menu, title, seo_url, url_custom
 							 FROM {$t_pages}
 							 WHERE active = '1' AND id IN ($in) ORDER BY sort ASC LIMIT 1";
-				$r_page   = $sbsql->query($q_page);
-				$page     = $sbsql->assoc($r_page);
+				$page     = sbDb()->row($q_page);
 				if ($page) $collect($row['content'], sbSearchPageUrl($page), sbSearchPageLabel($page));
 			}
 		}
@@ -768,14 +788,12 @@ if (!function_exists("sbSearchTitle")) {
 */
 if (!function_exists("sbSearchTarget")) {
 	function sbSearchTarget() {
-		global $sbsql;
 		static $target = null;
 
 		if ($target !== null) return $target;
 
 		$table   = sbSearchTable('sb_pages');
-		$request = $sbsql->query("SELECT seo_url FROM $table WHERE active = '1' AND module_view = 'search' ORDER BY sort ASC LIMIT 1");
-		$page    = $sbsql->assoc($request);
+		$page    = sbDb()->row("SELECT seo_url FROM $table WHERE active = '1' AND module_view = 'search' ORDER BY sort ASC LIMIT 1");
 		$seo     = ($page && trim((string)$page['seo_url']) != '') ? trim($page['seo_url']) : false;
 
 		if ($seo !== false) {

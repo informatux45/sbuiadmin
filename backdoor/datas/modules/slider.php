@@ -58,8 +58,8 @@ switch($action) {
 		// Action DELETE
 		if ($action == 'del') {
 			$get_id  = intval($_GET['id'] ?? 0);
-			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
-			$request = $sbsql->query($query_2);
+			$query_2 = "DELETE FROM $table WHERE id = $get_id";
+			$request = sbDb()->delete('sb_slider', 'id = ?', array($get_id)) !== false;
 			
 			if ($request)
 				$sb_msg_valid = $text . ' supprimé avec succès';
@@ -75,8 +75,7 @@ switch($action) {
 		$query     = "SELECT t1.*, COUNT(*) AS cpt_img
 					  FROM $table AS t1
 					  LEFT JOIN $table_photo AS t2 ON (t1.id = t2.sid) GROUP BY t1.id";
-		$request2  = $sbsql->query($query);
-		$result2   = $sbsql->toarray($request2);
+		$result2   = sbDb()->all($query) ?: array();
 		
 		$sbsmarty->assign('all', true);
 		$sbsmarty->assign('allslider', $result2);
@@ -97,8 +96,8 @@ switch($action) {
 		// Action DELETE photo
 		if ($action == 'delphoto') {
 			$get_id  = intval($_GET['id'] ?? 0);
-			$query_5 = "DELETE FROM $table_photo WHERE id = '$get_id'";
-			$request = $sbsql->query($query_5);
+			$query_5 = "DELETE FROM $table_photo WHERE id = $get_id";
+			$request = sbDb()->delete('sb_slider_photos', 'id = ?', array($get_id)) !== false;
 			
 			if ($request)
 				$sb_msg_valid = $text . ' supprimé avec succès';
@@ -107,14 +106,14 @@ switch($action) {
 		}
 
 		// Initialisation
-		$sid = $_GET['sid'] ?? '';
+		// intval() : sid partait tel quel dans le SQL et dans le gabarit
+		$sid = intval($_GET['sid'] ?? 0);
 		$sb_table_header = array('Tri', 'Photo', 'Name', 'Actions');
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		
 		// Contents table
-		$query_4  = "SELECT * FROM $table_photo WHERE sid = '$sid'";
-		$request2 = $sbsql->query($query_4);
-		$result2  = $sbsql->toarray($request2);
+		$query_4  = "SELECT * FROM $table_photo WHERE sid = $sid";
+		$result2  = sbDb()->all("SELECT * FROM {sb_slider_photos} WHERE sid = ?", array($sid)) ?: array();
 		
 		$sbsmarty->assign('allphoto', $result2);
 		
@@ -173,9 +172,9 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'add') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table (title,jquery,responsive,auto,pause,speed,randomstart,mode,preloadimages,controls,autocontrols,autohover,captions,adaptiveheight,adaptiveheightspeed,slidemargin,video,usecss,pager,pagertype,active)
-						  VALUES ('$title','$jquery','$responsive','$auto','$pause','$speed','$randomstart','$mode','$preloadimages','$controls','$autocontrols','$autohover','$captions','$adaptiveheight','$adaptiveheightspeed','$slidemargin','$video','$usecss','$pager','$pagertype','$active')";
-				$result_add = $sbsql->query($query);
+				$sb_slider_data = array_map('strval', compact('title', 'jquery', 'responsive', 'auto', 'pause', 'speed', 'randomstart', 'mode', 'preloadimages', 'controls', 'autocontrols', 'autohover', 'captions', 'adaptiveheight', 'adaptiveheightspeed', 'slidemargin', 'video', 'usecss', 'pager', 'pagertype', 'active'));
+				$query = "INSERT INTO $table (" . implode(',', array_keys($sb_slider_data)) . ")";
+				$result_add = sbDb()->insert('sb_slider', $sb_slider_data) !== false;
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$title = $jquery = $responsive = $auto = $pause = $speed = $randomstart = $mode = $preloadimages = $controls = $autocontrols = $autohover = $captions = $adaptiveheight = $adaptiveheightspeed = $slidemargin = $video = $usecss = $pager = $pagertype = $active = '';
@@ -188,30 +187,9 @@ switch($action) {
 
 			} elseif ($formType == 'edit' && $id > 0) {
 				// UPDATE DATAS
-				$query = "UPDATE $table SET title = '$title'
-										   ,jquery = '$jquery'
-										   ,responsive = '$responsive'
-										   ,auto = '$auto'
-										   ,pause = '$pause'
-										   ,speed = '$speed'
-										   ,randomstart = '$randomstart'
-										   ,mode = '$mode'
-										   ,preloadimages = '$preloadimages'
-										   ,controls = '$controls'
-										   ,autocontrols = '$autocontrols'
-										   ,autohover = '$autohover'
-										   ,captions = '$captions'
-										   ,adaptiveheight = '$adaptiveheight'
-										   ,adaptiveheightspeed = '$adaptiveheightspeed'
-										   ,slidemargin = '$slidemargin'
-										   ,video = '$video'
-										   ,usecss = '$usecss'
-										   ,pager = '$pager'
-										   ,pagertype = '$pagertype'
-										   ,active = '$active'
-										   WHERE id = '$id'";
-											 
-				$result_edit = $sbsql->query($query);
+				$sb_slider_data = array_map('strval', compact('title', 'jquery', 'responsive', 'auto', 'pause', 'speed', 'randomstart', 'mode', 'preloadimages', 'controls', 'autocontrols', 'autohover', 'captions', 'adaptiveheight', 'adaptiveheightspeed', 'slidemargin', 'video', 'usecss', 'pager', 'pagertype', 'active'));
+				$query = "UPDATE $table SET " . implode(', ', array_keys($sb_slider_data)) . " WHERE id = $id";
+				$result_edit = sbDb()->update('sb_slider', $sb_slider_data, 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -237,8 +215,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id                  = intval($_GET['id'] ?? 0);
 			$query_1             = "SELECT * FROM $table WHERE id = $id";
-			$requestQ            = $sbsql->query($query_1);
-			$assoc               = $sbsql->assoc($requestQ);
+			$assoc               = sbDb()->row("SELECT * FROM {sb_slider} WHERE id = ?", array($id)) ?: array();
 			$title               = $sbsanitize->displayText($assoc['title'], 'UTF-8', 1, 0);
 			$jquery              = $assoc['jquery'];
 			$responsive          = $assoc['responsive'];
@@ -452,9 +429,8 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'photoadd') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table_photo (title,sid,photo,type,active,sort)
-						  VALUES ('$title','$sid','$media','$type','$active','0')";
-				$result_add = $sbsql->query($query);
+				$query = "INSERT INTO $table_photo (title,sid,photo,type,active,sort)";
+				$result_add = sbDb()->insert('sb_slider_photos', array('title' => $title, 'sid' => $sid, 'photo' => $media, 'type' => $type, 'active' => $active, 'sort' => 0)) !== false;
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$title = $photo = $video = $type = $active = '';
@@ -467,14 +443,8 @@ switch($action) {
 
 			} elseif ($formType == 'photoedit' && $id > 0) {
 				// UPDATE DATAS
-				$query = "UPDATE $table_photo SET title = '$title'
-												 ,photo = '$media'
-												 ,type = '$type' 
-												 ,active = '$active'
-												 ,sid = '$sid'
-												 WHERE id = '$id'";
-											 
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table_photo SET title, photo, type, active, sid WHERE id = $id";
+				$result_edit = sbDb()->update('sb_slider_photos', array('title' => $title, 'photo' => $media, 'type' => $type, 'active' => $active, 'sid' => $sid), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -500,8 +470,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id       = intval($_GET['id'] ?? 0);
 			$query_1  = "SELECT * FROM $table_photo WHERE id = $id";
-			$requestQ = $sbsql->query($query_1);
-			$assoc    = $sbsql->assoc($requestQ);
+			$assoc    = sbDb()->row("SELECT * FROM {sb_slider_photos} WHERE id = ?", array($id)) ?: array();
 			$sid      = $assoc['sid'];
 			$title    = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), 'UTF-8', 1, 0);
 			$type     = $sbsanitize->displayLang(sb_utf8_encode($assoc['type']), 'UTF-8', 1, 0);
@@ -532,8 +501,7 @@ switch($action) {
 		// --- Choix du slider
 		// -----------------------------------
 		$query_slider   = "SELECT id, title FROM $table";
-		$request_slider = $sbsql->query($query_slider);
-		$sliders        = $sbsql->toarray($request_slider);
+		$sliders        = sbDb()->all($query_slider) ?: array();
 		$sbform->openSelect("Choix du slider", array("id"=>"sid", "name"=>"sid"), true);
 		$sbform->addOption('Choisissez un slider', array ("value"=>"", "selected"=>""));
 		foreach($sliders as $row) {
@@ -613,7 +581,7 @@ switch($action) {
 				// --- brut dans le WHERE (les actions de tri ne passent pas par le jeton
 				// --- CSRF de openForm(), voir index.php).
 				$query_sort  = "UPDATE $table_photo SET sort = $tri WHERE id = " . intval($sb_toSort[$i]);
-				$result_sort = $sbsql->query($query_sort);
+				$result_sort = sbDb()->update('sb_slider_photos', array('sort' => $tri), 'id = ?', array(intval($sb_toSort[$i]))) !== false;
 				if (!$result_sort) {
 					// --- Error Database
 					$sql_error++;
@@ -632,9 +600,8 @@ switch($action) {
 		
 		// --- Recuperation des donnees
 		$sid        = intval($_GET['sid'] ?? 0);
-		$query_3    = "SELECT * FROM $table_photo WHERE sid = '$sid' ORDER BY sort ASC";
-		$requestQ   = $sbsql->query($query_3);
-		$sort_array = $sbsql->toarray($requestQ);
+		$query_3    = "SELECT * FROM $table_photo WHERE sid = $sid ORDER BY sort ASC";
+		$sort_array = sbDb()->all("SELECT * FROM {sb_slider_photos} WHERE sid = ? ORDER BY sort ASC", array($sid)) ?: array();
 		foreach($sort_array as $sort) {
 			$title  = $sbsanitize->displayText($sort['title'], 'UTF-8', 1, 0, 0, 0, 0, 1);
 			$active = ($sort['active']) ? $title : "<span style='color: red;'>" . $title . "</span>";

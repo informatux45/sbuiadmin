@@ -15,8 +15,8 @@ return array(
 	'title'         => 'Galeries',
 	'icon'          => 'picture-o', // Font Awesome (menu, carte Modules)
 	'description'   => "Galeries de photos et de vidéos avec visionneuse, à insérer dans un contenu par code court.",
-	'version'       => '1.0.1',
-	'requires_core' => '4.29',
+	'version'       => '1.0.2',
+	'requires_core' => '4.75',
 	'author'        => 'INFORMATUX',
 	'routes'        => array('gallery'),
 	'page_module'   => false,
