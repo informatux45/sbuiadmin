@@ -20,8 +20,8 @@ return array(
 	'title'         => 'E-commerce',
 	'icon'          => 'star', // Font Awesome (menu, carte Modules)
 	'description'   => "Boutique en ligne : produits, catégories, commandes, paiements, transport, remises et export comptable.",
-	'version'       => '2.0.1',
-	'requires_core' => '4.40',
+	'version'       => '2.0.2',
+	'requires_core' => '4.75',
 	'author'        => 'INFORMATUX',
 	'routes'        => array(), // pas de front
 	'page_module'   => false,

@@ -30,8 +30,7 @@ include_once( SB_MODULES_DIR . MODULEFILE . DIRECTORY_SEPARATOR . 'inc' . DIRECT
 // --- Get News options
 // ------------------------
 $initOptions     = "SELECT * FROM {$module['tables']['newssett']} WHERE id = '1'";
-$request_options = $sbsql->query($initOptions);
-$news_options    = $sbsql->assoc($request_options);
+$news_options    = sbDb()->row($initOptions) ?: array();
 $sbsmarty->assign('sbnews_options', $news_options);
 // --- Check start index or categories
 // --- 0: Categories list
@@ -44,7 +43,8 @@ if ($news_options['module_start'] && (empty($_GET['op']))) {
 	$_GET['id'] = false;
 }
 // --- Item per page
-$news_per_page = $news_options['item_per_page'];
+// (entier >= 1 : il va dans LIMIT et sert de diviseur)
+$news_per_page = max(1, intval($news_options['item_per_page'] ?? 10));
 
 // ------------------------
 
@@ -72,8 +72,7 @@ switch($op) {
 	default: // Show all categories of NEWS
 		// --- SQL Request
 		$query   = "SELECT * FROM {$module['tables']['newscat']} WHERE active = '1' ORDER BY sort ASC";
-		$request = $sbsql->query($query);
-		$result  = $sbsql->toarray($request);
+		$result  = sbDb()->all($query) ?: array();
 		// --- Assign Array
 		$sbsmarty->assign('categories', $result);
 		
@@ -118,12 +117,10 @@ switch($op) {
 		          WHERE $where_categories
 		          ORDER BY t1.date DESC ";
 		// --- Total NEWS
-		$queryT = $sbsql->query($initQ);
-		$totalT = $sbsql->numrows();
+		$totalT = count(sbDb()->all($initQ) ?: array());
 
 		$query   = $initQ . "LIMIT $news_page, $news_per_page";
-		$request = $sbsql->query($query);
-		$result  = $sbsql->toarray($request);
+		$result  = sbDb()->all($query) ?: array();
 		// --- Assign Array
 		$sbsmarty->assign('all', $result);
 		// --- Assign News info Page
@@ -136,10 +133,9 @@ switch($op) {
 		// --- Assign Title Page
 		// --------------------------
 		$catid_module_show = $news_options['catid_module_show'];
-		$queryN   = "SELECT * FROM {$module['tables']['newscat']} WHERE id = '$catid_module_show'";
-		$requestN = $sbsql->query($queryN);
+		$queryN   = "SELECT * FROM {$module['tables']['newscat']} WHERE id = " . intval($catid_module_show);
 		// Rubrique absente : réglages vides (PHP 8 : pas de lecture sur null)
-		$assoc   = $sbsql->assoc($requestN) ?: array('tpl_list' => '', 'module_show' => '', 'module_show_masonry' => '');
+		$assoc   = sbDb()->row($queryN) ?: array('tpl_list' => '', 'module_show' => '', 'module_show_masonry' => '');
 		// --- Infos
 		$sb_news_title = _CMS_NEWS_ALLNEWS;
 		// --- Assign news title
@@ -168,12 +164,10 @@ switch($op) {
 		// --- dont $id n'est qu'un morceau (2 capte 12, 20...).
 		$initQ = "SELECT * FROM {$module['tables']['news']} WHERE CONCAT('|', catid, '|') LIKE '%|$id|%' AND active = '1' ORDER BY date DESC ";
 		// --- Total NEWS
-		$queryT = $sbsql->query($initQ);
-		$totalT = $sbsql->numrows();
+		$totalT = count(sbDb()->all($initQ) ?: array());
 
 		$query   = $initQ . "LIMIT $news_page, $news_per_page";
-		$request = $sbsql->query($query);
-		$result  = $sbsql->toarray($request);
+		$result  = sbDb()->all($query) ?: array();
 		// --- Assign Array
 		$sbsmarty->assign('all', $result);
 		// --- Assign News info Page
@@ -185,10 +179,9 @@ switch($op) {
 		// --------------------------
 		// --- Assign Title Page
 		// --------------------------
-		$queryN   = "SELECT * FROM {$module['tables']['newscat']} WHERE id = '$id'";
-		$requestN = $sbsql->query($queryN);
+		$queryN   = "SELECT * FROM {$module['tables']['newscat']} WHERE id = $id";
 		// Rubrique absente : réglages vides (PHP 8 : pas de lecture sur null)
-		$assoc   = $sbsql->assoc($requestN) ?: array('tpl_list' => '', 'module_show' => '', 'module_show_masonry' => '');
+		$assoc   = sbDb()->row($queryN) ?: array('tpl_list' => '', 'module_show' => '', 'module_show_masonry' => '');
 		// --- Infos
 		//$sb_news_title = _CMS_NEWS_NEWS . ' ' . $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']);
 		$sb_news_title = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']);
@@ -215,19 +208,17 @@ switch($op) {
 
 	case "article": // Show article detail of NEWS
 		// --- SQL Request
-		$query   = "SELECT * FROM {$module['tables']['news']} WHERE id = '$id' AND active = '1'";
-		$request = $sbsql->query($query);
-		$item    = $sbsql->assoc($request);
+		$query   = "SELECT * FROM {$module['tables']['news']} WHERE id = $id AND active = '1'";
+		$item    = sbDb()->row($query) ?: array();
 		// --- Assign Array
 		$sbsmarty->assign('item', $item);
 		
 		// --------------------------
 		// --- Assign Title Page
 		// --------------------------
-		$catid    = intval($item['catid']);
-		$queryN   = "SELECT id, title, subtitle, tpl_single FROM {$module['tables']['newscat']} WHERE id = '$catid'";
-		$requestN = $sbsql->query($queryN);
-		$assoc    = $sbsql->assoc($requestN);
+		$catid    = intval($item['catid'] ?? 0);
+		$queryN   = "SELECT id, title, subtitle, tpl_single FROM {$module['tables']['newscat']} WHERE id = $catid";
+		$assoc    = sbDb()->row($queryN) ?: array();
 		// --- Check if type
 		//$sb_news_title = _CMS_NEWS_NEWS . ' ' . $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']);
 		$sb_news_title = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']) . ' - ' . $sbsanitize->displayLang(sb_utf8_encode($item['title']), $_SESSION['lang']);
@@ -251,8 +242,7 @@ switch($op) {
 							(SELECT title FROM {$module['tables']['news']} s2 WHERE s2.date > s.date AND s2.active = 1 AND catid = '$catid' ORDER BY date ASC LIMIT 1 OFFSET 0) as prev_title
 							FROM {$module['tables']['news']} s
 							WHERE id = $id ";
-		$request_np = $sbsql->query($query_np);
-		$result_np  = $sbsql->assoc($request_np);
+		$result_np  = sbDb()->row($query_np) ?: array();
 		$sbsmarty->assign('next_prev', $result_np);
 		
 		// --------------------------
@@ -274,8 +264,7 @@ switch($op) {
 					$query .= "ORDER BY RAND() LIMIT $other_news_per_page";
 				break;
 			}
-			$request = $sbsql->query($query);
-			$result  = $sbsql->toarray($request);
+			$result  = sbDb()->all($query) ?: array();
 			$sbsmarty->assign('sbnews_other_news', $result);
 		}
 		

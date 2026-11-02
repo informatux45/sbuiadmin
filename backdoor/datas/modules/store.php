@@ -59,8 +59,8 @@ switch($action) {
 		// Action DELETE
 		if ($action == 'del') {
 			$get_id   = intval($_GET['id'] ?? 0);
-			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
-			$request  = $sbsql->query($query_2);
+			$query_2 = "DELETE FROM $table WHERE id = $get_id";
+			$request  = sbDb()->delete('sb_store_product', 'id = ?', array($get_id)) !== false;
 
 			if ($request)
 				$sb_msg_valid = $text . ' supprimé avec succès';
@@ -77,8 +77,7 @@ switch($action) {
 		            FROM $table AS t1
 					LEFT JOIN $table_cat AS t2 ON (t1.catid = t2.id)
 					ORDER BY t1.sort ASC";
-		$request0  = $sbsql->query($query_0);
-		$result0   = $sbsql->toarray($request0);
+		$result0   = sbDb()->all($query_0) ?: array();
 
 		$sbsmarty->assign('all', true);
 		$sbsmarty->assign('allproducts', $result0);
@@ -134,11 +133,11 @@ switch($action) {
 			$tva_sum_ht = 0.0;
 			if ($tva_assujetti) {
 				foreach (['tva1', 'tva2', 'tva3'] as $k) {
-					$libelle    = $sbsanitize->displayText($_POST[$k . '_libelle'], 'UTF-8', 1, 0);
-					$nom        = $sbsanitize->displayText($_POST[$k . '_nom'], 'UTF-8', 1, 0);
-					$taux       = $sbsanitize->displayText($_POST[$k . '_taux'], 'UTF-8', 1, 0);
-					$montant_ht = str_replace(',', '.', $sbsanitize->displayText($_POST[$k . '_montant_ht'], 'UTF-8', 1, 0));
-					$compte     = $sbsanitize->displayText($_POST[$k . '_compte'], 'UTF-8', 1, 0);
+					$libelle    = $sbsanitize->displayText($_POST[$k . '_libelle'] ?? '', 'UTF-8', 1, 0);
+					$nom        = $sbsanitize->displayText($_POST[$k . '_nom'] ?? '', 'UTF-8', 1, 0);
+					$taux       = $sbsanitize->displayText($_POST[$k . '_taux'] ?? '', 'UTF-8', 1, 0);
+					$montant_ht = str_replace(',', '.', $sbsanitize->displayText($_POST[$k . '_montant_ht'] ?? '', 'UTF-8', 1, 0));
+					$compte     = $sbsanitize->displayText($_POST[$k . '_compte'] ?? '', 'UTF-8', 1, 0);
 					if (trim($libelle) == '' || trim($taux) == '') continue;
 					$tva_data[$k] = ['libelle' => $libelle, 'nom' => $nom, 'taux' => $taux, 'montant_ht' => $montant_ht, 'compte' => $compte];
 					$tva_sum_ht  += floatval($montant_ht);
@@ -168,9 +167,8 @@ switch($action) {
 				// défaut depuis MySQL 5.7), les omettre fait échouer tout
 				// l'INSERT (erreur 1364). On les initialise donc explicitement
 				// à vide.
-				$query = "INSERT INTO $table (catid,reference,title,description,description_short,custom,price,priceht,tva_assujetti,tva,photo,photos,phys_visuals,poids,allow_physical,allow_dematerialise,active)
-						  VALUES ('$catid','$reference','$title','$description','$description_short','','$price','$priceht','$tva_assujetti','$tva','$photo','','','$poids','$allow_physical','$allow_dematerialise','$active')";
-				$result_add = $sbsql->query($query);
+				$query = "INSERT INTO $table (catid,reference,title,description,description_short,custom,price,priceht,tva_assujetti,tva,photo,photos,phys_visuals,poids,allow_physical,allow_dematerialise,active)";
+				$result_add = sbDb()->insert('sb_store_product', array('catid' => $catid, 'reference' => $reference, 'title' => $title, 'description' => $description, 'description_short' => $description_short, 'custom' => '', 'price' => $price, 'priceht' => $priceht, 'tva_assujetti' => $tva_assujetti, 'tva' => $tva, 'photo' => $photo, 'photos' => '', 'phys_visuals' => '', 'poids' => $poids, 'allow_physical' => $allow_physical, 'allow_dematerialise' => $allow_dematerialise, 'active' => $active)) !== false;
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$catid = $reference = $title = $description = $description_short = $photo = $price = $priceht = $poids = $allow_physical = $allow_dematerialise = $tva_assujetti = $active = '';
@@ -183,23 +181,8 @@ switch($action) {
 
 			} elseif ($formType == 'edit' && $id > 0) {
 				// UPDATE DATAS
-				$query = "UPDATE $table SET catid = '$catid'
-											,reference = '$reference'
-											,title = '$title'
-											,description = '$description'
-											,description_short = '$description_short'
-											,price = '$price'
-											,priceht = '$priceht'
-											,tva_assujetti = '$tva_assujetti'
-											,tva = '$tva'
-											,photo = '$photo'
-											,poids = '$poids'
-											,allow_physical = '$allow_physical'
-											,allow_dematerialise = '$allow_dematerialise'
-											,active = '$active'
-											WHERE id = '$id'";
-
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table SET catid, reference, title, description, description_short, price, priceht, tva_assujetti, tva, photo, poids, allow_physical, allow_dematerialise, active WHERE id = $id";
+				$result_edit = sbDb()->update('sb_store_product', array('catid' => $catid, 'reference' => $reference, 'title' => $title, 'description' => $description, 'description_short' => $description_short, 'price' => $price, 'priceht' => $priceht, 'tva_assujetti' => $tva_assujetti, 'tva' => $tva, 'photo' => $photo, 'poids' => $poids, 'allow_physical' => $allow_physical, 'allow_dematerialise' => $allow_dematerialise, 'active' => $active), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -229,8 +212,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id                  = intval($_GET['id'] ?? 0);
 			$query_1             = "SELECT * FROM $table WHERE id = $id";
-			$requestQ            = $sbsql->query($query_1);
-			$assoc               = $sbsql->assoc($requestQ);
+			$assoc               = sbDb()->row($query_1) ?: array();
 			$catid               = $assoc['catid'];
 			$reference           = $assoc['reference'];
 			$title               = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']));
@@ -269,8 +251,7 @@ switch($action) {
 		// --- Catégorie
 		// ----------------------------
 		$query_category   = "SELECT * FROM $table_cat WHERE active = '1' ORDER BY title ASC";
-		$request_category = $sbsql->query($query_category);
-		$categories       = $sbsql->toarray($request_category);
+		$categories       = sbDb()->all($query_category) ?: array();
 		$sbform->openSelect("Catégorie", array("id"=>"catid", "name"=>"catid", "style" => "width: 500px;"), true);
 		if ($catid == '' || $catid > 0) $sbform->addOption('Choisissez une catégorie', array ("value"=>"", "selected"=>""));
 		foreach($categories as $row) {
@@ -363,7 +344,7 @@ switch($action) {
 				// --- brut dans le WHERE (les actions de tri ne passent pas par le jeton
 				// --- CSRF de openForm(), voir index.php).
 				$query_sort  = "UPDATE $table SET sort = $tri WHERE id = " . intval($sb_toSort[$i]);
-				$result_sort = $sbsql->query($query_sort);
+				$result_sort = sbDb()->update('sb_store_product', array('sort' => $tri), 'id = ?', array(intval($sb_toSort[$i]))) !== false;
 				if (!$result_sort) {
 					// --- Error Database
 					$sql_error++;
@@ -382,8 +363,7 @@ switch($action) {
 
 		// --- Recuperation des donnees
 		$query_3      = "SELECT * FROM $table ORDER BY sort ASC";
-		$requestQ      = $sbsql->query($query_3);
-		$sort_array    = $sbsql->toarray($requestQ);
+		$sort_array    = sbDb()->all($query_3) ?: array();
 		foreach($sort_array as $sort) {
 			$active = ($sort['active']) ? $sbsanitize->displayLang(sb_utf8_encode($sort['title'])) : "<span style='color: red;'>".$sbsanitize->displayLang(sb_utf8_encode($sort['title']))."</span>";
 			$sort_id          = $sort['id'];
@@ -417,14 +397,13 @@ switch($action) {
 			// -------------------------------------
 			// --- Check if product uses this category
 			$query_prod   = "SELECT id FROM $table WHERE catid = $get_id";
-			$request_prod = $sbsql->query($query_prod);
-			$numrows_prod = $sbsql->numrows($request_prod);
+			$numrows_prod = count(sbDb()->all($query_prod) ?: array());
 			// -------------------------------------
 			if ($numrows_prod > 0) {
 				$sb_msg_error = 'Cette catégorie contient des produits !!<br>Vous devez supprimer ou déplacer les produits de cette catégorie avant !!';
 			} else {
-				$query_5 = "DELETE FROM $table_cat WHERE id = '$get_id'";
-				$request  = $sbsql->query($query_5);
+				$query_5 = "DELETE FROM $table_cat WHERE id = $get_id";
+				$request  = sbDb()->delete('sb_store_category', 'id = ?', array($get_id)) !== false;
 
 				if ($request)
 					$sb_msg_valid = 'Catégorie supprimée avec succès';
@@ -439,8 +418,7 @@ switch($action) {
 
 		// Contents table
 		$query_4  = "SELECT * FROM $table_cat ORDER BY sort ASC";
-		$request2 = $sbsql->query($query_4);
-		$result2  = $sbsql->toarray($request2);
+		$result2  = sbDb()->all($query_4) ?: array();
 
 		$sbsmarty->assign('allcat', true);
 		$sbsmarty->assign('allcategory', $result2);
@@ -480,9 +458,8 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'categoryadd') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table_cat (title,description,photo,active)
-						  VALUES ('$title','$description','$photo','$active')";
-				$result_add = $sbsql->query($query);
+				$query = "INSERT INTO $table_cat (title,description,photo,active)";
+				$result_add = sbDb()->insert('sb_store_category', array('title' => $title, 'description' => $description, 'photo' => $photo, 'active' => $active)) !== false;
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$title = $description = $photo = $active = '';
@@ -495,13 +472,8 @@ switch($action) {
 
 			} elseif ($formType == 'categoryedit' && $id > 0) {
 				// UPDATE DATAS
-				$query = "UPDATE $table_cat SET title = '$title'
-											    ,description = '$description'
-											    ,photo = '$photo'
-											    ,active = '$active'
-											    WHERE id = '$id'";
-
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table_cat SET title, description, photo, active WHERE id = $id";
+				$result_edit = sbDb()->update('sb_store_category', array('title' => $title, 'description' => $description, 'photo' => $photo, 'active' => $active), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- Message SUCCES
 					$sb_msg_valid = 'Catégorie modifiée avec succès';
@@ -525,8 +497,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id          = intval($_GET['id'] ?? 0);
 			$query_1     = "SELECT * FROM $table_cat WHERE id = $id";
-			$requestQ    = $sbsql->query($query_1);
-			$assoc       = $sbsql->assoc($requestQ);
+			$assoc       = sbDb()->row($query_1) ?: array();
 			$title       = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']));
 			$description = $sbsanitize->displayLang(sb_utf8_encode($assoc['description']));
 			$photo       = $assoc['photo'];
@@ -590,20 +561,8 @@ switch($action) {
 			$unique_code_length    = intval($_POST['unique_code_length'] ?? 0);
 
 			// UPDATE DATAS (ligne unique, id=1)
-			$query = "UPDATE $table_config SET is_tva = '$is_tva'
-										       ,currency = '$currency'
-										       ,currency_text = '$currency_text'
-										       ,currency_position = '$currency_position'
-										       ,n_decimals = '$n_decimals'
-										       ,per_page = '$per_page'
-										       ,invoice_prefix = '$invoice_prefix'
-										       ,unique_code_root = '$unique_code_root'
-										       ,unique_code_key = '$unique_code_key'
-										       ,unique_code_pattern = '$unique_code_pattern'
-										       ,unique_code_length = '$unique_code_length'
-										       WHERE id = '1'";
-
-			$result_edit = $sbsql->query($query);
+			$query = "UPDATE $table_config SET is_tva, currency, currency_text, currency_position, n_decimals, per_page, invoice_prefix, unique_code_root, unique_code_key, unique_code_pattern, unique_code_length WHERE id = 1";
+			$result_edit = sbDb()->update('sb_store_config', array('is_tva' => $is_tva, 'currency' => $currency, 'currency_text' => $currency_text, 'currency_position' => $currency_position, 'n_decimals' => $n_decimals, 'per_page' => $per_page, 'invoice_prefix' => $invoice_prefix, 'unique_code_root' => $unique_code_root, 'unique_code_key' => $unique_code_key, 'unique_code_pattern' => $unique_code_pattern, 'unique_code_length' => $unique_code_length), 'id = ?', array(1)) !== false;
 			if ($result_edit) {
 				// --- Message SUCCES
 				$sb_msg_valid = 'Paramètres modifiés avec succès';
@@ -618,8 +577,7 @@ switch($action) {
 		} else {
 			// --- Recuperation des donnees
 			$query_1  = "SELECT * FROM $table_config WHERE id = 1";
-			$requestQ = $sbsql->query($query_1);
-			$assoc    = $sbsql->assoc($requestQ);
+			$assoc    = sbDb()->row($query_1) ?: array();
 
 			$is_tva               = $assoc['is_tva'];
 			$currency              = $assoc['currency'];

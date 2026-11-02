@@ -39,12 +39,12 @@ if (!function_exists("sbSearchSource_news")) {
 	function sbSearchSource_news($terms, $lang) {
 		global $sbsql;
 		$results = array();
-		$where   = sbSearchWhere(array('title', 'subtitle', 'desc_short', 'desc_full'), $terms);
+		$bind    = array();
+		$where   = sbSearchWhere(array('title', 'subtitle', 'desc_short', 'desc_full'), $terms, $bind);
 		$query   = "SELECT id, title, subtitle, desc_short, desc_full
 					FROM " . sbSearchTable('sb_news') . "
 					WHERE active = '1'" . $where . " ORDER BY date DESC";
-		$request = $sbsql->query($query);
-		$rows    = $sbsql->toarray($request);
+		$rows    = sbDb()->all($query, $bind) ?: array();
 		if ($rows) {
 			foreach ($rows as $row) {
 				if (!sbSearchMatches(array($row['title'], $row['subtitle'], $row['desc_short'], $row['desc_full']), $terms)) continue;
@@ -72,8 +72,7 @@ if (!function_exists("sbSearchHosts_news")) {
 		$query   = "SELECT id, title, desc_short, desc_full
 					FROM " . sbSearchTable('sb_news') . "
 					WHERE active = '1' AND (desc_full LIKE '%[CS %' OR desc_short LIKE '%[CS %')";
-		$request = $sbsql->query($query);
-		$rows    = $sbsql->toarray($request);
+		$rows    = sbDb()->all($query) ?: array();
 		if ($rows) {
 			foreach ($rows as $row) {
 				$url   = sbSearchNewsUrl($row['id'], $row['title']);

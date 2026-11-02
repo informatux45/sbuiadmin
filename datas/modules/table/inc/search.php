@@ -50,22 +50,22 @@ if (!function_exists("sbSearchSource_table")) {
 		$hits    = array();
 		$t_table = sbSearchTable('sb_table');
 
-		$where   = sbSearchWhere(array('name'), $terms);
-		$request = $sbsql->query("SELECT id, name FROM {$t_table} WHERE active = '1'" . $where);
-		$rows    = $sbsql->toarray($request);
+		$bind    = array();
+		$where   = sbSearchWhere(array('name'), $terms, $bind);
+		$rows    = sbDb()->all("SELECT id, name FROM {$t_table} WHERE active = '1'" . $where, $bind);
 		if ($rows) foreach ($rows as $row) $hits[intval($row['id'])] = '';
 
-		$where   = sbSearchWhere(array('content'), $terms);
-		$request = $sbsql->query("SELECT tid, content FROM " . sbSearchTable('sb_table_datas') . " WHERE 1 = 1" . $where);
-		$rows    = $sbsql->toarray($request);
+		$bind    = array();
+		$where   = sbSearchWhere(array('content'), $terms, $bind);
+		$rows    = sbDb()->all("SELECT tid, content FROM " . sbSearchTable('sb_table_datas') . " WHERE 1 = 1" . $where, $bind);
 		if ($rows) foreach ($rows as $row) {
 			$tid = intval($row['tid']);
 			if (empty($hits[$tid])) $hits[$tid] = $row['content'];
 		}
 
-		$where   = sbSearchWhere(array('title'), $terms);
-		$request = $sbsql->query("SELECT tid, title FROM " . sbSearchTable('sb_table_structure') . " WHERE active = '1'" . $where);
-		$rows    = $sbsql->toarray($request);
+		$bind    = array();
+		$where   = sbSearchWhere(array('title'), $terms, $bind);
+		$rows    = sbDb()->all("SELECT tid, title FROM " . sbSearchTable('sb_table_structure') . " WHERE active = '1'" . $where, $bind);
 		if ($rows) foreach ($rows as $row) {
 			$tid = intval($row['tid']);
 			if (empty($hits[$tid])) $hits[$tid] = $row['title'];
@@ -73,8 +73,7 @@ if (!function_exists("sbSearchSource_table")) {
 
 		if (!empty($hits)) {
 			$in      = implode(',', array_map('intval', array_keys($hits)));
-			$request = $sbsql->query("SELECT id, name FROM {$t_table} WHERE active = '1' AND id IN ($in)");
-			$rows    = $sbsql->toarray($request);
+			$rows    = sbDb()->all("SELECT id, name FROM {$t_table} WHERE active = '1' AND id IN ($in)");
 			if ($rows) {
 				foreach ($rows as $row) {
 					$cells = sbSearchTableCells($hits[intval($row['id'])]);

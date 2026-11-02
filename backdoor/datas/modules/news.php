@@ -59,8 +59,8 @@ switch($action) {
 		// Action DELETE
 		if ($action == 'del') {
 			$get_id  = intval($_GET['id'] ?? 0);
-			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
-			$request = $sbsql->query($query_2);
+			$query_2 = "DELETE FROM $table WHERE id = $get_id";
+			$request = sbDb()->delete('sb_news', 'id = ?', array($get_id)) !== false;
 			
 			if ($request)
 				$sb_msg_valid = $text . ' supprimé avec succès';
@@ -76,8 +76,7 @@ switch($action) {
 		$query    = "SELECT t1.*, t2.title AS catname
 					 FROM $table AS t1
 					 LEFT JOIN $table_category AS t2 ON (t1.catid = t2.id)";
-		$request2 = $sbsql->query($query);
-		$result2  = $sbsql->toarray($request2);
+		$result2  = sbDb()->all($query) ?: array();
 		
 		$sbsmarty->assign('all', true);
 		$sbsmarty->assign('allnew', $result2);
@@ -89,17 +88,13 @@ switch($action) {
 		$query_news_active       = "SELECT id FROM $table WHERE active = '1'";
 		$query_categories_total  = "SELECT id FROM $table_category";
 		$query_categories_active = "SELECT id FROM $table_category WHERE active = '1'";
-		$request_news_total    = $sbsql->query($query_news_total);
-		$numrows_news_total    = $sbsql->numrows();
+		$numrows_news_total    = count(sbDb()->all($query_news_total) ?: array());
 		$sbsmarty->assign('total_news', $numrows_news_total);
-		$request_news_active   = $sbsql->query($query_news_active);
-		$numrows_news_active   = $sbsql->numrows();
+		$numrows_news_active   = count(sbDb()->all($query_news_active) ?: array());
 		$sbsmarty->assign('total_news_active', $numrows_news_active);
-		$request_categories_total = $sbsql->query($query_categories_total);
-		$numrows_categories_total = $sbsql->numrows();
+		$numrows_categories_total = count(sbDb()->all($query_categories_total) ?: array());
 		$sbsmarty->assign('total_categories', $numrows_categories_total);
-		$request_categories_active  = $sbsql->query($query_categories_active);
-		$numrows_categories_active  = $sbsql->numrows();
+		$numrows_categories_active  = count(sbDb()->all($query_categories_active) ?: array());
 		$sbsmarty->assign('total_categories_active', $numrows_categories_active);
 		// ----------------------------------------
 		
@@ -122,14 +117,13 @@ switch($action) {
 			// -------------------------------------
 			// --- Check if News article in CATEGORY
 			$query_article   = "SELECT * FROM $table WHERE catid = $get_id";
-			$request_article = $sbsql->query($query_article);
-			$numrows_article = $sbsql->numrows($request_article);
+			$numrows_article = count(sbDb()->all($query_article) ?: array());
 			// -------------------------------------
 			if ($numrows_article > 0) {
 				$sb_msg_error = 'Cette catégorie contient des articles !!<br>Vous devez supprimer les articles contenus dans cette catégorie avant !!';		
 			} else {
-				$query_5 = "DELETE FROM $table_category WHERE id = '$get_id'";
-				$request  = $sbsql->query($query_5);
+				$query_5 = "DELETE FROM $table_category WHERE id = $get_id";
+				$request  = sbDb()->delete('sb_news_category', 'id = ?', array($get_id)) !== false;
 				
 				if ($request)
 					$sb_msg_valid = 'Catégorie supprimée avec succès';
@@ -144,8 +138,7 @@ switch($action) {
 		
 		// Contents table
 		$query_4  = "SELECT * FROM $table_category";
-		$request2 = $sbsql->query($query_4);
-		$result2  = $sbsql->toarray($request2);
+		$result2  = sbDb()->all($query_4) ?: array();
 		
 		$sbsmarty->assign('allcat', true);
 		$sbsmarty->assign('allcategory', $result2);
@@ -219,9 +212,8 @@ switch($action) {
 			if ($formType == 'add') {
 				// INSERT DATAS
 				// viewed explicite : des bases anciennes n'ont pas de DEFAULT (mode strict)
-				$query = "INSERT INTO $table (catid,title,subtitle,desc_short,desc_full,image,date,viewed,active)
-						  VALUES ('$catid','$title','$subtitle','$desc_short','$desc_full','$photo','$date',0,'$active')";
-				$result_add = $sbsql->query($query);
+				$query = "INSERT INTO $table (catid,title,subtitle,desc_short,desc_full,image,date,viewed,active)";
+				$result_add = sbDb()->insert('sb_news', array('catid' => $catid, 'title' => $title, 'subtitle' => $subtitle, 'desc_short' => $desc_short, 'desc_full' => $desc_full, 'image' => $photo, 'date' => $date, 'viewed' => 0, 'active' => $active)) !== false;
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$catid = $title_fr = $desc_short_fr = $desc_full_fr = $title_en = $desc_short_en = $desc_full_en = $photo = $date = $active = '';
@@ -234,17 +226,8 @@ switch($action) {
 
 			} elseif ($formType == 'edit' && $id > 0) {
 				// UPDATE DATAS
-				$query = "UPDATE $table SET catid = '$catid'
-																,title = '$title'
-																,subtitle = '$subtitle'
-																,desc_short = '$desc_short'
-																,desc_full = '$desc_full'
-																,image = '$photo'
-																,date = '$date'
-																,active = '$active'
-																WHERE id = '$id'";
-											 
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table SET catid, title, subtitle, desc_short, desc_full, image, date, active WHERE id = $id";
+				$result_edit = sbDb()->update('sb_news', array('catid' => $catid, 'title' => $title, 'subtitle' => $subtitle, 'desc_short' => $desc_short, 'desc_full' => $desc_full, 'image' => $photo, 'date' => $date, 'active' => $active), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -280,8 +263,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id            = intval($_GET['id'] ?? 0);
 			$query_1       = "SELECT * FROM $table WHERE id = $id";
-			$requestQ      = $sbsql->query($query_1);
-			$assoc         = $sbsql->assoc($requestQ);
+			$assoc         = sbDb()->row($query_1) ?: array();
 			$catid         = $assoc['catid'];
 			$title_fr      = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']));
 			$subtitle_fr   = $sbsanitize->displayLang(sb_utf8_encode($assoc['subtitle']));
@@ -319,10 +301,8 @@ switch($action) {
 		// --- CATEGORIES
 		// -----------------------------------
 		// --- Extraction de toutes les categories
-		$sbsql->free();
 		$query_cat   = "SELECT id, title FROM $table_category ORDER BY title ASC";
-		$request_cat = $sbsql->query($query_cat);
-		$categories  = $sbsql->toarray($request_cat);
+		$categories  = sbDb()->all($query_cat) ?: array();
 		// --- Initialisation
 		$tab_category = array();
 		// --- Tableau des categories
@@ -422,9 +402,8 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'categoryadd') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table_category (title,subtitle,photo,sort,active)
-						  VALUES ('$title','$subtitle','$photo','0','$active')";
-				$result_add = $sbsql->query($query);
+				$query = "INSERT INTO $table_category (title,subtitle,photo,sort,active)";
+				$result_add = sbDb()->insert('sb_news_category', array('title' => $title, 'subtitle' => $subtitle, 'photo' => $photo, 'sort' => 0, 'active' => $active)) !== false;
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$title_fr = $subtitle_fr = $photo = $active = '';
@@ -437,13 +416,8 @@ switch($action) {
 
 			} elseif ($formType == 'categoryedit' && $id > 0) {
 				// UPDATE DATAS
-				$query = "UPDATE $table_category SET title = '$title'
-													,subtitle = '$subtitle'
-													,photo = '$photo'
-													,active = '$active'
-													WHERE id = '$id'";
-											 
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table_category SET title, subtitle, photo, active WHERE id = $id";
+				$result_edit = sbDb()->update('sb_news_category', array('title' => $title, 'subtitle' => $subtitle, 'photo' => $photo, 'active' => $active), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -469,8 +443,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id          = intval($_GET['id'] ?? 0);
 			$query_1     = "SELECT * FROM $table_category WHERE id = $id";
-			$requestQ    = $sbsql->query($query_1);
-			$assoc       = $sbsql->assoc($requestQ);
+			$assoc       = sbDb()->row($query_1) ?: array();
 			$title_fr    = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']));
 			$subtitle_fr = $sbsanitize->displayLang(sb_utf8_encode($assoc['subtitle']));
 			// ----------------------------
@@ -551,7 +524,7 @@ switch($action) {
 				// --- brut dans le WHERE (les actions de tri ne passent pas par le jeton
 				// --- CSRF de openForm(), voir index.php).
 				$query_sort  = "UPDATE $table_category SET sort = $tri WHERE id = " . intval($sb_toSort[$i]);
-				$result_sort = $sbsql->query($query_sort);
+				$result_sort = sbDb()->update('sb_news_category', array('sort' => $tri), 'id = ?', array(intval($sb_toSort[$i]))) !== false;
 				if (!$result_sort) {
 					// --- Error Database
 					$sql_error++;
@@ -571,8 +544,7 @@ switch($action) {
 		// --- Recuperation des donnees
 		$sid           = intval($_GET['sid'] ?? 0);
 		$query_3       = "SELECT * FROM $table_category ORDER BY sort ASC";
-		$requestQ      = $sbsql->query($query_3);
-		$sort_array    = $sbsql->toarray($requestQ);
+		$sort_array    = sbDb()->all($query_3) ?: array();
 		foreach($sort_array as $sort) {
 			$active = ($sort['active']) ? $sbsanitize->displayLang(sb_utf8_encode($sort['title'])) : "<span style='color: red;'>".$sbsanitize->displayLang(sb_utf8_encode($sort['title']))."</span>";
 			$sort_id          = $sort['id'];
@@ -643,8 +615,7 @@ switch($action) {
 
 					// --- Relecture pour réafficher l'existant plutôt qu'un éditeur vide
 					$query_current  = "SELECT $action FROM $table_category WHERE id = '$id'";
-					$requestCurrent = $sbsql->query($query_current);
-					$assocCurrent   = $sbsql->assoc($requestCurrent);
+					$assocCurrent   = sbDb()->row($query_current) ?: array();
 					// --- Message ERROR (aucune écriture)
 					$sb_msg_error = "L'éditeur de code n'a pas répondu : le template (".$action.") n'a pas été modifié. Rechargez la page et réessayez.";
 					$content      = isset($assocCurrent[$action]) ? $assocCurrent[$action] : '';
@@ -653,10 +624,9 @@ switch($action) {
 				} else {
 
 					// UPDATE DATAS
-					$content_sql = $sbsql->escape_string($content);
-					$query = "UPDATE $table_category SET $action = '$content_sql' WHERE id = '$id'";
-
-					$result_edit = $sbsql->query($query);
+					// $action : tpl_list ou tpl_single (case du switch)
+					$query = "UPDATE $table_category SET $action WHERE id = $id";
+					$result_edit = sbDb()->update('sb_news_category', array($action => (string) $content), 'id = ?', array($id)) !== false;
 					if ($result_edit) {
 						// --- On ne vide pas les champs du formulaire
 						// -------------------------------------------
@@ -682,8 +652,7 @@ switch($action) {
 			$catid = intval($_GET['id'] ?? 0);
 			// --- Recuperation des donnees
 			$query_1   = "SELECT title, $action FROM $table_category WHERE id = '$catid'";
-			$requestQ  = $sbsql->query($query_1);
-			$assoc     = $sbsql->assoc($requestQ);
+			$assoc     = sbDb()->row($query_1) ?: array();
 			$id        = $catid;
 			$content   = $assoc[$action];
 			$title_fr  = $sbsanitize->displayLang($assoc['title']); // Legende
@@ -697,8 +666,7 @@ switch($action) {
 			$catid = intval($_GET['id'] ?? 0);
 			// --- Recuperation des donnees
 			$query_1   = "SELECT title, $action FROM $table_category WHERE id = '$catid'";
-			$requestQ  = $sbsql->query($query_1);
-			$assoc     = $sbsql->assoc($requestQ);
+			$assoc     = sbDb()->row($query_1) ?: array();
 			$title_fr  = $sbsanitize->displayLang($assoc['title']); // Legende
 		}
 		
@@ -771,26 +739,8 @@ switch($action) {
 			// EDIT
 			if ($formType == 'settings' && $id > 0) {
 				// UPDATE DATAS
-				$query = "UPDATE $table_settings SET catid = '$catid'
-													,catid_module_show = '$catid_module_show'
-													,item_per_page = '$item_per_page'
-													,module_start = '$module_start'
-													,breadcrumb = '$breadcrumb'
-													,title_h1 = '$title_h1'
-													,title_h2 = '$title_h2'
-													,theme_view_cat = '$theme_view_cat'
-													,theme_view_list = '$theme_view_list'
-													,theme_view_single = '$theme_view_single'
-													,other_news = '$other_news'
-													,other_news_per_page = '$other_news_per_page'
-													,other_news_title = '$other_news_title'
-													,other_news_type = '$other_news_type'
-													,news_next_prev = '$news_next_prev'
-													,comments = '$comments'
-													,comments_user = '$comments_user'
-													WHERE id = '$id'";
-											 
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table_settings SET catid, catid_module_show, item_per_page, module_start, breadcrumb, title_h1, title_h2, theme_view_cat, theme_view_list, theme_view_single, other_news, other_news_per_page, other_news_title, other_news_type, news_next_prev, comments, comments_user WHERE id = $id";
+				$result_edit = sbDb()->update('sb_news_settings', array('catid' => $catid, 'catid_module_show' => $catid_module_show, 'item_per_page' => $item_per_page, 'module_start' => $module_start, 'breadcrumb' => $breadcrumb, 'title_h1' => $title_h1, 'title_h2' => $title_h2, 'theme_view_cat' => $theme_view_cat, 'theme_view_list' => $theme_view_list, 'theme_view_single' => $theme_view_single, 'other_news' => $other_news, 'other_news_per_page' => $other_news_per_page, 'other_news_title' => $other_news_title, 'other_news_type' => $other_news_type, 'news_next_prev' => $news_next_prev, 'comments' => $comments, 'comments_user' => $comments_user), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -812,8 +762,7 @@ switch($action) {
 		if ($formType == 'settings' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
 			$query_1              = "SELECT * FROM $table_settings WHERE id = $id";
-			$requestQ             = $sbsql->query($query_1);
-			$assoc                = $sbsql->assoc($requestQ);
+			$assoc                = sbDb()->row($query_1) ?: array();
 			$catid                = $assoc['catid'];
 			$catid_module_show    = $assoc['catid_module_show'];
 			$item_per_page        = $assoc['item_per_page'];
@@ -920,8 +869,7 @@ switch($action) {
 		// --- Liste des catégories visibles
 		// ----------------------------
 		$query_cat   = "SELECT * FROM $table_category WHERE active = '1' ORDER BY title ASC";
-		$request_cat = $sbsql->query($query_cat);
-		$categories  = $sbsql->toarray($request_cat);
+		$categories  = sbDb()->all($query_cat) ?: array();
 		// Initialisation
 		$tab_categories = array();
 		// --- Tableau des categories
@@ -1046,11 +994,8 @@ switch($action) {
 			// EDIT
 			if ($formType == 'settingscategory' && $id > 0) {
 				// UPDATE DATAS
-				$query = "UPDATE $table_category SET module_show = '$module_show'
-																		 ,module_show_masonry = '$module_show_masonry'
-																		 WHERE id = '$id'";
-											 
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table_category SET module_show, module_show_masonry WHERE id = $id";
+				$result_edit = sbDb()->update('sb_news_category', array('module_show' => $module_show, 'module_show_masonry' => $module_show_masonry), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -1072,8 +1017,7 @@ switch($action) {
 		if ($formType == 'settingscategory' && empty($_POST['form_submit'])) {
 			// --- Recuperation des donnees
 			$query_1             = "SELECT * FROM $table_category WHERE id = $id";
-			$requestQ            = $sbsql->query($query_1);
-			$assoc               = $sbsql->assoc($requestQ);
+			$assoc               = sbDb()->row($query_1) ?: array();
 			$module_show         = sb_utf8_encode($assoc['module_show']);
 			$module_show_masonry = $assoc['module_show_masonry'];
 			$title_fr            = $sbsanitize->displayLang($assoc['title']);

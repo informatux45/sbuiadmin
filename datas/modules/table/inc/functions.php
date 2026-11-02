@@ -26,7 +26,7 @@ function shortcode_sbtable($param = '') {
 
 	// --- Initialization
 	$html_table = '';
-	$id         = intval($param['id']);
+	$id         = intval($param['id'] ?? 0);
 	// --- Tables
 	$table_table     = _AM_DB_PREFIX . "sb_table";
 	$table_structure = _AM_DB_PREFIX . "sb_table_structure";
@@ -34,19 +34,15 @@ function shortcode_sbtable($param = '') {
 	// --- SQL TABLE
 	$query = "SELECT t2.tid, t2.content FROM $table_table AS t1
 			  LEFT JOIN $table_datas AS t2 ON (t1.id = t2.tid)
-			  WHERE t1.id = '$id' AND t1.active = '1'
+			  WHERE t1.id = ? AND t1.active = '1'
 			  ORDER BY t2.sort ASC
 			 ";
-	$request = $sbsql->query($query);
-	$table   = $sbsql->toarray($request);
+	$table   = sbDb()->all($query, array($id)) ?: array();
 	
 	// --- Check if news exists
 	if ($table) {
 		// --- Get Config options Table
-		$query_config      = "SELECT type FROM $table_table WHERE id = '$id'";
-		$request_config    = $sbsql->query($query_config);
-		$result_config     = $sbsql->object($request_config);
-		$responsive_config = $sbsanitize->sTrim($result_config->type);
+		$responsive_config = $sbsanitize->sTrim((string) sbDb()->value("SELECT type FROM {sb_table} WHERE id = ?", array($id)));
 		// --- Construct HTML
 		switch($responsive_config) {
 			default:
@@ -68,8 +64,7 @@ function shortcode_sbtable($param = '') {
 
 		// --- SQL Request
 		$query_structure   = "SELECT * FROM $table_structure WHERE tid = '$id' AND active = 1 ORDER BY sort ASC";
-		$request_structure = $sbsql->query($query_structure);
-		$result_structure  = $sbsql->toarray($request_structure);
+		$result_structure  = sbDb()->all($query_structure) ?: array();
 
 		$columns      = [];
 		$field_type   = [];

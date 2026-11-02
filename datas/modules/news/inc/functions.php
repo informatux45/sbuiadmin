@@ -20,16 +20,16 @@ if (!defined('SB_PATH')) {
  * return HTML
  */
 function shortcode_sbnews_item($param = '') {
-	global $sbsanitize, $sbsql;
+	global $sbsanitize;
+	// --- Id : entier (il vient du texte d'un contenu, partait tel quel dans le SQL et l'URL)
+	$param['id'] = intval($param['id'] ?? 0);
 
 	// --- Initialization
 	$item_html = '';
 	// --- Tables
 	$table = _AM_DB_PREFIX . 'sb_news';
 	// --- SQL Slider
-	$query_item   = "SELECT * FROM $table WHERE id = '{$param['id']}' AND active = '1'";
-	$request_item = $sbsql->query($query_item);
-	$item_info    = $sbsql->assoc($request_item);
+	$item_info    = sbDb()->row("SELECT * FROM {sb_news} WHERE id = ? AND active = '1'", array($param['id'])) ?: array();
 	// --- Check if news exists
 	if ($item_info) {
 		// --- Check if new is active
@@ -96,14 +96,11 @@ function shortcode_sbnews_latest($param = '') {
 	$table_category = _AM_DB_PREFIX . 'sb_news_category';
 	// --- SQL Request
 	//$query_item   = "SELECT t1.*, t2.title as catname FROM $table AS t1 WHERE catid = '{$param['id']}'";
-	$query_item   = "SELECT t1.*, t2.title AS catname
-					 FROM $table AS t1
-					 LEFT JOIN $table_category AS t2 ON (t1.catid = t2.id)
-					 WHERE t1.catid = '{$param['id']}' AND t1.active = '1'
-					 ORDER BY date DESC LIMIT 1
-					 ";
-	$request_item = $sbsql->query($query_item);
-	$item_info    = $sbsql->assoc($request_item);
+	$item_info    = sbDb()->row("SELECT t1.*, t2.title AS catname
+					 FROM {sb_news} AS t1
+					 LEFT JOIN {sb_news_category} AS t2 ON (t1.catid = t2.id)
+					 WHERE t1.catid = ? AND t1.active = '1'
+					 ORDER BY date DESC LIMIT 1", array(intval($param['id'] ?? 0))) ?: array();
 	// --- Check if news exists
 	if ($item_info) {
 		// --- Check if new is active
@@ -180,13 +177,14 @@ function shortcode_sbnews_blocks_recent($param = '') {
 	$query_item  = "SELECT t1.*, t2.title AS catname
 					FROM $table AS t1
 					LEFT JOIN $table_category AS t2 ON (t1.catid = t2.id) ";
-	if ($catid)
-		$query_item .= "WHERE t1.catid = '$catid' AND t1.active = '1' ";
-	else
+	$bind = array();
+	if ($catid) {
+		$query_item .= "WHERE t1.catid = ? AND t1.active = '1' ";
+		$bind[] = $catid;
+	} else
 		$query_item .= "WHERE t1.active = '1' ";
-	$query_item .= "ORDER BY date DESC LIMIT $limit";
-	$request_item = $sbsql->query($query_item);
-	$items_info   = $sbsql->toarray($request_item);
+	$query_item .= "ORDER BY date DESC " . sbDb()->limit($limit);
+	$items_info   = sbDb()->all($query_item, $bind) ?: array();
 	
 	// --- Check if news exists
 	if ($items_info) {
@@ -236,14 +234,12 @@ function shortcode_sbnews_blocks_recent($param = '') {
  */
 if (!function_exists("insert_sbGetNewsViewed")) {
 	function insert_sbGetNewsViewed($param) {
-		global $sbsql;
 		// --- Initialize
-		$id    = $param['id'];
-		$table = _AM_DB_PREFIX . 'sb_news';
+		$id    = intval($param['id'] ?? 0);
 		// --- Check if ID
 		if (!$id) return false;
 		// --- Update VIEWED (Increment)
-		$result = $sbsql->query( "UPDATE $table SET viewed = viewed + 1 WHERE id = '$id'" );
+		$result = sbDb()->run("UPDATE {sb_news} SET viewed = viewed + 1 WHERE id = ?", array($id));
 	}
 }
 

@@ -59,14 +59,14 @@ switch($action) {
 		// Action DELETE table
 		if ($action == 'del') {
 			$get_id  = intval($_GET['id'] ?? 0);
-			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
-			$request = $sbsql->query($query_2);
+			$query_2 = "DELETE FROM $table WHERE id = $get_id";
+			$request = sbDb()->delete('sb_table', 'id = ?', array($get_id)) !== false;
 			// --- Supression de la structure
-			$query_del_structure   = "DELETE FROM $table_structure WHERE tid = '$get_id'";
-			$request_del_structure = $sbsql->query($query_del_structure);
+			$query_del_structure   = "DELETE FROM $table_structure WHERE tid = $get_id";
+			$request_del_structure = sbDb()->delete('sb_table_structure', 'tid = ?', array($get_id)) !== false;
 			// --- Suppression des données
-			$query_del_datas   = "DELETE FROM $table_datas WHERE tid = '$get_id'";
-			$request_del_datas = $sbsql->query($query_del_datas);
+			$query_del_datas   = "DELETE FROM $table_datas WHERE tid = $get_id";
+			$request_del_datas = sbDb()->delete('sb_table_datas', 'tid = ?', array($get_id)) !== false;
 			
 			if ($request)
 				$sb_msg_valid = $text . ' supprimé avec succès (ses données et sa structure également)';
@@ -80,8 +80,7 @@ switch($action) {
 		
 		// Contents table
 		$query    = "SELECT * FROM $table";
-		$request2 = $sbsql->query($query);
-		$result2  = $sbsql->toarray($request2);
+		$result2  = sbDb()->all($query) ?: array();
 		
 		$sbsmarty->assign('all', true);
 		$sbsmarty->assign('alltable', $result2);
@@ -120,9 +119,8 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'add') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table (name,type,active)
-						  VALUES ('$name', '$type', '$active')";
-				$result_add = $sbsql->query($query);
+				$query = "INSERT INTO $table (name,type,active)";
+				$result_add = sbDb()->insert('sb_table', array('name' => $name, 'type' => $type, 'active' => $active)) !== false;
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$name = $active = '';
@@ -135,12 +133,8 @@ switch($action) {
 
 			} elseif ($formType == 'edit' && $id > 0) {
 				// UPDATE DATAS
-				$query = "UPDATE $table SET name = '$name'
-										   ,active = '$active'
-										   ,type = '$type'
-										   WHERE id = '$id'";
-											 
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table SET name, active, type WHERE id = $id";
+				$result_edit = sbDb()->update('sb_table', array('name' => $name, 'active' => $active, 'type' => $type), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -166,8 +160,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id       = intval($_GET['id'] ?? 0);
 			$query_1  = "SELECT * FROM $table WHERE id = $id";
-			$requestQ = $sbsql->query($query_1);
-			$assoc    = $sbsql->assoc($requestQ);
+			$assoc    = sbDb()->row($query_1) ?: array();
 			$name     = sb_utf8_encode($assoc['name']);
 			$type     = sb_utf8_encode($assoc['type']);
 			$active   = $assoc['active'];
@@ -223,8 +216,8 @@ switch($action) {
 		// Action DELETE Fields table (structure)
 		if ($action == 'delfield') {
 			$get_id  = intval($_GET['id'] ?? 0);
-			$query_2 = "DELETE FROM $table_structure WHERE id = '$get_id'";
-			$request = $sbsql->query($query_2);
+			$query_2 = "DELETE FROM $table_structure WHERE id = $get_id";
+			$request = sbDb()->delete('sb_table_structure', 'id = ?', array($get_id)) !== false;
 			
 			if ($request)
 				$sb_msg_valid = 'Colonne de tableau supprimée avec succès';
@@ -244,8 +237,7 @@ switch($action) {
 		// Contents table
 		$tid             = intval($_GET['tid'] ?? 0); // Table ID
 		$query_table     = "SELECT * FROM $table WHERE id = '$tid'";
-		$request_table   = $sbsql->query($query_table);
-		$result_table    = $sbsql->object($request_table);
+		$result_table    = ($sb_obj = sbDb()->row($query_table)) ? (object) $sb_obj : null;
 		$tabname         = $result_table->name;
 		$sbsmarty->assign('tabname', $tabname);
 
@@ -261,9 +253,8 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'editfield' && !$id) {
 				// INSERT DATAS
-				$query = "INSERT INTO $table_structure (tid,title,field_type,field_target,active,sort)
-						  VALUES ('$tid','$title','$field_type','$field_target','$active','99')";
-				$result_add = $sbsql->query($query);
+				$query = "INSERT INTO $table_structure (tid,title,field_type,field_target,active,sort)";
+				$result_add = sbDb()->insert('sb_table_structure', array('tid' => $tid, 'title' => $title, 'field_type' => $field_type, 'field_target' => $field_target, 'active' => $active, 'sort' => 99)) !== false;
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$tid = $title = $field_type = $field_target = $active = '';
@@ -276,13 +267,8 @@ switch($action) {
 
 			} elseif ($formType == 'editfield' && $id > 0) {
 				// UPDATE DATAS
-				$query = "UPDATE $table_structure SET title = '$title'
-													 ,field_type = '$field_type'
-													 ,field_target = '$field_target'
-													 ,active = '$active'
-													 WHERE id = '$id'";
-											 
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table_structure SET title, field_type, field_target, active WHERE id = $id";
+				$result_edit = sbDb()->update('sb_table_structure', array('title' => $title, 'field_type' => $field_type, 'field_target' => $field_target, 'active' => $active), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -304,8 +290,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id           = intval($_GET['id']);
 			$query_1      = "SELECT * FROM $table_structure WHERE id = $id";
-			$requestQ     = $sbsql->query($query_1);
-			$assoc        = $sbsql->assoc($requestQ);
+			$assoc        = sbDb()->row($query_1) ?: array();
 			$tid          = intval($assoc['tid']);
 			$title        = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']));
 			$field_type   = sb_utf8_encode($assoc['field_type']);
@@ -381,8 +366,7 @@ switch($action) {
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		// --------------------------------
 		$query_structure   = "SELECT * FROM $table_structure WHERE tid = '" . intval($_GET['tid'] ?? 0) . "' ORDER BY sort ASC";
-		$request_structure = $sbsql->query($query_structure);
-		$result_structure  = $sbsql->toarray($request_structure);
+		$result_structure  = sbDb()->all($query_structure) ?: array();
 		
 		if (!empty(array_filter($result_structure)))
 			$sbsmarty->assign('allstructure', $result_structure);
@@ -397,8 +381,8 @@ switch($action) {
 		// Action DELETE Fields table (structure)
 		if ($action == 'deldatas') {
 			$get_id  = intval($_GET['id'] ?? 0);
-			$query_2 = "DELETE FROM $table_datas WHERE id = '$get_id'";
-			$request = $sbsql->query($query_2);
+			$query_2 = "DELETE FROM $table_datas WHERE id = $get_id";
+			$request = sbDb()->delete('sb_table_datas', 'id = ?', array($get_id)) !== false;
 			
 			if ($request)
 				$sb_msg_valid = 'Ligne de donnée supprimée avec succès';
@@ -418,8 +402,7 @@ switch($action) {
 		// Contents table
 		$tid             = intval($_GET['tid'] ?? 0); // Table ID
 		$query_table     = "SELECT * FROM $table WHERE id = '$tid'";
-		$request_table   = $sbsql->query($query_table);
-		$result_table    = $sbsql->object($request_table);
+		$result_table    = ($sb_obj = sbDb()->row($query_table)) ? (object) $sb_obj : null;
 		$tabname         = $result_table->name;
 		$sbsmarty->assign('tabname', $tabname);
 
@@ -429,7 +412,8 @@ switch($action) {
 			$content = "";
 			// Loop $_POST (form submit)			
 			foreach($_POST as $key => $val) {
-				if ($key != 'form_submit') {
+				// Jeton CSRF : vérifié par index.php, jamais enregistré avec les données
+				if ($key != 'form_submit' && $key != 'sbuiadmin_csrf_token') {
 					if ($key == 'id')
 						$id = intval($val);
 					if ($key == 'tid')
@@ -447,9 +431,8 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'editdatas' && !$id) {
 				// INSERT DATAS
-				$query = "INSERT INTO $table_datas (tid,content,sort)
-						  VALUES ('$tid','$content','99')";
-				$result_add = $sbsql->query($query);
+				$query = "INSERT INTO $table_datas (tid,content,sort)";
+				$result_add = sbDb()->insert('sb_table_datas', array('tid' => $tid, 'content' => $content, 'sort' => 99)) !== false;
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					foreach($_POST as $key => $val) {
@@ -465,10 +448,8 @@ switch($action) {
 
 			} elseif ($formType == 'editdatas' && $id > 0) {
 				// UPDATE DATAS
-				$query = "UPDATE $table_datas SET content = '$content'
-												  WHERE id = '$id'";
-											 
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table_datas SET content WHERE id = $id";
+				$result_edit = sbDb()->update('sb_table_datas', array('content' => $content), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -497,8 +478,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id           = intval($_GET['id']);
 			$query_1      = "SELECT * FROM $table_datas WHERE id = $id ORDER BY sort ASC";
-			$requestQ     = $sbsql->query($query_1);
-			$assoc        = $sbsql->assoc($requestQ);
+			$assoc        = sbDb()->row($query_1) ?: array();
 			$tid          = intval($assoc['tid']);
 			$title_fr     = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']));
 			// ----------------------------
@@ -523,8 +503,7 @@ switch($action) {
 		$sbform->openForm(array('action' => "$formAction", 'name' => "$formName", 'id' => "$formName", 'reloadpage' => "$formAction", 'submitpage' => "$formAction"));
 		// --- Add inputs and more
 		$query_structure   = "SELECT * FROM $table_structure WHERE tid = '".intval($_GET['tid'] ?? 0)."' ORDER BY sort ASC";
-		$request_structure = $sbsql->query($query_structure);
-		$result_structure  = $sbsql->toarray($request_structure);
+		$result_structure  = sbDb()->all($query_structure) ?: array();
 
 		if (empty($_POST['form_submit']) && !empty($_GET['id'])) $structure_datas = sbTableEditdatas($result_structure, intval($_GET['id'] ?? 0));
 		
@@ -593,16 +572,14 @@ switch($action) {
 		// --- SQL Request (DATAS)
 		// --------------------------------
 		$query_datas   = "SELECT * FROM $table_datas WHERE tid = '" . intval($_GET['tid'] ?? 0) . "' ORDER BY sort ASC";
-		$request_datas = $sbsql->query($query_datas);
-		$result_datas  = $sbsql->toarray($request_datas);
+		$result_datas  = sbDb()->all($query_datas) ?: array();
 		// --------------------------------
 		// --- SQL Request (JSON)
 		// --------------------------------
 		// --- SQL Request
 		//$query_structure   = "SELECT * FROM $table_structure WHERE tid = '$tid' AND active = 1 ORDER BY sort ASC";
 		$query_structure   = "SELECT * FROM $table_structure WHERE tid = '" . intval($_GET['tid'] ?? 0) . "' ORDER BY sort ASC";
-		$request_structure = $sbsql->query($query_structure);
-		$result_structure  = $sbsql->toarray($request_structure);
+		$result_structure  = sbDb()->all($query_structure) ?: array();
 		$sbsmarty->assign('structure', $result_structure);
 		// --------------------------------
 		// Check if array is empty
@@ -620,8 +597,7 @@ switch($action) {
 		// --------------------------------
 		$tid             = intval($_GET['tid'] ?? 0);
 		$query_1         = "SELECT name FROM $table WHERE id = '$tid'";
-		$request_tblname = $sbsql->query($query_1);
-		$table_infos     = $sbsql->object($request_tblname);
+		$table_infos     = ($sb_obj = sbDb()->row($query_1)) ? (object) $sb_obj : null;
 		$formName        = "sort_form";
 		$formType        = "sortstructure";
 		$btn_add_edit    = "Valider le tri des colonnes";
@@ -643,7 +619,7 @@ switch($action) {
 				// --- brut dans le WHERE (les actions de tri ne passent pas par le jeton
 				// --- CSRF de openForm(), voir index.php).
 				$query_sort  = "UPDATE $table_structure SET sort = $tri WHERE id = " . intval($sb_toSort[$i]);
-				$result_sort = $sbsql->query($query_sort);
+				$result_sort = sbDb()->update('sb_table_structure', array('sort' => $tri), 'id = ?', array(intval($sb_toSort[$i]))) !== false;
 				if (!$result_sort) {
 					// --- Error Database
 					$sql_error++;
@@ -662,8 +638,7 @@ switch($action) {
 		
 		// --- Recuperation des donnees
 		$query_3    = "SELECT * FROM $table_structure WHERE tid = '$tid' ORDER BY sort ASC";
-		$requestQ   = $sbsql->query($query_3);
-		$sort_array = $sbsql->toarray($requestQ);
+		$sort_array = sbDb()->all($query_3) ?: array();
 		foreach($sort_array as $sort) {
 			$active = ($sort['active']) ? $sbsanitize->displayLang(sb_utf8_encode($sort['title'])) : "<span style='color: red;'>".$sbsanitize->displayLang(sb_utf8_encode($sort['title']))."</span>";
 			$sort_id          = $sort['id'];
@@ -697,8 +672,7 @@ switch($action) {
 		// --------------------------------
 		$tid             = intval($_GET['tid'] ?? 0);
 		$query_1         = "SELECT name FROM $table WHERE id = '$tid'";
-		$request_tblname = $sbsql->query($query_1);
-		$table_infos     = $sbsql->object($request_tblname);
+		$table_infos     = ($sb_obj = sbDb()->row($query_1)) ? (object) $sb_obj : null;
 		$formName        = "sort_form";
 		$formType        = "sortdatas";
 		$btn_add_edit    = "Valider le tri des données";
@@ -720,7 +694,7 @@ switch($action) {
 				// --- brut dans le WHERE (les actions de tri ne passent pas par le jeton
 				// --- CSRF de openForm(), voir index.php).
 				$query_sort  = "UPDATE $table_datas SET sort = $tri WHERE id = " . intval($sb_toSort[$i]);
-				$result_sort = $sbsql->query($query_sort);
+				$result_sort = sbDb()->update('sb_table_datas', array('sort' => $tri), 'id = ?', array(intval($sb_toSort[$i]))) !== false;
 				if (!$result_sort) {
 					// --- Error Database
 					$sql_error++;
@@ -739,8 +713,7 @@ switch($action) {
 		
 		// --- Recuperation des donnees
 		$query_3      = "SELECT * FROM $table_datas WHERE tid = '$tid' ORDER BY sort ASC";
-		$requestQ      = $sbsql->query($query_3);
-		$sort_array    = $sbsql->toarray($requestQ);
+		$sort_array    = sbDb()->all($query_3) ?: array();
 		foreach($sort_array as $sort) {
 			$datas            = json_decode($sort['content'], true);
 			$active           = $sbsanitize->displayText($datas[0]['v']);
@@ -789,10 +762,7 @@ switch($action) {
 */
 function sbTableEditdatas($structure, $id) {
 	global $sbsql, $sbsanitize;
-	$table_datas = _AM_DB_PREFIX . "sb_table_datas";
-	$query       = "SELECT * FROM $table_datas WHERE id = '$id'";
-	$request     = $sbsql->query($query);
-	$datas       = $sbsql->assoc($request);
+	$datas       = sbDb()->row("SELECT * FROM {sb_table_datas} WHERE id = ?", array(intval($id))) ?: array();
 
 	$columns = [];
 	foreach($structure as $col) {

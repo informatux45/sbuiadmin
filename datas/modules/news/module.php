@@ -15,8 +15,8 @@ return array(
 	'title'         => 'Actualités',
 	'icon'          => 'rss', // Font Awesome (menu, carte Modules)
 	'description'   => "Articles classés par catégories, avec page d'actualités, gabarits de liste et d'article, et blocs « derniers articles » par code court.",
-	'version'       => '1.0.5',
-	'requires_core' => '4.29',
+	'version'       => '1.0.6',
+	'requires_core' => '4.75',
 	'author'        => 'INFORMATUX',
 	'routes'        => array('news'),
 	'page_module'   => true,

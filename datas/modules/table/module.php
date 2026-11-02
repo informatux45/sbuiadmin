@@ -15,8 +15,8 @@ return array(
 	'title'         => 'Tableaux',
 	'icon'          => 'table', // Font Awesome (menu, carte Modules)
 	'description'   => "Tableaux de données dynamiques et adaptatifs (colonnes et lignes éditables), à insérer dans une page par code court.",
-	'version'       => '1.0.2',
-	'requires_core' => '4.29',
+	'version'       => '1.0.3',
+	'requires_core' => '4.75',
 	'author'        => 'INFORMATUX',
 	'routes'        => array(),
 	'page_module'   => false,
