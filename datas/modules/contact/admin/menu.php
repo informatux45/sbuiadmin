@@ -12,9 +12,8 @@ defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
 // Bulle rouge : messages non lus, pour qui a le droit de les voir (ligne Contact → Messages)
 $sb_contact_unread = 0;
-if (isset($GLOBALS['sbsql']) && function_exists('sbHasMenuLinkRight') && sbHasMenuLinkRight('index.php?p=contact&a=messages', 'contact:messages')) {
-	$sb_contact_row    = $GLOBALS['sbsql']->assoc($GLOBALS['sbsql']->query('SELECT COUNT(*) AS n FROM ' . _AM_DB_PREFIX . 'sb_contact_messages WHERE is_read = 0'));
-	$sb_contact_unread = $sb_contact_row ? (int) $sb_contact_row['n'] : 0;
+if (function_exists('sbDb') && sbDb() && function_exists('sbHasMenuLinkRight') && sbHasMenuLinkRight('index.php?p=contact&a=messages', 'contact:messages')) {
+	$sb_contact_unread = (int) sbDb()->value('SELECT COUNT(*) FROM {sb_contact_messages} WHERE is_read = 0');
 }
 
 return array(

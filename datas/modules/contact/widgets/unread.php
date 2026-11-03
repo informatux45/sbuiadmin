@@ -17,10 +17,10 @@ return array(
 	'format' => 'kpi',
 	'description' => 'Messages de contact pas encore lus, avec le nombre reçu sur les 7 derniers jours.',
 	'render' => function (array $p) {
-		$sbsql = $GLOBALS['sbsql'] ?? null;
-		if (!$sbsql) return array('value' => '—');
+		$db = function_exists('sbDb') ? sbDb() : null;
+		if (!$db) return array('value' => '—');
 		$d7  = date('Y-m-d H:i:s', time() - 7 * 86400);
-		$row = $sbsql->assoc($sbsql->query('SELECT SUM(is_read = 0) AS unread, SUM(created_at >= \'' . $d7 . '\') AS week FROM ' . _AM_DB_PREFIX . 'sb_contact_messages'));
+		$row = $db->row('SELECT SUM(CASE WHEN is_read = 0 THEN 1 ELSE 0 END) AS unread, SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) AS week FROM {sb_contact_messages}', array($d7));
 		if (!$row) return array('value' => '—');
 		$week = (int) $row['week'];
 		return array(

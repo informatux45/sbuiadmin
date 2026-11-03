@@ -22,14 +22,13 @@ if (!defined('SB_PATH')) {
 */
 if (!function_exists("sbSearchSource_contact")) {
 	function sbSearchSource_contact($terms, $lang) {
-		global $sbsql;
 		$results = array();
-		$where   = sbSearchWhere(array('title'), $terms);
+		$bind    = array();
+		$where   = sbSearchWhere(array('title'), $terms, $bind);
 		$query   = "SELECT id, title
 					FROM " . sbSearchTable('sb_contact') . "
 					WHERE active = '1'" . $where . " ORDER BY sort ASC";
-		$request = $sbsql->query($query);
-		$rows    = $sbsql->toarray($request);
+		$rows    = sbDb()->all($query, $bind) ?: array();
 		if ($rows) {
 			foreach ($rows as $row) {
 				if (!sbSearchMatches(array($row['title']), $terms)) continue;

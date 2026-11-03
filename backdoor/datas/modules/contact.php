@@ -51,10 +51,9 @@ $table_messages  = _AM_DB_PREFIX . "sb_contact_messages";
 
 // Bulle du menu de gauche (messages non lus) : le menu est construit avant ce
 // contrôleur, il est reconstruit ici quand un message est lu ou supprimé
-$sbContactRefreshBadge = function () use ($sbsql, $sbsmarty, $table_messages) {
+$sbContactRefreshBadge = function () use ($sbsmarty) {
 	if (!isset($GLOBALS['module_menu']['contact'])) return;
-	$row = $sbsql->assoc($sbsql->query("SELECT COUNT(*) AS n FROM $table_messages WHERE is_read = 0"));
-	$n   = $row ? (int) $row['n'] : 0;
+	$n   = (int) sbDb()->value("SELECT COUNT(*) FROM {sb_contact_messages} WHERE is_read = 0");
 	$GLOBALS['module_menu']['contact']['badge']       = $n;
 	$GLOBALS['module_menu']['contact']['badge_title'] = $n . ' message' . ($n > 1 ? 's' : '') . ' non lu' . ($n > 1 ? 's' : '');
 	$sbsmarty->assign('sb_main_menu', sbGetMenuModule('main'));
@@ -71,8 +70,8 @@ switch($action) {
 		// Action DELETE
 		if ($action == 'del') {
 			$get_id  = intval($_GET['id'] ?? 0);
-			$query_2 = "DELETE FROM $table WHERE id = '$get_id'";
-			$request = $sbsql->query($query_2);
+			$query_2 = "DELETE FROM $table WHERE id = $get_id";
+			$request = sbDb()->delete('sb_contact', 'id = ?', array($get_id)) !== false;
 			
 			if ($request)
 				$sb_msg_valid = $text . ' supprimé avec succès';
@@ -86,13 +85,12 @@ switch($action) {
 		
 		// Contents table
 		$query    = "SELECT * FROM $table";
-		$request2 = $sbsql->query($query);
-		$result2  = $sbsql->toarray($request2);
+		$result2  = sbDb()->all($query) ?: array();
 		
 		// Messages reçus par formulaire (total, non lus)
 		$counts   = array();
-		$requestM = $sbsql->query("SELECT form_id, COUNT(*) AS total, SUM(is_read = 0) AS unread FROM $table_messages GROUP BY form_id");
-		foreach ((array) $sbsql->toarray($requestM) as $row) $counts[(int) $row['form_id']] = array('total' => (int) $row['total'], 'unread' => (int) $row['unread']);
+		$requestM = sbDb()->all("SELECT form_id, COUNT(*) AS total, SUM(CASE WHEN is_read = 0 THEN 1 ELSE 0 END) AS unread FROM $table_messages GROUP BY form_id");
+		foreach ($requestM ?: array() as $row) $counts[(int) $row['form_id']] = array('total' => (int) $row['total'], 'unread' => (int) $row['unread']);
 		foreach ((array) $result2 as $k => $row) $result2[$k]['messages'] = $counts[(int) $row['id']] ?? array('total' => 0, 'unread' => 0);
 
 		$sbsmarty->assign('all', true);
@@ -143,9 +141,8 @@ switch($action) {
 			// ADD or EDIT
 			if ($formType == 'add') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table (title,recipients,subject,form,active)
-						  VALUES ('$title','$recipients','$subject','$contactform','$active')";
-				$result_add = $sbsql->query($query);
+				$query = "INSERT INTO $table (title,recipients,subject,form,active)";
+				$result_add = sbDb()->insert('sb_contact', array('title' => $title, 'recipients' => $recipients, 'subject' => $subject, 'form' => $contactform, 'active' => $active)) !== false;
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$title = $recipients = $subject = $subject_fr = $subject_en = $contactform = $active = '';
@@ -158,14 +155,8 @@ switch($action) {
 
 			} elseif ($formType == 'edit' && $id > 0) {
 				// UPDATE DATAS
-				$query = "UPDATE $table SET title = '$title'
-										   ,recipients = '$recipients'
-										   ,subject = '$subject'
-										   ,form = '$contactform'
-										   ,active = '$active'
-										   WHERE id = '$id'";
-											 
-				$result_edit = $sbsql->query($query);
+				$query = "UPDATE $table SET title, recipients, subject, form, active WHERE id = $id";
+				$result_edit = sbDb()->update('sb_contact', array('title' => $title, 'recipients' => $recipients, 'subject' => $subject, 'form' => $contactform, 'active' => $active), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -191,8 +182,7 @@ switch($action) {
 			// --- Recuperation des donnees
 			$id          = intval($_GET['id'] ?? 0);
 			$query_1     = "SELECT * FROM $table WHERE id = $id";
-			$requestQ    = $sbsql->query($query_1);
-			$assoc       = $sbsql->assoc($requestQ);
+			$assoc       = sbDb()->row($query_1) ?: array('title' => '', 'recipients' => '', 'form' => '', 'active' => '', 'subject' => '');
 			$title       = $sbsanitize->displayLang(sb_utf8_encode($assoc['title']));
 			$recipients  = $assoc['recipients'];
 			$contactform = $assoc['form'];
@@ -266,7 +256,7 @@ switch($action) {
 		if ($action == 'messagedel') {
 			$msg_id  = intval($_GET['mid'] ?? 0);
 			$query_2 = "DELETE FROM $table_messages WHERE id = $msg_id AND form_id = $form_id";
-			if ($sbsql->query($query_2)) {
+			if (sbDb()->delete('sb_contact_messages', 'id = ? AND form_id = ?', array($msg_id, $form_id)) !== false) {
 				$sb_msg_valid = 'Message supprimé avec succès';
 				$sbContactRefreshBadge();
 			}
@@ -277,12 +267,12 @@ switch($action) {
 
 		$form_title = 'Page Contact';
 		if ($form_id > 0) {
-			$assoc      = $sbsql->assoc($sbsql->query("SELECT title FROM $table WHERE id = $form_id"));
+			$assoc      = sbDb()->row("SELECT title FROM $table WHERE id = ?", array($form_id));
 			$form_title = $assoc ? $sbsanitize->displayLang(sb_utf8_encode($assoc['title'])) : 'Formulaire supprimé';
 		}
 
 		$query    = "SELECT id, created_at, name, email, sent, error, is_read FROM $table_messages WHERE form_id = $form_id ORDER BY created_at DESC";
-		$messages = $sbsql->toarray($sbsql->query($query));
+		$messages = sbDb()->all($query);
 		if ($messages === false) $sb_msg_error = "Table des messages absente : mettez le module Contact à jour (Configuration &gt; Mise à jour).";
 
 		$sbsmarty->assign('sb_table_header', array('Date', 'Nom', 'Email', 'Envoi', 'Actions'));
@@ -297,13 +287,13 @@ switch($action) {
 	case "message":
 		// --- Un message (id = message), marqué lu à l'ouverture
 		$msg_id  = intval($_GET['id'] ?? 0);
-		$message = $sbsql->assoc($sbsql->query("SELECT * FROM $table_messages WHERE id = $msg_id"));
+		$message = sbDb()->row("SELECT * FROM $table_messages WHERE id = ?", array($msg_id));
 		if ($message) {
-			if (!$message['is_read'] && $sbsql->query("UPDATE $table_messages SET is_read = 1 WHERE id = $msg_id")) $sbContactRefreshBadge();
+			if (!$message['is_read'] && sbDb()->update('sb_contact_messages', array('is_read' => 1), 'id = ?', array($msg_id)) !== false) $sbContactRefreshBadge();
 			$message['fields'] = json_decode((string) $message['fields'], true) ?: array();
 			$form_title = 'Page Contact';
 			if ($message['form_id'] > 0) {
-				$assoc      = $sbsql->assoc($sbsql->query("SELECT title FROM $table WHERE id = " . (int) $message['form_id']));
+				$assoc      = sbDb()->row("SELECT title FROM $table WHERE id = ?", array((int) $message['form_id']));
 				$form_title = $assoc ? $sbsanitize->displayLang(sb_utf8_encode($assoc['title'])) : 'Formulaire supprimé';
 			}
 			$sbsmarty->assign('form_title', $form_title);
@@ -341,43 +331,34 @@ switch($action) {
 			$email_smtp_auth     = $sbsanitize->displayText($_POST['email_smtp_auth'] ?? '', 'UTF-8', 1, 0);
 			$email_smtp_port     = $sbsanitize->displayText($_POST['email_smtp_port'] ?? '', 'UTF-8', 1, 0);
 			$email_smtp_username = $sbsanitize->displayText($_POST['email_smtp_username'] ?? '', 'UTF-8', 1, 0);
-			$email_smtp_password = $sbsql->escape_string(sbSecretSeal(trim((string) ($_POST['email_smtp_password'] ?? ''))));
+			$email_smtp_password = sbSecretSeal(trim((string) ($_POST['email_smtp_password'] ?? '')));
 			$email_smtp_secure   = $sbsanitize->displayText($_POST['email_smtp_secure'] ?? '', 'UTF-8', 1, 0);
 			$email_smtp_debug    = $sbsanitize->displayText($_POST['email_smtp_debug'] ?? '', 'UTF-8', 1, 0);
 			$contact_retention   = max(0, intval($_POST['contact_retention'] ?? 12));
 			
 			// --- EDIT
-			// UPDATE DATAS
-			$query_email_to         = "UPDATE $table_cmsconfig SET content = '$email_to' WHERE config = 'email_to'";
-			$query_email_subject    = "UPDATE $table_cmsconfig SET content = '$email_subject' WHERE config = 'email_subject'";
-
-			$query_email_smtp          = "UPDATE $table_cmsconfig SET content = '$email_smtp' WHERE config = 'email_smtp'";
-			$query_email_smtp_host     = "UPDATE $table_cmsconfig SET content = '$email_smtp_host' WHERE config = 'email_smtp_host'";
-			$query_email_smtp_auth     = "UPDATE $table_cmsconfig SET content = '$email_smtp_auth' WHERE config = 'email_smtp_auth'";
-			$query_email_smtp_port     = "UPDATE $table_cmsconfig SET content = '$email_smtp_port' WHERE config = 'email_smtp_port'";
-			$query_email_smtp_username = "UPDATE $table_cmsconfig SET content = '$email_smtp_username' WHERE config = 'email_smtp_username'";
-			$query_email_smtp_password = "UPDATE $table_cmsconfig SET content = '$email_smtp_password' WHERE config = 'email_smtp_password'";
-			$query_email_smtp_secure   = "UPDATE $table_cmsconfig SET content = '$email_smtp_secure' WHERE config = 'email_smtp_secure'";
-			$query_email_smtp_debug    = "UPDATE $table_cmsconfig SET content = '$email_smtp_debug' WHERE config = 'email_smtp_debug'";
+			// UPDATE DATAS (valeurs liées : sbConfigWrite)
+			$query_email_to = "UPDATE $table_cmsconfig SET content WHERE config IN (email_to, email_subject, email_smtp*, contact_retention)";
+			$values = array(
+				'email_to'            => $email_to,
+				'email_subject'       => $email_subject,
+				'email_smtp'          => $email_smtp,
+				'email_smtp_host'     => $email_smtp_host,
+				'email_smtp_auth'     => $email_smtp_auth,
+				'email_smtp_port'     => $email_smtp_port,
+				'email_smtp_username' => $email_smtp_username,
+				'email_smtp_secure'   => $email_smtp_secure,
+				'email_smtp_debug'    => $email_smtp_debug,
+			);
+			// Champ mot de passe laissé vide = valeur inchangée
+			if ($email_smtp_password !== '') $values['email_smtp_password'] = $email_smtp_password;
+			$result_edit = sbConfigWrite($values);
 			// Réglage du module (absent des installations d'avant 1.1.0)
-			$query_contact_retention   = ($sbsql->assoc($sbsql->query("SELECT id FROM $table_cmsconfig WHERE config = 'contact_retention'")))
-				? "UPDATE $table_cmsconfig SET content = '$contact_retention' WHERE config = 'contact_retention'"
-				: "INSERT INTO $table_cmsconfig (config, content) VALUES ('contact_retention', '$contact_retention')";
+			$result_edit_contact_retention = (sbDb()->value("SELECT id FROM $table_cmsconfig WHERE config = 'contact_retention'"))
+				? sbConfigWrite(array('contact_retention' => $contact_retention))
+				: sbDb()->insert('sb_config', array('config' => 'contact_retention', 'content' => (string) $contact_retention)) !== false;
 			
-			$result_edit_email_to         = $sbsql->query($query_email_to);
-			$result_edit_email_subject    = $sbsql->query($query_email_subject);
-			
-			$result_edit_email_smtp          = $sbsql->query($query_email_smtp);
-			$result_edit_email_smtp_host     = $sbsql->query($query_email_smtp_host);
-			$result_edit_email_smtp_auth     = $sbsql->query($query_email_smtp_auth);
-			$result_edit_email_smtp_port     = $sbsql->query($query_email_smtp_port);
-			$result_edit_email_smtp_username = $sbsql->query($query_email_smtp_username);
-			$result_edit_email_smtp_password = ($email_smtp_password === '') ? true : $sbsql->query($query_email_smtp_password);
-			$result_edit_email_smtp_secure   = $sbsql->query($query_email_smtp_secure);
-			$result_edit_email_smtp_debug    = $sbsql->query($query_email_smtp_debug);
-			$result_edit_contact_retention   = $sbsql->query($query_contact_retention);
-			
-			if ($result_edit_email_to && $result_edit_email_subject && $result_edit_email_smtp && $result_edit_email_smtp_host && $result_edit_email_smtp_auth && $result_edit_email_smtp_port && $result_edit_email_smtp_username && $result_edit_email_smtp_password && $result_edit_email_smtp_secure && $result_edit_email_smtp_debug && $result_edit_contact_retention) {
+			if ($result_edit && $result_edit_contact_retention) {
 				// --- Message SUCCES
 				$sb_msg_valid = 'Configuration EMAIL modifiée avec succès';
 			} else {
@@ -386,29 +367,20 @@ switch($action) {
 			}
 
 			// --- Debug SQL
-			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_email_to . "\n" . $result_edit_email_subject . "\n" . 'Submit Form Type = '.$formType);
+			if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $query_email_to . "\n" . 'Submit Form Type = '.$formType);
 			
 		}
 		
 		// --------------------------------
 		// --- Recuperation des donnees
 		// --------------------------------
-		$queryT   = "SELECT content FROM $table_cmsconfig WHERE config = 'email_to'";
-		$queryA   = "SELECT content FROM $table_cmsconfig WHERE config = 'email_subject'";
-
-		$requestT = $sbsql->query($queryT);
-		$requestA = $sbsql->query($queryA);
-		$assocT   = $sbsql->assoc($requestT);
-		$assocA   = $sbsql->assoc($requestA);
-		
-		$assocEmail['email_smtp']          = $sbsql->assoc($sbsql->query( "SELECT content FROM $table_cmsconfig WHERE config = 'email_smtp'" ));
-		$assocEmail['email_smtp_host']     = $sbsql->assoc($sbsql->query( "SELECT content FROM $table_cmsconfig WHERE config = 'email_smtp_host'" ));
-		$assocEmail['email_smtp_auth']     = $sbsql->assoc($sbsql->query( "SELECT content FROM $table_cmsconfig WHERE config = 'email_smtp_auth'" ));
-		$assocEmail['email_smtp_port']     = $sbsql->assoc($sbsql->query( "SELECT content FROM $table_cmsconfig WHERE config = 'email_smtp_port'" ));
-		$assocEmail['email_smtp_username'] = $sbsql->assoc($sbsql->query( "SELECT content FROM $table_cmsconfig WHERE config = 'email_smtp_username'" ));
-		$assocEmail['email_smtp_password'] = $sbsql->assoc($sbsql->query( "SELECT content FROM $table_cmsconfig WHERE config = 'email_smtp_password'" ));
-		$assocEmail['email_smtp_secure']   = $sbsql->assoc($sbsql->query( "SELECT content FROM $table_cmsconfig WHERE config = 'email_smtp_secure'" ));
-		$assocEmail['email_smtp_debug']    = $sbsql->assoc($sbsql->query( "SELECT content FROM $table_cmsconfig WHERE config = 'email_smtp_debug'" ));
+		$queryT   = "SELECT config, content FROM $table_cmsconfig WHERE config IN (email_to, email_subject, email_smtp*)";
+		$cfg      = sbConfigRead(array('email_to', 'email_subject', 'email_smtp', 'email_smtp_host', 'email_smtp_auth', 'email_smtp_port', 'email_smtp_username', 'email_smtp_password', 'email_smtp_secure', 'email_smtp_debug'));
+		// Même forme qu'avant (ligne ou null) pour la suite du formulaire
+		$sbContactCfg = function ($k) use ($cfg) { return array_key_exists($k, $cfg) ? array('content' => $cfg[$k]) : null; };
+		$assocT   = $sbContactCfg('email_to');
+		$assocA   = $sbContactCfg('email_subject');
+		foreach (array('email_smtp', 'email_smtp_host', 'email_smtp_auth', 'email_smtp_port', 'email_smtp_username', 'email_smtp_password', 'email_smtp_secure', 'email_smtp_debug') as $k) $assocEmail[$k] = $sbContactCfg($k);
 		
 		// --- Debug SQL
 		if (_AM_SITE_DEBUG) $sbsmarty->assign('sbdebugsql', $queryT . "\n" . $queryP . "\n" . $queryS . "\n" . 'Form Type = '.$formType);						

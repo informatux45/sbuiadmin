@@ -20,7 +20,7 @@ if (!defined('SB_PATH')) {
  * return HTML
  */
 function shortcode_sbcontactajax($param = '') {
-	global $sbsanitize, $sbsql;
+	global $sbsanitize;
 
 	// --- Initialization
 	$id        = (isset($param['id']) && intval($param['id']) > 0) ? intval($param['id']) : intval($_GET['id'] ?? 0);
@@ -30,9 +30,8 @@ function shortcode_sbcontactajax($param = '') {
 	// --- Tables
 	$table = _AM_DB_PREFIX . 'sb_contact';
 	// --- SQL Contact form
-	$query_form   = "SELECT * FROM $table WHERE id = '$id'";
-	$request_form = $sbsql->query($query_form);
-	$form_info    = $sbsql->assoc($request_form);
+	$query_form   = "SELECT * FROM $table WHERE id = ?";
+	$form_info    = sbDb()->row($query_form, array($id));
 	
 	// --- Check if form exists
 	if ($form_info) {
@@ -43,14 +42,13 @@ function shortcode_sbcontactajax($param = '') {
 			// --- --- --- --- --- --- ---
 			$module['tables']['config']  = _AM_DB_PREFIX . "sb_config";
 			# Include Globals
-			global $sbsmarty, $sbsanitize, $sbsql;
+			global $sbsmarty, $sbsanitize;
 			# ################################################
 			# Global email settings
 			# SQL Request (all config)
 			$email_to = $subject = '';
 			$query   = "SELECT config, content FROM {$module['tables']['config']} WHERE config = 'email_to' OR config = 'email_subject'";
-			$request = $sbsql->query($query);
-			$result  = $sbsql->toarray($request);
+			$result  = sbDb()->all($query) ?: array();
 			foreach($result as $val) {
 				switch($val['config']) {
 					case "email_to": $email_to = $sbsanitize->sTrim($val['content']); break;
@@ -173,7 +171,7 @@ function shortcode_sbcontactajax($param = '') {
 }
 
 function shortcode_sbcontact($param = '') {
-	global $sbsanitize, $sbsql;
+	global $sbsanitize;
 
 	// --- Initialization
 	$id        = intval($param['id'] ?? 0);
@@ -184,9 +182,8 @@ function shortcode_sbcontact($param = '') {
 	// --- Tables
 	$table = _AM_DB_PREFIX . 'sb_contact';
 	// --- SQL Slider
-	$query_form   = "SELECT * FROM $table WHERE id = '$id'";
-	$request_form = $sbsql->query($query_form);
-	$form_info    = $sbsql->assoc($request_form);
+	$query_form   = "SELECT * FROM $table WHERE id = ?";
+	$form_info    = sbDb()->row($query_form, array($id));
 	
 	// --- Check if form exists
 	if ($form_info) {
@@ -197,14 +194,13 @@ function shortcode_sbcontact($param = '') {
 			// --- --- --- --- --- --- ---
 			$module['tables']['config']  = _AM_DB_PREFIX . "sb_config";
 			# Include Globals
-			global $sbsmarty, $sbsanitize, $sbsql;
+			global $sbsmarty, $sbsanitize;
 			# ################################################
 			# Global email settings
 			# SQL Request (all config)
 			$email_to = $subject = '';
 			$query   = "SELECT config, content FROM {$module['tables']['config']} WHERE config = 'email_to' OR config = 'email_subject'";
-			$request = $sbsql->query($query);
-			$result  = $sbsql->toarray($request);
+			$result  = sbDb()->all($query) ?: array();
 			foreach($result as $val) {
 				switch($val['config']) {
 					case "email_to": $email_to = $sbsanitize->sTrim($val['content']); break;
@@ -214,9 +210,8 @@ function shortcode_sbcontact($param = '') {
 			# ################################################
 			# Settings for email settings (if exists)
 			# SQL Request	
-			$query_contact   = "SELECT recipients, subject FROM $table WHERE id = '$id'";
-			$request_contact = $sbsql->query($query_contact);
-			$result_contact  = $sbsql->assoc($request_contact);
+			$query_contact   = "SELECT recipients, subject FROM $table WHERE id = ?";
+			$result_contact  = sbDb()->row($query_contact, array($id)) ?: array('recipients' => '', 'subject' => '');
 			if ($result_contact['recipients'] != '') $email_to = $sbsanitize->sTrim($result_contact['recipients']);
 			if ($sbsanitize->displayLang(sb_utf8_encode($result_contact['subject'])) != '') $subject = $sbsanitize->displayLang(sb_utf8_encode($result_contact['subject']));
 			# ################################################
@@ -289,7 +284,7 @@ function shortcode_sbcontact($param = '') {
  * return HTML
  */
 function sbGetContactFormElements($string, $publickey = '', $sendmail = false) {
-	global $sbsanitize, $sbsql;
+	global $sbsanitize;
 	
 	// --- Types
 	$type_elements = ['TEXT','CHECKBOX','TXTAREA','SELECT','ALTCHA','SUBMIT'];
@@ -535,32 +530,28 @@ function sbContactSend($form_id, $email_to, $subject, $title, array $skip = arra
 
 /** Durée de conservation des messages, en mois (0 = sans limite) */
 function sbContactRetention() {
-	global $sbsql;
-	$row = $sbsql->assoc($sbsql->query("SELECT content FROM " . _AM_DB_PREFIX . "sb_config WHERE config = 'contact_retention'"));
-	return $row ? max(0, (int) $row['content']) : 12;
+	$v = sbDb()->value("SELECT content FROM {sb_config} WHERE config = 'contact_retention'");
+	return ($v !== null && $v !== false) ? max(0, (int) $v) : 12;
 }
 
 /** Supprime les messages plus anciens que la durée de conservation */
 function sbContactPurgeMessages() {
-	global $sbsql;
 	$months = sbContactRetention();
-	if ($months > 0) $sbsql->query("DELETE FROM " . _AM_DB_PREFIX . "sb_contact_messages WHERE created_at < DATE_SUB(NOW(), INTERVAL $months MONTH)");
+	// Date limite calculée en PHP (INTERVAL n'existe pas en SQLite)
+	if ($months > 0) sbDb()->delete('sb_contact_messages', 'created_at < ?', array(date('Y-m-d H:i:s', strtotime('-' . $months . ' months'))));
 }
 
 /** Enregistre un message reçu ($error : '' si le mail est parti) */
 function sbContactSaveMessage($form_id, $name, $email, array $fields, $recipients, $error) {
-	global $sbsql;
 	sbContactPurgeMessages();
-	$q = function ($v, $max = 0) use ($sbsql) {
+	$cut = function ($v, $max = 0) {
 		$v = (string) $v;
-		if ($max) $v = mb_substr($v, 0, $max, 'UTF-8');
-		return "'" . $sbsql->escape_string($v) . "'";
+		return $max ? mb_substr($v, 0, $max, 'UTF-8') : $v;
 	};
 	$json = json_encode($fields, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
-	$sql  = "INSERT INTO " . _AM_DB_PREFIX . "sb_contact_messages (form_id, created_at, name, email, fields, recipients, sent, error)"
-		. " VALUES (" . (int) $form_id . ", NOW(), " . $q($name, 255) . ", " . $q($email, 255) . ", " . $q($json) . ", " . $q($recipients) . ", "
-		. ($error === '' ? 1 : 0) . ", " . $q($error, 255) . ")";
-	if (!$sbsql->query($sql)) error_log('Contact : message non enregistré : ' . $sbsql->error);
+	$ok   = sbDb()->run("INSERT INTO {sb_contact_messages} (form_id, created_at, name, email, fields, recipients, sent, error) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?)",
+		array((int) $form_id, $cut($name, 255), $cut($email, 255), (string) $json, $cut($recipients), $error === '' ? 1 : 0, $cut($error, 255)));
+	if (!$ok) error_log('Contact : message non enregistré : ' . sbDb()->error());
 }
 
 

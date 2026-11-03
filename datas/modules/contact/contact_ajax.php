@@ -28,7 +28,7 @@ session_start();
 // -----------------------------------------
 include_once('../../../sbconfig.php');
 include_once('../../../header.php');
-global $sbsmarty, $sbsanitize, $sbsql, $sbpage;
+global $sbsmarty, $sbsanitize, $sbpage;
 
 // ---------------------------
 // Define some important stuff
@@ -64,8 +64,7 @@ $module['tables']['contact'] = "sb_contact";
 // --- SQL Request (all config)
 $email_to = $subject = '';
 $query   = "SELECT config, content FROM {$module['tables']['config']} WHERE config = 'email_to' OR config = 'email_subject'";
-$request = $sbsql->query($query);
-$result  = $sbsql->toarray($request);
+$result  = sbDb()->all($query) ?: array();
 foreach($result as $val) {
 	switch($val['config']) {
 		case "email_to": $email_to = $sbsanitize->sTrim($val['content']); break;
@@ -88,9 +87,8 @@ $template = 'index';
 # Settings for email settings (if exists)
 # SQL Request
 # --------------------------------------------------
-$query_contact   = "SELECT recipients, subject, active FROM " . _AM_DB_PREFIX . $module['tables']['contact'] . " WHERE id = '$id'";
-$request_contact = $sbsql->query($query_contact);
-$result_contact  = $sbsql->assoc($request_contact);
+$query_contact   = "SELECT recipients, subject, active FROM " . _AM_DB_PREFIX . $module['tables']['contact'] . " WHERE id = ?";
+$result_contact  = sbDb()->row($query_contact, array($id));
 // --- Formulaire inexistant ou désactivé : rien n'est envoyé ni enregistré
 if (!$result_contact || !$result_contact['active']) {
 	http_response_code(404);

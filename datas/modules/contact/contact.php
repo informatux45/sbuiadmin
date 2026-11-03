@@ -38,7 +38,7 @@ $module['tables']['contact'] = "sb_contact";
 // -------------------------------------------------
 
 # Include Globals
-global $sbsmarty, $sbsanitize, $sbsql, $sbpage;
+global $sbsmarty, $sbsanitize, $sbpage;
 
 # --------------------------------------------------
 # Global email settings
@@ -46,8 +46,7 @@ global $sbsmarty, $sbsanitize, $sbsql, $sbpage;
 // --- SQL Request (all config)
 $email_to = $subject = '';
 $query   = "SELECT config, content FROM {$module['tables']['config']} WHERE config = 'email_to' OR config = 'email_subject'";
-$request = $sbsql->query($query);
-$result  = $sbsql->toarray($request);
+$result  = sbDb()->all($query) ?: array();
 foreach($result as $val) {
 	switch($val['config']) {
 		case "email_to": $email_to = $sbsanitize->sTrim($val['content']); break;

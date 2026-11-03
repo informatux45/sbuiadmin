@@ -732,7 +732,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_modules` (
 
 INSERT INTO `<DB_PREFIX>sb_modules` (`name`, `version`, `db_version`, `installed_at`) VALUES
 ('store', '2.0.2', '2.0.2', NOW()),
-('contact', '1.1.1', '1.1.1', NOW()),
+('contact', '1.1.2', '1.1.2', NOW()),
 ('download', '1.0.2', '1.0.2', NOW()),
 ('faq', '1.0.2', '1.0.2', NOW()),
 ('gallery', '1.0.2', '1.0.2', NOW()),

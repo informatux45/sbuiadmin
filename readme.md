@@ -160,6 +160,10 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 
 ## 📝 Changelog
 
+**4.77**
+- Contact uses bound SQL parameters (admin, forms, messages, search)
+- Contact 1.1.2: message purge works without MySQL-only date syntax
+
 **4.76**
 - News, tables and e-commerce use bound SQL parameters
 - Tables: the CSRF token is no longer stored in rows nor shown in search results
@@ -170,13 +174,13 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 - Slider admin and shortcodes: injection through the slider id fixed
 - Pages: adding a custom link fixed (strict MySQL)
 
+<details>
+  <summary><strong>Older versions</strong></summary>
+
 **4.74**
 - System pages (dashboard, menus, blocks, CMS config) use bound SQL parameters
 - Block sorting by module fixed (injection, blocks missing after creation)
 - News 1.0.5: adding an article fixed on older databases
-
-<details>
-  <summary><strong>Older versions</strong></summary>
 
 **4.73**
 - Login, users, rights and messages use bound SQL parameters
