@@ -282,9 +282,8 @@ if (!function_exists("sbSearchEngine")) {
 */
 if (!function_exists("sbSearchLikeTerm")) {
 	function sbSearchLikeTerm($term) {
-		global $sbsql;
-
-		$safe = $sbsql->escape_string($term);
+		// Ancien appel sans valeurs liées (modules de sites) : échappement sbDb
+		$safe = sbDb()->escape($term);
 
 		return str_replace(array('%', '_'), array('\%', '\_'), $safe);
 	}
@@ -318,7 +317,6 @@ if (!function_exists("sbSearchLikeValue")) {
 */
 if (!function_exists("sbSearchWhere")) {
 	function sbSearchWhere($columns, $terms, &$bind = null) {
-		global $sbsql;
 
 		if (empty($columns) || empty($terms)) return '';
 		// --- $bind (tableau) : marqueurs ? et valeurs ajoutees a $bind ;
@@ -343,7 +341,7 @@ if (!function_exists("sbSearchWhere")) {
 					$clauses[] = "$haystack REGEXP ?";
 					$bind[]    = $regex;
 				} else {
-					$clauses[] = "$haystack REGEXP '" . $sbsql->escape_string($regex) . "'";
+					$clauses[] = "$haystack REGEXP '" . sbDb()->escape($regex) . "'";
 				}
 			} else {
 				// --- Repli : pas d'insensibilite aux accents, on cherche donc

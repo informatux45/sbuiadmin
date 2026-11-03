@@ -43,10 +43,9 @@ function sbMaintenanceBackofficeUser() {
 
 /** Réglages de la page (CMS Config > Maintenance) */
 function sbMaintenanceSettings() {
-	global $sbsql;
 	$cs = array();
-	$res = $sbsql->query("SELECT config, content FROM " . _AM_DB_PREFIX . "sb_config WHERE config LIKE 'coming-soon%'");
-	foreach ((array) $sbsql->toarray($res) as $row) $cs[$row['config']] = (string) $row['content'];
+	$db = function_exists('sbDb') ? sbDb() : null;
+	foreach (($db ? $db->all("SELECT config, content FROM {sb_config} WHERE config LIKE 'coming-soon%'") : false) ?: array() as $row) $cs[$row['config']] = (string) $row['content'];
 	return $cs;
 }
 

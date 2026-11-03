@@ -189,12 +189,11 @@
 
 								// --- Compte admin n°1 : identifiant et mot de passe choisis à
 								// --- l'étape 4 (le dump ne contient plus de mot de passe).
-								// --- Valeurs sûres en SQL : identifiant filtré par regex, hash
-								// --- password_hash() limité à [./$A-Za-z0-9,=+-].
+								// --- Valeurs liées (identifiant déjà filtré par regex à l'étape 4)
 								$sb_admin_failed = false;
 								if ($sb_set_admin) {
-									$sb_admin_sql = "UPDATE `" . $database_prefix . "sb_users` SET `username` = '" . $admin_username . "', `password` = '" . str_replace("'", '', $admin_password_hash) . "' WHERE `id` = 1";
-									if (!$db->Query($sb_admin_sql)) {
+									$sb_admin_sql = "UPDATE `" . $database_prefix . "sb_users` SET `username` = ?, `password` = ? WHERE `id` = 1";
+									if ($db->Run($sb_admin_sql, array((string) $admin_username, (string) $admin_password_hash)) === false) {
 										$error_mg[] = lang_key('alert_admin_password_missing') . (EI_MODE == 'debug' ? ' ' . $db->Error() : '');
 										$sb_admin_failed = true;
 									}

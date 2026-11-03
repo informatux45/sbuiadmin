@@ -139,8 +139,8 @@ if (!empty($_SESSION['sbuiadmin_user_name']) && $sb_admin_2fa_ok) {
 // Get CMS Theme infos
 // ----------------------
 $query_theme_infos   = "SELECT config, content FROM " . _AM_DB_PREFIX . "sb_config WHERE config LIKE 'theme_infos_%'";
-$request_theme_infos = $sbsql->query($query_theme_infos);
-$result_theme_infos  = $sbsql->toarray($request_theme_infos);
+$result_theme_infos  = sbDb()->all($query_theme_infos) ?: array();
+$sb_theme_infos      = array();
 foreach($result_theme_infos as $row_theme_infos) {
 	$theme_config = $row_theme_infos['config'];
 	$sb_theme_infos[$theme_config] = $row_theme_infos['content'];

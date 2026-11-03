@@ -91,7 +91,6 @@ class Database
 	private $force_encoding = false;
     private $persistent_connection = false;
 	private static $installation = false;
-	private $use_mysql = false;
 
 	private $error = '';
 	private $affectedRows = '0';
@@ -185,21 +184,8 @@ class Database
      */
     public function Open()
     {
-        // Without PDO extension
-        if($this->use_mysql && $this->db_driver == 'mysql'){
-            // Choose the appropriate connect function 
-            if($this->persistent_connection){
-                $func = 'mysql_pconnect';
-            } else {
-                $func = 'mysql_connect';
-            }    
-            // Connect to the MySQL server 
-            $this->dbh = $func($this->host, $this->user, $this->password);
-            return true;
-        }
-        
-        // With PDO extension
-		if(version_compare(PHP_VERSION, '5.0.0', '<') || !defined('PDO::ATTR_DRIVER_NAME')){
+        // PDO uniquement (l'ancienne branche mysql_*, retirée de PHP 7, est supprimée)
+		if(!defined('PDO::ATTR_DRIVER_NAME')){
 			$this->error = 'You must have PHP 5 or newer installed to use PHP Data Objects (PDO) extension';
 			return false; 
 		}
@@ -286,11 +272,7 @@ class Database
      */
 	public function GetVersion()
 	{
-        if($this->use_mysql && $this->db_driver == 'mysql'){
-            $version = mysql_get_server_info();
-        }else{
-            $version = $this->dbh->getAttribute(PDO::ATTR_SERVER_VERSION);
-        }
+        $version = $this->dbh->getAttribute(PDO::ATTR_SERVER_VERSION);
         // clean version number from alphabetic characters
 		return preg_replace('/[^0-9,.]/', '', $version);
 	}
@@ -312,27 +294,42 @@ class Database
     {
         if(!$this->dbh || empty($query)) return false;
         
-        if($this->use_mysql && $this->db_driver == 'mysql'){
-            $this->sth = mysql_query($query, $this->dbh);            
-            return ($this->sth != false);            
-        }else{
-            try{  
-                $this->sth = $this->dbh->query($query);
-                if($this->sth !== FALSE){
-                    $this->sth->setFetchMode($fetch_mode);
-                    return $this->sth;
-                }
-                else return false; 
-            }catch(PDOException $e){
-                $this->error = $e->getMessage();
-                $this->sth = null;
-                if(!self::$installation){
-                    $sql_log = $this->PrepareLogSQL($e, $query);
-                    $this->Exec($sql_log);
-                }
-                return false; 
-            }                        
-        }    
+        try{  
+            $this->sth = $this->dbh->query($query);
+            if($this->sth !== FALSE){
+                $this->sth->setFetchMode($fetch_mode);
+                return $this->sth;
+            }
+            else return false; 
+        }catch(PDOException $e){
+            $this->error = $e->getMessage();
+            $this->sth = null;
+            if(!self::$installation){
+                $sql_log = $this->PrepareLogSQL($e, $query);
+                $this->Exec($sql_log);
+            }
+            return false; 
+        }                        
+    }
+
+    /**
+     *	Requête préparée (valeurs liées) : nombre de lignes touchées ou false
+     *		@param $query  requête avec marqueurs ?
+     *		@param $bind   valeurs, dans l'ordre des marqueurs
+     */
+    public function Run($query, array $bind = array())
+    {
+        if(!$this->dbh || empty($query)) return false;
+        try{
+            $this->sth = $this->dbh->prepare($query);
+            $this->sth->execute(array_values($bind));
+            $this->affectedRows = $this->sth->rowCount();
+            return $this->affectedRows;
+        }catch(PDOException $e){
+            $this->error = $e->getMessage();
+            $this->sth = null;
+            return false;
+        }
     }
 
     /**

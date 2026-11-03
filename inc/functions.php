@@ -475,14 +475,14 @@ if (!function_exists("sbRenamePageBuilderClasses")) {
 */
 if (!function_exists("sbGetSeo")) {
 	function sbGetSeo($text = '', $key = '') {
-		global $sbsql, $sbsanitize;
+		global $sbsanitize;
 		$cms_seo = '';
 		$table   = _AM_DB_PREFIX . 'sb_config';
 		
 		// --- Get CMS SEO
 		$query   = "SELECT config, content FROM $table WHERE config = 'seo-keywords' OR config = 'seo-description'";
-		$request = $sbsql->query($query);
-		$result  = $sbsql->toarray($request);
+		$result  = sbDb()->all($query);
+		$cs      = array('seo-keywords' => '', 'seo-description' => '');
 		
 		if ($result) {
 			foreach($result as $row) {
@@ -535,22 +535,19 @@ if (!function_exists("insert_sbGetUserIP")) {
  */
 if (!function_exists("sbIsBlockedIP")) {
 	function sbIsBlockedIP( $ip = '') {
-		global $sbsql, $sbsanitize;
-		$table   = _AM_DB_PREFIX . 'sb_blocked_ip';
+		global $sbsanitize;
 		// L'IP vient de Client-IP / X-Forwarded-For quand ils sont présents :
-		// valeur choisie par le visiteur, et stopXSS() laisse passer l'apostrophe.
-		// Appelé sur CHAQUE page du front (header.php) : injection SQL sans session.
-		$user_ip = $sbsql->escape_string(trim( $sbsanitize->stopXSS( (empty($ip)) ? sbGetUserIP() : $ip ) ));
+		// valeur choisie par le visiteur : toujours liée (appelé sur CHAQUE
+		// page du front, sans session).
+		$user_ip = trim( $sbsanitize->stopXSS( (empty($ip)) ? sbGetUserIP() : $ip ) );
 		
 		// Supprimer tout ceux dont le temps a expiré. expirationtime contient
 		// déjà la durée du bannissement : y rajouter cette durée doublait le
 		// bannissement (24 h réglées, 48 h subies).
 		$now = time();
-		$sbsql->query("DELETE FROM $table WHERE expirationtime < $now");
+		sbDb()->delete('sb_blocked_ip', 'expirationtime < ?', array($now));
 		// Chercher si l'ip est présente dans la table (et toujours bannie)
-		$query   = "SELECT ip FROM $table WHERE ip = '$user_ip' AND expirationtime >= $now";
-		$request = $sbsql->query($query);
-		$user    = $sbsql->assoc($request);
+		$user    = sbDb()->row("SELECT ip FROM {sb_blocked_ip} WHERE ip = ? AND expirationtime >= ?", array($user_ip, $now));
 
 		return ($user) ? $user['ip'] : false;
 	}
@@ -567,18 +564,13 @@ if (!function_exists("insert_sbIsBlockedIP")) {
  */
 if (!function_exists("sbGetInfoBlockedIP")) {
 	function sbGetInfoBlockedIP( $ip = '') {
-		global $sbsql, $sbsanitize;
-		$table   = _AM_DB_PREFIX . 'sb_blocked_ip';
-		// L'IP vient de Client-IP / X-Forwarded-For quand ils sont présents :
-		// valeur choisie par le visiteur, et stopXSS() laisse passer l'apostrophe.
-		// Appelé sur CHAQUE page du front (header.php) : injection SQL sans session.
-		$user_ip = $sbsql->escape_string(trim( $sbsanitize->stopXSS( (empty($ip)) ? sbGetUserIP() : $ip ) ));
+		global $sbsanitize;
+		// L'IP vient de Client-IP / X-Forwarded-For : valeur du visiteur, liée
+		$user_ip = trim( $sbsanitize->stopXSS( (empty($ip)) ? sbGetUserIP() : $ip ) );
 
-		$query   = "SELECT * FROM $table WHERE ip = '$user_ip'";
-		$request = $sbsql->query($query);
-		$user    = $sbsql->assoc($request);
+		$user    = sbDb()->row("SELECT * FROM {sb_blocked_ip} WHERE ip = ?", array($user_ip));
 		
-		return $user;
+		return $user ?: false;
 	}
 }
 if (!function_exists("insert_sbGetInfoBlockedIP")) {
@@ -602,14 +594,10 @@ if (!function_exists("insert_sbGetInfoBlockedIP")) {
 */
 if (!function_exists("insert_sbGetMenuCms")) {
 	function insert_sbGetMenuCms($param) {
-		global $sbsql, $sbsanitize;
-		$table_menu = _AM_DB_PREFIX . 'sb_menu';
-		$table_page = _AM_DB_PREFIX . 'sb_pages';
-		$menu_tag   = trim($param['mtag']);
+		global $sbsanitize;
+		$menu_tag   = trim((string) ($param['mtag'] ?? ''));
 		
-		$query   = "SELECT * FROM $table_menu WHERE tag = '$menu_tag' AND active = '1'";
-		$request = $sbsql->query($query);
-		$assoc   = $sbsql->assoc($request);
+		$assoc   = sbDb()->row("SELECT * FROM {sb_menu} WHERE tag = ? AND active = '1'", array($menu_tag)) ?: array('pages' => '');
 	
 		$menu_ul_class = trim($param['mclass']);
 		$menu_ul_id    = trim($param['mid']);
@@ -624,9 +612,7 @@ if (!function_exists("insert_sbGetMenuCms")) {
 	
 		foreach($menu_entries as $entry) {
 			// Get Page Info
-			$query2   = "SELECT * FROM $table_page WHERE id = '$entry' AND active = '1'";
-			$request2 = $sbsql->query($query2);
-			$assoc2   = $sbsql->assoc($request2);
+			$assoc2   = sbDb()->row("SELECT * FROM {sb_pages} WHERE id = ? AND active = '1'", array((int) $entry));
 			// Check if entry is actived AND exist
 			if ($assoc2) {
 				// Check if active menu
@@ -710,7 +696,7 @@ if (!function_exists("insert_sbGetContentCms")) {
 */
 if (!function_exists("insert_sbGetHeaders")) {
 	function insert_sbGetHeaders() {
-		global $sbsql, $sbsanitize;
+		global $sbsanitize;
 		$cms_headers  = '';
 		$table_config = _AM_DB_PREFIX . 'sb_config';
 
@@ -802,8 +788,14 @@ if (!function_exists("insert_sbGetHeaders")) {
 					OR config = 'javascript'
 					OR config = 'seo-google-analytics'
 					ORDER BY config ASC";
-		$request = $sbsql->query($query);
-		$result  = $sbsql->toarray($request);
+		// Rangé par nom (une ligne absente décalait les positions 0, 1, 2)
+		$rows    = array();
+		foreach (sbDb()->all($query) ?: array() as $row) $rows[$row['config']] = $row;
+		$result  = array(
+			0 => $rows['css'] ?? array('content' => ''),
+			1 => $rows['javascript'] ?? array('content' => ''),
+			2 => $rows['seo-google-analytics'] ?? array('content' => ''),
+		);
 		
 		// --- Get CSS Code
 		if ($sbsanitize->sTrim($result[0]['content']) != '') {
@@ -848,9 +840,7 @@ if (!function_exists("sbPluginEnabled")) {
 	function sbPluginEnabled($name) {
 		static $list = null;
 		if ($list === null) {
-			global $sbsql;
-			$row  = $sbsql->assoc($sbsql->query("SELECT content FROM " . _AM_DB_PREFIX . "sb_config WHERE config = 'plugins'"));
-			$list = array_filter(explode('|', (string) ($row['content'] ?? '')));
+			$list = array_filter(explode('|', (string) sbDb()->value("SELECT content FROM {sb_config} WHERE config = 'plugins'")));
 		}
 		return in_array($name, $list, true);
 	}
@@ -862,14 +852,13 @@ if (!function_exists("sbPluginEnabled")) {
 */
 if (!function_exists("insert_sbGetPlugins")) {
 	function insert_sbGetPlugins() {
-		global $sbsql, $sbsanitize;
+		global $sbsanitize;
 		$cms_plugins  = '';
 		$table_config = _AM_DB_PREFIX . 'sb_config';
 		
 		// --- Get CMS Plugins CODE (PLUGINS)
 		$query   = "SELECT content FROM $table_config WHERE config = 'plugins' ORDER BY config ASC";
-		$request = $sbsql->query($query);
-		$result  = $sbsql->assoc($request);
+		$result  = sbDb()->row($query) ?: array('content' => '');
 		
 		// --- Get PLUGINS Code
 		if ($sbsanitize->sTrim($result['content']) != '') {
@@ -908,7 +897,7 @@ if (!function_exists("insert_sbGetPlugins")) {
 			// --- Plugin CONSENTEMENT (bandeau cookies, CookieConsent 3, MIT)
 			// --------------------------
 			if (in_array('cookieconsent', $plugins_array)) {
-				$cc = $sbsql->toarray($sbsql->query("SELECT config, content FROM $table_config WHERE config IN ('plugin-consent-policy', 'seo-google-analytics')"));
+				$cc = sbDb()->all("SELECT config, content FROM $table_config WHERE config IN ('plugin-consent-policy', 'seo-google-analytics')");
 				$cc_cfg = array();
 				foreach ((array) $cc as $row) $cc_cfg[$row['config']] = trim(html_entity_decode((string) $row['content'], ENT_QUOTES, 'UTF-8'));
 				$cc_policy = $cc_cfg['plugin-consent-policy'] ?? '';
@@ -971,17 +960,14 @@ if (!function_exists("insert_sbGetFonts")) {
 */
 if (!function_exists("insert_sbGetConfig")) {
 	function insert_sbGetConfig($param) {
-		global $sbsql, $sbsanitize, $_SESSION;
-		$table_config = _AM_DB_PREFIX . 'sb_config';
-		$config_name  = $sbsanitize->stopXSS(trim($param['id']));
+		global $sbsanitize, $_SESSION;
+		$config_name  = $sbsanitize->stopXSS(trim((string) ($param['id'] ?? '')));
 	
 		// --- Get CMS Configuration
-		$query   = "SELECT content FROM $table_config WHERE config = '$config_name'";
-		$request = $sbsql->query($query);
-		$result  = $sbsql->object($request);
+		$result  = sbDb()->value("SELECT content FROM {sb_config} WHERE config = ?", array($config_name));
 		
 		// Réglage absent : vide (PHP 8 : pas de lecture sur null)
-		$config_info = $sbsanitize->displayText($sbsanitize->displayLang($result ? $result->content : '', $_SESSION['lang'] ?? 'fr'));
+		$config_info = $sbsanitize->displayText($sbsanitize->displayLang((string) $result, $_SESSION['lang'] ?? 'fr'));
 		
 		return sbGetShortcode($config_info);
 	}
@@ -996,15 +982,16 @@ if (!function_exists("insert_sbGetConfig")) {
 */
 if (!function_exists("insert_sbGetNumRows")) {
 	function insert_sbGetNumRows($param) {
-		global $sbsql, $sbsanitize;
-		$colon = $sbsanitize->stopXSS(trim($param['col']));
-		$table = $sbsanitize->stopXSS(trim($param['tbl']));
-		$cond  = $sbsanitize->stopXSS(trim($param['cond']));
+		global $sbsanitize;
+		$colon = $sbsanitize->stopXSS(trim((string) ($param['col'] ?? '')));
+		$table = $sbsanitize->stopXSS(trim((string) ($param['tbl'] ?? '')));
+		$cond  = $sbsanitize->stopXSS(trim((string) ($param['cond'] ?? '')));
 	
-		// --- Get CMS Configuration
-		$query   = "SELECT $colon FROM $table WHERE $cond";
-		$request = $sbsql->query($query);
-		$result  = $sbsql->numrows();
+		// --- Requête écrite par le thème (gabarit) : colonne et table
+		// --- limitées à des noms SQL, la condition reste celle du gabarit
+		if (!preg_match('/^(\*|[A-Za-z_][A-Za-z0-9_]*(\s*,\s*[A-Za-z_][A-Za-z0-9_]*)*)$/', $colon) || !preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $table)) return 0;
+		$query   = "SELECT $colon FROM $table WHERE " . ($cond !== '' ? $cond : '1 = 1');
+		$result  = count(sbDb()->all($query) ?: array());
 		
 		return $result;
 	}
@@ -1051,14 +1038,14 @@ if (!function_exists("insert_sbGetLangUrl")) {
 */
 if (!function_exists("insert_sbGetContentCmsBlocks")) {
 	function insert_sbGetContentCmsBlocks($param) {
-		global $sbsql, $sbsmarty, $sbsanitize;
+		global $sbsmarty, $sbsanitize;
 		
 		// --- Initialization
 		$table_blocs   = _AM_DB_PREFIX . 'sb_blocs';
 		$table_sort    = _AM_DB_PREFIX . 'sb_blocs_sort';
-		$page_id       = (!isset($param['mod'])) ? intval($param['pid']) : $param['pid'];
+		$page_id       = (!isset($param['mod'])) ? intval($param['pid'] ?? 0) : (string) ($param['pid'] ?? '');
 		$type_t1       = (!isset($param['mod'])) ? 't1.page_id' : 't1.module_id';
-		$type_t1_query = (!isset($param['mod'])) ? "$type_t1 = $page_id" : "$type_t1 = '$page_id'";
+		$type_t1_query = "$type_t1 = ?";
 		
 		// --- Get ALL blocks for this page_id
 		$query   = "SELECT t1.bloc_id, $type_t1, t1.sort,
@@ -1067,8 +1054,7 @@ if (!function_exists("insert_sbGetContentCmsBlocks")) {
 						   LEFT JOIN $table_blocs AS t2 ON (t1.bloc_id = t2.id)
 						   WHERE t2.active = '1' AND $type_t1_query
 						   ORDER BY t1.sort ASC ";	
-		$request = $sbsql->query($query);
-		return $sbsql->toarray($request);
+		return sbDb()->all($query, array($page_id)) ?: array();
 	}
 }
 
@@ -1258,14 +1244,13 @@ if (!function_exists("insert_sbGetMobileDetect")) {
  */
 if (!function_exists("insert_sbGetSeoMetas")) {
 	function insert_sbGetSeoMetas() {
-		global $sbsql, $sbsanitize;
+		global $sbsanitize;
 		$metas_seo = '';
 		$table     = _AM_DB_PREFIX . 'sb_config';
 		
 		// --- Get CMS SEO Metas
 		$query   = "SELECT config, content FROM $table WHERE config LIKE 'seo-%'";
-		$request = $sbsql->query($query);
-		$result  = $sbsql->toarray($request);
+		$result  = sbDb()->all($query);
 		
 		if ($result) {
 			// Loop all Metas
