@@ -119,6 +119,8 @@
 		
 	if($passed_step == 5){
 		
+		$database_driver   = (isset($_SESSION['database_driver']) && $_SESSION['database_driver'] === 'sqlite') ? 'sqlite' : 'mysql';
+		$database_path     = isset($_SESSION['database_path']) ? (string) $_SESSION['database_path'] : '';
 		$database_host	   = isset($_SESSION['database_host']) ? prepare_input($_SESSION['database_host']) : '';
 		$database_name	   = isset($_SESSION['database_name']) ? prepare_input($_SESSION['database_name']) : '';
 		$database_username = isset($_SESSION['database_username']) ? prepare_input($_SESSION['database_username']) : '';
@@ -139,10 +141,16 @@
 			$sql_dump_file = EI_SQL_DUMP_FILE_CREATE;
 		}		
 						
+		if ($database_driver == 'sqlite') {
+			// SQLite : un fichier (hors du site), installation neuve seulement
+			$install_type = 'create';
+			if ($database_path === '') $error_mg[] = 'Fichier SQLite non défini : revenez à l\'étape « Paramètres database ».';
+		} else {
 		if(empty($database_host)) $error_mg[] = lang_key('alert_db_host_empty');	
 		if(empty($database_name)) $error_mg[] = lang_key('alert_db_name_empty'); 
 		if(empty($database_username)) $error_mg[] = lang_key('alert_db_username_empty'); 	
 		if (empty($database_password)) $error_mg[] = lang_key('alert_db_password_empty');
+		}
 
 		// --- Premier compte admin : identifiant + HASH posés à l'étape 4.
 		// --- Vérifié AVANT de créer les tables, pour ne jamais laisser une
@@ -165,11 +173,17 @@
 					$error_mg[] = lang_key('alert_wrong_testing_parameters');
 				}
 			}else{				
-				$db = Database::GetInstance($database_host, $database_name, $database_username, $database_password, EI_DATABASE_TYPE, false, true);
+				if ($database_driver == 'sqlite') {
+					require_once(dirname(__DIR__) . '/inc/sbuiadmin-settings.php');
+					require_once('include/sbsqlite.inc.php');
+					$db = new SbInstallSqlite($database_path, $database_prefix);
+				} else {
+					$db = Database::GetInstance($database_host, $database_name, $database_username, $database_password, EI_DATABASE_TYPE, false, true);
+				}
 				if(EI_DATABASE_CREATE && ($install_type == 'create') && !$db->Create()){
 					$error_mg[] = $db->Error();					
 				}else if($db->Open()){
-					if(EI_CHECK_DB_MINIMUM_VERSION && (version_compare($db->GetVersion(), EI_DB_MINIMUM_VERSION, '<'))){
+					if($database_driver != 'sqlite' && EI_CHECK_DB_MINIMUM_VERSION && (version_compare($db->GetVersion(), EI_DB_MINIMUM_VERSION, '<'))){
 						$alert_min_version_db = lang_key('alert_min_version_db');
 						$alert_min_version_db = str_replace('_DB_VERSION_', '<b>'.EI_DB_MINIMUM_VERSION.'</b>', $alert_min_version_db);
 						$alert_min_version_db = str_replace('_DB_CURR_VERSION_', '<b>'.$db->GetVersion().'</b>', $alert_min_version_db);
@@ -182,8 +196,8 @@
 						if (file_exists(__DIR__ . '/installer/installer.lock')) {
 							$error_mg[] = 'SBUIADMIN est déjà installé : installation refusée.';
 						}else if($sql_dump != ''){
-							if(false == ($db_error = apphp_db_install($sql_dump_file))){
-								if(EI_MODE != 'debug') $error_mg[] = lang_key('error_sql_executing');								
+							if(false == ($db_error = ($database_driver == 'sqlite' ? $db->Install($sql_dump_file) : apphp_db_install($sql_dump_file)))){
+								if(EI_MODE != 'debug') $error_mg[] = lang_key('error_sql_executing') . ($database_driver == 'sqlite' ? ' (' . $db->Error() . ')' : '');								
 							}else{
 								// write additional operations here, like setting up system preferences etc.
 
@@ -193,6 +207,7 @@
 								$sb_admin_failed = false;
 								if ($sb_set_admin) {
 									$sb_admin_sql = "UPDATE `" . $database_prefix . "sb_users` SET `username` = ?, `password` = ? WHERE `id` = 1";
+									// (SbInstallSqlite::Run ou Database::Run : requête liée)
 									if ($db->Run($sb_admin_sql, array((string) $admin_username, (string) $admin_password_hash)) === false) {
 										$error_mg[] = lang_key('alert_admin_password_missing') . (EI_MODE == 'debug' ? ' ' . $db->Error() : '');
 										$sb_admin_failed = true;
@@ -220,6 +235,8 @@
 								if ($install_type != 'un-install') {
 									$sb_db_existing = sbDbConfig(true);
 									$sb_db_new = array(
+										'driver'   => $database_driver,
+										'path'     => $database_driver == 'sqlite' ? $database_path : '',
 										'host'     => (string) $_SESSION['database_host'],
 										'name'     => (string) $_SESSION['database_name'],
 										'user'     => (string) $_SESSION['database_username'],
@@ -233,7 +250,7 @@
 									if (!$sb_dbconfig_file) {
 										$sb_install_ok = false;
 										$error_mg[] = "<b>Erreur :</b> impossible d'écrire sbdbconfig.php. Rendez inscriptible le dossier <code>" . htmlspecialchars(dirname(dirname(__DIR__, 2))) . "</code> (recommandé, hors du site) ou <code>" . htmlspecialchars(dirname(__DIR__, 2)) . "</code>, puis relancez l'installation.";
-									} elseif (($sb_db_check = sbDbConfig(true)) && $sb_db_check['source'] !== 'env' && ($sb_db_check['source'] !== $sb_dbconfig_file || $sb_db_check['prefix'] !== $sb_db_new['prefix'] || $sb_db_check['name'] !== $sb_db_new['name'])) {
+									} elseif (($sb_db_check = sbDbConfig(true)) && $sb_db_check['source'] !== 'env' && ($sb_db_check['source'] !== $sb_dbconfig_file || $sb_db_check['prefix'] !== $sb_db_new['prefix'] || $sb_db_check['name'] !== $sb_db_new['name'] || $sb_db_check['driver'] !== $sb_db_new['driver'] || $sb_db_check['path'] !== $sb_db_new['path'])) {
 										// Relu autre chose que ce qui vient d'être écrit (fichier d'un
 										// autre site, cache) : surtout ne rien écrire dans la base
 										$sb_install_ok = false;
@@ -315,8 +332,7 @@
 											// Code d'accès au site en maintenance (?d=) : tiré au sort,
 											// un code commun à toutes les installations ouvrait le site
 											// à tous (voir inc/migrations/4.39.php)
-											mysqli_query(sbSettingsDb(), "UPDATE `" . sbSettingsTable() . "` SET `content` = '" . bin2hex(random_bytes(8))
-												. "' WHERE `config` = 'coming-soon-url' AND TRIM(`content`) IN ('', 'comingSoon', 'DevProgress')");
+											if (sbDb()) sbDb()->run("UPDATE {sb_config} SET `content` = ? WHERE `config` = 'coming-soon-url' AND TRIM(`content`) IN ('', 'comingSoon', 'DevProgress')", array(bin2hex(random_bytes(8))));
 										}
 									}
 								}

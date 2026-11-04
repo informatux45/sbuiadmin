@@ -231,7 +231,8 @@ class Database
 				case 'mysql':
 				default:
 					$this->dbh = new PDO($this->db_driver.':host='.$_db_host.$port.';dbname='.$this->database, $this->user, $this->password);
-                    $this->dbh->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
+                    // PHP 8.4+ : Pdo\Mysql (PDO::MYSQL_ATTR_* déprécié en 8.5)
+                    $this->dbh->setAttribute(class_exists('Pdo\\Mysql') ? constant('Pdo\\Mysql::ATTR_USE_BUFFERED_QUERY') : constant('PDO::MYSQL_ATTR_USE_BUFFERED_QUERY'), true);
                     if($this->persistent_connection) $this->dbh->setAttribute(PDO::ATTR_PERSISTENT, true);
 					break;
 			}

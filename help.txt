@@ -1,8 +1,13 @@
 # SBUIADMIN - Installation
 
 ### Prérequis
-- PHP 8.4+ (pdo_mysql, mysqli, sodium, openssl, curl, gd, mbstring, zip)
-- MySQL 5.7+ / MariaDB 10.3+, Apache + mod_rewrite + mod_headers
+- PHP 8.4+ (pdo_mysql ou pdo_sqlite, sodium, openssl, curl, gd, mbstring, zip)
+- MySQL 5.7+ / MariaDB 10.3+, ou SQLite ; Apache + mod_rewrite + mod_headers
+
+### Base SQLite
+- Choisie à l'étape « Paramètres database » : un fichier hors du site.
+- Configuration > Réglages > Changer de base : SQLite <-> MySQL/MariaDB
+  (copie vérifiée, ancienne base gardée, retour possible).
 
 ### Installation
 - Depuis GitHub : déposer seul sbuiadmin_netinstall.php dans le dossier

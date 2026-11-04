@@ -28,6 +28,25 @@ $sbsmarty->assign('module_url', $module_url);
 // Include Config CMS
 // -----------------------
 include_once('../sbconfig.php');
+
+// -----------------------------------------------------------------------
+// Gabarit d'une catégorie (tpl_list, tpl_single), saisi dans l'admin et
+// exécuté par {eval} : compilé à blanc d'abord (sans l'exécuter). Une erreur
+// de syntaxe ne fait plus tomber la page (500) : affichage par défaut.
+// -----------------------------------------------------------------------
+if (!function_exists('sbNewsTplError')) {
+	/** Erreur de compilation Smarty du gabarit ('' si valide ou vide) */
+	function sbNewsTplError($smarty, $code) {
+		if (trim((string) $code) === '' || !is_object($smarty) || !method_exists($smarty, 'createTemplate')) return '';
+		try {
+			$tpl = $smarty->createTemplate('eval:' . $code);
+			$tpl->compileTemplateSource();
+			return '';
+		} catch (Throwable $e) {
+			return trim(preg_replace('/\s+/', ' ', $e->getMessage()));
+		}
+	}
+}
  
 // -----------------------
 // Message status
@@ -621,6 +640,12 @@ switch($action) {
 					$content      = isset($assocCurrent[$action]) ? $assocCurrent[$action] : '';
 					$query        = $query_current;
 
+				} elseif (($sb_tpl_err = sbNewsTplError($sbsmarty, $content)) !== '' && stripos($sb_tpl_err, 'unknown modifier') === false) {
+
+					// --- Gabarit invalide (syntaxe Smarty) : refusé, l'éditeur garde la saisie
+					$sb_msg_error = "Template (" . $action . ") non enregistré : erreur de syntaxe Smarty. " . htmlspecialchars(substr($sb_tpl_err, 0, 400), ENT_QUOTES, 'UTF-8');
+					$query        = '';
+
 				} else {
 
 					// UPDATE DATAS
@@ -631,7 +656,7 @@ switch($action) {
 						// --- On ne vide pas les champs du formulaire
 						// -------------------------------------------
 						// --- Message SUCCES
-						$sb_msg_valid = 'Template ('.$action.') modifié avec succès';
+						$sb_msg_valid = 'Template ('.$action.') modifié avec succès' . (!empty($sb_tpl_err) ? ' (attention : ' . htmlspecialchars(substr($sb_tpl_err, 0, 200), ENT_QUOTES, 'UTF-8') . ')' : '');
 					} else {
 						// --- Message ERROR
 						$sb_msg_error = 'Error: Write Error (EDIT)!';

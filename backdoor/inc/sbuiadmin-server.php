@@ -209,7 +209,10 @@ function sbServerIniBytes($v) {
 function sbServerPhp() {
 	$ext = array();
 	// Extensions dont le CMS a besoin (true = indispensable)
-	foreach (array('mysqli' => true, 'mbstring' => true, 'json' => true, 'openssl' => true, 'sodium' => true, 'curl' => true,
+	// Pilote PDO de la base du site (pdo_mysql ou pdo_sqlite)
+	$c = function_exists('sbDbConfig') ? sbDbConfig() : array();
+	$pdo = (($c['driver'] ?? 'mysql') === 'sqlite') ? 'pdo_sqlite' : 'pdo_mysql';
+	foreach (array($pdo => true, 'mbstring' => true, 'json' => true, 'openssl' => true, 'sodium' => true, 'curl' => true,
 	               'gd' => true, 'fileinfo' => true, 'zip' => false, 'intl' => false, 'iconv' => false, 'zend opcache' => false) as $e => $required) {
 		$ext[] = array('name' => $e === 'zend opcache' ? 'opcache' : $e, 'loaded' => extension_loaded($e), 'required' => $required);
 	}

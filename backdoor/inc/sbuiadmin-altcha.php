@@ -45,7 +45,7 @@ function sbAltchaAvailable() {
 		$autoload = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 		if (is_readable($autoload)) require_once $autoload;
 	}
-	$ok = class_exists('\\AltchaOrg\\Altcha\\Altcha') && sbSettingsDb() && sbAltchaSecrets() !== false;
+	$ok = class_exists('\\AltchaOrg\\Altcha\\Altcha') && function_exists('sbDb') && sbDb() && sbAltchaSecrets() !== false;
 	if (!$ok) error_log('SBUIADMIN ALTCHA indisponible (PHP 8.4+, vendor/altcha-org et base requis) : formulaires non protégés');
 	return $ok;
 }
@@ -73,11 +73,10 @@ function sbAltchaSecrets() {
 
 /** Retire de la base les clés Google reCAPTCHA (réglages et module contact) */
 function sbAltchaDropObsolete() {
-	$link = sbSettingsDb();
-	if (!$link) return;
-	$quote = function ($v) use ($link) { return "'" . mysqli_real_escape_string($link, $v) . "'"; };
+	$db = function_exists('sbDb') ? sbDb() : null;
+	if (!$db) return;
 	$obsolete = array_merge(sbSettingsObsoleteNames(), array('email_publickey', 'email_privatekey'));
-	@mysqli_query($link, "DELETE FROM `" . sbSettingsTable() . "` WHERE `config` IN (" . implode(',', array_map($quote, $obsolete)) . ")");
+	$db->delete('sb_config', '`config` IN (' . implode(',', array_fill(0, count($obsolete), '?')) . ')', $obsolete);
 }
 
 /** Bornes des réglages numériques (valeur saisie hors bornes = défaut) */
@@ -175,24 +174,20 @@ function sbAltchaVerify($payload = null) {
  * @return bool false si déjà utilisée (ou mémorisation impossible)
  */
 function sbAltchaRemember($signature, $expires) {
-	$link = sbSettingsDb();
-	if (!$link) return false;
-	$c = sbDbConfig();
-	$t = $c['prefix'] . 'sb_altcha_used';
-	if (!@mysqli_query($link, "CREATE TABLE IF NOT EXISTS `$t` (
-		`sig` char(64) NOT NULL,
-		`expires` int unsigned NOT NULL,
-		PRIMARY KEY (`sig`),
-		KEY `expires` (`expires`)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4")) return false;
-	@mysqli_query($link, "DELETE FROM `$t` WHERE `expires` < " . time());
-	$sig  = hash('sha256', $signature);
-	$stmt = mysqli_prepare($link, "INSERT IGNORE INTO `$t` (`sig`, `expires`) VALUES (?, ?)");
-	if (!$stmt) return false;
-	mysqli_stmt_bind_param($stmt, 'si', $sig, $expires);
-	$ok = mysqli_stmt_execute($stmt) && mysqli_stmt_affected_rows($stmt) === 1;
-	mysqli_stmt_close($stmt);
-	return $ok;
+	$db = function_exists('sbDb') ? sbDb() : null;
+	if (!$db) return false;
+	try {
+		sbdbschema::runScript($db, "CREATE TABLE IF NOT EXISTS `" . $db->prefix() . "sb_altcha_used` (
+			`sig` char(64) NOT NULL,
+			`expires` int unsigned NOT NULL,
+			PRIMARY KEY (`sig`),
+			KEY `expires` (`expires`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+	} catch (RuntimeException $e) {
+		return false;
+	}
+	$db->delete('sb_altcha_used', '`expires` < ?', array(time()));
+	return $db->insertIgnore('sb_altcha_used', array('sig' => hash('sha256', $signature), 'expires' => (int) $expires)) === 1;
 }
 
 /**

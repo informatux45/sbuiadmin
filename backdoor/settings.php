@@ -93,6 +93,81 @@ global $sbfiles_medias_exts_safe;
 // ---------------------------------------------------
 $action = $_GET['a'] ?? '';
 switch($action) {
+	// --------------------------------
+	// --- Changer de base de données (SQLite <-> MySQL/MariaDB)
+	// --------------------------------
+	case 'database':
+		require_once(__DIR__ . '/inc/sbuiadmin-dbswitch.php');
+		if (is_file(__DIR__ . '/inc/sbuiadmin-update.php')) require_once(__DIR__ . '/inc/sbuiadmin-update.php');
+		$formName        = "db_form";
+		$btn_add_edit    = "Copier et basculer";
+		$sb_db_cur       = sbDbConfig();
+		$sb_db_in        = array('db_driver' => $sb_db_cur['driver'] === 'sqlite' ? 'mysql' : 'sqlite', 'db_host' => 'localhost', 'db_name' => '', 'db_user' => '', 'db_path' => sbDbSqliteSuggestedPath());
+		$sb_db_user_name = (string) ($_SESSION['sbuiadmin_user_name'] ?? '');
+		if (!empty($_POST['form_submit']) && $_POST['form_submit'] === $formName) {
+			foreach (array('db_driver', 'db_host', 'db_name', 'db_user', 'db_path') as $k) if (isset($_POST[$k]) && is_string($_POST[$k])) $sb_db_in[$k] = trim($_POST[$k]);
+			try {
+				$sb_db_target = sbDbSwitchTarget(array_merge($sb_db_in, array('db_password' => is_string($_POST['db_password'] ?? null) ? $_POST['db_password'] : '')));
+				if (($_POST['db_op'] ?? '') === 'test') {
+					sbDbSwitchConnect($sb_db_target);
+					$sb_msg_valid = 'Connexion réussie : ' . sbDbSwitchLabel($sb_db_target) . ' est joignable et vide pour le préfixe « ' . $sb_db_target['prefix'] . ' ».';
+				} elseif (empty($_POST['db_confirm'])) {
+					$sb_msg_error = 'Cochez la confirmation avant de copier et basculer.';
+				} else {
+					$sb_db_res = sbDbSwitchRun($sb_db_target);
+					$sb_db_rows = array_sum($sb_db_res['tables']);
+					if (is_object($sbusers) && method_exists($sbusers, 'updateAccessLog')) @$sbusers->updateAccessLog('settings', 'Base changée : ' . $sb_db_res['from'] . ' -> ' . $sb_db_res['to'], $sb_db_user_name);
+					$sb_msg_valid = 'Base changée : ' . count($sb_db_res['tables']) . ' tables et ' . $sb_db_rows . ' lignes copiées et vérifiées. Le site utilise maintenant ' . $sb_db_res['to'] . '. L\'ancienne base est intacte.';
+					$sb_db_cur = sbDbConfig();
+				}
+			} catch (Throwable $e) {
+				$sb_msg_error = $e->getMessage();
+			}
+		} elseif (!empty($_POST['form_submit']) && $_POST['form_submit'] === 'db_revert') {
+			try {
+				$sb_db_back = sbDbSwitchRevert();
+				if (is_object($sbusers) && method_exists($sbusers, 'updateAccessLog')) @$sbusers->updateAccessLog('settings', 'Retour à la base précédente : ' . $sb_db_back, $sb_db_user_name);
+				$sb_msg_valid = 'Le site utilise de nouveau ' . $sb_db_back . ' (sans les changements faits depuis la bascule).';
+				$sb_db_cur = sbDbConfig();
+			} catch (Throwable $e) {
+				$sb_msg_error = $e->getMessage();
+			}
+		}
+		$sb_db_prev = sbDbSwitchPrevious();
+		$formAction = $module_url . "&a=database";
+		$sbform->openForm(array('action' => "$formAction", 'name' => "$formName", 'id' => "$formName", 'reloadpage' => "$formAction", 'submitpage' => "$formAction"));
+		$sbform->addBreak('Base actuelle');
+		$sbform->addAnything("<div class='form-group'><p><strong>" . htmlspecialchars(sbDbSwitchLabel($sb_db_cur), ENT_QUOTES, 'UTF-8') . "</strong> · préfixe des tables : <code>" . htmlspecialchars($sb_db_cur['prefix'], ENT_QUOTES, 'UTF-8') . "</code></p>"
+			. "<p>Toutes les tables du CMS sont recopiées dans la nouvelle base, leur nombre de lignes vérifié, puis le site bascule (même clé de chiffrement). L'ancienne base n'est jamais modifiée : vous pouvez y revenir. Faites-le à un moment calme : ce qui est enregistré pendant la copie (journal, messages) peut manquer.</p></div>");
+		$sbform->addBreak('Nouvelle base');
+		$sb_db_radio = array(
+			array('text' => 'MySQL / MariaDB' . (sbDbDriverAvailable('mysql') ? '' : ' (extension pdo_mysql absente)'), 'value' => 'mysql'),
+			array('text' => 'SQLite (un fichier)' . (sbDbDriverAvailable('sqlite') ? '' : ' (extension pdo_sqlite absente)'), 'value' => 'sqlite'),
+		);
+		$sbform->addRadio('Type', $sb_db_radio, array('name' => 'db_driver', 'checked' => $sb_db_in['db_driver']), true, '&nbsp;&nbsp;', '');
+		$sbform->addInput('text', 'Hôte MySQL', array('name' => 'db_host', 'value' => htmlspecialchars($sb_db_in['db_host'], ENT_QUOTES, 'UTF-8'), 'placeholder' => 'localhost, hôte:port ou hôte:/chemin/socket', 'autocomplete' => 'off'), false, false, 'MySQL / MariaDB : la base doit déjà exister et être vide (aucune table au préfixe actuel).');
+		$sbform->addInput('text', 'Nom de la base', array('name' => 'db_name', 'value' => htmlspecialchars($sb_db_in['db_name'], ENT_QUOTES, 'UTF-8'), 'autocomplete' => 'off'), false);
+		$sbform->addInput('text', 'Utilisateur', array('name' => 'db_user', 'value' => htmlspecialchars($sb_db_in['db_user'], ENT_QUOTES, 'UTF-8'), 'autocomplete' => 'off'), false);
+		$sbform->addInput('password', 'Mot de passe', array('name' => 'db_password', 'value' => '', 'autocomplete' => 'new-password'), false);
+		$sbform->addInput('text', 'Fichier SQLite', array('name' => 'db_path', 'value' => htmlspecialchars($sb_db_in['db_path'], ENT_QUOTES, 'UTF-8'), 'placeholder' => '/chemin/hors/du/site/sbuiadmin.sqlite', 'style' => 'width: 100% !important', 'autocomplete' => 'off'), false, false, 'SQLite : chemin absolu, hors du site (sinon le fichier serait téléchargeable), dossier inscriptible par PHP.');
+		$sb_db_check = array(array('text' => "J'ai compris : le site va utiliser la nouvelle base", 'name' => 'db_confirm', 'checked' => '0'));
+		$sbform->addCheckbox('Confirmation', $sb_db_check, '', false, '<br />', '');
+		$sbform->addAnything("<div class='form-group'><button type='submit' name='db_op' value='test' class='btn'>Tester la connexion</button></div>");
+		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => "$formName"));
+		$sbform->addInput('submit', '', array('value' => "$btn_add_edit"));
+		$sbform->closeForm();
+		if ($sb_db_prev) {
+			// Retour à la base précédente : second petit formulaire (jeton CSRF compris)
+			$sbform->openForm(array('action' => "$formAction", 'name' => 'db_revert', 'id' => 'db_revert', 'reloadpage' => "$formAction", 'submitpage' => "$formAction"));
+			$sbform->addBreak('Base précédente');
+			$sbform->addAnything("<div class='form-group'><p>" . htmlspecialchars(sbDbSwitchLabel($sb_db_prev), ENT_QUOTES, 'UTF-8') . " : toujours disponible. Y revenir ne reprend pas les changements faits depuis la bascule.</p></div>");
+			$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => 'db_revert'));
+			$sbform->addInput('submit', '', array('value' => 'Revenir à cette base'));
+			$sbform->closeForm();
+		}
+		$sbsmarty->assign('sb_db_switch', true);
+	break;
+
 	default:
 		// --------------------------------
 		// Initialize Form
@@ -318,8 +393,10 @@ switch($action) {
 		} else {
 			$sb_db_where = "<strong style='color: red;'>Introuvable</strong>";
 		}
-		$sb_db_html  = "<div class='form-group'><p>Les accès à la base ne sont plus modifiables depuis l'administration. Emplacement : " . $sb_db_where . "</p>";
-		$sb_db_html .= "<p>Hôte, base, utilisateur, mot de passe, préfixe : " . (($sb_db_cfg['host'] !== '' && $sb_db_cfg['name'] !== '') ? "définis ✓" : "<strong style='color: red;'>manquants</strong>") . " · Clé de chiffrement des secrets : " . (sbSecretKey() ? "définie ✓" : "<strong style='color: red;'>absente</strong>") . "</p>";
+		$sb_db_html  = "<div class='form-group'><p>Les accès à la base ne se saisissent pas ici. Emplacement : " . $sb_db_where . "</p>";
+		$sb_db_ok = $sb_db_cfg['driver'] === 'sqlite' ? $sb_db_cfg['path'] !== '' : ($sb_db_cfg['host'] !== '' && $sb_db_cfg['name'] !== '');
+		$sb_db_html .= "<p>Type : <strong>" . ($sb_db_cfg['driver'] === 'sqlite' ? 'SQLite' : 'MySQL / MariaDB') . "</strong> · " . ($sb_db_cfg['driver'] === 'sqlite' ? 'Fichier, préfixe' : 'Hôte, base, utilisateur, mot de passe, préfixe') . " : " . ($sb_db_ok ? "définis ✓" : "<strong style='color: red;'>manquants</strong>") . " · Clé de chiffrement des secrets : " . (sbSecretKey() ? "définie ✓" : "<strong style='color: red;'>absente</strong>") . "</p>";
+		$sb_db_html .= "<p><a class='btn' href='" . htmlspecialchars($module_url . '&a=database', ENT_QUOTES, 'UTF-8') . "'>Changer de base de données</a> " . ($sb_db_cfg['driver'] === 'sqlite' ? 'Passer sur MySQL / MariaDB (ou un autre fichier SQLite).' : 'Passer sur SQLite, ou sur une autre base MySQL / MariaDB.') . "</p>";
 		foreach ($GLOBALS['sb_settings_warnings'] as $sb_db_warning) {
 			$sb_db_html .= "<p style='color: red;'>" . htmlspecialchars($sb_db_warning, ENT_QUOTES, 'UTF-8') . "</p>";
 		}

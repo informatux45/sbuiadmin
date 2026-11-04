@@ -21,6 +21,11 @@
 	require_once('include/database.class.php'); 
 	require_once('include/functions.inc.php');
 	require_once('include/languages.inc.php');	
+	// Fonctions des réglages (chemin SQLite proposé et contrôlé), sans chargement
+	defined('SBUIADMIN_SETTINGS_NO_AUTOLOAD') or define('SBUIADMIN_SETTINGS_NO_AUTOLOAD', true);
+	require_once(dirname(__DIR__) . '/inc/sbuiadmin-settings.php');
+	$sb_sqlite_ok = extension_loaded('pdo_sqlite');
+	$sb_mysql_ok  = extension_loaded('pdo_mysql');
 
 	$task = isset($_POST['task']) ? prepare_input($_POST['task']) : '';
 	$passed_step = isset($_SESSION['passed_step']) ? (int)$_SESSION['passed_step'] : 0;
@@ -40,6 +45,8 @@
 	// handle form submission
 	// -------------------------------------------------
 	if($task == 'send'){
+		$database_driver	= (isset($_POST['database_driver']) && $_POST['database_driver'] === 'sqlite' && $sb_sqlite_ok) ? 'sqlite' : 'mysql';
+		$database_path		= isset($_POST['database_path']) && is_string($_POST['database_path']) ? trim($_POST['database_path']) : '';
 		$database_host		= isset($_POST['database_host']) ? prepare_input($_POST['database_host']) : 'localhost';
 		$database_name 		= isset($_POST['database_name']) ? prepare_input($_POST['database_name']) : '';
 		$database_username	= isset($_POST['database_username']) ? prepare_input($_POST['database_username']) : '';
@@ -49,7 +56,34 @@
 		
 		// validation here
 		// -------------------------------------------------
-		if($database_host == ''){
+		if($database_driver == 'sqlite'){
+			// SQLite : un fichier hors du site, installation neuve seulement
+			$install_type = 'create';
+			$focus_field = 'database_path';
+			if(!preg_match('/^[A-Za-z0-9_]*$/', $database_prefix)){
+				$error_msg = lang_key('database_prefix') . ' : lettres, chiffres et _ seulement.';
+			}else if(($error_msg = sbDbSqlitePathError($database_path)) === ''){
+				try {
+					$sb_test = sbdb::connect(array('driver' => 'sqlite', 'path' => $database_path, 'prefix' => $database_prefix));
+					if(sbdbschema::hasTable($sb_test, $database_prefix . 'sb_users')) $error_msg = 'Ce fichier contient déjà une installation SBUIADMIN avec ce préfixe : choisissez un autre fichier ou un autre préfixe.';
+					$sb_test = null;
+				} catch (RuntimeException $e) {
+					$error_msg = htmlspecialchars($e->getMessage());
+				}
+			}
+			if(empty($error_msg)){
+				$_SESSION['database_driver'] = 'sqlite';
+				$_SESSION['database_path'] = $database_path;
+				$_SESSION['database_host'] = $_SESSION['database_name'] = $_SESSION['database_username'] = $_SESSION['database_password'] = '';
+				$_SESSION['database_prefix'] = $database_prefix;
+				$_SESSION['install_type'] = 'create';
+				$_SESSION['passed_step'] = 3;
+				header('location: administrator_account.php');
+				exit;
+			}
+		}else if(!$sb_mysql_ok){
+			$error_msg = "L'extension PHP pdo_mysql n'est pas activée : choisissez SQLite, ou activez-la chez l'hébergeur.";
+		}else if($database_host == ''){
 			$focus_field = 'database_host';
 			$error_msg = lang_key('alert_db_host_empty');	
 		}else if($database_name == ''){
@@ -88,6 +122,8 @@
 			}			
 			
 			if(empty($error_msg)){
+				$_SESSION['database_driver'] = 'mysql';
+				$_SESSION['database_path'] = '';
 				$_SESSION['database_host'] = $database_host;
 				$_SESSION['database_name'] = $database_name;
 				$_SESSION['database_username'] = $database_username;
@@ -107,6 +143,8 @@
 			}
 		}		
 	}else{
+		$database_driver	= (isset($_SESSION['database_driver']) && $_SESSION['database_driver'] === 'sqlite') ? 'sqlite' : ($sb_mysql_ok || !$sb_sqlite_ok ? 'mysql' : 'sqlite');
+		$database_path		= isset($_SESSION['database_path']) && $_SESSION['database_path'] !== '' ? $_SESSION['database_path'] : sbDbSqliteSuggestedPath();
 		$database_host		= isset($_SESSION['database_host']) ? $_SESSION['database_host'] : 'localhost';
 		$database_name 		= isset($_SESSION['database_name']) ? $_SESSION['database_name'] : '';
 		$database_username	= isset($_SESSION['database_username']) ? $_SESSION['database_username'] : '';
@@ -163,6 +201,21 @@
 			</tr>
 			<tr><td nowrap height="10px" colspan="3"></td></tr>
 			<tr>
+				<td width="250px" nowrap>&nbsp;Type de base : <span class="star">*</span></td>
+				<td colspan="2">
+					<label><input type="radio" name="database_driver" value="mysql" <?php echo $database_driver == 'mysql' ? 'checked="checked"' : ''; ?> <?php echo $sb_mysql_ok ? '' : 'disabled="disabled"'; ?> onclick="sbDriverToggle()" /> MySQL / MariaDB<?php echo $sb_mysql_ok ? '' : ' (extension pdo_mysql absente)'; ?></label>
+					&nbsp;&nbsp;
+					<label><input type="radio" name="database_driver" value="sqlite" <?php echo $database_driver == 'sqlite' ? 'checked="checked"' : ''; ?> <?php echo $sb_sqlite_ok ? '' : 'disabled="disabled"'; ?> onclick="sbDriverToggle()" /> SQLite (un fichier, sans serveur)<?php echo $sb_sqlite_ok ? '' : ' (extension pdo_sqlite absente)'; ?></label>
+				</td>
+			</tr>
+			<tr class="sb-sqlite-row">
+				<td nowrap>&nbsp;Fichier SQLite : <span class="star">*</span></td>
+				<td colspan="2">
+					<input type="text" class="form_text" name="database_path" id="database_path" size="60" value="<?php echo htmlspecialchars($database_path); ?>" autocomplete="off" />
+					<br /><small>Chemin absolu, <b>hors du site</b> (sinon le fichier serait téléchargeable). Le dossier doit être inscriptible par PHP. Une base MySQL/MariaDB pourra être choisie plus tard dans Configuration &gt; Réglages.</small>
+				</td>
+			</tr>
+			<tr class="sb-mysql-row">
 				<td width="250px" nowrap>&nbsp;<?php echo lang_key('database_host'); ?>: <span class="star">*</span></td>
 				<td>
 					<input type="text" class="form_text" name="database_host" id="database_host" size="30" value="<?php echo $database_host; ?>" placeholder="<?php if(EI_MODE == 'demo') echo 'demo: localhost'; ?>" onfocus="textboxOnFocus('notes_host')" onblur="textboxOnBlur('notes_host')" required="" />					
@@ -192,19 +245,19 @@
 					<div id="notes_message" class="notes_container"></div>					
 				</td>
 			</tr>
-			<tr>
+			<tr class="sb-mysql-row">
 				<td nowrap>&nbsp;<?php echo lang_key('database_name'); ?>: <span class="star">*</span></td>
 				<td>
 					<input type="text" class="form_text" name="database_name" id="database_name" size="30" <?php if(EI_MODE != 'debug') echo 'autocomplete="off"'; ?> value="<?php echo $database_name; ?>" placeholder="<?php if(EI_MODE == 'demo') echo 'demo: db_name'; ?>" onfocus="textboxOnFocus('notes_db_name')" onblur="textboxOnBlur('notes_db_name')" required="" />					
 				</td>
 			</tr>
-			<tr>
+			<tr class="sb-mysql-row">
 				<td nowrap>&nbsp;<?php echo lang_key('database_username'); ?>: <span class="star">*</span></td>
 				<td>
 					<input type="text" class="form_text" name="database_username" id="database_username" size="30" <?php if(EI_MODE != 'debug') echo 'autocomplete="off"'; ?> value="<?php echo $database_username; ?>" placeholder="<?php if(EI_MODE == 'demo') echo 'demo: test'; ?>" onfocus="textboxOnFocus('notes_db_user')" onblur="textboxOnBlur('notes_db_user')" required="" />
 				</td>
 			</tr>
-			<tr>
+			<tr class="sb-mysql-row">
 				<td nowrap>&nbsp;<?php echo lang_key('database_password'); ?>: <span class="star">*</span></td>
 				<td>
 					<input type="password" class="form_text" name="database_password" id="database_password" size="30" value="<?php echo $database_password; ?>" <?php if(EI_MODE != 'debug') echo 'autocomplete="off"'; ?> placeholder="<?php if(EI_MODE == 'demo') echo 'demo: test'; ?>" onfocus="textboxOnFocus('notes_db_password')" onblur="textboxOnBlur('notes_db_password')" required="" />
@@ -216,7 +269,7 @@
 					<input type="text" class="form_text" name="database_prefix" size="12" maxlength="12" value="<?php echo $database_prefix; ?>" <?php if(EI_MODE != 'debug') echo 'autocomplete="off"'; ?> onfocus="textboxOnFocus('notes_db_prefix')" onblur="textboxOnBlur('notes_db_prefix')" required="" />
 				</td>
 			</tr>
-			<tr>
+			<tr class="sb-mysql-row">
 				<td nowrap>&nbsp;<?php echo lang_key('installation_type'); ?></td>
 				<td>
 					<?php if(EI_ALLOW_NEW_INSTALLATION && !$program_already_installed) { ?><input type="radio" name="install_type" id="rb_create" value="create" <?php echo ($install_type == 'create') ? 'checked="checked"' : ''; ?> onclick="installTypeOnClick(this.value)" /> <label for="rb_create"><?php echo lang_key('new'); ?></label> <?php } ?>
@@ -224,7 +277,7 @@
 					<?php if(EI_ALLOW_UN_INSTALLATION) { ?><input type="radio" name="install_type" id="rb_uninstall" value="un-install" <?php echo (!$program_already_installed) ? 'disabled="disabled"' : ''; ?> <?php echo ($install_type == 'un-install') ? 'checked="checked"' : ''; ?> onclick="installTypeOnClick(this.value)" /> <label for="rb_uninstall"><?php echo lang_key('uninstall'); ?></label> <?php } ?>						
 				</td>
 			</tr>
-			<tr>
+			<tr class="sb-mysql-row">
 				<td>&nbsp;</td>
 				<td>
 					<input type="button" class="form_button" title="<?php echo lang_key('test_database_connection'); ?>" onclick="testDatabaseConnection()" value="<?php echo lang_key('test_connection'); ?>" />
@@ -251,9 +304,23 @@
 
 <script type="text/javascript">
 	function bodyOnLoad(){
+		sbDriverToggle();
 		setFocus("<?php echo $focus_field; ?>");
 		installTypeOnClick($("input[@name='install_type']:checked").val());
-	}	
+	}
+	// MySQL ou SQLite : champs de l'autre type masqués et désactivés (non envoyés, non exigés)
+	function sbDriverToggle(){
+		var c = document.querySelector('input[name="database_driver"]:checked');
+		var sqlite = c && c.value === 'sqlite';
+		document.querySelectorAll('.sb-mysql-row').forEach(function (tr) {
+			tr.style.display = sqlite ? 'none' : '';
+			tr.querySelectorAll('input').forEach(function (i) { i.disabled = sqlite; });
+		});
+		document.querySelectorAll('.sb-sqlite-row').forEach(function (tr) {
+			tr.style.display = sqlite ? '' : 'none';
+			tr.querySelectorAll('input').forEach(function (i) { i.disabled = !sqlite; });
+		});
+	}
 </script>
 </body>
 </html>

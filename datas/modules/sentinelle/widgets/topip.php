@@ -26,10 +26,13 @@ return array(
 		if (!$dbt) return '<p>Journal indisponible.</p>';
 		list($db, $table) = $dbt;
 		$since = date('Y-m-d H:i:s', time() - (int) $p['days'] * 86400);
-		$res = mysqli_query($db, "SELECT ip, MAX(country) AS country, COUNT(*) AS n, SUM(severity = 'critical') AS crit, MAX(created_at) AS last, SUBSTRING_INDEX(GROUP_CONCAT(type ORDER BY id DESC), ',', 1) AS type FROM `$table` WHERE created_at >= '$since' GROUP BY ip ORDER BY n DESC LIMIT " . (int) $p['nb']);
+		// Dernier type par IP : sous-requête (MySQL et SQLite)
+		$res = $db->all("SELECT ip, MAX(country) AS country, COUNT(*) AS n, SUM(CASE WHEN severity = 'critical' THEN 1 ELSE 0 END) AS crit, MAX(created_at) AS last, "
+			. "(SELECT l2.type FROM `$table` l2 WHERE l2.ip = l.ip AND l2.created_at >= ? ORDER BY l2.id DESC LIMIT 1) AS type "
+			. "FROM `$table` l WHERE created_at >= ? GROUP BY ip ORDER BY n DESC LIMIT " . (int) $p['nb'], array($since, $since)) ?: array();
 		$types = sentinelle_types();
 		$rows = '';
-		while ($res && ($r = mysqli_fetch_assoc($res))) {
+		foreach ($res as $r) {
 			$banned = sentinelle_banned($r['ip']) ? ' <span class="badge danger">bannie</span>' : '';
 			$rows .= '<tr><td><a href="index.php?p=sentinelle&amp;ip=' . rawurlencode($r['ip']) . '&amp;days=all">' . htmlspecialchars($r['ip']) . '</a>' . ($r['country'] ? ' <small>' . htmlspecialchars($r['country']) . '</small>' : '') . $banned . '</td>'
 				. '<td>' . (int) $r['n'] . ((int) $r['crit'] ? ' <small>(' . (int) $r['crit'] . ' critique' . ((int) $r['crit'] > 1 ? 's' : '') . ')</small>' : '') . '</td>'

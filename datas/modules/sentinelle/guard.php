@@ -2,8 +2,8 @@
 /**
  * Module sentinelle : journal et inspection des requêtes
  * (chargé par backdoor/inc/sbuiadmin-sentinelle.php, sur le site et dans
- * l'administration, avant les modules). Accès base par sbSettingsDb() :
- * disponible avant $sbsql.
+ * l'administration, avant les modules). Accès base par sbDb() (MySQL ou
+ * SQLite) : disponible avant $sbsql.
  *
  * @package SBUIADMIN
  * @file UTF-8
@@ -104,10 +104,9 @@ function sentinelle_is_trusted($ip = null) {
 
 /** Connexion et nom de la table du journal (ou de $table), ou null */
 function sentinelle_db($table = 'sb_sentinelle_log') {
-	$db = function_exists('sbSettingsDb') ? sbSettingsDb() : null;
-	if (!($db instanceof mysqli)) return null;
-	$c = function_exists('sbDbConfig') ? sbDbConfig() : array();
-	return array($db, str_replace('`', '', (string) ($c['prefix'] ?? '') . $table));
+	$db = function_exists('sbDb') ? sbDb() : null;
+	if (!($db instanceof sbdb)) return null;
+	return array($db, str_replace('`', '', $db->prefix() . $table));
 }
 
 /** Texte coupé à $max caractères (UTF-8), sans caractères de contrôle */
@@ -138,14 +137,9 @@ function sentinelle_event($type, $severity = 'warning', $detail = '', $action = 
 
 	if (!in_array($type, sentinelle_types_every(), true)) {
 		$since = date('Y-m-d H:i:s', time() - 10);
-		$stmt = mysqli_prepare($db, "SELECT id FROM `$table` WHERE ip = ? AND type = ? AND created_at >= ? LIMIT 1");
-		if (!$stmt) return false;
-		mysqli_stmt_bind_param($stmt, 'sss', $ip, $type, $since);
-		mysqli_stmt_execute($stmt);
-		mysqli_stmt_store_result($stmt);
-		$dup = mysqli_stmt_num_rows($stmt) > 0;
-		mysqli_stmt_close($stmt);
-		if ($dup) return true;
+		$dup = $db->value("SELECT id FROM `$table` WHERE ip = ? AND type = ? AND created_at >= ? LIMIT 1", array($ip, $type, $since));
+		if ($dup === false) return false;
+		if ($dup !== null) return true;
 	}
 
 	$context = $GLOBALS['sentinelle_context']
@@ -156,11 +150,8 @@ function sentinelle_event($type, $severity = 'warning', $detail = '', $action = 
 	$user    = sentinelle_cut($user, 64);
 	$detail  = sentinelle_cut($detail, 2000);
 	$country = sentinelle_country($ip);
-	$stmt = mysqli_prepare($db, "INSERT INTO `$table` (created_at, ip, country, type, severity, action, context, method, uri, user_agent, user, detail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-	if (!$stmt) return false;
-	mysqli_stmt_bind_param($stmt, 'ssssssssssss', $now, $ip, $country, $type, $severity, $action, $context, $method, $uri, $agent, $user, $detail);
-	$ok = mysqli_stmt_execute($stmt);
-	mysqli_stmt_close($stmt);
+	$ok = $db->run("INSERT INTO `$table` (created_at, ip, country, type, severity, action, context, method, uri, user_agent, user, detail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		array($now, $ip, (string) $country, $type, $severity, $action, (string) $context, $method, $uri, $agent, $user, $detail)) !== false;
 	// Purge des lignes trop anciennes, de temps en temps
 	if ($ok && mt_rand(1, 100) === 1) sentinelle_purge_old();
 	if ($ok) sentinelle_alert_maybe($severity);
@@ -173,12 +164,7 @@ function sentinelle_purge_old() {
 	if (!$dbt) return false;
 	list($db, $table) = $dbt;
 	$limit = date('Y-m-d H:i:s', time() - sentinelle_retention() * 86400);
-	$stmt = mysqli_prepare($db, "DELETE FROM `$table` WHERE created_at < ?");
-	if (!$stmt) return false;
-	mysqli_stmt_bind_param($stmt, 's', $limit);
-	$ok = mysqli_stmt_execute($stmt);
-	mysqli_stmt_close($stmt);
-	return $ok;
+	return $db->run("DELETE FROM `$table` WHERE created_at < ?", array($limit)) !== false;
 }
 
 /**
@@ -425,8 +411,7 @@ function sentinelle_bans_active($reset = false) {
 	$dbt = sentinelle_db('sb_sentinelle_ban');
 	if (!$dbt) return $rows;
 	list($db, $table) = $dbt;
-	$res = @mysqli_query($db, "SELECT * FROM `$table` WHERE expires_at IS NULL OR expires_at > '" . date('Y-m-d H:i:s') . "' ORDER BY id DESC");
-	while ($res && ($r = mysqli_fetch_assoc($res))) $rows[] = $r;
+	$rows = $db->all("SELECT * FROM `$table` WHERE expires_at IS NULL OR expires_at > ? ORDER BY id DESC", array(date('Y-m-d H:i:s'))) ?: array();
 	return $rows;
 }
 
@@ -443,12 +428,7 @@ function sentinelle_ban_hit($id) {
 	$dbt = sentinelle_db('sb_sentinelle_ban');
 	if (!$dbt) return;
 	list($db, $table) = $dbt;
-	$stmt = mysqli_prepare($db, "UPDATE `$table` SET hits = hits + 1, last_hit = ? WHERE id = ?");
-	if (!$stmt) return;
-	$now = date('Y-m-d H:i:s');
-	mysqli_stmt_bind_param($stmt, 'si', $now, $id);
-	mysqli_stmt_execute($stmt);
-	mysqli_stmt_close($stmt);
+	$db->run("UPDATE `$table` SET hits = hits + 1, last_hit = ? WHERE id = ?", array(date('Y-m-d H:i:s'), (int) $id));
 }
 
 /**
@@ -472,13 +452,8 @@ function sentinelle_ban_add($range, $duration, $reason = '', $source = 'manual')
 	$expires = (int) $duration > 0 ? date('Y-m-d H:i:s', time() + (int) $duration) : null;
 	$reason = sentinelle_cut($reason, 255);
 	$source = $source === 'auto' ? 'auto' : 'manual';
-	$stmt = mysqli_prepare($db, "DELETE FROM `$table` WHERE ip_range = ?");
-	if ($stmt) { mysqli_stmt_bind_param($stmt, 's', $range); mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt); }
-	$stmt = mysqli_prepare($db, "INSERT INTO `$table` (ip_range, reason, source, created_at, expires_at, hits) VALUES (?, ?, ?, ?, ?, 0)");
-	if (!$stmt) return 'Base indisponible';
-	mysqli_stmt_bind_param($stmt, 'sssss', $range, $reason, $source, $now, $expires);
-	$ok = mysqli_stmt_execute($stmt);
-	mysqli_stmt_close($stmt);
+	$db->run("DELETE FROM `$table` WHERE ip_range = ?", array($range));
+	$ok = $db->run("INSERT INTO `$table` (ip_range, reason, source, created_at, expires_at, hits) VALUES (?, ?, ?, ?, ?, 0)", array($range, $reason, $source, $now, $expires)) !== false;
 	sentinelle_bans_active(true);
 	return $ok ? '' : 'Enregistrement impossible';
 }
@@ -488,11 +463,8 @@ function sentinelle_ban_remove($id) {
 	$dbt = sentinelle_db('sb_sentinelle_ban');
 	if (!$dbt) return false;
 	list($db, $table) = $dbt;
-	$stmt = mysqli_prepare($db, "DELETE FROM `$table` WHERE id = ?");
-	if (!$stmt) return false;
-	mysqli_stmt_bind_param($stmt, 'i', $id);
-	$ok = mysqli_stmt_execute($stmt) && mysqli_stmt_affected_rows($stmt) > 0;
-	mysqli_stmt_close($stmt);
+	$st = $db->run("DELETE FROM `$table` WHERE id = ?", array((int) $id));
+	$ok = $st && $st->rowCount() > 0;
 	sentinelle_bans_active(true);
 	return $ok;
 }
@@ -558,15 +530,7 @@ function sentinelle_events_since($since, $level = 'info', $limit = 50) {
 	if (!$dbt) return array();
 	list($db, $table) = $dbt;
 	$levels = array('info' => "('info','warning','critical')", 'warning' => "('warning','critical')", 'critical' => "('critical')");
-	$stmt = mysqli_prepare($db, "SELECT * FROM `$table` WHERE created_at >= ? AND severity IN " . ($levels[$level] ?? $levels['info']) . " ORDER BY id DESC LIMIT " . (int) $limit);
-	if (!$stmt) return array();
-	mysqli_stmt_bind_param($stmt, 's', $since);
-	mysqli_stmt_execute($stmt);
-	$res = mysqli_stmt_get_result($stmt);
-	$rows = array();
-	while ($res && ($r = mysqli_fetch_assoc($res))) $rows[] = $r;
-	mysqli_stmt_close($stmt);
-	return $rows;
+	return $db->all("SELECT * FROM `$table` WHERE created_at >= ? AND severity IN " . ($levels[$level] ?? $levels['info']) . " ORDER BY id DESC LIMIT " . (int) $limit, array((string) $since)) ?: array();
 }
 
 /** Tableau HTML des événements (échappé) */
@@ -640,10 +604,10 @@ function sentinelle_send_digest() {
 	if (!$dbt) return false;
 	list($db, $table) = $dbt;
 	$to = date('Y-m-d 00:00:00');
-	$res = mysqli_query($db, "SELECT type, severity, COUNT(*) AS n, COUNT(DISTINCT ip) AS ips FROM `$table` WHERE created_at >= '$from' AND created_at < '$to' GROUP BY type, severity ORDER BY n DESC");
+	$res = $db->all("SELECT type, severity, COUNT(*) AS n, COUNT(DISTINCT ip) AS ips FROM `$table` WHERE created_at >= ? AND created_at < ? GROUP BY type, severity ORDER BY n DESC", array($from, $to)) ?: array();
 	$types = sentinelle_types();
 	$lines = ''; $total = 0;
-	while ($res && ($r = mysqli_fetch_assoc($res))) {
+	foreach ($res as $r) {
 		$total += (int) $r['n'];
 		$lines .= '<tr><td>' . htmlspecialchars($types[$r['type']] ?? $r['type']) . '</td><td>' . htmlspecialchars($r['severity']) . '</td><td>' . (int) $r['n'] . '</td><td>' . (int) $r['ips'] . '</td></tr>';
 	}
@@ -763,13 +727,8 @@ function sentinelle_autoban_duration($ip) {
 	if (!$dbt) return $base;
 	list($db, $table) = $dbt;
 	$since = date('Y-m-d H:i:s', time() - 30 * 86400);
-	$stmt = mysqli_prepare($db, "SELECT COUNT(*) FROM `$table` WHERE ip = ? AND type = 'auto_ban' AND created_at >= ?");
-	if (!$stmt) return $base;
-	mysqli_stmt_bind_param($stmt, 'ss', $ip, $since);
-	mysqli_stmt_execute($stmt);
-	mysqli_stmt_bind_result($stmt, $n);
-	mysqli_stmt_fetch($stmt);
-	mysqli_stmt_close($stmt);
+	$n = $db->value("SELECT COUNT(*) FROM `$table` WHERE ip = ? AND type = 'auto_ban' AND created_at >= ?", array((string) $ip, $since));
+	if ($n === false) return $base;
 	return (int) $n >= 2 ? min($base * 30, 90 * 86400) : $base;
 }
 
@@ -788,14 +747,7 @@ function sentinelle_autoban_count($ip, $minutes) {
 	list($db, $table) = $dbt;
 	$since = date('Y-m-d H:i:s', time() - $minutes * 60);
 	$in = "'" . implode("','", sentinelle_autoban_types()) . "'";
-	$stmt = mysqli_prepare($db, "SELECT COUNT(*) FROM `$table` WHERE ip = ? AND created_at >= ? AND (action = 'blocked' OR severity = 'critical' OR type IN ($in))");
-	if (!$stmt) return 0;
-	mysqli_stmt_bind_param($stmt, 'ss', $ip, $since);
-	mysqli_stmt_execute($stmt);
-	mysqli_stmt_bind_result($stmt, $c);
-	mysqli_stmt_fetch($stmt);
-	mysqli_stmt_close($stmt);
-	return (int) $c;
+	return (int) $db->value("SELECT COUNT(*) FROM `$table` WHERE ip = ? AND created_at >= ? AND (action = 'blocked' OR severity = 'critical' OR type IN ($in))", array((string) $ip, $since));
 }
 
 function sentinelle_autoban_maybe($ip, $type, $severity = 'warning', $action = 'logged') {

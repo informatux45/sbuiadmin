@@ -875,7 +875,8 @@ return array(
 
 	'up' => function (SbMigration $m) use ($sb_schema_443) {
 		// Type actuel d'une colonne (connexion de la mise à jour, si disponible)
-		$db  = function_exists('sbUpdDb') ? sbUpdDb() : null;
+		// mysqli (sbSettingsDb), aussi sous le code d'avant la 4.80 ; null sous SQLite
+		$db  = function_exists('sbSettingsDb') ? sbSettingsDb() : null;
 		$col = function ($table, $column) use ($db, $m) {
 			if (!($db instanceof mysqli)) return null;
 			$r = $db->query("SELECT COLUMN_TYPE, IS_NULLABLE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '"

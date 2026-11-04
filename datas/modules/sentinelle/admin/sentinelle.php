@@ -281,8 +281,7 @@ switch ($action) {
 		if ($sb_sentinelle_ready) {
 			list($db, $table) = sentinelle_db('sb_sentinelle_ban');
 			$now = date('Y-m-d H:i:s');
-			$res = @mysqli_query($db, "SELECT * FROM `$table` ORDER BY (expires_at IS NULL OR expires_at > '$now') DESC, id DESC LIMIT 500");
-			while ($res && ($r = mysqli_fetch_assoc($res))) {
+			foreach ($db->all("SELECT * FROM `$table` ORDER BY (expires_at IS NULL OR expires_at > ?) DESC, id DESC LIMIT 500", array($now)) ?: array() as $r) {
 				$r['active'] = $r['expires_at'] === null || $r['expires_at'] > $now;
 				$sb_bans[] = $r;
 			}
@@ -305,17 +304,14 @@ switch ($action) {
 		if ($sb_sentinelle_ready && $action === 'del') {
 			list($db, $table) = sentinelle_db();
 			$sb_id = (int) ($_GET['id'] ?? 0);
-			$stmt = mysqli_prepare($db, "DELETE FROM `$table` WHERE id = ?");
-			mysqli_stmt_bind_param($stmt, 'i', $sb_id);
-			if (mysqli_stmt_execute($stmt)) $sb_msg_valid = 'Ligne du journal supprimée';
+			if ($db->run("DELETE FROM `$table` WHERE id = ?", array($sb_id)) !== false) $sb_msg_valid = 'Ligne du journal supprimée';
 			else $sb_msg_error = 'Error: Write Error (DEL)!';
-			mysqli_stmt_close($stmt);
 		}
 		if ($sb_sentinelle_ready && $action === 'purge') {
 			list($db, $table) = sentinelle_db();
 			$sb_scope = is_string($_GET['scope'] ?? null) ? $_GET['scope'] : '';
 			if ($sb_scope === 'all') {
-				$sb_ok = mysqli_query($db, "DELETE FROM `$table`");
+				$sb_ok = $db->run("DELETE FROM `$table`") !== false;
 			} elseif ($sb_scope === 'old') {
 				$sb_ok = sentinelle_purge_old();
 			} else {
@@ -340,27 +336,20 @@ switch ($action) {
 		if ($sb_sentinelle_ready) {
 			list($db, $table) = sentinelle_db();
 			if (mt_rand(1, 10) === 1) sentinelle_purge_old();
-			$where = array(); $types = ''; $args = array();
+			$where = array(); $args = array();
 			foreach (array('type', 'severity', 'ip') as $f) {
-				if ($sb_filter[$f] !== '') { $where[] = "`$f` = ?"; $types .= 's'; $args[] = $sb_filter[$f]; }
+				if ($sb_filter[$f] !== '') { $where[] = "`$f` = ?"; $args[] = $sb_filter[$f]; }
 			}
-			if ($sb_filter['days'] !== 'all') { $where[] = 'created_at >= ?'; $types .= 's'; $args[] = date('Y-m-d H:i:s', time() - (int) $sb_filter['days'] * 86400); }
+			if ($sb_filter['days'] !== 'all') { $where[] = 'created_at >= ?'; $args[] = date('Y-m-d H:i:s', time() - (int) $sb_filter['days'] * 86400); }
 			$sql = "SELECT * FROM `$table`" . ($where ? ' WHERE ' . implode(' AND ', $where) : '') . ' ORDER BY id DESC LIMIT 1000';
-			$stmt = mysqli_prepare($db, $sql);
-			if ($stmt) {
-				if ($args) mysqli_stmt_bind_param($stmt, $types, ...$args);
-				mysqli_stmt_execute($stmt);
-				$res = mysqli_stmt_get_result($stmt);
-				while ($res && ($r = mysqli_fetch_assoc($res))) {
-					$r['type_label'] = $sb_types[$r['type']] ?? $r['type'];
-					$sb_rows[] = $r;
-				}
-				mysqli_stmt_close($stmt);
+			foreach ($db->all($sql, $args) ?: array() as $r) {
+				$r['type_label'] = $sb_types[$r['type']] ?? $r['type'];
+				$sb_rows[] = $r;
 			}
 			$d1 = date('Y-m-d H:i:s', time() - 86400);
 			$d7 = date('Y-m-d H:i:s', time() - 7 * 86400);
-			$res = mysqli_query($db, "SELECT SUM(created_at >= '$d1') AS day, COUNT(*) AS week, COUNT(DISTINCT IF(created_at >= '$d1', ip, NULL)) AS ips, SUM(severity = 'critical' AND created_at >= '$d1') AS critical FROM `$table` WHERE created_at >= '$d7'");
-			if ($res && ($r = mysqli_fetch_assoc($res))) foreach ($sb_kpi as $k => $v) $sb_kpi[$k] = (int) $r[$k];
+			$r = $db->row("SELECT SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) AS day, COUNT(*) AS week, COUNT(DISTINCT CASE WHEN created_at >= ? THEN ip END) AS ips, SUM(CASE WHEN severity = 'critical' AND created_at >= ? THEN 1 ELSE 0 END) AS critical FROM `$table` WHERE created_at >= ?", array($d1, $d1, $d1, $d7));
+			if ($r) foreach ($sb_kpi as $k => $v) $sb_kpi[$k] = (int) $r[$k];
 		}
 		// Export CSV (filtres en cours), avant tout affichage
 		if ($action === 'export') {

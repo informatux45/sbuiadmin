@@ -736,11 +736,11 @@ INSERT INTO `<DB_PREFIX>sb_modules` (`name`, `version`, `db_version`, `installed
 ('download', '1.0.2', '1.0.2', NOW()),
 ('faq', '1.0.2', '1.0.2', NOW()),
 ('gallery', '1.0.2', '1.0.2', NOW()),
-('news', '1.0.6', '1.0.6', NOW()),
+('news', '1.0.7', '1.0.7', NOW()),
 ('slider', '1.0.2', '1.0.2', NOW()),
 ('tabbs', '1.0.3', '1.0.3', NOW()),
 ('table', '1.0.3', '1.0.3', NOW()),
-('sentinelle', '1.7.3', '1.7.3', NOW());
+('sentinelle', '1.7.4', '1.7.4', NOW());
 
 -- --------------------------------------------------------
 

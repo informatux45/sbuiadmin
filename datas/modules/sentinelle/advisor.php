@@ -248,11 +248,9 @@ function sentinelle_advisor_users() {
 	$dbt = function_exists('sentinelle_db') ? sentinelle_db('sb_users') : null;
 	if (!$dbt) return null;
 	list($db, $table) = $dbt;
-	$res = @mysqli_query($db, "SELECT username FROM `$table`");
-	if (!$res) return null;
-	$out = array();
-	while ($r = mysqli_fetch_row($res)) $out[] = (string) $r[0];
-	return $out;
+	$res = $db->column("SELECT username FROM `$table`");
+	if ($res === false) return null;
+	return array_map('strval', $res);
 }
 
 /** Score sur 100 : ok = 1, warn = 0,5, bad = 0 (non vérifiables et rappels exclus) */

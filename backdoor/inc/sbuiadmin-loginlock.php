@@ -55,23 +55,28 @@ function sbLoginLockNormalize($login) {
 	return function_exists('mb_substr') ? mb_substr($login, 0, 191, 'UTF-8') : substr($login, 0, 191);
 }
 
-/** Connexion + table (créée au besoin), ou null */
+/** Connexion (sbDb) + table (créée au besoin), ou null */
 function sbLoginLockDb() {
 	static $ready = null;
-	$link = sbSettingsDb();
-	if (!$link) return null;
+	$db = function_exists('sbDb') ? sbDb() : null;
+	if (!$db) return null;
 	if ($ready === null) {
-		$ready = (bool) @mysqli_query($link, "CREATE TABLE IF NOT EXISTS `" . sbLoginLockTable() . "` (
-			`id` int unsigned NOT NULL AUTO_INCREMENT,
-			`login` varchar(191) NOT NULL,
-			`ip` varchar(45) NOT NULL,
-			`created` int unsigned NOT NULL,
-			PRIMARY KEY (`id`),
-			KEY `login_created` (`login`, `created`),
-			KEY `ip_created` (`ip`, `created`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+		try {
+			sbdbschema::runScript($db, "CREATE TABLE IF NOT EXISTS `" . sbLoginLockTable() . "` (
+				`id` int unsigned NOT NULL AUTO_INCREMENT,
+				`login` varchar(191) NOT NULL,
+				`ip` varchar(45) NOT NULL,
+				`created` int unsigned NOT NULL,
+				PRIMARY KEY (`id`),
+				KEY `login_created` (`login`, `created`),
+				KEY `ip_created` (`ip`, `created`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+			$ready = true;
+		} catch (RuntimeException $e) {
+			$ready = false;
+		}
 	}
-	return $ready ? $link : null;
+	return $ready ? $db : null;
 }
 
 function sbLoginLockTable() {
@@ -94,17 +99,10 @@ function sbLoginLockUntil(array $times, $max, $window, $duration) {
 }
 
 /** Horodatages des échecs récents pour une colonne (login ou ip) */
-function sbLoginLockTimes($link, $column, $value, $since, $limit) {
-	$stmt = mysqli_prepare($link, "SELECT `created` FROM `" . sbLoginLockTable() . "` WHERE `$column` = ? AND `created` >= ? ORDER BY `created` ASC LIMIT " . (int) $limit);
-	if (!$stmt) return array();
-	mysqli_stmt_bind_param($stmt, 'si', $value, $since);
-	mysqli_stmt_execute($stmt);
-	$created = null;
-	mysqli_stmt_bind_result($stmt, $created);
-	$times = array();
-	while (mysqli_stmt_fetch($stmt)) $times[] = (int) $created;
-	mysqli_stmt_close($stmt);
-	return $times;
+function sbLoginLockTimes($db, $column, $value, $since, $limit) {
+	if (!in_array($column, array('login', 'ip'), true)) return array();
+	$rows = $db->column('SELECT `created` FROM {sb_login_attempts} WHERE `' . $column . '` = ? AND `created` >= ? ORDER BY `created` ASC LIMIT ' . (int) $limit, array((string) $value, (int) $since));
+	return array_map('intval', $rows ?: array());
 }
 
 /**
@@ -114,18 +112,18 @@ function sbLoginLockTimes($link, $column, $value, $since, $limit) {
 function sbLoginLocked($login) {
 	$p = sbLoginLockParams();
 	if (!$p['enabled']) return 0;
-	$link = sbLoginLockDb();
-	if (!$link) return 0;
+	$db = sbLoginLockDb();
+	if (!$db) return 0;
 	$now   = time();
 	$since = $now - $p['window'] - $p['duration'];
 	$until = 0;
 	$login = sbLoginLockNormalize($login);
 	if ($login !== '') {
-		$until = sbLoginLockUntil(sbLoginLockTimes($link, 'login', $login, $since, 5000), $p['max_login'], $p['window'], $p['duration']);
+		$until = sbLoginLockUntil(sbLoginLockTimes($db, 'login', $login, $since, 5000), $p['max_login'], $p['window'], $p['duration']);
 	}
 	$ip = sbLoginLockIp();
 	if ($ip !== '') {
-		$until = max($until, sbLoginLockUntil(sbLoginLockTimes($link, 'ip', $ip, $since, 20000), $p['max_ip'], $p['window'], $p['duration']));
+		$until = max($until, sbLoginLockUntil(sbLoginLockTimes($db, 'ip', $ip, $since, 20000), $p['max_ip'], $p['window'], $p['duration']));
 	}
 	return ($until > $now) ? $until - $now : 0;
 }
@@ -134,34 +132,19 @@ function sbLoginLocked($login) {
 function sbLoginFailed($login) {
 	$p = sbLoginLockParams();
 	if (!$p['enabled']) return;
-	$link = sbLoginLockDb();
-	if (!$link) return;
-	$t     = sbLoginLockTable();
+	$db = sbLoginLockDb();
+	if (!$db) return;
 	$now   = time();
-	$login = sbLoginLockNormalize($login);
-	$ip    = sbLoginLockIp();
-	$stmt  = mysqli_prepare($link, "INSERT INTO `$t` (`login`, `ip`, `created`) VALUES (?, ?, ?)");
-	if ($stmt) {
-		mysqli_stmt_bind_param($stmt, 'ssi', $login, $ip, $now);
-		mysqli_stmt_execute($stmt);
-		mysqli_stmt_close($stmt);
-	}
+	$db->insert('sb_login_attempts', array('login' => sbLoginLockNormalize($login), 'ip' => sbLoginLockIp(), 'created' => $now));
 	// Ménage : au-delà d'une journée, plus aucun échec ne sert
-	@mysqli_query($link, "DELETE FROM `$t` WHERE `created` < " . ($now - 86400 - $p['window'] - $p['duration']));
+	$db->delete('sb_login_attempts', '`created` < ?', array($now - 86400 - $p['window'] - $p['duration']));
 }
 
 /** Connexion réussie : efface les échecs de ce couple identifiant/IP */
 function sbLoginSucceeded($login) {
-	$link = sbLoginLockDb();
-	if (!$link) return;
-	$login = sbLoginLockNormalize($login);
-	$ip    = sbLoginLockIp();
-	$stmt  = mysqli_prepare($link, "DELETE FROM `" . sbLoginLockTable() . "` WHERE `login` = ? AND `ip` = ?");
-	if ($stmt) {
-		mysqli_stmt_bind_param($stmt, 'ss', $login, $ip);
-		mysqli_stmt_execute($stmt);
-		mysqli_stmt_close($stmt);
-	}
+	$db = sbLoginLockDb();
+	if (!$db) return;
+	$db->delete('sb_login_attempts', '`login` = ? AND `ip` = ?', array(sbLoginLockNormalize($login), sbLoginLockIp()));
 }
 
 /** Appel AJAX (ajax=… ou X-Requested-With) : sans session, réponse 401 en JSON, rien au journal */

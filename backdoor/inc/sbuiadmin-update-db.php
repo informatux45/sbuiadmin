@@ -24,6 +24,8 @@
  *
  * SAUVEGARDE SQL - tables du CMS (préfixe), en PHP pur (ni mysqldump ni
  * shell), par flux ; restauration complète (tables créées depuis supprimées).
+ * MySQL/MariaDB ou SQLite (connexion sbdb) ; une migration écrite pour
+ * MySQL est traduite sous SQLite (inc/class/sbuiadmin-dbschema.php).
  *
  * CHIFFREMENT - libsodium (secretstream) avec la clé de sbdbconfig.php :
  * une sauvegarde lue hors de son serveur est illisible.
@@ -44,17 +46,17 @@ defined('SB_UPD_DUMP_SEP') or define('SB_UPD_DUMP_SEP', "\n-- SBUPD --\n");
 // -----------------------------------------------------------------------
 
 class SbMigration {
-	/** @var mysqli */
+	/** @var sbdb */
 	private $db;
 	private $prefix;
-	private $schema;
 	public $log = array();
 
-	public function __construct(mysqli $db, $prefix) {
+	/** $db : connexion sbdb (une ancienne connexion mysqli est remplacée par sbDb()) */
+	public function __construct($db, $prefix) {
+		if (!($db instanceof sbdb)) $db = function_exists('sbDb') ? sbDb() : null;
+		if (!($db instanceof sbdb)) throw new RuntimeException('Base de données inaccessible');
 		$this->db = $db;
 		$this->prefix = (string) $prefix;
-		$r = $db->query('SELECT DATABASE()');
-		$this->schema = $r ? (string) $r->fetch_row()[0] : '';
 	}
 
 	/** Nom complet (préfixe), contrôlé */
@@ -67,31 +69,36 @@ class SbMigration {
 		if (!preg_match('/^[A-Za-z0-9_]{1,64}$/', (string) $name)) throw new RuntimeException('Identifiant refusé : ' . $name);
 		return '`' . $name . '`';
 	}
-	private function q($v) {
-		return "'" . $this->db->real_escape_string((string) $v) . "'";
-	}
-	private function scalar($sql) {
-		$r = $this->db->query($sql);
-		if ($r === false) throw new RuntimeException('Requête en échec : ' . $this->db->error);
-		$row = $r->fetch_row();
-		return $row ? $row[0] : null;
+	private function sqlite() {
+		return $this->db->driver() === 'sqlite';
 	}
 
-	/** Requête libre (doit être idempotente) */
+	/** Requête libre (doit être idempotente), écrite pour MySQL : traduite sous SQLite */
 	public function query($sql) {
-		if ($this->db->query($sql) === false) throw new RuntimeException('Requête en échec (' . $this->db->error . ') : ' . substr($sql, 0, 200));
+		try {
+			sbdbschema::runScript($this->db, $sql);
+		} catch (RuntimeException $e) {
+			throw new RuntimeException('Requête en échec (' . $e->getMessage() . ') : ' . substr($sql, 0, 200));
+		}
 		$this->log[] = $sql;
 		return true;
 	}
 
 	public function tableExists($table) {
-		return (int) $this->scalar('SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = ' . $this->q($this->schema) . ' AND TABLE_NAME = ' . $this->q($this->table($table))) > 0;
+		return sbdbschema::hasTable($this->db, $this->table($table));
 	}
 	public function columnExists($table, $column) {
-		return (int) $this->scalar('SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = ' . $this->q($this->schema) . ' AND TABLE_NAME = ' . $this->q($this->table($table)) . ' AND COLUMN_NAME = ' . $this->q($column)) > 0;
+		$t = $this->table($table);
+		if ($this->sqlite()) return (int) $this->db->value('SELECT COUNT(*) FROM pragma_table_info(?) WHERE name = ?', array($t, (string) $column)) > 0;
+		return (int) $this->db->value('SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?', array($t, (string) $column)) > 0;
 	}
 	public function indexExists($table, $index) {
-		return (int) $this->scalar('SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = ' . $this->q($this->schema) . ' AND TABLE_NAME = ' . $this->q($this->table($table)) . ' AND INDEX_NAME = ' . $this->q($index)) > 0;
+		$t = $this->table($table);
+		if ($this->sqlite()) {
+			if ($index === 'PRIMARY') { $m = sbdbschema::describe($this->db, $t); return $m && $m['pk']; }
+			return (int) $this->db->value("SELECT COUNT(*) FROM sqlite_master WHERE type = 'index' AND tbl_name = ? AND name = ?", array($t, $t . '__' . $index)) > 0;
+		}
+		return (int) $this->db->value('SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND INDEX_NAME = ?', array($t, (string) $index)) > 0;
 	}
 
 	/** $definition : colonnes et clés entre parenthèses, sans le CREATE */
@@ -138,11 +145,15 @@ class SbMigration {
 	/** Ligne de sb_config ajoutée si absente (jamais écrasée) */
 	public function addConfig($config, $content) {
 		$t = $this->ident($this->table('sb_config'));
-		if ((int) $this->scalar("SELECT COUNT(*) FROM $t WHERE `config` = " . $this->q($config)) > 0) return false;
-		return $this->query("INSERT INTO $t (`config`, `content`) VALUES (" . $this->q($config) . ', ' . $this->q($content) . ')');
+		if ((int) $this->db->value("SELECT COUNT(*) FROM $t WHERE `config` = ?", array((string) $config)) > 0) return false;
+		if ($this->db->run("INSERT INTO $t (`config`, `content`) VALUES (?, ?)", array((string) $config, (string) $content)) === false) throw new RuntimeException('Requête en échec : ' . $this->db->error());
+		$this->log[] = 'addConfig ' . $config;
+		return true;
 	}
 	public function deleteConfig($config) {
-		return $this->query('DELETE FROM ' . $this->ident($this->table('sb_config')) . ' WHERE `config` = ' . $this->q($config));
+		if ($this->db->run('DELETE FROM ' . $this->ident($this->table('sb_config')) . ' WHERE `config` = ?', array((string) $config)) === false) throw new RuntimeException('Requête en échec : ' . $this->db->error());
+		$this->log[] = 'deleteConfig ' . $config;
+		return true;
 	}
 }
 
@@ -167,12 +178,11 @@ function sbUpdDbVersion() {
 
 /** Base d'avant les migrations : ni sb_modules ni sb_users_rights */
 function sbUpdDbLooksOld() {
-	$db = function_exists('sbSettingsDb') ? sbSettingsDb() : null;
-	if (!($db instanceof mysqli)) return false;
+	$db = function_exists('sbDb') ? sbDb() : null;
+	if (!$db) return false;
 	$prefix = function_exists('sbUpdDbPrefix') ? sbUpdDbPrefix() : (defined('_AM_DB_PREFIX') ? _AM_DB_PREFIX : '');
 	foreach (array('sb_modules', 'sb_users_rights') as $t) {
-		$r = $db->query("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '" . $db->real_escape_string($prefix . $t) . "'");
-		if ($r && (int) $r->fetch_row()[0] > 0) return false;
+		if (sbdbschema::hasTable($db, $prefix . $t)) return false;
 	}
 	return true;
 }
@@ -206,7 +216,7 @@ function sbUpdLoadMigration($file) {
  * @param callable|null $progress fonction(texte)
  * @return array versions appliquées
  */
-function sbUpdMigrateUp(mysqli $db, $prefix, array $pending, $progress = null) {
+function sbUpdMigrateUp($db, $prefix, array $pending, $progress = null) {
 	$done = array();
 	foreach ($pending as $v => $file) {
 		$mig = sbUpdLoadMigration($file);
@@ -222,7 +232,7 @@ function sbUpdMigrateUp(mysqli $db, $prefix, array $pending, $progress = null) {
  * Annule des migrations (descente), de la plus récente à la plus ancienne,
  * puis remet db_version à $toDb. Exige qu'elles soient toutes réversibles.
  */
-function sbUpdMigrateDown(mysqli $db, $prefix, array $files, $toDb, $progress = null) {
+function sbUpdMigrateDown($db, $prefix, array $files, $toDb, $progress = null) {
 	$migs = array();
 	foreach ($files as $v => $file) {
 		$mig = sbUpdLoadMigration($file);
@@ -242,62 +252,77 @@ function sbUpdMigrateDown(mysqli $db, $prefix, array $files, $toDb, $progress = 
 // -----------------------------------------------------------------------
 
 /** Tables du CMS (préfixe) */
-function sbUpdDbTables(mysqli $db, $prefix) {
+function sbUpdDbTables(sbdb $db, $prefix) {
+	if ($db->driver() === 'sqlite') return $db->tables((string) $prefix);
 	$like = str_replace(array('\\', '_', '%'), array('\\\\', '\\_', '\\%'), $prefix) . '%';
-	$r = $db->query("SHOW FULL TABLES LIKE '" . $db->real_escape_string($like) . "'");
-	if ($r === false) throw new RuntimeException('Liste des tables illisible : ' . $db->error);
+	$rows = $db->all('SHOW FULL TABLES LIKE ' . $db->pdo()->quote($like));
+	if ($rows === false) throw new RuntimeException('Liste des tables illisible : ' . $db->error());
 	$tables = array();
-	while ($row = $r->fetch_row()) if (($row[1] ?? 'BASE TABLE') === 'BASE TABLE') $tables[] = $row[0];
+	foreach ($rows as $row) {
+		$row = array_values($row);
+		if (($row[1] ?? 'BASE TABLE') === 'BASE TABLE') $tables[] = $row[0];
+	}
 	return $tables;
 }
 
 /** Taille approximative des tables du CMS (octets), pour l'espace disque */
-function sbUpdDbSize(mysqli $db, $prefix) {
+function sbUpdDbSize(sbdb $db, $prefix) {
+	if ($db->driver() === 'sqlite') {
+		$c = function_exists('sbDbConfig') ? sbDbConfig() : array();
+		return (int) @filesize((string) ($c['path'] ?? ''));
+	}
 	$like = str_replace(array('\\', '_', '%'), array('\\\\', '\\_', '\\%'), $prefix) . '%';
-	$r = $db->query("SELECT COALESCE(SUM(DATA_LENGTH + INDEX_LENGTH), 0) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME LIKE '" . $db->real_escape_string($like) . "'");
-	return $r ? (int) $r->fetch_row()[0] : 0;
+	return (int) $db->value('SELECT COALESCE(SUM(DATA_LENGTH + INDEX_LENGTH), 0) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME LIKE ?', array($like));
+}
+
+/** Valeur -> littéral SQL de la sauvegarde (binaire en hexadécimal) */
+function sbUpdDumpValue(sbdb $db, $v) {
+	if ($v === null) return 'NULL';
+	$v = (string) $v;
+	if ($v === '') return "''";
+	if (strpos($v, "\0") === false && preg_match('//u', $v)) return $db->pdo()->quote($v);
+	return $db->driver() === 'sqlite' ? "X'" . bin2hex($v) . "'" : '0x' . bin2hex($v);
 }
 
 /**
  * Écrit la sauvegarde SQL (en clair) dans $file : en-tête JSON (tables),
- * puis une instruction par bloc (séparateur SB_UPD_DUMP_SEP).
+ * puis une instruction par bloc (séparateur SB_UPD_DUMP_SEP). Elle ne se
+ * restaure que sur une base du même type (MySQL ou SQLite).
  * $only : périmètre limité (noms complets, ex. tables d'un module) ; la
  * restauration ne touchera alors qu'à ces tables (en-tête 'scope').
  * @return array tables sauvegardées
  */
-function sbUpdDbDump(mysqli $db, $prefix, $file, ?array $only = null) {
+function sbUpdDbDump(sbdb $db, $prefix, $file, ?array $only = null) {
 	$tables = sbUpdDbTables($db, $prefix);
 	if ($only !== null) $tables = array_values(array_intersect($tables, $only));
 	$fh = fopen($file, 'wb');
 	if (!$fh) throw new RuntimeException('Sauvegarde SQL impossible à créer');
 	@chmod($file, 0600);
-	$head = array('sbupd_dump' => 1, 'date' => date('c'), 'prefix' => $prefix, 'tables' => $tables);
+	$head = array('sbupd_dump' => 1, 'date' => date('c'), 'prefix' => $prefix, 'driver' => $db->driver(), 'tables' => $tables);
 	if ($only !== null) $head['scope'] = array_values($only);
 	fwrite($fh, '-- ' . json_encode($head) . SB_UPD_DUMP_SEP);
 	foreach ($tables as $t) {
-		$c = $db->query('SHOW CREATE TABLE `' . str_replace('`', '``', $t) . '`');
-		if ($c === false) throw new RuntimeException('Structure illisible : ' . $t);
-		fwrite($fh, 'DROP TABLE IF EXISTS `' . str_replace('`', '``', $t) . '`' . SB_UPD_DUMP_SEP);
-		fwrite($fh, $c->fetch_row()[1] . SB_UPD_DUMP_SEP);
-		$r = $db->query('SELECT * FROM `' . str_replace('`', '``', $t) . '`', MYSQLI_USE_RESULT);
-		if ($r === false) throw new RuntimeException('Données illisibles : ' . $t);
-		$fields = $r->fetch_fields();
-		$cols = array();
-		$binary = array();
-		foreach ($fields as $i => $f) {
-			$cols[] = '`' . str_replace('`', '``', $f->name) . '`';
-			$binary[$i] = ($f->charsetnr == 63 && in_array($f->type, array(MYSQLI_TYPE_BLOB, MYSQLI_TYPE_TINY_BLOB, MYSQLI_TYPE_MEDIUM_BLOB, MYSQLI_TYPE_LONG_BLOB, MYSQLI_TYPE_STRING, MYSQLI_TYPE_VAR_STRING), true));
+		$q = '`' . str_replace('`', '``', $t) . '`';
+		fwrite($fh, 'DROP TABLE IF EXISTS ' . $q . SB_UPD_DUMP_SEP);
+		if ($db->driver() === 'sqlite') {
+			// Table, puis ses index et déclencheurs, tels qu'enregistrés par SQLite
+			$ddl = $db->all("SELECT sql FROM sqlite_master WHERE tbl_name = ? AND sql IS NOT NULL ORDER BY CASE type WHEN 'table' THEN 0 WHEN 'index' THEN 1 ELSE 2 END", array($t));
+			if (!$ddl) throw new RuntimeException('Structure illisible : ' . $t);
+			foreach ($ddl as $d) fwrite($fh, $d['sql'] . SB_UPD_DUMP_SEP);
+		} else {
+			$c = $db->row('SHOW CREATE TABLE ' . $q);
+			if (!$c) throw new RuntimeException('Structure illisible : ' . $t);
+			fwrite($fh, array_values($c)[1] . SB_UPD_DUMP_SEP);
 		}
-		$head = 'INSERT INTO `' . str_replace('`', '``', $t) . '` (' . implode(', ', $cols) . ') VALUES ';
+		$st = $db->run('SELECT * FROM ' . $q);
+		if ($st === false) throw new RuntimeException('Données illisibles : ' . $t);
+		$head = null;
 		$batch = array();
 		$size = 0;
-		while ($row = $r->fetch_row()) {
+		while (($row = $st->fetch(PDO::FETCH_ASSOC)) !== false) {
+			if ($head === null) $head = 'INSERT INTO ' . $q . ' (' . implode(', ', array_map(function ($c) { return '`' . str_replace('`', '``', $c) . '`'; }, array_keys($row))) . ') VALUES ';
 			$vals = array();
-			foreach ($row as $i => $v) {
-				if ($v === null) $vals[] = 'NULL';
-				elseif ($binary[$i]) $vals[] = ($v === '') ? "''" : '0x' . bin2hex($v);
-				else $vals[] = "'" . $db->real_escape_string($v) . "'";
-			}
+			foreach ($row as $v) $vals[] = sbUpdDumpValue($db, $v);
 			$line = '(' . implode(', ', $vals) . ')';
 			$batch[] = $line;
 			$size += strlen($line);
@@ -308,7 +333,7 @@ function sbUpdDbDump(mysqli $db, $prefix, $file, ?array $only = null) {
 			}
 		}
 		if ($batch) fwrite($fh, $head . implode(', ', $batch) . SB_UPD_DUMP_SEP);
-		$r->free();
+		$st->closeCursor();
 	}
 	if (!fclose($fh)) throw new RuntimeException('Sauvegarde SQL impossible à écrire');
 	return $tables;
@@ -320,12 +345,15 @@ function sbUpdDbDump(mysqli $db, $prefix, $file, ?array $only = null) {
  * périmètre limité ('scope') : seules les tables de ce périmètre sont
  * concernées, le reste de la base n'est jamais touché.
  */
-function sbUpdDbRestore(mysqli $db, $prefix, $file) {
+function sbUpdDbRestore(sbdb $db, $prefix, $file) {
 	$fh = fopen($file, 'rb');
 	if (!$fh) throw new RuntimeException('Sauvegarde SQL illisible');
 	$header = null;
 	$buf = '';
-	$db->query('SET FOREIGN_KEY_CHECKS = 0');
+	$sqlite = $db->driver() === 'sqlite';
+	$db->pdo()->exec($sqlite ? 'PRAGMA foreign_keys = OFF' : 'SET FOREIGN_KEY_CHECKS = 0');
+	// SQLite : tout ou rien, et sans une écriture disque par ligne
+	if ($sqlite) $db->pdo()->beginTransaction();
 	try {
 		while (!feof($fh) || $buf !== '') {
 			if (!feof($fh)) $buf .= fread($fh, 1024 * 1024);
@@ -335,23 +363,33 @@ function sbUpdDbRestore(mysqli $db, $prefix, $file) {
 				if ($header === null) {
 					$header = json_decode(substr($stmt, 3), true);
 					if (!is_array($header) || empty($header['sbupd_dump']) || ($header['prefix'] ?? null) !== $prefix) throw new RuntimeException('Sauvegarde SQL non reconnue');
+					// Sauvegardes d'avant la 4.80 : MySQL
+					if (($header['driver'] ?? 'mysql') !== $db->driver()) throw new RuntimeException('Sauvegarde SQL d\'une base ' . ($header['driver'] ?? 'mysql') . ' : restauration impossible sur ' . $db->driver());
 					// Tables (du périmètre) créées depuis la sauvegarde : supprimées
 					$current = sbUpdDbTables($db, $prefix);
 					if (isset($header['scope'])) $current = array_intersect($current, (array) $header['scope']);
-					foreach (array_diff($current, $header['tables']) as $extra) {
-						if ($db->query('DROP TABLE IF EXISTS `' . str_replace('`', '``', $extra) . '`') === false) throw new RuntimeException('Suppression impossible : ' . $extra);
-					}
+					foreach (array_diff($current, $header['tables']) as $extra) sbdbschema::exec($db, 'DROP TABLE IF EXISTS `' . str_replace('`', '``', $extra) . '`');
 					continue;
 				}
-				if ($stmt !== '' && $db->query($stmt) === false) throw new RuntimeException('Restauration SQL en échec : ' . $db->error);
+				if ($stmt === '') continue;
+				try {
+					sbdbschema::exec($db, $stmt);
+				} catch (RuntimeException $e) {
+					throw new RuntimeException('Restauration SQL en échec : ' . $e->getMessage());
+				}
 			}
 			if (feof($fh) && $buf !== '') {
 				if (trim($buf) !== '') throw new RuntimeException('Sauvegarde SQL tronquée');
 				$buf = '';
 			}
 		}
+		if ($sqlite && $header === null) throw new RuntimeException('Sauvegarde SQL vide');
+		if ($sqlite) $db->pdo()->commit();
+	} catch (Throwable $e) {
+		if ($sqlite && $db->pdo()->inTransaction()) $db->pdo()->rollBack();
+		throw $e;
 	} finally {
-		$db->query('SET FOREIGN_KEY_CHECKS = 1');
+		$db->pdo()->exec($sqlite ? 'PRAGMA foreign_keys = ON' : 'SET FOREIGN_KEY_CHECKS = 1');
 		fclose($fh);
 	}
 	if ($header === null) throw new RuntimeException('Sauvegarde SQL vide');

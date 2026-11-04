@@ -31,8 +31,7 @@ return array(
 		$now = time();
 		$d1 = date('Y-m-d H:i:s', $now - $h * 3600);
 		$d2 = date('Y-m-d H:i:s', $now - 2 * $h * 3600);
-		$res = mysqli_query($db, "SELECT SUM(created_at >= '$d1') AS cur, SUM(created_at < '$d1') AS prev, COUNT(DISTINCT IF(created_at >= '$d1', ip, NULL)) AS ips FROM `$table` WHERE created_at >= '$d2' AND severity IN $in");
-		$r = $res ? mysqli_fetch_assoc($res) : null;
+		$r = $db->row("SELECT SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) AS cur, SUM(CASE WHEN created_at < ? THEN 1 ELSE 0 END) AS prev, COUNT(DISTINCT CASE WHEN created_at >= ? THEN ip END) AS ips FROM `$table` WHERE created_at >= ? AND severity IN $in", array($d1, $d1, $d1, $d2)) ?: null;
 		$cur = (int) ($r['cur'] ?? 0); $prev = (int) ($r['prev'] ?? 0);
 		return array(
 			'value'      => number_format($cur, 0, ',', ' '),

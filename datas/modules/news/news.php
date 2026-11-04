@@ -21,6 +21,34 @@ define('MODULEVERSION','0.1.2');
 include_once( SB_MODULES_DIR . MODULEFILE . DIRECTORY_SEPARATOR . 'common.php' );
 global $module, $sbsmarty, $sbsanitize, $sbsql, $sbpage;
 
+// -----------------------------------------------------------------------
+// Gabarit d'une catégorie (tpl_list, tpl_single), saisi dans l'admin et
+// exécuté par {eval} : compilé à blanc d'abord (sans l'exécuter). Une erreur
+// de syntaxe ne fait plus tomber la page (500) : affichage par défaut.
+// -----------------------------------------------------------------------
+if (!function_exists('sbNewsTplError')) {
+	/** Erreur de compilation Smarty du gabarit ('' si valide ou vide) */
+	function sbNewsTplError($smarty, $code) {
+		if (trim((string) $code) === '' || !is_object($smarty) || !method_exists($smarty, 'createTemplate')) return '';
+		try {
+			$tpl = $smarty->createTemplate('eval:' . $code);
+			$tpl->compileTemplateSource();
+			return '';
+		} catch (Throwable $e) {
+			return trim(preg_replace('/\s+/', ' ', $e->getMessage()));
+		}
+	}
+}
+
+/** Gabarit valide ou '' (défaut) ; une erreur est écrite dans le journal PHP */
+$sb_news_tpl = function ($code, $label) use ($sbsmarty, $sbsanitize) {
+	$code = $sbsanitize->sTrim((string) $code);
+	$err = sbNewsTplError($sbsmarty, $code);
+	if ($err === '') return $code;
+	error_log('SBUIADMIN news : gabarit ' . $label . ' invalide, affichage par défaut (' . substr($err, 0, 300) . ')');
+	return '';
+};
+
 # Include Module Common Infos
 $sblang_news = (SBLANG && $_SESSION['lang'] != 'en') ? SBLANG : 'en_US';
 include_once( SB_MODULES_DIR . MODULEFILE . DIRECTORY_SEPARATOR . 'lang' . DIRECTORY_SEPARATOR . $sblang_news . '.php' );
@@ -143,7 +171,7 @@ switch($op) {
 		// --- Assign news category title (template)
 		$sbsmarty->assign('sbnews_cat_title', $sb_news_title);
 		$sbsmarty->assign('sbnews_cat_subtitle', '');
-		$sbsmarty->assign('sbnews_cat_tpl_list', $sbsanitize->sTrim($assoc['tpl_list']));
+		$sbsmarty->assign('sbnews_cat_tpl_list', $sb_news_tpl($assoc['tpl_list'], 'tpl_list'));
 		$sbsmarty->assign('sbnews_module_show', $assoc['module_show']);
 		$sbsmarty->assign('sbnews_module_show_masonry', $assoc['module_show_masonry']);
 		// --- Breadcrumb
@@ -193,7 +221,7 @@ switch($op) {
 		// --- Assign news category title (template)
 		$sbsmarty->assign('sbnews_cat_title', $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']));
 		$sbsmarty->assign('sbnews_cat_subtitle', $sbsanitize->displayLang(sb_utf8_encode($assoc['subtitle']), $_SESSION['lang']));
-		$sbsmarty->assign('sbnews_cat_tpl_list', $sbsanitize->sTrim($assoc['tpl_list']));
+		$sbsmarty->assign('sbnews_cat_tpl_list', $sb_news_tpl($assoc['tpl_list'], 'tpl_list'));
 		$sbsmarty->assign('sbnews_module_show', $assoc['module_show']);
 		$sbsmarty->assign('sbnews_module_show_masonry', $assoc['module_show_masonry']);
 		// --- Breadcrumb
@@ -230,7 +258,7 @@ switch($op) {
 		// --- Assign news category title (template)
 		$sbsmarty->assign('sbnews_item_cat_id', intval($assoc['id']));
 		$sbsmarty->assign('sbnews_item_cat_title', $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']));
-		$sbsmarty->assign('sbnews_item_tpl_single', $sbsanitize->sTrim($assoc['tpl_single']));
+		$sbsmarty->assign('sbnews_item_tpl_single', $sb_news_tpl($assoc['tpl_single'], 'tpl_single'));
 		// --- Breadcrumb
 		$sbsmarty->assign('sbnews_nav1', $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']));
 		$sbsmarty->assign('sbnews_nav2',  $sbsanitize->displayLang(sb_utf8_encode($item['title']), $_SESSION['lang']));

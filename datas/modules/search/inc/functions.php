@@ -325,6 +325,9 @@ if (!function_exists("sbSearchWhere")) {
 
 		$haystack = "CONCAT_WS(' ', " . implode(', ', $columns) . ")";
 		$engine   = sbSearchEngine();
+		// --- SQLite : l'antislash n'échappe les jokers du LIKE qu'avec ESCAPE
+		// --- (MySQL l'utilise par défaut)
+		$escape   = (sbDb() && sbDb()->driver() === 'sqlite') ? " ESCAPE '\\'" : '';
 		$clauses  = array();
 
 		foreach ($terms as $term) {
@@ -353,10 +356,10 @@ if (!function_exists("sbSearchWhere")) {
 				$ors = array();
 				foreach ($variants as $variant) {
 					if ($bound) {
-						$ors[]  = "$haystack LIKE ?";
+						$ors[]  = "$haystack LIKE ?" . $escape;
 						$bind[] = sbSearchLikeValue($variant);
 					} else {
-						$ors[]  = "$haystack LIKE '%" . sbSearchLikeTerm($variant) . "%'";
+						$ors[]  = "$haystack LIKE '%" . sbSearchLikeTerm($variant) . "%'" . $escape;
 					}
 				}
 				$clauses[] = implode(' OR ', $ors);

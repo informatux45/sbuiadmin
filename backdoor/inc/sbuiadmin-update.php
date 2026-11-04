@@ -444,8 +444,18 @@ function sbUpdModulesNewer($idx) {
 	return $out;
 }
 
+/**
+ * Fichiers de développement de la racine (documentation, Composer) : livrés
+ * dans l'archive (installation neuve) mais jamais déployés par une mise à
+ * jour ; une copie déjà présente sur le site est laissée telle quelle.
+ */
+function sbUpdIsDevFile($rel) {
+	return in_array($rel, array('composer.json', 'composer.lock', 'help.txt', 'readme.md'), true);
+}
+
 /** Fichiers propres au site : jamais écrits ni supprimés (chemins de l'archive) */
 function sbUpdIsProtected($rel) {
+	if (sbUpdIsDevFile($rel)) return true;
 	static $exact = array(
 		'.htaccess', '.user.ini', 'sbconfig.php', 'sitemap.xml', 'robots.txt', 'sbuiadmin_netinstall.php',
 		'inc/cmscustom.php', 'inc/sbsession.txt',
@@ -577,7 +587,7 @@ function sbUpdPrepare() {
 		if ($owned !== null && sbUpdIsModuleFile($rel, $owned)) { $skippedModules++; continue; }
 		if (sbUpdIsProtected($rel)) {
 			// Fichier propre au site, non écrit : signaler s'il change dans la nouvelle version
-			if ($oldList !== null && isset($oldList[$rel]) && $oldList[$rel] !== $newList[$rel]) $protectedChanged[] = $rel;
+			if (!sbUpdIsDevFile($rel) && $oldList !== null && isset($oldList[$rel]) && $oldList[$rel] !== $newList[$rel]) $protectedChanged[] = $rel;
 			continue;
 		}
 		$target = sbUpdTargetRel($rel);
@@ -668,8 +678,8 @@ function sbUpdPreflight(array $job) {
 		if (is_file($t) && !is_writable(dirname($t))) $denied[] = sbUpdTargetRel($rel);
 	}
 	if ($denied) throw new RuntimeException('Fichiers non modifiables par PHP (droits) : ' . implode(', ', array_slice($denied, 0, 10)) . (count($denied) > 10 ? ' et ' . (count($denied) - 10) . ' autres' : '') . '. Rien n\'a été modifié.');
-	$link = function_exists('sbSettingsDb') ? sbSettingsDb() : null;
-	$dbSize = ($link instanceof mysqli) ? sbUpdDbSize($link, sbUpdDbPrefix()) : 0;
+	$link = function_exists('sbDb') ? sbDb() : null;
+	$dbSize = $link ? sbUpdDbSize($link, sbUpdDbPrefix()) : 0;
 	$need = (int) ($job['manifest']['size'] * 3 + $dbSize * 2 + 20 * 1024 * 1024);
 	$free = @disk_free_space(sbUpdWorkDir());
 	if ($free !== false && $free < $need) throw new RuntimeException('Espace disque insuffisant : ' . round($free / 1048576) . ' Mo libres, ' . round($need / 1048576) . ' Mo nécessaires');
@@ -739,11 +749,11 @@ function sbUpdLog($event, $user = '') {
 	}
 }
 
-/** Connexion et préfixe de la base (null hors CMS) */
+/** Connexion à la base (sbdb, MySQL ou SQLite), exception si impossible */
 function sbUpdDb() {
-	$link = function_exists('sbSettingsDb') ? sbSettingsDb() : null;
-	if (!($link instanceof mysqli)) throw new RuntimeException('Base de données inaccessible');
-	return $link;
+	$db = function_exists('sbDb') ? sbDb() : null;
+	if (!$db) throw new RuntimeException('Base de données inaccessible');
+	return $db;
 }
 
 /**

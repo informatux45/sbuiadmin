@@ -5,7 +5,7 @@
  *
  * Les réglages vivent dans la table {préfixe}sb_config, avec les autres
  * entrées de configuration du CMS (une ligne par réglage, colonne updated_at
- * datée par MySQL à chaque modification). Seuls les accès à
+ * datée par la base à chaque modification). Seuls les accès à
  * la base (et la clé de chiffrement des secrets) restent hors base, dans
  * sbdbconfig.php, cherché comme wp-config.php : un niveau au-dessus du site
  * d'abord, puis à la racine du site. Les variables d'environnement
@@ -457,6 +457,54 @@ function sbDbConfigWrite(array $c) {
 }
 
 // -----------------------------------------------------------------------
+// Fichier SQLite
+// -----------------------------------------------------------------------
+
+/**
+ * Fichier SQLite proposé : hors du site, au premier dossier inscriptible où
+ * sbdbconfig.php irait (private/ du compte d'abord), nommé d'après le site.
+ * @return string chemin, '' si aucun dossier inscriptible hors du site
+ */
+function sbDbSqliteSuggestedPath() {
+	$name = 'sbuiadmin-' . preg_replace('/[^A-Za-z0-9_.-]/', '_', basename(sbDbConfigSiteId())) . '.sqlite';
+	foreach (sbDbConfigDirs() as $dir) {
+		if (!$dir[1] || !$dir[2] || !@is_dir($dir[0]) || !@is_writable($dir[0])) continue;
+		return $dir[0] . DIRECTORY_SEPARATOR . $name;
+	}
+	return '';
+}
+
+/**
+ * Chemin de base SQLite acceptable ? Chemin absolu, extension .sqlite, .db
+ * ou .sqlite3, dossier existant et inscriptible (SQLite y écrit son journal),
+ * HORS du site (un fichier servi par le web serait téléchargeable), fichier
+ * absent ou déjà une base SQLite.
+ * @return string '' si oui, sinon la raison
+ */
+function sbDbSqlitePathError($path) {
+	$path = trim((string) $path);
+	if ($path === '') return 'Indiquez le chemin du fichier SQLite.';
+	if (preg_match('/[\x00;]/', $path) || strpos($path, '..') !== false) return 'Chemin refusé.';
+	if (!preg_match('#^(/|[A-Za-z]:[\\\\/])#', $path)) return 'Indiquez un chemin absolu (commençant par /).';
+	if (!preg_match('/\.(sqlite3?|db)$/i', $path)) return 'Le fichier doit se terminer par .sqlite, .sqlite3 ou .db.';
+	$dir = dirname($path);
+	if (!@is_dir($dir)) return 'Le dossier ' . $dir . ' n\'existe pas.';
+	if (!@is_writable($dir)) return 'Le dossier ' . $dir . ' n\'est pas inscriptible par PHP.';
+	$realDir = @realpath($dir);
+	$root = @realpath(SB_SETTINGS_SITE_ROOT);
+	if ($realDir && $root && ($realDir === $root || strpos($realDir . DIRECTORY_SEPARATOR, $root . DIRECTORY_SEPARATOR) === 0)) {
+		return 'Le fichier doit être hors du site (sinon il serait téléchargeable par le web) : choisissez un dossier au-dessus de ' . $root . '.';
+	}
+	if (@file_exists($path)) {
+		if (!@is_file($path) || is_link($path)) return 'Ce chemin n\'est pas un fichier.';
+		if (!@is_writable($path)) return 'Le fichier existe mais n\'est pas inscriptible.';
+		$head = (string) @file_get_contents($path, false, null, 0, 16);
+		if (@filesize($path) > 0 && $head !== "SQLite format 3\0") return 'Ce fichier existe et n\'est pas une base SQLite.';
+	}
+	return '';
+}
+
+// -----------------------------------------------------------------------
 // Chiffrement des secrets (sodium)
 // -----------------------------------------------------------------------
 
@@ -502,14 +550,22 @@ function sbDbHostParts($host) {
 	return preg_match('/^\d+$/', $extra) ? array($h, (int) $extra, false) : array($h, 3306, $extra);
 }
 
-/** Connexion mysqli dédiée aux réglages (null si impossible) */
+/**
+ * Ancienne connexion mysqli aux réglages : gardée seulement pour les
+ * migrations d'avant la 4.80 (inc/migrations/), qui l'appellent encore.
+ * Base SQLite ou extension mysqli absente : null. Le CMS passe par sbDb().
+ * $reset : nouvelle connexion (après réécriture de sbdbconfig.php), sbDb() compris.
+ */
 function sbSettingsDb($reset = false) {
 	static $link = false;
-	if ($reset && $link) @mysqli_close($link);
+	if ($reset) {
+		if ($link) @mysqli_close($link);
+		if (function_exists('sbDb')) sbDb(true);
+	}
 	if ($link !== false && !$reset) return $link;
 	$link = null;
 	$c = sbDbConfig();
-	if ($c['host'] === '' || $c['name'] === '' || !function_exists('mysqli_connect')) return $link;
+	if ($c['driver'] !== 'mysql' || $c['host'] === '' || $c['name'] === '' || !function_exists('mysqli_connect')) return $link;
 	mysqli_report(MYSQLI_REPORT_OFF);
 	list($host, $port, $socket) = sbDbHostParts($c['host']);
 	$l = @mysqli_connect($host, $c['user'], $c['password'], $c['name'], $port, $socket ?: null);
@@ -518,6 +574,11 @@ function sbSettingsDb($reset = false) {
 		$link = $l;
 	}
 	return $link;
+}
+
+/** Connexion des réglages : sbDb() (MySQL ou SQLite), null si impossible */
+function sbSettingsConn() {
+	return function_exists('sbDb') ? sbDb() : null;
 }
 
 /** Table des réglages : sb_config, partagée avec la configuration du CMS */
@@ -532,61 +593,78 @@ function sbSettingsOldTable() {
 	return $c['prefix'] . 'sb_settings';
 }
 
+/** Verrou MySQL des migrations de réglages (sans objet sous SQLite) */
+function sbSettingsLock(sbdb $db, $take) {
+	if ($db->driver() !== 'mysql') return;
+	$db->run($take ? "SELECT GET_LOCK('sbsettings_migrate', 10)" : "SELECT RELEASE_LOCK('sbsettings_migrate')");
+}
+
 /**
  * sb_config présente, avec sa colonne updated_at : NULL pour les valeurs
- * d'avant la colonne, puis datée par MySQL à l'ajout et à chaque
+ * d'avant la colonne, puis datée par la base à l'ajout et à chaque
  * modification réelle d'une valeur (y compris par les écrans du CMS qui
- * écrivent dans sb_config sans la nommer).
+ * écrivent dans sb_config sans la nommer). $db : ignoré (ancienne signature).
  * @return bool table utilisable
  */
-function sbSettingsEnsureTable($link) {
+function sbSettingsEnsureTable($db = null) {
 	static $done = array();
+	$db = sbSettingsConn();
+	if (!$db) return false;
 	$t = sbSettingsTable();
 	if (isset($done[$t])) return $done[$t];
-	if (!mysqli_query($link, "CREATE TABLE IF NOT EXISTS `$t` (
-		`id` int(11) NOT NULL AUTO_INCREMENT,
-		`config` varchar(50) NOT NULL COMMENT 'Nom de la configuration',
-		`content` text NOT NULL COMMENT 'Valeur de la configuration',
-		`updated_at` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Dernière modification',
-		PRIMARY KEY (`id`),
-		UNIQUE KEY `config` (`config`)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8")) return $done[$t] = false;
-	$res = mysqli_query($link, "SHOW COLUMNS FROM `$t` LIKE 'updated_at'");
-	if ($res && mysqli_num_rows($res) === 0) {
+	try {
+		sbdbschema::runScript($db, "CREATE TABLE IF NOT EXISTS `$t` (
+			`id` int(11) NOT NULL AUTO_INCREMENT,
+			`config` varchar(50) NOT NULL COMMENT 'Nom de la configuration',
+			`content` text NOT NULL COMMENT 'Valeur de la configuration',
+			`updated_at` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Dernière modification',
+			PRIMARY KEY (`id`),
+			UNIQUE KEY `config` (`config`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8");
+	} catch (RuntimeException $e) {
+		return $done[$t] = false;
+	}
+	if ($db->driver() === 'mysql' && !sbSettingsHasUpdatedAt()) {
 		// Ajoutée vide (date inconnue), puis datée pour les ajouts suivants
-		if (@mysqli_query($link, "ALTER TABLE `$t` ADD `updated_at` datetime NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'Dernière modification'")) {
-			@mysqli_query($link, "ALTER TABLE `$t` MODIFY `updated_at` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Dernière modification'");
+		if ($db->run("ALTER TABLE `$t` ADD `updated_at` datetime NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'Dernière modification'")) {
+			$db->run("ALTER TABLE `$t` MODIFY `updated_at` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Dernière modification'");
 		}
 	}
 	return $done[$t] = true;
 }
 
 /** sb_config a-t-elle sa colonne updated_at ? */
-function sbSettingsHasUpdatedAt($link) {
-	$res = @mysqli_query($link, "SHOW COLUMNS FROM `" . sbSettingsTable() . "` LIKE 'updated_at'");
-	return $res && mysqli_num_rows($res) > 0;
+function sbSettingsHasUpdatedAt($db = null) {
+	$db = sbSettingsConn();
+	if (!$db) return false;
+	$t = sbSettingsTable();
+	$cols = $db->driver() === 'sqlite'
+		? $db->column('SELECT name FROM pragma_table_info(?)', array($t))
+		: $db->column('SHOW COLUMNS FROM `' . str_replace('`', '', $t) . '`');
+	return in_array('updated_at', (array) $cols, true);
 }
 
 /**
- * Installations 4.11 : réglages de sb_settings copiés dans sb_config (dates de
- * modification comprises), puis sb_settings supprimée. Sans effet si elle
- * n'existe pas.
+ * Installations 4.11 (MySQL) : réglages de sb_settings copiés dans
+ * sb_config (dates de modification comprises), puis sb_settings supprimée.
+ * Sans effet si elle n'existe pas.
  * @return bool fusion faite
  */
-function sbSettingsMergeOldTable($link) {
+function sbSettingsMergeOldTable($db = null) {
+	$db = sbSettingsConn();
+	if (!$db || $db->driver() !== 'mysql') return false;
 	$old = sbSettingsOldTable();
-	$res = @mysqli_query($link, "SHOW TABLES LIKE '" . mysqli_real_escape_string($link, $old) . "'");
-	if (!$res || mysqli_num_rows($res) === 0) return false;
-	if (!sbSettingsEnsureTable($link)) return false;
-	@mysqli_query($link, "SELECT GET_LOCK('sbsettings_migrate', 10)");
+	if (!sbdbschema::hasTable($db, $old)) return false;
+	if (!sbSettingsEnsureTable()) return false;
+	sbSettingsLock($db, true);
 	$t  = sbSettingsTable();
-	$ok = sbSettingsHasUpdatedAt($link)
-		? @mysqli_query($link, "INSERT INTO `$t` (`config`, `content`, `updated_at`) SELECT `name`, `value`, `updated_at` FROM `$old` ON DUPLICATE KEY UPDATE `content` = VALUES(`content`), `updated_at` = VALUES(`updated_at`)")
-		: @mysqli_query($link, "INSERT INTO `$t` (`config`, `content`) SELECT `name`, `value` FROM `$old` ON DUPLICATE KEY UPDATE `content` = VALUES(`content`)");
-	if ($ok && !@mysqli_query($link, "DROP TABLE `$old`")) {
+	$ok = sbSettingsHasUpdatedAt()
+		? $db->run("INSERT INTO `$t` (`config`, `content`, `updated_at`) SELECT `name`, `value`, `updated_at` FROM `$old` ON DUPLICATE KEY UPDATE `content` = VALUES(`content`), `updated_at` = VALUES(`updated_at`)")
+		: $db->run("INSERT INTO `$t` (`config`, `content`) SELECT `name`, `value` FROM `$old` ON DUPLICATE KEY UPDATE `content` = VALUES(`content`)");
+	if ($ok && !$db->run("DROP TABLE `$old`")) {
 		$GLOBALS['sb_settings_warnings'][] = "Réglages copiés dans sb_config, mais l'ancienne table " . $old . " n'a pu être supprimée (droit DROP) : la supprimer à la main.";
 	}
-	@mysqli_query($link, "SELECT RELEASE_LOCK('sbsettings_migrate')");
+	sbSettingsLock($db, false);
 	return (bool) $ok;
 }
 
@@ -628,24 +706,19 @@ function sbSettingsMigrate() {
 	}
 	if (!$legacy) return true;
 
-	$link = sbSettingsDb();
-	if (!$link || !sbSettingsEnsureTable($link)) return false;
-	@mysqli_query($link, "SELECT GET_LOCK('sbsettings_migrate', 10)");
+	$db = sbSettingsConn();
+	if (!$db || !sbSettingsEnsureTable()) return false;
+	sbSettingsLock($db, true);
 
 	// 2. Réglages : settings.txt -> sb_config (écrase, voir plus haut)
-	$t = sbSettingsTable();
 	$secret = sbSettingsSecretNames();
-	$stmt = mysqli_prepare($link, "INSERT INTO `$t` (`config`, `content`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `content` = VALUES(`content`)");
-	$ok = (bool) $stmt;
-	if ($ok) {
-		foreach (sbSettingsLegacyMap() as $i => $name) {
-			$value = trim($legacy[$i]);
-			if (in_array($name, $secret, true)) $value = sbSecretSeal($value);
-			mysqli_stmt_bind_param($stmt, 'ss', $name, $value);
-			$ok = mysqli_stmt_execute($stmt) && $ok;
-		}
+	$ok = true;
+	foreach (sbSettingsLegacyMap() as $i => $name) {
+		$value = trim($legacy[$i]);
+		if (in_array($name, $secret, true)) $value = sbSecretSeal($value);
+		$ok = $db->upsert('sb_config', array('config' => $name, 'content' => $value), array('config')) && $ok;
 	}
-	if ($ok) sbConfigSealSecrets($link);
+	if ($ok) sbConfigSealSecrets();
 
 	// 3. Copie de l'ancien fichier hors de portée du web, puis vidage
 	if ($ok) {
@@ -660,52 +733,42 @@ function sbSettingsMigrate() {
 			$GLOBALS['sb_settings_warnings'][] = "Réglages migrés en base, mais la copie de settings.txt n'a pu être écrite : settings.txt n'a pas été vidé.";
 		}
 	}
-	@mysqli_query($link, "SELECT RELEASE_LOCK('sbsettings_migrate')");
+	sbSettingsLock($db, false);
 	return $ok;
 }
 
 /** Chiffre les secrets du module contact encore en clair dans sb_config */
-function sbConfigSealSecrets($link) {
+function sbConfigSealSecrets($db = null) {
 	if (!sbSecretKey()) return;
-	$c = sbDbConfig();
-	$t = $c['prefix'] . 'sb_config';
+	$db = sbSettingsConn();
+	if (!$db) return;
 	foreach (sbConfigSecretNames() as $name) {
-		$stmt = mysqli_prepare($link, "SELECT `content` FROM `$t` WHERE `config` = ?");
-		if (!$stmt) return;
-		// bind_result plutôt que get_result : ce dernier exige mysqlnd
-		mysqli_stmt_bind_param($stmt, 's', $name);
-		mysqli_stmt_execute($stmt);
-		$content = null;
-		mysqli_stmt_bind_result($stmt, $content);
-		$found = mysqli_stmt_fetch($stmt);
-		mysqli_stmt_close($stmt);
-		if (!$found || $content === null || $content === '' || strpos($content, SB_SETTINGS_ENC_PREFIX) === 0) continue;
-		$sealed = sbSecretSeal($content);
-		$up = mysqli_prepare($link, "UPDATE `$t` SET `content` = ? WHERE `config` = ?");
-		mysqli_stmt_bind_param($up, 'ss', $sealed, $name);
-		mysqli_stmt_execute($up);
+		$content = $db->value('SELECT `content` FROM {sb_config} WHERE `config` = ?', array($name));
+		if ($content === false || $content === null || $content === '' || strpos($content, SB_SETTINGS_ENC_PREFIX) === 0) continue;
+		$db->update('sb_config', array('content' => sbSecretSeal($content)), '`config` = ?', array($name));
 	}
 }
 
 /** Lignes de réglages présentes dans sb_config (false si la requête échoue) */
-function sbSettingsFetch($link) {
-	$names = array_map(function ($n) use ($link) { return "'" . mysqli_real_escape_string($link, $n) . "'"; }, array_keys(sbSettingsDefaults()));
-	$res = @mysqli_query($link, "SELECT `config`, `content` FROM `" . sbSettingsTable() . "` WHERE `config` IN (" . implode(',', $names) . ")");
-	if (!$res) return false;
+function sbSettingsFetch($db = null) {
+	$db = sbSettingsConn();
+	if (!$db) return false;
+	$names = array_keys(sbSettingsDefaults());
+	$res = $db->all('SELECT `config`, `content` FROM {sb_config} WHERE `config` IN (' . implode(',', array_fill(0, count($names), '?')) . ')', $names);
+	if ($res === false) return false;
 	$rows = array();
-	while ($row = mysqli_fetch_row($res)) $rows[$row[0]] = $row[1];
+	foreach ($res as $row) $rows[$row['config']] = $row['content'];
 	return $rows;
 }
 
 /** Charge tous les réglages (valeurs par défaut pour les absents) */
 function sbSettingsLoad() {
 	$settings = sbSettingsDefaults();
-	$link = sbSettingsDb();
-	if ($link) {
-		$rows = sbSettingsFetch($link);
+	if (sbSettingsConn()) {
+		$rows = sbSettingsFetch();
 		// Aucun réglage dans sb_config : installation 4.11, réglages encore
 		// dans sb_settings (fusion, une seule fois)
-		if (!$rows && sbSettingsMergeOldTable($link)) $rows = sbSettingsFetch($link);
+		if (!$rows && sbSettingsMergeOldTable()) $rows = sbSettingsFetch();
 		if ($rows !== false) {
 			$settings = array_merge($settings, $rows);
 			$GLOBALS['sb_settings_loaded_from_db'] = true;
@@ -771,24 +834,21 @@ function sbLogaccessRetention() {
  * @return bool
  */
 function sbSettingsSave(array $values, $only_missing = false) {
-	$link = sbSettingsDb();
-	if (!$link || !sbSettingsEnsureTable($link)) return false;
-	$t = sbSettingsTable();
+	$db = sbSettingsConn();
+	if (!$db || !sbSettingsEnsureTable()) return false;
 	$secret = sbSettingsSecretNames();
 	$known = sbSettingsDefaults();
-	// updated_at : posée par MySQL (ajout, ou valeur réellement modifiée)
-	$stmt = mysqli_prepare($link, $only_missing
-		? "INSERT IGNORE INTO `$t` (`config`, `content`) VALUES (?, ?)"
-		: "INSERT INTO `$t` (`config`, `content`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `content` = VALUES(`content`)");
-	if (!$stmt) return false;
+	// updated_at : posée par la base (ajout, ou valeur réellement modifiée)
 	$ok = true;
 	foreach ($values as $name => $value) {
 		if (!array_key_exists($name, $known)) continue;
 		$value = trim((string) $value);
-		$stored = in_array($name, $secret, true) ? sbSecretSeal($value) : $value;
-		mysqli_stmt_bind_param($stmt, 'ss', $name, $stored);
-		if (mysqli_stmt_execute($stmt)) {
-			if (!$only_missing || mysqli_stmt_affected_rows($stmt) > 0) $GLOBALS['sb_settings'][$name] = $value;
+		$row = array('config' => $name, 'content' => in_array($name, $secret, true) ? sbSecretSeal($value) : $value);
+		if ($only_missing) {
+			$n = $db->insertIgnore('sb_config', $row);
+			if ($n === false) $ok = false; elseif ($n > 0) $GLOBALS['sb_settings'][$name] = $value;
+		} elseif ($db->upsert('sb_config', $row, array('config'))) {
+			$GLOBALS['sb_settings'][$name] = $value;
 		} else {
 			$ok = false;
 		}

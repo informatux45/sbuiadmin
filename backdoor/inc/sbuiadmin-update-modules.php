@@ -87,8 +87,7 @@ function sbModLocalFiles($name) {
 function sbModTable() {
 	$db = sbUpdDb();
 	$t = sbUpdDbPrefix() . 'sb_modules';
-	$r = $db->query("SHOW TABLES LIKE '" . $db->real_escape_string($t) . "'");
-	if (!$r || $r->num_rows === 0) {
+	if (!sbdbschema::hasTable($db, $t)) {
 		$mig = sbUpdLoadMigration(sbUpdMigrationsDir() . '/4.29.php');
 		call_user_func($mig['up'], new SbMigration($db, sbUpdDbPrefix()));
 		sbModulesInstalled(true);
@@ -310,13 +309,12 @@ function sbModKeepBackup($name, $plain, array $info = array()) {
 function sbModRestoreState($name, array $before) {
 	$db = sbUpdDb();
 	$t = sbModTable();
-	$q = function ($v) use ($db) { return "'" . $db->real_escape_string((string) $v) . "'"; };
-	$db->query("DELETE FROM $t WHERE `name` = " . $q($name));
+	$db->delete('sb_modules', '`name` = ?', array($name));
 	if (is_array($before['row'] ?? null)) {
 		$r = $before['row'];
-		$ok = $db->query("INSERT INTO $t (`name`, `version`, `db_version`, `installed_at`, `updated_at`) VALUES (" . $q($name) . ', ' . $q($r['version'] ?? '') . ', ' . $q($r['db_version'] ?? '') . ', '
-			. (empty($r['installed_at']) ? 'NOW()' : $q($r['installed_at'])) . ', ' . (empty($r['updated_at']) ? 'NULL' : $q($r['updated_at'])) . ')');
-		if (!$ok) throw new RuntimeException('Registre des modules : ' . $db->error);
+		$ok = $db->insert('sb_modules', array('name' => $name, 'version' => (string) ($r['version'] ?? ''), 'db_version' => (string) ($r['db_version'] ?? ''),
+			'installed_at' => empty($r['installed_at']) ? date('Y-m-d H:i:s') : (string) $r['installed_at'], 'updated_at' => empty($r['updated_at']) ? null : (string) $r['updated_at']));
+		if ($ok === false) throw new RuntimeException('Registre des modules : ' . $db->error());
 	}
 	if (is_array($before['stored'] ?? null)) sbModStoreList($name, (string) ($before['version'] ?? ''), $before['stored']);
 	else @unlink(sbModWorkDir() . '/' . $name . '.json');
@@ -400,25 +398,25 @@ function sbModPruneDirs(array $targets) {
  * gardée à la désinstallation n'est pas retouchée). Rien d'autre n'est admis.
  * @return array tables créées
  */
-function sbModRunSql(mysqli $db, $prefix, $sql) {
+function sbModRunSql(sbdb $db, $prefix, $sql) {
 	if (!preg_match('/^[A-Za-z0-9_]*$/', (string) $prefix)) throw new RuntimeException('Préfixe de table refusé');
-	$created = $skipped = array();
-	foreach (preg_split('/;\s*(\n|$)/', str_replace('<DB_PREFIX>', $prefix, (string) $sql)) as $stmt) {
-		$stmt = trim($stmt);
-		if ($stmt === '') continue;
-		if (preg_match('/^CREATE TABLE IF NOT EXISTS `([A-Za-z0-9_]+)` \(/', $stmt, $m)) {
-			$r = $db->query("SHOW TABLES LIKE '" . $db->real_escape_string($m[1]) . "'");
-			if ($r && $r->num_rows > 0) { $skipped[$m[1]] = true; continue; }
-			if (!$db->query($stmt)) throw new RuntimeException('Création de ' . $m[1] . ' impossible : ' . $db->error);
-			$created[$m[1]] = true;
-		} elseif (preg_match('/^ALTER TABLE `([A-Za-z0-9_]+)`\s/', $stmt, $m)) {
-			if (!isset($created[$m[1]])) continue;
-			if (!$db->query($stmt)) throw new RuntimeException('Modification de ' . $m[1] . ' impossible : ' . $db->error);
-		} else {
-			throw new RuntimeException('Instruction SQL refusée dans le schéma du module : ' . substr($stmt, 0, 60));
-		}
+	$sql = str_replace('<DB_PREFIX>', $prefix, (string) $sql);
+	foreach (sbdbschema::split($sql) as $stmt) {
+		$kind = sbdbschema::kind($stmt);
+		if ($kind !== 'create' && $kind !== 'alter') throw new RuntimeException('Instruction SQL refusée dans le schéma du module : ' . substr($stmt, 0, 60));
+		if ($kind === 'create' && !preg_match('/^CREATE\s+TABLE\s+IF\s+NOT\s+EXISTS\s/i', $stmt)) throw new RuntimeException('Instruction SQL refusée dans le schéma du module (CREATE TABLE IF NOT EXISTS attendu) : ' . substr($stmt, 0, 60));
 	}
-	return array_keys($created);
+	// Une table gardée à la désinstallation n'est ni recréée ni retouchée ;
+	// les ALTER ne visent que les tables créées par ce schéma
+	$creates = array();
+	foreach (sbdbschema::split($sql) as $stmt) if (sbdbschema::kind($stmt, $t) === 'create') $creates[$t] = true;
+	try {
+		return sbdbschema::runScript($db, $sql, function ($kind, $table) use ($creates) {
+			return $kind === 'create' || isset($creates[$table]);
+		});
+	} catch (RuntimeException $e) {
+		throw new RuntimeException('Schéma du module : ' . $e->getMessage());
+	}
 }
 
 /** Migrations du module (datas/modules/<nom>/migrations/<version>.php) entre deux versions */
@@ -434,12 +432,12 @@ function sbModMigrate($name, $from, $to) {
 
 function sbModSaveRow($name, $version, $dbVersion, $new) {
 	$db = sbUpdDb();
-	$t = sbModTable();
-	$q = function ($v) use ($db) { return "'" . $db->real_escape_string((string) $v) . "'"; };
-	$sql = $new
-		? "INSERT INTO $t (`name`, `version`, `db_version`, `installed_at`) VALUES (" . $q($name) . ', ' . $q($version) . ', ' . $q($dbVersion) . ', NOW())'
-		: "UPDATE $t SET `version` = " . $q($version) . ', `db_version` = ' . $q($dbVersion) . ', `updated_at` = NOW() WHERE `name` = ' . $q($name);
-	if (!$db->query($sql)) throw new RuntimeException('Registre des modules impossible à mettre à jour : ' . $db->error);
+	sbModTable();
+	$now = date('Y-m-d H:i:s');
+	$ok = $new
+		? $db->insert('sb_modules', array('name' => (string) $name, 'version' => (string) $version, 'db_version' => (string) $dbVersion, 'installed_at' => $now))
+		: $db->update('sb_modules', array('version' => (string) $version, 'db_version' => (string) $dbVersion, 'updated_at' => $now), '`name` = ?', array((string) $name));
+	if ($ok === false) throw new RuntimeException('Registre des modules impossible à mettre à jour : ' . $db->error());
 	sbModulesInstalled(true);
 }
 
@@ -463,8 +461,7 @@ function sbModExistingTables($name) {
 	$out = array();
 	foreach (array_keys((array) ($meta['tables'] ?? array())) as $t) {
 		if (!preg_match('/^[A-Za-z0-9_]+$/', $t)) continue;
-		$r = $db->query("SHOW TABLES LIKE '" . $db->real_escape_string(sbUpdDbPrefix() . $t) . "'");
-		if ($r && $r->num_rows > 0) $out[] = $t;
+		if (sbdbschema::hasTable($db, sbUpdDbPrefix() . $t)) $out[] = $t;
 	}
 	return $out;
 }
@@ -479,13 +476,11 @@ function sbModShortcodeUses($name) {
 	$sources = array('sb_pages' => array('Pages', 'content'), 'sb_blocs' => array('Blocs', 'content'), 'sb_news' => array('Actualités', 'desc_full'), 'sb_tabbs_tab' => array('Onglets', 'content'));
 	$out = array();
 	foreach ($sources as $table => $info) {
-		$r = $db->query("SHOW TABLES LIKE '" . $db->real_escape_string($p . $table) . "'");
-		if (!$r || $r->num_rows === 0) continue;
+		if (!sbdbschema::hasTable($db, $p . $table)) continue;
 		$or = array();
 		foreach ($codes as $c) if (preg_match('/^[a-z0-9_]+$/', $c)) $or[] = "`" . $info[1] . "` REGEXP 'name=" . $c . "([^a-z0-9_]|$)'";
 		if (!$or) continue;
-		$r = $db->query('SELECT COUNT(*) FROM `' . $p . $table . '` WHERE ' . implode(' OR ', $or));
-		$n = $r ? (int) $r->fetch_row()[0] : 0;
+		$n = (int) $db->value('SELECT COUNT(*) FROM `' . $p . $table . '` WHERE ' . implode(' OR ', $or));
 		if ($n > 0) $out[] = $info[0] . ' : ' . $n;
 	}
 	return $out;
@@ -655,8 +650,7 @@ function sbModTableRows($name) {
 	$db = sbUpdDb();
 	$out = array();
 	foreach (sbModExistingTables($name) as $t) {
-		$r = $db->query('SELECT COUNT(*) FROM `' . sbUpdDbPrefix() . $t . '`');
-		$out[$t] = $r ? (int) $r->fetch_row()[0] : 0;
+		$out[$t] = (int) $db->value('SELECT COUNT(*) FROM `' . sbUpdDbPrefix() . $t . '`');
 	}
 	return $out;
 }
@@ -912,7 +906,7 @@ function sbModReplaceInfo($name, ?array $r = null) {
 	}
 	$db = sbUpdDb();
 	$pre = sbUpdDbPrefix();
-	$exists = function ($t) use ($db) { $q = $db->query("SHOW TABLES LIKE '" . $db->real_escape_string($t) . "'"); return $q && $q->num_rows > 0; };
+	$exists = function ($t) use ($db) { return sbdbschema::hasTable($db, $t); };
 	$tables = array();
 	foreach ((array) ($r['tables'] ?? array()) as $from => $to) {
 		if (!preg_match('/^[A-Za-z0-9_]+$/', (string) $from) || !preg_match('/^[A-Za-z0-9_]+$/', (string) $to)) throw new RuntimeException('Tables de reprise invalides');
@@ -933,32 +927,35 @@ function sbModTakeover($name, array $info) {
 	$db = sbUpdDb();
 	$pre = sbUpdDbPrefix();
 	$old = $info['old'];
-	$q = function ($v) use ($db) { return "'" . $db->real_escape_string((string) $v) . "'"; };
 	$undo = array('tables' => array(), 'rights' => false, 'modules' => null);
 	foreach ($info['tables'] as $from => $to) {
-		if (!$db->query('RENAME TABLE `' . $pre . $from . '` TO `' . $pre . $to . '`')) throw new RuntimeException('Renommage de ' . $pre . $from . ' impossible : ' . $db->error);
+		try {
+			sbdbschema::runScript($db, 'RENAME TABLE `' . $pre . $from . '` TO `' . $pre . $to . '`');
+		} catch (RuntimeException $e) {
+			throw new RuntimeException('Renommage de ' . $pre . $from . ' impossible : ' . $e->getMessage());
+		}
 		$undo['tables'][$to] = $from;
 	}
 	// Droits : « boutique » et « boutique:xxx » deviennent « store », « store:xxx »
 	$rt = $pre . 'sb_users_rights';
-	$r = $db->query("SHOW TABLES LIKE " . $q($rt));
-	if ($r && $r->num_rows > 0) {
-		if (!$db->query("UPDATE `$rt` SET `module` = CONCAT(" . $q($name) . ", SUBSTRING(`module`, " . (strlen($old) + 1) . ")) WHERE `module` = " . $q($old) . " OR `module` LIKE " . $q($old . ':%'))) throw new RuntimeException('Droits : ' . $db->error);
+	if (sbdbschema::hasTable($db, $rt)) {
+		if ($db->run("UPDATE `$rt` SET `module` = CONCAT(?, SUBSTR(`module`, " . (strlen($old) + 1) . ")) WHERE `module` = ? OR `module` LIKE ?", array($name, $old, $old . ':%')) === false) throw new RuntimeException('Droits : ' . $db->error());
 		$undo['rights'] = true;
 	}
 	// Réglage « modules » (modules autorisés de l'admin)
 	$ct = $pre . 'sb_config';
-	$r = $db->query("SELECT `content` FROM `$ct` WHERE `config` = 'modules'");
-	$row = $r ? $r->fetch_row() : null;
+	$content = $db->value("SELECT `content` FROM `$ct` WHERE `config` = 'modules'");
+	$row = ($content !== null && $content !== false) ? array($content) : null;
 	if ($row) {
 		$list = array_map('trim', explode(',', (string) $row[0]));
 		if (in_array($old, $list, true)) {
 			$undo['modules'] = (string) $row[0];
 			$list = array_values(array_unique(array_map(function ($m) use ($old, $name) { return $m === $old ? $name : $m; }, $list)));
-			if (!$db->query("UPDATE `$ct` SET `content` = " . $q(implode(',', $list)) . " WHERE `config` = 'modules'")) throw new RuntimeException('Réglage modules : ' . $db->error);
+			if ($db->run("UPDATE `$ct` SET `content` = ? WHERE `config` = 'modules'", array(implode(',', $list))) === false) throw new RuntimeException('Réglage modules : ' . $db->error());
 		}
 	}
-	if (!$db->query('DELETE FROM `' . str_replace('`', '', sbModTable()) . '` WHERE `name` = ' . $q($old))) throw new RuntimeException('Registre des modules : ' . $db->error);
+	sbModTable();
+	if ($db->delete('sb_modules', '`name` = ?', array($old)) === false) throw new RuntimeException('Registre des modules : ' . $db->error());
 	$root = sbUpdSiteRoot() . '/';
 	$targets = array();
 	foreach ($info['files'] as $rel) { @unlink($root . sbUpdTargetRel($rel)); $targets[] = sbUpdTargetRel($rel); }
@@ -973,9 +970,8 @@ function sbModTakeover($name, array $info) {
 function sbModTakeoverUndo($name, $old, array $undo) {
 	$db = sbUpdDb();
 	$pre = sbUpdDbPrefix();
-	$q = function ($v) use ($db) { return "'" . $db->real_escape_string((string) $v) . "'"; };
-	if (!empty($undo['rights'])) $db->query('UPDATE `' . $pre . 'sb_users_rights` SET `module` = CONCAT(' . $q($old) . ', SUBSTRING(`module`, ' . (strlen($name) + 1) . ')) WHERE `module` = ' . $q($name) . ' OR `module` LIKE ' . $q($name . ':%'));
-	if ($undo['modules'] !== null) $db->query('UPDATE `' . $pre . "sb_config` SET `content` = " . $q($undo['modules']) . " WHERE `config` = 'modules'");
+	if (!empty($undo['rights'])) $db->run('UPDATE `' . $pre . 'sb_users_rights` SET `module` = CONCAT(?, SUBSTR(`module`, ' . (strlen($name) + 1) . ')) WHERE `module` = ? OR `module` LIKE ?', array($old, $name, $name . ':%'));
+	if ($undo['modules'] !== null) $db->run('UPDATE `' . $pre . "sb_config` SET `content` = ? WHERE `config` = 'modules'", array($undo['modules']));
 }
 
 /** Installer : tables (install.php), migrations des tables gardées, inscription */
@@ -1071,7 +1067,8 @@ function sbModRunUninstall($name, $remove) {
 	$tables = sbModExistingTables($name);
 	if (!$remove) {
 		$plain = sbModBackup($name, array(), array(), false);
-		if (!$db->query('DELETE FROM ' . sbModTable() . " WHERE `name` = '" . $db->real_escape_string($name) . "'")) { @unlink($plain); throw new RuntimeException('Registre des modules : ' . $db->error); }
+		sbModTable();
+		if ($db->delete('sb_modules', '`name` = ?', array($name)) === false) { @unlink($plain); throw new RuntimeException('Registre des modules : ' . $db->error()); }
 		sbModKept($name, $tables ? (string) $row['db_version'] : '');
 		sbModKeepBackup($name, $plain, array('op' => 'uninstall', 'label' => 'la désinstallation', 'db' => false, 'files' => 0,
 			'after' => array('installed' => false, 'version' => (string) (sbModuleMeta($name)['version'] ?? '')), 'complete' => true));
@@ -1085,9 +1082,10 @@ function sbModRunUninstall($name, $remove) {
 	$targets = array();
 	try {
 		foreach ($tables as $t) {
-			if (!$db->query('DROP TABLE IF EXISTS `' . sbUpdDbPrefix() . $t . '`')) throw new RuntimeException('Suppression de la table ' . $t . ' impossible (' . $db->error . ')');
+			if ($db->run('DROP TABLE IF EXISTS `' . sbUpdDbPrefix() . $t . '`') === false) throw new RuntimeException('Suppression de la table ' . $t . ' impossible (' . $db->error() . ')');
 		}
-		if (!$db->query('DELETE FROM ' . sbModTable() . " WHERE `name` = '" . $db->real_escape_string($name) . "'")) throw new RuntimeException('Registre des modules : ' . $db->error);
+		sbModTable();
+		if ($db->delete('sb_modules', '`name` = ?', array($name)) === false) throw new RuntimeException('Registre des modules : ' . $db->error());
 		foreach ($dp['files'] as $rel) {
 			$t = sbUpdTargetRel($rel);
 			if (is_file($root . $t) && !@unlink($root . $t)) throw new RuntimeException('Suppression impossible : ' . $t);

@@ -152,8 +152,6 @@
 
 		$validations['divider_extensions'] = array('title' => 'Extensions PHP requises', 'description' => '');
 		foreach (array(
-			'mysqli'   => 'MySQLi (base de données du CMS)',
-			'pdo_mysql'=> 'PDO MySQL (base de données du CMS)',
 			'session'  => 'Session',
 			'json'     => 'JSON',
 			'mbstring' => 'mbstring (texte UTF-8)',
@@ -168,11 +166,15 @@
 		) as $sb_name => $sb_label) {
 			$validations['ext_' . $sb_name] = array(true, $sb_label, $sb_ext($sb_name), lang_key('installed'), lang_key('not_installed'));
 		}
+		// Base : PDO MySQL ou PDO SQLite (au moins un des deux)
+		$sb_pdo = array_values(array_filter(array('pdo_mysql' => 'MySQL/MariaDB', 'pdo_sqlite' => 'SQLite'), function ($k) use ($sb_ext) { return $sb_ext($k); }, ARRAY_FILTER_USE_KEY));
+		$validations['ext_pdo_db'] = array(true, 'PDO MySQL ou PDO SQLite (base de données du CMS)', (bool) $sb_pdo, $sb_pdo ? implode(' et ', $sb_pdo) : '', lang_key('not_installed'));
 
 		$validations['divider_extensions_reco'] = array('title' => 'Extensions PHP recommandées', 'description' => 'Facultatives : seule la fonction indiquée est privée si elles manquent.');
 		foreach (array(
 			'mysqlnd'  => 'mysqlnd (pilote MySQL natif)',
-			'pdo_sqlite' => 'PDO SQLite (base SQLite, à venir)',
+			'pdo_mysql'  => 'PDO MySQL (base MySQL/MariaDB)',
+			'pdo_sqlite' => 'PDO SQLite (base SQLite)',
 			'exif'     => 'EXIF (orientation des photos)',
 			'intl'     => 'intl (dates et tri localisés)',
 			'iconv'    => 'iconv (conversions de jeux de caractères)',
@@ -237,7 +239,7 @@
 		if ($sb_hd === null) { $sb_r = $sb_probe(''); $sb_hd = $sb_r === null ? null : (strpos($sb_r['headers'], 'x-content-type-options') !== false); }
 		$validations['mod_headers'] = array(true, 'mod_headers (en-têtes de sécurité)', $sb_hd, lang_key('installed'), $sb_hd === null ? 'non vérifiable' : lang_key('not_installed'));
 
-		$validations['db_version_note'] = array(false, 'MySQL 5.7+ ou MariaDB 10.3+ (vérifié à l\'étape suivante)', null, '', 'vérifié à l\'étape « Paramètres database »');
+		$validations['db_version_note'] = array(false, 'MySQL 5.7+ ou MariaDB 10.3+ (vérifié à l\'étape suivante), ou SQLite', null, '', 'vérifié à l\'étape « Paramètres database »');
 	}
 
 	if(EI_CHECK_DIRECTORIES_AND_FILES){

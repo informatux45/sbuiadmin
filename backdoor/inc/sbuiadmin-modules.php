@@ -96,15 +96,13 @@ function sbModulesInstalled($reset = false) {
 	static $rows = false;
 	if ($rows !== false && !$reset) return $rows;
 	$rows = null;
-	$db = function_exists('sbSettingsDb') ? sbSettingsDb() : null;
-	if (!($db instanceof mysqli)) return $rows;
-	$c = function_exists('sbDbConfig') ? sbDbConfig() : array();
-	$table = (string) ($c['prefix'] ?? '') . 'sb_modules';
-	$res = @mysqli_query($db, 'SELECT name, version, db_version, installed_at, updated_at FROM `' . str_replace('`', '', $table) . '`');
-	if (!$res) return $rows;
+	$db = function_exists('sbDb') ? sbDb() : null;
+	if (!$db) return $rows;
+	// Requête en échec : table pas encore créée
+	$res = $db->all('SELECT name, version, db_version, installed_at, updated_at FROM {sb_modules}');
+	if ($res === false) return $rows;
 	$rows = array();
-	while ($r = mysqli_fetch_assoc($res)) $rows[$r['name']] = $r;
-	mysqli_free_result($res);
+	foreach ($res as $r) $rows[$r['name']] = $r;
 	return $rows;
 }
 

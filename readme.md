@@ -81,7 +81,7 @@
 <details>
   <summary>⚙️ <strong>Requirements</strong></summary>
 
-> PHP 8.4+ (PHP 8.5 ready) · MySQL 5.7+ / MariaDB 10.3+ · Linux / Apache servers (recommended).
+> PHP 8.4+ (PHP 8.5 ready) · MySQL 5.7+ / MariaDB 10.3+ or SQLite 3.24+ · Linux / Apache servers (recommended).
 </details>
 
 ---
@@ -93,8 +93,8 @@
 | | Required | Recommended |
 |---|---|---|
 | **PHP** | 8.4 or later | 8.5 (tested version) |
-| **Extensions** | `mysqli`, `pdo_mysql` (installer), `session`, `json`, `mbstring`, `sodium`, `openssl`, `curl`, `gd`, `fileinfo`, `filter`, `hash`, `zip` | `exif`, `intl`, `iconv`, `dom`, `simplexml`, `mysqlnd`, `memcache`/`memcached` (login anti-flood) |
-| **Database** | MySQL 5.7+ or MariaDB 10.3+ | |
+| **Extensions** | `pdo_mysql` or `pdo_sqlite`, `session`, `json`, `mbstring`, `sodium`, `openssl`, `curl`, `gd`, `fileinfo`, `filter`, `hash`, `zip` | `exif`, `intl`, `iconv`, `dom`, `simplexml`, `mysqlnd`, `memcache`/`memcached` (login anti-flood) |
+| **Database** | MySQL 5.7+, MariaDB 10.3+ or SQLite 3.24+ (one file, outside the web root) | |
 | **Web server** | Apache with `mod_rewrite` and `mod_headers` | Apache 2.4 |
 | **php.ini** | `file_uploads = On` | `upload_max_filesize` ≥ 8M, `memory_limit` ≥ 128M, `display_errors = Off` |
 
@@ -160,6 +160,11 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 
 ## 📝 Changelog
 
+**4.80**
+- SQLite database: installer choice, switch to or from MySQL in Settings
+- Updates no longer deploy readme, help and composer files
+- News 1.0.7: an invalid category template no longer breaks the page
+
 **4.79**
 - Smarty unescape: no PHP 8.5 deprecation on empty values
 
@@ -168,12 +173,12 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 - Theme menus, settings and blocks: injection through template parameters fixed
 - Header code: CSS, JavaScript and Analytics no longer shift when one is missing
 
+<details>
+  <summary><strong>Older versions</strong></summary>
+
 **4.77**
 - Contact uses bound SQL parameters (admin, forms, messages, search)
 - Contact 1.1.2: message purge works without MySQL-only date syntax
-
-<details>
-  <summary><strong>Older versions</strong></summary>
 
 **4.76**
 - News, tables and e-commerce use bound SQL parameters

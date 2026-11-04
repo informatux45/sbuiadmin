@@ -121,6 +121,13 @@ class sbdb {
 			$a = func_get_args();
 			return in_array(null, $a, true) ? null : implode('', $a);
 		}, -1, $det);
+		// CONCAT_WS : NULL ignorés (natif seulement depuis SQLite 3.44)
+		$pdo->createFunction('CONCAT_WS', function () {
+			$a = func_get_args();
+			$sep = array_shift($a);
+			if ($sep === null) return null;
+			return implode((string) $sep, array_map('strval', array_filter($a, function ($v) { return $v !== null; })));
+		}, -1, $det);
 		$pdo->createFunction('RAND', function () { return mt_rand() / mt_getrandmax(); }, 0);
 		$pdo->createFunction('LCASE', function ($s) { return $s === null ? null : mb_strtolower((string) $s, 'UTF-8'); }, 1, $det);
 		$pdo->createFunction('UCASE', function ($s) { return $s === null ? null : mb_strtoupper((string) $s, 'UTF-8'); }, 1, $det);
@@ -437,8 +444,14 @@ function sbDb($reset = false) {
 		$GLOBALS['sb_db_error'] = 'Réglages de la base non chargés';
 		return $db;
 	}
+	$c = sbDbConfig();
+	// Site pas encore configuré (installation) : aucune tentative de connexion
+	if ((($c['driver'] ?? 'mysql') === 'sqlite') ? (string) ($c['path'] ?? '') === '' : ((string) ($c['host'] ?? '') === '' || (string) ($c['name'] ?? '') === '')) {
+		$GLOBALS['sb_db_error'] = 'Base de données non configurée';
+		return $db;
+	}
 	try {
-		$db = sbdb::connect(sbDbConfig());
+		$db = sbdb::connect($c);
 	} catch (RuntimeException $e) {
 		$GLOBALS['sb_db_error'] = $e->getMessage();
 		error_log('SBUIADMIN : ' . $e->getMessage());
@@ -485,3 +498,6 @@ function sbDbUnavailable() {
 function sbDbDriverAvailable($driver) {
 	return isset(sbdb::DRIVERS[$driver]) && extension_loaded(sbdb::DRIVERS[$driver]);
 }
+
+// Schéma des tables (scripts MySQL traduits pour SQLite, copie entre bases)
+require_once(__DIR__ . DIRECTORY_SEPARATOR . 'sbuiadmin-dbschema.php');

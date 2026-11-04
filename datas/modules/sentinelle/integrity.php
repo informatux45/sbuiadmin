@@ -146,8 +146,7 @@ function sentinelle_integrity_approved() {
 	$out = array();
 	try {
 		// Table absente (base du module pas encore mise à jour) : aucun
-		$res = @mysqli_query($db, "SELECT `path`, `sha256` FROM `$table`");
-		if ($res) while ($row = mysqli_fetch_assoc($res)) $out[$row['path']] = $row['sha256'];
+		foreach ($db->all("SELECT `path`, `sha256` FROM `$table`") ?: array() as $row) $out[$row['path']] = $row['sha256'];
 	} catch (Throwable $e) {
 		return array();
 	}
@@ -180,24 +179,16 @@ function sentinelle_integrity_approve(array $r, $user = '') {
 	if (!$dbt) return -1;
 	list($db, $table) = $dbt;
 	$root = rtrim(sbUpdSiteRoot(), '/') . '/';
-	try {
-		$stmt = mysqli_prepare($db, "INSERT INTO `$table` (`path`, `sha256`, `approved_at`, `user`) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE `sha256` = VALUES(`sha256`), `approved_at` = VALUES(`approved_at`), `user` = VALUES(`user`)");
-	} catch (Throwable $e) {
-		return -1;
-	}
-	if (!$stmt) return -1;
+	// Table absente (base du module pas encore mise à jour) : -1
+	if (!sbdbschema::hasTable($db, $table)) return -1;
 	$n = 0;
 	$now = date('Y-m-d H:i:s');
 	$user = sentinelle_cut($user, 64);
 	foreach (array_merge($r['added'], $r['watched'], $r['approved_changed']) as $rel) {
 		$hash = sbUpdHashFile($root . sbUpdTargetRel($rel));
 		if ($hash === null || strlen($rel) > 255) continue;
-		mysqli_stmt_bind_param($stmt, 'ssss', $rel, $hash, $now, $user);
-		try {
-			if (mysqli_stmt_execute($stmt)) $n++;
-		} catch (Throwable $e) {
-			// ligne refusée : fichier laissé « ajouté »
-		}
+		// Ligne refusée : fichier laissé « ajouté »
+		if ($db->upsert('sb_sentinelle_approved', array('path' => $rel, 'sha256' => $hash, 'approved_at' => $now, 'user' => $user), array('path'))) $n++;
 	}
 	if ($n) sentinelle_event('integrity_approve', 'warning', 'Intégrité : ' . $n . ' fichier(s) propre(s) au site approuvé(s)', 'logged', $user);
 	return $n;
@@ -209,7 +200,7 @@ function sentinelle_integrity_unapprove_all($user = '') {
 	if (!$dbt) return false;
 	list($db, $table) = $dbt;
 	try {
-		$ok = (bool) @mysqli_query($db, "DELETE FROM `$table`");
+		$ok = $db->run("DELETE FROM `$table`") !== false;
 	} catch (Throwable $e) {
 		return false;
 	}
