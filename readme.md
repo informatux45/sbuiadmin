@@ -160,6 +160,10 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 
 ## 📝 Changelog
 
+**4.81**
+- Contact 1.1.3: email and name fields detected by name (contact-email, e-mail...)
+- Contact: forms without an email field are sent (no Reply-To)
+
 **4.80**
 - SQLite database: installer choice, switch to or from MySQL in Settings
 - Updates no longer deploy readme, help and composer files
@@ -168,13 +172,13 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 **4.79**
 - Smarty unescape: no PHP 8.5 deprecation on empty values
 
+<details>
+  <summary><strong>Older versions</strong></summary>
+
 **4.78**
 - Public site and installer use bound SQL parameters
 - Theme menus, settings and blocks: injection through template parameters fixed
 - Header code: CSS, JavaScript and Analytics no longer shift when one is missing
-
-<details>
-  <summary><strong>Older versions</strong></summary>
 
 **4.77**
 - Contact uses bound SQL parameters (admin, forms, messages, search)

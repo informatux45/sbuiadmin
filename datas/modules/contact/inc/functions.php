@@ -493,9 +493,14 @@ function sbContactSend($form_id, $email_to, $subject, $title, array $skip = arra
 		if (in_array((string) $k, $skip, true)) continue;
 		$fields[(string) $k] = is_array($v) ? implode(', ', array_map('strval', $v)) : trim((string) $v);
 	}
-	$name  = trim(str_replace(array("\r", "\n"), ' ', $fields['name'] ?? ''));
-	$email = $fields['email'] ?? '';
-	if (!filter_var($email, FILTER_VALIDATE_EMAIL)) return _CMS_CONTACT_FORM_ERROR_EMAIL;
+	// --- Noms de champs libres : « email » sinon le premier contenant mail/courriel,
+	// --- « name » sinon le premier dont un segment est name/nom (pas « prenom »)
+	$email_key = sbContactFieldKey($fields, 'email', '/mail|courriel/i');
+	$name_key  = sbContactFieldKey($fields, 'name', '/(^|[-_\s])(name|nom)([-_\s]|$)/i');
+	$name      = trim(str_replace(array("\r", "\n"), ' ', $name_key !== null ? $fields[$name_key] : ''));
+	$email     = $email_key !== null ? $fields[$email_key] : '';
+	// --- Champ email présent = obligatoire et valide ; absent = envoi sans Reply-To
+	if ($email_key !== null && !filter_var($email, FILTER_VALIDATE_EMAIL)) return _CMS_CONTACT_FORM_ERROR_EMAIL;
 
 	$subject    = $sbsanitize->displayText($subject, 'UTF-8');
 	$recipients = sbContactRecipients($email_to);
@@ -514,7 +519,7 @@ function sbContactSend($form_id, $email_to, $subject, $title, array $skip = arra
 		if (!$mail->setFrom(SBFROMEMAIL, $name)) {
 			$error = $mail->ErrorInfo;
 		} else {
-			$mail->addReplyTo($email, $name);
+			if ($email !== '') $mail->addReplyTo($email, $name);
 			foreach ($recipients as $to) $mail->addAddress($to);
 			$mail->Subject = $subject;
 			$mail->msgHTML($html);
@@ -526,6 +531,17 @@ function sbContactSend($form_id, $email_to, $subject, $title, array $skip = arra
 	if ($error === '') return '';
 	error_log('Contact : envoi en échec : ' . $error);
 	return _CMS_CONTACT_FORM_ERROR_SEND;
+}
+
+/**
+ * Clé du champ posté jouant un rôle (email, nom) : nom exact, sinon le premier
+ * champ dont le nom correspond au motif
+ * @return string|null
+ */
+function sbContactFieldKey(array $fields, $exact, $pattern) {
+	if (array_key_exists($exact, $fields)) return $exact;
+	foreach (array_keys($fields) as $k) if (preg_match($pattern, (string) $k)) return (string) $k;
+	return null;
 }
 
 /** Durée de conservation des messages, en mois (0 = sans limite) */
