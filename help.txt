@@ -86,6 +86,8 @@ Chaque site a son sbdbconfig.php (sbdbconfig-<dossier>.php pour les suivants).
   location ~ ^/ADMIN/inc/.*\.(php|phar|txt|log|sql|ini)$ { deny all; }
   location ~ /\. { deny all; }
   location ~ (^|/)(sbdbconfig[^/]*|sbsettings-backup-[^/]*)\.php$ { deny all; }
+  location ~* "(\.(md|dist|sql|bak|old|orig|swp|swo|save|sav|log|ini|sh|tmp)|\.(php|phtml|phar)(\d+|[.~#_-][^/]*)|\.(bak|orig|swp|swo|sql)([._~-][^/]*|\d+)|\.(old|save|sav|tmp)(\d+|[._-]\d[^/]*)|~|/#[^/]*#|/(composer\.(json|lock)|package(-lock)?\.json))$" { deny all; }
+  (sauvegardes x.php.bak-..., x.php~, fichiers de dev : 4.83 ; guillemets obligatoires, # dans le motif)
 (ADMIN = dossier d'administration, backdoor par défaut)
 
 ### Mises à jour (Configuration > Mise à jour)
@@ -103,6 +105,9 @@ Chaque site a son sbdbconfig.php (sbdbconfig-<dossier>.php pour les suivants).
   Après modification, vider l'opcache si rien ne change.
 - 4.70 : un ancien sbconfig.php qui lisait inc/admin/theme.txt est corrigé
   (thème en base) puis theme.txt supprimé ; original gardé pour le retour.
+- 4.83 : bloc « sauvegardes et fichiers de dev jamais servis » ajouté au
+  .htaccess du site (après celui des fichiers cachés) ; non inscriptible =
+  inchangé, à ajouter à la main (voir le .htaccess livré).
 - 4.72 : la base passe par PDO (extension pdo_mysql exigée, vérifiée avant la
   mise à jour depuis la 4.71 ; sinon page « Extension PHP manquante »).
 - vendor/.htaccess refuse tout au web : un dossier de vendor/ propre au site

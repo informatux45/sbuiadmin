@@ -160,6 +160,10 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 
 ## 📝 Changelog
 
+**4.83**
+- .htaccess: backup copies (x.php.bak-..., x.php~, dump.sql.gz) and dev files (.md, .sql, .log, .sh) never served
+- Existing sites: the block is added to their .htaccess by the update
+
 **4.82**
 - Contact 1.1.4: file fields ([TEXT type=file]) attached to the email (JPG, PNG, GIF, PDF, 2 MB max, content checked)
 - Contact: required file enforced server-side, AJAX forms send files; name field must end with name/nom
@@ -168,13 +172,13 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 - Contact 1.1.3: email and name fields detected by name (contact-email, e-mail...)
 - Contact: forms without an email field are sent (no Reply-To)
 
+<details>
+  <summary><strong>Older versions</strong></summary>
+
 **4.80**
 - SQLite database: installer choice, switch to or from MySQL in Settings
 - Updates no longer deploy readme, help and composer files
 - News 1.0.7: an invalid category template no longer breaks the page
-
-<details>
-  <summary><strong>Older versions</strong></summary>
 
 **4.79**
 - Smarty unescape: no PHP 8.5 deprecation on empty values

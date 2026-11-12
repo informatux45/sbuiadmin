@@ -78,6 +78,42 @@ Header always set Strict-Transport-Security "max-age=31536000" env=HTTPS
 </IfModule>
 </FilesMatch>
 
+## SBUIADMIN 4.83 : sauvegardes et fichiers de dev jamais servis (début)
+## Une copie posée à côté d'un fichier n'est pas exécutée par PHP : Apache la
+## servirait en clair (functions.php.bak-20261112, x.php~, dump.sql.gz...).
+## 1) extensions de dev ou de sauvegarde en fin de nom ;
+## 2) source PHP suivie d'un suffixe, quel qu'il soit ;
+## 3) suffixes de sauvegarde, fichiers d'éditeur ; .old/.save/.tmp au milieu
+##    d'un nom seulement suivis d'un chiffre (jquery.old-browser.js servi).
+<FilesMatch "(?i)^(composer\.(json|lock)|installed\.(json|php)|package(-lock)?\.json|.*\.(md|dist|sql|bak|old|orig|swp|swo|save|sav|log|ini|sh|tmp))$">
+<IfModule mod_authz_core.c>
+	Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+	Order allow,deny
+	Deny from all
+</IfModule>
+</FilesMatch>
+<FilesMatch "(?i)\.(php|phtml|phar)(\d+|[.~#_-][^/]*)$">
+<IfModule mod_authz_core.c>
+	Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+	Order allow,deny
+	Deny from all
+</IfModule>
+</FilesMatch>
+<FilesMatch "(?i)(\.(bak|orig|swp|swo|sql)([._~-][^/]*|\d+)|\.(old|save|sav|tmp)(\d+|[._-]\d[^/]*)|~|^#.*#)$">
+<IfModule mod_authz_core.c>
+	Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+	Order allow,deny
+	Deny from all
+</IfModule>
+</FilesMatch>
+## SBUIADMIN 4.83 (fin)
+
 ## Prevent directory listings
 Options All -Indexes
 
