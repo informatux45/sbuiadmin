@@ -90,7 +90,7 @@ function shortcode_sbcontactajax($param = '') {
 			$form_html .= '<div id="form-messages-' . $form_t . '"></div>';
 
 			// --- Form
-			$form_html .= '<form id="ajax-contact-' . $form_t . '" action="' . SB_MODULES_URL . 'contact/contact_ajax.php?id='.$id.'" method="post" class="'.$class.'">';
+			$form_html .= '<form id="ajax-contact-' . $form_t . '" action="' . SB_MODULES_URL . 'contact/contact_ajax.php?id='.$id.'" method="post" enctype="multipart/form-data" class="'.$class.'">';
 
 			// --- Construct Form
 			$form_html .= sbGetContactFormElements($form_info['form'], '', $sendmail);
@@ -114,14 +114,16 @@ function shortcode_sbcontactajax($param = '') {
 					// Stop the browser from submitting the form.
 					e.preventDefault();
 			
-					// Serialize the form data.
-					var formData = $(form).serialize();
+					// Form data, files included (multipart)
+					var formData = new FormData(form[0]);
 			
 					// Submit the form using AJAX.
 					$.ajax({
 						type: 'POST',
 						url: $(form).attr('action'),
-						data: formData
+						data: formData,
+						processData: false,
+						contentType: false
 					})
 					.done(function(response) {
 						// Make sure that the formMessages div has the 'success' class.
@@ -131,8 +133,8 @@ function shortcode_sbcontactajax($param = '') {
 						// Set the message text.
 						$(formMessages).html(response);
 			
-						// Clear the form.
-						$('#name, #email, #message').val('');
+						// Clear the form (files included).
+						form[0].reset();
 					})
 					.always(function() {
 						// Un défi ALTCHA ne sert qu'une fois : nouveau défi pour un nouvel envoi
@@ -220,7 +222,7 @@ function shortcode_sbcontact($param = '') {
 			if(isset($_POST['submitform']) && !empty($_POST['submitform'])) {
 				// --- Anti-robot ALTCHA (une seule API : inc/sbuiadmin-altcha.php)
 				if (sbAltchaVerify()) {
-					$errMsg = sbContactSend($id, $email_to, $subject, $subject . ' (' . _AM_SITE_TITLE . ')', array('submitform', 'go'));
+					$errMsg = sbContactSend($id, $email_to, $subject, $subject . ' (' . _AM_SITE_TITLE . ')', array('submitform', 'go'), $form_info['form']);
 					if ($errMsg === '') {
 						$succMsg = _CMS_CONTACT_FORM_SUCCESS;
 						// --- Empty form fields
@@ -241,7 +243,7 @@ function shortcode_sbcontact($param = '') {
 			$form_name  = ($formname) ? 'name="'.$formname.'" id="'.$formname.'" ' : '';
 			$form_class = ($class) ? ' class="'.$class.'"' : '';
 			$form_html .= '<a name="form_'.$id.'"></a>';
-			$form_html .= '<form '.$form_name.'action="http' . ((($_SERVER['HTTPS'] ?? '') == 'on') ? 's' : '') . '://' . htmlspecialchars($_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], ENT_QUOTES, 'UTF-8') . '#form_' . $id . '" method="post"'.$form_class.'>';
+			$form_html .= '<form '.$form_name.'action="http' . ((($_SERVER['HTTPS'] ?? '') == 'on') ? 's' : '') . '://' . htmlspecialchars($_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], ENT_QUOTES, 'UTF-8') . '#form_' . $id . '" method="post" enctype="multipart/form-data"'.$form_class.'>';
 			// --- Error / Success Message
 			//$form_html .= '<div class="usermessagea">';
 			if ($errMsg) {
@@ -482,9 +484,10 @@ function sbContactRecipients($list) {
  * @param string $subject  sujet du mail
  * @param string $title    titre en tête du mail
  * @param array  $skip     champs techniques à ne pas transmettre
+ * @param string $form     code du formulaire (ses champs [TEXT type=file] acceptent une pièce jointe)
  * @return string '' si envoyé, sinon le message d'erreur pour le visiteur
  */
-function sbContactSend($form_id, $email_to, $subject, $title, array $skip = array()) {
+function sbContactSend($form_id, $email_to, $subject, $title, array $skip = array(), $form = '') {
 	global $sbsanitize;
 
 	$skip[] = SB_ALTCHA_FIELD;
@@ -494,13 +497,19 @@ function sbContactSend($form_id, $email_to, $subject, $title, array $skip = arra
 		$fields[(string) $k] = is_array($v) ? implode(', ', array_map('strval', $v)) : trim((string) $v);
 	}
 	// --- Noms de champs libres : « email » sinon le premier contenant mail/courriel,
-	// --- « name » sinon le premier dont un segment est name/nom (pas « prenom »)
+	// --- « name » sinon le premier qui finit par le segment name/nom (contact-name, votre-nom ;
+	// --- pas « prenom » ni « nom-coffret »)
 	$email_key = sbContactFieldKey($fields, 'email', '/mail|courriel/i');
-	$name_key  = sbContactFieldKey($fields, 'name', '/(^|[-_\s])(name|nom)([-_\s]|$)/i');
+	$name_key  = sbContactFieldKey($fields, 'name', '/(^|[-_\s])(name|nom)$/i');
 	$name      = trim(str_replace(array("\r", "\n"), ' ', $name_key !== null ? $fields[$name_key] : ''));
 	$email     = $email_key !== null ? $fields[$email_key] : '';
 	// --- Champ email présent = obligatoire et valide ; absent = envoi sans Reply-To
 	if ($email_key !== null && !filter_var($email, FILTER_VALIDATE_EMAIL)) return _CMS_CONTACT_FORM_ERROR_EMAIL;
+	// --- Pièces jointes : seulement les champs fichier déclarés dans le formulaire ;
+	// --- le message enregistré n'en garde que le nom
+	$uploads = sbContactUploads(sbContactFileFields($form), $_FILES);
+	if ($uploads['error'] !== '') return $uploads['error'];
+	foreach ($uploads['files'] as $file) $fields[$file['field']] = $file['name'];
 
 	$subject    = $sbsanitize->displayText($subject, 'UTF-8');
 	$recipients = sbContactRecipients($email_to);
@@ -521,9 +530,12 @@ function sbContactSend($form_id, $email_to, $subject, $title, array $skip = arra
 		} else {
 			if ($email !== '') $mail->addReplyTo($email, $name);
 			foreach ($recipients as $to) $mail->addAddress($to);
+			foreach ($uploads['files'] as $file) {
+				if (!$mail->addAttachment($file['path'], $file['name'])) $error = $mail->ErrorInfo;
+			}
 			$mail->Subject = $subject;
 			$mail->msgHTML($html);
-			if (!$mail->send()) $error = $mail->ErrorInfo;
+			if ($error === '' && !$mail->send()) $error = $mail->ErrorInfo;
 		}
 	}
 
@@ -542,6 +554,88 @@ function sbContactFieldKey(array $fields, $exact, $pattern) {
 	if (array_key_exists($exact, $fields)) return $exact;
 	foreach (array_keys($fields) as $k) if (preg_match($pattern, (string) $k)) return (string) $k;
 	return null;
+}
+
+/** Taille maximale d'une pièce jointe, en octets */
+defined('SB_CONTACT_FILE_MAX') or define('SB_CONTACT_FILE_MAX', 2 * 1024 * 1024);
+
+/**
+ * Champs fichier d'un formulaire ([TEXT type=file/name=...])
+ * @param string $form code du formulaire
+ * @return array nom du champ => obligatoire (bool)
+ */
+function sbContactFileFields($form) {
+	$out = array();
+	preg_match_all('/\[TEXT(.*?)\]/', (string) $form, $m);
+	foreach ($m[1] as $attrs) {
+		$p = array();
+		foreach (explode('/', trim($attrs)) as $pair) {
+			list($k, $v) = array_pad(explode('=', $pair, 2), 2, '');
+			$p[trim($k)] = trim($v);
+		}
+		$name = $p['name'] ?? '';
+		if (strtolower($p['type'] ?? '') === 'file' && $name !== '') $out[$name] = array_key_exists('required', $p);
+	}
+	return $out;
+}
+
+/**
+ * Type réel d'un fichier d'après ses premiers octets
+ * @return string jpg, png, gif, pdf ou ''
+ */
+function sbContactFileType($path) {
+	if (!is_file($path) || !is_readable($path)) return '';
+	$h = file_get_contents($path, false, null, 0, 8);
+	if (!is_string($h)) return '';
+	if (strncmp($h, "\xFF\xD8\xFF", 3) === 0) return 'jpg';
+	if ($h === "\x89PNG\r\n\x1A\n") return 'png';
+	if (strncmp($h, 'GIF87a', 6) === 0 || strncmp($h, 'GIF89a', 6) === 0) return 'gif';
+	if (strncmp($h, '%PDF-', 5) === 0) return 'pdf';
+	return '';
+}
+
+/**
+ * Pièces jointes reçues pour les champs fichier du formulaire : une par champ,
+ * JPG/PNG/GIF/PDF (extension ET contenu), SB_CONTACT_FILE_MAX octets au plus
+ * @param array    $file_fields nom => obligatoire (sbContactFileFields)
+ * @param array    $files       $_FILES
+ * @param callable $is_uploaded contrôle d'origine du fichier (is_uploaded_file)
+ * @return array ['files' => [['field', 'path', 'name']], 'error' => '' ou message]
+ */
+function sbContactUploads(array $file_fields, array $files, $is_uploaded = 'is_uploaded_file') {
+	$types = array('jpg' => 'jpg', 'jpeg' => 'jpg', 'png' => 'png', 'gif' => 'gif', 'pdf' => 'pdf');
+	$out   = array();
+	foreach ($file_fields as $field => $required) {
+		$f = $files[$field] ?? null;
+		// --- name[] : seul le premier fichier est pris
+		if (is_array($f) && is_array($f['error'] ?? null)) {
+			$f = array('name' => reset($f['name']), 'tmp_name' => reset($f['tmp_name']), 'error' => reset($f['error']));
+		}
+		$err = is_array($f) ? (int) ($f['error'] ?? UPLOAD_ERR_NO_FILE) : UPLOAD_ERR_NO_FILE;
+		if ($err === UPLOAD_ERR_NO_FILE) {
+			if ($required) return array('files' => array(), 'error' => _CMS_CONTACT_FORM_ERROR_FILE_REQUIRED);
+			continue;
+		}
+		if ($err === UPLOAD_ERR_INI_SIZE || $err === UPLOAD_ERR_FORM_SIZE) return array('files' => array(), 'error' => _CMS_CONTACT_FORM_ERROR_FILE_SIZE);
+		$tmp = (string) ($f['tmp_name'] ?? '');
+		if ($err !== UPLOAD_ERR_OK || $tmp === '' || !call_user_func($is_uploaded, $tmp)) {
+			error_log('Contact : pièce jointe non reçue (' . $field . ', code ' . $err . ')');
+			return array('files' => array(), 'error' => _CMS_CONTACT_FORM_ERROR_SEND);
+		}
+		$size = is_file($tmp) ? (int) filesize($tmp) : 0;
+		if ($size > SB_CONTACT_FILE_MAX) return array('files' => array(), 'error' => _CMS_CONTACT_FORM_ERROR_FILE_SIZE);
+		$name = str_replace('\\', '/', (string) ($f['name'] ?? ''));
+		$name = substr($name, strrpos('/' . $name, '/'));
+		$ext  = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+		if ($size === 0 || !isset($types[$ext]) || $types[$ext] !== sbContactFileType($tmp)) {
+			return array('files' => array(), 'error' => _CMS_CONTACT_FORM_ERROR_FILE_TYPE);
+		}
+		// --- Nom propre (lettres, chiffres, . _ - espace), extension conservée
+		$base = trim(preg_replace('/[^\p{L}\p{N}._ -]+/u', '_', pathinfo($name, PATHINFO_FILENAME)) ?? '', ' .');
+		$base = ($base === '') ? 'fichier' : mb_substr($base, 0, 80, 'UTF-8');
+		$out[] = array('field' => (string) $field, 'path' => $tmp, 'name' => $base . '.' . $ext);
+	}
+	return array('files' => $out, 'error' => '');
 }
 
 /** Durée de conservation des messages, en mois (0 = sans limite) */

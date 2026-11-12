@@ -25,6 +25,9 @@ define('_CMS_CONTACT_FORM_ERROR_CAPTCHA',			"Robot verification failed, please t
 define('_CMS_CONTACT_FORM_ERROR_CAPTCHA_EMPTY',		"Please complete the anti-robot check before sending");
 define('_CMS_CONTACT_FORM_ERROR_EMAIL',			"Please enter a valid email address");
 define('_CMS_CONTACT_FORM_ERROR_SEND',			"Your message could not be sent, please try again later");
+define('_CMS_CONTACT_FORM_ERROR_FILE_REQUIRED',	"Please attach the requested file");
+define('_CMS_CONTACT_FORM_ERROR_FILE_SIZE',		"File too large (2 MB maximum)");
+define('_CMS_CONTACT_FORM_ERROR_FILE_TYPE',		"File type not allowed (JPG, PNG, GIF or PDF)");
 define('_CMS_CONTACT_NOFORM',						'Form not available!');
 define('_CMS_CONTACT_FORM_NOTFOUND',				"Form not found!");
 define('_CMS_CONTACT_FORM_INACTIVE',				"Form inactive!");

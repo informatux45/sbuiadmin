@@ -25,6 +25,9 @@ define('_CMS_CONTACT_FORM_ERROR_CAPTCHA',			"Vérification captcha échouée, es
 define('_CMS_CONTACT_FORM_ERROR_CAPTCHA_EMPTY',		"Merci de valider la vérification anti-robot avant l'envoi");
 define('_CMS_CONTACT_FORM_ERROR_EMAIL',			"Merci d'indiquer une adresse email valide");
 define('_CMS_CONTACT_FORM_ERROR_SEND',			"Votre message n'a pas pu être envoyé, merci de réessayer plus tard");
+define('_CMS_CONTACT_FORM_ERROR_FILE_REQUIRED',	"Merci de joindre le fichier demandé");
+define('_CMS_CONTACT_FORM_ERROR_FILE_SIZE',		"Fichier trop volumineux (2 Mo maximum)");
+define('_CMS_CONTACT_FORM_ERROR_FILE_TYPE',		"Type de fichier refusé (JPG, PNG, GIF ou PDF)");
 define('_CMS_CONTACT_NOFORM',						'Formulaire non disponible !');
 define('_CMS_CONTACT_FORM_NOTFOUND',				"Formulaire inexistant !");
 define('_CMS_CONTACT_FORM_INACTIVE',				"Formulaire désactivé !");

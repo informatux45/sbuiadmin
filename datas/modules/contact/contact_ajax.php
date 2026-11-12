@@ -87,7 +87,7 @@ $template = 'index';
 # Settings for email settings (if exists)
 # SQL Request
 # --------------------------------------------------
-$query_contact   = "SELECT recipients, subject, active FROM " . _AM_DB_PREFIX . $module['tables']['contact'] . " WHERE id = ?";
+$query_contact   = "SELECT recipients, subject, active, form FROM " . _AM_DB_PREFIX . $module['tables']['contact'] . " WHERE id = ?";
 $result_contact  = sbDb()->row($query_contact, array($id));
 // --- Formulaire inexistant ou désactivé : rien n'est envoyé ni enregistré
 if (!$result_contact || !$result_contact['active']) {
@@ -111,7 +111,7 @@ switch($op) {
 		if(isset($_POST['submitform']) && !empty($_POST['submitform'])) {
 			// --- Anti-robot ALTCHA (une seule API : inc/sbuiadmin-altcha.php)
 			if (sbAltchaVerify()) {
-				$errMsg = sbContactSend($id, $email_to, $subject, 'Contact site ' . _AM_SITE_TITLE, array('submitform', 'submit'));
+				$errMsg = sbContactSend($id, $email_to, $subject, 'Contact site ' . _AM_SITE_TITLE, array('submitform', 'submit'), $result_contact['form']);
 				if ($errMsg === '') {
 					echo '<div class="box success-ajax-msg"><i class="fa-solid fa-check green response-ajax-msg" aria-hidden="true"></i> ' . _CMS_CONTACT_FORM_SUCCESS . '</div>';
 				} else {

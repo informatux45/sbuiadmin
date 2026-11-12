@@ -15,7 +15,7 @@ return array(
 	'title'         => 'Contact',
 	'icon'          => 'envelope', // Font Awesome (menu, carte Modules)
 	'description'   => "Formulaires de contact personnalisables (champs, destinataires, protection ALTCHA), à insérer dans une page par code court ; messages reçus consultables par formulaire.",
-	'version'       => '1.1.3',
+	'version'       => '1.1.4',
 	'requires_core' => '4.75',
 	'author'        => 'INFORMATUX',
 	'routes'        => array(),
