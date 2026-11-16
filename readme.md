@@ -160,6 +160,10 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 
 ## 📝 Changelog
 
+**4.84**
+- Database switch: the revert button no longer overrides Copy and switch
+- SQLite to MySQL: values MySQL would refuse are listed before copying, optional automatic fix
+
 **4.83**
 - .htaccess: backup copies (x.php.bak-..., x.php~, dump.sql.gz) and dev files (.md, .sql, .log, .sh) never served
 - Existing sites: the block is added to their .htaccess by the update
@@ -168,12 +172,12 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 - Contact 1.1.4: file fields ([TEXT type=file]) attached to the email (JPG, PNG, GIF, PDF, 2 MB max, content checked)
 - Contact: required file enforced server-side, AJAX forms send files; name field must end with name/nom
 
+<details>
+  <summary><strong>Older versions</strong></summary>
+
 **4.81**
 - Contact 1.1.3: email and name fields detected by name (contact-email, e-mail...)
 - Contact: forms without an email field are sent (no Reply-To)
-
-<details>
-  <summary><strong>Older versions</strong></summary>
 
 **4.80**
 - SQLite database: installer choice, switch to or from MySQL in Settings

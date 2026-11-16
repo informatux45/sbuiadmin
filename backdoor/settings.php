@@ -104,31 +104,53 @@ switch($action) {
 		$sb_db_cur       = sbDbConfig();
 		$sb_db_in        = array('db_driver' => $sb_db_cur['driver'] === 'sqlite' ? 'mysql' : 'sqlite', 'db_host' => 'localhost', 'db_name' => '', 'db_user' => '', 'db_path' => sbDbSqliteSuggestedPath());
 		$sb_db_user_name = (string) ($_SESSION['sbuiadmin_user_name'] ?? '');
-		if (!empty($_POST['form_submit']) && $_POST['form_submit'] === $formName) {
+		$sb_db_issues    = null; // SQLite -> MySQL : valeurs que MySQL refuserait
+		$sb_db_fix       = !empty($_POST['db_fix']);
+		// Un seul formulaire (sbform ne gère qu'une balise <form>) : le retour
+		// à la base précédente est le bouton db_op=revert de ce formulaire
+		if (!empty($_POST['form_submit']) && $_POST['form_submit'] === $formName && ($_POST['db_op'] ?? '') === 'revert') {
+			try {
+				$sb_db_back = sbDbSwitchRevert();
+				if (is_object($sbusers) && method_exists($sbusers, 'updateAccessLog')) @$sbusers->updateAccessLog('settings', 'Retour à la base précédente : ' . $sb_db_back, $sb_db_user_name);
+				$sb_msg_valid = 'Le site utilise de nouveau ' . $sb_db_back . ' (sans les changements faits depuis la bascule).';
+				$sb_db_cur = sbDbConfig();
+				$sb_db_in['db_driver'] = $sb_db_cur['driver'] === 'sqlite' ? 'mysql' : 'sqlite';
+			} catch (Throwable $e) {
+				$sb_msg_error = $e->getMessage();
+			}
+		} elseif (!empty($_POST['form_submit']) && $_POST['form_submit'] === $formName) {
 			foreach (array('db_driver', 'db_host', 'db_name', 'db_user', 'db_path') as $k) if (isset($_POST[$k]) && is_string($_POST[$k])) $sb_db_in[$k] = trim($_POST[$k]);
 			try {
 				$sb_db_target = sbDbSwitchTarget(array_merge($sb_db_in, array('db_password' => is_string($_POST['db_password'] ?? null) ? $_POST['db_password'] : '')));
 				if (($_POST['db_op'] ?? '') === 'test') {
 					sbDbSwitchConnect($sb_db_target);
 					$sb_msg_valid = 'Connexion réussie : ' . sbDbSwitchLabel($sb_db_target) . ' est joignable et vide pour le préfixe « ' . $sb_db_target['prefix'] . ' ».';
+					// SQLite -> MySQL : contrôle des valeurs dès le test
+					$sb_db_issues = sbDb() ? sbDbSwitchCheck(sbDb(), $sb_db_target['driver'], sbDb()->tables((string) $sb_db_cur['prefix'])) : null;
+					if ($sb_db_issues && $sb_db_issues['count']) {
+						$sb_msg_valid .= ' Attention : ' . $sb_db_issues['count'] . ' valeur(s) de la base SQLite seraient refusées par MySQL (détail sous le formulaire) : cochez « Corriger automatiquement » pour basculer.';
+					}
 				} elseif (empty($_POST['db_confirm'])) {
 					$sb_msg_error = 'Cochez la confirmation avant de copier et basculer.';
 				} else {
-					$sb_db_res = sbDbSwitchRun($sb_db_target);
+					$sb_db_res = sbDbSwitchRun($sb_db_target, $sb_db_fix);
 					$sb_db_rows = array_sum($sb_db_res['tables']);
-					if (is_object($sbusers) && method_exists($sbusers, 'updateAccessLog')) @$sbusers->updateAccessLog('settings', 'Base changée : ' . $sb_db_res['from'] . ' -> ' . $sb_db_res['to'], $sb_db_user_name);
-					$sb_msg_valid = 'Base changée : ' . count($sb_db_res['tables']) . ' tables et ' . $sb_db_rows . ' lignes copiées et vérifiées. Le site utilise maintenant ' . $sb_db_res['to'] . '. L\'ancienne base est intacte.';
+					$sb_db_log = 'Base changée : ' . $sb_db_res['from'] . ' -> ' . $sb_db_res['to'];
+					if ($sb_db_res['fixed']) {
+						// Chaque valeur corrigée est gardée dans le journal
+						$sb_db_log .= ' ; ' . $sb_db_res['fixed'] . ' valeur(s) corrigée(s)';
+						// 100 lignes au plus (texte stocké en entités HTML, colonne text de 64 Ko)
+						$sb_db_logged = array_slice($sb_db_res['issues']['items'], 0, 100);
+						foreach ($sb_db_logged as $sb_db_it) $sb_db_log .= "\n" . $sb_db_it['table'] . '.' . $sb_db_it['column'] . ' (' . $sb_db_it['row'] . ') : ' . $sb_db_it['reason'] . ' : « ' . $sb_db_it['value'] . ' » -> « ' . $sb_db_it['fix'] . ' »';
+						if ($sb_db_res['issues']['count'] > count($sb_db_logged)) $sb_db_log .= "\n… et " . ($sb_db_res['issues']['count'] - count($sb_db_logged)) . ' autre(s)';
+					}
+					if (is_object($sbusers) && method_exists($sbusers, 'updateAccessLog')) @$sbusers->updateAccessLog('settings', $sb_db_log, $sb_db_user_name);
+					$sb_msg_valid = 'Base changée : ' . count($sb_db_res['tables']) . ' tables et ' . $sb_db_rows . ' lignes copiées et vérifiées' . ($sb_db_res['fixed'] ? ', ' . $sb_db_res['fixed'] . ' valeur(s) corrigée(s) (détail dans le journal)' : '') . '. Le site utilise maintenant ' . $sb_db_res['to'] . '. L\'ancienne base est intacte.';
 					$sb_db_cur = sbDbConfig();
 				}
-			} catch (Throwable $e) {
+			} catch (sbDbSwitchIssues $e) {
+				$sb_db_issues = $e->issues;
 				$sb_msg_error = $e->getMessage();
-			}
-		} elseif (!empty($_POST['form_submit']) && $_POST['form_submit'] === 'db_revert') {
-			try {
-				$sb_db_back = sbDbSwitchRevert();
-				if (is_object($sbusers) && method_exists($sbusers, 'updateAccessLog')) @$sbusers->updateAccessLog('settings', 'Retour à la base précédente : ' . $sb_db_back, $sb_db_user_name);
-				$sb_msg_valid = 'Le site utilise de nouveau ' . $sb_db_back . ' (sans les changements faits depuis la bascule).';
-				$sb_db_cur = sbDbConfig();
 			} catch (Throwable $e) {
 				$sb_msg_error = $e->getMessage();
 			}
@@ -151,20 +173,32 @@ switch($action) {
 		$sbform->addInput('password', 'Mot de passe', array('name' => 'db_password', 'value' => '', 'autocomplete' => 'new-password'), false);
 		$sbform->addInput('text', 'Fichier SQLite', array('name' => 'db_path', 'value' => htmlspecialchars($sb_db_in['db_path'], ENT_QUOTES, 'UTF-8'), 'placeholder' => '/chemin/hors/du/site/sbuiadmin.sqlite', 'style' => 'width: 100% !important', 'autocomplete' => 'off'), false, false, 'SQLite : chemin absolu, hors du site (sinon le fichier serait téléchargeable), dossier inscriptible par PHP.');
 		$sb_db_check = array(array('text' => "J'ai compris : le site va utiliser la nouvelle base", 'name' => 'db_confirm', 'checked' => '0'));
+		if ($sb_db_cur['driver'] === 'sqlite') {
+			$sb_db_fixbox = array(array('text' => 'Corriger automatiquement les valeurs que MySQL refuserait', 'name' => 'db_fix', 'checked' => $sb_db_fix ? '1' : '0'));
+			$sbform->addCheckbox('Valeurs incompatibles', $sb_db_fixbox, '', false, '<br />', 'Vers MySQL seulement. SQLite ne contrôle ni les types ni les longueurs : texte trop long coupé, nombre ramené dans ses limites, sinon valeur vide (si la colonne l\'accepte), par défaut, ou 0 / texte vide / 1970-01-01. Chaque correction est notée dans le journal ; la base SQLite n\'est pas modifiée.');
+		}
 		$sbform->addCheckbox('Confirmation', $sb_db_check, '', false, '<br />', '');
+		if ($sb_db_issues && $sb_db_issues['count']) {
+			$h = function ($s) { return htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8'); };
+			$sb_db_tbl = "<div class='form-group'><p><strong>" . (int) $sb_db_issues['count'] . " valeur(s) refusée(s) par MySQL</strong>"
+				. ($sb_db_issues['count'] > count($sb_db_issues['items']) ? ' (les ' . count($sb_db_issues['items']) . ' premières)' : '') . " :</p>"
+				. "<div style='overflow-x:auto'><table class='data-table'><thead><tr><th>Table</th><th>Colonne</th><th>Ligne</th><th>Valeur</th><th>Problème</th><th>Correction</th></tr></thead><tbody>";
+			foreach ($sb_db_issues['items'] as $it) {
+				$sb_db_tbl .= '<tr><td>' . $h(substr($it['table'], strlen((string) $sb_db_cur['prefix']))) . '</td><td>' . $h($it['column']) . '</td><td>' . $h($it['row']) . '</td><td style="white-space:normal;word-break:break-all">' . $h($it['value']) . '</td><td style="white-space:normal">' . $h($it['reason']) . '</td><td style="white-space:normal;word-break:break-all">' . $h($it['fix']) . '</td></tr>';
+			}
+			$sbform->addAnything($sb_db_tbl . '</tbody></table></div></div>');
+		}
 		$sbform->addAnything("<div class='form-group'><button type='submit' name='db_op' value='test' class='btn'>Tester la connexion</button></div>");
+		if ($sb_db_prev) {
+			// Retour à la base précédente : bouton du MÊME formulaire (sbform
+			// n'affiche qu'une balise <form> ; un second openForm fusionnait tout)
+			$sbform->addBreak('Base précédente');
+			$sbform->addAnything("<div class='form-group'><p>" . htmlspecialchars(sbDbSwitchLabel($sb_db_prev), ENT_QUOTES, 'UTF-8') . " : toujours disponible. Y revenir ne reprend pas les changements faits depuis la bascule.</p>"
+				. "<p><button type='submit' name='db_op' value='revert' class='btn'>Revenir à cette base</button></p></div>");
+		}
 		$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => "$formName"));
 		$sbform->addInput('submit', '', array('value' => "$btn_add_edit"));
 		$sbform->closeForm();
-		if ($sb_db_prev) {
-			// Retour à la base précédente : second petit formulaire (jeton CSRF compris)
-			$sbform->openForm(array('action' => "$formAction", 'name' => 'db_revert', 'id' => 'db_revert', 'reloadpage' => "$formAction", 'submitpage' => "$formAction"));
-			$sbform->addBreak('Base précédente');
-			$sbform->addAnything("<div class='form-group'><p>" . htmlspecialchars(sbDbSwitchLabel($sb_db_prev), ENT_QUOTES, 'UTF-8') . " : toujours disponible. Y revenir ne reprend pas les changements faits depuis la bascule.</p></div>");
-			$sbform->addInput('hidden', '', array('name' => 'form_submit', 'value' => 'db_revert'));
-			$sbform->addInput('submit', '', array('value' => 'Revenir à cette base'));
-			$sbform->closeForm();
-		}
 		$sbsmarty->assign('sb_db_switch', true);
 	break;
 

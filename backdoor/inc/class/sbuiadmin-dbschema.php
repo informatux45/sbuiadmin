@@ -775,8 +775,11 @@ class sbdbschema {
 	 * @param callable|null $progress fonction(texte)
 	 * @return array table => nombre de lignes
 	 */
-	public static function copyTables(sbdb $from, sbdb $to, array $tables, $progress = null) {
+	public static function copyTables(sbdb $from, sbdb $to, array $tables, $progress = null, $fix = false, &$fixed = null) {
 		$counts = array();
+		$fixed = 0;
+		// Correction des valeurs que MySQL strict refuserait (voir mysqlIssues)
+		$fix = $fix && $to->driver() === 'mysql';
 		foreach ($tables as $t) {
 			$m = self::describe($from, $t);
 			if (!$m) throw new RuntimeException('Table illisible : ' . $t);
@@ -797,7 +800,11 @@ class sbdbschema {
 				$ins = $to->pdo()->prepare($insert);
 				while (($row = $st->fetch(PDO::FETCH_ASSOC)) !== false) {
 					$vals = array();
-					foreach ($cols as $c) $vals[] = $row[$c] ?? null;
+					foreach ($cols as $c) {
+						$v = $row[$c] ?? null;
+						if ($fix && self::mysqlValueIssue($m['columns'][$c], $v) !== '') { $v = self::mysqlFixValue($m['columns'][$c], $v); $fixed++; }
+						$vals[] = $v;
+					}
 					$ins->execute($vals);
 					if (++$n % 1000 === 0) { $to->pdo()->commit(); $to->pdo()->beginTransaction(); }
 				}
@@ -812,5 +819,197 @@ class sbdbschema {
 			$counts[$t] = $n;
 		}
 		return $counts;
+	}
+
+	// -------------------------------------------------------------------
+	// SQLite -> MySQL : valeurs que MySQL (mode strict) refuserait.
+	// SQLite ne contrôle ni les types ni les longueurs : une base née sous
+	// SQLite peut contenir un texte dans un entier, un texte trop long ou
+	// une date invalide, et une seule ligne ferait échouer toute la copie.
+	// -------------------------------------------------------------------
+
+	const INT_MAX = array('tinyint' => '127', 'smallint' => '32767', 'mediumint' => '8388607', 'int' => '2147483647', 'integer' => '2147483647', 'bigint' => '9223372036854775807');
+	const TEXT_BYTES = array('tinytext' => 255, 'text' => 65535, 'mediumtext' => 16777215);
+
+	/** Type de base (« int », « varchar »…) et arguments d'une colonne */
+	private static function typeParts(array $c) {
+		$type = strtolower(trim((string) $c['type']));
+		$base = preg_replace('/[\s(].*$/s', '', $type);
+		$args = preg_match('/^[a-z ]+\((.*)\)/s', $type, $m) ? $m[1] : '';
+		return array($base, $args);
+	}
+
+	/** Bornes [min, max] (chaînes d'entiers) d'une colonne entière */
+	private static function intBounds($base, $unsigned) {
+		$max = self::INT_MAX[$base];
+		if ($unsigned) return array('0', $base === 'bigint' ? '18446744073709551615' : (string) (2 * (int) $max + 1));
+		return array('-' . ($base === 'bigint' ? '9223372036854775808' : (string) ((int) $max + 1)), $max);
+	}
+
+	/** Compare deux entiers écrits en chaîne (taille quelconque) : -1, 0, 1 */
+	private static function intCmp($a, $b) {
+		$na = $a[0] === '-'; $nb = $b[0] === '-';
+		$a = ltrim(ltrim($a, '+-'), '0'); $b = ltrim(ltrim($b, '+-'), '0');
+		if ($a === '') $na = false;
+		if ($b === '') $nb = false;
+		if ($na !== $nb) return $na ? -1 : 1;
+		$r = strlen($a) <=> strlen($b) ?: strcmp($a, $b) <=> 0;
+		return $na ? -$r : $r;
+	}
+
+	/** Valeurs d'un enum('a','b') */
+	private static function enumValues($args) {
+		preg_match_all("/'((?:[^']|'')*)'/", $args, $m);
+		return array_map(function ($v) { return str_replace("''", "'", $v); }, $m[1]);
+	}
+
+	/** Date/heure valide pour MySQL ? */
+	private static function validDate($base, $s) {
+		if ($base === 'date') {
+			if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $s, $m)) return false;
+		} else {
+			if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}):(\d{2})(?:\.\d{1,6})?)?$/', $s, $m)) return false;
+			if (isset($m[4]) && ((int) $m[4] > 23 || (int) $m[5] > 59 || (int) $m[6] > 59)) return false;
+		}
+		if ((int) $m[1] < 1000 || !checkdate((int) $m[2], (int) $m[3], (int) $m[1])) return false;
+		if ($base === 'timestamp') {
+			$v = sprintf('%s-%s-%s %s', $m[1], $m[2], $m[3], isset($m[4]) ? $m[4] . ':' . $m[5] . ':' . $m[6] : '00:00:00');
+			if ($v < '1970-01-01 00:00:01' || $v > '2038-01-19 03:14:07') return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Motif du refus de la valeur par MySQL strict, ou '' si elle passe.
+	 * NULL n'est jamais signalé (SQLite applique déjà NOT NULL).
+	 */
+	public static function mysqlValueIssue(array $c, $v) {
+		if ($v === null) return '';
+		list($base, $args) = self::typeParts($c);
+		$s = is_string($v) ? $v : (is_float($v) ? sprintf('%.15F', $v) : (string) $v);
+		if (is_float($v)) $s = rtrim(rtrim($s, '0'), '.');
+		if (isset(self::INT_MAX[$base])) {
+			$n = trim($s);
+			if (!preg_match('/^[+-]?\d+$/', $n)) return is_numeric($n) ? 'nombre à virgule dans un entier' : 'valeur non numérique';
+			list($lo, $hi) = self::intBounds($base, !empty($c['unsigned']));
+			if (self::intCmp($n, $lo) < 0 || self::intCmp($n, $hi) > 0) return 'hors limites (' . $lo . ' à ' . $hi . ')';
+			return '';
+		}
+		if (in_array($base, array('decimal', 'numeric', 'float', 'double', 'real'), true)) {
+			$n = trim($s);
+			if (!is_numeric($n)) return 'valeur non numérique';
+			if (!empty($c['unsigned']) && (float) $n < 0) return 'négatif dans un nombre positif';
+			if (($base === 'decimal' || $base === 'numeric') && preg_match('/^(\d+)\s*(?:,\s*(\d+))?$/', $args, $p)) {
+				$intDigits = (int) $p[1] - (int) ($p[2] ?? 0);
+				if (strlen(ltrim(preg_replace('/[.].*$/', '', ltrim($n, '+-')), '0')) > $intDigits) return 'hors limites (' . $p[1] . ' chiffres)';
+			}
+			return '';
+		}
+		if (in_array($base, array('char', 'varchar', 'tinytext', 'text', 'mediumtext', 'longtext', 'enum', 'set', 'json'), true)) {
+			if (!mb_check_encoding($s, 'UTF-8')) return 'texte UTF-8 invalide';
+			if (($base === 'char' || $base === 'varchar') && ctype_digit($args) && mb_strlen($s, 'UTF-8') > (int) $args) {
+				return 'trop long (' . mb_strlen($s, 'UTF-8') . ' caractères pour ' . $args . ')';
+			}
+			if (isset(self::TEXT_BYTES[$base]) && strlen($s) > self::TEXT_BYTES[$base]) return 'trop long (' . strlen($s) . ' octets pour ' . self::TEXT_BYTES[$base] . ')';
+			if ($base === 'enum') {
+				foreach (self::enumValues($args) as $e) if (mb_strtolower($e, 'UTF-8') === mb_strtolower($s, 'UTF-8')) return '';
+				return 'valeur hors de la liste';
+			}
+			if ($base === 'json') {
+				json_decode($s);
+				if (json_last_error() !== JSON_ERROR_NONE) return 'JSON invalide';
+			}
+			return '';
+		}
+		if (in_array($base, array('date', 'datetime', 'timestamp'), true)) {
+			return self::validDate($base, trim($s)) ? '' : 'date invalide';
+		}
+		return '';
+	}
+
+	/**
+	 * Valeur corrigée pour MySQL : texte trop long coupé, UTF-8 réparé,
+	 * nombre arrondi ou ramené dans ses limites ; sinon (texte dans un
+	 * nombre, date invalide, hors liste) vide (NULL) si la colonne
+	 * l'accepte, puis sa valeur par défaut, puis 0 / '' / 1970-01-01.
+	 */
+	public static function mysqlFixValue(array $c, $v) {
+		if (self::mysqlValueIssue($c, $v) === '') return $v;
+		list($base, $args) = self::typeParts($c);
+		$s = is_string($v) ? $v : (string) $v;
+		if (in_array($base, array('char', 'varchar', 'tinytext', 'text', 'mediumtext', 'longtext', 'enum', 'set', 'json'), true) && !mb_check_encoding($s, 'UTF-8')) {
+			$s = mb_scrub($s, 'UTF-8');
+			if (self::mysqlValueIssue($c, $s) === '') return $s;
+		}
+		if (($base === 'char' || $base === 'varchar') && ctype_digit($args)) return mb_substr($s, 0, (int) $args, 'UTF-8');
+		if (isset(self::TEXT_BYTES[$base])) return mb_strcut($s, 0, self::TEXT_BYTES[$base], 'UTF-8');
+		if ($base === 'json') return json_encode($s, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+		$n = trim($s);
+		if (isset(self::INT_MAX[$base]) && is_numeric($n)) {
+			list($lo, $hi) = self::intBounds($base, !empty($c['unsigned']));
+			if (!preg_match('/^[+-]?\d+$/', $n)) $n = number_format(round((float) $n), 0, '.', '');
+			if (self::intCmp($n, $lo) < 0) return $lo;
+			if (self::intCmp($n, $hi) > 0) return $hi;
+			return $n;
+		}
+		if (in_array($base, array('decimal', 'numeric', 'float', 'double', 'real'), true) && is_numeric($n)) {
+			if (!empty($c['unsigned']) && (float) $n < 0) return '0';
+			if (preg_match('/^(\d+)\s*(?:,\s*(\d+))?$/', $args, $p)) {
+				$d = (int) ($p[2] ?? 0);
+				$max = str_repeat('9', max(0, (int) $p[1] - $d)) . ($d ? '.' . str_repeat('9', $d) : '');
+				return ((float) $n < 0 ? '-' : '') . ($max === '' ? '0' : $max);
+			}
+		}
+		// Vide, puis valeur par défaut, puis valeur neutre
+		if (!empty($c['null'])) return null;
+		$def = $c['default'] ?? null;
+		if ($def !== null && strtoupper($def) !== 'NULL') {
+			if (strtoupper($def) === 'CURRENT_TIMESTAMP') $dv = $base === 'date' ? date('Y-m-d') : date('Y-m-d H:i:s');
+			elseif ($def !== '' && ($def[0] === "'" || $def[0] === '"')) $dv = str_replace($def[0] . $def[0], $def[0], substr($def, 1, -1));
+			else $dv = $def;
+			if (self::mysqlValueIssue($c, $dv) === '') return $dv;
+		}
+		if (isset(self::INT_MAX[$base]) || in_array($base, array('decimal', 'numeric', 'float', 'double', 'real'), true)) return '0';
+		if ($base === 'date') return '1970-01-01';
+		if ($base === 'datetime') return '1970-01-01 00:00:00';
+		if ($base === 'timestamp') return '1970-01-01 00:00:01';
+		if ($base === 'enum') { $e = self::enumValues($args); return $e ? $e[0] : ''; }
+		return '';
+	}
+
+	/**
+	 * Parcourt les tables d'une base (SQLite) et liste les valeurs que MySQL
+	 * strict refuserait, avec leur correction.
+	 * @return array count (total), items (les $limit premiers : table,
+	 *               column, row, value, reason, fix)
+	 */
+	public static function mysqlIssues(sbdb $db, array $tables, $limit = 200) {
+		$out = array('count' => 0, 'items' => array());
+		$excerpt = function ($v) {
+			if ($v === null) return 'NULL';
+			$s = mb_scrub((string) $v, 'UTF-8');
+			return mb_strlen($s, 'UTF-8') > 40 ? mb_substr($s, 0, 40, 'UTF-8') . '…' : $s;
+		};
+		foreach ($tables as $t) {
+			$m = self::describe($db, $t);
+			if (!$m) continue;
+			$st = $db->run('SELECT * FROM ' . self::q($t));
+			if ($st === false) continue;
+			$i = 0;
+			while (($row = $st->fetch(PDO::FETCH_ASSOC)) !== false) {
+				$i++;
+				foreach ($m['columns'] as $name => $c) {
+					$why = self::mysqlValueIssue($c, $row[$name] ?? null);
+					if ($why === '') continue;
+					$out['count']++;
+					if (count($out['items']) >= $limit) continue;
+					$key = array();
+					foreach ($m['pk'] as $k) $key[] = $k . '=' . $excerpt($row[$k] ?? null);
+					$out['items'][] = array('table' => $t, 'column' => $name, 'row' => $key ? implode(', ', $key) : 'ligne ' . $i,
+						'value' => $excerpt($row[$name]), 'reason' => $why, 'fix' => $excerpt(self::mysqlFixValue($c, $row[$name])));
+				}
+			}
+		}
+		return $out;
 	}
 }

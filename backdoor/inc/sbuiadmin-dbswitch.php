@@ -17,6 +17,24 @@
 
 defined('SBUIADMIN_PATH') or die('Are you crazy!');
 
+/**
+ * Copie SQLite -> MySQL refusée avant de commencer : valeurs que MySQL
+ * strict rejetterait (liste dans $issues, voir sbdbschema::mysqlIssues)
+ */
+class sbDbSwitchIssues extends RuntimeException {
+	public $issues;
+	public function __construct(array $issues) {
+		$this->issues = $issues;
+		parent::__construct($issues['count'] . ' valeur(s) de la base SQLite seraient refusées par MySQL : rien n\'a été copié. Corrigez-les, ou cochez « Corriger automatiquement » (détail sous le formulaire).');
+	}
+}
+
+/** Valeurs à corriger avant une copie de $from (SQLite) vers MySQL, ou null si sans objet */
+function sbDbSwitchCheck(sbdb $from, $toDriver, array $tables) {
+	if ($from->driver() !== 'sqlite' || $toDriver !== 'mysql') return null;
+	return sbdbschema::mysqlIssues($from, $tables);
+}
+
 /** Fichier des accès de la base précédente (à côté de sbdbconfig.php), ou false */
 function sbDbSwitchPreviousFile() {
 	$cur = sbDbConfigPath();
@@ -101,7 +119,7 @@ function sbDbSwitchConnect(array $t) {
  * @return array tables (nom => lignes), from, to (libellés)
  * @throws RuntimeException
  */
-function sbDbSwitchRun(array $t) {
+function sbDbSwitchRun(array $t, $fix = false) {
 	$cur = sbDbConfig();
 	if ($cur['source'] === 'env') throw new RuntimeException('Accès définis par les variables d\'environnement du serveur (SBUIADMIN_DB_*) : changez-les côté serveur.');
 	if ($cur['source'] === 'none' || $cur['source'] === 'legacy' || !sbDbConfigPath()) throw new RuntimeException('sbdbconfig.php introuvable : changement impossible.');
@@ -112,8 +130,12 @@ function sbDbSwitchRun(array $t) {
 	if (!$tables) throw new RuntimeException('Aucune table du CMS dans la base actuelle.');
 	@set_time_limit(0);
 	ignore_user_abort(true);
+	// SQLite -> MySQL : valeurs refusées par MySQL strict listées AVANT la copie
+	$issues = sbDbSwitchCheck($from, $to->driver(), $tables);
+	if ($issues && $issues['count'] && !$fix) throw new sbDbSwitchIssues($issues);
+	$fixed = 0;
 	try {
-		$counts = sbdbschema::copyTables($from, $to, $tables);
+		$counts = sbdbschema::copyTables($from, $to, $tables, null, (bool) $fix, $fixed);
 	} catch (Throwable $e) {
 		foreach ($tables as $tb) { try { sbdbschema::exec($to, 'DROP TABLE IF EXISTS `' . str_replace('`', '``', $tb) . '`'); } catch (Throwable $x) {} }
 		throw new RuntimeException('Copie interrompue, base actuelle inchangée : ' . $e->getMessage());
@@ -138,7 +160,7 @@ function sbDbSwitchRun(array $t) {
 		throw new RuntimeException('Vérification après bascule en échec : anciens accès remis.');
 	}
 	if (function_exists('sbUpdClearCaches')) sbUpdClearCaches();
-	return array('tables' => $counts, 'from' => sbDbSwitchLabel($cur), 'to' => sbDbSwitchLabel($t));
+	return array('tables' => $counts, 'from' => sbDbSwitchLabel($cur), 'to' => sbDbSwitchLabel($t), 'fixed' => $fixed, 'issues' => $issues);
 }
 
 /**
