@@ -467,6 +467,8 @@ function sbUpdIsProtected($rel) {
 	static $prefixes = array('upload/', 'datas/cache/', 'backdoor/datas/cache/', 'backdoor/datas/updates/', 'backdoor/install/', '.sbupd/');
 	if (in_array($rel, $exact, true)) return true;
 	foreach ($prefixes as $p) if (strpos($rel, $p) === 0) return true;
+	// sbdata/ : base SQLite protégée du site (jamais de PHP attendu là)
+	if (preg_match('#^sbdata/(\.htaccess|web\.config|[^/]+\.(sqlite3?|db)(-journal|-wal|-shm)?)$#i', $rel)) return true;
 	return (bool) preg_match('#(^|/)sbdbconfig[^/]*\.php$|(^|/)sbsettings-backup-[^/]*\.php$#', $rel);
 }
 

@@ -160,6 +160,10 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 
 ## 📝 Changelog
 
+**4.85**
+- SQLite: hosts without a folder outside the site can use a protected sbdata/ folder
+- The protection is proven by an HTTP request before use, rechecked in Settings
+
 **4.84**
 - Database switch: the revert button no longer overrides Copy and switch
 - SQLite to MySQL: values MySQL would refuse are listed before copying, optional automatic fix
@@ -168,12 +172,12 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 - .htaccess: backup copies (x.php.bak-..., x.php~, dump.sql.gz) and dev files (.md, .sql, .log, .sh) never served
 - Existing sites: the block is added to their .htaccess by the update
 
+<details>
+  <summary><strong>Older versions</strong></summary>
+
 **4.82**
 - Contact 1.1.4: file fields ([TEXT type=file]) attached to the email (JPG, PNG, GIF, PDF, 2 MB max, content checked)
 - Contact: required file enforced server-side, AJAX forms send files; name field must end with name/nom
-
-<details>
-  <summary><strong>Older versions</strong></summary>
 
 **4.81**
 - Contact 1.1.3: email and name fields detected by name (contact-email, e-mail...)

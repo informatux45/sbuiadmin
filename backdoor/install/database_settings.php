@@ -57,7 +57,7 @@
 		// validation here
 		// -------------------------------------------------
 		if($database_driver == 'sqlite'){
-			// SQLite : un fichier hors du site, installation neuve seulement
+			// SQLite : un fichier hors du site (ou dans sbdata/ prouvé protégé), installation neuve seulement
 			$install_type = 'create';
 			$focus_field = 'database_path';
 			if(!preg_match('/^[A-Za-z0-9_]*$/', $database_prefix)){
@@ -212,7 +212,7 @@
 				<td nowrap>&nbsp;Fichier SQLite : <span class="star">*</span></td>
 				<td colspan="2">
 					<input type="text" class="form_text" name="database_path" id="database_path" size="60" value="<?php echo htmlspecialchars($database_path); ?>" autocomplete="off" />
-					<br /><small>Chemin absolu, <b>hors du site</b> (sinon le fichier serait téléchargeable). Le dossier doit être inscriptible par PHP. Une base MySQL/MariaDB pourra être choisie plus tard dans Configuration &gt; Réglages.</small>
+					<br /><small>Chemin absolu, <b>hors du site</b> (sinon le fichier serait téléchargeable). Le dossier doit être inscriptible par PHP. À défaut, le dossier protégé <b>sbdata/</b> du site est accepté s'il est prouvé non servi par le web (vérification HTTP ; sous nginx : <code>location ^~ /sbdata/ { deny all; }</code>). Une base MySQL/MariaDB pourra être choisie plus tard dans Configuration &gt; Réglages.</small>
 				</td>
 			</tr>
 			<tr class="sb-mysql-row">

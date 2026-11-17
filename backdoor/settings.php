@@ -161,6 +161,13 @@ switch($action) {
 		$sbform->addBreak('Base actuelle');
 		$sbform->addAnything("<div class='form-group'><p><strong>" . htmlspecialchars(sbDbSwitchLabel($sb_db_cur), ENT_QUOTES, 'UTF-8') . "</strong> · préfixe des tables : <code>" . htmlspecialchars($sb_db_cur['prefix'], ENT_QUOTES, 'UTF-8') . "</code></p>"
 			. "<p>Toutes les tables du CMS sont recopiées dans la nouvelle base, leur nombre de lignes vérifié, puis le site bascule (même clé de chiffrement). L'ancienne base n'est jamais modifiée : vous pouvez y revenir. Faites-le à un moment calme : ce qui est enregistré pendant la copie (journal, messages) peut manquer.</p></div>");
+		// Base SQLite dans le site (sbdata/) : protection revérifiée à chaque affichage
+		if ($sb_db_cur['driver'] === 'sqlite' && sbDbSqliteInSite(dirname((string) $sb_db_cur['path']))) {
+			$sb_db_web = sbDbSqliteWebError(dirname((string) $sb_db_cur['path']));
+			$sbform->addAnything($sb_db_web === ''
+				? "<div class='form-group'><p>Base dans le dossier protégé du site : vérifiée non servie par le web à l'instant.</p></div>"
+				: "<div class='form-group'><p style='color:#c0392b'><strong>Base SQLite exposée : " . htmlspecialchars($sb_db_web, ENT_QUOTES, 'UTF-8') . "</strong> Passez sur MySQL/MariaDB ou sur un fichier hors du site sans attendre.</p></div>");
+		}
 		$sbform->addBreak('Nouvelle base');
 		$sb_db_radio = array(
 			array('text' => 'MySQL / MariaDB' . (sbDbDriverAvailable('mysql') ? '' : ' (extension pdo_mysql absente)'), 'value' => 'mysql'),
@@ -171,7 +178,7 @@ switch($action) {
 		$sbform->addInput('text', 'Nom de la base', array('name' => 'db_name', 'value' => htmlspecialchars($sb_db_in['db_name'], ENT_QUOTES, 'UTF-8'), 'autocomplete' => 'off'), false);
 		$sbform->addInput('text', 'Utilisateur', array('name' => 'db_user', 'value' => htmlspecialchars($sb_db_in['db_user'], ENT_QUOTES, 'UTF-8'), 'autocomplete' => 'off'), false);
 		$sbform->addInput('password', 'Mot de passe', array('name' => 'db_password', 'value' => '', 'autocomplete' => 'new-password'), false);
-		$sbform->addInput('text', 'Fichier SQLite', array('name' => 'db_path', 'value' => htmlspecialchars($sb_db_in['db_path'], ENT_QUOTES, 'UTF-8'), 'placeholder' => '/chemin/hors/du/site/sbuiadmin.sqlite', 'style' => 'width: 100% !important', 'autocomplete' => 'off'), false, false, 'SQLite : chemin absolu, hors du site (sinon le fichier serait téléchargeable), dossier inscriptible par PHP.');
+		$sbform->addInput('text', 'Fichier SQLite', array('name' => 'db_path', 'value' => htmlspecialchars($sb_db_in['db_path'], ENT_QUOTES, 'UTF-8'), 'placeholder' => '/chemin/hors/du/site/sbuiadmin.sqlite', 'style' => 'width: 100% !important', 'autocomplete' => 'off'), false, false, 'SQLite : chemin absolu, hors du site (sinon le fichier serait téléchargeable), dossier inscriptible par PHP. À défaut, le dossier protégé sbdata/ du site, accepté s\'il est prouvé non servi par le web.');
 		$sb_db_check = array(array('text' => "J'ai compris : le site va utiliser la nouvelle base", 'name' => 'db_confirm', 'checked' => '0'));
 		if ($sb_db_cur['driver'] === 'sqlite') {
 			$sb_db_fixbox = array(array('text' => 'Corriger automatiquement les valeurs que MySQL refuserait', 'name' => 'db_fix', 'checked' => $sb_db_fix ? '1' : '0'));

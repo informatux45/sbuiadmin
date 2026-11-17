@@ -6,6 +6,9 @@
 
 ### Base SQLite
 - Choisie à l'étape « Paramètres database » : un fichier hors du site.
+  Sans dossier inscriptible hors du site : sbdata/ du site (.htaccess
+  Require all denied), accepté seulement si une requête HTTP le prouve non
+  servi ; nginx : location ^~ /sbdata/ { deny all; }
 - Configuration > Réglages > Changer de base : SQLite <-> MySQL/MariaDB
   (copie vérifiée, ancienne base gardée, retour possible).
 

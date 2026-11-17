@@ -63,3 +63,7 @@ Thumbs.db
 desktop.ini
 *.orig
 *.rej
+
+# Base SQLite du site dans le dossier protege sbdata/ (repli quand aucun
+# dossier hors du site n'est inscriptible) : donnees propres au site.
+sbdata/

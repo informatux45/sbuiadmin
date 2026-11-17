@@ -463,7 +463,9 @@ function sbDbConfigWrite(array $c) {
 /**
  * Fichier SQLite proposé : hors du site, au premier dossier inscriptible où
  * sbdbconfig.php irait (private/ du compte d'abord), nommé d'après le site.
- * @return string chemin, '' si aucun dossier inscriptible hors du site
+ * Hébergement sans dossier inscriptible hors du site : dossier protégé
+ * sbdata/ du site (créé ici), fichier au nom tiré au hasard.
+ * @return string chemin, '' si aucun dossier inscriptible
  */
 function sbDbSqliteSuggestedPath() {
 	$name = 'sbuiadmin-' . preg_replace('/[^A-Za-z0-9_.-]/', '_', basename(sbDbConfigSiteId())) . '.sqlite';
@@ -471,14 +473,107 @@ function sbDbSqliteSuggestedPath() {
 		if (!$dir[1] || !$dir[2] || !@is_dir($dir[0]) || !@is_writable($dir[0])) continue;
 		return $dir[0] . DIRECTORY_SEPARATOR . $name;
 	}
+	$safe = sbDbSqliteSafeDir();
+	if (sbDbSqliteProtectDir($safe)) {
+		foreach (glob($safe . DIRECTORY_SEPARATOR . 'sbuiadmin-*.sqlite') ?: array() as $f) return $f;
+		return $safe . DIRECTORY_SEPARATOR . 'sbuiadmin-' . bin2hex(random_bytes(8)) . '.sqlite';
+	}
 	return '';
+}
+
+/** Dossier protégé du site pour une base SQLite (repli quand rien n'est inscriptible hors du site) */
+function sbDbSqliteSafeDir() {
+	return rtrim(SB_SETTINGS_SITE_ROOT, '/\\') . DIRECTORY_SEPARATOR . 'sbdata';
+}
+
+/**
+ * Crée le dossier protégé et ses interdictions (Apache 2.2/2.4, IIS) si
+ * besoin. Nginx ignore ces fichiers : c'est la vérification HTTP
+ * (sbDbSqliteWebError) qui décide.
+ * @return bool dossier présent et inscriptible
+ */
+function sbDbSqliteProtectDir($dir) {
+	if (!@is_dir($dir) && !@mkdir($dir, 0755)) return false;
+	if (!@is_writable($dir)) return false;
+	$files = array(
+		'.htaccess' => "# SBUIADMIN : base SQLite du site, jamais servie par le web\n"
+			. "<IfModule mod_authz_core.c>\n\tRequire all denied\n</IfModule>\n"
+			. "<IfModule !mod_authz_core.c>\n\tOrder allow,deny\n\tDeny from all\n</IfModule>\n",
+		'web.config' => "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<configuration>\n\t<system.webServer>\n\t\t<security>\n\t\t\t<authorization>\n\t\t\t\t<remove users=\"*\" roles=\"\" verbs=\"\" />\n\t\t\t\t<add accessType=\"Deny\" users=\"*\" />\n\t\t\t</authorization>\n\t\t</security>\n\t</system.webServer>\n</configuration>\n",
+	);
+	foreach ($files as $name => $content) {
+		$f = $dir . DIRECTORY_SEPARATOR . $name;
+		if (@is_file($f) && @file_get_contents($f) === $content) continue;
+		if (@file_put_contents($f, $content, LOCK_EX) !== strlen($content)) return false;
+		@chmod($f, 0644);
+	}
+	return true;
+}
+
+/** Le dossier est-il dans le site ? */
+function sbDbSqliteInSite($dir) {
+	$realDir = @realpath($dir);
+	$root = @realpath(SB_SETTINGS_SITE_ROOT);
+	return $realDir && $root && ($realDir === $root || strpos($realDir . DIRECTORY_SEPARATOR, $root . DIRECTORY_SEPARATOR) === 0);
+}
+
+/** URL d'un dossier du site (d'après la requête en cours), ou '' */
+function sbDbSqliteDirUrl($dir) {
+	$host = (string) ($_SERVER['HTTP_HOST'] ?? '');
+	$docroot = !empty($_SERVER['DOCUMENT_ROOT']) ? @realpath($_SERVER['DOCUMENT_ROOT']) : false;
+	$real = @realpath($dir);
+	if ($host === '' || !preg_match('/^([A-Za-z0-9.-]+|\[[0-9A-Fa-f:.]+\])(:\d{1,5})?$/', $host) || !$docroot || !$real) return '';
+	if (strpos($real . DIRECTORY_SEPARATOR, $docroot . DIRECTORY_SEPARATOR) !== 0) return '';
+	$https = (!empty($_SERVER['HTTPS']) && strtolower((string) $_SERVER['HTTPS']) !== 'off')
+		|| strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https'
+		|| (string) ($_SERVER['SERVER_PORT'] ?? '') === '443';
+	$path = str_replace(DIRECTORY_SEPARATOR, '/', substr($real, strlen($docroot)));
+	return ($https ? 'https' : 'http') . '://' . $host . implode('/', array_map('rawurlencode', explode('/', $path))) . '/';
+}
+
+/**
+ * Preuve que le web ne sert pas les fichiers du dossier : une sonde
+ * (.sqlite au contenu aléatoire) y est posée puis demandée par HTTP.
+ * Accepté seulement sur 403, 404 ou 410 sans le contenu de la sonde ;
+ * 401 (mot de passe HTTP), 200, redirection finale ou erreur réseau = refus.
+ * @return string '' si protégé, sinon la raison
+ */
+function sbDbSqliteWebError($dir) {
+	static $cache = array();
+	$real = @realpath($dir) ?: $dir;
+	if (isset($cache[$real])) return $cache[$real];
+	$nginx = ' Sous nginx, ajoutez « location ^~ /' . basename($real) . '/ { deny all; } » à la configuration du site, ou choisissez un dossier hors du site.';
+	$url = sbDbSqliteDirUrl($real);
+	if ($url === '') return $cache[$real] = 'Impossible de déterminer l\'adresse web du dossier ' . $real . ' pour vérifier qu\'il est protégé : choisissez un dossier hors du site.';
+	if (!function_exists('curl_init')) return $cache[$real] = 'Extension PHP curl absente : impossible de vérifier que le dossier ' . $real . ' est protégé.';
+	$token = bin2hex(random_bytes(16));
+	$probe = 'sbprobe-' . bin2hex(random_bytes(6)) . '.sqlite';
+	if (@file_put_contents($real . DIRECTORY_SEPARATOR . $probe, $token) !== strlen($token)) return $cache[$real] = 'Impossible d\'écrire dans ' . $real . '.';
+	$ch = curl_init($url . $probe);
+	curl_setopt_array($ch, array(
+		CURLOPT_RETURNTRANSFER => true, CURLOPT_FOLLOWLOCATION => true, CURLOPT_MAXREDIRS => 3,
+		CURLOPT_CONNECTTIMEOUT => 5, CURLOPT_TIMEOUT => 8, CURLOPT_USERAGENT => 'SBUIADMIN sqlite-check',
+		CURLOPT_PROTOCOLS => CURLPROTO_HTTP | CURLPROTO_HTTPS, CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTP | CURLPROTO_HTTPS,
+	));
+	$body = curl_exec($ch);
+	$code = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+	$err = curl_error($ch);
+	$ch = null;
+	@unlink($real . DIRECTORY_SEPARATOR . $probe);
+	if ($body === false) return $cache[$real] = 'Vérification du dossier ' . $real . ' impossible (' . $err . ') : choisissez un dossier hors du site.';
+	if (strpos((string) $body, $token) !== false) return $cache[$real] = 'Le dossier ' . $real . ' est servi par le web (un fichier de test y a été téléchargé) : la base serait téléchargeable.' . $nginx;
+	if (!in_array($code, array(403, 404, 410), true)) {
+		return $cache[$real] = 'Le dossier ' . $real . ' n\'est pas prouvé protégé (réponse HTTP ' . $code . ' au lieu de 403).' . ($code === 401 ? ' Un mot de passe HTTP ne suffit pas.' : '') . $nginx;
+	}
+	return $cache[$real] = '';
 }
 
 /**
  * Chemin de base SQLite acceptable ? Chemin absolu, extension .sqlite, .db
  * ou .sqlite3, dossier existant et inscriptible (SQLite y écrit son journal),
- * HORS du site (un fichier servi par le web serait téléchargeable), fichier
- * absent ou déjà une base SQLite.
+ * HORS du site (un fichier servi par le web serait téléchargeable) ou dans
+ * le dossier protégé sbdata/ du site, prouvé non servi par une requête HTTP,
+ * fichier absent ou déjà une base SQLite.
  * @return string '' si oui, sinon la raison
  */
 function sbDbSqlitePathError($path) {
@@ -488,12 +583,19 @@ function sbDbSqlitePathError($path) {
 	if (!preg_match('#^(/|[A-Za-z]:[\\\\/])#', $path)) return 'Indiquez un chemin absolu (commençant par /).';
 	if (!preg_match('/\.(sqlite3?|db)$/i', $path)) return 'Le fichier doit se terminer par .sqlite, .sqlite3 ou .db.';
 	$dir = dirname($path);
+	$safe = sbDbSqliteSafeDir();
+	// Dossier protégé du site : créé (avec ses interdictions) à la demande
+	if (rtrim($dir, '/\\') === $safe && !sbDbSqliteProtectDir($safe)) return 'Le dossier ' . $safe . ' n\'a pas pu être créé ou n\'est pas inscriptible par PHP.';
 	if (!@is_dir($dir)) return 'Le dossier ' . $dir . ' n\'existe pas.';
 	if (!@is_writable($dir)) return 'Le dossier ' . $dir . ' n\'est pas inscriptible par PHP.';
-	$realDir = @realpath($dir);
-	$root = @realpath(SB_SETTINGS_SITE_ROOT);
-	if ($realDir && $root && ($realDir === $root || strpos($realDir . DIRECTORY_SEPARATOR, $root . DIRECTORY_SEPARATOR) === 0)) {
-		return 'Le fichier doit être hors du site (sinon il serait téléchargeable par le web) : choisissez un dossier au-dessus de ' . $root . '.';
+	if (sbDbSqliteInSite($dir)) {
+		$realSafe = @realpath($safe);
+		if (!$realSafe || @realpath($dir) !== $realSafe) {
+			return 'Le fichier doit être hors du site (sinon il serait téléchargeable par le web) : choisissez un dossier au-dessus de ' . @realpath(SB_SETTINGS_SITE_ROOT) . ', ou à défaut le dossier protégé ' . $safe . '.';
+		}
+		if (!sbDbSqliteProtectDir($realSafe)) return 'Le dossier ' . $safe . ' n\'est pas inscriptible par PHP.';
+		$web = sbDbSqliteWebError($realSafe);
+		if ($web !== '') return $web;
 	}
 	if (@file_exists($path)) {
 		if (!@is_file($path) || is_link($path)) return 'Ce chemin n\'est pas un fichier.';
