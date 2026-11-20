@@ -17,6 +17,7 @@ define('_CMS_NEWS_NEWS',					'Actualités');
 define('_CMS_NEWS_ALLNEWS',					"Toute l'actualité");
 define('_CMS_NEWS_NONEWS',					'Aucun article pour cette catégorie');
 define('_CMS_NEWS_NOCATEGORIES',			'Aucune catégorie disponible');
+define('_CMS_NEWS_SUBCATEGORIES',			'Sous-catégories');
 define('_CMS_NEWS_READ_ITEM',				"Lire l'article");
 define('_CMS_NEWS_NOITEM',					'Article non disponible !');
 define('_CMS_NEWS_ITEMNOTFOUND',			"Article inexistant !");

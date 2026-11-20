@@ -92,23 +92,32 @@ if ($sb_search_raw === '') {
 	// --------------------------------------------------
 	// --- 1. PAGES (titre + contenu)
 	// --------------------------------------------------
+	// --- Le texte d'une page peut vivre dans sa vue diverse (fichier du
+	// --- thème, champ various_view) : ces pages sont lues en entier, le
+	// --- LIKE sur la base ne voyant pas le fichier.
 	$bind    = array();
-	$where   = sbSearchWhere(array('title', 'content'), $sb_search_terms, $bind);
-	$query   = "SELECT id, menu, title, seo_url, url_custom, content
+	$where   = preg_replace('/^\s*AND\s+/', '', sbSearchWhere(array('title', 'content'), $sb_search_terms, $bind));
+	if ($where === '') $where = '1 = 1';
+	$query   = "SELECT id, menu, title, seo_url, url_custom, content, various_view
 				FROM {$module['tables']['pages']}
-				WHERE active = '1'" . $where . " ORDER BY sort ASC";
+				WHERE active = '1' AND (various_view <> '' OR ($where)) ORDER BY sort ASC";
 	$rows    = sbDb()->all($query, $bind);
 	if ($rows) {
 		foreach ($rows as $row) {
+			// --- Pages techniques : jamais dans les résultats
+			if (in_array(trim((string) $row['seo_url']), sbSearchSystemPages(), true)) continue;
+			$content = (string) $row['content'];
+			$various = sbSearchVariousContent($row['various_view'] ?? '');
+			if ($various !== '') $content .= ' ' . $various;
 			// --- Le LIKE ne fait que degrossir : il travaille sur la forme
 			// --- STOCKEE et confond le mot cherche avec le nom d'une entite
 			// --- HTML ("amp", "eacute"...). Voir sbSearchMatches().
-			if (!sbSearchMatches(array($row['title'], $row['content']), $sb_search_terms)) continue;
+			if (!sbSearchMatches(array($row['title'], $content), $sb_search_terms)) continue;
 			$results[] = array(
 				'module'  => 'pages',
 				'type'    => _CMS_SEARCH_SRC_PAGES,
 				'title'   => sbSearchPageLabel($row),
-				'excerpt' => sbSearchExcerpt($row['content'], $sb_search_terms),
+				'excerpt' => sbSearchExcerpt($content, $sb_search_terms),
 				'url'     => sbSearchPageUrl($row),
 				'host'    => false,
 			);

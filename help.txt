@@ -63,6 +63,13 @@
   (180 j), sauf « update ». Un module y écrit par $sbusers->updateAccessLog(),
   jamais par son propre INSERT. logaccess_lastpurge : clé volatile.
 
+### Actualités et recherche
+- Sous-catégories (news 1.0.8) : « Appartient à la catégorie » dans le
+  formulaire d'une catégorie, un seul niveau. Le site liste les principales,
+  une catégorie montre aussi les articles de ses sous-catégories.
+- Recherche : le texte des vues diverses des pages est cherché ; login,
+  search et 404 exclues (constante SB_SEARCH_EXCLUDED_PAGES pour changer).
+
 ### Thème
 - Le thème affiche lui-même le gabarit annexe des pages : mettre
   $theme['various_in_theme'] = true; dans son config.php (sinon doublon).

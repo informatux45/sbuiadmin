@@ -4,6 +4,19 @@
 
 {include file='news/tpls/news_breadcrumb.tpl'}
 
+{* --- Sous-catégories de la catégorie affichée (rien si aucune) --- *}
+{if $sbnews_subcats}
+	<div class="sbnews-subcats">
+		<p class="sbnews-subcats-title">{$smarty.const._CMS_NEWS_SUBCATEGORIES}</p>
+		<ul>
+			{foreach from=$sbnews_subcats item=subcat}
+				{assign var="subcatname" value=$subcat.title|unescape:"htmlall"|sbDisplayLang:"`$smarty.session.lang`"|strip_tags}
+				<li><a href='{seo url="index.php?p=news&op=category&id={$subcat.id}" rewrite="news/category/{$subcat.id}/{$subcatname|sbRewriteString|strtolower}"}'>{$subcatname}</a></li>
+			{/foreach}
+		</ul>
+	</div>
+{/if}
+
 {if $sbnews_module_show == 'masonry'}
 	<link rel="stylesheet" href="{$smarty.const.SB_MODULES_URL}{$smarty.const.MODULEFILE}/inc/style_category_masonry.css">
 	<style>
@@ -24,9 +37,10 @@
 {/if}
 
 {if $sbnews_module_show == 'masonry'}
-	<div id="sbnews" data-masonry='{ "itemSelector": ".sbnews" }'>
+	<div id="sbnews" class="sbnews-layout-masonry" data-masonry='{ "itemSelector": ".sbnews" }'>
 {else}
-	<div id="sbnews">
+	{* Classe de la disposition choisie : un thème peut cibler chacune *}
+	<div id="sbnews" class="sbnews-layout-{$sbnews_module_show|default:'normal'}">
 {/if}
 
 {foreach from=$all item=news}
@@ -43,7 +57,7 @@
 
 			<div class="sbnews-div-l">
 				<a class="" href="{seo url="index.php?p=news&op=article&id={$news.id}" rewrite="news/article/{$news.id}/{$news.title|unescape:"htmlall"|sbDisplayLang:"`$smarty.session.lang`"|strip_tags|sbRewriteString|strtolower}"}">
-					<img src="{if $news.image}{$smarty.const._AM_MEDIAS_URL}{$news.image}{else}{$smarty.const.SB_MODULES_URL}{$smarty.const.MODULEFILE}/images/news-img.jpg{/if}" alt="{$news.title|unescape:"htmlall"|sbDisplayLang:"`$smarty.session.lang`"}" style="width: 100%;">
+					<img src="{if $news.image}{$smarty.const.SB_URL}thumb.php?src={$smarty.const._AM_MEDIAS_URL}{$news.image}&size=480x&crop=1{else}{$smarty.const.SB_MODULES_URL}{$smarty.const.MODULEFILE}/images/news-img.jpg{/if}" alt="{$news.title|unescape:"htmlall"|sbDisplayLang:"`$smarty.session.lang`"}" style="width: 100%;">
 				</a>
 			</div>
 		
@@ -54,9 +68,7 @@
 				{if $news.catname}
 					<p class="sbnews-category">
 						{assign var=catid value="|"|explode:$news.catid} 
-						<a href='{seo url="index.php?p=news&op=category&id={$news.catid}" rewrite="news/category/{$catid[0]}/{$news.catname|unescape:"htmlall"|sbDisplayLang:"`$smarty.session.lang`"|strip_tags|sbRewriteString|strtolower}"}'>
-							{$news.catname|unescape:"htmlall"|sbDisplayLang:"`$smarty.session.lang`"}
-						</a>
+						<a href='{seo url="index.php?p=news&op=category&id={$news.catid}" rewrite="news/category/{$catid[0]}/{$news.catname|unescape:"htmlall"|sbDisplayLang:"`$smarty.session.lang`"|strip_tags|sbRewriteString|strtolower}"}'>{$news.catname|unescape:"htmlall"|sbDisplayLang:"`$smarty.session.lang`"}</a>
 					</p>
 				{/if}
 				<p class="sbnews-date">
@@ -70,9 +82,7 @@
 					{/if}
 				</p>
 				<span class="sbnews-link-item">
-					<a href="{seo url="index.php?p=news&op=article&id={$news.id}" rewrite="news/article/{$news.id}/{$news.title|unescape:"htmlall"|sbDisplayLang:"`$smarty.session.lang`"|strip_tags|sbRewriteString|strtolower}"}">
-						{$smarty.const._CMS_NEWS_READ_ITEM}
-					</a>
+					<a href="{seo url="index.php?p=news&op=article&id={$news.id}" rewrite="news/article/{$news.id}/{$news.title|unescape:"htmlall"|sbDisplayLang:"`$smarty.session.lang`"|strip_tags|sbRewriteString|strtolower}"}">{$smarty.const._CMS_NEWS_READ_ITEM}</a>
 				</span>
 			</div>
 

@@ -17,6 +17,7 @@ define('_CMS_NEWS_NEWS',					'News');
 define('_CMS_NEWS_ALLNEWS',					"All news");
 define('_CMS_NEWS_NONEWS',					'No item for this category!');
 define('_CMS_NEWS_NOCATEGORIES',			'No category available!');
+define('_CMS_NEWS_SUBCATEGORIES',			'Sub-categories');
 define('_CMS_NEWS_READ_ITEM',				"Read item");
 define('_CMS_NEWS_NOITEM',					'Item not available!');
 define('_CMS_NEWS_ITEMNOTFOUND',			"Item not found");

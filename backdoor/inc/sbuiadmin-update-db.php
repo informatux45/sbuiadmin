@@ -171,6 +171,10 @@ function sbUpdDbVersion() {
 		// est antérieure aux migrations (4.13 ou avant, fichiers remplacés à la
 		// main) ; la noter « à jour » sautait ses migrations (4.43)
 		if (sbUpdDbLooksOld()) $v = '4.13';
+		// Une base plus récente sans db_version (4.10 à 4.13, fichiers
+		// remplacés ensuite) n'a pas forcément passé les migrations : partir
+		// de 4.13, elles sont idempotentes
+		elseif (version_compare($v, '4.13', '>')) $v = '4.13';
 		sbSettingsSave(array('db_version' => $v));
 	}
 	return $v;

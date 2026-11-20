@@ -245,3 +245,20 @@ h2.sbnews-single-others-h2 {
 .sbnews_color:before {
   background-color: rgba(0,0,0,0.9);
 }
+/* Sous-catégories (page d'une catégorie) */
+.sbnews-subcats {
+  margin: 0 0 20px;
+}
+.sbnews-subcats-title {
+  font-weight: bold;
+  margin: 0 0 5px;
+}
+.sbnews-subcats ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.sbnews-subcats li {
+  display: inline-block;
+  margin: 0 15px 5px 0;
+}

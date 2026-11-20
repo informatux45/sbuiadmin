@@ -736,7 +736,7 @@ INSERT INTO `<DB_PREFIX>sb_modules` (`name`, `version`, `db_version`, `installed
 ('download', '1.0.2', '1.0.2', NOW()),
 ('faq', '1.0.2', '1.0.2', NOW()),
 ('gallery', '1.0.2', '1.0.2', NOW()),
-('news', '1.0.7', '1.0.7', NOW()),
+('news', '1.0.8', '1.0.8', NOW()),
 ('slider', '1.0.2', '1.0.2', NOW()),
 ('tabbs', '1.0.3', '1.0.3', NOW()),
 ('table', '1.0.3', '1.0.3', NOW()),
@@ -798,6 +798,7 @@ INSERT INTO `<DB_PREFIX>sb_news` (`id`, `catid`, `title`, `subtitle`, `desc_shor
 DROP TABLE IF EXISTS `<DB_PREFIX>sb_news_category`;
 CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_news_category` (
   `id` int(11) NOT NULL,
+  `subcat_id` int(11) NOT NULL DEFAULT 0 COMMENT 'Categorie parente (0 : categorie principale)',
   `title` text NOT NULL,
   `subtitle` text,
   `tpl_list` text,

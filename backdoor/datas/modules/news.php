@@ -69,9 +69,20 @@ $table_category = _AM_DB_PREFIX . "sb_news_category";
 $table_settings = _AM_DB_PREFIX . "sb_news_settings";
 $text           = "Article";
 
+/**
+ * Une catégorie a-t-elle des sous-catégories ? Sert à borner la hiérarchie
+ * à un niveau : une catégorie qui en contient d'autres reste principale.
+ *
+ * @param  int  $id  Identifiant de la catégorie
+ * @return bool
+ */
+function sbNewsCategoryHasChildren($id) {
+	return (bool) sbDb()->value("SELECT id FROM {sb_news_category} WHERE subcat_id = ? LIMIT 1", array(intval($id)));
+}
+
 $action = $_GET['a'] ?? '';
 // PHP 8 : variables lues par certaines branches seulement
-$breadcrumb = $btn_add_edit = $catid = $catid_module_show = $comments = $comments_user = $content = $desc_full_en = $desc_short_en = $formName = $id = $item_per_page = $module_show = $module_show_masonry = $module_start = $news_next_prev = $other_news = $other_news_per_page = $other_news_title = $other_news_type = $query = $query_2 = $query_5 = $query_article = $subtitle_en = $subtitle_fr = $theme_view_cat = $theme_view_list = $theme_view_single = $title_en = $title_fr = $title_h1 = $title_h2 = ''; $toSort = [];
+$breadcrumb = $btn_add_edit = $catid = $catid_module_show = $comments = $comments_user = $content = $desc_full_en = $desc_short_en = $formName = $id = $item_per_page = $module_show = $module_show_masonry = $module_start = $news_next_prev = $other_news = $other_news_per_page = $other_news_title = $other_news_type = $query = $query_2 = $query_5 = $query_article = $subcat_id = $subtitle_en = $subtitle_fr = $theme_view_cat = $theme_view_list = $theme_view_single = $title_en = $title_fr = $title_h1 = $title_h2 = ''; $toSort = [];
 switch($action) {
 	case "del":
 	default:
@@ -135,11 +146,17 @@ switch($action) {
 			$get_id   = intval($_GET['id'] ?? 0);
 			// -------------------------------------
 			// --- Check if News article in CATEGORY
-			$query_article   = "SELECT * FROM $table WHERE catid = $get_id";
-			$numrows_article = count(sbDb()->all($query_article) ?: array());
+			// --- catid est multivalué ("10|5|6") : la catégorie peut être
+			// --- en 2e position ou plus
+			$query_article   = "SELECT COUNT(*) FROM $table WHERE CONCAT('|', catid, '|') LIKE '%|$get_id|%'";
+			$numrows_article = intval(sbDb()->value("SELECT COUNT(*) FROM {sb_news} WHERE CONCAT('|', catid, '|') LIKE ?", array('%|' . $get_id . '|%')));
 			// -------------------------------------
 			if ($numrows_article > 0) {
 				$sb_msg_error = 'Cette catégorie contient des articles !!<br>Vous devez supprimer les articles contenus dans cette catégorie avant !!';		
+			} elseif (sbNewsCategoryHasChildren($get_id)) {
+				// Ses sous-catégories resteraient rattachées à une catégorie
+				// disparue : invisibles sur le site
+				$sb_msg_error = 'Cette catégorie contient des sous-catégories !!<br>Vous devez les détacher ou les supprimer avant !!';
 			} else {
 				$query_5 = "DELETE FROM $table_category WHERE id = $get_id";
 				$request  = sbDb()->delete('sb_news_category', 'id = ?', array($get_id)) !== false;
@@ -156,7 +173,9 @@ switch($action) {
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		
 		// Contents table
-		$query_4  = "SELECT * FROM $table_category";
+		// Jointure sur elle-même : titre de la catégorie parente, rappelé
+		// devant celui d'une sous-catégorie
+		$query_4  = "SELECT t1.*, t2.title AS parentname FROM $table_category AS t1 LEFT JOIN $table_category AS t2 ON (t1.subcat_id = t2.id)";
 		$result2  = sbDb()->all($query_4) ?: array();
 		
 		$sbsmarty->assign('allcat', true);
@@ -417,15 +436,32 @@ switch($action) {
 			}
 			$photo      = $sbsanitize->displayText($_POST['photo'] ?? '', 'UTF-8', 1, 0);
 			$active     = $sbsanitize->displayText($_POST['active'] ?? '', 'UTF-8', 1, 0);
+			// --- Catégorie parente : un seul niveau (rattachement à une
+			// --- catégorie principale, jamais à elle-même ; une catégorie
+			// --- qui a des sous-catégories reste principale)
+			$subcat_id  = intval($_POST['subcat_id'] ?? 0);
+			if ($subcat_id == $id) $subcat_id = 0;
+			if ($subcat_id > 0) {
+				$parent = sbDb()->row("SELECT subcat_id FROM {sb_news_category} WHERE id = ?", array($subcat_id));
+				if (!$parent || intval($parent['subcat_id']) > 0) {
+					$subcat_id    = 0;
+					$sb_msg_error = 'Une sous-catégorie ne peut pas en contenir une autre : le rattachement a été ignoré';
+				}
+			}
+			if ($subcat_id > 0 && $id > 0 && sbNewsCategoryHasChildren($id)) {
+				$subcat_id    = 0;
+				$sb_msg_error = 'Cette catégorie contient des sous-catégories : elle ne peut pas être rattachée à une autre';
+			}
 
 			// ADD or EDIT
 			if ($formType == 'categoryadd') {
 				// INSERT DATAS
-				$query = "INSERT INTO $table_category (title,subtitle,photo,sort,active)";
-				$result_add = sbDb()->insert('sb_news_category', array('title' => $title, 'subtitle' => $subtitle, 'photo' => $photo, 'sort' => 0, 'active' => $active)) !== false;
+				$query = "INSERT INTO $table_category (title,subtitle,photo,sort,active,subcat_id)";
+				$result_add = sbDb()->insert('sb_news_category', array('title' => $title, 'subtitle' => $subtitle, 'photo' => $photo, 'sort' => 0, 'active' => $active, 'subcat_id' => $subcat_id)) !== false;
 				if ($result_add) {
 					// --- Vider les champs du formulaire
 					$title_fr = $subtitle_fr = $photo = $active = '';
+					$subcat_id = 0;
 					// --- Message SUCCESS
 					$sb_msg_valid = 'Catégorie ajoutée avec succès';
 				} else {
@@ -435,8 +471,8 @@ switch($action) {
 
 			} elseif ($formType == 'categoryedit' && $id > 0) {
 				// UPDATE DATAS
-				$query = "UPDATE $table_category SET title, subtitle, photo, active WHERE id = $id";
-				$result_edit = sbDb()->update('sb_news_category', array('title' => $title, 'subtitle' => $subtitle, 'photo' => $photo, 'active' => $active), 'id = ?', array($id)) !== false;
+				$query = "UPDATE $table_category SET title, subtitle, photo, active, subcat_id WHERE id = $id";
+				$result_edit = sbDb()->update('sb_news_category', array('title' => $title, 'subtitle' => $subtitle, 'photo' => $photo, 'active' => $active, 'subcat_id' => $subcat_id), 'id = ?', array($id)) !== false;
 				if ($result_edit) {
 					// --- On ne vide pas les champs du formulaire
 					// -------------------------------------------
@@ -456,6 +492,7 @@ switch($action) {
 			// Si AJOUT (First time)
 			// --- Vider les champs du formulaire
 			$title_fr = $subtitle_fr = $photo = $active = '';
+			$subcat_id = 0;
 		}
 		// --------------------------------
 		if ($formType == 'categoryedit' && empty($_POST['form_submit'])) {
@@ -471,6 +508,7 @@ switch($action) {
 			// ----------------------------
 			$photo       = sb_utf8_encode($assoc['photo']);
 			$active      = $assoc['active'];
+			$subcat_id   = intval($assoc['subcat_id'] ?? 0);
 
 			$sbsmarty->assign('assoc', $query_1);
 
@@ -500,6 +538,33 @@ switch($action) {
 		$sbform->addInput('text', "$subtitle_fr_title", array ('name' => 'subtitle_fr', 'value' => "$subtitle_fr", 'placeholder' => "Sous Titre de la catégorie"), false);
 		if ($getMultilang)
 			$sbform->addInput('text', 'Sous Titre (EN)', array ('name' => 'subtitle_en', 'value' => "$subtitle_en", 'placeholder' => "Sous Titre de votre catégorie (EN)"), false);
+		// ----------------------------
+		// --- Catégorie parente
+		// ----------------------------
+		// Une catégorie qui a déjà des sous-catégories ne peut pas être
+		// rattachée : le choix se limite alors à « Aucune »
+		$id           = intval($id);
+		$subcat_id    = intval($subcat_id);
+		$has_children = ($id > 0) ? sbNewsCategoryHasChildren($id) : false;
+		$parents      = sbDb()->all("SELECT id, title FROM {sb_news_category} WHERE subcat_id = 0 ORDER BY sort ASC") ?: array();
+		$sbform->openSelect('Appartient à la catégorie', array("id"=>"subcat_id", "name"=>"subcat_id"), false);
+		if ($subcat_id > 0)
+			$sbform->addOption('Aucune (catégorie principale)', array ("value"=>"0"));
+		else
+			$sbform->addOption('Aucune (catégorie principale)', array ("value"=>"0", "selected"=>""));
+		if (!$has_children) {
+			foreach ($parents as $row) {
+				if (intval($row['id']) == $id) continue;
+				$parent_title = $sbsanitize->displayLang(sb_utf8_encode($row['title']));
+				if (intval($row['id']) == $subcat_id)
+					$sbform->addOption($parent_title, array ("value"=>$row['id'], "selected"=>""));
+				else
+					$sbform->addOption($parent_title, array ("value"=>$row['id']));
+			}
+		}
+		$sbform->closeSelect(($has_children)
+			? "Cette catégorie contient déjà des sous-catégories : elle ne peut pas être rattachée à une autre"
+			: "Rattache la catégorie à une catégorie principale, qui l'affichera comme sous-catégorie");
 		// ----------------------------
 		// --- Photo
 		// ----------------------------
@@ -562,10 +627,15 @@ switch($action) {
 		
 		// --- Recuperation des donnees
 		$sid           = intval($_GET['sid'] ?? 0);
-		$query_3       = "SELECT * FROM $table_category ORDER BY sort ASC";
+		// Même jointure que la liste : le tri reste global, la catégorie
+		// parente est rappelée devant chaque sous-catégorie
+		$query_3       = "SELECT t1.*, t2.title AS parentname FROM $table_category AS t1 LEFT JOIN $table_category AS t2 ON (t1.subcat_id = t2.id) ORDER BY t1.sort ASC";
 		$sort_array    = sbDb()->all($query_3) ?: array();
 		foreach($sort_array as $sort) {
-			$active = ($sort['active']) ? $sbsanitize->displayLang(sb_utf8_encode($sort['title'])) : "<span style='color: red;'>".$sbsanitize->displayLang(sb_utf8_encode($sort['title']))."</span>";
+			$title  = $sbsanitize->displayLang(sb_utf8_encode($sort['title']));
+			if (!empty($sort['parentname']))
+				$title = $sbsanitize->displayLang(sb_utf8_encode($sort['parentname'])) . ' &rsaquo; ' . $title;
+			$active = ($sort['active']) ? $title : "<span style='color: red;'>".$title."</span>";
 			$sort_id          = $sort['id'];
 			$toSort[$sort_id] = $active;
 		}

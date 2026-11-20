@@ -706,6 +706,39 @@ if (!function_exists("sbSearchHostIndex")) {
 }
 
 /**
+* Pages techniques du CMS, jamais proposees en resultat (connexion,
+* recherche elle-meme, page d'erreur). Surchargeable par la constante
+* SB_SEARCH_EXCLUDED_PAGES (seo_url separees par des virgules).
+* @return	array	seo_url exclues
+*/
+if (!function_exists("sbSearchSystemPages")) {
+	function sbSearchSystemPages() {
+		$list = defined('SB_SEARCH_EXCLUDED_PAGES') ? SB_SEARCH_EXCLUDED_PAGES : 'login,search,404';
+		return array_values(array_filter(array_map('trim', explode(',', (string) $list)), 'strlen'));
+	}
+}
+
+/**
+* Contenu de la vue diverse d'une page (sb_pages.various_view), fichier du
+* dossier SB_VARIOUS_DIR du theme. Nom de fichier seul (pas de chemin),
+* fichier reellement situe dans ce dossier, taille bornee ; '' sinon.
+* @param	string	$file	valeur de various_view
+* @return	string	contenu brut (balises comprises)
+*/
+if (!function_exists("sbSearchVariousContent")) {
+	function sbSearchVariousContent($file) {
+		$file = trim((string) $file);
+		if ($file === '' || $file !== basename($file) || !defined('SB_VARIOUS_DIR')) return '';
+		$dir  = realpath(SB_VARIOUS_DIR);
+		$path = realpath(SB_VARIOUS_DIR . $file);
+		if ($dir === false || $path === false || strpos($path, $dir . DIRECTORY_SEPARATOR) !== 0) return '';
+		if (!is_file($path) || !is_readable($path) || filesize($path) > 1048576) return '';
+		$content = file_get_contents($path);
+		return ($content === false) ? '' : $content;
+	}
+}
+
+/**
 * URL publique d'une page du CMS (meme construction que le menu principal,
 * voir sbGetMenu() dans inc/functions.php).
 * @param	array	$row	ligne de sb_pages (seo_url, url_custom)

@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_news` (
 
 CREATE TABLE IF NOT EXISTS `<DB_PREFIX>sb_news_category` (
   `id` int(11) NOT NULL,
+  `subcat_id` int(11) NOT NULL DEFAULT 0 COMMENT 'Categorie parente (0 : categorie principale)',
   `title` text NOT NULL,
   `subtitle` text,
   `tpl_list` text,

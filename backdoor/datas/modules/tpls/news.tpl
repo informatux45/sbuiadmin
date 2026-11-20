@@ -186,7 +186,7 @@
 											{foreach from=$allcategory item=category}
 												<tr class="data-row">
 													<td>{$category.sort}</td>
-													<td>{$category.title|unescape:"htmlall"|@sbDisplayLang}</td>
+													<td>{if $category.parentname}<span class="text-muted">{$category.parentname|unescape:"htmlall"|@sbDisplayLang} &rsaquo;</span> {/if}{$category.title|unescape:"htmlall"|@sbDisplayLang}</td>
 													<td>[CS id={$category.id} name=sbnews_latest]</td>
 													<td>
 														<div class="data-cell-actions">

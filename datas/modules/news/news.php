@@ -99,7 +99,9 @@ $module['template_main'] = MODULEFILE . '_' . $template . '.tpl';
 switch($op) {
 	default: // Show all categories of NEWS
 		// --- SQL Request
-		$query   = "SELECT * FROM {$module['tables']['newscat']} WHERE active = '1' ORDER BY sort ASC";
+		// --- Catégories principales seulement : une sous-catégorie s'atteint
+		// --- depuis la page de la catégorie qui la contient.
+		$query   = "SELECT * FROM {$module['tables']['newscat']} WHERE active = '1' AND subcat_id = 0 ORDER BY sort ASC";
 		$result  = sbDb()->all($query) ?: array();
 		// --- Assign Array
 		$sbsmarty->assign('categories', $result);
@@ -155,7 +157,8 @@ switch($op) {
 		$sbsmarty->assign('news_per_page', $news_per_page);
 		$sbsmarty->assign('news_total',$totalT);
 		$sbsmarty->assign('news_page', $news_page);
-		$sbsmarty->assign('news_total', floor($totalT / $news_per_page));
+		// --- Dernière page, numérotée à partir de 0 (le gabarit affiche +1)
+		$sbsmarty->assign('news_total', max(0, (int) ceil($totalT / $news_per_page) - 1));
 		
 		// --------------------------
 		// --- Assign Title Page
@@ -176,6 +179,8 @@ switch($op) {
 		$sbsmarty->assign('sbnews_module_show_masonry', $assoc['module_show_masonry']);
 		// --- Breadcrumb
 		$sbsmarty->assign('sbnews_nav1', _CMS_NEWS_ALLNEWS);
+		// --- Catégories principales (choix de catégorie dans le gabarit)
+		$sbsmarty->assign('categories', sbDb()->all("SELECT * FROM {$module['tables']['newscat']} WHERE active = '1' AND subcat_id = 0 ORDER BY sort ASC") ?: array());
 
 		// --------------------------
 		// --- Choose theme view
@@ -186,11 +191,23 @@ switch($op) {
 	case "category": // Show a category of NEWS
 		// --- Initialization
 		$news_page     = (isset($_GET['l'])) ? intval($_GET['l']) : 0;
+		// --- Sous-catégories actives (tableau vide si aucune) : bloc du
+		// --- gabarit et filtre des articles ci-dessous
+		$subcats = sbDb()->all("SELECT * FROM {$module['tables']['newscat']} WHERE active = '1' AND subcat_id = ? ORDER BY sort ASC", array($id)) ?: array();
+		$sbsmarty->assign('sbnews_subcats', $subcats);
 		// --- SQL Request
 		// --- catid multi-rubriques ("10|4") : voir le commentaire du case
 		// --- "categories" ci-dessus, LIKE '%$id%' capte les identifiants
 		// --- dont $id n'est qu'un morceau (2 capte 12, 20...).
-		$initQ = "SELECT * FROM {$module['tables']['news']} WHERE CONCAT('|', catid, '|') LIKE '%|$id|%' AND active = '1' ORDER BY date DESC ";
+		// --- La catégorie présente ses articles ET ceux de ses
+		// --- sous-catégories, classés par date ; sans sous-catégorie, la
+		// --- requête est celle d'avant.
+		$cat_ids = array($id);
+		foreach ($subcats as $row) $cat_ids[] = intval($row['id']);
+		$where_cats = array();
+		foreach ($cat_ids as $cat_id) $where_cats[] = "CONCAT('|', catid, '|') LIKE '%|$cat_id|%'";
+		$where_cats = '(' . implode(' OR ', $where_cats) . ')';
+		$initQ = "SELECT * FROM {$module['tables']['news']} WHERE $where_cats AND active = '1' ORDER BY date DESC ";
 		// --- Total NEWS
 		$totalT = count(sbDb()->all($initQ) ?: array());
 
@@ -202,7 +219,8 @@ switch($op) {
 		$sbsmarty->assign('news_per_page', $news_per_page);
 		$sbsmarty->assign('news_total',$totalT);
 		$sbsmarty->assign('news_page', $news_page);
-		$sbsmarty->assign('news_total', floor($totalT / $news_per_page));
+		// --- Dernière page, numérotée à partir de 0 (le gabarit affiche +1)
+		$sbsmarty->assign('news_total', max(0, (int) ceil($totalT / $news_per_page) - 1));
 		
 		// --------------------------
 		// --- Assign Title Page
@@ -226,6 +244,11 @@ switch($op) {
 		$sbsmarty->assign('sbnews_module_show_masonry', $assoc['module_show_masonry']);
 		// --- Breadcrumb
 		$sbsmarty->assign('sbnews_nav1', $sbsanitize->displayLang(sb_utf8_encode($assoc['title']), $_SESSION['lang']));
+		// --- Catégorie courante, sa parente (0 : catégorie principale) et
+		// --- catégories principales (choix de catégorie dans le gabarit)
+		$sbsmarty->assign('sbnews_cat_id', $id);
+		$sbsmarty->assign('sbnews_cat_parent', intval($assoc['subcat_id'] ?? 0));
+		$sbsmarty->assign('categories', sbDb()->all("SELECT * FROM {$module['tables']['newscat']} WHERE active = '1' AND subcat_id = 0 ORDER BY sort ASC") ?: array());
 
 		// --------------------------
 		// --- Choose theme view
