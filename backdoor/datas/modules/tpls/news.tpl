@@ -113,7 +113,7 @@
                                     <thead>
                                         <tr>
                                             {foreach from=$sb_table_header item=header}
-												<th{if $header@last} data-sort="false"{/if}>
+												<th{if $header@last} data-sort="false"{/if}{if $header@first} data-sort-default="desc"{/if}>
 													{$header}{if !$header@last} <span class="sort"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>{/if}
 												</th>
 											{/foreach}

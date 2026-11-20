@@ -102,10 +102,12 @@ switch($action) {
 		$sb_table_header = ['Date', 'Titre', 'Catégorie', 'Shortcode', 'Actions'];
 		$sbsmarty->assign('sb_table_header', $sb_table_header);
 		
-		// Contents table
+		// Contents table : plus récents d'abord (date AAAA-MM-JJ, puis ordre
+		// de création pour une même date)
 		$query    = "SELECT t1.*, t2.title AS catname
 					 FROM $table AS t1
-					 LEFT JOIN $table_category AS t2 ON (t1.catid = t2.id)";
+					 LEFT JOIN $table_category AS t2 ON (t1.catid = t2.id)
+					 ORDER BY t1.date DESC, t1.id DESC";
 		$result2  = sbDb()->all($query) ?: array();
 		
 		$sbsmarty->assign('all', true);
