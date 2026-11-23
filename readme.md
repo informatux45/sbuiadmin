@@ -160,18 +160,21 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 
 ## 📝 Changelog
 
+**4.89**
+- PHP 8.6: Smarty replace/escape without the deprecated mbregex functions
+
 **4.88**
 - News 1.0.10: admin list sorted by date, newest first
 
 **4.87**
 - News 1.0.9: category templates (tpl_list, tpl_single) up to 16 MB (MEDIUMTEXT)
 
+<details>
+  <summary><strong>Older versions</strong></summary>
+
 **4.86**
 - News 1.0.8: sub-categories (one level); search covers page various views, skips login/search/404
 - Fixes: news pagination, category deletion check, missing db_version; cache/upload .htaccess restored
-
-<details>
-  <summary><strong>Older versions</strong></summary>
 
 **4.85**
 - SQLite: hosts without a folder outside the site can use a protected sbdata/ folder
