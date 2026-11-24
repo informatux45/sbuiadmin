@@ -161,6 +161,10 @@ if (SBREWRITEURL) {
 } else {
 	// --- Get "p" in URL
 	$sb_get_page    = (isset($_GET['p'])) ? $sbsanitize->stopXSS($_GET['p']) : 'index';
+	// --- Sans réécriture, le .htaccess envoie quand même ici toute adresse
+	// --- inexistante (/page-inconnue, image absente...) : sans ce contrôle
+	// --- elle affichait l'accueil en 200 (fausse page indexée par Google)
+	if (!sbFrontPathIsRoot((string) ($_SERVER['REQUEST_URI'] ?? '/'), (string) ($_SERVER['SCRIPT_NAME'] ?? '/index.php'))) $sb_get_page = '';
 }
 // ----------------------
 
@@ -208,8 +212,6 @@ if (in_array($sb_get_page, $sb_front_pages)) {
 	// Check if display is possible
 	// ---------------------------------------	
 	if (!$include_page_path) {
-		// --- Get Statistics
-		//sbGetStats('NOT FOUND');
 		// --- Unsafe Pages / Modules
 		http_response_code(404); // page inexistante : un 200 ici fait indexer la 404 par Google
 		$sbsmarty->display("404.tpl");
@@ -296,11 +298,6 @@ if (in_array($sb_get_page, $sb_front_pages)) {
 			$mod_theme_view = (isset($modpage['theme_main'])) ? $modpage['theme_main'] : false;
 		}
 		$sbsmarty->assign("theme_view", $mod_theme_view);
-		// ---------------------------------------		
-		// --- Get Statistics
-		// ---------------------------------------
-		//global $sb_pages_title;
-		//sbGetStats($sb_pages_title);
 		// ---------------------------------------
 		// Assign Index TPL Theme
 		// ---------------------------------------		
@@ -343,21 +340,12 @@ if (in_array($sb_get_page, $sb_front_pages)) {
 			$mod_theme_view = (isset($module['theme_main'])) ? $module['theme_main'] : false;
 		}
 		$sbsmarty->assign("theme_view", $mod_theme_view);
-		// ---------------------------------------		
-		// --- Get Statistics
-		// ---------------------------------------
-		//global $sb_pages_title;
-		//sbGetStats($sb_pages_title);
 		// ---------------------------------------
 		// Assign Index TPL Theme
 		// ---------------------------------------		
 		$sbsmarty->display("index.tpl", $sb_smarty_cache_id);
 
 	} else {
-		// ---------------------------------------
-		// --- Get Statistics
-		// ---------------------------------------
-		//sbGetStats('NOT FOUND');
 		// -----------------------------------
 		// --- Page doesn't exist
 		// -----------------------------------
@@ -366,8 +354,6 @@ if (in_array($sb_get_page, $sb_front_pages)) {
 	}
 	
 } else {
-	// --- Get Statistics
-	//sbGetStats('NOT FOUND');
 	// --- Unsafe Pages / Modules
 	http_response_code(404); // page inexistante : un 200 ici fait indexer la 404 par Google
 	$sbsmarty->display("404.tpl");

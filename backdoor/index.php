@@ -536,7 +536,7 @@ $sbsmarty->assign([
 	,'all' => false
 	,'sbtranfer_media' => false
 	,'sb_table_header' => false
-	,'sb_crumb_action' => sbCrumbActionLabel($_GET['a'] ?? '')
+	,'sb_crumb_action' => sbCrumbActionLabel($_GET['a'] ?? '', $sb_get_page ?? '')
 ]);
 
 // --------------------------------
@@ -670,6 +670,8 @@ if (in_array($sb_get_page, $sb_safe_pages) || in_array($sb_get_page, $sb_safe_mo
 				foreach (sbModulesPresent() as $sb_mod_name => $sb_mod_meta) {
 					if (!sbModuleActive($sb_mod_name)) foreach (array_keys((array) $sb_mod_meta['tables']) as $sb_mod_t) $sb_dashboard_off[$sb_mod_t] = true;
 				}
+				// Tables exclues du dashboard par leur module (widget configuré avant : ignoré)
+				$sb_dashboard_off += sbDashboardHiddenTables();
 
 				foreach ($sb_dashboard_widgets_rows as $sb_widget) {
 					$sb_widget_type = isset($sb_widget['type']) ? $sb_widget['type'] : 'table';

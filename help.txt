@@ -63,6 +63,23 @@
   (180 j), sauf « update ». Un module y écrit par $sbusers->updateAccessLog(),
   jamais par son propre INSERT. logaccess_lastpurge : clé volatile.
 
+### Statistiques (module)
+- Mesure d'audience sans cookie : aucune IP enregistrée, visiteur = empreinte
+  dont la clé change chaque jour (exemption de consentement CNIL). Page notée
+  par le serveur (même en cache Smarty), complétée par inc/stats.js (écran,
+  temps de lecture, liens sortants, fichiers) via beacon.php.
+- Exclus : robots, admins connectés (réglage), IP/plages, DNT/GPC (option).
+- Rapports calculés jour par jour (sb_stats_daily, au plus une fois par heure
+  lors des visites) ; journal des visites purgé après 180 jours (réglable).
+- Tableau de bord à widgets par utilisateur (glisser-déposer) ; widgets
+  « Visites », « Visiteurs en ligne », « Évolution », « Pages les plus vues »,
+  « Sources de trafic » pour le dashboard du CMS.
+- Droits : Statistiques (rapports), → Journal des visites (visites une par
+  une, temps réel), → Réglages.
+- Pays : base DB-IP Lite téléchargée depuis Réglages (licence CC BY 4.0 à
+  accepter, SHA1 vérifié), dans datas/modules/stats/geoip/ (jamais versionné) ;
+  CF-IPCountry utilisé si le proxy est réglé sur Cloudflare.
+
 ### Actualités et recherche
 - Sous-catégories (news 1.0.8) : « Appartient à la catégorie » dans le
   formulaire d'une catégorie, un seul niveau. Le site liste les principales,
@@ -156,5 +173,10 @@ Chaque site a son sbdbconfig.php (sbdbconfig-<dossier>.php pour les suivants).
 - 'csrf_get' => array('duplicate', ...) : actions GET sensibles du module
   (jeton exigé, ajouté aux liens par csrf.js). Tout POST de l'admin exige
   le jeton (ajouté automatiquement aux formulaires, fetch et jQuery).
+- 'crumbs' => array('action' => 'Libellé', ...) : fil d'Ariane des pages
+  a= du module (sinon l'action brute).
+- <module>_front_head() (dans inc/functions.php du module) : HTML ajouté à
+  l'en-tête des pages du site par {insert name="sbGetHeaders"}, à chaque
+  affichage (même en cache Smarty).
 - 'modifiers' => array('maFonction', ...) : fonctions utilisables dans les
   gabarits Smarty (peuvent être définies dans inc/functions.php).

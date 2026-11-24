@@ -8,6 +8,10 @@ datas/cache/medias/
 datas/cache/tpls_c/
 datas/cache/sentinelle/
 
+# Base des pays du module Statistiques (DB-IP, téléchargée depuis ses
+# Réglages, licence acceptée par chaque site) : jamais versionnée ni publiée
+datas/modules/stats/geoip/
+
 # Marqueur de fin d'installation, propre à chaque installation. NE JAMAIS
 # le committer : présent dans une archive téléchargée, il refermerait
 # l'assistant d'installation (voir backdoor/install/inc-auth-guard.php)

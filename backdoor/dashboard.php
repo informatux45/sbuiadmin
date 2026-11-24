@@ -235,6 +235,8 @@ switch ($action) {
 		// colonne soumise sans la confronter à cette liste (voir
 		// sbGetDbSchema(), inc/sbuiadmin-functions.php).
 		$sb_schema = sbGetDbSchema();
+		// Tables qu'un module ne veut jamais voir affichées (réglages, secrets)
+		$sb_schema = array_diff_key($sb_schema, sbDashboardHiddenTables());
 
 		// --------------------------------
 		// --- Control form submit --------

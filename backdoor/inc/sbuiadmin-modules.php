@@ -166,6 +166,21 @@ function sbModuleRoutes($activeOnly = true) {
 	return array_values(array_unique($out));
 }
 
+/**
+ * Tables de modules jamais proposées au widget « Table SQL » du dashboard
+ * ('dashboard' => false dans 'tables' de module.php : réglages, secrets...)
+ * @return array nom de table => true
+ */
+function sbDashboardHiddenTables() {
+	$out = array();
+	foreach (sbModulesPresent() as $m) {
+		foreach ((array) ($m['tables'] ?? array()) as $t => $info) {
+			if (is_array($info) && array_key_exists('dashboard', $info) && $info['dashboard'] === false) $out[(string) $t] = true;
+		}
+	}
+	return $out;
+}
+
 /** Une clé de métadonnées fusionnée sur les modules installés (tables, pagebuilder...) */
 function sbModulesCollect($key) {
 	$out = array();

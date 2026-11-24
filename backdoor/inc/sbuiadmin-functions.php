@@ -632,8 +632,13 @@ require_once __DIR__ . '/../../inc/sbfontawesome.php';
  * Libellé du fil d'Ariane pour l'action a= de l'adresse (texte brut, à
  * échapper à l'affichage) ; action inconnue (module tiers) : son nom
  */
-function sbCrumbActionLabel($action) {
+function sbCrumbActionLabel($action, $module = '') {
 	if (!is_string($action) || $action === '') return '';
+	// Libellés propres à un module installé : 'crumbs' => array(action => libellé) de son module.php
+	if (is_string($module) && $module !== '' && function_exists('sbModuleActive') && sbModuleActive($module)) {
+		$crumbs = (array) (sbModuleMeta($module)['crumbs'] ?? array());
+		if (isset($crumbs[$action]) && is_string($crumbs[$action])) return $crumbs[$action];
+	}
 	static $labels = array(
 		'add' => 'Ajout', 'addcustom' => 'Ajout', 'edit' => 'Modification', 'editcustom' => 'Modification',
 		'del' => 'Suppression', 'delete' => 'Suppression', 'sort' => 'Tri', 'sortmod' => 'Tri', 'up' => 'Tri', 'down' => 'Tri',

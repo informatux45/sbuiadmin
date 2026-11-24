@@ -160,6 +160,30 @@ if (!function_exists("sbGetSeoUrl")) {
 }
 
 /**
+ * Adresse du contrôleur frontal lui-même (dossier du site, index.php ou
+ * index.html) ? Sans réécriture d'URL, tout autre chemin arrivé ici vient du
+ * renvoi des adresses inexistantes du .htaccess : c'est une 404.
+ * Le dossier du site est celui de SCRIPT_NAME (donné par le serveur), pas
+ * le réglage site_url : un réglage faux ne met pas tout le site en 404.
+ * @param string $uri    REQUEST_URI
+ * @param string $script SCRIPT_NAME (/sous-dossier/index.php)
+ */
+if (!function_exists("sbFrontPathIsRoot")) {
+	function sbFrontPathIsRoot($uri, $script) {
+		$parts = parse_url('http://h' . '/' . ltrim((string) $uri, '/'));
+		if ($parts === false) return false;
+		$path = '/' . trim(rawurldecode((string) ($parts['path'] ?? '')), '/');
+		$dir  = rtrim(str_replace('\\', '/', dirname('/' . ltrim((string) $script, '/'))), '/');
+		if ($dir !== '') {
+			if ($path === $dir) return true;
+			if (strpos($path, $dir . '/') !== 0) return false;
+			$path = substr($path, strlen($dir));
+		}
+		return in_array($path, array('/', '/index.php', '/index.html'), true);
+	}
+}
+
+/**
 * Get Rewrite URL (SEO)
 * @param	string	subdirectory	Site subdirectory visible in url (SBSITESUBDIRECTORY) without trailing slashes
 * @return string (core display)
@@ -230,20 +254,6 @@ if (!function_exists("sbRewriteUrl")) {
 			}
 		}	
 	}
-}
-
-/**
-* Get Stats Script
-* @param	string	sb_pages_title	Page title
-* @return void
-*/
-function sbGetStats($sb_pages_title) {
-	$nom_page = $sb_pages_title;
-	$Racine_abs = str_replace($_SERVER['PHP_SELF'], "", $_SERVER['SCRIPT_FILENAME']);
-	$sb_require_front = 'go';
-	$sb_require_admin = SBADMIN;
-	require_once(SB_ADMIN_DIR . 'inc/plugins/stats/visiteur.php');
-	// --------------------------------
 }
 
 /**
@@ -827,8 +837,36 @@ if (!function_exists("insert_sbGetHeaders")) {
 			$cms_headers .= '</script>' . "\n";
 			$cms_headers .= '<!-- End Google Analytics -->' . "\n";
 		}
-		
+
+		// --- Code d'en-tête des modules installés (fonction <module>_front_head())
+		$cms_headers .= sbModulesFrontHead();
+
 		return $cms_headers;
+	}
+}
+
+/**
+ * Code d'en-tête fourni par les modules installés : un module déclare dans
+ * son inc/functions.php une fonction <module>_front_head() qui retourne du
+ * HTML (balise <script>, <link>...). Appelé par insert_sbGetHeaders(), donc
+ * à chaque affichage, même servi par le cache Smarty. Une erreur d'un
+ * module n'empêche jamais la page de s'afficher.
+ * @return string html
+ */
+if (!function_exists("sbModulesFrontHead")) {
+	function sbModulesFrontHead() {
+		$html = '';
+		if (!function_exists('sbModulesActive')) return $html;
+		foreach (array_keys(sbModulesActive()) as $name) {
+			$fn = $name . '_front_head';
+			if (!function_exists($fn)) continue;
+			try {
+				$out = $fn();
+				if (is_string($out)) $html .= $out;
+			} catch (Throwable $e) {
+			}
+		}
+		return $html;
 	}
 }
 
