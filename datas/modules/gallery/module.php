@@ -15,10 +15,10 @@ return array(
 	'title'         => 'Galeries',
 	'icon'          => 'picture-o', // Font Awesome (menu, carte Modules)
 	'description'   => "Galeries de photos et de vidéos avec visionneuse, à insérer dans un contenu par code court.",
-	'version'       => '1.0.2',
+	'version'       => '1.0.3',
 	'requires_core' => '4.75',
 	'author'        => 'INFORMATUX',
-	'routes'        => array('gallery'),
+	'routes'        => array(), // pas de page publique : codes courts seulement
 	'page_module'   => false,
 	'shortcodes'    => array('sbgallery'),
 	'tables'        => array(

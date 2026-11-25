@@ -558,6 +558,29 @@ function sbModFilePlan(array $new, $old) {
 }
 
 /**
+ * Fichiers PHP du dossier d'un module absents de la version livrée et
+ * inconnus de la précédente (ancienne version d'avant les listes signées,
+ * ajout local) : signalés, jamais supprimés (origine inconnue). Un ancien
+ * contrôleur public resté là serait encore exécuté par index.php.
+ * @param array $new  chemin => sha256 de la version livrée
+ * @param array $skip chemins déjà traités (retirés, modifiés localement)
+ * @return array chemins (ceux de l'archive), triés
+ */
+function sbModUnknownFiles($name, array $new, array $skip = array()) {
+	$out = array();
+	$dir = sbModulesDir() . $name;
+	if (!sbModuleValidName($name) || !is_dir($dir)) return $out;
+	$it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS));
+	foreach ($it as $f) {
+		if (!$f->isFile() || $f->isLink() || !preg_match('/\.(php\d?|phtml|phar|inc)$/i', $f->getFilename())) continue;
+		$rel = 'datas/modules/' . $name . '/' . str_replace('\\', '/', substr($f->getPathname(), strlen($dir) + 1));
+		if (!isset($new[$rel]) && !in_array($rel, $skip, true)) $out[] = $rel;
+	}
+	sort($out, SORT_STRING);
+	return $out;
+}
+
+/**
  * Liste officielle des fichiers d'un module : celle livrée par cette page
  * si elle est de la version présente, sinon celle de l'index publié pour
  * cette version (module arrivé avec le core, ou changé hors de cette page :
@@ -691,6 +714,11 @@ function sbModPlan($name, $op) {
 		$plan['modified'] = $fp['modified'];
 		$plan['unchecked'] = ($op === 'update' && $old === null);
 		$plan['download'] = ($op === 'install');
+		// Restes d'une ancienne version hors de toute liste : signalés seulement
+		if ($row['present']) {
+			$unknown = sbModUnknownFiles($name, $dl['entry']['files'], array_merge($fp['delete'], $fp['modified']));
+			if ($unknown) $plan['notes'][] = 'Fichiers PHP inconnus de cette version, laissés dans le dossier du module (ancienne version ou ajout local ; à supprimer s\'ils ne servent plus) : ' . implode(', ', $unknown) . '.';
+		}
 		if ($op === 'install') {
 			$zmeta = sbModZipMeta($dl['zip'], $name);
 			$plan['tables_new'] = array_keys((array) ($zmeta['tables'] ?? array()));
