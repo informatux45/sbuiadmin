@@ -98,7 +98,8 @@
 
 ### Site dans un sous-dossier (ex. /new/)
 - Configuration > Générale > URL du site : https://exemple.fr/new/
-- .htaccess : ErrorDocument 404 /new/index.php?p=pages&id=404
+- .htaccess : ErrorDocument 404 /new/index.php?p=pages&id=404 (écrit par
+  l'installation et la migration 4.91 si la ligne livrée n'a pas été retouchée)
 
 ### Double authentification
 - Configurer d'abord le SMTP (Contact > Paramètres), puis l'activer dans

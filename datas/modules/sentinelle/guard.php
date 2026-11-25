@@ -510,7 +510,10 @@ function sentinelle_digest_maybe() {
 function sentinelle_integrity_maybe() {
 	if (sbSetting('sentinelle_integrity_auto', '1') !== '1' || !defined('SBUIADMIN_PATH') || !is_dir((string) SBUIADMIN_PATH)) return false;
 	$today = date('Y-m-d');
-	if (sbSetting('sentinelle_integrity_last') === $today || !empty($GLOBALS['sentinelle_integrity_pending'])) return false;
+	// Résumé d'une autre version (mise à jour du jour) : analyse refaite sans attendre demain
+	$sum   = json_decode((string) sbSetting('sentinelle_integrity'), true);
+	$stale = is_array($sum) && defined('_AM_START_VERSION') && (string) ($sum['version'] ?? '') !== (string) _AM_START_VERSION;
+	if ((sbSetting('sentinelle_integrity_last') === $today && !$stale) || !empty($GLOBALS['sentinelle_integrity_pending'])) return false;
 	$GLOBALS['sentinelle_integrity_pending'] = true;
 	if (function_exists('sbSettingsSave')) sbSettingsSave(array('sentinelle_integrity_last' => $today));
 	register_shutdown_function('sentinelle_deferred', 'sentinelle_integrity_deferred', array());

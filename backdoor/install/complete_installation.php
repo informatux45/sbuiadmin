@@ -333,6 +333,10 @@
 											// un code commun à toutes les installations ouvrait le site
 											// à tous (voir inc/migrations/4.39.php)
 											if (sbDb()) sbDb()->run("UPDATE {sb_config} SET `content` = ? WHERE `config` = 'coming-soon-url' AND TRIM(`content`) IN ('', 'comingSoon', 'DevProgress')", array(bin2hex(random_bytes(8))));
+											// .htaccess : ErrorDocument 404 en adresse absolue, sous-dossier
+											// compris (ligne livrée seulement, voir inc/sbuiadmin-htaccess.php)
+											require_once(dirname(__DIR__) . '/inc/sbuiadmin-htaccess.php');
+											sbHtaccessErrorDocApply(dirname(__DIR__, 2) . '/.htaccess', $_SESSION['settings_customer_url']);
 										}
 									}
 								}

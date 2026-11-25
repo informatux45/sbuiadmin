@@ -160,6 +160,10 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 
 ## 📝 Changelog
 
+**4.91**
+- `.htaccess`: absolute `ErrorDocument 404` (subfolder included), fixed by migration
+- Sentinelle 1.7.5: integrity re-checked right after a core update
+
 **4.90**
 - New Statistics module (Matomo-like, no cookie, no IP stored): reports, charts, real time, widget dashboard, countries (DB-IP)
 - Unknown addresses return a real 404 when rewrite URLs are off
@@ -167,11 +171,11 @@ The administration folder is shipped as `backdoor`. A new installation proposes 
 **4.89**
 - PHP 8.6: Smarty replace/escape without the deprecated mbregex functions
 
-**4.88**
-- News 1.0.10: admin list sorted by date, newest first
-
 <details>
   <summary><strong>Older versions</strong></summary>
+
+**4.88**
+- News 1.0.10: admin list sorted by date, newest first
 
 **4.87**
 - News 1.0.9: category templates (tpl_list, tpl_single) up to 16 MB (MEDIUMTEXT)

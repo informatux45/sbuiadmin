@@ -23,7 +23,7 @@ Header always set Strict-Transport-Security "max-age=31536000" env=HTTPS
 </IfModule>
 
  ## Error Document
- ErrorDocument 404 index.php?p=pages&id=404
+ ErrorDocument 404 /index.php?p=pages&id=404
 
 ## Prevent viewing of .htaccess file
 <Files .htaccess>
